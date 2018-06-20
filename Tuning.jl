@@ -12,7 +12,6 @@ function update_parameters!(array, range)
             catch e
                 println("Array out of bound while updating parameters")
             end
-
             array[i] = range[i][1]
         end
     end
@@ -25,9 +24,9 @@ function parameters_dictionary(ps::ParametersSet, array, discrete_prms_map)
     dict = Dict()
     for i in 1:length(array)
         if typeof(ps[i]) <: ContinuousParameter
-            dict[ps[i].name] = ps[i].transform( convert(Float64, array[i]) )
+            dict[Symbol(ps[i].name)] = ps[i].transform( convert(Float64, array[i]) )
         else
-            dict[ps[i].name] = discrete_prms_map[ps[i].name][array[i]]
+            dict[Symbol(ps[i].name)] = discrete_prms_map[ps[i].name][array[i]]
         end
     end
     dict
@@ -78,6 +77,7 @@ function tune(learner::Learner, task::Task, parameters_set::ParametersSet;
     n_parameters = length(parameters_set.parameters)
     n_obs        = size(data,1)
 
+    # TODO: remake this iteration hacky thing
     # prms_value: current value-index of each parameter
     # prms_range: range of each parameter
     # For discrete parameters, the range is set to 1:(number of discrete values)
@@ -121,11 +121,7 @@ function tune(learner::Learner, task::Task, parameters_set::ParametersSet;
     end
 
     println("Retraining best model")
-    if typeof(task) <: Task{RegressionTask}
-        best_index = indmin(storage.averageCV)
-    else
-        best_index = indmax(storage.averageCV)
-    end
+    best_index = indmax(storage.averageCV)
     lrn = ModelLearner(storage.models[best_index], storage.parameters[best_index])
     modelᵧ = learnᵧ(lrn, task)
     lrn = ModelLearner(lrn, modelᵧ, parameters_set)
@@ -146,7 +142,6 @@ function tune(multiplex::MLRMultiplex, task::Task;
         multiplex.learners[i]  = tune(multiplex.learners[i], task, multiplex.parametersSets[i],
                                         sampler=sampler, measure=measure, storage=storage)
     end
-
 end
 
 """
@@ -162,48 +157,4 @@ function GroupTuner(;learners=nothing::Array{<:Learner}, task=nothing::Task, dat
             sampler=sampler, measure=measure, storage=storage)
     end
     storage
-end
-
-# greedy
-# compare with variable selection in MLR https://github.com/mlr-org/mlr/blob/bb32eb8f6e7cbcd3a653440325a28632843de9f6/R/selectFeaturesSequential.R
-# backwards is here http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFE.html#sklearn.feature_selection.RFE
-
-function variable_select_forward(;learner=nothing::Learner, task=nothing::Task, data=nothing::Matrix{Real}, sampler=Resampling()::Resampling,
-            measure=nothing::Function)
-    # TODO: divide and clean up code. Use better goddam variable names.
-    n_obs        = size(data,1)
-
-    p=size(data)[2]
-    vars=Set([1:p;])
-    selvar=Int64[]
-    # Loop over parameters
-    while length(selvar)< p
-        print("$(length(selvar)+1). Variables")
-        res=[]
-        resv=[]
-        for v in vars
-            @show tmpvars= vcat(selvar, [v])
-        # Set new parametersparameters_set[i].values
-            # Update learner with new parameters
-            lrn = Learner(learner.name)
-            # Get training/testing validation sets
-            trainⱼ, testⱼ = get_samples(sampler, n_obs)
-            scores = []
-            for j in 1:length(trainⱼ)
-                @show size(data[trainⱼ[j], tmpvars])
-                @show (lrn, task, data[trainⱼ[j], tmpvars])
-                modelᵧ = learnᵧ(lrn, task, data[trainⱼ[j], tmpvars])
-                preds = predictᵧ(modelᵧ, data=data[testⱼ[j],tmpvars], task=task)
-                score = measure( data[testⱼ[j], task.target], preds)
-                push!(scores, score)
-            end
-            println("Trained:")
-            println(lrn)
-            println("Average CV accuracy: $(mean(scores))\n")
-            push!(res,mean(scores))
-            push!(resv,v)
-        end
-        i=argmax(res)
-        @show selvar=resv[i]
-    end
 end

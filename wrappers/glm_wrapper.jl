@@ -9,15 +9,15 @@ using SparseRegression
 """
 function get_parameters(model::MLRModel{<:SModel})
     parameters = Dict(
-        "λ" => Dict(
+        :λ => Dict(
                     "type"=>Union{Float64, Array{Float64}},
                     "desc"=>"Regularization constant. Small => strong regularization"
                     ),
-        "penalty" => Dict(
+        :penalty => Dict(
                     "type"=>LearnBase.Penalty,
                     "desc"=>"Penalty to use. Any penalty from LearnBase.Penalty can be used"
                     ),
-        "loss" => Dict(
+        :loss => Dict(
                     "type"=>LearnBase.Loss,
                     "desc"=>"Loss to use. Any loss from LearnBase.Loss can be used"
                     )
@@ -50,7 +50,7 @@ function makeLasso(learner::Learner, task::Task)
     MLRModel(model, copy(learner.parameters))
 end
 
-function makeElasticnet(learner::Learner, task::Task)
+function makeElasticnet(learner::Learner, task::RegressionTask)
     if isempty(learner.parameters)
         model = SModel(task.data[:, task.features], task.data[:, task.targets])
     else
@@ -85,13 +85,13 @@ function makeGlm(learner::Learner, task::Task)
 end
 
 # Utiliy function #
-function get_λ(parameters, task::Task)
-    if get(parameters, "λ", false) == false
+function get_λ(parameters, task::RegressionTask)
+    if get(parameters, :λ, false) == false
         lambda = fill(0.0, task.features)
-    elseif typeof(parameters["λ"]) <: Real
-        lambda = fill(parameters["λ"], length(task.features) )
-    elseif typeof(parameters["λ"]) <: Vector{AbstractFloat}
-        lambda = copy(parameters["λ"])
+    elseif typeof(parameters[:λ]) <: Real
+        lambda = fill(parameters[:λ], length(task.features) )
+    elseif typeof(parameters[:λ]) <: Vector{AbstractFloat}
+        lambda = copy(parameters[:λ])
     end
     lambda
 end
@@ -102,7 +102,7 @@ end
     How to predict using a specific model
 """
 function predictᵧ(modelᵧ::MLRModel{<:SModel},
-                    data_features::Matrix, task::Task)
+                    data_features::Matrix, task::RegressionTask)
     p = predict(modelᵧ.model, data_features)
     p, nothing
 end
@@ -110,6 +110,6 @@ end
 """
     How to learn using a specific model
 """
-function learnᵧ!(modelᵧ::MLRModel{<:SModel}, learner::Learner, task::Task)
+function learnᵧ!(modelᵧ::MLRModel{<:SModel}, learner::Learner, task::RegressionTask)
     learn!(modelᵧ.model)
 end

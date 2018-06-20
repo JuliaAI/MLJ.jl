@@ -16,7 +16,6 @@ task = Task(task_type=:classification, targets=[4], data=data)
 lrn = ModelLearner("forest", Dict(:nsubfeatures=>2, :ntrees=>10))
 
 modelᵧ = learnᵧ(lrn, task)
-# TODO: Understand why some predictions have probability zero
 predictᵧ(modelᵧ, data[:,task.features], task)
 
 
@@ -38,19 +37,20 @@ data = Fakedata(1000,3)
 
 ps = ParametersSet([
     ContinuousParameter(
-        name = "λ",
+        name = :λ,
         lower = -4,
-        upper = 1,
+        upper = -2,
         transform = x->10^x
     ),
     DiscreteParameter(
-        name = "penalty",
+        name = :penalty,
         values = [L2Penalty(), L1Penalty()]
     )
+
     ])
 
 
-task = Task(task_type="regression", targets=[4], data=data)
+task = Task(task_type=:regression, targets=[4], data=data)
 lrn = ModelLearner("glm")
 
 storage = MLRStorage()
