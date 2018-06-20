@@ -13,7 +13,7 @@ load("decisiontree")
 data = FakedataClassif(1000,3)
 
 task = Task(task_type=:classification, targets=[4], data=data)
-lrn = ModelLearner("forest", Dict(:nsubfeatures=>2, :ntrees=>10))
+lrn = ModelLearner(:forest, Dict(:nsubfeatures=>2, :ntrees=>10))
 
 modelᵧ = learnᵧ(lrn, task)
 predictᵧ(modelᵧ, data[:,task.features], task)
@@ -23,8 +23,8 @@ predictᵧ(modelᵧ, data[:,task.features], task)
 load("multivariate")
 data = Fakedata(1000,4)
 
-task = Task(task_type="regression", targets=[3], data=data)
-lrn = ModelLearner("multivariate", Dict("regType"=>"llsq"))
+task = Task(task_type=:regression, targets=[3], data=data)
+lrn = ModelLearner("multivariate", Dict(:regType=>:llsq))
 
 modelᵧ = learnᵧ(lrn, task)
 predictᵧ(modelᵧ, data[:, task.features], task)
@@ -88,7 +88,7 @@ ps = ParametersSet([
 
 data = FakedataClassif(1000,3)
 
-task = Task(task_type="classification", targets=[4], data=data)
+task = Task(task_type=:classification, targets=[4], data=data)
 lrn = ModelLearner("libsvm")
 
 lrn = tune(lrn, task, ps, measure=accuracy)
@@ -148,49 +148,49 @@ plot_storage(storage, plotting_args=Dict(:ylim=>(0.0,0.035)))
 lrns = Array{Learner,1}(0)
 push!(lrns, ModelLearner("decisiontree", ParametersSet([
     ContinuousParameter(
-        name="maxlabels",
+        name=:maxlabels,
         lower = 1,
         upper = 4,
         transform = x->x
     ),
     ContinuousParameter(
-        name="nsubfeatures",
+        name=:nsubfeatures,
         lower = 2,
         upper = 3,
         transform = x->x
     ),
     ContinuousParameter(
-        name = "maxdepth",
+        name = :maxdepth,
         lower = 3,
         upper = 12,
         transform = x->x
     )])))
 push!(lrns, ModelLearner("libsvm", ParametersSet([
     ContinuousParameter(
-        name = "cost",
+        name = :cost,
         lower = -4,
         upper = 1,
         transform = x->10^x
     ),
     DiscreteParameter(
-        name = "svmtype",
+        name = :svmtype,
         values = [SVC()]
     )])))
 push!(lrns, ModelLearner("libsvm", ParametersSet([
     ContinuousParameter(
-        name = "cost",
+        name = :cost,
         lower = -4,
         upper = 1,
         transform = x->10^x
     ),
     DiscreteParameter(
-        name = "svmtype",
+        name = :svmtype,
         values = [NuSVC()]
     )])))
 
 data = FakedataClassif(1000,4)
 stacking = CompositeLearner(Stacking(MAJORITY), lrns)
-task = Task(task_type="classification", targets=[5], data=data)
+task = Task(task_type=:classification, targets=[5], data=data)
 storage = MLRStorage()
 tune(stacking, task, storage=storage, measure=accuracy)
 
