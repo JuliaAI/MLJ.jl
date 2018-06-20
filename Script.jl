@@ -20,7 +20,6 @@ modelᵧ = learnᵧ(lrn, task)
 predictᵧ(modelᵧ, data[:,task.features], task)
 
 
-
 # Multivariate example
 load("multivariate")
 data = Fakedata(1000,4)

@@ -93,7 +93,10 @@ end
 function predictᵧ(modelᵧ::MLRModel{<:DecisionTree.Node},
                      data_features::Matrix, task::ClassificationTask)
     probs = apply_tree(modelᵧ.model, data_features)
+    # generate prediction from probability
     preds = [p>0.5?1:0 for p in probs]
+    # Reformat probabilities to label
+    probs = [p>0.5?p:1-p for p in probs]
     preds, probs
 end
 
@@ -112,6 +115,9 @@ end
 function predictᵧ(modelᵧ::MLRModel{<:DecisionTree.Ensemble},
                     data_features::Matrix, task::ClassificationTask)
     probs = apply_forest(modelᵧ.model, data_features)
+    # generate prediction from probability
     preds = [p>0.5?1:0 for p in probs]
+    # Reformat probabilities to label
+    probs = [p>0.5?p:1-p for p in probs]
     preds, probs
 end
