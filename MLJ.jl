@@ -2,6 +2,7 @@ import StatsBase: predict
 import Base: getindex, show
 import MLBase: Kfold, LOOCV, fit!, predict
 import MLMetrics: accuracy, mean_squared_error
+import MLLabelUtils: convertlabel, LabelEnc.MarginBased
 
 """
     Contains task type (regression,classification,..)
@@ -42,7 +43,7 @@ function Task(;task_type=:regression, targets=nothing, data=nothing::Matrix{<:Re
     elseif task_type == :classification
         task = ClassificationTask(targets, features, data)
     else
-        error("Only regression and classification tasks are currently available")
+        error("Only :regression and :classification tasks are currently available")
     end
     task
 end

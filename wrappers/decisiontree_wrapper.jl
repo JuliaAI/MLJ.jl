@@ -9,7 +9,7 @@ function makeDecisiontree(learner::Learner, task::ClassificationTask)
         :maxdepth=>Integer
     )
 
-    # TODO: Find a better hack for this no_more stuff
+    # TODO: Find a better solution than this no_more hack
     # Due to the fact that decision tree parameters need to be in order, and all available
     # before the next can be set
     no_more = false

@@ -1,7 +1,5 @@
 using LIBSVM
 
-# model = svmtrain(train,train_targets,probability=true)   #train the classifier (default: radial basis kernel)
-# (predicted_labels, decision_values) = svmpredict(model, test);
 
 function getParamsLibsvm()
     possible_parameters = Dict(
@@ -20,33 +18,36 @@ function getParamsLibsvm()
     possible_parameters
 end
 
-function makeLibsvm(learner::Learner, task::Task)
+function makeLibsvm(learner::Learner, task::ClassificationTask)
     parameters = Dict()
     possible_parameters = getParamsLibsvm()
 
-    for (p_name, p_value) in learner.parameters
-        p_symbol = Symbol(p_name)
+    if get(learner.parameters, :svmtype, false) == false
+        throw("Parameter :svmtype must be set")
+    end
+
+    for (p_symbol, p_value) in learner.parameters
         if get(possible_parameters, p_symbol, false) != false
             if !(typeof(p_value) <: possible_parameters[p_symbol])
-                throw("Parameter $p_name is not of the correct type: $p_value
+                throw("Parameter $p_symbol is not of the correct type: $p_value
                         ($(typeof(p_value)) instead of $(possible_parameters[p_symbol]))")
             end
             parameters[p_symbol] = p_value
         else
-            println("Parameter $p_name was not found and is therefore ignored")
+            println("Parameter $p_symbol was not found and is therefore ignored")
         end
     end
     parameters[:svmtype] = typeof(parameters[:svmtype])
-    MLRModel(learner.parameters["svmtype"], parameters, inplace=false)
+    MLRModel(learner.parameters[:svmtype], parameters, inplace=false)
 end
 
 function predictᵧ(modelᵧ::MLRModel{<:LIBSVM.SVM{Float64}},
-                data_features::Matrix, task::Task)
+                data_features::Matrix, task::ClassificationTask)
     (labels, decision_values) = svmpredict(modelᵧ.model, data_features')
     labels, decision_values
 end
 
-function learnᵧ(modelᵧ::MLRModel{<:LIBSVM.AbstractSVC}, learner::Learner, task::Task)
+function learnᵧ(modelᵧ::MLRModel{<:LIBSVM.AbstractSVC}, learner::Learner, task::ClassificationTask)
     train = task.data[:, task.features]'
     targets = task.data[:,task.targets[1]]
 

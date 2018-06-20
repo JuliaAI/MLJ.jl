@@ -66,21 +66,21 @@ plot_storage(storage, plotting_args=Dict(:title=>"A visualisation example"))
 load("libsvm")
 ps = ParametersSet([
     ContinuousParameter(
-        name = "cost",
+        name = :cost,
         lower = -4,
         upper = 1,
         transform = x->10^x
     ),
     DiscreteParameter(
-        name = "svmtype",
+        name = :svmtype,
         values = [SVC()]
     ),
     DiscreteParameter(
-        name = "kernel",
+        name = :kernel,
         values = [Kernel.Polynomial]
     ),
     ContinuousParameter(
-        name = "coef0",
+        name = :coef0,
         lower = -4,
         upper = 1,
         transform = x->10^x
@@ -100,7 +100,7 @@ load("glm")
 load("multivariate")
 
 data = Fakedata(1000,4)
-task = Task(task_type="regression", targets=[5], data=data)
+task = Task(task_type=:regression, targets=[5], data=data)
 
 lrns = Array{Learner}(0)
 psSet = Array{ParametersSet}(0)
@@ -108,13 +108,13 @@ psSet = Array{ParametersSet}(0)
 lrn = ModelLearner("glm")
 ps = ParametersSet([
     ContinuousParameter(
-        name = "cost",
+        name = :cost,
         lower = -4,
         upper = 1,
         transform = x->10^x
     ),
     DiscreteParameter(
-        name = "penalty",
+        name = :penalty,
         values = [L2Penalty(), L1Penalty()]
     )])
 push!(lrns, lrn)
@@ -123,11 +123,11 @@ push!(psSet, ps)
 lrn = ModelLearner("multivariate")
 ps = ParametersSet([
     DiscreteParameter(
-        name="regType",
-        values = ["llsq", "ridge"]
+        name=:regType,
+        values = [:llsq, :ridge]
     ),
     ContinuousParameter(
-        name = "λ",
+        name = :λ,
         lower = -4,
         upper = 1,
         transform = x->10^x
