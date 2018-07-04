@@ -138,6 +138,7 @@ function tune(multiplex::MLRMultiplex, task::Task;
     sampler=Resampling()::Resampling, measure=MLMetrics.accuracy::Function,
     storage=nothing::Union{Void,MLRStorage})
 
+    # Tune each model separately
     for i in 1:multiplex.size
         multiplex.learners[i]  = tune(multiplex.learners[i], task, multiplex.parametersSets[i],
                                         sampler=sampler, measure=measure, storage=storage)

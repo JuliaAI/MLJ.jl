@@ -123,11 +123,11 @@ MLRModel(model, parameters; inplace=true::Bool) = MLRModel(model, parameters, in
 abstract type Learner end
 
 immutable ModelLearner <: Learner
-    name::String
+    name::Symbol
     parameters::Union{Void, Dict, ParametersSet}
     modelᵧ::Union{Void, MLRModel}
-    ModelLearner(learner::String) = new(learner, nothing)
-    ModelLearner(learner::String, parameters) = new(learner, parameters, nothing)
+    ModelLearner(learner::Symbol) = new(learner, nothing)
+    ModelLearner(learner::Symbol, parameters) = new(learner, parameters, nothing)
     ModelLearner(learner::Learner, modelᵧ::MLRModel) = new(learner.name, learner.parameters, modelᵧ)
     ModelLearner(learner::Learner, modelᵧ::MLRModel, parameters::ParametersSet) = new(learner.name, parameters, modelᵧ)
 

@@ -24,7 +24,7 @@ load("multivariate")
 data = Fakedata(1000,4)
 
 task = Task(task_type=:regression, targets=[3], data=data)
-lrn = ModelLearner("multivariate", Dict(:regType=>:llsq))
+lrn = ModelLearner(:multivariate, Dict(:regType=>:llsq))
 
 modelᵧ = learnᵧ(lrn, task)
 predictᵧ(modelᵧ, data[:, task.features], task)
@@ -51,7 +51,7 @@ ps = ParametersSet([
 
 
 task = Task(task_type=:regression, targets=[4], data=data)
-lrn = ModelLearner("glm")
+lrn = ModelLearner(:glm)
 
 storage = MLRStorage()
 
@@ -89,7 +89,7 @@ ps = ParametersSet([
 data = FakedataClassif(1000,3)
 
 task = Task(task_type=:classification, targets=[4], data=data)
-lrn = ModelLearner("libsvm")
+lrn = ModelLearner(:libsvm)
 
 lrn = tune(lrn, task, ps, measure=accuracy)
 
@@ -105,7 +105,7 @@ task = Task(task_type=:regression, targets=[5], data=data)
 lrns = Array{Learner}(0)
 psSet = Array{ParametersSet}(0)
 
-lrn = ModelLearner("glm")
+lrn = ModelLearner(:glm)
 ps = ParametersSet([
     ContinuousParameter(
         name = :cost,
@@ -120,7 +120,7 @@ ps = ParametersSet([
 push!(lrns, lrn)
 push!(psSet, ps)
 
-lrn = ModelLearner("multivariate")
+lrn = ModelLearner(:multivariate)
 ps = ParametersSet([
     DiscreteParameter(
         name=:regType,
@@ -146,7 +146,7 @@ plot_storage(storage, plotting_args=Dict(:ylim=>(0.0,0.035)))
 
 # Stacking
 lrns = Array{Learner,1}(0)
-push!(lrns, ModelLearner("decisiontree", ParametersSet([
+push!(lrns, ModelLearner(:decisiontree, ParametersSet([
     ContinuousParameter(
         name=:maxlabels,
         lower = 1,
@@ -165,7 +165,7 @@ push!(lrns, ModelLearner("decisiontree", ParametersSet([
         upper = 12,
         transform = x->x
     )])))
-push!(lrns, ModelLearner("libsvm", ParametersSet([
+push!(lrns, ModelLearner(:libsvm, ParametersSet([
     ContinuousParameter(
         name = :cost,
         lower = -4,
@@ -176,7 +176,7 @@ push!(lrns, ModelLearner("libsvm", ParametersSet([
         name = :svmtype,
         values = [SVC()]
     )])))
-push!(lrns, ModelLearner("libsvm", ParametersSet([
+push!(lrns, ModelLearner(:libsvm, ParametersSet([
     ContinuousParameter(
         name = :cost,
         lower = -4,
