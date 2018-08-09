@@ -1,5 +1,7 @@
-## Gammaₘₗ: Machine Learning Models Tuning Library - 100% Made in Julia
+## MLJ Machine Learning Models Tuning Library - 100% Made in Julia
 
+
+MAJOR change in design [outlined here](https://github.com/dominusmi/Julia-Machine-Learning-Review/pull/24)
 
 γₘₗ is an attempt to create a framework capable of easily tuning machine learning models.
 Thanks to a solid abstraction layer, it allows user to easily add new models to its framework,
