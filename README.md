@@ -20,7 +20,7 @@ without losing any of the features.
 - [ ] Find a way to make it clear what arguments a model expects
 - [ ] Allow any sampling methods from `MLBase.jl`
 - [ ] Add compatibility with multiple targets
-- [ ] Compatibility with Julia 1.0 [issue #4](https://github.com/alan-turing-institute/mlj/issues/4)
+- [ ] Upgrade it to Julia 1.0 [issue #4](https://github.com/alan-turing-institute/mlj/issues/4)
 
 
 **Known Issues:**
