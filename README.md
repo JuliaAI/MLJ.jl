@@ -17,9 +17,23 @@ MLJis an attempt to create a framework capable of easily tuning machine learning
 Thanks to a solid abstraction layer, it allows user to easily add new models to its framework,
 without losing any of the features.
 
+We are not trying to __reinvent the wheel__ instead we are heavily inspired by [mlR](https://mlr-org.github.io/) ( [recent slides 7/18](https://github.com/mlr-org/mlr-outreach). )
 
 
-**Landmarks:**
+# join!(us)
+We are looking for collaborators @ the Alan Turing Institute! 
+ * Finalising API design and user interaction patterns! 
+ * Backend improvement! (Scheduling, Dagger, JuliaDB, Queryverse)
+   * Store learner meta info in METADATA.JL fashion  (ideally open.ml compatable)
+ * Feature Improvement 
+   * Bootstrapping from Sklearn and mlr by wrapping with task info
+   * Pipelining an composition meta-interface
+   * Implementation of unsupported learners
+
+
+
+
+## Landmarks:
 
 - [x] Implement first basic structure
 - [x] Implement tuning for continuous parameters
