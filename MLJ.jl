@@ -189,7 +189,7 @@ end
 function MLRModel(learner::Learner, task::Task)
     # Calls function with name "makeModelname"
     f_name = learner.name
-    f_name = "make" * titlecase(f_name)
+    f_name = "make" * titlecase(String(f_name))
 
     f = getfield(Main, Symbol(f_name))
     f(learner, task)
