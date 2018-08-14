@@ -68,9 +68,9 @@ end
     Tunes learner given a task and parameter sets.
     Returns a learner which contains best tuned model
 """
-function tune(learner::Learner, task::Task, parameters_set::ParametersSet;
+function tune(learner::Learner, task::MLTask, parameters_set::ParametersSet;
                 sampler=Resampling()::Resampling, measure=MLMetrics.accuracy::Function,
-                storage=MLRStorage()::MLRStorage)
+                storage=MLJStorage()::MLJStorage)
 
     # TODO: divide and clean up code. Use better goddam variable names.
 
@@ -134,9 +134,9 @@ end
 """
     Tune for multiplex type
 """
-function tune(multiplex::MLRMultiplex, task::Task;
+function tune(multiplex::MLJMultiplex, task::MLTask;
     sampler=Resampling()::Resampling, measure=MLMetrics.accuracy::Function,
-    storage=nothing::Union{Void,MLRStorage})
+    storage=nothing::Union{Void,MLJStorage})
 
     # Tune each model separately
     for i in 1:multiplex.size
@@ -148,11 +148,11 @@ end
 """
     Tunes multiple models with multiple different paramters
 """
-function GroupTuner(;learners=nothing::Array{<:Learner}, task=nothing::Task, data=nothing::Matrix{Real},
+function GroupTuner(;learners=nothing::Array{<:Learner}, task=nothing::MLTask, data=nothing::Matrix{Real},
                 parameters_sets=nothing::Array{<:ParametersSet}, sampler=Resampling()::Resampling,
-                measure=nothing::Function, storage=nothing::Union{Void,MLRStorage})
+                measure=nothing::Function, storage=nothing::Union{Void,MLJStorage})
 
-    storage = MLRStorage()
+    storage = MLJStorage()
     for (i,lrn) in enumerate(learners)
         tune(learner=lrn, task=task, data=data, parameters_set=parameters_sets[i],
             sampler=sampler, measure=measure, storage=storage)

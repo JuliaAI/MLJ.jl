@@ -54,7 +54,7 @@ end
 """
     Tunes the model
 """
-function tune(;learner=nothing::Learner, task=nothing::Task, data=nothing::Matrix{Real},
+function tune(;learner=nothing::Learner, task=nothing::MLTask, data=nothing::Matrix{Real},
                 parameters_set=nothing::ParametersSet, sampler=Resampling()::Resampling,
                 measure=nothing::Function)
 
@@ -122,7 +122,7 @@ end
 # compare with variable selection in MLR https://github.com/mlr-org/mlr/blob/bb32eb8f6e7cbcd3a653440325a28632843de9f6/R/selectFeaturesSequential.R
 # backwards is here http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFE.html#sklearn.feature_selection.RFE 
 
-function variable_select_forward(;learner=nothing::Learner, task=nothing::Task, data=nothing::Matrix{Real}, sampler=Resampling()::Resampling,
+function variable_select_forward(;learner=nothing::Learner, task=nothing::MLTask, data=nothing::Matrix{Real}, sampler=Resampling()::Resampling,
                 measure=nothing::Function)
 
     # TODO: divide and clean up code. Use better goddam variable names.

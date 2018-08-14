@@ -1,9 +1,9 @@
 """
     Tuning for stacking compositve learner
 """
-function tune(learner::CompositeLearner{<:Stacking}, task::Task;
+function tune(learner::CompositeLearner{<:Stacking}, task::MLTask;
                 sampler=Resampling()::Resampling, measure=MLMetrics.accuracy::Function,
-                storage=MLRStorage()::MLRStorage)
+                storage=MLJStorage()::MLJStorage)
 
 
     for (i,lrn) in enumerate(learner.learners)
@@ -14,7 +14,7 @@ function tune(learner::CompositeLearner{<:Stacking}, task::Task;
 end
 
 function predictᵧ(stacking::CompositeLearner{Stacking},
-                data_features::Matrix, task::Task)
+                data_features::Matrix, task::MLTask)
 
     # TODO: add more stacking options
     predictions_matrix = zeros(size(data_features,1), length(stacking.learners))

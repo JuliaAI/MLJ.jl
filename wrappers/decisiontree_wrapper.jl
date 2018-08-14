@@ -34,7 +34,7 @@ function makeDecisiontree(learner::Learner, task::ClassificationTask)
 
 
     node = Node(0, nothing, Leaf(nothing,[nothing]), Leaf(nothing,[nothing]))
-    MLRModel(node, parameters, inplace=false)
+    MLJModel(node, parameters, inplace=false)
 end
 
 
@@ -74,12 +74,12 @@ function makeForest(lrn::Learner, task::ClassificationTask)
             end
         end
     end
-    MLRModel(DecisionForestᵧ(), parameters, inplace=false)
+    MLJModel(DecisionForestᵧ(), parameters, inplace=false)
 end
 
 
 
-function learnᵧ(modelᵧ::MLRModel{<:Node}, learner::Learner, task::ClassificationTask)
+function learnᵧ(modelᵧ::MLJModel{<:Node}, learner::Learner, task::ClassificationTask)
     # TODO: add pruning
 
     train = task.data[:,task.features]
@@ -87,10 +87,10 @@ function learnᵧ(modelᵧ::MLRModel{<:Node}, learner::Learner, task::Classifica
 
     tree = build_tree(target, train, modelᵧ.parameters...)
 
-    MLRModel(tree, modelᵧ.parameters)
+    MLJModel(tree, modelᵧ.parameters)
 end
 
-function predictᵧ(modelᵧ::MLRModel{<:DecisionTree.Node},
+function predictᵧ(modelᵧ::MLJModel{<:DecisionTree.Node},
                      data_features::Matrix, task::ClassificationTask)
     probs = apply_tree(modelᵧ.model, data_features)
     # generate prediction from probability
@@ -101,7 +101,7 @@ function predictᵧ(modelᵧ::MLRModel{<:DecisionTree.Node},
 end
 
 
-function learnᵧ(modelᵧ::MLRModel{<:DecisionForestᵧ}, learner::Learner, task::ClassificationTask)
+function learnᵧ(modelᵧ::MLJModel{<:DecisionForestᵧ}, learner::Learner, task::ClassificationTask)
     # TODO: add pruning
 
     train = task.data[:,task.features]
@@ -109,10 +109,10 @@ function learnᵧ(modelᵧ::MLRModel{<:DecisionForestᵧ}, learner::Learner, tas
 
     forest = build_forest(targets, train, modelᵧ.parameters...)
 
-    MLRModel(forest, modelᵧ.parameters)
+    MLJModel(forest, modelᵧ.parameters)
 end
 
-function predictᵧ(modelᵧ::MLRModel{<:DecisionTree.Ensemble},
+function predictᵧ(modelᵧ::MLJModel{<:DecisionTree.Ensemble},
                     data_features::Matrix, task::ClassificationTask)
     probs = apply_forest(modelᵧ.model, data_features)
     # generate prediction from probability

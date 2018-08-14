@@ -9,20 +9,20 @@ import MLLabelUtils: convertlabel, LabelEnc.MarginBased
     and the columns to use as target and as features.
     TODO: accept multiple targets
 """
-abstract type Task end
+abstract type MLTask end
 
-immutable RegressionTask <: Task
+immutable RegressionTask <: MLTask
     targets::Array{<:Integer}
     features::Array{Int}
     data::Matrix{<:Real}
 end
-immutable ClassificationTask <:Task
+immutable ClassificationTask <:MLTask
     targets::Array{<:Integer}
     features::Array{Int}
     data::Matrix{<:Real}
 end
 
-function Task(;task_type=:regression, targets=nothing, data=nothing::Matrix{<:Real})
+function MLTask(;task_type=:regression, targets=nothing, data=nothing::Matrix{<:Real})
     if targets == nothing || data == nothing
         throw("Requires target and data to be set")
     end
@@ -109,12 +109,12 @@ getindex(p::ParametersSet, i::Int64) = p.parameters[i]
 """
     Abstraction layer for model
 """
-immutable MLRModel{T}
+immutable MLJModel{T}
     model::T
     parameters
     inplace::Bool
 end
-MLRModel(model, parameters; inplace=true::Bool) = MLRModel(model, parameters, inplace)
+MLJModel(model, parameters; inplace=true::Bool) = MLJModel(model, parameters, inplace)
 
 
 """
@@ -125,11 +125,11 @@ abstract type Learner end
 immutable ModelLearner <: Learner
     name::Symbol
     parameters::Union{Void, Dict, ParametersSet}
-    modelᵧ::Union{Void, MLRModel}
+    modelᵧ::Union{Void, MLJModel}
     ModelLearner(learner::Symbol) = new(learner, nothing)
     ModelLearner(learner::Symbol, parameters) = new(learner, parameters, nothing)
-    ModelLearner(learner::Learner, modelᵧ::MLRModel) = new(learner.name, learner.parameters, modelᵧ)
-    ModelLearner(learner::Learner, modelᵧ::MLRModel, parameters::ParametersSet) = new(learner.name, parameters, modelᵧ)
+    ModelLearner(learner::Learner, modelᵧ::MLJModel) = new(learner.name, learner.parameters, modelᵧ)
+    ModelLearner(learner::Learner, modelᵧ::MLJModel, parameters::ParametersSet) = new(learner.name, parameters, modelᵧ)
 
 end
 
@@ -163,21 +163,21 @@ end
 """
     Structure used to record results of tuning
 """
-mutable struct MLRStorage
+mutable struct MLJStorage
     models::Array{<:Any,1}
     measures::Array{<:Any,1}
     averageCV::Array{<:Float64,1}
     parameters::Array{<:Dict,1}
-    MLRStorage() = new([],[],Array{Float64}(0),Array{Dict}(0))
+    MLJStorage() = new([],[],Array{Float64}(0),Array{Dict}(0))
 end
 
 
 
-mutable struct MLRMultiplex
+mutable struct MLJMultiplex
     learners::Array{Learner}
     parametersSets::Array{ParametersSet}
     size::Integer
-    MLRMultiplex(lrns::Array{Learner}, ps::Array{ParametersSet}) = new(lrns, ps, size(lrns,1))
+    MLJMultiplex(lrns::Array{Learner}, ps::Array{ParametersSet}) = new(lrns, ps, size(lrns,1))
 end
 
 
@@ -186,7 +186,7 @@ end
     modelname is stored in learner.name
     Function makeModelname should be defined separately for each model
 """
-function MLRModel(learner::Learner, task::Task)
+function MLJModel(learner::Learner, task::MLTask)
     # Calls function with name "makeModelname"
     f_name = learner.name
     f_name = "make" * titlecase(String(f_name))
@@ -199,8 +199,8 @@ end
     Function which sets up model given by learner, and then calls model-based
     learning function, which must be defined separately for each model.
 """
-function learnᵧ(learner::Learner, task::Task)
-    modelᵧ = MLRModel(learner, task)
+function learnᵧ(learner::Learner, task::MLTask)
+    modelᵧ = MLJModel(learner, task)
     if modelᵧ.inplace
         learnᵧ!(modelᵧ, learner, task)
     else
@@ -213,7 +213,7 @@ end
     Allows to predict using learner instead of model.
 """
 function predictᵧ(learner::ModelLearner,
-                data_features::Matrix, task::Task)
+                data_features::Matrix, task::MLTask)
 
     predictᵧ(learner.modelᵧ, data_features, task)
 end

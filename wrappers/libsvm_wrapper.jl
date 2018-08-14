@@ -38,19 +38,19 @@ function makeLibsvm(learner::Learner, task::ClassificationTask)
         end
     end
     parameters[:svmtype] = typeof(parameters[:svmtype])
-    MLRModel(learner.parameters[:svmtype], parameters, inplace=false)
+    MLJModel(learner.parameters[:svmtype], parameters, inplace=false)
 end
 
-function predictᵧ(modelᵧ::MLRModel{<:LIBSVM.SVM{Float64}},
+function predictᵧ(modelᵧ::MLJModel{<:LIBSVM.SVM{Float64}},
                 data_features::Matrix, task::ClassificationTask)
     (labels, decision_values) = svmpredict(modelᵧ.model, data_features')
     labels, decision_values
 end
 
-function learnᵧ(modelᵧ::MLRModel{<:LIBSVM.AbstractSVC}, learner::Learner, task::ClassificationTask)
+function learnᵧ(modelᵧ::MLJModel{<:LIBSVM.AbstractSVC}, learner::Learner, task::ClassificationTask)
     train = task.data[:, task.features]'
     targets = task.data[:,task.targets[1]]
 
     model = svmtrain(train,targets; modelᵧ.parameters...)
-    modelᵧ = MLRModel(model, modelᵧ.parameters)
+    modelᵧ = MLJModel(model, modelᵧ.parameters)
 end

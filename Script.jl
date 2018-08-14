@@ -12,7 +12,7 @@ srand(1)
 load("decisiontree")
 data = FakedataClassif(1000,3)
 
-task = Task(task_type=:classification, targets=[4], data=data)
+task = MLTask(task_type=:classification, targets=[4], data=data)
 lrn = ModelLearner(:forest, Dict(:nsubfeatures=>2, :ntrees=>10))
 
 modelᵧ = learnᵧ(lrn, task)
@@ -23,7 +23,7 @@ predictᵧ(modelᵧ, data[:,task.features], task)
 load("multivariate")
 data = Fakedata(1000,4)
 
-task = Task(task_type=:regression, targets=[3], data=data)
+task = MLTask(task_type=:regression, targets=[3], data=data)
 lrn = ModelLearner(:multivariate, Dict(:regType=>:llsq))
 
 modelᵧ = learnᵧ(lrn, task)
@@ -50,10 +50,10 @@ ps = ParametersSet([
     ])
 
 
-task = Task(task_type=:regression, targets=[4], data=data)
+task = MLTask(task_type=:regression, targets=[4], data=data)
 lrn = ModelLearner(:glm)
 
-storage = MLRStorage()
+storage = MLJStorage()
 
 lrn = tune(lrn, task, ps, measure=mean_squared_error, storage=storage)
 
@@ -88,7 +88,7 @@ ps = ParametersSet([
 
 data = FakedataClassif(1000,3)
 
-task = Task(task_type=:classification, targets=[4], data=data)
+task = MLTask(task_type=:classification, targets=[4], data=data)
 lrn = ModelLearner(:libsvm)
 
 lrn = tune(lrn, task, ps, measure=accuracy)
@@ -100,7 +100,7 @@ load("glm")
 load("multivariate")
 
 data = Fakedata(1000,4)
-task = Task(task_type=:regression, targets=[5], data=data)
+task = MLTask(task_type=:regression, targets=[5], data=data)
 
 lrns = Array{Learner}(0)
 psSet = Array{ParametersSet}(0)
@@ -136,8 +136,8 @@ ps = ParametersSet([
 push!(lrns, lrn)
 push!(psSet, ps)
 
-storage = MLRStorage()
-mp = MLRMultiplex(lrns, psSet)
+storage = MLJStorage()
+mp = MLJMultiplex(lrns, psSet)
 
 tune(mp, task, storage=storage, measure=mean_squared_error)
 
@@ -190,8 +190,8 @@ push!(lrns, ModelLearner(:libsvm, ParametersSet([
 
 data = FakedataClassif(1000,4)
 stacking = CompositeLearner(Stacking(MAJORITY), lrns)
-task = Task(task_type=:classification, targets=[5], data=data)
-storage = MLRStorage()
+task = MLTask(task_type=:classification, targets=[5], data=data)
+storage = MLJStorage()
 tune(stacking, task, storage=storage, measure=accuracy)
 
 pp = predictᵧ(stacking, data[:,task.features], task)

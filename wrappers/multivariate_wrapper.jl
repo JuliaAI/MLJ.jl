@@ -24,7 +24,7 @@ function getParamsMultivariate()
     possible_parameters
 end
 
-function makeMultivariate(learner::Learner, task::Task)
+function makeMultivariate(learner::Learner, task::MLTask)
     prms = learner.parameters
     possible_parameters = getParamsMultivariate()
 
@@ -32,9 +32,9 @@ function makeMultivariate(learner::Learner, task::Task)
         if prms[:regType] == :ridge
             λ = get(prms, :λ, false)
             λ =  (λ==false ? 0.1 : λ)
-            MLRModel(MultivariateRidge(λ), copy(prms))
+            MLJModel(MultivariateRidge(λ), copy(prms))
         else
-            MLRModel(MultivariateLlsq(), copy(prms))
+            MLJModel(MultivariateLlsq(), copy(prms))
         end
     else
         throw("regType must be either :ridge or :llsq")
@@ -44,7 +44,7 @@ end
 """
     Train a ridge classifier
 """
-function learnᵧ!(modelᵧ::MLRModel{<:MultivariateRidge}, learner::Learner, task::ClassificationTask)
+function learnᵧ!(modelᵧ::MLJModel{<:MultivariateRidge}, learner::Learner, task::ClassificationTask)
     # Convert user labels to +/- 1 "binary" labelled data
     margin_labels = convertlabel( LabelEnc.MarginBased, task.data[:,task.targets])
 
@@ -60,7 +60,7 @@ end
     Predicts using a ridge classifier.
     Probabilities are based on distance from predicted label
 """
-function predictᵧ(modelᵧ::MLRModel{<:MultivariateModel},
+function predictᵧ(modelᵧ::MLJModel{<:MultivariateModel},
                     data_features::Matrix{<:Real}, task::RegressionTask)
 
     sol = modelᵧ.model.sol
@@ -81,16 +81,16 @@ function predictᵧ(modelᵧ::MLRModel{<:MultivariateModel},
 end
 
 
-function learnᵧ!(modelᵧ::MLRModel{<:MultivariateRidge}, learner::Learner, task::RegressionTask)
+function learnᵧ!(modelᵧ::MLJModel{<:MultivariateRidge}, learner::Learner, task::RegressionTask)
     modelᵧ.model.sol = ridge(task.data[:,task.features], task.data[:,task.targets], modelᵧ.model.λ)
 end
 
 
-function learnᵧ!(modelᵧ::MLRModel{<:MultivariateLlsq}, learner::Learner, task::RegressionTask)
+function learnᵧ!(modelᵧ::MLJModel{<:MultivariateLlsq}, learner::Learner, task::RegressionTask)
     modelᵧ.model.sol = llsq(task.data[:,task.features], task.data[:,task.targets])
 end
 
-function predictᵧ(modelᵧ::MLRModel{<:MultivariateModel},
+function predictᵧ(modelᵧ::MLJModel{<:MultivariateModel},
                     data_features::Matrix{<:Real}, task::RegressionTask)
 
     sol = modelᵧ.model.sol

@@ -1,6 +1,6 @@
 store_results!(no_storage::Void, measure, laraner) = nothing
 
-function store_results!(storage::MLRStorage, measure::Any, learner::Learner)
+function store_results!(storage::MLJStorage, measure::Any, learner::Learner)
     push!(storage.models, learner.name)
     push!(storage.measures, measure)
     push!(storage.averageCV, mean(measure))
@@ -8,7 +8,7 @@ function store_results!(storage::MLRStorage, measure::Any, learner::Learner)
 end
 
 
-function get_best(storage::MLRStorage)
+function get_best(storage::MLJStorage)
     best_index = indmax(storage.averageCV)
 
     Dict(

@@ -2,7 +2,7 @@ using Plots
 plotlyjs()
 
 
-function plot_storage(storage::MLRStorage; plotting_args=[])
+function plot_storage(storage::MLJStorage; plotting_args=[])
     models = Set(storage.models)
     fig = plot(;plotting_args...)
 
