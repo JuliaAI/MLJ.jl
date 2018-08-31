@@ -11,7 +11,7 @@ default_parameters = Dict("pruning_purity" => 1.0
 """
 
 function fit(model::DecisionTreeClassifier, X::AbstractArray, y::AbstractArray)
-    print("Fitting in the wrapper!")
+    print("Fitting in the interface!")
     model_fit = build_tree(y, X)
     ModelFit(model, model_fit)
 end
@@ -22,7 +22,7 @@ function predict(model::DecisionTreeClassifier, modelFit::BaseModelFit, Xnew)
 end
 
 function fit(model::DecisionTreeRegressor, X::AbstractArray, y::AbstractArray)
-    print("Fitting regression in the wrapper!")
+    print("Fitting regression in the interface!")
     model_fit = build_tree(y, X)
     ModelFit(model, model_fit)
 end

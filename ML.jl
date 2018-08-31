@@ -45,9 +45,93 @@ end
 
 function load_interface_for{T<:BaseModel}(model::T)
     if isa(model, DecisionTreeModel)
-        print("Including library for $(typeof(model))")
+        print("Including library for $(typeof(model)) \n")
         include("interfaces/decisiontree_interface.jl")
+    elseif isa(model, SparseRegressionModel)
+        print("Including library for $(typeof(model)) \n")
+        include("interfaces/glm_interface.jl")
     end
 end
 
+function load_interface_for(model::String)
+    if model == "SparseRegressionModel"
+        print("Including library for "*model*"\n")
+        include("interfaces/glm_interface.jl")
+    end
+end
+
+mutable struct SparseRegressionModel <: BaseModel
+    parameters
+end
+
+"""
+ PARAMETERS 
+
+ A parameter set allows a user to add multiple parameters to tune
+ It must include a name. Constructor only accepts key arguments
+ TODO: parameters cross-checked by learner to see whether they are valid
+"""
+abstract type Parameter end
+
+"""
+    Discrete parameter requires a name and an array of value to check
+    TODO: check whether values are correct for specific learner
+"""
+struct DiscreteParameter <: Parameter
+    name::String
+    values::Array{Any}
+    DiscreteParameter(;name=nothing,values=nothing) = new(name, values)
+end
+
+"""
+    Tuning of a parameter. Must provide name, lower & upper bound, and transform
+    that iterates through values in lower:upper and gives te actual parameter to test
+
+    e.g.
+    ```julia
+        # Will check λ={1,4,9,16}
+        ContinuousParameter("λ", 1, 4, x->x²)
+    ```
+"""
+struct ContinuousParameter <: Parameter
+    name::String
+    lower::Real
+    upper::Real
+    transform::Function
+    ContinuousParameter(;name=nothing, lower=nothing, upper=nothing, transform=nothing) = new(name, lower, upper, transform)
+end
+
+# util functions to get the actual values from the Parameter types.
+function get_param_values(p::ContinuousParameter)
+    """
+    Util function to get the values from the Parameter.
+    """
+    values = []
+        if p.lower < p.upper
+            for x in (p.lower:p.upper)
+                push!(values, p.transform(x))
+            end
+            return values
+        else
+            error("lower value must be lower than upper value")
+        end
+end
+
+function get_param_values(p::DiscreteParameter)
+    """
+    Util function to get the values from the Parameter.
+    """
+    return p.values
+end
+
+"""
+    Set of parameters.
+    Will be used to implement checks on validity of parameters
+"""
+struct ParametersSet
+   parameters::Array{Parameter}
+end
+getindex(p::ParametersSet, i::Int64) = p.parameters[i]
+
+include("Tuning_.jl")
 #end # module
