@@ -7,7 +7,7 @@ First attempt is present in the [AnalyticalEngine.jl](https://github.com/tlienar
 
 Current project was started as research study group at the Univeristy of Warwick. It started with a review of existing ML Modules that are available in Julia [in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational) and [overview](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Package%20Review).
 
-![alt text](../master/material/packages.jpg)
+![alt text](../tuning/material/packages.jpg)
 
 MAJOR change in design [outlined here](https://nbviewer.jupyter.org/github/gbohner/Julia-Machine-Learning-Review/blob/f3482badf1f275e2a98bf7e338d406d399609f37/MLR/TuningDispatch_framework.ipynb)
 
