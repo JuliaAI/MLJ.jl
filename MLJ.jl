@@ -11,12 +11,12 @@ import MLLabelUtils: convertlabel, LabelEnc.MarginBased
 """
 abstract type MLTask end
 
-immutable RegressionTask <: MLTask
+struct RegressionTask <: MLTask
     targets::Array{<:Integer}
     features::Array{Int}
     data::Matrix{<:Real}
 end
-immutable ClassificationTask <:MLTask
+struct ClassificationTask <:MLTask
     targets::Array{<:Integer}
     features::Array{Int}
     data::Matrix{<:Real}
@@ -48,12 +48,11 @@ function MLTask(;task_type=:regression, targets=nothing, data=nothing::Matrix{<:
     task
 end
 
-
 """
     Allows resampling for cross validation
     TODO: add more methods (only accepts k-fold)
 """
-immutable Resampling
+struct Resampling
     method::String
     iterations::Int
     Resampling() = new("KFold", 3)
@@ -72,7 +71,7 @@ abstract type Parameter end
     Discrete parameter requires a name and an array of value to check
     TODO: check whether values are correct for specific learner
 """
-immutable DiscreteParameter <: Parameter
+struct DiscreteParameter <: Parameter
     name::String
     values::Array{Any}
     DiscreteParameter(;name=nothing,values=nothing) = new(name, values)
@@ -88,7 +87,7 @@ end
         ContinuousParameter("λ", 1, 4, x->x²)
     ```
 """
-immutable ContinuousParameter <: Parameter
+struct ContinuousParameter <: Parameter
     name::String
     lower::Real
     upper::Real
@@ -100,7 +99,7 @@ end
     Set of parameters.
     Will be used to implement checks on validity of parameters
 """
-immutable ParametersSet
+struct ParametersSet
    parameters::Array{Parameter}
 end
 getindex(p::ParametersSet, i::Int64) = p.parameters[i]
@@ -109,20 +108,77 @@ getindex(p::ParametersSet, i::Int64) = p.parameters[i]
 """
     Abstraction layer for model
 """
-immutable MLJModel{T}
+struct MLJModel{T}
     model::T
     parameters
     inplace::Bool
 end
 MLJModel(model, parameters; inplace=true::Bool) = MLJModel(model, parameters, inplace)
 
+# Define BaseModel as an abstract type, all models will belong to this category
+abstract type BaseModel end
+abstract type BaseModelFit{T<:BaseModel} end
+
+# When we fit a model, we get back a ModelFit object, that has the original model, as well as results, and should not change once fitted
+struct ModelFit{T} <: BaseModelFit{T}
+    model :: T
+    fit_result
+end
+model(modelFit::ModelFit) = modelFit.model # Accessor function for the family of ModelFit types, instead of directly accessing the field. This way the accessor function is already informed by the type of the model, as it infers it from the type of ModelFit it is accessing, and ends up being faster than using modelFit.model arbitrarily?
+
+# Define a generic predict for BaseModelFit, that disambiguates them based on what Model they are the result of
+predict(modelFit::BaseModelFit, Xnew) = predict(model(modelFit), modelFit, Xnew)
 
 """
-    Contains the name and the parameters of the model to train.
+Every model has 
+- a unique name (that is the model type)
+- a fit function (that dispatches based on first input of model type and returns a ModelFit type) and a 
+- predict function (that dispatches based on the first input of model type, and second input of ModelFit type)
 """
+abstract type DecisionTreeModel <: BaseModel end
+
+mutable struct DecisionTreeClassifier <: DecisionTreeModel
+    parameters::Dict # a dictionary of names and values 
+end
+function DecisionTreeClassifier(model::DecisionTreeClassifier, parameters::Dict)
+    load_interface_for(model)
+    new(model, parameters)
+end
+
+"""
+function fit(model::DecisionTreeClassifier, X::AbstractArray, y::AbstractArray) 
+    print("Fitting a decision tree model: $(typeof(model))")
+    include("wrappers/decisiontree_wrapper.1.jl")
+    result = build_tree(y, X);
+    #result = fit(y, X);
+    ModelFit(model, result)
+end
+
+function predict(model::DecisionTreeClassifier, modelFit::BaseModelFit, Xnew)
+    print("Predicting using: $(typeof(model))")
+    predicted_value = apply_tree(modelFit.fit_result, Xnew);
+end
+"""
+
+function load_interface_for{T<:BaseModel}(model::T)
+    if isa(model, DecisionTreeModel)
+        print("Including library for $(typeof(model))")
+        include("wrappers/decisiontree_interface.jl")
+    end
+end
+
+mutable struct DecisionTreeRegressor <: DecisionTreeModel
+    parameters::Dict # a dictionary of names and values 
+end
+"""
+fit(model::DecisionTreeRegressor, X::AbstractArray, y::AbstractArray) = ModelFit(model)
+predict(model::DecisionTreeRegressor, modelFit::BaseModelFit, Xnew) = nothing
+"""
+# Contains the name and the parameters of the model to train.
+
 abstract type Learner end
 
-immutable ModelLearner <: Learner
+struct ModelLearner <: Learner
     name::Symbol
     parameters::Union{Void, Dict, ParametersSet}
     modelᵧ::Union{Void, MLJModel}
@@ -141,7 +197,7 @@ global const MAJORITY = 1
     @vars
         vote_type: type of voting, currently only "majority" accepted
 """
-immutable Stacking
+struct Stacking
     voting_type::Integer
 end
 
@@ -234,7 +290,7 @@ function loadAll()
         include(wrapper)
     end
 end
-
+    
 include("Tuning.jl")
 include("Stacking.jl")
 include("Resampling.jl")
