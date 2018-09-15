@@ -1,6 +1,5 @@
-#include("MLJ.jl")
+include("src/MLJ.jl")
 
-include("src/ML.jl")
 using RDatasets
 
 iris = dataset("datasets", "iris");
