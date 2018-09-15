@@ -1,4 +1,6 @@
-# module MLJ
+module MLJ
+
+export fit, predict, model
 
 import StatsBase: predict
 import Base: getindex, show
@@ -305,4 +307,4 @@ include("Resampling.jl")
 include("Storage.jl")
 include("Utilities.jl")
 
-#end # module
+end # module
