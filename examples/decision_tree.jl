@@ -1,4 +1,4 @@
-using MLJ
+include("src/MLJ.jl")
 using RDatasets
 
 iris = dataset("datasets", "iris");
