@@ -1,6 +1,6 @@
-#module MLJ
+module MLJ
 
-#export fit, predict, model
+export fit, predict, model, tune, load_interface_for
 
 import StatsBase: predict
 import Base: getindex, show
@@ -118,6 +118,23 @@ struct ParametersSet
    parameters::Array{Parameter}
 end
 getindex(p::ParametersSet, i::Int64) = p.parameters[i]
+
+function load_interface_for{T<:BaseModel}(model::T)
+    if isa(model, DecisionTreeModel)
+        print("Including library for $(typeof(model)) \n")
+        include("src/interfaces/decisiontree_interface.jl")
+    elseif isa(model, SparseRegressionModel)
+        print("Including library for $(typeof(model)) \n")
+        include("src/interfaces/glm_interface.jl")
+    end
+end
+
+function load_interface_for(model::String)
+    if model == "SparseRegressionModel"
+        print("Including library for "*model*"\n")
+        include("src/interfaces/glm_interface.jl")
+    end
+end
 
 # Begin of OLD CODE
 """
@@ -307,4 +324,4 @@ include("Resampling.jl")
 include("Storage.jl")
 include("Utilities.jl")
 
-#end # module
+end # module
