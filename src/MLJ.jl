@@ -1,6 +1,7 @@
 module MLJ
 
-export fit, predict, model, tune, load_interface_for
+export fit, predict, model, tune, load_interface_for,
+        DecisionTreeClassifier
 
 import StatsBase: predict
 import Base: getindex, show
