@@ -1,5 +1,4 @@
 using DecisionTree
-using MLJ
 # https://github.com/bensadeghi/DecisionTree.jl
 """
 default_parameters = Dict("pruning_purity" => 1.0
