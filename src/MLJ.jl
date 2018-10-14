@@ -2,7 +2,8 @@ module MLJ
 
 export  fit, predict, model, tune, load_interface_for,
         DecisionTreeClassifier, MLJDecisionTreeRegressor, SparseRegressionModel, ModelFit, BaseModelFit,
-        DiscreteParameter, ContinuousParameter, ParametersSet
+        DiscreteParameter, ContinuousParameter, ParametersSet,
+        mean_squared_error, squared_error
 
 import StatsBase: predict
 import Base: getindex, show
