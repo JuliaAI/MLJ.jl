@@ -1,4 +1,5 @@
 using DecisionTree
+using MLJ
 # https://github.com/bensadeghi/DecisionTree.jl
 """
 default_parameters = Dict("pruning_purity" => 1.0
@@ -21,13 +22,13 @@ function predict(model::DecisionTreeClassifier, modelFit::BaseModelFit, Xnew)
     predicted_value = apply_tree(modelFit.fit_result, Xnew);
 end
 
-function fit(model::DecisionTreeRegressor, X::AbstractArray, y::AbstractArray)
+function fit(model::MLJDecisionTreeRegressor, X::AbstractArray, y::AbstractArray)
     print("Fitting regression in the interface!")
     model_fit = build_tree(y, X)
     ModelFit(model, model_fit)
 end
 
-function predict(model::DecisionTreeRegressor, modelFit::BaseModelFit, Xnew)
+function predict(model::MLJDecisionTreeRegressor, modelFit::BaseModelFit, Xnew)
     print("Predicting regression using: $(typeof(model))")
     predicted_value = apply_tree(modelFit.fit_result, Xnew);
 end

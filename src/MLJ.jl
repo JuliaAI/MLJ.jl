@@ -1,7 +1,7 @@
 module MLJ
 
 export  fit, predict, model, tune, load_interface_for,
-        DecisionTreeClassifier, DecisionTreeRegressor, SparseRegressionModel, ModelFit, BaseModelFit,
+        DecisionTreeClassifier, MLJDecisionTreeRegressor, SparseRegressionModel, ModelFit, BaseModelFit,
         DiscreteParameter, ContinuousParameter, ParametersSet
 
 import StatsBase: predict
@@ -41,11 +41,11 @@ function DecisionTreeClassifier(model::DecisionTreeClassifier, parameters::Dict)
     new(model, parameters)
 end
 
-mutable struct DecisionTreeRegressor <: DecisionTreeModel
+mutable struct MLJDecisionTreeRegressor <: DecisionTreeModel
     parameters::Dict # a dictionary of names and values 
 end
 
-function DecisionTreeRegressor(model::DecisionTreeRegressor, parameters::Dict)
+function DecisionTreeRegressor(model::MLJDecisionTreeRegressor, parameters::Dict)
     #load_interface_for(model)
     new(model, parameters)
 end
