@@ -8,7 +8,6 @@ using SparseRegression
 - `w::Union{Nothing, AbstractWeights} = nothing`
 """
 
-
 # fit() function should only have model instance, X, and y. Default values should be used from the model definition.
 function fit(model::SparseRegressionModel, X::AbstractArray, y::AbstractArray; penalty::Penalty=L2Penalty(), λ::Vector{Float64} = fill(.1, size(X, 2)))
     #print("Fitting from SparseRegression Interface with parameters...")
