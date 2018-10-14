@@ -1,7 +1,8 @@
 module MLJ
 
-export fit, predict, model, tune, load_interface_for,
-        DecisionTreeClassifier
+export  fit, predict, model, tune, load_interface_for,
+        DecisionTreeClassifier, DecisionTreeRegressor, SparseRegressionModel, ModelFit,
+        DiscreteParameter, ContinuousParameter, ParametersSet
 
 import StatsBase: predict
 import Base: getindex, show
@@ -123,17 +124,19 @@ getindex(p::ParametersSet, i::Int64) = p.parameters[i]
 function load_interface_for{T<:BaseModel}(model::T)
     if isa(model, DecisionTreeModel)
         print("Including library for $(typeof(model)) \n")
-        include("src/interfaces/decisiontree_interface.jl")
+        #include("/src/interfaces/decisiontree_interface.jl")
+        include("interfaces/decisiontree_interface.jl")
     elseif isa(model, SparseRegressionModel)
         print("Including library for $(typeof(model)) \n")
-        include("src/interfaces/glm_interface.jl")
+        #include("/src/interfaces/glm_interface.jl")
+        include("interfaces/glm_interface.jl")
     end
 end
 
 function load_interface_for(model::String)
     if model == "SparseRegressionModel"
         print("Including library for "*model*"\n")
-        include("src/interfaces/glm_interface.jl")
+        include("interfaces/glm_interface.jl")
     end
 end
 
