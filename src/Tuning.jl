@@ -69,7 +69,7 @@ function tune(model::T, parameterset::ParametersSet, X::AbstractArray, y::Abstra
 
         # Ideally a tune() function accepting SparseRegressionModel types should get the parameters from the grid and run all the models and return them.
         my_glm_model = SparseRegressionModel(parameterset)
-        my_sparse_regression = MLJ.fit(my_glm_model, X, y, penalty=penalty, λ=lambda)
+        my_sparse_regression = fit(my_glm_model, X, y, penalty=penalty, λ=lambda)
         push!(models, my_sparse_regression)
 
         # TODO: implement a function reciving the input data and returing a train and test dataset for evaluation.
