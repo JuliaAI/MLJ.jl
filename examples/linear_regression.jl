@@ -26,6 +26,7 @@ new_data = rand(1, 10)
 predict(my_glm_model, my_sparse_regression, new_data)
 y_pred = predict(my_glm_model, my_sparse_regression, x)
 
+# using the mean_squared_error function from Metrics.jl in MLJ
 mean_squared_error(y, y_pred)
 
 # Tuning

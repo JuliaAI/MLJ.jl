@@ -325,5 +325,6 @@ include("Stacking.jl")
 include("Resampling.jl")
 include("Storage.jl")
 include("Utilities.jl")
+include("Metrics.jl")
 
 end # module
