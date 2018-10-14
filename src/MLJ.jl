@@ -37,7 +37,7 @@ mutable struct DecisionTreeClassifier <: DecisionTreeModel
 end
 
 function DecisionTreeClassifier(model::DecisionTreeClassifier, parameters::Dict)
-    load_interface_for(model)
+    #load_interface_for(model)
     new(model, parameters)
 end
 
@@ -46,7 +46,7 @@ mutable struct DecisionTreeRegressor <: DecisionTreeModel
 end
 
 function DecisionTreeRegressor(model::DecisionTreeRegressor, parameters::Dict)
-    load_interface_for(model)
+    #load_interface_for(model)
     new(model, parameters)
 end
 
