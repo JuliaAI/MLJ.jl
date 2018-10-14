@@ -1,5 +1,4 @@
-include("src/MLJ.jl")
-#using MLJ
+using MLJ
 
 load_interface_for("SparseRegressionModel")
 
