@@ -1,4 +1,5 @@
-include("src/MLJ.jl")
+#include("src/MLJ.jl")
+using MLJ
 using RDatasets
 
 iris = dataset("datasets", "iris");
@@ -34,7 +35,7 @@ reg_parameters = Dict("pruning_purity" => 1.0
                 , "min_purity_increase" => 0.0
                 , "n_subfeatures" => 0)
 
-my_reg_model = DecisionTreeRegressor(reg_parameters)
+my_reg_model = MLJDecisionTreeRegressor(reg_parameters)
 load_interface_for(my_reg_model)
 my_reg_tree = fit(my_reg_model, reg_features, reg_labels)
 reg_result = predict(my_reg_model, my_reg_tree, [-0.9,3.0,5.1,1.9,0.0])

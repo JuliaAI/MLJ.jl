@@ -1,6 +1,9 @@
-#module MLJ
+module MLJ
 
-#export fit, predict, model
+export  fit, predict, model, tune, load_interface_for,
+        DecisionTreeClassifier, MLJDecisionTreeRegressor, SparseRegressionModel, ModelFit, BaseModelFit,
+        DiscreteParameter, ContinuousParameter, ParametersSet
+
 
 import StatsBase: predict
 import Base: getindex, show
@@ -18,7 +21,7 @@ struct ModelFit{T} <: BaseModelFit{T}
     fit_result
 end
 model(modelFit::ModelFit) = modelFit.model # Accessor function for the family of ModelFit types, instead of directly accessing the field. This way the accessor function is already informed by the type of the model, as it infers it from the type of ModelFit it is accessing, and ends up being faster than using modelFit.model arbitrarily?
-
+fit(modelFit::ModelFit) = modelFit.model
 # Define a generic predict for BaseModelFit, that disambiguates them based on what Model they are the result of
 predict(modelFit::BaseModelFit, Xnew) = predict(model(modelFit), modelFit, Xnew)
 
@@ -35,21 +38,25 @@ mutable struct DecisionTreeClassifier <: DecisionTreeModel
 end
 
 function DecisionTreeClassifier(model::DecisionTreeClassifier, parameters::Dict)
-    load_interface_for(model)
+    #load_interface_for(model)
     new(model, parameters)
 end
 
-mutable struct DecisionTreeRegressor <: DecisionTreeModel
+mutable struct MLJDecisionTreeRegressor <: DecisionTreeModel
     parameters::Dict # a dictionary of names and values 
 end
 
-function DecisionTreeRegressor(model::DecisionTreeRegressor, parameters::Dict)
-    load_interface_for(model)
+function MLJDecisionTreeRegressor(model::MLJDecisionTreeRegressor, parameters::Dict)
+    #load_interface_for(model)
     new(model, parameters)
 end
 
 mutable struct SparseRegressionModel <: BaseModel
     parameters
+end
+
+function SparseRegressionModel(model::SparseRegressionModel, parameters::Dict)
+    new(model, parameters)
 end
 
 """
@@ -118,6 +125,23 @@ struct ParametersSet
    parameters::Array{Parameter}
 end
 getindex(p::ParametersSet, i::Int64) = p.parameters[i]
+
+function load_interface_for{T<:BaseModel}(model::T)
+    if isa(model, DecisionTreeModel)
+        print("Including library for $(typeof(model)) \n")
+        include("src/interfaces/decisiontree_interface.jl")
+    elseif isa(model, SparseRegressionModel)
+        print("Including library for $(typeof(model)) \n")
+        include("src/interfaces/glm_interface.jl")
+    end
+end
+
+function load_interface_for(model::String)
+    if model == "SparseRegressionModel"
+        print("Including library for "*model*"\n")
+        include("src/interfaces/glm_interface.jl")
+    end
+end
 
 # Begin of OLD CODE
 """
@@ -307,4 +331,4 @@ include("Resampling.jl")
 include("Storage.jl")
 include("Utilities.jl")
 
-#end # module
+end # module

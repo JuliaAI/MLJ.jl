@@ -1,5 +1,5 @@
 include("src/MLJ.jl")
-#using MLJ
+using MLJ
 
 load_interface_for("SparseRegressionModel")
 
@@ -27,7 +27,8 @@ new_data = rand(1, 10)
 predict(my_glm_model, my_sparse_regression, new_data)
 y_pred = predict(my_glm_model, my_sparse_regression, x)
 
-mean_squared_error(y, y_pred)
+# using the mean_squared_error function from Metrics.jl in MLJ
+MLMetrics.mean_squared_error(y, y_pred)
 
 # Tuning
 """
@@ -43,4 +44,4 @@ TODO:
 Gergo's suggestion: to create a fit function to wrap up the tune() function. So the user just calls fit().
     fit(tmp, x, y) = tune(tmp.model, tmp.params, x, y, measure = tmp.metric)
 """
-best_model = tune(my_glm_model, parameters, x, y, measure=mean_squared_error)
+best_model = tune(my_glm_model, parameters, x, y, measure=MLMetrics.mean_squared_error)
