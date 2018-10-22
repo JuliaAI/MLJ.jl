@@ -3,7 +3,13 @@
 Edoardo Barp, Gergö Bohner, Valentin Churvay, Harvey Devereux, Thibaut Lienart, Franz J Király, Mohammed Nook, Annika Stechemesser, Sebastian Vollmer; Mike Innes in partnership with Julia Computing
 
 First attempt is present in the [AnalyticalEngine.jl](https://github.com/tlienart/AnalyticalEngine.jl) and [Orchestra.jl](https://github.com/svs14/Orchestra.jl)
+To clone MLJ in Julia, from the Julia REPL:
+```{julia}
+Pkg.clone("https://github.com/alan-turing-institute/mlj.git", "MLJ")
+```
+To try experimental features use Pkg.checkout(“MLJ”, “develop”)
 
+There are two examples included in the repo in the examples folder, both are running ok.
 
 Current project was started as research study group at the Univeristy of Warwick. It started with a review of existing ML Modules that are available in Julia [in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational) and [overview](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Package%20Review).
 
