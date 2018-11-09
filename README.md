@@ -62,7 +62,7 @@ slides 7/18](https://github.com/mlr-org/mlr-outreach). )
 We are looking for collaborators @ the Alan Turing Institute! 
  * Finalising API design and user interaction patterns! 
  * Backend improvement! (Scheduling, Dagger, JuliaDB, Queryverse)
-   * Store learner meta info in METADATA.JL fashion  (ideally open.ml compatable)
+   * Store learner meta info in METADATA.JL fashion (ideally open.ml compatible)
  * Feature Improvement 
    * Bootstrapping from Sklearn and mlr by wrapping with task info
    * Pipelining an composition meta-interface
