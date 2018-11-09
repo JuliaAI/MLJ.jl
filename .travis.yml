@@ -20,15 +20,15 @@ matrix:
   - julia: nightly
 
 ## uncomment following lines to deploy documentation
-jobs:
-  include:
-    - stage: Documentation
-      julia: 1.0
-      os: linux
-      script:
-        - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
-        - julia --project=docs --color=yes docs/make.jl
-      after_success: skip
+#jobs:
+#  include:
+#    - stage: Documentation
+#      julia: 1.0
+#      os: linux
+#      script:
+#        - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
+#        - julia --project=docs --color=yes docs/make.jl
+#      after_success: skip
 after_success:
   - julia --project=test/coverage -e 'using Pkg; Pkg.instantiate()'
   - julia --project=test/coverage test/coverage/coverage.jl
