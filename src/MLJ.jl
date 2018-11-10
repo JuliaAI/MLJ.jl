@@ -45,7 +45,7 @@ const DEFAULT_SHOW_DEPTH = 2      # how deep to display fields of `MLJType` obje
 
 ## GENERAL PURPOSE UTILITIES
 
-include("utilities.jl")
+include("Utilities.jl")
 
 
 ## ABSTRACT TYPES
