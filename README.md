@@ -7,7 +7,6 @@ earlier proof-of-concept, see
 [this](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
 branch and **this summary [POSTER](material/MLJ-JuliaCon2018-poster.pdf)**
 
-![alt text](material/packages.jpg)
 
 ### Requirements
 
@@ -44,6 +43,8 @@ Julia
 [in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational)
 and
 [overview](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Package%20Review).
+
+![alt text](material/packages.jpg)
 
 Further work culminated in the first MLJ
 [proof-of-concept](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
