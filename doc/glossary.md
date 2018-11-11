@@ -1,9 +1,13 @@
 # Glossary
 
+## Basics
+
 ### task (object of type `Task`)
 
-Data plus a clearly specified learning objective. In addition, a
-description of how the completed task is to be evaluated.
+Data plus a clearly specified learning objective. 
+
+> In addition, a description of how the completed task is to be
+> evaluated?
 
 
 ### hyperparameters
@@ -47,16 +51,30 @@ needs to predict or what a transformer needs to transform).
 What Julia calls a function. (In Julia, a "function" is a collection
 of methods sharing the same name but different type signatures.)
 
+Associated with every model is a `fit` method for computing assoicated
+fit-results (training), and an `update!` method for retraining with
+new hyperaparameters (but unchanged data).
 
-### operator
+
+### operation
 
 Data-manipulating operations (methods) parameterized by some
 fit-result. For learners, the `predict` or `predict_proba` methods, for
 transformers, the `transform` or `inverse_transform` method. In some
-contexts such an operator might be replaced by an ordinary operator
+contexts such an operation might be replaced by an ordinary operation
 (method) that does *not* depend on an fit-result, which are then then
-called *static* operators for clarity. An operator that is not static
+called *static* operations for clarity. An operation that is not static
 is *dynamic*.
+
+## Learning Networks and Composite Models
+
+*Note:* Multiple trainable models may share the same model, and
+multiple learning nodes may share the same trainable model.
+
+### source node
+
+A mutable container for training data, for use as the mimimal node in a
+learning network (see below).
 
 
 ### trainable model
@@ -67,48 +85,46 @@ An object consisting of:
 
 (2) A fit-result (undefined until training)
 
-(3) Sources for training data, called *training arguments*. A training
-argument is either concrete data (eg, data frame) or *dynamic data*,
-as defined below.
+(3) *Training arguments* (one for each data argument of the model's
+associated `fit` method). A training argument is either a source node (see
+above) or a *learning node*, as defined below.
 
-(4) A cache object (undefined until training) for storing information
-required to restart an iterative model, for retraining with new model
-hyperparameters without repeating redundant computations, or for
-accesssing model-specific functionality (such as pruning a decision
-tree).
+(4) A cache object (undefined until training), for storing information
+that allows the model to be retrained without repeating unnecessary
+computations.
 
 (5) "Report" metadata, recording algorithm-specific statistics of
 training (eg, internal estimate of generalization error) or the
 results of calls to access model-specific functionality.
 
-(6) "Dependency" metadata, for recording dependencies on other
-trainable models implied by the training arguments (when they are
-dynamic data; see below).
+(6) "Dependency" metadata, for recording dependencies on other other
+trainable models that is implied by the training arguments (when they
+are not source nodes).
 
 
-### dynamic data
+### learning node
 
-A "trainable" data-like object consisting of:
+Essentially a trainable model wrapped in an assoicated operation
+(e.g., `predict` or `inverse_transform`. It detail, it consists of:
 
-(1) An operator, static or dynamic.
+(1) An operation, static or dynamic.
 
-(2) A trainable model, void if the operator is static.
+(2) A trainable model, void if the operation is static.
 
-(3) Connections to other dynamic or static data, specified by a list
-   of **arguments** (one for each argument of the operator); each
-   argument is data, dynamic or static.
-
+(3) Upstream connections to other learning or source nodes, specified by a list
+   of *arguments* (one for each argument of the operation).
+   
 (4) Metadata recording the dependencies of the object's trainable
-models, and the dependecies on other trainable models implied by its
+model, and the dependecies on other trainable models implied by its
 arguments.
-
-The "data-like" behaviour of dynamic data is implemented by
-overloading Julia's indexing methods and is sketched [here](dynamic_data.md).
 
 
 ### learning network (implicity defined by dynamic data)
 
-A directed graph implicit in the specification of dynamic data. All
-nodes are dynamic data except for the source nodes, which are
-static. Something like a scikit-learn pipeline.
+A directed graph implicit in the specification of a learning node. 
+
+### composite model
+
+A learning network codified as a model with attendent methods (`fit`,
+`update!` and, e.g, `predict`).
 
