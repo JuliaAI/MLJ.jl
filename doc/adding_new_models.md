@@ -213,7 +213,7 @@ Checks and corrects for invalid fields (hyperparameters), returning a
 warning `messsage`. Should only throw an exception as a last resort.
 
 ````julia
-    update!(learner::ConcreteModel, verbosity, fitresult, cache, X, y; kwargs...) 
+    report = update!(learner::ConcreteModel, verbosity, fitresult, cache, X, y; kwargs...) 
 ````
 
 A package interface author may overload an `update!` method to enable
