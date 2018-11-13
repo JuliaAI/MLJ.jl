@@ -97,14 +97,14 @@ mutable struct TrainableModel{M<:Model}
     fitresult
     cache
     args::Vector
-	report
+    report
     tape::Vector{TrainableModel}
     frozen::Bool
 end
 ````
 
 Elements of `args` (the *training arguments*) can be `SourceNode`s or
-`LearningNodes`. We have a constructor,
+`LearningNode`s. We have a constructor,
 
 ````julia 
 TrainableModel(model::Model, args...)
