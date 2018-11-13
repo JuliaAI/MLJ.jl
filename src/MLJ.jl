@@ -188,6 +188,27 @@ clean!(fitresult::Model) = ""
 fit2(model::Model, verbosity, fitresult, cache, args...) =
     fit(model, verbosity, args...)
 
+"""
+    replace(model::Model, fld1=>val1, fld2=>val2, ...)
+
+Return a replica of `model` with the values of fields `fld1`, `fld2`,
+... replaced with `val1`, `val2`, ... respectively.
+
+"""
+function Base.copy(model::T, field_value_pairs::Pair...) where T<:Model
+
+    value_given_field = Dict(field_val_pairs)
+    fields = keys(value_given_field)
+    constructor_args = map(fieldnames(model)) do fld
+        if fld in fields
+            value_given_field[fld]
+        else
+            getfield(model, fld)
+        end
+    end
+    return T(contructor_args...)
+end
+
 
 ## LOAD BUILT-IN MODELS
 
