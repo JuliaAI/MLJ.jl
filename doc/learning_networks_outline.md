@@ -277,9 +277,9 @@ function update!(composite::WetSupervised, verbosity, fitresult, cache, X, y)
 
     t_X, t_y, l, transformer_X, transformer_y, learner = cache
 
-    case1 = (t_X.model != transformer_X) # true if `transformer_X` has changed
-    case2 = (t_y.model != transformer_y) # true if `transformer_y` has changed
-    caes3 = (l.model != learner) # true if `learner` has changed
+    case1 = (composite.transformer_X != transformer_X) # true if `transformer_X` has changed
+    case2 = (composite.transformer_y != transformer_y) # true if `transformer_y` has changed
+    caes3 = (composite.learner != learner) # true if `learner` has changed
 
     if case1
         freeze!(t_X)
