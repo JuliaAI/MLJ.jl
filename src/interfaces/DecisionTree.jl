@@ -14,12 +14,12 @@ module DecisionTree_
 export DecisionTreeClassifier
 
 # to be extended:
-import MLJ: predict, fit, fit2, clean!   #> compulsory for learners
-# import MLJ: predict_proba              #> if implemented
+import MLJ: predict, fit, clean!         #> compulsory for learners
+# import MLJ: update, predict_proba     #> if implemented
 
 # needed:
 import DecisionTree                #> import package
-import MLJ: Classifier, Regressor  #> and supertypes for the models to be defined
+import MLJ: Classifier             #> and supertypes for the models to be defined
 
 #> The DecisionTreeClassifier model type declared below is a
 #> parameterized type (not necessary for models in general). This is
@@ -42,6 +42,8 @@ mutable struct DecisionTreeClassifier{T} <: Classifier{DecisionTreeClassifierFit
     min_purity_increase::Float64
     n_subfeatures::Float64
     display_depth::Int
+    post_prune::Bool
+    merge_purity_threshold::Float64
 end
 
 # constructor:
@@ -56,7 +58,9 @@ function DecisionTreeClassifier(
     , min_samples_split=2
     , min_purity_increase=0.0
     , n_subfeatures=0
-    , display_depth=5)
+    , display_depth=5
+    , post_prune=false
+    , merge_purity_threshold=0.9)
 
     !(target_type == nothing) || throw(error("You must specify target_type=..."))
 
@@ -67,7 +71,9 @@ function DecisionTreeClassifier(
         , min_samples_split
         , min_purity_increase
         , n_subfeatures
-        , display_depth)
+        , display_depth
+        , post_prune
+        , merge_purity_threshold)
 
     message = clean!(model)           #> future proof by including these 
     isempty(message) || @warn message #> two lines even if no clean! defined below
@@ -91,9 +97,8 @@ function clean!(model::DecisionTreeClassifier)
     return warning
 end
 
-#> A required `fit` method returns `fitresult, cache, report`. The
-#> `cache` is for use by `fit2` if implemented and `fit2` needs
-#> it. Otherwise return `nothing` for `cache`.
+#> A required `fit` method returns `fitresult, cache, report`. (Return
+#> `cache=nothing` unless you are overloading `update`)
 
 function fit(model::DecisionTreeClassifier{T2}
              , verbosity            #> must be here even if unsupported in pkg (as here)
@@ -110,6 +115,11 @@ function fit(model::DecisionTreeClassifier{T2}
                                         , model.min_samples_leaf
                                         , model.min_samples_split
                                         , model.min_purity_increase)
+
+
+    if model.post_prune 
+        fitresult = DecisionTree.prune_tree(fitresult, model.merge_purity_threshold)
+    end
     
     verbosity < 1 || DecisionTree.print_tree(fitresult, model.display_depth)
 
@@ -121,47 +131,6 @@ function fit(model::DecisionTreeClassifier{T2}
     report = nothing
     
     return fitresult, cache, report 
-
-end
-
-#> An optional `fit2` method, requiring the `fitresult` and `cache`
-#> outputs of a previous `fit` on the same data (but on a possibly new
-#> or mutated `model`) is for: (i) enabling refitting without
-#> repeating some redundant computations; or (ii) requesting
-#> package-specific functionality that depends on an initial train,
-#> such as optimizing the weights in an ensemble, or, as here, pruning
-#> a trained decision tree. There is a fall-back in MLJ which accepts
-#> no keyword arguments and basically duplicates the effect of `fit`
-#> above. See the "doc/adding_models.md" for more detail.
-
-function fit2(model::DecisionTreeClassifier
-              , verbosity           #> must be here even if unsupported in pkg
-              , fitresult
-              , cache
-              , X                   #> no need to annotate types here
-              , y  
-              ; prune_only=false    #> kwargs to request post-train, pkg-specific actions
-              , merge_purity_threshold=0.9)
-
-    if prune_only
-
-        verbosity < 1 || @info "Not completely retraining. Only pruning decision tree."
-        
-        fitresult = DecisionTree.prune_tree(fitresult, merge_purity_threshold)
-        report = nothing
-        cache = nothing
-        
-        verbosity < 1 || DecisionTree.print_tree(fitresult, model.display_depth)
-
-#        verbosity < 1 || @info "Done."
-
-        return fitresult, cache, report
-
-    else # fit as usual:
-
-        return fit(model, verbosity, X, y)
-
-    end
 
 end
 

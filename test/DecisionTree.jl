@@ -20,19 +20,16 @@ train, test = partition(allrows, 0.7)
 baretree.max_depth = 1 
 fitresult, cache, report = MLJ.fit(baretree, 1, X_array, y);
 baretree.max_depth = -1 # no max depth
-fitresult, cache, report = MLJ.fit2(baretree, 1, fitresult, cache, X_array, y);
-fitresult, cache, report = MLJ.fit2(baretree, 1, fitresult, cache, X_array, y
-                                    ; prune_only=true, merge_purity_threshold=0.1);
+fitresult, cache, report = MLJ.update(baretree, 1, fitresult, cache, X_array, y);
 
-
-# in this case decision tree is perfect predictor:
-fitresult, cache, report = MLJ.fit2(baretree, 1, fitresult, cache, X_array, y);
+# in this case decision tree is a perfect predictor:
 yhat = predict(baretree, fitresult, X_array);
 @test yhat == y
 
 # but pruning upsets this:
-fitresult, cache, report = MLJ.fit2(baretree, 1, fitresult, cache, X_array, y
-                                    ; prune_only=true, merge_purity_threshold=0.1);
+baretree.post_prune = true
+baretree.merge_purity_threshold=0.1
+fitresult, cache, report = MLJ.update(baretree, 1, fitresult, cache, X_array, y)
 yhat = predict(baretree, fitresult, X_array);
 @test yhat != y
 

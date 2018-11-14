@@ -176,7 +176,7 @@ include("datasets.jl")
 
 # low-level methods to be extended:
 function fit end
-function fit2 end
+function update end
 function predict end
 function predict_proba end
 function transform end 
@@ -187,7 +187,7 @@ function inverse_transform end
 clean!(fitresult::Model) = ""
 
 # fallback method for refitting:
-fit2(model::Model, verbosity, fitresult, cache, args...) =
+update(model::Model, verbosity, fitresult, cache, args...) =
     fit(model, verbosity, args...)
 
 # models are `==` if they have the same type and their field values are `==`:

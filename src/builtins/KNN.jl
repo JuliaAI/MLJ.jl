@@ -5,13 +5,12 @@ module KNN
 export KNNRegressor
 
 import MLJ: Regressor
-using Dates
 using LinearAlgebra
 
 # to be extended:
-import MLJ: predict, fit, fit2, clean!
+import MLJ: predict, fit, update, clean!
 
-KNNFitResultType = Tuple{Matrix{Float64},Vector{Float64}, Dates.DateTime}
+KNNFitResultType = Tuple{Matrix{Float64},Vector{Float64}}
 
 # TODO: introduce type parameters for the function fields (metric, kernel)
 
@@ -53,8 +52,6 @@ function fit(model::KNNRegressor
     
     return fitresult, cache, report 
 end
-
-fit2(model, verbosity, fitresult, cache, X, y) = fitresult, cache, nothing
 
 first_component_is_less_than(v, w) = isless(v[1], w[1])
 

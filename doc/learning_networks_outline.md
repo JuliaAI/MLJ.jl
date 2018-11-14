@@ -265,17 +265,17 @@ function fit!(composite::WetSupervised, verbosity, Xtrain, ytrain)
     fitresult = yhat
     report = l.report
     cache = WetSupervisedCache(t_X, t_y, l,
-                               copy(composite.transformer_X),
-                               copy(composite.transformer_y),
-                               copy(composite.learner))
+                               deepcopy(composite.transformer_X),
+                               deepcopy(composite.transformer_y),
+                               deepcopy(composite.learner))
 
     return fitresult, cache, report
 
 end
 
-function update!(composite::WetSupervised, verbosity, fitresult, cache, X, y)
+function update(composite::WetSupervised, verbosity, old_fitresult, old_cache, X, y)
 
-    t_X, t_y, l, transformer_X, transformer_y, learner = cache
+    t_X, t_y, l, transformer_X, transformer_y, learner = old_cache
 
     case1 = (composite.transformer_X != transformer_X) # true if `transformer_X` has changed
     case2 = (composite.transformer_y != transformer_y) # true if `transformer_y` has changed
@@ -291,10 +291,15 @@ function update!(composite::WetSupervised, verbosity, fitresult, cache, X, y)
         freeze!(l)
     end
 
-    fit!(fitresult)       # remember `fitresult` is a learning node
+    fit!(old_fitresult)
     thaw!(t_X); thaw!(t_y); thaw!(l)
-
-    return l.report
+	
+	old_cache.transformer_X = deepcopy(composite.transformer_X)
+	old_cache.transformer_y = deepcopy(composite.transformer_y)
+	old_cache.learner = copy(composite.learner)
+	
+	
+	return old_fitresult, old_cache, l.report
 
 end
 
