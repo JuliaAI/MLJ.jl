@@ -29,6 +29,7 @@ import Requires.@require  # lazy code loading package
 import CSV
 import DataFrames: DataFrame, AbstractDataFrame, SubDataFrame, eltypes, names
 import Distributions
+import Base.==
 
 # from Standard Library:
 using Statistics
@@ -163,6 +164,7 @@ X_and_y(task::SupervisedTask) = (task.data[Cols, features(task)],
 
 include("datasets.jl")
 
+
 ## LOW-LEVEL MODEL METHODS 
 
 # Most concrete model types, and their associated low-level methods,
@@ -188,25 +190,34 @@ clean!(fitresult::Model) = ""
 fit2(model::Model, verbosity, fitresult, cache, args...) =
     fit(model, verbosity, args...)
 
+# models are `==` if they have the same type and their field values are `==`:
+function ==(m1::M, m2::M) where M<:Model
+    ret = true
+    for fld in fieldnames(M)
+        ret = ret && getfield(m1, fld) == getfield(m2, fld)
+    end
+    return ret
+end
+
+# not sure we need this:
 """
-    replace(model::Model, fld1=>val1, fld2=>val2, ...)
+    copy(model::Model, fld1=>val1, fld2=>val2, ...)
 
 Return a replica of `model` with the values of fields `fld1`, `fld2`,
 ... replaced with `val1`, `val2`, ... respectively.
 
 """
-function Base.copy(model::T, field_value_pairs::Pair...) where T<:Model
-
-    value_given_field = Dict(field_val_pairs)
+function Base.copy(model::T, field_value_pairs::Vararg{Pair{Symbol}}) where T<:Model
+    value_given_field = Dict(field_value_pairs)
     fields = keys(value_given_field)
-    constructor_args = map(fieldnames(model)) do fld
+    constructor_args = map(fieldnames(typeof(model))) do fld
         if fld in fields
             value_given_field[fld]
         else
             getfield(model, fld)
         end
     end
-    return T(contructor_args...)
+    return T(constructor_args...)
 end
 
 
