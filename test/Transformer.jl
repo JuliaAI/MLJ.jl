@@ -1,7 +1,19 @@
 module TestTransformer
 
+# using Revise
 using MLJ
 using Test
+
+# selecting features
+X, y = datanow()
+namesX = names(X)
+selector = FeatureSelector()
+fitresult, cache, report = MLJ.fit(selector, 1, X)
+@test fitresult == namesX
+transform(selector, fitresult, X[1:2,:])
+selector = FeatureSelector([:Zn, :Crim])
+fitresult, cache, report = MLJ.fit(selector, 1, X)
+@test names(transform(selector, fitresult, X[1:2,:])) == [:Zn, :Crim]
 
 # relabelling with integer transformer:
 y = rand(Char, 50)

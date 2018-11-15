@@ -16,6 +16,7 @@ export KNNRegressor                                # "builtins/KNN.jl":
 export node, trainable, fit!, freeze!, thaw!       # "networks.jl"
 
 # defined in include file "builtins/Transformers.jl":
+export FeatureSelector
 export ToIntTransformer                     
 export UnivariateStandardizer, Standardizer 
 # export OneHotEncoder

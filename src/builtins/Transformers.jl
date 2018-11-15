@@ -1,6 +1,7 @@
 # note: this file defines *and* imports one module; see end
 module Transformers
 
+export FeatureSelector
 export ToIntTransformer
 export UnivariateStandardizer, Standardizer
 
@@ -16,6 +17,46 @@ import MLJ: fit, transform, inverse_transform
 ## CONSTANTS
 
 const N_VALUES_THRESH = 16 # for BoxCoxTransformation
+
+
+## FOR FEATURE (COLUMN) SELECTION
+
+"""
+    FeatureSelector(features=Symbol[])
+
+A transformer model for `DataFrame`s that returns a new `DataFrame`
+with only the those features (columns) encountered during fitting the
+transformer, and in the order encountered then.  Alternatively, if a
+non-empty `features` is specified, then only the specified features
+are used. Throws an error if a recorded or specified feature is not
+present in the transformation input.
+
+"""
+mutable struct FeatureSelector <: Transformer
+    features::Vector{Symbol} 
+end
+
+FeatureSelector(;features=Symbol[]) = FeatureSelector(features)
+
+function fit(transformer::FeatureSelector, verbosity, X::AbstractDataFrame)
+    namesX = names(X)
+    issubset(Set(transformer.features), Set(namesX)) ||
+        throw(error("Attempting to select non-existent feature(s)."))
+    if isempty(transformer.features)
+        fitresult = namesX
+    else
+        fitresult = transformer.features
+    end
+    report = Dict{Symbol,Any}()
+    report[:features_to_keep] = fitresult
+    return fitresult, nothing, report
+end
+
+function transform(transformer::FeatureSelector, features, X)
+    issubset(Set(features), Set(names(X))) ||
+        throw(error("Supplied frame does not admit previously selected features."))
+    return X[features]
+end 
 
 
 ## FOR RELABELLING BY CONSECUTIVE INTEGERS STARTING AT 1
