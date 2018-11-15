@@ -13,6 +13,7 @@ export @more, @constant                            # "show.jl"
 export rms, rmsl, rmslp1, rmsp                     # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow  # "datasets.jl"
 export KNNRegressor                                # "builtins/KNN.jl":
+export node, trainable, fit!, freeze!, thaw!       # "networks.jl"
 
 # defined in include file "builtins/Transformers.jl":
 export ToIntTransformer                     
@@ -39,7 +40,7 @@ using LinearAlgebra
 ## CONSTANTS
 
 const srcdir = dirname(@__FILE__) # the directory containing this file 
-const TREE_INDENT = 2 # indentation for tree-based display of dynamic data 
+const TREE_INDENT = 2 # indentation for tree-based display of learning networks 
 const COLUMN_WIDTH = 24           # for displaying dictionaries with `show`
 const DEFAULT_SHOW_DEPTH = 2      # how deep to display fields of `MLJType` objects
 
@@ -91,18 +92,18 @@ include("metrics.jl")
 # `df[Cols, c]` selects features of df at `c` (single integer or symbol, vector of symbols, integer range or colon); not supported for vectors
 # `df[Names]` returns names of all features of `df` (or indices if unsupported)
 
-
 struct Rows end
 struct Cols end
 struct Names end
 struct Eltypes end
-struct Echo end # needed to terminate calls of dynamic data types on unseen source data
+# struct Echo end 
+
 
 Base.getindex(df::AbstractDataFrame, ::Type{Rows}, r) = df[r,:]
 Base.getindex(df::AbstractDataFrame, ::Type{Cols}, c) = df[c]
 Base.getindex(df::AbstractDataFrame, ::Type{Names}) = names(df)
 Base.getindex(df::AbstractDataFrame, ::Type{Eltypes}) = eltypes(df)
-Base.getindex(df::AbstractDataFrame, ::Type{Echo}, dg) = dg
+# Base.getindex(df::AbstractDataFrame, ::Type{Echo}, dg) = dg
 
 # Base.getindex(df::JuliaDB.Table, ::Type{Rows}, r) = df[r]
 # Base.getindex(df::JuliaDB.Table, ::Type{Cols}, c) = select(df, c)
@@ -113,10 +114,10 @@ Base.getindex(A::AbstractMatrix, ::Type{Rows}, r) = A[r,:]
 Base.getindex(A::AbstractMatrix, ::Type{Cols}, c) = A[:,c]
 Base.getindex(A::AbstractMatrix, ::Type{Names}) = 1:size(A, 2)
 Base.getindex(A::AbstractMatrix{T}, ::Type{Eltypes}) where T = [T for j in 1:size(A, 2)]
-Base.getindex(A::AbstractMatrix, ::Type{Echo}, B) = B
+# Base.getindex(A::AbstractMatrix, ::Type{Echo}, B) = B
 
 Base.getindex(v::AbstractVector, ::Type{Rows}, r) = v[r]
-Base.getindex(v::AbstractVector, ::Type{Echo}, w) = w
+# Base.getindex(v::AbstractVector, ::Type{Echo}, w) = w
 
 
 ## CONCRETE TASK TYPES
@@ -165,7 +166,7 @@ X_and_y(task::SupervisedTask) = (task.data[Cols, features(task)],
 include("datasets.jl")
 
 
-## LOW-LEVEL MODEL METHODS 
+## MODEL INTERFACE 
 
 # Most concrete model types, and their associated low-level methods,
 # are defined in package interfaces, located in
@@ -199,7 +200,7 @@ function ==(m1::M, m2::M) where M<:Model
     return ret
 end
 
-# not sure we need this:
+# TODO: not sure we need this:
 """
     copy(model::Model, fld1=>val1, fld2=>val2, ...)
 
@@ -219,6 +220,11 @@ function Base.copy(model::T, field_value_pairs::Vararg{Pair{Symbol}}) where T<:M
     end
     return T(constructor_args...)
 end
+
+
+## LOAD LEARNING NETWORKS API
+
+include("networks.jl")
 
 
 ## LOAD BUILT-IN MODELS

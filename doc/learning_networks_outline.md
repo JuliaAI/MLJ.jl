@@ -9,13 +9,9 @@ under "goals" below).
 
 This document assumes familiarity with the
 [glossary](https://github.com/alan-turing-institute/MLJ.jl/blob/master/doc/glossary.md)
-but also elucidates it. The API below is hinted at by the ["dynamic
-data" post](https://github.com/alan-turing-institute/MLJ.jl/issues/14)
-but is mostly stripped of the dynamic data interpretation (which may
-be useful, but caused some misunderstandings).
+but also elucidates it. The source code is [here]
+code](https://github.com/alan-turing-institute/MLJ.jl/blob/master/src/networks.jl).
 
-In this outline I am omitting some type declarations, some fields and some type
-parameters for clarity.
 
 Recall that the `Model`
 [API](https://github.com/alan-turing-institute/MLJ.jl/blob/master/doc/adding_new_models.md)
@@ -29,11 +25,8 @@ fitresult, cache, report = fit!(model::Model, verbosity, X, y)
 and
 
 ````julia
-report = update!(model::Model, verbosity, fitresult, X, y)
+fitresult, cache, report = update!(model::Model, verbosity, old_fitresult, old_cache, X, y)
 ````
-
-Also assumed later is that each model has a `copy` method implemented.
-
 
 ### goals
 
@@ -58,13 +51,15 @@ inverse-transformed. Finally, when we call `update!` on the
 retrained.* In particular, if transformer hyperparameters are not
 changed, then only the learner is retrained.
 
-Other use cases are composite models that resample a model for
-cross-validation and stacked models with a metalearner.
+Other possible use cases are composite models that resample a model for
+cross-validation and stacked models with a meta-learner.
 
 
 ### source nodes
 
 ````julia
+abstract type Node <: MLJType end
+
 mutable struct SourceNode{D} 
     data::D 
 end 
@@ -78,9 +73,9 @@ Learning networks are defined by `LearningNode`s. Inside each
 types are coupled.
 
 We presently constrain each connected component of a learning network
-(as defined by the normal flow of information) to have a unique source
-node, although the network may have several connected components
-coupled via *training* connections.
+(as defined by the normal flow of information, with no account paid to
+training) to have a unique source node, although the network may have
+several connected components coupled via *training* connections.
 
 Like `SourceNodes`, `LearningNode`s will be callable. If `X` is a
 `LearningNode` then `X()` is the result of applying the complete
@@ -96,7 +91,7 @@ mutable struct TrainableModel{M<:Model}
     model::M
     fitresult
     cache
-    args::Vector
+    args::Vector{Node}
     report
     tape::Vector{TrainableModel}
     frozen::Bool
@@ -104,10 +99,10 @@ end
 ````
 
 Elements of `args` (the *training arguments*) can be `SourceNode`s or
-`LearningNode`s. We have a constructor,
+`LearningNode`s, which have the common supertype `Node`. We have a constructor,
 
 ````julia 
-TrainableModel(model::Model, args...)
+trainable(model::Model, args::Node...)
 ````
  
 which computes its dependency `tape`, and sets `frozen=false`, and
@@ -115,7 +110,7 @@ leaves other fields undefined.  Methods `freeze!(::TrainableModel)`
 and `thaw!(::TrainableModel)` reset the `frozen` flag accordingly.
 
 ````julia
-fit!(trainable::TrainableModel)
+fit!(trainable::TrainableModel; verbosity=1)
 ````
 
 Computes or updates the `fitresult` field in `TrainableModel` (as well
@@ -126,11 +121,12 @@ method throws an error if any other trainable model on which
 responsibility for scheduling lies not with a trainable model but with
 the learning nodes that point to them.)
 
-> **Implementation detail:** The data arguments provided the model `fit`
-> method are `[arg() for arg in args]...`.
+> **Implementation detail:** The data arguments provided the
+> (low-level) model `fit` method are `[arg() for arg in args]...`.
 
-Although not absolutely essential, it is natural to extend model
-methods to trainable model methods in the obvious way. So, for
+For each operation supported by a model `M` (e.g, `predict`,
+`inverse_transform`) the learning networkds API defines a
+corresponding operation for a `TrainableModel{M}` object. So, for
 example:
 
 ````julia
@@ -144,7 +140,7 @@ inverse_transform(trainable::TrainableModel{T<:Transformer}, Xnew) =
     inverse_transform(trainable.model, trainable.fitrestult, Xnew)
 ````
 
-where `Xnew` is just data. In this sequel, I assume this has been done.
+where `Xnew` is just data. 
 
 
 ### learning nodes
@@ -153,24 +149,26 @@ Recall from the
 [glossary](https://github.com/alan-turing-institute/MLJ.jl/blob/master/doc/glossary.md)
 that the *arguments* of a learning node are other nodes (source or
 learning) indicating its upstream connections; these constitute its
-`args` field:
+`args` field (internal constructor omitted):
 
 ````julia
-struct LearningNode
-    operation::Function       # eg, `predict` or `inverse_transform` or a static operation
-    trainable::TrainableModel # is  `nothing` for static operations
-    args                      
-    tape                      # for tracking dependencies
+struct LearningNode{M<:Union{TrainableModel, Nothing}} <: Node
+
+    operation::Function   # that can be dispatched on `trainable`(eg, `predict`) or a static operation
+    trainable::M          # is `nothing` for static operations
+    args                  # nodes where `operation` looks for its arguments
+    tape::Vector{TrainableModel}    # for tracking dependencies
+    depth::Int64       
+
 end
-````
 
 The dependency `tape` (e.g., a DAG of trainable models) is computed on
 construction, by merging the `tape`s of its `args` and incorporating the new
 trainable model `trainable`:
 
 ````julia
-LearningNode(operation, trainable::TrainableModel, args...)`
-LearningNode(operation, args...) = LearningNode(operation, nothing, args...)
+LearningNode(operation, trainable::TrainableModel, args::Node...)`
+LearningNode(operation, args::Node...) = LearningNode(operation, nothing, args::Node...)
 ````
 
 We make each learning node `z` callable: `z(Xnew)` is the result of
@@ -187,7 +185,7 @@ We furthermore introduce the following additional syntax, in the case that
 `trainable` is a `Trainable{<:Supervised}` object:
 
 ````julia
-predict(trainable, X::Union{LearningNode,Source}) =
+predict(trainable::TrainableModel, X::Union{LearningNode,Source}) =
     LearningNode(predict, trainable, X)
 ````
 
@@ -220,11 +218,11 @@ function fit!(X::LearningNode)
 ````
 
 Call `fit!` on all trainable models in the dependency `tape` of `X` in
-an appropriate order (or using a scheduler) unless a trainable model
-has been previously fit and is frozen. For data, use what is currently
-located at each source node on which the learning node
-depends. Remember, that for training purposes, multiple sources are
-possible (our use case below being a case in point).
+an appropriate order (in the future using a scheduler) unless a
+trainable model has been previously fit and is frozen. For data, use
+what is currently located at each source node on which the learning
+node depends. Remember, that for training purposes, multiple sources
+are possible (our use case below being a case in point).
     
 ### example
 
@@ -247,16 +245,16 @@ end
 
 function fit!(composite::WetSupervised, verbosity, Xtrain, ytrain)
 
-    X = Source(Xtrain)
-    y = Source(ytrain)
+    X = node(Xtrain) # instantiates a source node
+    y = node(ytrain)
     
-    t_X = Trainable(composite.transformer_X, X)
-    t_y = Trainable(composite.transformer_y, y)
+    t_X = trainable(composite.transformer_X, X)
+    t_y = trainable(composite.transformer_y, y)
 
     Xt = transform(t_X, X) 
     yt = transform(t_y, y)
 
-    l = Trainable(composite.learner, Xt, yt)
+    l = trainable(composite.learner, Xt, yt)
     zhat = predict(l, Xt)
 
     yhat = inverse_transform(t_y, zhat)
