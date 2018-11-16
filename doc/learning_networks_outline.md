@@ -164,6 +164,7 @@ struct LearningNode{M<:Union{TrainableModel, Nothing}} <: Node
     depth::Int64       
 
 end
+````
 
 The dependency `tape` (e.g., a DAG of trainable models) is computed on
 construction, by merging the `tape`s of its `args` and incorporating the new
