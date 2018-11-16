@@ -78,7 +78,7 @@ function thaw!(trainable::TrainableModel)
 end
 
 # fit method:
-function fit!(trainable::TrainableModel; verbosity=1, kwargs...)
+function fit!(trainable::TrainableModel, verbosity; kwargs...)
 
     if trainable.frozen && verbosity > -1
         @warn "$trainable not trained as it is frozen."
@@ -107,6 +107,8 @@ function fit!(trainable::TrainableModel; verbosity=1, kwargs...)
 
 end
 
+# for convenience:
+fit!(trainable::TrainableModel; kwargs...) = fit!(trainable, 1; kwargs...) 
 
 # predict method for trainable learner models (X data):
 function predict(trainable::TrainableModel{L}, X) where L<: Learner 
@@ -218,13 +220,16 @@ LearningNode(operation::Function, args::Node...) = LearningNode(operation, nothi
 (y::LearningNode{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
 # the "fit through" method:
-function fit!(y::LearningNode; verbosity=1, kwargs...)
+function fit!(y::LearningNode, verbosity; kwargs...)
     for trainable in y.tape[1:end-1]
-        fit!(trainable; verbosity=verbosity)
+        fit!(trainable, verbosity)
     end
-    fit!(y.tape[end]; verbosity=verbosity, kwargs...)
+    fit!(y.tape[end], verbosity; kwargs...)
     return y
 end
+
+# for convenience:
+fit!(y::LearningNode; kwargs...) = fit!(y, 1; kwargs...)
 
 # allow arguments of `LearningNodes` and `TrainableModel`s to appear
 # at REPL:

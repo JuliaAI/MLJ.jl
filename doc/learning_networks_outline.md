@@ -1,4 +1,4 @@
-## Rough outline of the proposed API for learning networks.
+## Rough outline of the learning networks API
 
 The API detailed here is probably not intended for the beginner user
 but allows advanced users and MLJ developers to build composite models
@@ -9,23 +9,22 @@ under "goals" below).
 
 This document assumes familiarity with the
 [glossary](https://github.com/alan-turing-institute/MLJ.jl/blob/master/doc/glossary.md)
-but also elucidates it. The source code is [here]
-code](https://github.com/alan-turing-institute/MLJ.jl/blob/master/src/networks.jl).
+but also elucidates it. The source code is [here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/src/networks.jl).
 
 
 Recall that the `Model`
 [API](https://github.com/alan-turing-institute/MLJ.jl/blob/master/doc/adding_new_models.md)
-specifies that each model has `fit` and `update!` methods, called like
+specifies that each model has `fit` and `update` methods, called like
 this:
 
 ````julia
-fitresult, cache, report = fit!(model::Model, verbosity, X, y)
+fitresult, cache, report = fit(model::Model, verbosity, X, y)
 ````
 
 and
 
 ````julia
-fitresult, cache, report = update!(model::Model, verbosity, old_fitresult, old_cache, X, y)
+fitresult, cache, report = update(model::Model, verbosity, old_fitresult, old_cache, X, y)
 ````
 
 ### goals
@@ -34,7 +33,9 @@ As an elementary goal of an API for learning networks we would like to
 have composite models like this:
 
 ````julia
-mutable struct WetSupervised{L<:Supervised,TX<::Transformer,Ty<::Transformer} <: Supervised
+import MLJ: Supervised, Transformer
+
+mutable struct WetSupervised{L<:Supervised,TX<:Transformer,Ty<:Transformer} 
     learner::L
     transformer_X::TX
     transformer_y::Ty
@@ -46,7 +47,7 @@ transformer to the inputs using `transformer_X`, fit a transformer to
 the target, using `transformer_y`, and fit the "dry" `learner` using the
 transformed data. When we dispatch `predict` on the `fitresult` of
 this training, predictions should be automatically
-inverse-transformed. Finally, when we call `update!` on the
+inverse-transformed. Finally, when we call `update` on the
 `fitresult` then *only the necessary component models ought to be
 retrained.* In particular, if transformer hyperparameters are not
 changed, then only the learner is retrained.
@@ -110,16 +111,18 @@ leaves other fields undefined.  Methods `freeze!(::TrainableModel)`
 and `thaw!(::TrainableModel)` reset the `frozen` flag accordingly.
 
 ````julia
-fit!(trainable::TrainableModel; verbosity=1)
+fit!(trainable::TrainableModel, verbosity; kwargs...)
+fit!(trainable::TrainableModel; kwargs...)
 ````
 
 Computes or updates the `fitresult` field in `TrainableModel` (as well
-as `cache`) by calling `fit` or `update!` on its model. To obtain our
-training data we reach back to the source nodes of each argument. The
-method throws an error if any other trainable model on which
-`trainable` depends has not itself been trained yet. (The
-responsibility for scheduling lies not with a trainable model but with
-the learning nodes that point to them.)
+as `cache`) by calling `fit` or `update` on its model (with the
+specified `kwargs` if any). To obtain our training data we reach back
+to the source nodes of each argument. The method throws an error if
+any other trainable model on which `trainable` depends has not itself
+been trained yet. (The responsibility for scheduling lies not with a
+trainable model but with the learning nodes that point to them.) If no
+`verbosity` is specified, a default of `1` is used.
 
 > **Implementation detail:** The data arguments provided the
 > (low-level) model `fit` method are `[arg() for arg in args]...`.
@@ -214,16 +217,20 @@ If `X` is just data, then `yhat=predict(trainable, X)` falls back to
 have its earlier meaning, so that `yhat` is also just data.
 
 ````
-function fit!(X::LearningNode)
+function fit!(X::LearningNode, verbosity; kwargs...)
+function fit!(X::LearningNode; kwargs...)
 ````
 
 Call `fit!` on all trainable models in the dependency `tape` of `X` in
 an appropriate order (in the future using a scheduler) unless a
-trainable model has been previously fit and is frozen. For data, use
+trainable model has been previously fit and is frozen. The `kwargs`
+are passed to the the `fit!` call to `X.trainable` only. For data, use
 what is currently located at each source node on which the learning
 node depends. Remember, that for training purposes, multiple sources
-are possible (our use case below being a case in point).
+are possible (our use case below being a case in point). No
+specification of `verbosity` implies a default of `1`.
     
+	
 ### example
 
 We can now give an implementation of the `WetSupervised` model
@@ -232,18 +239,20 @@ composite model.
 
 
 ````julia
+import LearningNode, TrainableModel, fit, predict
+
 # 1st three fields for each component's trainable model; 2nd three
-# fields for copies of corresponding models used in last training:
-mutable struct WetSupervisedCache{L,TX,Ty}
+# fields for copies of corresponding models (hyperparameters) used in last training:
+mutable struct WetSupervisedCache{L,TX,Ty} <: MLJType
     t_X::TrainableModel{TX}   
     t_y::TrainableModel{Ty}
-    l::Supervised{L}
+    l::TrainableModel{L}
     transformer_X::TX      
     transformer_y::Ty
     learner::L
 end
 
-function fit!(composite::WetSupervised, verbosity, Xtrain, ytrain)
+function fit(composite::WetSupervised, verbosity, Xtrain, ytrain)
 
     X = node(Xtrain) # instantiates a source node
     y = node(ytrain)
@@ -251,14 +260,14 @@ function fit!(composite::WetSupervised, verbosity, Xtrain, ytrain)
     t_X = trainable(composite.transformer_X, X)
     t_y = trainable(composite.transformer_y, y)
 
-    Xt = transform(t_X, X) 
+    Xt = array(transform(t_X, X))
     yt = transform(t_y, y)
 
     l = trainable(composite.learner, Xt, yt)
     zhat = predict(l, Xt)
 
     yhat = inverse_transform(t_y, zhat)
-    fit!(yhat)
+    fit!(yhat, verbosity-1)
 
     fitresult = yhat
     report = l.report
@@ -271,33 +280,37 @@ function fit!(composite::WetSupervised, verbosity, Xtrain, ytrain)
 
 end
 
-function update(composite::WetSupervised, verbosity, old_fitresult, old_cache, X, y)
+function update(composite::WetSupervised, verbosity, old_fitresult, old_cache, X, y; kwargs...)
 
-    t_X, t_y, l, transformer_X, transformer_y, learner = old_cache
+    t_X, t_y, l = old_cache.t_X, old_cache.t_y, old_cache.l
+    transformer_X, transformer_y = old_cache.transformer_X, old_cache.transformer_y
+    learner = old_cache.learner 
 
-    case1 = (composite.transformer_X != transformer_X) # true if `transformer_X` has changed
-    case2 = (composite.transformer_y != transformer_y) # true if `transformer_y` has changed
-    caes3 = (composite.learner != learner) # true if `learner` has changed
+    case1 = (composite.transformer_X == transformer_X) # true if `transformer_X` has not changed
+    case2 = (composite.transformer_y == transformer_y) # true if `transformer_y` has not changed
+    case3 = (composite.learner == learner) # true if `learner` has not changed
 
+    # we initially activate all trainable models, but leave them in the
+    # state needed for this call to update (for post-train inspection):
+    thaw!(t_X); thaw!(t_y); thaw!(l)
+    
     if case1
         freeze!(t_X)
     end
     if case2
         freeze!(t_y)
     end
-    if case1 || case2 || case3
+    if case1 && case2 && case3
         freeze!(l)
     end
 
-    fit!(old_fitresult)
-    thaw!(t_X); thaw!(t_y); thaw!(l)
+    fit!(old_fitresult, verbosity-1; kwargs...)
 	
-	old_cache.transformer_X = deepcopy(composite.transformer_X)
-	old_cache.transformer_y = deepcopy(composite.transformer_y)
-	old_cache.learner = copy(composite.learner)
+    old_cache.transformer_X = deepcopy(composite.transformer_X)
+    old_cache.transformer_y = deepcopy(composite.transformer_y)
+    old_cache.learner = copy(composite.learner)
 	
-	
-	return old_fitresult, old_cache, l.report
+    return old_fitresult, old_cache, l.report
 
 end
 

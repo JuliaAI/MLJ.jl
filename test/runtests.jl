@@ -13,7 +13,7 @@ include("metrics.jl")
 include("datasets.jl")
 include("KNN.jl")
 # include("dynamic.jl")
-include("Transformer.jl")
+include("Transformers.jl")
 include("DecisionTree.jl")
 
 
