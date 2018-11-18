@@ -109,7 +109,7 @@ train, test = partition(eachindex(yin), 0.7);
 Xtrain = Xin[train,:];
 ytrain = yin[train];
 
-import MLJ: fit, predict
+import MLJ: fit, predict, update
 function fit(composite::WetSupervised, verbosity, Xtrain, ytrain)
 
     X = node(Xtrain) # instantiates a source node
