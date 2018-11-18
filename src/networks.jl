@@ -81,7 +81,7 @@ end
 function fit!(trainable::TrainableModel, verbosity; kwargs...)
 
     if trainable.frozen && verbosity > -1
-        @warn "$trainable not trained as it is frozen."
+        @warn "$trainable with model $(trainable.model) not trained as it is frozen."
         return trainable
     end
         
