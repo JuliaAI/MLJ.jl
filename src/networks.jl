@@ -99,11 +99,11 @@ function fit!(trainable::TrainableModel, verbosity; kwargs...)
 
     if !isdefined(trainable, :fitresult)
         trainable.fitresult, trainable.cache, report =
-            fit(trainable.model, verbosity, args...)
+            fit(trainable.model, verbosity, :, args...)
     else
         trainable.fitresult, trainable.cache, report =
             update(trainable.model, verbosity, trainable.fitresult,
-                   trainable.cache, args...; kwargs...)
+                   trainable.cache, :, args...; kwargs...)
     end
 
     trainable.previous_model = deepcopy(trainable.model)

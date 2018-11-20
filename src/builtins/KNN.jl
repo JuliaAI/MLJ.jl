@@ -42,11 +42,12 @@ end
 
 function fit(model::KNNRegressor
              , verbosity
+             , rows
              , X::Matrix{Float64}
              , y::Vector{Float64})
     
     # computing norms of rows later on is faster if we use the transpose of X:
-    fitresult = (X', y)
+    fitresult = (X[rows,:]', y[rows])
     cache = nothing
     report = nothing
     
