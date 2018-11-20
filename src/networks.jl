@@ -81,7 +81,7 @@ end
 function fit!(trainable::TrainableModel, verbosity; kwargs...)
 
     if trainable.frozen && verbosity > -1
-        @warn "$trainable not trained as it is frozen."
+        @warn "$trainable with model $(trainable.model) not trained as it is frozen."
         return trainable
     end
         
@@ -243,33 +243,42 @@ function spaces(n)
     end
     return s
 end
-function Base.show(stream::IO, ::MIME"text/plain", X::LearningNode)
-#   gap = spaces(20 - TREE_INDENT*get_depth(X) + TREE_INDENT)
-    gap = ""
+
+function Base.show(stream::IO, ::MIME"text/plain", X::Node)
     if X isa SourceNode
-        @show "here"
-        print(stream, gap)
+        printstyled(IOContext(stream, :color=>true), handle(X), bold=true)
     else
         detail = (X.trainable == nothing ? "(" : "($(handle(X.trainable)), ")
         operation_name = typeof(X.operation).name.mt.name
-#       println(stream, gap, operation_name, detail) # or uncomment next two lines
-        print(stream, operation_name, detail)
+        print(stream, operation_name, "(")
+        if X.trainable != nothing
+            color = (X.trainable.frozen ? :red : :green)
+            printstyled(IOContext(stream, :color=>true), handle(X.trainable),
+                        bold=true, color=color)
+            print(stream, ", ")
+        end
         n_args = length(X.args)
         counter = 1
         for arg in X.args
-            if arg isa LearningNode
-                show(stream, MIME("text/plain"), arg)
-            else # arg is a SourceNode, and so:
-#               print(stream, gap, spaces(TREE_INDENT), handle(arg))
-                printstyled(IOContext(stream, :color=> true), handle(arg), color=:blue)
-            end
+            show(stream, MIME("text/plain"), arg)
             counter >= n_args || print(stream, ", ")
             counter += 1
         end
-    print(stream, ")")
+        print(stream, ")")
     end
 end
 
+function Base.show(stream::IO, ::MIME"text/plain", trainable::TrainableModel)
+    print(stream, "trainable($(trainable.model), ")
+    n_args = length(trainable.args)
+    counter = 1
+    for arg in trainable.args
+        printstyled(IOContext(stream, :color=>true), handle(arg), bold=true)
+        counter >= n_args || print(stream, ", ")
+        counter += 1
+    end
+    print(stream, ")")
+end
 
 ## SYNTACTIC SUGAR FOR LEARNING NETWORKS
 

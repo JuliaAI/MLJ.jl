@@ -21,7 +21,7 @@ mutable struct KNNRegressor <: Regressor{KNNFitResultType}
 end
 
 euclidean(v1, v2) = norm(v2 - v1)
-reciprocal(d) = 1/d
+reciprocal(d) = d < eps(Float64) ? sign(d)/eps(Float64) : 1/d
 
 # lazy keywork constructor:
 function KNNRegressor(; K=1, metric=euclidean, kernel=reciprocal)
