@@ -153,16 +153,31 @@ end
 
 ## LEARNING NETWORKS INTERFACE - BASICS
 
-# TODO: do these really need to be mutable?
+# source nodes are stale when instantiated, becoming fresh the first
+# time they are called to obtain their contents. They can only be made
+# stale again by reloading with data.
+
 mutable struct SourceNode{D} <: Node
     data::D      # training data
+    stale::Bool
 end
 
-is_stale(s::SourceNode) = false
+SourceNode(data) = SourceNode(data, true)
+is_stale(s::SourceNode) = s.stale
 
 # make source nodes callable:
-(s::SourceNode)() = s.data
+function (s::SourceNode)()
+    s.stale = false
+    return s.data
+end
 (s::SourceNode)(Xnew) = Xnew
+
+function Base.reload(s::SourceNode, data)
+    s.data = data
+    s.stale = true
+    return s
+end
+
 
 struct LearningNode{M<:Union{TrainableModel, Nothing}} <: Node
 
@@ -254,14 +269,6 @@ fit!(y::LearningNode; kwargs...) = fit!(y, 1; kwargs...)
 istoobig(d::Tuple{Node}) = length(d) > 10
 
 # overload show method
-function spaces(n)
-    s = ""
-    for i in 1:n
-        s = string(s, " ")
-    end
-    return s
-end
-
 function _recursive_show(stream::IO, X::Node)
     if X isa SourceNode
         printstyled(IOContext(stream, :color=>true), handle(X), bold=true)
@@ -285,17 +292,24 @@ function _recursive_show(stream::IO, X::Node)
         print(stream, ")")
     end
 end
+
 function Base.show(stream::IO, ::MIME"text/plain", X::Node)
     id = objectid(X) 
     description = string(typeof(X).name.name)
     str = "$description @ $(handle(X))"
     printstyled(IOContext(stream, :color=> true), str, bold=true)
-    print(" = ")
-    _recursive_show(stream, X)
+    if !(X isa SourceNode)
+        print(stream, " = ")
+        _recursive_show(stream, X)
+    end
 end
     
-
 function Base.show(stream::IO, ::MIME"text/plain", trainable::TrainableModel)
+    id = objectid(trainable) 
+    description = string(typeof(trainable).name.name)
+    str = "$description @ $(handle(trainable))"
+    printstyled(IOContext(stream, :color=> true), str, bold=true)
+    print(stream, " = ")
     print(stream, "trainable($(trainable.model), ")
     n_args = length(trainable.args)
     counter = 1

@@ -42,6 +42,7 @@ tape = MLJ.get_tape
 
 XX = node(X_frame[train,:])
 yy = node(y[train])
+@test MLJ.is_stale(XX)
 
 # construct a transformer to standardize the target:
 uscale_ = UnivariateStandardizer()
@@ -72,7 +73,8 @@ yhat = inverse_transform(uscale, zhat)
 
 # fit-through training:
 fit!(yhat)
-fit!(yhat, 0)
+@test !MLJ.is_stale(XX)
+@test MLJ.is_stale(reload(XX, Xtrain))
 
 rms(yhat(X_frame[test,:]), y[test])
 
@@ -96,15 +98,6 @@ selector_ = FeatureSelector()
 encoder_ = ToIntTransformer()
 
 composite = WetSupervised(tree_, selector_, encoder_)
-
-mutable struct WetSupervisedCache{L,TX,Ty} <: MLJType
-    t_X::TrainableModel{TX}   
-    t_y::TrainableModel{Ty}
-    l::TrainableModel{L}
-    transformer_X::TX      
-    transformer_y::Ty
-    learner::L
-end
 
 Xin, yin = X_and_y(load_iris());
 train, test = partition(eachindex(yin), 0.7);
@@ -154,28 +147,24 @@ selector = fitresult.args[1].args[1].args[1].trainable
 
 # this should trigger no retraining:
 fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
-@test encoder.frozen && tree.frozen && selector.frozen
 
 # this should trigger retraining of encoder and tree
 encoder_.initial_label = 13
 fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
-@test !encoder.frozen && !tree.frozen && selector.frozen
 
 # this should trigger retraining of selector and tree:
 selector_.features = [:petal_length,] 
 fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
-@test encoder.frozen && !tree.frozen && !selector.frozen
 
 # this should trigger retraining of tree only:
 tree_.max_depth = 1
 fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
-@test encoder.frozen && !tree.frozen && selector.frozen
+
 
 # this should trigger retraining of all parts:
 encoder_.initial_label = 42
 selector_.features = []
 fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
-@test !encoder.frozen && !tree.frozen && !selector.frozen
 
 predict(composite, fitresult, Xin[test,:]);
 
