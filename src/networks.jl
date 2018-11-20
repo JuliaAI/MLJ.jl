@@ -24,6 +24,7 @@ end
 mutable struct TrainableModel{B<:Model} <: MLJType
 
     model::B
+    previous_model::B
     fitresult
     cache
     args::Tuple{Vararg{Node}}
@@ -69,12 +70,18 @@ end
 # automatically detect type parameter:
 TrainableModel(model::B, args...) where B<:Model = TrainableModel{B}(model, args...)
 
-# to turn of fit-through fitting:
+# to turn fit-through fitting off and on:
 function freeze!(trainable::TrainableModel)
     trainable.frozen = true
 end
 function thaw!(trainable::TrainableModel)
     trainable.frozen = false
+end
+
+function is_stale(trainable::TrainableModel)
+    !isdefined(trainable, :fitresult) ||
+        trainable.model != trainable.previous_model ||
+        reduce(|,[is_stale(arg) for arg in trainable.args])
 end
 
 # fit method:
@@ -95,9 +102,12 @@ function fit!(trainable::TrainableModel, verbosity; kwargs...)
             fit(trainable.model, verbosity, args...)
     else
         trainable.fitresult, trainable.cache, report =
-        update(trainable.model, verbosity, trainable.fitresult, trainable.cache, args...; kwargs...)
+            update(trainable.model, verbosity, trainable.fitresult,
+                   trainable.cache, args...; kwargs...)
     end
 
+    trainable.previous_model = deepcopy(trainable.model)
+    
     if report != nothing
         merge!(trainable.report, report)
     end
@@ -143,14 +153,31 @@ end
 
 ## LEARNING NETWORKS INTERFACE - BASICS
 
-# TODO: do these really need to be mutable?
+# source nodes are stale when instantiated, becoming fresh the first
+# time they are called to obtain their contents. They can only be made
+# stale again by reloading with data.
+
 mutable struct SourceNode{D} <: Node
     data::D      # training data
+    stale::Bool
 end
 
+SourceNode(data) = SourceNode(data, true)
+is_stale(s::SourceNode) = s.stale
+
 # make source nodes callable:
-(s::SourceNode)() = s.data
+function (s::SourceNode)()
+    s.stale = false
+    return s.data
+end
 (s::SourceNode)(Xnew) = Xnew
+
+function Base.reload(s::SourceNode, data)
+    s.data = data
+    s.stale = true
+    return s
+end
+
 
 struct LearningNode{M<:Union{TrainableModel, Nothing}} <: Node
 
@@ -195,6 +222,11 @@ end
 get_depth(::SourceNode) = 0
 get_depth(X::LearningNode) = X.depth
 
+function is_stale(X::LearningNode)
+    (X.trainable != nothing && is_stale(X.trainable)) ||
+        reduce(|, [is_stale(arg) for arg in X.args])
+end
+
 # to complete the definition of `TrainableModel` and `LearningNode`
 # constructors:
 get_tape(::Any) = TrainableModel[]
@@ -220,12 +252,12 @@ LearningNode(operation::Function, args::Node...) = LearningNode(operation, nothi
 (y::LearningNode{Nothing})() = (y.operation)([arg() for arg in y.args]...)
 (y::LearningNode{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
-# the "fit through" method:
+# the "fit through" method:   ## kwargs currently being ignored
 function fit!(y::LearningNode, verbosity; kwargs...)
-    for trainable in y.tape[1:end-1]
+    stale_trainables = filter(is_stale, y.tape)
+    for trainable in stale_trainables
         fit!(trainable, verbosity)
     end
-    fit!(y.tape[end], verbosity; kwargs...)
     return y
 end
 
@@ -237,15 +269,7 @@ fit!(y::LearningNode; kwargs...) = fit!(y, 1; kwargs...)
 istoobig(d::Tuple{Node}) = length(d) > 10
 
 # overload show method
-function spaces(n)
-    s = ""
-    for i in 1:n
-        s = string(s, " ")
-    end
-    return s
-end
-
-function Base.show(stream::IO, ::MIME"text/plain", X::Node)
+function _recursive_show(stream::IO, X::Node)
     if X isa SourceNode
         printstyled(IOContext(stream, :color=>true), handle(X), bold=true)
     else
@@ -261,7 +285,7 @@ function Base.show(stream::IO, ::MIME"text/plain", X::Node)
         n_args = length(X.args)
         counter = 1
         for arg in X.args
-            show(stream, MIME("text/plain"), arg)
+            _recursive_show(stream, arg)
             counter >= n_args || print(stream, ", ")
             counter += 1
         end
@@ -269,7 +293,23 @@ function Base.show(stream::IO, ::MIME"text/plain", X::Node)
     end
 end
 
+function Base.show(stream::IO, ::MIME"text/plain", X::Node)
+    id = objectid(X) 
+    description = string(typeof(X).name.name)
+    str = "$description @ $(handle(X))"
+    printstyled(IOContext(stream, :color=> true), str, bold=true)
+    if !(X isa SourceNode)
+        print(stream, " = ")
+        _recursive_show(stream, X)
+    end
+end
+    
 function Base.show(stream::IO, ::MIME"text/plain", trainable::TrainableModel)
+    id = objectid(trainable) 
+    description = string(typeof(trainable).name.name)
+    str = "$description @ $(handle(trainable))"
+    printstyled(IOContext(stream, :color=> true), str, bold=true)
+    print(stream, " = ")
     print(stream, "trainable($(trainable.model), ")
     n_args = length(trainable.args)
     counter = 1

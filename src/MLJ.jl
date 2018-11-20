@@ -8,12 +8,12 @@ export array
 export predict, transform, inverse_transform
 
 # defined in include files:
-export partition, @curve, @pcurve                  # "utilities.jl"
-export @more, @constant                            # "show.jl"
-export rms, rmsl, rmslp1, rmsp                     # "metrics.jl"
-export load_boston, load_ames, load_iris, datanow  # "datasets.jl"
-export KNNRegressor                                # "builtins/KNN.jl":
-export node, trainable, fit!, freeze!, thaw!       # "networks.jl"
+export partition, @curve, @pcurve                    # "utilities.jl"
+export @more, @constant                              # "show.jl"
+export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
+export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
+export KNNRegressor                                  # "builtins/KNN.jl":
+export node, trainable, fit!, freeze!, thaw!, reload # "networks.jl"
 
 # defined in include file "builtins/Transformers.jl":
 export FeatureSelector
