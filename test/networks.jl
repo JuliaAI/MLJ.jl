@@ -29,6 +29,8 @@ knn_.K = 5
 fit!(knn1, 0)
 rms(predict(knn1, Xs(X[test,:])), ys(y[test]))
 
+@test MLJ.is_stale(knn1) == false
+
 # TODO: compare to constant regressor and check it's significantly better
 
 
@@ -129,47 +131,15 @@ function fit(composite::WetSupervised, verbosity, Xtrain, ytrain)
 
     fitresult = yhat
     report = l.report
-    cache = WetSupervisedCache(t_X, t_y, l,
-                               deepcopy(composite.transformer_X),
-                               deepcopy(composite.transformer_y),
-                               deepcopy(composite.learner))
-
+    cache = l
+    
     return fitresult, cache, report
 
 end
 
-function update(composite::WetSupervised, verbosity, old_fitresult, old_cache, X, y; kwargs...)
-
-    t_X, t_y, l = old_cache.t_X, old_cache.t_y, old_cache.l
-    transformer_X, transformer_y = old_cache.transformer_X, old_cache.transformer_y
-    learner = old_cache.learner 
-
-    case1 = (composite.transformer_X == transformer_X) # true if `transformer_X` has not changed
-    case2 = (composite.transformer_y == transformer_y) # true if `transformer_y` has not changed
-    case3 = (composite.learner == learner) # true if `learner` has not changed
-
-    # we initially activate all trainable models, but leave them in the
-    # state needed for this call to update (for post-train inspection):
-    thaw!(t_X); thaw!(t_y); thaw!(l)
-    
-    if case1
-        freeze!(t_X)
-    end
-    if case2
-        freeze!(t_y)
-    end
-    if case1 && case2 && case3
-        freeze!(l)
-    end
-
-    fit!(old_fitresult, verbosity-1; kwargs...)
-	
-    old_cache.transformer_X = deepcopy(composite.transformer_X)
-    old_cache.transformer_y = deepcopy(composite.transformer_y)
-    old_cache.learner = copy(composite.learner)
-	
-    return old_fitresult, old_cache, l.report
-
+function update(composite::WetSupervised, verbosity, fitresult, cache, X, y; kwargs...)
+    fit!(fitresult)
+    return fitresult, cache, cache.report
 end
 
 predict(composite::WetSupervised, fitresult, Xnew) = fitresult(Xnew)
@@ -187,12 +157,12 @@ fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain
 @test encoder.frozen && tree.frozen && selector.frozen
 
 # this should trigger retraining of encoder and tree
-encoder_.initial_label = 17
+encoder_.initial_label = 13
 fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
 @test !encoder.frozen && !tree.frozen && selector.frozen
 
 # this should trigger retraining of selector and tree:
-selector_.features = [:sepal_width, :petal_length]
+selector_.features = [:petal_length,] 
 fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
 @test encoder.frozen && !tree.frozen && !selector.frozen
 
