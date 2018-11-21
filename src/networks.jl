@@ -85,7 +85,7 @@ function is_stale(trainable::TrainableModel)
 end
 
 # fit method:
-function fit!(trainable::TrainableModel, verbosity; kwargs...)
+function fit!(trainable::TrainableModel, rows=:; verbosity=1)
 
     if trainable.frozen 
         verbosity < 0 || @warn "$trainable with model $(trainable.model) "*
@@ -99,11 +99,11 @@ function fit!(trainable::TrainableModel, verbosity; kwargs...)
 
     if !isdefined(trainable, :fitresult)
         trainable.fitresult, trainable.cache, report =
-            fit(trainable.model, verbosity, :, args...)
+            fit(trainable.model, verbosity, rows, args...)
     else
         trainable.fitresult, trainable.cache, report =
             update(trainable.model, verbosity, trainable.fitresult,
-                   trainable.cache, :, args...; kwargs...)
+                   trainable.cache, rows, args...)
     end
 
     trainable.previous_model = deepcopy(trainable.model)
@@ -117,9 +117,6 @@ function fit!(trainable::TrainableModel, verbosity; kwargs...)
     return trainable
 
 end
-
-# for convenience:
-fit!(trainable::TrainableModel; kwargs...) = fit!(trainable, 1; kwargs...) 
 
 # predict method for trainable learner models (X data):
 function predict(trainable::TrainableModel{L}, X) where L<: Learner 
@@ -253,16 +250,13 @@ LearningNode(operation::Function, args::Node...) = LearningNode(operation, nothi
 (y::LearningNode{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
 # the "fit through" method:   ## kwargs currently being ignored
-function fit!(y::LearningNode, verbosity; kwargs...)
+function fit!(y::LearningNode, rows=:; verbosity=1)
     stale_trainables = filter(is_stale, y.tape)
     for trainable in stale_trainables
-        fit!(trainable, verbosity)
+        fit!(trainable, rows; verbosity=verbosity-1)
     end
     return y
 end
-
-# for convenience:
-fit!(y::LearningNode; kwargs...) = fit!(y, 1; kwargs...)
 
 # allow arguments of `LearningNodes` and `TrainableModel`s to appear
 # at REPL:

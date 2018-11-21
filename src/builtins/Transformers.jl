@@ -60,7 +60,9 @@ end
 
 
 ## FOR RELABELLING BY CONSECUTIVE INTEGERS STARTING AT 1
-
+"""
+Note that `ToIntTransformer` fits all data provided, ie it ignores `rows`
+"""
 mutable struct ToIntTransformer <: Transformer
     sorted::Bool
     initial_label::Int # ususally 0 or 1
@@ -87,7 +89,6 @@ function fit(transformer::ToIntTransformer
              , rows
              , v::AbstractVector{T}) where T
 
-    v = v[rows]
     int_given_T = Dict{T, Int}()
     T_given_int = Dict{Int, T}()
     vals = collect(Set(v)) 
