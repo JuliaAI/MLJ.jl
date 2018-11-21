@@ -31,9 +31,9 @@ mutable struct TrainableModel{B<:Model} <: MLJType
     report
     tape::Vector{TrainableModel}
     frozen::Bool
+    rows # for remembering the rows used in last call to `fit!`
     
     function TrainableModel{B}(model::B, args::Node...) where B<:Model
-
 
         # check number of arguments for model subtypes:
         !(B <: Supervised) || length(args) == 2 ||
@@ -85,7 +85,7 @@ function is_stale(trainable::TrainableModel)
 end
 
 # fit method:
-function fit!(trainable::TrainableModel, rows=:; verbosity=1)
+function fit!(trainable::TrainableModel, rows=nothing; verbosity=1)
 
     if trainable.frozen 
         verbosity < 0 || @warn "$trainable with model $(trainable.model) "*
@@ -99,12 +99,20 @@ function fit!(trainable::TrainableModel, rows=:; verbosity=1)
     args = [arg() for arg in trainable.args]
 
     if !isdefined(trainable, :fitresult)
+        rows != nothing || error("An untrained TrainableModel requires rows to fit.")
         trainable.fitresult, trainable.cache, report =
             fit(trainable.model, verbosity, rows, args...)
+        trainable.rows = deepcopy(rows)
     else
-        trainable.fitresult, trainable.cache, report =
-            update(trainable.model, verbosity, trainable.fitresult,
-                   trainable.cache, rows, args...)
+        if rows == nothing # (ie rows not specified) update:
+            trainable.fitresult, trainable.cache, report =
+                update(trainable.model, verbosity, trainable.fitresult,
+                       trainable.cache, trainable.rows, args...)
+        else # retrain from scratch:
+            trainable.fitresult, trainable.cache, report =
+                fit(trainable.model, verbosity, rows, args...)
+            trainable.rows = deepcopy(rows)
+        end
     end
 
     trainable.previous_model = deepcopy(trainable.model)
@@ -112,8 +120,6 @@ function fit!(trainable::TrainableModel, rows=:; verbosity=1)
     if report != nothing
         merge!(trainable.report, report)
     end
-
-#    verbosity <1 || @info "Done."
 
     return trainable
 
@@ -183,7 +189,7 @@ struct LearningNode{M<:Union{TrainableModel, Nothing}} <: Node
     trainable::M          # is `nothing` for static operations
     args::Tuple{Vararg{Node}}       # nodes where `operation` looks for its arguments
     tape::Vector{TrainableModel}    # for tracking dependencies
-    depth::Int64       
+    depth::Int64
 
     function LearningNode{M}(operation, trainable::M, args::Node...) where {B<:Model, M<:Union{TrainableModel{B},Nothing}}
 
@@ -250,11 +256,18 @@ LearningNode(operation::Function, args::Node...) = LearningNode(operation, nothi
 (y::LearningNode{Nothing})() = (y.operation)([arg() for arg in y.args]...)
 (y::LearningNode{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
-# the "fit through" method:   ## kwargs currently being ignored
-function fit!(y::LearningNode, rows=:; verbosity=1)
-    stale_trainables = filter(is_stale, y.tape)
-    for trainable in stale_trainables
+function fit!(y::LearningNode, rows; verbosity=1)
+    for trainable in y.tape
         fit!(trainable, rows; verbosity=verbosity-1)
+    end
+    return y
+end
+# if no `rows` specified, only retrain stale dependent TrainableModels
+# (using whatever rows each was last trained on):
+function fit!(y::LearningNode; verbosity=1)
+    trainables = filter(is_stale, y.tape)
+    for trainable in trainables
+        fit!(trainable; verbosity=verbosity-1)
     end
     return y
 end

@@ -24,10 +24,10 @@ Xs = node(Xtrain)
 ys = node(ytrain)
 
 knn1 = trainable(knn_, Xs, ys)
-fit!(knn1)
+fit!(knn1, :)
 knn_.K = 5
 fit!(knn1, train[1:end-10])
-fit!(knn1, verbosity=0)
+fit!(knn1, verbosity=2)
 rms(predict(knn1, Xs(X[test,:])), ys(y[test]))
 
 @test MLJ.is_stale(knn1) == false
@@ -73,7 +73,9 @@ zhat = predict(knn, Xa)
 yhat = inverse_transform(uscale, zhat)
 
 # fit-through training:
-fit!(yhat)
+fit!(yhat, 1:100, verbosity=2)
+fit!(yhat, :, verbosity=2)
+fit!(yhat, verbosity=2)
 @test !MLJ.is_stale(XX)
 @test MLJ.is_stale(reload(XX, Xtrain))
 
@@ -121,7 +123,7 @@ function fit(composite::WetSupervised, verbosity, rows, Xtrain, ytrain)
     zhat = predict(l, Xt)
 
     yhat = inverse_transform(t_y, zhat)
-    fit!(yhat, rows, verbosity=verbosity-1)
+    fit!(yhat, rows, verbosity=verbosity)
 
     fitresult = yhat
     report = l.report
@@ -133,14 +135,14 @@ end
 
 function update(composite::WetSupervised, verbosity, fitresult, cache,
                 rows, X, y; kwargs...)
-    fit!(fitresult, rows; verbosity=verbosity)
+    fit!(fitresult; verbosity=verbosity)
     return fitresult, cache, cache.report
 end
 
 predict(composite::WetSupervised, fitresult, Xnew) = fitresult(Xnew)
 
 # let's train the composite:
-fitresult, cache, report = fit(composite, 3, :, Xtrain, ytrain)
+fitresult, cache, report = fit(composite, 2, :, Xtrain, ytrain)
 
 # to check internals:
 encoder = fitresult.trainable
@@ -168,6 +170,16 @@ encoder_.initial_label = 42
 selector_.features = []
 fitresult, cache, report = update(composite, 2, fitresult, cache, :, Xtrain, ytrain)
 
-predict(composite, fitresult, Xin[test,:]);
+predict(composite, fitresult, Xin[test,:])
+
+XXX = node(Xin[train,:])
+yyy = node(yin[train])
+
+composite_ = trainable(composite, XXX, yyy)
+yhat = predict(composite_, XX)
+fit!(yhat, :, verbosity=3)
+composite.transformer_X.features = [:petal_length]
+fit!(yhat, verbosity=3)
+yhat(Xin[test,:])
 
 end
