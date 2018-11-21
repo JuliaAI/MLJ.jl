@@ -42,7 +42,7 @@ abstract type Model <: MLJType end
 ````
 
 Associated with every concrete subtype of `Model` there must be a
-`fit` method, which applies implements the associated algorithm to
+`fit` method, which implements the associated algorithm to
 produce a *fit-result* (see below). 
 
 Informally, we divide some common learning algorithms into those
@@ -114,10 +114,10 @@ Here is an example of a concrete model type declaration:
 
 R = Tuple{Matrix{Float64},Vector{Float64}}
 
-mutable struct KNNRegressor <: Regressor{R}
+mutable struct KNNRegressor{M,K} <: Regressor{R}
     K::Int          
-    metric::Function
-    kernel::Function
+    metric::M
+    kernel::K
 end
 
 ````
@@ -138,7 +138,7 @@ package interfaces, together with model declerations.
 #### Compulsory methods
 
 ````julia
-fitresult, cache, report =  fit(learner::ConcreteModel, verbosity::Int, X, y)
+fitresult, cache, report =  fit(learner::ConcreteModel, verbosity::Int, rows, X, y)
 ````
 
 Here `fitresult::R` is the fit-result in the sense above. Any
@@ -155,9 +155,13 @@ not presently restricted.
 
 The types of the training data `X` and `y` should be whatever is
 required by the package for the training algorithm and declared in the
-`fit` type signature for safety.  Checks not specific to the package
-(e.g., dimension matching checks) should be left to higher levels of
-the interface to avoid code duplication.
+`fit` type signature for safety.  It is understood that `fit` only
+uses `rows` for training, except in special cases requiring all available
+data (e.g., to determine all possibly classes for a
+categorical feature) and data leakage is not likely by doing
+so. Checks not specific to the package (e.g., dimension matching
+checks) should be left to higher levels of the interface to avoid code
+duplication.
 
 The method `fit` should initially call `clean!` on `learner` and issue
 the returned warning indicating the changes to `learner`. The `clean!`

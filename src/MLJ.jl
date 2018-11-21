@@ -189,8 +189,8 @@ function inverse_transform end
 clean!(fitresult::Model) = ""
 
 # fallback method for refitting:
-update(model::Model, verbosity, fitresult, cache, args...) =
-    fit(model, verbosity, args...)
+update(model::Model, verbosity, fitresult, cache, rows, args...) =
+    fit(model, verbosity, rows, args...)
 
 # models are `==` if they have the same type and their field values are `==`:
 function ==(m1::M, m2::M) where M<:Model

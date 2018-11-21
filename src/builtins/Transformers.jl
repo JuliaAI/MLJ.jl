@@ -38,7 +38,7 @@ end
 
 FeatureSelector(;features=Symbol[]) = FeatureSelector(features)
 
-function fit(transformer::FeatureSelector, verbosity, X::AbstractDataFrame)
+function fit(transformer::FeatureSelector, verbosity, rows, X::AbstractDataFrame)
     namesX = names(X)
     issubset(Set(transformer.features), Set(namesX)) ||
         throw(error("Attempting to select non-existent feature(s)."))
@@ -60,7 +60,9 @@ end
 
 
 ## FOR RELABELLING BY CONSECUTIVE INTEGERS STARTING AT 1
-
+"""
+Note that `ToIntTransformer` fits all data provided, ie it ignores `rows`
+"""
 mutable struct ToIntTransformer <: Transformer
     sorted::Bool
     initial_label::Int # ususally 0 or 1
@@ -83,7 +85,8 @@ ToIntFitResult(S::Type{T}) where T =
     ToIntFitResult{T}(0, Dict{T, Int}(), Dict{Int, T}())
 
 function fit(transformer::ToIntTransformer
-             , verbosity::Int 
+             , verbosity::Int
+             , rows
              , v::AbstractVector{T}) where T
 
     int_given_T = Dict{T, Int}()
@@ -146,7 +149,8 @@ inverse_transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T},
 mutable struct UnivariateStandardizer <: Transformer
 end
 
-function fit(transformer::UnivariateStandardizer, verbosity, v::AbstractVector{T}) where T<:Real
+function fit(transformer::UnivariateStandardizer, verbosity, rows, v::AbstractVector{T}) where T<:Real
+    v = v[rows]
     std(v) > eps(Float64) || 
         @warn "Extremely small standard deviation encountered in standardization."
     fitresult = (mean(v), std(v))
@@ -200,8 +204,9 @@ end
 # null fitresult:
 StandardizerFitResult() = StandardizerFitResult(zeros(0,0), Symbol[], Bool[])
 
-function fit(transformer::Standardizer, verbosity::Int, X::DataFrame)
+function fit(transformer::Standardizer, verbosity::Int, rows, X::DataFrame)
 
+    X = X[rows,:]
     features = names(X)
     
     # determine indices of features to be transformed
@@ -221,7 +226,7 @@ function fit(transformer::Standardizer, verbosity::Int, X::DataFrame)
     for j in 1:size(X, 2)
         if is_transformed[j]
             fitresult, cache, report =
-                fit(UnivariateStandardizer(), verbosity-1, collect(X[j]))
+                fit(UnivariateStandardizer(), verbosity-1, :, collect(X[j]))
             fitresults[:,j] = [fitresult...]
             verbosity < 2 ||
                 @info "  :$(features[j])    mu=$(fitresults[1,j])  sigma=$(fitresults[2,j])"

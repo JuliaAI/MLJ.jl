@@ -102,14 +102,15 @@ end
 
 function fit(model::DecisionTreeClassifier{T2}
              , verbosity            #> must be here even if unsupported in pkg (as here)
+             , rows
              , X::Array{Float64,2}
              , y::Vector{T}) where {T,T2}
 
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
 
-    fitresult = DecisionTree.build_tree(y
-                                        , X
+    fitresult = DecisionTree.build_tree(y[rows]
+                                        , X[rows,:]
                                         , model.n_subfeatures
                                         , model.max_depth
                                         , model.min_samples_leaf
