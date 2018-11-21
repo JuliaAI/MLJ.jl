@@ -95,6 +95,7 @@ function fit!(trainable::TrainableModel, rows=:; verbosity=1)
         
     verbosity < 1 || @info "Training $trainable whose model is $(trainable.model)."
 
+    # call up the data at relevant source nodes for training:
     args = [arg() for arg in trainable.args]
 
     if !isdefined(trainable, :fitresult)
