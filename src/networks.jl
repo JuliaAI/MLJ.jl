@@ -1,6 +1,6 @@
 abstract type AbstractNode <: MLJType end
 
-# a tape is a vector of `TrainableModels` defined below, used to track dependencies
+# a tape is a vector of `NodalTrainableModels` defined below, used to track dependencies
 """ 
     merge!(tape1, tape2)
 
@@ -21,7 +21,7 @@ end
 # TODO: replace linear tapes below with dependency trees to allow
 # better scheduling of training learning networks data.
 
-mutable struct TrainableModel{B<:Model} <: MLJType
+mutable struct NodalTrainableModel{B<:Model} <: MLJType
 
     model::B
     previous_model::B
@@ -29,19 +29,19 @@ mutable struct TrainableModel{B<:Model} <: MLJType
     cache
     args::Tuple{Vararg{AbstractNode}}
     report
-    tape::Vector{TrainableModel}
+    tape::Vector{NodalTrainableModel}
     frozen::Bool
     rows # for remembering the rows used in last call to `fit!`
     
-    function TrainableModel{B}(model::B, args::AbstractNode...) where B<:Model
+    function NodalTrainableModel{B}(model::B, args::AbstractNode...) where B<:Model
 
         # check number of arguments for model subtypes:
         !(B <: Supervised) || length(args) == 2 ||
             throw(error("Wrong number of arguments. "*
-                        "Use TrainableModel(model, X, y) for supervised learner models."))
+                        "Use NodalTrainableModel(model, X, y) for supervised learner models."))
         !(B <: Unsupervised) || length(args) == 1 ||
             throw(error("Wrong number of arguments. "*
-                        "Use TrainableModel(model, X) for an unsupervised learner model."))
+                        "Use NodalTrainableModel(model, X) for an unsupervised learner model."))
         
         trainable = new{B}(model)
         trainable.frozen = false
@@ -65,24 +65,24 @@ mutable struct TrainableModel{B<:Model} <: MLJType
 end
 
 # automatically detect type parameter:
-TrainableModel(model::B, args...) where B<:Model = TrainableModel{B}(model, args...)
+NodalTrainableModel(model::B, args...) where B<:Model = NodalTrainableModel{B}(model, args...)
 
 # to turn fit-through fitting off and on:
-function freeze!(trainable::TrainableModel)
+function freeze!(trainable::NodalTrainableModel)
     trainable.frozen = true
 end
-function thaw!(trainable::TrainableModel)
+function thaw!(trainable::NodalTrainableModel)
     trainable.frozen = false
 end
 
-function is_stale(trainable::TrainableModel)
+function is_stale(trainable::NodalTrainableModel)
     !isdefined(trainable, :fitresult) ||
         trainable.model != trainable.previous_model ||
         reduce(|,[is_stale(arg) for arg in trainable.args])
 end
 
 # fit method:
-function fit!(trainable::TrainableModel, rows=nothing; verbosity=1)
+function fit!(trainable::NodalTrainableModel, rows=nothing; verbosity=1)
 
     if trainable.frozen 
         verbosity < 0 || @warn "$trainable with model $(trainable.model) "*
@@ -95,7 +95,7 @@ function fit!(trainable::TrainableModel, rows=nothing; verbosity=1)
     # call up the data at relevant source nodes for training:
 
     if !isdefined(trainable, :fitresult)
-        rows != nothing || error("An untrained TrainableModel requires rows to fit.")
+        rows != nothing || error("An untrained NodalTrainableModel requires rows to fit.")
         args = [arg()[Rows, rows] for arg in trainable.args]
         trainable.fitresult, trainable.cache, report =
             fit(trainable.model, verbosity, args...)
@@ -128,7 +128,7 @@ end
 # networks.jl
 
 # predict method for trainable learner models (X data):
-function predict(trainable::TrainableModel, X) 
+function predict(trainable::NodalTrainableModel, X) 
     if isdefined(trainable, :fitresult)
         return predict(trainable.model, trainable.fitresult, X)
     else
@@ -137,7 +137,7 @@ function predict(trainable::TrainableModel, X)
 end
 
 # a transform method for trainable transformer models (X data):
-function transform(trainable::TrainableModel, X)
+function transform(trainable::NodalTrainableModel, X)
     if isdefined(trainable, :fitresult)
         return transform(trainable.model, trainable.fitresult, X)
     else
@@ -146,7 +146,7 @@ function transform(trainable::TrainableModel, X)
 end
 
 # an inverse-transform method for trainable transformer models (X data):
-function inverse_transform(trainable::TrainableModel, X)
+function inverse_transform(trainable::NodalTrainableModel, X)
     if isdefined(trainable, :fitresult)
         return inverse_transform(trainable.model, trainable.fitresult, X)
     else
@@ -169,15 +169,15 @@ is_stale(s::Source) = false
 (s::Source)() = s.data
 (s::Source)(Xnew) = Xnew
 
-struct Node{M<:Union{TrainableModel, Nothing}} <: AbstractNode
+struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
 
     operation::Function   # that can be dispatched on `trainable`(eg, `predict`) or a static operation
     trainable::M          # is `nothing` for static operations
     args::Tuple{Vararg{AbstractNode}}       # nodes where `operation` looks for its arguments
-    tape::Vector{TrainableModel}    # for tracking dependencies
+    tape::Vector{NodalTrainableModel}    # for tracking dependencies
     depth::Int64
 
-    function Node{M}(operation, trainable::M, args::AbstractNode...) where {B<:Model, M<:Union{TrainableModel{B},Nothing}}
+    function Node{M}(operation, trainable::M, args::AbstractNode...) where {B<:Model, M<:Union{NodalTrainableModel{B},Nothing}}
 
         # check the number of arguments:
         if trainable == nothing
@@ -213,14 +213,14 @@ function is_stale(X::Node)
         reduce(|, [is_stale(arg) for arg in X.args])
 end
 
-# to complete the definition of `TrainableModel` and `Node`
+# to complete the definition of `NodalTrainableModel` and `Node`
 # constructors:
-get_tape(::Any) = TrainableModel[]
+get_tape(::Any) = NodalTrainableModel[]
 get_tape(X::Node) = X.tape
-get_tape(trainable::TrainableModel) = trainable.tape
+get_tape(trainable::NodalTrainableModel) = trainable.tape
 
 # autodetect type parameter:
-Node(operation, trainable::M, args...) where M<:Union{TrainableModel, Nothing} =
+Node(operation, trainable::M, args...) where M<:Union{NodalTrainableModel, Nothing} =
     Node{M}(operation, trainable, args...)
 
 # constructor for static operations:
@@ -244,7 +244,7 @@ function fit!(y::Node, rows; verbosity=1)
     end
     return y
 end
-# if no `rows` specified, only retrain stale dependent TrainableModels
+# if no `rows` specified, only retrain stale dependent NodalTrainableModels
 # (using whatever rows each was last trained on):
 function fit!(y::Node; verbosity=1)
     trainables = filter(is_stale, y.tape)
@@ -254,7 +254,7 @@ function fit!(y::Node; verbosity=1)
     return y
 end
 
-# allow arguments of `Nodes` and `TrainableModel`s to appear
+# allow arguments of `Nodes` and `NodalTrainableModel`s to appear
 # at REPL:
 istoobig(d::Tuple{AbstractNode}) = length(d) > 10
 
@@ -294,7 +294,7 @@ function Base.show(stream::IO, ::MIME"text/plain", X::AbstractNode)
     end
 end
     
-function Base.show(stream::IO, ::MIME"text/plain", trainable::TrainableModel)
+function Base.show(stream::IO, ::MIME"text/plain", trainable::NodalTrainableModel)
     id = objectid(trainable) 
     description = string(typeof(trainable).name.name)
     str = "$description @ $(handle(trainable))"
@@ -317,13 +317,13 @@ Node(X) = Source(X) # here `X` is data
 
 # aliases
 node = Node
-trainable = TrainableModel
+trainable = NodalTrainableModel
 
 # TODO: use macro to autogenerate these during model decleration/package glue-code:
 # remove need for `Node` syntax in case of operations of main interest:
-predict(trainable::TrainableModel, X::AbstractNode) = node(predict, trainable, X)
-transform(trainable::TrainableModel, X::AbstractNode) = node(transform, trainable, X)
-inverse_transform(trainable::TrainableModel, X::AbstractNode) = node(inverse_transform, trainable, X)
+predict(trainable::NodalTrainableModel, X::AbstractNode) = node(predict, trainable, X)
+transform(trainable::NodalTrainableModel, X::AbstractNode) = node(transform, trainable, X)
+inverse_transform(trainable::NodalTrainableModel, X::AbstractNode) = node(inverse_transform, trainable, X)
 
 array(X) = convert(Array, X)
 array(X::AbstractNode) = node(array, X)
