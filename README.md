@@ -1,6 +1,6 @@
 ## MLJ Machine Learning Models Tuning Library - 100% Made in Julia
 
-Edoardo Barp, Anthony Blaom, Gergö Bohner, Valentin Churvay, Harvey Devereux, Thibaut Lienart, Franz J Király, Mohammed Nook, Annika Stechemesser, Sebastian Vollmer; Mike Innes in partnership with Julia Computing
+Diego Arenas, Edoardo Barp, Anthony Blaom, Gergö Bohner, Valentin Churvay, Harvey Devereux, Thibaut Lienart, Franz J Király, Mohammed Nook, Annika Stechemesser, Sebastian Vollmer; Mike Innes in partnership with Julia Computing
 
 The current master branch is under considerable redevelopment. For an
 earlier proof-of-concept, see
