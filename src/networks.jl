@@ -123,7 +123,7 @@ function fit!(trainable::TrainableModel, rows=nothing; verbosity=1)
 end
 
 # predict method for trainable learner models (X data):
-function predict(trainable::TrainableModel{L}, X) where L<:Model
+function predict(trainable::TrainableModel, X) 
     if isdefined(trainable, :fitresult)
         return predict(trainable.model, trainable.fitresult, X)
     else

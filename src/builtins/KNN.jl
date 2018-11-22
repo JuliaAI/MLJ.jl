@@ -4,11 +4,12 @@ module KNN
 
 export KNNRegressor
 
-import MLJ: Supervised
+import MLJ: Supervised 
 using LinearAlgebra
 
 # to be extended:
-import MLJ: predict, fit, update, clean!
+import MLJ: predict, fit, update, clean!, properties, operations, type_of_X, type_of_y
+import MLJ: Regression, Classification, MultiClass, Nominal, Numeric, Weights, NAs
 
 KNNFitResultType = Tuple{Matrix{Float64},Vector{Float64}}
 
@@ -19,6 +20,12 @@ mutable struct KNNRegressor <: Supervised{KNNFitResultType}
     metric::Function
     kernel::Function 
 end
+
+# metadata:
+properties(::Type{KNNRegressor}) = [Regression(), Numeric()]
+operations(::Type{KNNRegressor}) = [:predict]
+type_of_X(::Type{KNNRegressor}) = Array{Float64,2}
+type_of_y(::Type{KNNRegressor}) = Vector{Float64}
 
 euclidean(v1, v2) = norm(v2 - v1)
 reciprocal(d) = d < eps(Float64) ? sign(d)/eps(Float64) : 1/d

@@ -11,7 +11,8 @@ import Distributions
 using Statistics
 
 # to be extended:
-import MLJ: fit, transform, inverse_transform
+import MLJ: fit, transform, inverse_transform, properties, operations, type_of_X
+import MLJ: Nominal, Numeric, Weights, NAs
 
 
 ## CONSTANTS
@@ -35,6 +36,11 @@ present in the transformation input.
 mutable struct FeatureSelector <: Unsupervised
     features::Vector{Symbol} 
 end
+
+# metadata:
+properties(::Type{FeatureSelector}) = [Numeric(), Nominal(), NAs()]
+operations(::Type{FeatureSelector}) = [:transform]
+type_of_X(::Type{FeatureSelector}) = AbstractDataFrame
 
 FeatureSelector(;features=Symbol[]) = FeatureSelector(features)
 
@@ -68,6 +74,11 @@ mutable struct ToIntTransformer <: Unsupervised
     initial_label::Int # ususally 0 or 1
     map_unseen_to_minus_one::Bool # unseen inputs are transformed to -1
 end
+
+# metadata:
+properties(::Type{ToIntTransformer}) = [Numeric(), Nominal(), NAs()]
+operations(::Type{ToIntTransformer}) = [:transform, :inverse_transform]
+type_of_X(::Type{ToIntTransformer}) = AbstractVector
 
 ToIntTransformer(; sorted=true, initial_label=1
                  , map_unseen_to_minus_one=false) =
@@ -150,6 +161,11 @@ inverse_transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T},
 mutable struct UnivariateStandardizer <: Unsupervised
 end
 
+# metadata:
+properties(::Type{UnivariateStandardizer}) = [Numeric(), NAs()]
+operations(::Type{UnivariateStandardizer}) = [:transform, :inverse_transform]
+type_of_X(::Type{UnivariateStandardizer}) = AbstractVector
+
 function fit(transformer::UnivariateStandardizer, verbosity, rows, v::AbstractVector{T}) where T<:Real
     v = v[rows]
     std(v) > eps(Float64) || 
@@ -192,6 +208,10 @@ inverse_transform(transformer::UnivariateStandardizer, fitresult, w) =
 mutable struct Standardizer <: Unsupervised
     features::Vector{Symbol} # features to be standardized; empty means all of
 end
+
+properties(::Type{Standardizer}) = [Numeric(), Nominal(), NAs()]
+operations(::Type{Standardizer}) = [:transform, :inverse_transform]
+type_of_X(::Type{Standardizer}) = DataFrame
 
 # lazy keyword constructor:
 Standardizer(; features=Symbol[]) = Standardizer(features)

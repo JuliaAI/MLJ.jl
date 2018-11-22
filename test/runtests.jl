@@ -8,6 +8,10 @@ using MLJ
 using Test
 
 @constant junk=KNNRegressor()
+properties(KNNRegressor)
+operations(KNNRegressor)
+type_of_X(KNNRegressor)
+type_of_y(KNNRegressor)
 
 include("metrics.jl")
 include("datasets.jl")

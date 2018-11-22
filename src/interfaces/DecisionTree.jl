@@ -1,9 +1,9 @@
 # this file defines *and* loads one module
 
 #> This interface for the DecisionTree package is annotated so that it
-#> may serve as a template for other supervised learning
-#> interfaces. The annotations, which begin with "#>", should be
-#> removed (but copy this file first!). See also the low-level
+#> may serve as a template for other interfaces introducing new
+#> Supervised subtypes. The annotations, which begin with "#>", should
+#> be removed (but copy this file first!). See also the model
 #> interface specification at "doc/adding_new_models.md".
 
 #> Glue code goes in a module, whose name is the package name with
@@ -14,8 +14,11 @@ module DecisionTree_
 export DecisionTreeClassifier
 
 # to be extended:
-import MLJ: predict, fit, clean!         #> compulsory for learners
-# import MLJ: update, predict_proba     #> if implemented
+#> for all Supervised models:
+import MLJ: predict, fit, clean!, properties, operations, type_of_X, type_of_y
+import MLJ: Regression, Classification, MultiClass, Nominal, Numeric, Weights, NAs
+
+# import MLJ: update, predict_proba      #> if implemented
 
 # needed:
 import DecisionTree                #> import package
@@ -45,6 +48,12 @@ mutable struct DecisionTreeClassifier{T} <: Supervised{DecisionTreeClassifierFit
     post_prune::Bool
     merge_purity_threshold::Float64
 end
+
+# metadata:
+properties(::Type{DecisionTreeClassifier}) = [MultiClass(), Numeric()]
+operations(::Type{DecisionTreeClassifier}) = [:predict]
+type_of_X(::Type{DecisionTreeClassifier}) = Array{Float64,2}
+type_of_y(::Type{DecisionTreeClassifier}) = Vector
 
 # constructor:
 #> all arguments are kwargs; 

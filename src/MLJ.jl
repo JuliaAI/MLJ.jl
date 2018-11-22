@@ -2,10 +2,14 @@ module MLJ
 
 export Rows, Cols, Names
 export features, X_and_y
+export Property, Regressor, TwoClass, MultiClass
+export Numeric, Nominal, Weights, NAs
+export properties, operations, type_of_X, type_of_y
+
 export array
 
 # defined here but extended by files in "interfaces/" (lazily loaded)
-export predict, transform, inverse_transform
+export predict, transform, inverse_transform, predict_proba, se, evaluate
 
 # defined in include files:
 export partition, @curve, @pcurve                    # "utilities.jl"
@@ -68,7 +72,7 @@ abstract type Unsupervised <: Model  end
 
 # tasks:
 abstract type Task <: MLJType end 
-
+abstract type Property end # subtypes are the allowable task properties
 
 ## LOSS FUNCTIONS
 
@@ -106,14 +110,30 @@ Base.getindex(A::AbstractMatrix{T}, ::Type{Eltypes}) where T = [T for j in 1:siz
 Base.getindex(v::AbstractVector, ::Type{Rows}, r) = v[r]
 
 
-## CONCRETE TASK TYPES
+## MODEL PROPERTIES
 
+""" Models with this property perform regression """
+struct Regression <: Property end    
+""" Models with this property perform binary classification """
+struct Classification <: Property end
+""" Models with this property perform binary and multiclass classification """
+struct MultiClass <: Property end
+""" Models with this property support nominal (categorical) features """
+struct Nominal <: Property end
+""" Models with this property support features of numeric type (continuous or ordered factor) """
+struct Numeric <: Property end
+""" Classfication models with this property allow weighting of the target classes """
+struct Weights <: Property end
+""" Models with this property support features with missing values """ 
+struct NAs <: Property end
+
+# TODO: add evaluation metric:
 struct SupervisedTask <: Task
     data
     target::Symbol
     ignore::Vector{Symbol}
-    method::Symbol
-    properties::Vector{Symbol}
+    operation::Symbol    # predict, transform, predict_proba, inverse_transform, etc
+    properties::Vector{Property}
 end
 
 # TODO: have constructor check data for properties to add to
@@ -122,19 +142,16 @@ function SupervisedTask(
     ; data=nothing
     , target=nothing
     , ignore=Symbol[]
-    , method=:predict
-    , properties=Symbol[])
+    , operation=:predict
+    , properties=Property[])
     
     data != nothing         || throw(error("You must specify data=..."))
     target != nothing       || throw(error("You must specify target=..."))
     target in names(data)   || throw(error("Supplied data does not have $target as field."))
-    return SupervisedTask(data, target, ignore, method, properties)
+    !isempty(properties)    || @warn "No properties specified for task. "*
+                                     "To list properties run `subtypes(Properties)`."
+    return SupervisedTask(data, target, ignore, operation, properties)
 end
-
-ClassificationTask(; properties=Symbol[], kwargs...) =
-    SupervisedTask(; properties=push!(properties, :classification), kwargs...)
-RegressionTask(; properties=Symbol[], kwargs...) =
-    SupervisedTask(; properties=push!(properties, :regression), kwargs...)
 
 
 ## RUDIMENTARY TASK OPERATIONS
@@ -165,13 +182,21 @@ include("datasets.jl")
 # ones not dependent on external packages) are contained in
 # "/src/builtins.jl"
 
-# low-level methods to be extended:
+# methods to be dispatched on `Model` instances:
 function fit end
 function update end
 function predict end
 function predict_proba end
 function transform end 
 function inverse_transform end
+function se end
+function evaluate end
+
+# methods to be dispatched on `Model` subtypes:
+function operations end
+function type_of_nominals end
+function type_of_X end
+function type_of_y end
 
 # fallback method to correct invalid hyperparameters and return
 # a warning (in this case empty):
@@ -180,6 +205,9 @@ clean!(fitresult::Model) = ""
 # fallback method for refitting:
 update(model::Model, verbosity, fitresult, cache, rows, args...) =
     fit(model, verbosity, rows, args...)
+
+# fallback for properties:
+properties(model::Model) = Property[]
 
 # models are `==` if they have the same type and their field values are `==`:
 function ==(m1::M, m2::M) where M<:Model
