@@ -1,4 +1,4 @@
-abstract type Node <: MLJType end
+abstract type AbstractNode <: MLJType end
 
 # a tape is a vector of `TrainableModels` defined below, used to track dependencies
 """ 
@@ -27,13 +27,13 @@ mutable struct TrainableModel{B<:Model} <: MLJType
     previous_model::B
     fitresult
     cache
-    args::Tuple{Vararg{Node}}
+    args::Tuple{Vararg{AbstractNode}}
     report
     tape::Vector{TrainableModel}
     frozen::Bool
     rows # for remembering the rows used in last call to `fit!`
     
-    function TrainableModel{B}(model::B, args::Node...) where B<:Model
+    function TrainableModel{B}(model::B, args::AbstractNode...) where B<:Model
 
         # check number of arguments for model subtypes:
         !(B <: Supervised) || length(args) == 2 ||
@@ -51,7 +51,7 @@ mutable struct TrainableModel{B<:Model} <: MLJType
         # note: `get_tape(arg)` returns arg.tape where this makes
         # sense and an empty tape otherwise.  However, the complete
         # definition of `get_tape` must be postponed until
-        # `LearningNode` type is defined.
+        # `Node` type is defined.
 
         # combine the tapes of all arguments to make a new tape:
         tape = get_tape(nothing) # returns blank tape 
@@ -159,45 +159,29 @@ end
 
 ## LEARNING NETWORKS INTERFACE - BASICS
 
-# source nodes are stale when instantiated, becoming fresh the first
-# time they are called to obtain their contents. They can only be made
-# stale again by reloading with data.
-
-mutable struct SourceNode{D} <: Node
+struct Source{D} <: AbstractNode
     data::D      # training data
-    stale::Bool
 end
 
-SourceNode(data) = SourceNode(data, true)
-is_stale(s::SourceNode) = s.stale
+is_stale(s::Source) = false
 
 # make source nodes callable:
-function (s::SourceNode)()
-    s.stale = false
-    return s.data
-end
-(s::SourceNode)(Xnew) = Xnew
+(s::Source)() = s.data
+(s::Source)(Xnew) = Xnew
 
-function Base.reload(s::SourceNode, data)
-    s.data = data
-    s.stale = true
-    return s
-end
-
-
-struct LearningNode{M<:Union{TrainableModel, Nothing}} <: Node
+struct Node{M<:Union{TrainableModel, Nothing}} <: AbstractNode
 
     operation::Function   # that can be dispatched on `trainable`(eg, `predict`) or a static operation
     trainable::M          # is `nothing` for static operations
-    args::Tuple{Vararg{Node}}       # nodes where `operation` looks for its arguments
+    args::Tuple{Vararg{AbstractNode}}       # nodes where `operation` looks for its arguments
     tape::Vector{TrainableModel}    # for tracking dependencies
     depth::Int64
 
-    function LearningNode{M}(operation, trainable::M, args::Node...) where {B<:Model, M<:Union{TrainableModel{B},Nothing}}
+    function Node{M}(operation, trainable::M, args::AbstractNode...) where {B<:Model, M<:Union{TrainableModel{B},Nothing}}
 
         # check the number of arguments:
         if trainable == nothing
-            length(args) > 0 || throw(error("`args` in `LearningNode(::Function, args...)` must be non-empty. "))
+            length(args) > 0 || throw(error("`args` in `Node(::Function, args...)` must be non-empty. "))
         end
 
         # get the trainable model's dependencies:
@@ -221,40 +205,40 @@ struct LearningNode{M<:Union{TrainableModel, Nothing}} <: Node
 end
 
 # ... where
-get_depth(::SourceNode) = 0
-get_depth(X::LearningNode) = X.depth
+get_depth(::Source) = 0
+get_depth(X::Node) = X.depth
 
-function is_stale(X::LearningNode)
+function is_stale(X::Node)
     (X.trainable != nothing && is_stale(X.trainable)) ||
         reduce(|, [is_stale(arg) for arg in X.args])
 end
 
-# to complete the definition of `TrainableModel` and `LearningNode`
+# to complete the definition of `TrainableModel` and `Node`
 # constructors:
 get_tape(::Any) = TrainableModel[]
-get_tape(X::LearningNode) = X.tape
+get_tape(X::Node) = X.tape
 get_tape(trainable::TrainableModel) = trainable.tape
 
 # autodetect type parameter:
-LearningNode(operation, trainable::M, args...) where M<:Union{TrainableModel, Nothing} =
-    LearningNode{M}(operation, trainable, args...)
+Node(operation, trainable::M, args...) where M<:Union{TrainableModel, Nothing} =
+    Node{M}(operation, trainable, args...)
 
 # constructor for static operations:
-LearningNode(operation::Function, args::Node...) = LearningNode(operation, nothing, args...)
+Node(operation::Function, args::AbstractNode...) = Node(operation, nothing, args...)
 
 # note: the following two methods only work as expected if the
-# LearningNode `y` has a single source.  TODO: track the source and
+# Node `y` has a single source.  TODO: track the source and
 # make sure it is unique
 
-# make learning nodes callable:
-(y::LearningNode)() = (y.operation)(y.trainable, [arg() for arg in y.args]...)
-(y::LearningNode)(Xnew) = (y.operation)(y.trainable, [arg(Xnew) for arg in y.args]...)
+# make nodes callable:
+(y::Node)() = (y.operation)(y.trainable, [arg() for arg in y.args]...)
+(y::Node)(Xnew) = (y.operation)(y.trainable, [arg(Xnew) for arg in y.args]...)
 
 # and for the special case of static operations:
-(y::LearningNode{Nothing})() = (y.operation)([arg() for arg in y.args]...)
-(y::LearningNode{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
+(y::Node{Nothing})() = (y.operation)([arg() for arg in y.args]...)
+(y::Node{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
-function fit!(y::LearningNode, rows; verbosity=1)
+function fit!(y::Node, rows; verbosity=1)
     for trainable in y.tape
         fit!(trainable, rows; verbosity=verbosity-1)
     end
@@ -262,7 +246,7 @@ function fit!(y::LearningNode, rows; verbosity=1)
 end
 # if no `rows` specified, only retrain stale dependent TrainableModels
 # (using whatever rows each was last trained on):
-function fit!(y::LearningNode; verbosity=1)
+function fit!(y::Node; verbosity=1)
     trainables = filter(is_stale, y.tape)
     for trainable in trainables
         fit!(trainable; verbosity=verbosity-1)
@@ -270,13 +254,13 @@ function fit!(y::LearningNode; verbosity=1)
     return y
 end
 
-# allow arguments of `LearningNodes` and `TrainableModel`s to appear
+# allow arguments of `Nodes` and `TrainableModel`s to appear
 # at REPL:
-istoobig(d::Tuple{Node}) = length(d) > 10
+istoobig(d::Tuple{AbstractNode}) = length(d) > 10
 
 # overload show method
-function _recursive_show(stream::IO, X::Node)
-    if X isa SourceNode
+function _recursive_show(stream::IO, X::AbstractNode)
+    if X isa Source
         printstyled(IOContext(stream, :color=>true), handle(X), bold=true)
     else
         detail = (X.trainable == nothing ? "(" : "($(handle(X.trainable)), ")
@@ -299,12 +283,12 @@ function _recursive_show(stream::IO, X::Node)
     end
 end
 
-function Base.show(stream::IO, ::MIME"text/plain", X::Node)
+function Base.show(stream::IO, ::MIME"text/plain", X::AbstractNode)
     id = objectid(X) 
     description = string(typeof(X).name.name)
     str = "$description @ $(handle(X))"
     printstyled(IOContext(stream, :color=> true), str, bold=true)
-    if !(X isa SourceNode)
+    if !(X isa Source)
         print(stream, " = ")
         _recursive_show(stream, X)
     end
@@ -329,32 +313,32 @@ end
 
 ## SYNTACTIC SUGAR FOR LEARNING NETWORKS
 
-LearningNode(X) = SourceNode(X) # here `X` is data
+Node(X) = Source(X) # here `X` is data
 
 # aliases
-node = LearningNode
+node = Node
 trainable = TrainableModel
 
 # TODO: use macro to autogenerate these during model decleration/package glue-code:
-# remove need for `LearningNode` syntax in case of operations of main interest:
-predict(trainable::TrainableModel, X::Node) = node(predict, trainable, X)
-transform(trainable::TrainableModel, X::Node) = node(transform, trainable, X)
-inverse_transform(trainable::TrainableModel, X::Node) = node(inverse_transform, trainable, X)
+# remove need for `Node` syntax in case of operations of main interest:
+predict(trainable::TrainableModel, X::AbstractNode) = node(predict, trainable, X)
+transform(trainable::TrainableModel, X::AbstractNode) = node(transform, trainable, X)
+inverse_transform(trainable::TrainableModel, X::AbstractNode) = node(inverse_transform, trainable, X)
 
 array(X) = convert(Array, X)
-array(X::Node) = node(array, X)
+array(X::AbstractNode) = node(array, X)
 
 Base.log(v::Vector{<:Number}) = log.(v)
 Base.exp(v::Vector{<:Number}) = exp.(v)
-Base.log(X::Node) = node(log, X)
-Base.exp(X::Node) = node(exp, X)
+Base.log(X::AbstractNode) = node(log, X)
+Base.exp(X::AbstractNode) = node(exp, X)
 
 
-rms(y::Node, yhat::Node) = node(rms, y, yhat)
-rms(y, yhat::Node) = node(rms, y, yhat)
-rms(y::Node, yhat) = node(rms, y, yhat)
+rms(y::AbstractNode, yhat::AbstractNode) = node(rms, y, yhat)
+rms(y, yhat::AbstractNode) = node(rms, y, yhat)
+rms(y::AbstractNode, yhat) = node(rms, y, yhat)
 
 import Base.+
-+(y1::Node, y2::Node) = node(+, y1, y2)
-+(y1, y2::Node) = node(+, y1, y2)
-+(y1::Node, y2) = node(+, y1, y2)
++(y1::AbstractNode, y2::AbstractNode) = node(+, y1, y2)
++(y1, y2::AbstractNode) = node(+, y1, y2)
++(y1::AbstractNode, y2) = node(+, y1, y2)

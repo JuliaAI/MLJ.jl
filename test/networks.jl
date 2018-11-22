@@ -35,7 +35,7 @@ rms(predict(knn1, Xs(X[test,:])), ys(y[test]))
 # TODO: compare to constant regressor and check it's significantly better
 
 
-## LEARNING NODES
+## NODES
 
 tape = MLJ.get_tape
 @test isempty(tape(nothing))
@@ -43,7 +43,7 @@ tape = MLJ.get_tape
 
 XX = node(X_frame[train,:])
 yy = node(y[train])
-@test MLJ.is_stale(XX)
+@test !MLJ.is_stale(XX)
 
 # construct a transformer to standardize the target:
 uscale_ = UnivariateStandardizer()
@@ -77,18 +77,18 @@ fit!(yhat, 1:100, verbosity=2)
 fit!(yhat, :, verbosity=2)
 fit!(yhat, verbosity=2)
 @test !MLJ.is_stale(XX)
-@test MLJ.is_stale(reload(XX, Xtrain))
+
 
 rms(yhat(X_frame[test,:]), y[test])
 
 
 ## MAKE A COMPOSITE MODEL
 
-import MLJ: Supervised, Unsupervised, LearningNode, TrainableModel, MLJType
+import MLJ: Supervised, Unsupervised, Node, TrainableModel, MLJType
 
 mutable struct WetSupervised{L<:Supervised,
                              TX<:Unsupervised,
-                             Ty<:Unsupervised} <: Supervised{LearningNode}
+                             Ty<:Unsupervised} <: Supervised{Node}
     learner::L
     transformer_X::TX
     transformer_y::Ty

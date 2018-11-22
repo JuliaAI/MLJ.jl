@@ -72,7 +72,7 @@ abstract type Unsupervised <: Model  end
 
 # tasks:
 abstract type Task <: MLJType end 
-abstract type Property end # subtypes are the allowable task properties
+abstract type Property end # subtypes are the allowable model properties
 
 
 ## LOSS FUNCTIONS
