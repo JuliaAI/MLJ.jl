@@ -61,20 +61,10 @@ abstract type MLJType end
 include("show.jl")
 
 # for storing hyperparameters:
-abstract type Model <: MLJType end 
+abstract type Model <: MLJType end
 
-abstract type Learner <: Model end
-
-# a model type for transformers
-abstract type Transformer <: Model end 
-
-# special learners:
-abstract type Supervised{E} <: Learner end # parameterized by fit-result `E`
-abstract type Unsupervised{E} <: Learner end
-
-# special supervised learners:
-abstract type Regressor{E} <: Supervised{E} end
-abstract type Classifier{E} <: Supervised{E} end
+abstract type Supervised{E} <: Model end # parameterized by fit-result `E`
+abstract type Unsupervised <: Model  end
 
 # tasks:
 abstract type Task <: MLJType end 
@@ -97,14 +87,11 @@ struct Rows end
 struct Cols end
 struct Names end
 struct Eltypes end
-# struct Echo end 
-
 
 Base.getindex(df::AbstractDataFrame, ::Type{Rows}, r) = df[r,:]
 Base.getindex(df::AbstractDataFrame, ::Type{Cols}, c) = df[c]
 Base.getindex(df::AbstractDataFrame, ::Type{Names}) = names(df)
 Base.getindex(df::AbstractDataFrame, ::Type{Eltypes}) = eltypes(df)
-# Base.getindex(df::AbstractDataFrame, ::Type{Echo}, dg) = dg
 
 # Base.getindex(df::JuliaDB.Table, ::Type{Rows}, r) = df[r]
 # Base.getindex(df::JuliaDB.Table, ::Type{Cols}, c) = select(df, c)
@@ -115,37 +102,39 @@ Base.getindex(A::AbstractMatrix, ::Type{Rows}, r) = A[r,:]
 Base.getindex(A::AbstractMatrix, ::Type{Cols}, c) = A[:,c]
 Base.getindex(A::AbstractMatrix, ::Type{Names}) = 1:size(A, 2)
 Base.getindex(A::AbstractMatrix{T}, ::Type{Eltypes}) where T = [T for j in 1:size(A, 2)]
-# Base.getindex(A::AbstractMatrix, ::Type{Echo}, B) = B
 
 Base.getindex(v::AbstractVector, ::Type{Rows}, r) = v[r]
-# Base.getindex(v::AbstractVector, ::Type{Echo}, w) = w
 
 
 ## CONCRETE TASK TYPES
 
 struct SupervisedTask <: Task
-    kind::Symbol
     data
     target::Symbol
     ignore::Vector{Symbol}
+    method::Symbol
+    properties::Vector{Symbol}
 end
 
+# TODO: have constructor check data for properties to add to
+# `properties`
 function SupervisedTask(
-    ; kind=nothing
-    , data=nothing
+    ; data=nothing
     , target=nothing
-    , ignore=Symbol[])
+    , ignore=Symbol[]
+    , method=:predict
+    , properties=Symbol[])
     
-    kind != nothing         || throw(error("You must specfiy kind=..."))
     data != nothing         || throw(error("You must specify data=..."))
     target != nothing       || throw(error("You must specify target=..."))
     target in names(data)   || throw(error("Supplied data does not have $target as field."))
-    return SupervisedTask(kind, data, target, ignore)
-
+    return SupervisedTask(data, target, ignore, method, properties)
 end
 
-ClassificationTask(; kwargs...) = SupervisedTask(; kind=:classification, kwargs...)
-RegressionTask(; kwargs...)     = SupervisedTask(; kind=:regression, kwargs...)
+ClassificationTask(; properties=Symbol[], kwargs...) =
+    SupervisedTask(; properties=push!(properties, :classification), kwargs...)
+RegressionTask(; properties=Symbol[], kwargs...) =
+    SupervisedTask(; properties=push!(properties, :regression), kwargs...)
 
 
 ## RUDIMENTARY TASK OPERATIONS
@@ -266,6 +255,3 @@ end
 
 end # module
 
-
-
-    

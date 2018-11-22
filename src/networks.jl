@@ -42,9 +42,6 @@ mutable struct TrainableModel{B<:Model} <: MLJType
         !(B <: Unsupervised) || length(args) == 1 ||
             throw(error("Wrong number of arguments. "*
                         "Use TrainableModel(model, X) for an unsupervised learner model."))
-        !(B <: Transformer) || length(args) == 1 ||
-            throw(error("Wrong number of arguments. Use TrainableModel(model, X) for "*
-                        "transformer models."))
         
         trainable = new{B}(model)
         trainable.frozen = false
@@ -126,7 +123,7 @@ function fit!(trainable::TrainableModel, rows=nothing; verbosity=1)
 end
 
 # predict method for trainable learner models (X data):
-function predict(trainable::TrainableModel{L}, X) where L<: Learner 
+function predict(trainable::TrainableModel{L}, X) where L<:Model
     if isdefined(trainable, :fitresult)
         return predict(trainable.model, trainable.fitresult, X)
     else
@@ -137,7 +134,7 @@ end
 # TODO: predict_proba method for classifier models:
 
 # a transform method for trainable transformer models (X data):
-function transform(trainable::TrainableModel{T}, X) where T<:Transformer
+function transform(trainable::TrainableModel, X)
     if isdefined(trainable, :fitresult)
         return transform(trainable.model, trainable.fitresult, X)
     else
@@ -146,7 +143,7 @@ function transform(trainable::TrainableModel{T}, X) where T<:Transformer
 end
 
 # an inverse-transform method for trainable transformer models (X data):
-function inverse_transform(trainable::TrainableModel{T}, X) where T<:Transformer
+function inverse_transform(trainable::TrainableModel, X)
     if isdefined(trainable, :fitresult)
         return inverse_transform(trainable.model, trainable.fitresult, X)
     else
@@ -196,10 +193,6 @@ struct LearningNode{M<:Union{TrainableModel, Nothing}} <: Node
         # check the number of arguments:
         if trainable == nothing
             length(args) > 0 || throw(error("`args` in `LearningNode(::Function, args...)` must be non-empty. "))
-        elseif B<:Union{Learner,Transformer}
-            length(args) == 1 || throw(error("Wrong number of arguments. "*
-                                             "Use `LearningNode(operation, trainable_model, X)` "*
-                                             "for learner or transformer models."))
         end
 
         # get the trainable model's dependencies:
@@ -337,13 +330,11 @@ LearningNode(X) = SourceNode(X) # here `X` is data
 node = LearningNode
 trainable = TrainableModel
 
+# TODO: use macro to autogenerate these during model decleration/package glue-code:
 # remove need for `LearningNode` syntax in case of operations of main interest:
-predict(trainable::TrainableModel{L}, X::Node) where L<:Learner =
-    node(predict, trainable, X)
-transform(trainable::TrainableModel{T}, X::Node) where T<:Transformer =
-    node(transform, trainable, X)
-inverse_transform(trainable::TrainableModel{T}, X::Node) where T<:Transformer =
-    node(inverse_transform, trainable, X)
+predict(trainable::TrainableModel, X::Node) = node(predict, trainable, X)
+transform(trainable::TrainableModel, X::Node) = node(transform, trainable, X)
+inverse_transform(trainable::TrainableModel, X::Node) = node(inverse_transform, trainable, X)
 
 array(X) = convert(Array, X)
 array(X::Node) = node(array, X)

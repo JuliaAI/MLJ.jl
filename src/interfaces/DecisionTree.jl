@@ -19,7 +19,7 @@ import MLJ: predict, fit, clean!         #> compulsory for learners
 
 # needed:
 import DecisionTree                #> import package
-import MLJ: Classifier             #> and supertypes for the models to be defined
+import MLJ: Supervised            #> and supertypes for the models to be defined
 
 #> The DecisionTreeClassifier model type declared below is a
 #> parameterized type (not necessary for models in general). This is
@@ -34,7 +34,7 @@ DecisionTreeClassifierFitResultType{T} =
 [https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md](https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md)
 
 """
-mutable struct DecisionTreeClassifier{T} <: Classifier{DecisionTreeClassifierFitResultType{T}} 
+mutable struct DecisionTreeClassifier{T} <: Supervised{DecisionTreeClassifierFitResultType{T}} 
     pruning_purity::Float64 
     max_depth::Int
     min_samples_leaf::Int

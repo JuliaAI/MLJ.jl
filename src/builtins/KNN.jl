@@ -4,7 +4,7 @@ module KNN
 
 export KNNRegressor
 
-import MLJ: Regressor
+import MLJ: Supervised
 using LinearAlgebra
 
 # to be extended:
@@ -14,7 +14,7 @@ KNNFitResultType = Tuple{Matrix{Float64},Vector{Float64}}
 
 # TODO: introduce type parameters for the function fields (metric, kernel)
 
-mutable struct KNNRegressor <: Regressor{KNNFitResultType}
+mutable struct KNNRegressor <: Supervised{KNNFitResultType}
     K::Int           # number of local target values averaged
     metric::Function
     kernel::Function 

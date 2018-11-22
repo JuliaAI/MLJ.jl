@@ -5,7 +5,7 @@ export FeatureSelector
 export ToIntTransformer
 export UnivariateStandardizer, Standardizer
 
-import MLJ: MLJType, Transformer
+import MLJ: MLJType, Unsupervised
 import DataFrames: names, AbstractDataFrame, DataFrame, eltypes
 import Distributions
 using Statistics
@@ -32,7 +32,7 @@ are used. Throws an error if a recorded or specified feature is not
 present in the transformation input.
 
 """
-mutable struct FeatureSelector <: Transformer
+mutable struct FeatureSelector <: Unsupervised
     features::Vector{Symbol} 
 end
 
@@ -63,7 +63,7 @@ end
 """
 Note that `ToIntTransformer` fits all data provided, ie it ignores `rows`
 """
-mutable struct ToIntTransformer <: Transformer
+mutable struct ToIntTransformer <: Unsupervised
     sorted::Bool
     initial_label::Int # ususally 0 or 1
     map_unseen_to_minus_one::Bool # unseen inputs are transformed to -1
@@ -89,6 +89,7 @@ function fit(transformer::ToIntTransformer
              , rows
              , v::AbstractVector{T}) where T
 
+    v = v[rows]
     int_given_T = Dict{T, Int}()
     T_given_int = Dict{Int, T}()
     vals = collect(Set(v)) 
@@ -146,7 +147,7 @@ inverse_transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T},
 
 ## UNIVARIATE STANDARDIZATION
 
-mutable struct UnivariateStandardizer <: Transformer
+mutable struct UnivariateStandardizer <: Unsupervised
 end
 
 function fit(transformer::UnivariateStandardizer, verbosity, rows, v::AbstractVector{T}) where T<:Real
@@ -188,7 +189,7 @@ inverse_transform(transformer::UnivariateStandardizer, fitresult, w) =
 # univariate trainable models. Make data container agnostic.
 
 """ Standardizes the columns of eltype <: AbstractFloat unless non-empty `features` specfied."""
-mutable struct Standardizer <: Transformer
+mutable struct Standardizer <: Unsupervised
     features::Vector{Symbol} # features to be standardized; empty means all of
 end
 
