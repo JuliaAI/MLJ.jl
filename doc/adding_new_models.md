@@ -120,7 +120,7 @@ interfaces, together with model declarations.
 #### Compulsory methods
 
 ````julia
-fitresult, cache, report =  fit(model::ConcreteModel, verbosity::Int, rows, X, y)
+fitresult, cache, report =  fit(model::ConcreteModel, verbosity::Int, X, y)
 ````
 
 Here `fitresult::R` is the fit-result in the sense above. Any
@@ -137,8 +137,7 @@ not presently restricted.
 
 The types of the training data `X` and `y` should be whatever is
 required by the package for the training algorithm and declared in the
-`fit` type signature for safety.  It is understood that `fit` only
-uses `rows` for training. Checks not specific to the package (e.g.,
+`fit` type signature for safety. Checks not specific to the package (e.g.,
 dimension matching checks) should be left to higher levels of the
 interface to avoid code duplication.
 

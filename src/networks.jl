@@ -93,21 +93,23 @@ function fit!(trainable::TrainableModel, rows=nothing; verbosity=1)
     verbosity < 1 || @info "Training $trainable whose model is $(trainable.model)."
 
     # call up the data at relevant source nodes for training:
-    args = [arg() for arg in trainable.args]
 
     if !isdefined(trainable, :fitresult)
         rows != nothing || error("An untrained TrainableModel requires rows to fit.")
+        args = [arg()[Rows, rows] for arg in trainable.args]
         trainable.fitresult, trainable.cache, report =
-            fit(trainable.model, verbosity, rows, args...)
+            fit(trainable.model, verbosity, args...)
         trainable.rows = deepcopy(rows)
     else
         if rows == nothing # (ie rows not specified) update:
+            args = [arg()[Rows, trainable.rows] for arg in trainable.args]
             trainable.fitresult, trainable.cache, report =
                 update(trainable.model, verbosity, trainable.fitresult,
-                       trainable.cache, trainable.rows, args...)
+                       trainable.cache, args...)
         else # retrain from scratch:
+            args = [arg()[Rows, rows] for arg in trainable.args]
             trainable.fitresult, trainable.cache, report =
-                fit(trainable.model, verbosity, rows, args...)
+                fit(trainable.model, verbosity, args...)
             trainable.rows = deepcopy(rows)
         end
     end
@@ -122,6 +124,9 @@ function fit!(trainable::TrainableModel, rows=nothing; verbosity=1)
 
 end
 
+# TODO: avoid repeated code below using macro and possibly move out of
+# networks.jl
+
 # predict method for trainable learner models (X data):
 function predict(trainable::TrainableModel, X) 
     if isdefined(trainable, :fitresult)
@@ -130,8 +135,6 @@ function predict(trainable::TrainableModel, X)
         throw(error("$trainable with model $(trainable.model) is not trained and so cannot predict."))
     end
 end
-
-# TODO: predict_proba method for classifier models:
 
 # a transform method for trainable transformer models (X data):
 function transform(trainable::TrainableModel, X)
@@ -150,6 +153,8 @@ function inverse_transform(trainable::TrainableModel, X)
         throw(error("$trainable with model $(trainable.model) is not trained and so cannot inverse_transform."))
     end
 end
+
+# TODO: predict_proba method for classifier models:
 
 
 ## LEARNING NETWORKS INTERFACE - BASICS

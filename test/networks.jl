@@ -108,7 +108,7 @@ Xtrain = Xin[train,:];
 ytrain = yin[train];
 
 import MLJ: fit, predict, update
-function fit(composite::WetSupervised, verbosity, rows, Xtrain, ytrain)
+function fit(composite::WetSupervised, verbosity, Xtrain, ytrain)
 
     X = node(Xtrain) # instantiates a source node
     y = node(ytrain)
@@ -123,7 +123,7 @@ function fit(composite::WetSupervised, verbosity, rows, Xtrain, ytrain)
     zhat = predict(l, Xt)
 
     yhat = inverse_transform(t_y, zhat)
-    fit!(yhat, rows, verbosity=verbosity)
+    fit!(yhat, :, verbosity=verbosity)
 
     fitresult = yhat
     report = l.report
@@ -134,7 +134,7 @@ function fit(composite::WetSupervised, verbosity, rows, Xtrain, ytrain)
 end
 
 function update(composite::WetSupervised, verbosity, fitresult, cache,
-                rows, X, y; kwargs...)
+                X, y; kwargs...)
     fit!(fitresult; verbosity=verbosity)
     return fitresult, cache, cache.report
 end
@@ -142,7 +142,7 @@ end
 predict(composite::WetSupervised, fitresult, Xnew) = fitresult(Xnew)
 
 # let's train the composite:
-fitresult, cache, report = fit(composite, 2, :, Xtrain, ytrain)
+fitresult, cache, report = fit(composite, 2, Xtrain, ytrain)
 
 # to check internals:
 encoder = fitresult.trainable
@@ -150,25 +150,25 @@ tree = fitresult.args[1].trainable
 selector = fitresult.args[1].args[1].args[1].trainable
 
 # this should trigger no retraining:
-fitresult, cache, report = update(composite, 2, fitresult, cache, :, Xtrain, ytrain)
+fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
 
 # this should trigger retraining of encoder and tree
 encoder_.initial_label = 14
-fitresult, cache, report = update(composite, 3, fitresult, cache, :, Xtrain, ytrain)
+fitresult, cache, report = update(composite, 3, fitresult, cache, Xtrain, ytrain)
 
 # this should trigger retraining of selector and tree:
-selector_.features = [:petal_length,] 
-fitresult, cache, report = update(composite, 2, fitresult, cache, :, Xtrain, ytrain)
+selector_.features = [:petal_length, :petal_width] 
+fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
 
 # this should trigger retraining of tree only:
-tree_.max_depth = 1
-fitresult, cache, report = update(composite, 2, fitresult, cache, :, Xtrain, ytrain)
+tree_.max_depth = 2
+fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
 
 
 # this should trigger retraining of all parts:
-encoder_.initial_label = 42
+encoder_.initial_label = 43
 selector_.features = []
-fitresult, cache, report = update(composite, 2, fitresult, cache, :, Xtrain, ytrain)
+fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
 
 predict(composite, fitresult, Xin[test,:])
 
