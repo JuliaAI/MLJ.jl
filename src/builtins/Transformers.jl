@@ -39,7 +39,7 @@ end
 
 # metadata:
 properties(::Type{FeatureSelector}) = [Numeric(), Nominal(), NAs()]
-operations(::Type{FeatureSelector}) = [:transform]
+operations(::Type{FeatureSelector}) = [transform]
 type_of_X(::Type{FeatureSelector}) = AbstractDataFrame
 
 FeatureSelector(;features=Symbol[]) = FeatureSelector(features)
@@ -77,7 +77,7 @@ end
 
 # metadata:
 properties(::Type{ToIntTransformer}) = [Numeric(), Nominal(), NAs()]
-operations(::Type{ToIntTransformer}) = [:transform, :inverse_transform]
+operations(::Type{ToIntTransformer}) = [transform, inverse_transform]
 type_of_X(::Type{ToIntTransformer}) = AbstractVector
 
 ToIntTransformer(; sorted=true, initial_label=1
@@ -161,7 +161,7 @@ end
 
 # metadata:
 properties(::Type{UnivariateStandardizer}) = [Numeric(), NAs()]
-operations(::Type{UnivariateStandardizer}) = [:transform, :inverse_transform]
+operations(::Type{UnivariateStandardizer}) = [transform, inverse_transform]
 type_of_X(::Type{UnivariateStandardizer}) = AbstractVector
 
 function fit(transformer::UnivariateStandardizer, verbosity, v::AbstractVector{T}) where T<:Real
@@ -207,7 +207,7 @@ mutable struct Standardizer <: Unsupervised
 end
 
 properties(::Type{Standardizer}) = [Numeric(), Nominal(), NAs()]
-operations(::Type{Standardizer}) = [:transform, :inverse_transform]
+operations(::Type{Standardizer}) = [transform, inverse_transform]
 type_of_X(::Type{Standardizer}) = DataFrame
 
 # lazy keyword constructor:

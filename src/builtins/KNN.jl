@@ -23,7 +23,7 @@ end
 
 # metadata:
 properties(::Type{KNNRegressor}) = [Regression(), Numeric()]
-operations(::Type{KNNRegressor}) = [:predict]
+operations(::Type{KNNRegressor}) = [predict]
 type_of_X(::Type{KNNRegressor}) = Array{Float64,2}
 type_of_y(::Type{KNNRegressor}) = Vector{Float64}
 

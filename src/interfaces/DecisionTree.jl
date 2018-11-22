@@ -51,7 +51,7 @@ end
 
 # metadata:
 properties(::Type{DecisionTreeClassifier}) = [MultiClass(), Numeric()]
-operations(::Type{DecisionTreeClassifier}) = [:predict]
+operations(::Type{DecisionTreeClassifier}) = [predict]
 type_of_X(::Type{DecisionTreeClassifier}) = Array{Float64,2}
 type_of_y(::Type{DecisionTreeClassifier}) = Vector
 

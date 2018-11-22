@@ -74,6 +74,7 @@ abstract type Unsupervised <: Model  end
 abstract type Task <: MLJType end 
 abstract type Property end # subtypes are the allowable task properties
 
+
 ## LOSS FUNCTIONS
 
 include("metrics.jl")
@@ -127,12 +128,15 @@ struct Weights <: Property end
 """ Models with this property support features with missing values """ 
 struct NAs <: Property end
 
+
+## CONCRETE TASK SUBTYPES
+
 # TODO: add evaluation metric:
 struct SupervisedTask <: Task
     data
     target::Symbol
     ignore::Vector{Symbol}
-    operation::Symbol    # predict, transform, predict_proba, inverse_transform, etc
+    operation::Function    # predict, transform, predict_proba, inverse_transform, etc
     properties::Vector{Property}
 end
 
@@ -142,7 +146,7 @@ function SupervisedTask(
     ; data=nothing
     , target=nothing
     , ignore=Symbol[]
-    , operation=:predict
+    , operation=predict
     , properties=Property[])
     
     data != nothing         || throw(error("You must specify data=..."))
@@ -185,6 +189,8 @@ include("datasets.jl")
 # methods to be dispatched on `Model` instances:
 function fit end
 function update end
+
+# methods to be dispatched on `Model` and a fit-result (*operations*):
 function predict end
 function predict_proba end
 function transform end 
