@@ -61,7 +61,7 @@ type_of_y(::Type{DecisionTreeClassifier}) = Vector
 #> give any compulsory args default value `nothing` and check they're
 #> something
 function DecisionTreeClassifier(
-    ; target_type=nothing 
+    ; target_type=Int
     , pruning_purity=1.0
     , max_depth=-1
     , min_samples_leaf=1
