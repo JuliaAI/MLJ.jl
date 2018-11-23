@@ -84,7 +84,7 @@ rms(yhat(X_frame[test,:]), y[test])
 
 ## MAKE A COMPOSITE MODEL
 
-import MLJ: Supervised, Unsupervised, Node, TrainableModel, MLJType
+import MLJ: Supervised, Unsupervised, Node, NodalTrainableModel, MLJType
 
 mutable struct WetSupervised{L<:Supervised,
                              TX<:Unsupervised,
