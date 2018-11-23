@@ -38,6 +38,7 @@ DecisionTreeClassifierFitResultType{T} =
 
 """
 mutable struct DecisionTreeClassifier{T} <: Supervised{DecisionTreeClassifierFitResultType{T}} 
+    target_type::Type{T}
     pruning_purity::Float64 
     max_depth::Int
     min_samples_leaf::Int
@@ -71,10 +72,9 @@ function DecisionTreeClassifier(
     , post_prune=false
     , merge_purity_threshold=0.9)
 
-    !(target_type == nothing) || throw(error("You must specify target_type=..."))
-
     model = DecisionTreeClassifier{target_type}(
-        pruning_purity
+        target_type
+        , pruning_purity
         , max_depth
         , min_samples_leaf
         , min_samples_split

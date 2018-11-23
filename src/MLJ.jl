@@ -226,6 +226,7 @@ function operations end
 function type_of_nominals end
 function type_of_X end
 function type_of_y end
+function defaults end
 
 # fallback method to correct invalid hyperparameters and return
 # a warning (in this case empty):
@@ -312,8 +313,10 @@ end
 
 
 function __init__()
-    @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=false
 end
+
+@load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=false
+
 
 end # module
 
