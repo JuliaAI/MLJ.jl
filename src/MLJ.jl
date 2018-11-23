@@ -5,7 +5,8 @@ export features, X_and_y
 export Property, Regressor, TwoClass, MultiClass
 export Numeric, Nominal, Weights, NAs
 export properties, operations, type_of_X, type_of_y
-
+export SupervisedTask, UnsupervisedTask, nrows
+export TrainableModel
 export array
 
 # defined here but extended by files in "interfaces/" (lazily loaded)
@@ -132,16 +133,33 @@ struct NAs <: Property end
 ## CONCRETE TASK SUBTYPES
 
 # TODO: add evaluation metric:
+struct UnsupervisedTask <: Task
+    data
+    ignore::Vector{Symbol}
+    operation::Function    # transform, inverse_transform, etc
+    properties::Vector{Property}
+end
+
+function UnsupervisedTask(
+    ; data=nothing
+    , ignore=Symbol[]
+    , operation=predict
+    , properties=Property[])
+    
+    data != nothing         || throw(error("You must specify data=..."))
+    !isempty(properties)    || @warn "No properties specified for task. "*
+                                     "To list properties run `subtypes(Properties)`."
+    return SupervisedTask(data, ignore, operation, properties)
+end
+
 struct SupervisedTask <: Task
     data
     target::Symbol
     ignore::Vector{Symbol}
-    operation::Function    # predict, transform, predict_proba, inverse_transform, etc
+    operation::Function    # predict, predict_proba, etc
     properties::Vector{Property}
 end
 
-# TODO: have constructor check data for properties to add to
-# `properties`
 function SupervisedTask(
     ; data=nothing
     , target=nothing
@@ -159,6 +177,11 @@ end
 
 
 ## RUDIMENTARY TASK OPERATIONS
+
+Base.length(task::Task) = length(task.data)
+Base.size(task::Task) = size(task.data)
+nrows(task::Task) = first(size(task))
+Base.eachindex(task::Task) = Base.OneTo(nrows(task))
 
 features(task::Task) = filter!(task.data[Names]) do ftr
     !(ftr in task.ignore)
@@ -244,6 +267,11 @@ function Base.copy(model::T, field_value_pairs::Vararg{Pair{Symbol}}) where T<:M
     end
     return T(constructor_args...)
 end
+
+
+## LOAD TRAINABLE MODELS API
+
+include("trainable_models.jl")
 
 
 ## LOAD LEARNING NETWORKS API

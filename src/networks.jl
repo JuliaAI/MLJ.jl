@@ -10,9 +10,9 @@ state).
 
 """
 function Base.merge!(tape1::Vector, tape2::Vector)
-    for trainable in tape2
-        if !(trainable in tape1)
-            push!(tape1, trainable)
+    for trainable_model in tape2
+        if !(trainable_model in tape1)
+            push!(tape1, trainable_model)
         end
     end
     return tape1
@@ -21,7 +21,7 @@ end
 # TODO: replace linear tapes below with dependency trees to allow
 # better scheduling of training learning networks data.
 
-mutable struct NodalTrainableModel{B<:Model} <: MLJType
+mutable struct NodalTrainableModel{B<:Model} <: AbstractTrainableModel
 
     model::B
     previous_model::B
@@ -43,10 +43,10 @@ mutable struct NodalTrainableModel{B<:Model} <: MLJType
             throw(error("Wrong number of arguments. "*
                         "Use NodalTrainableModel(model, X) for an unsupervised learner model."))
         
-        trainable = new{B}(model)
-        trainable.frozen = false
-        trainable.args = args
-        trainable.report = Dict{Symbol,Any}()
+        trainable_model = new{B}(model)
+        trainable_model.frozen = false
+        trainable_model.args = args
+        trainable_model.report = Dict{Symbol,Any}()
 
         # note: `get_tape(arg)` returns arg.tape where this makes
         # sense and an empty tape otherwise.  However, the complete
@@ -58,9 +58,9 @@ mutable struct NodalTrainableModel{B<:Model} <: MLJType
         for arg in args
             merge!(tape, get_tape(arg))
         end
-        trainable.tape = tape
+        trainable_model.tape = tape
 
-        return trainable
+        return trainable_model
     end
 end
 
@@ -68,91 +68,89 @@ end
 NodalTrainableModel(model::B, args...) where B<:Model = NodalTrainableModel{B}(model, args...)
 
 # to turn fit-through fitting off and on:
-function freeze!(trainable::NodalTrainableModel)
-    trainable.frozen = true
+function freeze!(trainable_model::NodalTrainableModel)
+    trainable_model.frozen = true
 end
-function thaw!(trainable::NodalTrainableModel)
-    trainable.frozen = false
+function thaw!(trainable_model::NodalTrainableModel)
+    trainable_model.frozen = false
 end
 
-function is_stale(trainable::NodalTrainableModel)
-    !isdefined(trainable, :fitresult) ||
-        trainable.model != trainable.previous_model ||
-        reduce(|,[is_stale(arg) for arg in trainable.args])
+function is_stale(trainable_model::NodalTrainableModel)
+    !isdefined(trainable_model, :fitresult) ||
+        trainable_model.model != trainable_model.previous_model ||
+        reduce(|,[is_stale(arg) for arg in trainable_model.args])
 end
 
 # fit method:
-function fit!(trainable::NodalTrainableModel, rows=nothing; verbosity=1)
+function fit!(trainable_model::NodalTrainableModel, rows=nothing; verbosity=1)
 
-    if trainable.frozen 
-        verbosity < 0 || @warn "$trainable with model $(trainable.model) "*
+    if trainable_model.frozen 
+        verbosity < 0 || @warn "$trainable_model with model $(trainable_model.model) "*
         "not trained as it is frozen."
-        return trainable
+        return trainable_model
     end
         
-    verbosity < 1 || @info "Training $trainable whose model is $(trainable.model)."
+    verbosity < 1 || @info "Training $trainable_model whose model is $(trainable_model.model)."
 
-    # call up the data at relevant source nodes for training:
-
-    if !isdefined(trainable, :fitresult)
+    if !isdefined(trainable_model, :fitresult)
         rows != nothing || error("An untrained NodalTrainableModel requires rows to fit.")
-        args = [arg()[Rows, rows] for arg in trainable.args]
-        trainable.fitresult, trainable.cache, report =
-            fit(trainable.model, verbosity, args...)
-        trainable.rows = deepcopy(rows)
+        args = [arg()[Rows, rows] for arg in trainable_model.args]
+        trainable_model.fitresult, trainable_model.cache, report =
+            fit(trainable_model.model, verbosity, args...)
+        trainable_model.rows = deepcopy(rows)
     else
         if rows == nothing # (ie rows not specified) update:
-            args = [arg()[Rows, trainable.rows] for arg in trainable.args]
-            trainable.fitresult, trainable.cache, report =
-                update(trainable.model, verbosity, trainable.fitresult,
-                       trainable.cache, args...)
+            args = [arg()[Rows, trainable_model.rows] for arg in trainable_model.args]
+            trainable_model.fitresult, trainable_model.cache, report =
+                update(trainable_model.model, verbosity, trainable_model.fitresult,
+                       trainable_model.cache, args...)
         else # retrain from scratch:
-            args = [arg()[Rows, rows] for arg in trainable.args]
-            trainable.fitresult, trainable.cache, report =
-                fit(trainable.model, verbosity, args...)
-            trainable.rows = deepcopy(rows)
+            args = [arg()[Rows, rows] for arg in trainable_model.args]
+            trainable_model.fitresult, trainable_model.cache, report =
+                fit(trainable_model.model, verbosity, args...)
+            trainable_model.rows = deepcopy(rows)
         end
     end
 
-    trainable.previous_model = deepcopy(trainable.model)
+    trainable_model.previous_model = deepcopy(trainable_model.model)
     
     if report != nothing
-        merge!(trainable.report, report)
+        merge!(trainable_model.report, report)
     end
 
-    return trainable
+    return trainable_model
 
 end
 
 # TODO: avoid repeated code below using macro and possibly move out of
 # networks.jl
 
-# predict method for trainable learner models (X data):
-function predict(trainable::NodalTrainableModel, X) 
-    if isdefined(trainable, :fitresult)
-        return predict(trainable.model, trainable.fitresult, X)
-    else
-        throw(error("$trainable with model $(trainable.model) is not trained and so cannot predict."))
-    end
-end
+# # predict method for trainable models (X data):
+# function predict(trainable_model::NodalTrainableModel, X) 
+#     if isdefined(trainable_model, :fitresult)
+#         return predict(trainable_model.model, trainable_model.fitresult, X)
+#     else
+#         throw(error("$trainable_model with model $(trainable_model.model) is not trained and so cannot predict."))
+#     end
+# end
 
-# a transform method for trainable transformer models (X data):
-function transform(trainable::NodalTrainableModel, X)
-    if isdefined(trainable, :fitresult)
-        return transform(trainable.model, trainable.fitresult, X)
-    else
-        throw(error("$trainable with model $(trainable.model) is not trained and so cannot transform."))
-    end
-end
+# # a transform method for trainable models (X data):
+# function transform(trainable_model::NodalTrainableModel, X)
+#     if isdefined(trainable_model, :fitresult)
+#         return transform(trainable_model.model, trainable_model.fitresult, X)
+#     else
+#         throw(error("$trainable_model with model $(trainable_model.model) is not trained and so cannot transform."))
+#     end
+# end
 
-# an inverse-transform method for trainable transformer models (X data):
-function inverse_transform(trainable::NodalTrainableModel, X)
-    if isdefined(trainable, :fitresult)
-        return inverse_transform(trainable.model, trainable.fitresult, X)
-    else
-        throw(error("$trainable with model $(trainable.model) is not trained and so cannot inverse_transform."))
-    end
-end
+# # an inverse-transform method for trainable models (X data):
+# function inverse_transform(trainable_model::NodalTrainableModel, X)
+#     if isdefined(trainable_model, :fitresult)
+#         return inverse_transform(trainable_model.model, trainable_model.fitresult, X)
+#     else
+#         throw(error("$trainable_model with model $(trainable_model.model) is not trained and so cannot inverse_transform."))
+#     end
+# end
 
 # TODO: predict_proba method for classifier models:
 
@@ -171,25 +169,25 @@ is_stale(s::Source) = false
 
 struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
 
-    operation::Function   # that can be dispatched on `trainable`(eg, `predict`) or a static operation
+    operation::Function   # that can be dispatched on a fit-result (eg, `predict`) or a static operation
     trainable::M          # is `nothing` for static operations
     args::Tuple{Vararg{AbstractNode}}       # nodes where `operation` looks for its arguments
     tape::Vector{NodalTrainableModel}    # for tracking dependencies
     depth::Int64
 
-    function Node{M}(operation, trainable::M, args::AbstractNode...) where {B<:Model, M<:Union{NodalTrainableModel{B},Nothing}}
+    function Node{M}(operation, trainable_model::M, args::AbstractNode...) where {B<:Model, M<:Union{NodalTrainableModel{B},Nothing}}
 
         # check the number of arguments:
-        if trainable == nothing
+        if trainable_model == nothing
             length(args) > 0 || throw(error("`args` in `Node(::Function, args...)` must be non-empty. "))
         end
 
         # get the trainable model's dependencies:
-        tape = copy(get_tape(trainable))
+        tape = copy(get_tape(trainable_model))
 
         # add the trainable model itself as a dependency:
-        if trainable != nothing
-            merge!(tape, [trainable, ])
+        if trainable_model != nothing
+            merge!(tape, [trainable_model, ])
         end
 
         # append the dependency tapes of all arguments:
@@ -199,7 +197,7 @@ struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
 
         depth = maximum(get_depth(arg) for arg in args) + 1
 
-        return new{M}(operation, trainable, args, tape, depth)
+        return new{M}(operation, trainable_model, args, tape, depth)
 
     end
 end
@@ -217,11 +215,11 @@ end
 # constructors:
 get_tape(::Any) = NodalTrainableModel[]
 get_tape(X::Node) = X.tape
-get_tape(trainable::NodalTrainableModel) = trainable.tape
+get_tape(trainable_model::NodalTrainableModel) = trainable_model.tape
 
 # autodetect type parameter:
-Node(operation, trainable::M, args...) where M<:Union{NodalTrainableModel, Nothing} =
-    Node{M}(operation, trainable, args...)
+Node(operation, trainable_model::M, args...) where M<:Union{NodalTrainableModel, Nothing} =
+    Node{M}(operation, trainable_model, args...)
 
 # constructor for static operations:
 Node(operation::Function, args::AbstractNode...) = Node(operation, nothing, args...)
@@ -239,17 +237,17 @@ Node(operation::Function, args::AbstractNode...) = Node(operation, nothing, args
 (y::Node{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
 function fit!(y::Node, rows; verbosity=1)
-    for trainable in y.tape
-        fit!(trainable, rows; verbosity=verbosity-1)
+    for trainable_model in y.tape
+        fit!(trainable_model, rows; verbosity=verbosity-1)
     end
     return y
 end
 # if no `rows` specified, only retrain stale dependent NodalTrainableModels
 # (using whatever rows each was last trained on):
 function fit!(y::Node; verbosity=1)
-    trainables = filter(is_stale, y.tape)
-    for trainable in trainables
-        fit!(trainable; verbosity=verbosity-1)
+    trainable_models = filter(is_stale, y.tape)
+    for trainable_model in trainable_models
+        fit!(trainable_model; verbosity=verbosity-1)
     end
     return y
 end
@@ -294,16 +292,16 @@ function Base.show(stream::IO, ::MIME"text/plain", X::AbstractNode)
     end
 end
     
-function Base.show(stream::IO, ::MIME"text/plain", trainable::NodalTrainableModel)
-    id = objectid(trainable) 
-    description = string(typeof(trainable).name.name)
-    str = "$description @ $(handle(trainable))"
+function Base.show(stream::IO, ::MIME"text/plain", trainable_model::NodalTrainableModel)
+    id = objectid(trainable_model) 
+    description = string(typeof(trainable_model).name.name)
+    str = "$description @ $(handle(trainable_model))"
     printstyled(IOContext(stream, :color=> true), str, bold=true)
     print(stream, " = ")
-    print(stream, "trainable($(trainable.model), ")
-    n_args = length(trainable.args)
+    print(stream, "trainable($(trainable_model.model), ")
+    n_args = length(trainable_model.args)
     counter = 1
-    for arg in trainable.args
+    for arg in trainable_model.args
         printstyled(IOContext(stream, :color=>true), handle(arg), bold=true)
         counter >= n_args || print(stream, ", ")
         counter += 1
@@ -321,9 +319,9 @@ trainable = NodalTrainableModel
 
 # TODO: use macro to autogenerate these during model decleration/package glue-code:
 # remove need for `Node` syntax in case of operations of main interest:
-predict(trainable::NodalTrainableModel, X::AbstractNode) = node(predict, trainable, X)
-transform(trainable::NodalTrainableModel, X::AbstractNode) = node(transform, trainable, X)
-inverse_transform(trainable::NodalTrainableModel, X::AbstractNode) = node(inverse_transform, trainable, X)
+predict(trainable_model::NodalTrainableModel, X::AbstractNode) = node(predict, trainable_model, X)
+transform(trainable_model::NodalTrainableModel, X::AbstractNode) = node(transform, trainable_model, X)
+inverse_transform(trainable_model::NodalTrainableModel, X::AbstractNode) = node(inverse_transform, trainable_model, X)
 
 array(X) = convert(Array, X)
 array(X::AbstractNode) = node(array, X)
