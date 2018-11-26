@@ -89,3 +89,4 @@ end
 @extend_to_trainable_models se
 @extend_to_trainable_models evaluate
 
+trainable(model::Model, args...) = TrainableModel(model, args...)

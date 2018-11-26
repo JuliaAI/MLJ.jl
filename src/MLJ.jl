@@ -18,7 +18,10 @@ export @more, @constant                              # "show.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
 export KNNRegressor                                  # "builtins/KNN.jl":
-export node, trainable, fit!, freeze!, thaw!, reload # "networks.jl"
+
+# defined in include files "trainable_models.jl" and "networks.jl":
+export TrainableModel, NodalTrainableModel, trainable
+export source, node, fit!, freeze!, thaw!
 
 # defined in include file "builtins/Transformers.jl":
 export FeatureSelector

@@ -311,11 +311,18 @@ end
 
 ## SYNTACTIC SUGAR FOR LEARNING NETWORKS
 
-Node(X) = Source(X) # here `X` is data
+source(X) = Source(X) # here `X` is data
+Node(X) = Source(X)   # here `X` is data
+Node(X::AbstractNode) = X 
+node = Node
+
+# unless no arguments are `AbstractNode`s, `trainable` creates a
+# NodalTrainablaeModel, rather than a `TrainableModel`:
+trainable(model::Model, args::AbstractNode...) = NodalTrainableModel(model, args...)
+trainable(model::Model, X, y::AbstractNode) = NodalTrainableModel(model, node(X), y)
+trainable(model::Model, X::AbstractNode, y) = NodalTrainableModel(model, X, node(y))
 
 # aliases
-node = Node
-trainable = NodalTrainableModel
 
 # TODO: use macro to autogenerate these during model decleration/package glue-code:
 # remove need for `Node` syntax in case of operations of main interest:
