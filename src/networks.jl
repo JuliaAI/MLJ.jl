@@ -1,4 +1,28 @@
+## ABSTRACT NODES AND SOURCE NODES
+
 abstract type AbstractNode <: MLJType end
+
+struct Source{D} <: AbstractNode
+    data::D      # training data
+end
+
+is_stale(s::Source) = false
+
+# make source nodes callable:
+function (s::Source)(; rows=:)
+    if rows == (:)
+        return s.data
+    else
+        return (s.data)[Rows, rows]
+    end
+end
+
+(s::Source)(Xnew) = Xnew
+
+get_sources(s::Source) = Set([s])
+
+
+## DEPENDENCY TAPES
 
 # a tape is a vector of `NodalTrainableModels` defined below, used to track dependencies
 """ 
@@ -155,30 +179,14 @@ end
 # TODO: predict_proba method for classifier models:
 
 
-## LEARNING NETWORKS INTERFACE - BASICS
-
-struct Source{D} <: AbstractNode
-    data::D      # training data
-end
-
-is_stale(s::Source) = false
-
-# make source nodes callable:
-function (s::Source)(; rows=:)
-    if rows == (:)
-        return s.data
-    else
-        return (s.data)[Rows, rows]
-    end
-end
-
-(s::Source)(Xnew) = Xnew
+## NODES
 
 struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
 
     operation::Function   # that can be dispatched on a fit-result (eg, `predict`) or a static operation
     trainable::M          # is `nothing` for static operations
     args::Tuple{Vararg{AbstractNode}}       # nodes where `operation` looks for its arguments
+    sources::Set{Source}
     tape::Vector{NodalTrainableModel}    # for tracking dependencies
     depth::Int64
 
@@ -188,6 +196,8 @@ struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
         if trainable_model == nothing
             length(args) > 0 || throw(error("`args` in `Node(::Function, args...)` must be non-empty. "))
         end
+
+        sources = union([get_sources(arg) for arg in args]...)
 
         # get the trainable model's dependencies:
         tape = copy(get_tape(trainable_model))
@@ -204,7 +214,7 @@ struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
 
         depth = maximum(get_depth(arg) for arg in args) + 1
 
-        return new{M}(operation, trainable_model, args, tape, depth)
+        return new{M}(operation, trainable_model, args, sources, tape, depth)
 
     end
 end
@@ -212,6 +222,7 @@ end
 # ... where
 get_depth(::Source) = 0
 get_depth(X::Node) = X.depth
+get_sources(X::Node) = X.sources
 
 function is_stale(X::Node)
     (X.trainable != nothing && is_stale(X.trainable)) ||
@@ -237,7 +248,11 @@ Node(operation::Function, args::AbstractNode...) = Node(operation, nothing, args
 
 # make nodes callable:
 (y::Node)(; rows=:) = (y.operation)(y.trainable, [arg(rows=rows) for arg in y.args]...)
-(y::Node)(Xnew) = (y.operation)(y.trainable, [arg(Xnew) for arg in y.args]...)
+function (y::Node)(Xnew)
+    length(y.sources) == 1 || error("Nodes with multiple sources are not callable on new data. "*
+                                    "Sources of node called = $(y.sources)")
+    return (y.operation)(y.trainable, [arg(Xnew) for arg in y.args]...)
+end
 
 # and for the special case of static operations:
 (y::Node{Nothing})(; rows=:) = (y.operation)([arg(rows=rows) for arg in y.args]...)
