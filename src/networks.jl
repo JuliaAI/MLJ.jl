@@ -183,7 +183,7 @@ end
 
 struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
 
-    operation::Function   # that can be dispatched on a fit-result (eg, `predict`) or a static operation
+    operation             # that can be dispatched on a fit-result (eg, `predict`) or a static operation
     trainable::M          # is `nothing` for static operations
     args::Tuple{Vararg{AbstractNode}}       # nodes where `operation` looks for its arguments
     sources::Set{Source}
@@ -240,7 +240,7 @@ Node(operation, trainable_model::M, args...) where M<:Union{NodalTrainableModel,
     Node{M}(operation, trainable_model, args...)
 
 # constructor for static operations:
-Node(operation::Function, args::AbstractNode...) = Node(operation, nothing, args...)
+Node(operation, args::AbstractNode...) = Node(operation, nothing, args...)
 
 # note: the following two methods only work as expected if the
 # Node `y` has a single source.  TODO: track the source and
