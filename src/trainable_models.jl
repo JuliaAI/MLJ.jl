@@ -67,26 +67,6 @@ function fit!(trainable_model::TrainableModel, rows=nothing; verbosity=1)
 
 end
 
-# to extend operations like `predict` from `Model`-dispatch to
-# `TrainableModel`-dispatch and `NodalTrainableModel`-dispatch
-# (`NodalTrainableModel`s are defined later in `src/networks.jl`):
-macro extend_to_trainable_models(operation)
-    quote
-        function $(esc(operation))(trainable_model::AbstractTrainableModel, X) 
-            if isdefined(trainable_model, :fitresult)
-                return $(esc(operation))(trainable_model.model, trainable_model.fitresult, X)
-            else
-                throw(error("$trainable_model with model $(trainable_model.model) is not trained and so cannot predict."))
-            end
-        end
-    end
-end
-
-@extend_to_trainable_models predict
-@extend_to_trainable_models transform
-@extend_to_trainable_models inverse_transform
-@extend_to_trainable_models predict_proba
-@extend_to_trainable_models se
-@extend_to_trainable_models evaluate
-
 trainable(model::Model, args...) = TrainableModel(model, args...)
+
+

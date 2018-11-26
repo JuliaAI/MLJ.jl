@@ -216,16 +216,11 @@ include("datasets.jl")
 function fit end
 function update end
 
-# methods to be dispatched on `Model` and a fit-result (*operations*):
-function predict end
-function predict_proba end
-function transform end 
-function inverse_transform end
-function se end
-function evaluate end
+# see "src/operations.jl" for list of all operations to be dispatched
+# on `Model`s and a fit-result.
 
 # methods to be dispatched on `Model` subtypes:
-function operations end
+function operations end 
 function type_of_nominals end
 function type_of_X end
 function type_of_y end
@@ -281,6 +276,11 @@ include("trainable_models.jl")
 ## LOAD LEARNING NETWORKS API
 
 include("networks.jl")
+
+
+## LOAD REGISTRY OF OPERATIONS
+
+include("operations.jl")
 
 
 ## LOAD BUILT-IN MODELS

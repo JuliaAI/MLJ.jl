@@ -188,7 +188,6 @@ struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
     args::Tuple{Vararg{AbstractNode}}       # nodes where `operation` looks for its arguments
     sources::Set{Source}
     tape::Vector{NodalTrainableModel}    # for tracking dependencies
-    depth::Int64
 
     function Node{M}(operation, trainable_model::M, args::AbstractNode...) where {B<:Model, M<:Union{NodalTrainableModel{B},Nothing}}
 
@@ -212,16 +211,14 @@ struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
             merge!(tape, get_tape(arg))
         end
 
-        depth = maximum(get_depth(arg) for arg in args) + 1
-
-        return new{M}(operation, trainable_model, args, sources, tape, depth)
+        return new{M}(operation, trainable_model, args, sources, tape)
 
     end
 end
 
 # ... where
-get_depth(::Source) = 0
-get_depth(X::Node) = X.depth
+#get_depth(::Source) = 0
+#get_depth(X::Node) = X.depth
 get_sources(X::Node) = X.sources
 
 function is_stale(X::Node)
@@ -334,23 +331,23 @@ end
 ## SYNTACTIC SUGAR FOR LEARNING NETWORKS
 
 source(X) = Source(X) # here `X` is data
-Node(X) = Source(X)   # here `X` is data
-Node(X::AbstractNode) = X 
+# Node(X) = Source(X)   # here `X` is data
+# Node(X::AbstractNode) = X 
 node = Node
 
 # unless no arguments are `AbstractNode`s, `trainable` creates a
 # NodalTrainablaeModel, rather than a `TrainableModel`:
 trainable(model::Model, args::AbstractNode...) = NodalTrainableModel(model, args...)
-trainable(model::Model, X, y::AbstractNode) = NodalTrainableModel(model, node(X), y)
-trainable(model::Model, X::AbstractNode, y) = NodalTrainableModel(model, X, node(y))
+trainable(model::Model, X, y::AbstractNode) = NodalTrainableModel(model, source(X), y)
+trainable(model::Model, X::AbstractNode, y) = NodalTrainableModel(model, X, source(y))
 
 # aliases
 
 # TODO: use macro to autogenerate these during model decleration/package glue-code:
 # remove need for `Node` syntax in case of operations of main interest:
-predict(trainable_model::NodalTrainableModel, X::AbstractNode) = node(predict, trainable_model, X)
-transform(trainable_model::NodalTrainableModel, X::AbstractNode) = node(transform, trainable_model, X)
-inverse_transform(trainable_model::NodalTrainableModel, X::AbstractNode) = node(inverse_transform, trainable_model, X)
+# predict(trainable_model::NodalTrainableModel, X::AbstractNode) = node(predict, trainable_model, X)
+# transform(trainable_model::NodalTrainableModel, X::AbstractNode) = node(transform, trainable_model, X)
+# inverse_transform(trainable_model::NodalTrainableModel, X::AbstractNode) = node(inverse_transform, trainable_model, X)
 
 array(X) = convert(Array, X)
 array(X::AbstractNode) = node(array, X)

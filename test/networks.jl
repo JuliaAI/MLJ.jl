@@ -20,15 +20,17 @@ train, valid, test = partition(allrows, 0.7, 0.15);
 Xtrain = X[train,:]
 ytrain = y[train]
 
-Xs = node(Xtrain)
-ys = node(ytrain)
+Xs = source(Xtrain)
+ys = source(ytrain)
 
 knn1 = trainable(knn_, Xs, ys)
 fit!(knn1, :)
 knn_.K = 5
 fit!(knn1, train[1:end-10])
 fit!(knn1, verbosity=2)
-rms(predict(knn1, Xs(X[test,:])), ys(y[test]))
+yhat = predict(knn1, Xs)
+yhat(X[test,:])
+rms(yhat(X[test,:]), y[test])
 
 @test MLJ.is_stale(knn1) == false
 
@@ -41,8 +43,8 @@ tape = MLJ.get_tape
 @test isempty(tape(nothing))
 @test isempty(tape(knn1))
 
-XX = node(X_frame[train,:])
-yy = node(y[train])
+XX = source(X_frame[train,:])
+yy = source(y[train])
 @test !MLJ.is_stale(XX)
 
 # construct a transformer to standardize the target:
@@ -110,8 +112,8 @@ ytrain = yin[train];
 import MLJ: fit, predict, update
 function fit(composite::WetSupervised, verbosity, Xtrain, ytrain)
 
-    X = node(Xtrain) # instantiates a source node
-    y = node(ytrain)
+    X = source(Xtrain) # instantiates a source node
+    y = source(ytrain)
     
     t_X = trainable(composite.transformer_X, X)
     t_y = trainable(composite.transformer_y, y)
@@ -172,8 +174,8 @@ fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain
 
 predict(composite, fitresult, Xin[test,:])
 
-XXX = node(Xin[train,:])
-yyy = node(yin[train])
+XXX = source(Xin[train,:])
+yyy = source(yin[train])
 
 composite_ = trainable(composite, XXX, yyy)
 yhat = predict(composite_, XX)
