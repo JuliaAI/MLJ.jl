@@ -94,18 +94,18 @@ function fit!(trainable_model::NodalTrainableModel, rows=nothing; verbosity=1)
 
     if !isdefined(trainable_model, :fitresult)
         rows != nothing || error("An untrained NodalTrainableModel requires rows to fit.")
-        args = [arg()[Rows, rows] for arg in trainable_model.args]
+        args = [arg(rows=rows) for arg in trainable_model.args]
         trainable_model.fitresult, trainable_model.cache, report =
             fit(trainable_model.model, verbosity, args...)
         trainable_model.rows = deepcopy(rows)
     else
         if rows == nothing # (ie rows not specified) update:
-            args = [arg()[Rows, trainable_model.rows] for arg in trainable_model.args]
+            args = [arg(rows=trainable_model.rows) for arg in trainable_model.args]
             trainable_model.fitresult, trainable_model.cache, report =
                 update(trainable_model.model, verbosity, trainable_model.fitresult,
                        trainable_model.cache, args...)
         else # retrain from scratch:
-            args = [arg()[Rows, rows] for arg in trainable_model.args]
+            args = [arg(rows=rows) for arg in trainable_model.args]
             trainable_model.fitresult, trainable_model.cache, report =
                 fit(trainable_model.model, verbosity, args...)
             trainable_model.rows = deepcopy(rows)
@@ -164,7 +164,14 @@ end
 is_stale(s::Source) = false
 
 # make source nodes callable:
-(s::Source)() = s.data
+function (s::Source)(; rows=:)
+    if rows == (:)
+        return s.data
+    else
+        return (s.data)[Rows, rows]
+    end
+end
+
 (s::Source)(Xnew) = Xnew
 
 struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
@@ -229,11 +236,11 @@ Node(operation::Function, args::AbstractNode...) = Node(operation, nothing, args
 # make sure it is unique
 
 # make nodes callable:
-(y::Node)() = (y.operation)(y.trainable, [arg() for arg in y.args]...)
+(y::Node)(; rows=:) = (y.operation)(y.trainable, [arg(rows=rows) for arg in y.args]...)
 (y::Node)(Xnew) = (y.operation)(y.trainable, [arg(Xnew) for arg in y.args]...)
 
 # and for the special case of static operations:
-(y::Node{Nothing})() = (y.operation)([arg() for arg in y.args]...)
+(y::Node{Nothing})(; rows=:) = (y.operation)([arg(rows=rows) for arg in y.args]...)
 (y::Node{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
 function fit!(y::Node, rows; verbosity=1)
