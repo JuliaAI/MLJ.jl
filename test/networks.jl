@@ -24,7 +24,7 @@ Xs = source(Xtrain)
 ys = source(ytrain)
 
 knn1 = trainable(knn_, Xs, ys)
-fit!(knn1, :)
+fit!(knn1)
 knn_.K = 5
 fit!(knn1, train[1:end-10])
 fit!(knn1, verbosity=2)

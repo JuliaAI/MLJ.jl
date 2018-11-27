@@ -117,7 +117,9 @@ function fit!(trainable_model::NodalTrainableModel, rows=nothing; verbosity=1)
     verbosity < 1 || @info "Training $trainable_model whose model is $(trainable_model.model)."
 
     if !isdefined(trainable_model, :fitresult)
-        rows != nothing || error("An untrained NodalTrainableModel requires rows to fit.")
+        if rows == nothing
+            rows=(:) # error("An untrained NodalTrainableModel requires rows to fit.")
+        end
         args = [arg(rows=rows) for arg in trainable_model.args]
         trainable_model.fitresult, trainable_model.cache, report =
             fit(trainable_model.model, verbosity, args...)

@@ -316,10 +316,8 @@ end
 
 
 function __init__()
+    @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=true
 end
-
-@load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=false
-
 
 end # module
 
