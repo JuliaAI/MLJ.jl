@@ -35,12 +35,14 @@ TrainableModel(model::B, args...) where B<:Model = TrainableModel{B}(model, args
 TrainableModel(model::Model, task::SupervisedTask) = TrainableModel(model, X_and_y(task)...)
 TrainableModel(model::Model, task::UnsupervisedTask) = TrainableModel(model, task.data)
 
-function fit!(trainable_model::TrainableModel, rows=nothing; verbosity=1)
+function fit!(trainable_model::TrainableModel; rows=nothing, verbosity=1)
 
     verbosity < 1 || @info "Training $trainable_model whose model is $(trainable_model.model)."
 
     if !isdefined(trainable_model, :fitresult)
-        rows != nothing || error("An untrained TrainableModel requires rows to fit.")
+        if rows == nothing
+            rows = (:) # error("An untrained TrainableModel requires rows to fit.")
+        end
         args = [arg[Rows, rows] for arg in trainable_model.args]
         trainable_model.fitresult, trainable_model.cache, report =
             fit(trainable_model.model, verbosity, args...)

@@ -24,9 +24,9 @@ Xs = source(Xtrain)
 ys = source(ytrain)
 
 knn1 = trainable(knn_, Xs, ys)
-fit!(knn1)
+fit!(knn1, verbosity=3)
 knn_.K = 5
-fit!(knn1, train[1:end-10])
+fit!(knn1, rows=train[1:end-10], verbosity=2)
 fit!(knn1, verbosity=2)
 yhat = predict(knn1, Xs)
 yhat(X[test,:])
@@ -75,11 +75,12 @@ zhat = predict(knn, Xa)
 yhat = inverse_transform(uscale, zhat)
 
 # fit-through training:
-fit!(yhat, 1:100, verbosity=2)
-fit!(yhat, :, verbosity=2)
-fit!(yhat, verbosity=2)
-@test !MLJ.is_stale(XX)
-
+fit!(yhat, rows=1:100, verbosity=2)
+fit!(yhat, rows=:, verbosity=2) # will retrain 
+fit!(yhat, verbosity=2) # will not retrain; nothing changed
+knn_.K =4
+fit!(yhat, verbosity=2) # will retrain; new hyperparameter
+@test !MLJ.is_stale(XX) # sources always fresh
 
 rms(yhat(X_frame[test,:]), y[test])
 
@@ -125,7 +126,7 @@ function fit(composite::WetSupervised, verbosity, Xtrain, ytrain)
     zhat = predict(l, Xt)
 
     yhat = inverse_transform(t_y, zhat)
-    fit!(yhat, :, verbosity=verbosity)
+    fit!(yhat, verbosity=verbosity)
 
     fitresult = yhat
     report = l.report
@@ -144,7 +145,7 @@ end
 predict(composite::WetSupervised, fitresult, Xnew) = fitresult(Xnew)
 
 # let's train the composite:
-fitresult, cache, report = fit(composite, 2, Xtrain, ytrain)
+fitresult, cache, report = fit(composite, 3, Xtrain, ytrain)
 
 # to check internals:
 encoder = fitresult.trainable
@@ -152,7 +153,7 @@ tree = fitresult.args[1].trainable
 selector = fitresult.args[1].args[1].args[1].trainable
 
 # this should trigger no retraining:
-fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
+fitresult, cache, report = update(composite, 3, fitresult, cache, Xtrain, ytrain)
 
 # this should trigger retraining of encoder and tree
 encoder_.initial_label = 14
@@ -166,7 +167,6 @@ fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain
 tree_.max_depth = 2
 fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
 
-
 # this should trigger retraining of all parts:
 encoder_.initial_label = 43
 selector_.features = []
@@ -179,7 +179,7 @@ yyy = source(yin[train])
 
 composite_ = trainable(composite, XXX, yyy)
 yhat = predict(composite_, XX)
-fit!(yhat, :, verbosity=3)
+fit!(yhat, verbosity=3)
 composite.transformer_X.features = [:petal_length]
 fit!(yhat, verbosity=3)
 yhat(Xin[test,:])

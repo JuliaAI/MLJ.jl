@@ -10,7 +10,7 @@ X = array(X_frame)
 train, test = partition(eachindex(y), 0.7);
 
 t = TrainableModel(KNNRegressor(K=4), X, y)
-fit!(t, train)
+fit!(t, rows=train)
 fit!(t)
 
 predict(t, X[test,:])

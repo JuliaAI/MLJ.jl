@@ -106,7 +106,7 @@ function is_stale(trainable_model::NodalTrainableModel)
 end
 
 # fit method:
-function fit!(trainable_model::NodalTrainableModel, rows=nothing; verbosity=1)
+function fit!(trainable_model::NodalTrainableModel; rows=nothing, verbosity=1)
 
     if trainable_model.frozen 
         verbosity < 0 || @warn "$trainable_model with model $(trainable_model.model) "*
@@ -257,18 +257,17 @@ end
 (y::Node{Nothing})(; rows=:) = (y.operation)([arg(rows=rows) for arg in y.args]...)
 (y::Node{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
-function fit!(y::Node, rows; verbosity=1)
-    for trainable_model in y.tape
-        fit!(trainable_model, rows; verbosity=verbosity-1)
+# if no `rows` specified, only retrain stale dependent
+# NodalTrainableModels (using whatever rows each one was last trained
+# on):
+function fit!(y::Node; rows=nothing, verbosity=1)
+    if rows == nothing
+        trainable_models = filter(is_stale, y.tape)
+    else
+        trainable_models = y.tape
     end
-    return y
-end
-# if no `rows` specified, only retrain stale dependent NodalTrainableModels
-# (using whatever rows each was last trained on):
-function fit!(y::Node; verbosity=1)
-    trainable_models = filter(is_stale, y.tape)
     for trainable_model in trainable_models
-        fit!(trainable_model; verbosity=verbosity-1)
+        fit!(trainable_model; rows=rows, verbosity=verbosity-1)
     end
     return y
 end
@@ -288,7 +287,7 @@ function _recursive_show(stream::IO, X::AbstractNode)
         if X.trainable != nothing
             color = (X.trainable.frozen ? :red : :green)
             printstyled(IOContext(stream, :color=>true), handle(X.trainable),
-                        bold=true, color=color)
+                        bold=true)
             print(stream, ", ")
         end
         n_args = length(X.args)
