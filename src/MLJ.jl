@@ -71,7 +71,7 @@ include("show.jl")
 # for storing hyperparameters:
 abstract type Model <: MLJType end
 
-abstract type Supervised{E} <: Model end # parameterized by fit-result `E`
+abstract type Supervised{R} <: Model end # parameterized by fit-result `R`
 abstract type Unsupervised <: Model  end
 
 # tasks:
