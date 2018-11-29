@@ -138,7 +138,7 @@ Base.getindex(v::AbstractVector, ::Type{Rows}, r) = v[r]
 
 ## MODEL METADATA
 
-# `property(ModelType)` is a tuple of instances of:
+# `property(SomeModelType)` is a tuple of instances of:
 """ Classfication models with this property allow weighting of the target classes """
 struct CanWeightTarget <: Property end
 """ Models with this property can provide feature rankings or importance scores """
