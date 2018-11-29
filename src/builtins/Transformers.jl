@@ -12,6 +12,7 @@ import MLJ: MLJType, Unsupervised
 import DataFrames: names, AbstractDataFrame, DataFrame, eltypes
 import Distributions
 using Statistics
+using Tables
 
 # to be extended:
 import MLJ: fit, transform, inverse_transform, properties, operations, inputs_can_be
@@ -222,15 +223,18 @@ end
 # null fitresult:
 StandardizerFitResult() = StandardizerFitResult(zeros(0,0), Symbol[], Bool[])
 
-function fit(transformer::Standardizer, verbosity::Int, X::DataFrame)
-
-    features = names(X)
+function fit(transformer::Standardizer, verbosity::Int, X::Any)
+    # if using Query.jl, replace below code with
+    # features = df |> @take(1) |> @map(fieldnames(typeof(_))) |> @mapmany(_, __)
+    # Since this is a really dirty way of proceeding, I've used
+    # Tables.jl for now.
+    features = collect(propertynames(first(Tables.rows(X))))
     
     # determine indices of features to be transformed
     features_to_try = (isempty(transformer.features) ? features : transformer.features)
-    is_transformed = Array{Bool}(undef, size(X, 2))
-    for j in 1:size(X, 2)
-        if features[j] in features_to_try && eltype(X[j]) <: AbstractFloat
+    is_transformed = Array{Bool}(undef, length(features))
+    for j in 1:length(features)
+        if features[j] in features_to_try && Tables.schema(X).types[j] <: AbstractFloat
             is_transformed[j] = true
         else
             is_transformed[j] = false
@@ -238,12 +242,12 @@ function fit(transformer::Standardizer, verbosity::Int, X::DataFrame)
     end
 
     # fit each of those features
-    fitresults = Array{Float64}(undef, 2, size(X, 2))
+    fitresults = Array{Float64}(undef, 2, length(features))
     verbosity < 2 || @info "Features standarized: "
-    for j in 1:size(X, 2)
+    for j in 1:length(features)
         if is_transformed[j]
             fitresult, cache, report =
-                fit(UnivariateStandardizer(), verbosity-1, collect(X[j]))
+                fit(UnivariateStandardizer(), verbosity-1, getproperty(X, propertynames(first(Tables.rows(X)))[j]))
             fitresults[:,j] = [fitresult...]
             verbosity < 2 ||
                 @info "  :$(features[j])    mu=$(fitresults[1,j])  sigma=$(fitresults[2,j])"
@@ -263,16 +267,17 @@ end
 
 function transform(transformer::Standardizer, fitresult, X)
 
-    names(X) == fitresult.features ||
+    collect(propertynames(first(Tables.rows(X)))) == fitresult.features ||
         error("Attempting to transform data frame with incompatible feature labels.")
 
-    Xnew = X[1:end,:] # make a copy of X, working even for `SubDataFrames`
+    Xnew = copy(X) # make a copy of X, working even for `SubDataFrames`
     univ_transformer = UnivariateStandardizer()
-    for j in 1:size(X, 2)
+    for j in 1:length(propertynames(first(Tables.rows(X))))
         if fitresult.is_transformed[j]
             # extract the (mu, sigma) pair:
             univ_fitresult = (fitresult.fitresults[1,j], fitresult.fitresults[2,j])  
-            Xnew[j] = transform(univ_transformer, univ_fitresult, collect(X[j]))
+            getproperty(Xnew, propertynames(first(Tables.rows(Xnew)))[j]) .= 
+                transform(univ_transformer, univ_fitresult, getproperty(X, propertynames(first(Tables.rows(X)))[j]))
         end
     end
     return Xnew
