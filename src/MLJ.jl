@@ -4,9 +4,9 @@ export Rows, Cols, Names
 export features, X_and_y
 export Property, Regressor, TwoClass, MultiClass
 export Numeric, Nominal, Weights, NAs
-export properties, operations, type_of_X, type_of_y
+export properties, operations, inputs_can_be, outputs_are
 export SupervisedTask, UnsupervisedTask, nrows
-export TrainableModel
+export Supervised, Unsupervised
 export array
 
 # defined here but extended by files in "interfaces/" (lazily loaded)
@@ -38,6 +38,7 @@ export UnivariateStandardizer, Standardizer
 import Requires.@require  # lazy code loading package
 import CSV
 import DataFrames: DataFrame, AbstractDataFrame, SubDataFrame, eltypes, names
+using  Query
 import Distributions
 import Base.==
 
@@ -71,7 +72,7 @@ include("show.jl")
 # for storing hyperparameters:
 abstract type Model <: MLJType end
 
-abstract type Supervised{E} <: Model end # parameterized by fit-result `E`
+abstract type Supervised{R} <: Model end # parameterized by fit-result `R`
 abstract type Unsupervised <: Model  end
 
 # tasks:
@@ -83,9 +84,29 @@ abstract type Property end # subtypes are the allowable model properties
 
 include("metrics.jl")
 
+
 ## UNIVERSAL ADAPTOR FOR DATA CONTAINERS
 
-# TODO: replace with IterationTables interface?
+# Note: By *generic table* we mean any source, supported by Query.jl,
+# for which @from iterates over rows. In particular `Matrix` objects
+# are not generic tables.
+
+# TODO: Must be a better way to do this?
+"""" 
+    MLJ.array(X)
+
+Convert a tabular data source `X`, of type supported by Query.jl, into
+an `Array`; or, if `X` is an `AbstractArray`, return `X`.
+
+"""
+function array(X)
+    df= @from row in X begin
+        @select row
+        @collect DataFrame
+    end
+    return convert(Array, df)
+end
+array(X::AbstractArray) = X
 
 # For vectors and tabular data containers `df`:
 # `df[Rows, r]` gets rows of `df` at `r` (single integer, integer range, or colon)
@@ -115,43 +136,48 @@ Base.getindex(A::AbstractMatrix{T}, ::Type{Eltypes}) where T = [T for j in 1:siz
 Base.getindex(v::AbstractVector, ::Type{Rows}, r) = v[r]
 
 
-## MODEL PROPERTIES
+## MODEL METADATA
 
-""" Models with this property perform regression """
-struct Regression <: Property end    
-""" Models with this property perform binary classification """
-struct Classification <: Property end
-""" Models with this property perform binary and multiclass classification """
-struct MultiClass <: Property end
-""" Models with this property support nominal (categorical) features """
-struct Nominal <: Property end
-""" Models with this property support features of numeric type (continuous or ordered factor) """
-struct Numeric <: Property end
+# `property(ModelType)` is a tuple of instances of:
 """ Classfication models with this property allow weighting of the target classes """
-struct Weights <: Property end
-""" Models with this property support features with missing values """ 
-struct NAs <: Property end
+struct CanWeightTarget <: Property end
+""" Models with this property can provide feature rankings or importance scores """
+struct CanRankFeatures <: Property end
+
+# `inputs_can_be(SomeModelType)` and `outputs_are(SomeModelType)` are tuples of
+# instances of:
+struct Nominal <: Property end
+struct Numeric <: Property end
+struct NA <: Property end
+
+# additionally, `outputs_are(SomeModelType)` can include:
+struct Probababilistic <: Property end
+struct Multivariate <: Property end
+
+# for `Model`s with nominal targets (classifiers)
+# `outputs_are(SomeModelType)` could also include:
+struct Multiclass <: Property end # can handle more than two classes
 
 
 ## CONCRETE TASK SUBTYPES
 
 # TODO: add evaluation metric:
+# TODO: add `inputs_can_be` and `outputs_are`
 struct UnsupervisedTask <: Task
     data
     ignore::Vector{Symbol}
     operation::Function    # transform, inverse_transform, etc
-    properties::Vector{Property}
+    properties::Tuple
 end
 
 function UnsupervisedTask(
     ; data=nothing
     , ignore=Symbol[]
     , operation=predict
-    , properties=Property[])
+    , properties=())
     
     data != nothing         || throw(error("You must specify data=..."))
-    !isempty(properties)    || @warn "No properties specified for task. "*
-                                     "To list properties run `subtypes(Properties)`."
+
     return SupervisedTask(data, ignore, operation, properties)
 end
 
@@ -160,7 +186,7 @@ struct SupervisedTask <: Task
     target::Symbol
     ignore::Vector{Symbol}
     operation::Function    # predict, predict_proba, etc
-    properties::Vector{Property}
+    properties::Tuple
 end
 
 function SupervisedTask(
@@ -168,13 +194,12 @@ function SupervisedTask(
     , target=nothing
     , ignore=Symbol[]
     , operation=predict
-    , properties=Property[])
+    , properties=())
     
     data != nothing         || throw(error("You must specify data=..."))
     target != nothing       || throw(error("You must specify target=..."))
     target in names(data)   || throw(error("Supplied data does not have $target as field."))
-    !isempty(properties)    || @warn "No properties specified for task. "*
-                                     "To list properties run `subtypes(Properties)`."
+
     return SupervisedTask(data, target, ignore, operation, properties)
 end
 
@@ -221,10 +246,13 @@ function update end
 
 # methods to be dispatched on `Model` subtypes:
 function operations end 
-function type_of_nominals end
-function type_of_X end
-function type_of_y end
-function defaults end
+function inputs_can_be end
+function outputs_are end
+function properties end
+
+# fallback method for coercing generic data into form required by fit:
+coerce(model::Model, args...) = args
+coerce_training(model::Model, args...) = args
 
 # fallback method to correct invalid hyperparameters and return
 # a warning (in this case empty):
@@ -316,8 +344,9 @@ end
 
 
 function __init__()
-    @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=true
 end
+
+@load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=false
 
 end # module
 

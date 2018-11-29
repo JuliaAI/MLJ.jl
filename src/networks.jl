@@ -121,19 +121,22 @@ function fit!(trainable_model::NodalTrainableModel; rows=nothing, verbosity=1)
             rows=(:) # error("An untrained NodalTrainableModel requires rows to fit.")
         end
         args = [arg(rows=rows) for arg in trainable_model.args]
+        clean!(trainable_model.model)
         trainable_model.fitresult, trainable_model.cache, report =
-            fit(trainable_model.model, verbosity, args...)
+            fit(trainable_model.model, verbosity, coerce_training(trainable_model.model, args...)...)
         trainable_model.rows = deepcopy(rows)
     else
         if rows == nothing # (ie rows not specified) update:
             args = [arg(rows=trainable_model.rows) for arg in trainable_model.args]
+            clean!(trainable_model.model)
             trainable_model.fitresult, trainable_model.cache, report =
                 update(trainable_model.model, verbosity, trainable_model.fitresult,
-                       trainable_model.cache, args...)
+                       trainable_model.cache, coerce_training(trainable_model.model, args...)...)
         else # retrain from scratch:
             args = [arg(rows=rows) for arg in trainable_model.args]
+            clean!(trainable_model.model)
             trainable_model.fitresult, trainable_model.cache, report =
-                fit(trainable_model.model, verbosity, args...)
+                fit(trainable_model.model, verbosity, coerce_training(trainable_model.model, args...)...)
             trainable_model.rows = deepcopy(rows)
         end
     end
@@ -350,7 +353,6 @@ trainable(model::Model, X::AbstractNode, y) = NodalTrainableModel(model, X, sour
 # transform(trainable_model::NodalTrainableModel, X::AbstractNode) = node(transform, trainable_model, X)
 # inverse_transform(trainable_model::NodalTrainableModel, X::AbstractNode) = node(inverse_transform, trainable_model, X)
 
-array(X) = convert(Array, X)
 array(X::AbstractNode) = node(array, X)
 
 Base.log(v::Vector{<:Number}) = log.(v)

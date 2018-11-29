@@ -1,5 +1,6 @@
 module TestKNN
 
+# using Revise
 using Test
 using MLJ
 
@@ -18,10 +19,16 @@ fitresult, cache, report = MLJ.fit(knn, 0, X, y);
 r = 1 + 1/sqrt(5) + 1/sqrt(10)
 Xtest = [1.0 1.0]
 ypred = (1 + 8/sqrt(5) + 2/sqrt(10))/r
-@test isapprox(predict(knn, fitresult, Xtest)[1], ypred)
+@test predict(knn, fitresult, Xtest)[1] ≈ ypred
 
 knn.K = 2
 fitresult, cache, report = MLJ.update(knn, 0, fitresult, cache, X, y); 
 @test predict(knn, fitresult, Xtest)[1] !=  ypred
+
+# test that coerce methods work:
+X, y = X_and_y(load_boston())
+knn_trainable = trainable(knn, X, y)
+fit!(knn_trainable)
+predict(knn_trainable, X[1:10,:])
 
 end

@@ -4,28 +4,23 @@ module KNN
 
 export KNNRegressor
 
-import MLJ: Supervised 
+import MLJ
+import MLJ: CanWeightTarget, CanRankFeatures
+import MLJ: Nominal, Numeric, NA, Probababilistic, Multivariate,  Multiclass
+
 using LinearAlgebra
 
 # to be extended:
-import MLJ: predict, fit, update, clean!, properties, operations, type_of_X, type_of_y
-import MLJ: Regression, Classification, MultiClass, Nominal, Numeric, Weights, NAs
 
 KNNFitResultType = Tuple{Matrix{Float64},Vector{Float64}}
 
 # TODO: introduce type parameters for the function fields (metric, kernel)
 
-mutable struct KNNRegressor <: Supervised{KNNFitResultType}
+mutable struct KNNRegressor <: MLJ.Supervised{KNNFitResultType}
     K::Int           # number of local target values averaged
     metric::Function
     kernel::Function 
 end
-
-# metadata:
-properties(::Type{KNNRegressor}) = [Regression(), Numeric()]
-operations(::Type{KNNRegressor}) = [predict]
-type_of_X(::Type{KNNRegressor}) = Array{Float64,2}
-type_of_y(::Type{KNNRegressor}) = Vector{Float64}
 
 euclidean(v1, v2) = norm(v2 - v1)
 reciprocal(d) = d < eps(Float64) ? sign(d)/eps(Float64) : 1/d
@@ -33,12 +28,12 @@ reciprocal(d) = d < eps(Float64) ? sign(d)/eps(Float64) : 1/d
 # lazy keywork constructor:
 function KNNRegressor(; K=1, metric=euclidean, kernel=reciprocal)
     model = KNNRegressor(K, metric, kernel)
-    message = clean!(model)
+    message = MLJ.clean!(model)
     isempty(message) || @warn message
     return model
 end
     
-function clean!(model::KNNRegressor)
+function MLJ.clean!(model::KNNRegressor)
     message = ""
     if model.K <= 0
         model.K = 1
@@ -47,7 +42,7 @@ function clean!(model::KNNRegressor)
     return message
 end
 
-function fit(model::KNNRegressor
+function MLJ.fit(model::KNNRegressor
              , verbosity
              , X::Matrix{Float64}
              , y::Vector{Float64})
@@ -60,6 +55,9 @@ function fit(model::KNNRegressor
     return fitresult, cache, report 
 end
 
+MLJ.coerce(model::KNNRegressor, X) = (MLJ.array(X),)
+MLJ.coerce_training(model::KNNRegressor, X, y) = (MLJ.array(X), [y...])
+                                       
 first_component_is_less_than(v, w) = isless(v[1], w[1])
 
 # TODO: there is way smarter way to do without sorting. Alternatively,
@@ -92,9 +90,15 @@ function predict_on_pattern(model, fitresult, pattern)
     return sum(wts .* ytrain[indices])
 end
 
-predict(model::KNNRegressor, fitresult, Xnew) =
+MLJ.predict(model::KNNRegressor, fitresult, Xnew) = 
     [predict_on_pattern(model, fitresult, Xnew[i,:]) for i in 1:size(Xnew,1)]
     
+# metadata:
+MLJ.properties(::Type{KNNRegressor}) = ()
+MLJ.operations(::Type{KNNRegressor}) = (MLJ.predict,)
+MLJ.inputs_can_be(::Type{KNNRegressor}) = (Numeric(),)
+MLJ.outputs_are(::Type{KNNRegressor}) = (Numeric(),)
+
 end # module
 
 
