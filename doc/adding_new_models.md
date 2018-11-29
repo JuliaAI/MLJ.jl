@@ -40,7 +40,7 @@ supertype of all models is:
 abstract type Model <: MLJType end 
 ````
 
-Models are divided into `Supervised` and `Unsupervised` subtypes. 
+Most models will fall into one of two subtypes: `Supervised` and `Unsupervised`:
 
 ````julia
 abstract type Supervised{R} <: Model end
@@ -60,7 +60,7 @@ Associated with every concrete subtype of `Model` there must be a
 *fit-result* (see below). At least one method dispatched on model
 instances and a fit-result (typically `predict` for supervised
 algorithms) must be provided. Such methods, here called *operations*,
-can have one of the following names: `predict`, `predict_proba`,
+can have one of the following names: `predict`, `predict_probability`,
 `transform`, `inverse_transform`, `se`, or `evaluate`.
 
 The outcome of training a learning algorithm is here called a
@@ -166,24 +166,44 @@ single-row `DataFrame`, for example - and suitably unwrap
 method.)
 
 **Metadata** Methods encoding certain model type metadata must be
-provided for the `Task` interface. For example, in the
+provided for the `Task` interface. For example, in the current
 `DecisionTreeClassifier`, metadata is declared as follows:
 
 ````julia
-properties(::Type{DecisionTreeClassifier}) = [MultiClass(), Numeric()]
-operations(::Type{DecisionTreeClassifier}) = [:predict]
-type_of_X(::Type{DecisionTreeClassifier}) = Array{Float64,2}
-type_of_y(::Type{DecisionTreeClassifier}) = Vector
+MLJ.properties(::Type{DecisionTreeClassifier}) = ()
+MLJ.operations(::Type{DecisionTreeClassifier}) = (MLJ.predict,) # TODO: add MLJ.predict_probabilitybility
+MLJ.inputs_can_be(::Type{DecisionTreeClassifier}) = (Numeric())
+MLJ.outputs_are(::Type{DecisionTreeClassifier}) = (Nominal())
 ````
 
-For a list of properties run `subtypes(Property)`. For explanation of
-a property, query the doc string, e.g., run `?MulitClass`.
+Available options can be gleaned from this code extract:
 
+````
+# `property(ModelType)` is a tuple of instances of:
+""" Classfication models with this property allow weighting of the target classes """
+struct CanWeightTarget <: Property end
+""" Models with this property can provide feature rankings or importance scores """
+struct CanRankFeatures <: Property end
+
+# `inputs_can_be(SomeModelType)` and `outputs_are(SomeModelType)` are tuples of
+# instances of:
+struct Nominal <: Property end
+struct Numeric <: Property end
+struct NA <: Property end
+
+# additionally, `outputs_are(SomeModelType)` can include:
+struct Probababilistic <: Property end
+struct Multivariate <: Property end
+
+# for `Model`s with nominal targets (classifiers)
+# `outputs_are(SomeModelType)` could also include:
+struct Multiclass <: Property end # can handle more than two classes
+````
 
 #### Optional methods
 
 **Binary classifiers.** A model with the `Classifier()` property can
-implement a `predict_proba` method to predict probabilities instead of
+implement a `predict_probability` method to predict probabilities instead of
 labels, and will have the same type signature as `predict` for its
 inputs. It should return a single `Float64` probability per input
 pattern.
@@ -262,11 +282,15 @@ code should be wrapped in a module to prevent namespace conflicts with
 other test code. For a module name, just prepend "Test", as in
 "TestDecisionTree". See "test/DecisionTree.jl" for an example. 
 
+- Do not add the external package to the `Project.toml` file in the
+  usual way. Rather, add its UUID to the `[extras]` section of
+  `Project.toml` and add the package name to `test = [Test", "DecisionTree",
+  ...]`.
+
 - Add a line to ["test/runtests.jl"](../test/runtests.jl) to
 `include` your test file, for the purpose of testing MLJ core and all
 currently supported packages, including yours. You can Test your code
 by running `test MLJ` from the Julia interactive package manager. You
 will need to `Pkg.dev` your local MLJ fork first. To test your code in
 isolation, locally edit "test/runtest.jl" appropriately.
-
 
