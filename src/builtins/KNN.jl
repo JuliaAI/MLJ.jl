@@ -4,12 +4,14 @@ module KNN
 
 export KNNRegressor
 
-import MLJ: Supervised 
+import MLJ
+import MLJ: Supervised, array 
+import MLJ: Regression, Classification, MultiClass, Nominal, Numeric, Weights, NAs
 using LinearAlgebra
 
 # to be extended:
-import MLJ: predict, fit, update, clean!, properties, operations, type_of_X, type_of_y
-import MLJ: Regression, Classification, MultiClass, Nominal, Numeric, Weights, NAs
+import MLJ: predict, fit, update, coerce, coerce_training
+import MLJ: clean!, properties, operations, type_of_X, type_of_y
 
 KNNFitResultType = Tuple{Matrix{Float64},Vector{Float64}}
 
@@ -60,6 +62,9 @@ function fit(model::KNNRegressor
     return fitresult, cache, report 
 end
 
+coerce(model::KNNRegressor, X) = (MLJ.array(X),)
+coerce_training(model::KNNRegressor, X, y) = (MLJ.array(X), [y...])
+                                       
 first_component_is_less_than(v, w) = isless(v[1], w[1])
 
 # TODO: there is way smarter way to do without sorting. Alternatively,
@@ -92,7 +97,7 @@ function predict_on_pattern(model, fitresult, pattern)
     return sum(wts .* ytrain[indices])
 end
 
-predict(model::KNNRegressor, fitresult, Xnew) =
+predict(model::KNNRegressor, fitresult, Xnew) = 
     [predict_on_pattern(model, fitresult, Xnew[i,:]) for i in 1:size(Xnew,1)]
     
 end # module

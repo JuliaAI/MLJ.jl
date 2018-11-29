@@ -19,7 +19,8 @@ end
 """Load a well-known public classification task with nominal features."""
 function load_iris()
     df = CSV.read(joinpath(datadir, "iris.csv"),
-                  categorical=false, allowmissing=:none)
+                  categorical=true, allowmissing=:none)
+    df[:target] = [df[:target]...] # change CategoricalArray to Array, keeping categ eltype
     return SupervisedTask(data=df, target=:target, properties=[Numeric(), MultiClass()])
 end
 

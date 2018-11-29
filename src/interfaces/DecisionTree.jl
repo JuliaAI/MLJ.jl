@@ -10,12 +10,14 @@
 #> trailing underscore "_":
 module DecisionTree_
 
-#> export the new models you're going to define (and, if possible, nothing else):
+#> export the new models you're going to define (and nothing else):
 export DecisionTreeClassifier
 
 # to be extended:
 #> for all Supervised models:
-import MLJ: predict, fit, clean!, properties, operations, type_of_X, type_of_y
+import MLJ
+import MLJ: coerce, coerce_training, fit, predict, clean!
+import MLJ: properties, operations, type_of_X, type_of_y
 import MLJ: Regression, Classification, MultiClass, Nominal, Numeric, Weights, NAs
 
 # import MLJ: update, predict_proba      #> if implemented
@@ -37,7 +39,7 @@ DecisionTreeClassifierFitResultType{T} =
 [https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md](https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md)
 
 """
-mutable struct DecisionTreeClassifier{T} <: Supervised{DecisionTreeClassifierFitResultType{T}} 
+mutable struct DecisionTreeClassifier{T} <: Supervised{DecisionTreeClassifierFitResultType{T}}
     target_type::Type{T}
     pruning_purity::Float64 
     max_depth::Int
@@ -108,15 +110,18 @@ end
 
 #> A required `fit` method returns `fitresult, cache, report`. (Return
 #> `cache=nothing` unless you are overloading `update`)
-
 function fit(model::DecisionTreeClassifier{T2}
              , verbosity            #> must be here even if unsupported in pkg (as here)
-             , X::Array{Float64,2}
+             , X::Matrix{Float64}
              , y::Vector{T}) where {T,T2}
 
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
 
+    
+    
+    
+    
     fitresult = DecisionTree.build_tree(y
                                         , X
                                         , model.n_subfeatures
@@ -143,11 +148,14 @@ function fit(model::DecisionTreeClassifier{T2}
 
 end
 
+#> method to coerce generic data into form required by fit:
+coerce(model::DecisionTreeClassifier, X) = (MLJ.array(X),)
+coerce_training(model::DecisionTreeClassifier, X, y) = (MLJ.array(X), [y...]) 
+
 predict(model::DecisionTreeClassifier 
         , fitresult
-        , Xnew::Union{Array{Float64,2},SubArray{Float64,2}}) =
-            DecisionTree.apply_tree(fitresult, collect(Xnew))
-
+        , Xnew) = 
+            DecisionTree.apply_tree(fitresult, Xnew)
 
 end # module
 

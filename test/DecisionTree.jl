@@ -11,7 +11,8 @@ X, y = X_and_y(task)
 X_array = convert(Array{Float64}, X);
  
 import DecisionTree
-baretree = DecisionTreeClassifier(target_type=String)
+import CategoricalArrays
+baretree = DecisionTreeClassifier(target_type=CategoricalArrays.CategoricalString{UInt32})
 
 # split the rows:
 allrows = eachindex(y)
@@ -33,5 +34,12 @@ baretree.merge_purity_threshold=0.1
 fitresult, cache, report = MLJ.update(baretree, 1, fitresult, cache, X_array, y)
 yhat = predict(baretree, fitresult, X_array);
 @test yhat != y
+
+# to test coercion methods, we construct a trainable_model and test on
+# untransformed data:
+
+tree = trainable(baretree, X, y)
+fit!(tree)
+predict(tree, X[1:3,:])
 
 end

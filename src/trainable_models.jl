@@ -20,7 +20,7 @@ mutable struct TrainableModel{M<:Model} <: AbstractTrainableModel
                         "Use NodalTrainableModel(model, X) for an unsupervised learner model."))
         
         trainable_model = new{M}(model)
-        trainable_model.args = args
+        trainable_model.args = coerce_training(model, args...)
         trainable_model.report = Dict{Symbol,Any}()
 
         return trainable_model

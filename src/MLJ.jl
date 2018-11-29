@@ -6,7 +6,7 @@ export Property, Regressor, TwoClass, MultiClass
 export Numeric, Nominal, Weights, NAs
 export properties, operations, type_of_X, type_of_y
 export SupervisedTask, UnsupervisedTask, nrows
-export TrainableModel
+export Supervised, Unsupervised
 export array
 
 # defined here but extended by files in "interfaces/" (lazily loaded)
@@ -38,6 +38,7 @@ export UnivariateStandardizer, Standardizer
 import Requires.@require  # lazy code loading package
 import CSV
 import DataFrames: DataFrame, AbstractDataFrame, SubDataFrame, eltypes, names
+using  Query
 import Distributions
 import Base.==
 
@@ -83,9 +84,29 @@ abstract type Property end # subtypes are the allowable model properties
 
 include("metrics.jl")
 
+
 ## UNIVERSAL ADAPTOR FOR DATA CONTAINERS
 
-# TODO: replace with IterationTables interface?
+# Note: By *generic table* we mean any source, supported by Query.jl,
+# for which @from iterates over rows. In particular `Matrix` objects
+# are not generic tables.
+
+# TODO: Must be a better way to do this?
+"""" 
+    MLJ.array(X)
+
+Convert a tabular data source `X`, of type supported by Query.jl, into
+an `Array`; or, if `X` is an `AbstractArray`, return `X`.
+
+"""
+function array(X)
+    df= @from row in X begin
+        @select row
+        @collect DataFrame
+    end
+    return convert(Array, df)
+end
+array(X::AbstractArray) = X
 
 # For vectors and tabular data containers `df`:
 # `df[Rows, r]` gets rows of `df` at `r` (single integer, integer range, or colon)
@@ -113,6 +134,8 @@ Base.getindex(A::AbstractMatrix, ::Type{Names}) = 1:size(A, 2)
 Base.getindex(A::AbstractMatrix{T}, ::Type{Eltypes}) where T = [T for j in 1:size(A, 2)]
 
 Base.getindex(v::AbstractVector, ::Type{Rows}, r) = v[r]
+
+
 
 
 ## MODEL PROPERTIES
@@ -226,6 +249,10 @@ function type_of_X end
 function type_of_y end
 function defaults end
 
+# fallback method for coercing generic data into form required by fit:
+coerce(model::Model, args...) = args
+coerce_training(model::Model, args...) = args
+
 # fallback method to correct invalid hyperparameters and return
 # a warning (in this case empty):
 clean!(fitresult::Model) = ""
@@ -318,6 +345,7 @@ end
 function __init__()
     @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=true
 end
+
 
 end # module
 

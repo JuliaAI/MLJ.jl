@@ -119,7 +119,7 @@ function fit(composite::WetSupervised, verbosity, Xtrain, ytrain)
     t_X = trainable(composite.transformer_X, X)
     t_y = trainable(composite.transformer_y, y)
 
-    Xt = array(transform(t_X, X))
+    Xt = transform(t_X, X)
     yt = transform(t_y, y)
 
     l = trainable(composite.learner, Xt, yt)
@@ -150,7 +150,7 @@ fitresult, cache, report = fit(composite, 3, Xtrain, ytrain)
 # to check internals:
 encoder = fitresult.trainable
 tree = fitresult.args[1].trainable
-selector = fitresult.args[1].args[1].args[1].trainable
+selector = fitresult.args[1].trainable
 
 # this should trigger no retraining:
 fitresult, cache, report = update(composite, 3, fitresult, cache, Xtrain, ytrain)

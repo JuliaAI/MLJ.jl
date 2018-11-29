@@ -23,15 +23,19 @@ function evaluate end
 #
 # `predict(trainable_model::NodalTrainableModel, X::Node)=node(predict, trainable_model, X)`
 #
-# This achieved below, except in the special case of a zero-argument
-# operations (like `evaluate`) for which the last will not work.
+# (If an operation has zero arguments, we cannot achieve the last
+# desire because of ambiguity with the preceding one.) The following
+# macro is for this purpose.
 
 macro extend_to_trainable_models(operation)
     quote
-
+        
         function $(esc(operation))(trainable_model::AbstractTrainableModel, args...) 
             if isdefined(trainable_model, :fitresult)
-                return $(esc(operation))(trainable_model.model, trainable_model.fitresult, args...)
+                tst = trainable_model isa Supervised
+                return $(esc(operation))(trainable_model.model,
+                                         trainable_model.fitresult,
+                                         coerce(trainable_model.model, args...)...)
             else
                 throw(error("$trainable_model with model $(trainable_model.model) is not trained and so cannot predict."))
             end
@@ -48,5 +52,7 @@ end
 @extend_to_trainable_models inverse_transform
 @extend_to_trainable_models predict_proba
 @extend_to_trainable_models se
-@extend_to_trainable_models evaluate
+# @extend_to_trainable_models evaluate
+
+
 
