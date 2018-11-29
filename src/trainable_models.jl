@@ -45,17 +45,20 @@ function fit!(trainable_model::TrainableModel; rows=nothing, verbosity=1)
             rows = (:) # error("An untrained TrainableModel requires rows to fit.")
         end
         args = [arg[Rows, rows] for arg in trainable_model.args]
+        clean!(trainable_model.model)
         trainable_model.fitresult, trainable_model.cache, report =
             fit(trainable_model.model, verbosity, args...)
         trainable_model.rows = rows
     else
         if rows == nothing # (ie rows not specified) update:
             args = [arg[Rows, trainable_model.rows] for arg in trainable_model.args]
+            clean!(trainable_model.model)
             trainable_model.fitresult, trainable_model.cache, report =
                 update(trainable_model.model, verbosity, trainable_model.fitresult,
                        trainable_model.cache, args...)
         else # retrain from scratch:
             args = [arg[Rows, rows] for arg in trainable_model.args]
+            clean!(trainable_model.model)
             trainable_model.fitresult, trainable_model.cache, report =
                 fit(trainable_model.model, verbosity, args...)
             trainable_model.rows = rows
