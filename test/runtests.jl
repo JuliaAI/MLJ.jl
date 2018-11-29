@@ -10,8 +10,8 @@ using Test
 @constant junk=KNNRegressor()
 properties(KNNRegressor)
 operations(KNNRegressor)
-type_of_X(KNNRegressor)
-type_of_y(KNNRegressor)
+inputs_can_be(KNNRegressor)
+outputs_are(KNNRegressor)
 
 include("metrics.jl")
 include("datasets.jl")

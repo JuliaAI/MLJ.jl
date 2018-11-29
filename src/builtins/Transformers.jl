@@ -5,14 +5,17 @@ export FeatureSelector
 export ToIntTransformer
 export UnivariateStandardizer, Standardizer
 
+import MLJ: CanWeightTarget, CanRankFeatures
+import MLJ: Nominal, Numeric, NA, Probababilistic, Multivariate,  Multiclass
+
 import MLJ: MLJType, Unsupervised
 import DataFrames: names, AbstractDataFrame, DataFrame, eltypes
 import Distributions
 using Statistics
 
 # to be extended:
-import MLJ: fit, transform, inverse_transform, properties, operations, type_of_X
-import MLJ: Nominal, Numeric, Weights, NAs
+import MLJ: fit, transform, inverse_transform, properties, operations, inputs_can_be
+
 
 
 ## CONSTANTS
@@ -38,9 +41,8 @@ mutable struct FeatureSelector <: Unsupervised
 end
 
 # metadata:
-properties(::Type{FeatureSelector}) = [Numeric(), Nominal(), NAs()]
-operations(::Type{FeatureSelector}) = [transform]
-type_of_X(::Type{FeatureSelector}) = AbstractDataFrame
+operations(::Type{FeatureSelector}) = (transform,)
+inputs_can_be(::Type{FeatureSelector}) = (Nominal(), Ordinal(), NA())
 
 FeatureSelector(;features=Symbol[]) = FeatureSelector(features)
 
@@ -76,9 +78,8 @@ mutable struct ToIntTransformer <: Unsupervised
 end
 
 # metadata:
-properties(::Type{ToIntTransformer}) = [Numeric(), Nominal(), NAs()]
-operations(::Type{ToIntTransformer}) = [transform, inverse_transform]
-type_of_X(::Type{ToIntTransformer}) = AbstractVector
+operations(::Type{ToIntTransformer}) = (transform, inverse_transform)
+inputs_can_be(::Type{ToIntTransformer}) = (Nominal(), NA())
 
 ToIntTransformer(; sorted=true, initial_label=1
                  , map_unseen_to_minus_one=false) =
@@ -160,9 +161,8 @@ mutable struct UnivariateStandardizer <: Unsupervised
 end
 
 # metadata:
-properties(::Type{UnivariateStandardizer}) = [Numeric(), NAs()]
-operations(::Type{UnivariateStandardizer}) = [transform, inverse_transform]
-type_of_X(::Type{UnivariateStandardizer}) = AbstractVector
+operations(::Type{UnivariateStandardizer}) = (transform, inverse_transform)
+inputs_can_be(::Type{UnivariateStandardizer}) = (Numeric(),)
 
 function fit(transformer::UnivariateStandardizer, verbosity, v::AbstractVector{T}) where T<:Real
     std(v) > eps(Float64) || 
@@ -206,9 +206,9 @@ mutable struct Standardizer <: Unsupervised
     features::Vector{Symbol} # features to be standardized; empty means all of
 end
 
-properties(::Type{Standardizer}) = [Numeric(), Nominal(), NAs()]
-operations(::Type{Standardizer}) = [transform, inverse_transform]
-type_of_X(::Type{Standardizer}) = DataFrame
+# metadata:
+operations(::Type{Standardizer}) = (transform, inverse_transform)
+inputs_can_be(::Type{Standardizer}) = (Numeric(), Nominal(), NA())
 
 # lazy keyword constructor:
 Standardizer(; features=Symbol[]) = Standardizer(features)
