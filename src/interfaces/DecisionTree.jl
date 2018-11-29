@@ -122,7 +122,7 @@ function MLJ.fit(model::DecisionTreeClassifier{T2}
         fitresult = DecisionTree.prune_tree(fitresult, model.merge_purity_threshold)
     end
     
-    verbosity < 0 || DecisionTree.print_tree(fitresult, model.display_depth)
+    verbosity < 2 || DecisionTree.print_tree(fitresult, model.display_depth)
 
     #> return package-specific statistics (eg, feature rankings,
     #> internal estimates of generalization error) in `report`, which
