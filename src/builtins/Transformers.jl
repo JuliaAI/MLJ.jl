@@ -267,16 +267,17 @@ end
 
 function transform(transformer::Standardizer, fitresult, X)
 
-    names(X) == fitresult.features ||
+    collect(propertynames(first(Tables.rows(X)))) == fitresult.features ||
         error("Attempting to transform data frame with incompatible feature labels.")
 
-    Xnew = X[1:end,:] # make a copy of X, working even for `SubDataFrames`
+    Xnew = copy(X) # make a copy of X, working even for `SubDataFrames`
     univ_transformer = UnivariateStandardizer()
-    for j in 1:size(X, 2)
+    for j in 1:length(propertynames(first(Tables.rows(X))))
         if fitresult.is_transformed[j]
             # extract the (mu, sigma) pair:
             univ_fitresult = (fitresult.fitresults[1,j], fitresult.fitresults[2,j])  
-            Xnew[j] = transform(univ_transformer, univ_fitresult, collect(X[j]))
+            getproperty(Xnew, propertynames(first(Tables.rows(Xnew)))[j]) .= 
+                transform(univ_transformer, univ_fitresult, getproperty(X, propertynames(first(Tables.rows(X)))[j]))
         end
     end
     return Xnew
