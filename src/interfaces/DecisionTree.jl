@@ -13,18 +13,13 @@ module DecisionTree_
 #> export the new models you're going to define (and nothing else):
 export DecisionTreeClassifier
 
-# to be extended:
 #> for all Supervised models:
 import MLJ
-import MLJ: coerce, coerce_training, fit, predict, clean!
-import MLJ: properties, operations, type_of_X, type_of_y
-import MLJ: Regression, Classification, MultiClass, Nominal, Numeric, Weights, NAs
+import MLJ: CanWeightTarget, CanRankFeatures
+import MLJ: Nominal, Numeric, NA, Probababilistic, Multivariate,  Multiclass
 
-# import MLJ: update, predict_proba      #> if implemented
-
-# needed:
-import DecisionTree                #> import package
-import MLJ: Supervised            #> and supertypes for the models to be defined
+#> import package:
+import DecisionTree                
 
 #> The DecisionTreeClassifier model type declared below is a
 #> parameterized type (not necessary for models in general). This is
@@ -39,7 +34,7 @@ DecisionTreeClassifierFitResultType{T} =
 [https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md](https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md)
 
 """
-mutable struct DecisionTreeClassifier{T} <: Supervised{DecisionTreeClassifierFitResultType{T}}
+mutable struct DecisionTreeClassifier{T} <: MLJ.Supervised{DecisionTreeClassifierFitResultType{T}}
     target_type::Type{T}
     pruning_purity::Float64 
     max_depth::Int
@@ -52,16 +47,8 @@ mutable struct DecisionTreeClassifier{T} <: Supervised{DecisionTreeClassifierFit
     merge_purity_threshold::Float64
 end
 
-# metadata:
-properties(::Type{DecisionTreeClassifier}) = [MultiClass(), Numeric()]
-operations(::Type{DecisionTreeClassifier}) = [predict]
-type_of_X(::Type{DecisionTreeClassifier}) = Array{Float64,2}
-type_of_y(::Type{DecisionTreeClassifier}) = Vector
-
 # constructor:
-#> all arguments are kwargs; 
-#> give any compulsory args default value `nothing` and check they're
-#> something
+#> all arguments are kwargs with a default value
 function DecisionTreeClassifier(
     ; target_type=Int
     , pruning_purity=1.0
@@ -86,7 +73,7 @@ function DecisionTreeClassifier(
         , post_prune
         , merge_purity_threshold)
 
-    message = clean!(model)           #> future proof by including these 
+    message = MLJ.clean!(model)           #> future proof by including these 
     isempty(message) || @warn message #> two lines even if no clean! defined below
 
     return model
@@ -95,7 +82,7 @@ end
 #> The following optional method (the fallback does nothing, returns
 #> empty warning) is called by the constructor above but also by the
 #> fit methods below:
-function clean!(model::DecisionTreeClassifier)
+function MLJ.clean!(model::DecisionTreeClassifier)
     warning = ""
     if  model.pruning_purity > 1
         warning *= "Need pruning_purity < 1. Resetting pruning_purity=1.0.\n"
@@ -110,7 +97,7 @@ end
 
 #> A required `fit` method returns `fitresult, cache, report`. (Return
 #> `cache=nothing` unless you are overloading `update`)
-function fit(model::DecisionTreeClassifier{T2}
+function MLJ.fit(model::DecisionTreeClassifier{T2}
              , verbosity            #> must be here even if unsupported in pkg (as here)
              , X::Matrix{Float64}
              , y::Vector{T}) where {T,T2}
@@ -135,7 +122,7 @@ function fit(model::DecisionTreeClassifier{T2}
         fitresult = DecisionTree.prune_tree(fitresult, model.merge_purity_threshold)
     end
     
-    verbosity < 1 || DecisionTree.print_tree(fitresult, model.display_depth)
+    verbosity < 0 || DecisionTree.print_tree(fitresult, model.display_depth)
 
     #> return package-specific statistics (eg, feature rankings,
     #> internal estimates of generalization error) in `report`, which
@@ -149,13 +136,19 @@ function fit(model::DecisionTreeClassifier{T2}
 end
 
 #> method to coerce generic data into form required by fit:
-coerce(model::DecisionTreeClassifier, X) = (MLJ.array(X),)
-coerce_training(model::DecisionTreeClassifier, X, y) = (MLJ.array(X), [y...]) 
+MLJ.coerce(model::DecisionTreeClassifier, X) = (MLJ.array(X),)
+MLJ.coerce_training(model::DecisionTreeClassifier, X, y) = (MLJ.array(X), [y...]) 
 
-predict(model::DecisionTreeClassifier 
+MLJ.predict(model::DecisionTreeClassifier 
         , fitresult
         , Xnew) = 
             DecisionTree.apply_tree(fitresult, Xnew)
+
+# metadata:           
+MLJ.properties(::Type{DecisionTreeClassifier}) = ()
+MLJ.operations(::Type{DecisionTreeClassifier}) = (MLJ.predict,)
+MLJ.inputs_can_be(::Type{DecisionTreeClassifier}) = (Numeric())
+MLJ.outputs_are(::Type{DecisionTreeClassifier}) = (Nominal())
 
 end # module
 
