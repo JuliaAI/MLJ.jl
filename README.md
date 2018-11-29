@@ -18,7 +18,7 @@ Julia 0.7
 To install, open Julia, open the package manager (with `]`) and run
 
 ````julia
-(v0.7) pkg> add https://github.com/alan-turing-institute/MLJ.jl/tree/master
+(v0.7) pkg> add https://github.com/alan-turing-institute/MLJ.jl.git
 ````
 
 Or add MLJ to your current Julia project by first activating your
