@@ -366,3 +366,15 @@ import Base.+
 +(y1::AbstractNode, y2::AbstractNode) = node(+, y1, y2)
 +(y1, y2::AbstractNode) = node(+, y1, y2)
 +(y1::AbstractNode, y2) = node(+, y1, y2)
+
+
+## COMPOSITE MODELS
+
+# fall-back for updating composite models (learning networks wrapped
+# as models):
+
+function update(model::Supervised{Node}, verbosity, fitresult, cache, args...)
+    fit!(fitresult; verbosity=verbosity)
+    return fitresult, cache, nothing
+end
+

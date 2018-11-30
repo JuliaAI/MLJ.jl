@@ -137,7 +137,7 @@ function fit(composite::WetSupervised, verbosity, Xtrain, ytrain)
 end
 
 function update(composite::WetSupervised, verbosity, fitresult, cache,
-                X, y; kwargs...)
+                X, y)
     fit!(fitresult; verbosity=verbosity)
     return fitresult, cache, cache.report
 end
