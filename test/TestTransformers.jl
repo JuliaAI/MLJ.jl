@@ -1,4 +1,4 @@
-module TestTransformer
+module TestTransformers
 
 # using Revise
 using MLJ
