@@ -1,7 +1,10 @@
 abstract type MLJType end
 
+
+## NESTED PARAMATER INTERFACE
+
 struct Params 
-    pairs::Tuple
+    pairs::Tuple{Vararg{Pair{Symbol}}}
     Params(args::Pair...) = new(args)
 end
 
@@ -78,7 +81,8 @@ function Base.copy(tree::Params, values=nothing)
 
     values != nothing || return deepcopy(tree)
     length(tree) == length(values) ||
-        throw(DimensionMismatch("Length of Params object not matching number of supplied values"))
+        throw(DimensionMismatch("Length of Params object not matching number "*
+                                "of supplied values"))
 
     pairs = []
     pos = 1
@@ -99,3 +103,58 @@ function Base.copy(tree::Params, values=nothing)
     return Params(pairs...)
 
 end
+
+
+## PARAMETER RANGES
+
+abstract type ParamRange <: MLJType end
+
+struct NominalRange{T} <: ParamRange
+    values::Tuple{Vararg{T}}
+end
+
+struct NumericRange{T} <: ParamRange
+    lower::T
+    upper::T
+    transform
+end
+
+""" 
+   get_type(T, field::Symbol)
+
+Returns the type of the field `field` of `DataType` T. Not a
+type-stable function.  
+
+"""
+function get_type(T, field::Symbol)
+    position = findfirst(fieldnames(T)) do fld
+        fld == field
+    end
+    position != nothing || error("Type $T does not have $field as a field.")
+    return T.types[position]
+end
+
+function ParamRange(model, field::Symbol; values=nothing,
+                    lower=nothing, upper=nothing, transform=identity)
+    T = get_type(typeof(model), field)
+    if T <: Real
+        lower !=nothing && upper != nothing ||
+            error("You must specify lower=... and upper=... .")
+        return NumericRange{T}(lower, upper, transform)
+    else
+        values !=nothing || error("You must specify values=... .")
+        return NominalRange{T}(Tuple(values))
+    end
+end
+
+# deterministic iterators:
+iterator(param_range::NominalRange) = param_range.values
+function iterator(param_range::NumericRange{T}, n::Int) where T
+    raw = range(param_range.lower, stop=param_range.upper, length=n)
+    return map(raw) do value
+        round(T, value)
+    end
+end
+
+    
+

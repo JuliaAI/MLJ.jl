@@ -53,4 +53,9 @@ tree = get_params(super_model)
           :model2 => Params(:K => 6, :metric => 20, :kernel => 'x'))
 
 
+p1 = ParamRange(dummy_model, :K, lower=1, upper=10)
+p2 = ParamRange(dummy_model, :kernel, values=['c', 'd', 'k', 'r'])
+@test typeof(collect(MLJ.iterator(p1, 5))[1] ) == Int
+@test collect(MLJ.iterator(p2)) == [p2.values...]
+
 end

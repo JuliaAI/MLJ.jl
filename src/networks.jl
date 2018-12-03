@@ -109,12 +109,14 @@ end
 function fit!(trainable_model::NodalTrainableModel; rows=nothing, verbosity=1)
 
     if trainable_model.frozen 
-        verbosity < 0 || @warn "$trainable_model with model $(trainable_model.model) "*
+#        verbosity < 0 || @warn "$trainable_model with model $(trainable_model.model) "*
+        verbosity < 0 || @warn "$trainable_model "*
         "not trained as it is frozen."
         return trainable_model
     end
         
-    verbosity < 1 || @info "Training $trainable_model whose model is $(trainable_model.model)."
+#    verbosity < 1 || @info "Training $trainable_model whose model is $(trainable_model.model)."
+    verbosity < 1 || @info "Training $trainable_model."
 
     if !isdefined(trainable_model, :fitresult)
         if rows == nothing
