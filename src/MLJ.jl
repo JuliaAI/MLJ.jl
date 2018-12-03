@@ -17,7 +17,7 @@ export partition, @curve, @pcurve                    # "utilities.jl"
 export @more, @constant                              # "show.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
-export Pairs, get_params, set_params!                # "parameters.jl"
+export Params, get_params, set_params!                # "parameters.jl"
 export KNNRegressor                                  # "builtins/KNN.jl":
 
 # defined in include files "trainable_models.jl" and "networks.jl":
