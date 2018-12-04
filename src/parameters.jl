@@ -152,7 +152,7 @@ iterator(param_range::NominalRange) = param_range.values
 function iterator(param_range::NumericRange{T}, n::Int) where T
     raw = range(param_range.lower, stop=param_range.upper, length=n)
     return map(raw) do value
-        round(T, value)
+        round(T, param_range.transform(value))
     end
 end
 
