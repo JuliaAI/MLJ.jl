@@ -46,12 +46,21 @@ function handle(X)
     end
 end
 
+
 ## EXPOSED SHOW METHODS
 
 # short version of showing a `MLJType` object:
 function Base.show(stream::IO, object::MLJType)
     id = objectid(object) 
     description = string(typeof(object).name.name)
+    parameters = typeof(object).parameters
+    if length(parameters) == 1
+        p_string = string(parameters[1])
+        if length(p_string) > 25
+            p_string = p_string[1:24]*"…"
+        end
+        description *= "{"*p_string*"}"
+    end
     #   description = string(typeof(object))
     str = "$description @ $(handle(object))"
     if !isempty(fieldnames(typeof(object)))
@@ -120,10 +129,20 @@ function _show(stream::IO, df::AbstractDataFrame)
     println(stream, "(omitted $(typeof(df)) of size $(size(df)))")
 end
 
-istoobig(x::AbstractArray) = true
-istoobig(x::AbstractArray{T}) where T<:Union{Number,Symbol,Char,MLJType} =
-    maximum(size(x)) > 5 
-function _show(stream::IO, A::AbstractArray{T}) where T
+istoobig(t::Tuple{Vararg{T}}) where T<:Union{Number,Symbol,Char,MLJType} =
+    length(t) > 5 
+function _show(stream::IO, t::Tuple)
+    if !istoobig(t)
+        show(stream, MIME("text/plain"), t)
+        println(stream)
+    else
+        println(stream, "(omitted $(typeof(t)) of length $(length(t)))")
+    end
+end
+
+istoobig(A::AbstractArray{T}) where T<:Union{Number,Symbol,Char,MLJType} =
+    maximum(size(A)) > 5 
+function _show(stream::IO, A::AbstractArray)
     if !istoobig(A)
         show(stream, MIME("text/plain"), A)
         println(stream)

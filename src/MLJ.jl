@@ -17,11 +17,13 @@ export partition, @curve, @pcurve                    # "utilities.jl"
 export @more, @constant                              # "show.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
+export Params, get_params, set_params!, ParamRange   # "parameters.jl"
 export KNNRegressor                                  # "builtins/KNN.jl":
 
 # defined in include files "trainable_models.jl" and "networks.jl":
 export TrainableModel, NodalTrainableModel, trainable
 export source, node, fit!, freeze!, thaw!
+
 
 # defined in include file "builtins/Transformers.jl":
 export FeatureSelector
@@ -46,6 +48,7 @@ import CategoricalArrays
 # from Standard Library:
 using Statistics
 using LinearAlgebra
+# using Random
 
 
 ## CONSTANTS
@@ -297,21 +300,12 @@ function Base.copy(model::T, field_value_pairs::Vararg{Pair{Symbol}}) where T<:M
     return T(constructor_args...)
 end
 
+## LOAD VARIOUS INTERFACE COMPONENTS
 
-## LOAD TRAINABLE MODELS API
-
-include("trainable_models.jl")
-
-
-## LOAD LEARNING NETWORKS API
-
+include("trainable_models.jl") 
 include("networks.jl")
-
-
-## LOAD REGISTRY OF OPERATIONS
-
 include("operations.jl")
-
+include("parameters.jl")
 
 ## LOAD BUILT-IN MODELS
 
