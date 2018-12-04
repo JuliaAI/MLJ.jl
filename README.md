@@ -1,11 +1,25 @@
 ## MLJ Machine Learning Models Tuning Library - 100% Made in Julia
 
-Diego Arenas, Edoardo Barp, Anthony Blaom, Gergö Bohner, Valentin Churvay, Harvey Devereux, Thibaut Lienart, Franz J Király, Mohammed Nook, Annika Stechemesser, Sebastian Vollmer; Mike Innes in partnership with Julia Computing
+[![Build Status](https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master)](https://travis-ci.com/alan-turing-institute/MLJ.jl)
+[![Slack Channel mlj](https://img.shields.io/badge/chat-on%20slack-yellow.svg)](https://slackinvite.julialang.org/)
 
-The current master branch is under considerable redevelopment. For an
+MLJ is an attempt to create a framework capable of easily tuning
+machine learning models.  Thanks to a solid abstraction layer, it
+will allows user to easily add new models to its framework, without losing
+any of the features. We are also looking for new [collaborators](#collaborators) to assist in this.
+
+
+We are not trying to __reinvent the wheel__ instead we are heavily
+inspired by [mlR](https://pat-s.github.io/mlr/index.html) ( [recent
+slides 7/18](https://github.com/mlr-org/mlr-outreach). )
+
+
+The current repository (master branch) is under considerable redevelopment. For an
 earlier proof-of-concept, see
 [this](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
 branch and **this summary [POSTER](material/MLJ-JuliaCon2018-poster.pdf)**
+
+
 
 
 ### Requirements
@@ -28,9 +42,19 @@ local clone. Test with `test MLJ` at the package manager prompt.
 
 ### Usage
 
-````julia
-using MLJ
-````
+For usage examples, please consult the [tests](https://github.com/alan-turing-institute/MLJ.jl/tree/master/test).
+
+### Collaborators
+We are looking for collaborators @ the Alan Turing Institute! 
+ * Finalising API design and user interaction patterns! 
+ * Backend improvement! (Scheduling, Dagger, JuliaDB, Queryverse)
+   * Store learner meta info in METADATA.JL fashion (ideally open.ml compatible)
+ * Feature Improvement 
+   * Bootstrapping from Sklearn and mlr by wrapping with task info
+   * Pipelining an composition meta-interface
+   * Implementation of unsupported learners
+
+
 
 ### History
 
@@ -49,26 +73,6 @@ and
 Further work culminated in the first MLJ
 [proof-of-concept](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
 
-MLJ is an attempt to create a framework capable of easily tuning
-machine learning models.  Thanks to a solid abstraction layer, it
-allows user to easily add new models to its framework, without losing
-any of the features.
-
-We are not trying to __reinvent the wheel__ instead we are heavily
-inspired by [mlR](https://pat-s.github.io/mlr/index.html) ( [recent
-slides 7/18](https://github.com/mlr-org/mlr-outreach). )
-
-
-## join!(us)
-We are looking for collaborators @ the Alan Turing Institute! 
- * Finalising API design and user interaction patterns! 
- * Backend improvement! (Scheduling, Dagger, JuliaDB, Queryverse)
-   * Store learner meta info in METADATA.JL fashion (ideally open.ml compatible)
- * Feature Improvement 
-   * Bootstrapping from Sklearn and mlr by wrapping with task info
-   * Pipelining an composition meta-interface
-   * Implementation of unsupported learners
-
 
 ### Proof of concept landmarks:
 
@@ -80,10 +84,13 @@ We are looking for collaborators @ the Alan Turing Institute!
 - [x] Wrap at least a handful of models for regression & classification
 - [x] Add multivariable regression methods
 - [x] Add automatic labelling for classifiers
+- [x] Upgrade it to Julia 1.0 [issue #4](https://github.com/alan-turing-institute/MLJ/issues/4)
 - [ ] Find a way to make it clear what arguments a model expects
 - [ ] Allow any sampling methods from `MLBase.jl`
 - [ ] Add compatibility with multiple targets
 - [ ] move to more dispatch based system as outlined [HERE](https://nbviewer.jupyter.org/github/gbohner/Julia-Machine-Learning-Review/blob/f3482badf1f275e2a98bf7e338d406d399609f37/MLR/TuningDispatch_framework.ipynb)
-- [ ] Upgrade it to Julia 1.0 [issue #4](https://github.com/alan-turing-institute/MLJ/issues/4)
 
+### Contributors
+
+Diego Arenas, Edoardo Barp, Anthony Blaom, Gergö Bohner, Valentin Churvay, Harvey Devereux, Thibaut Lienart, Franz J Király, Mohammed Nook, Annika Stechemesser, Yiannis Simillides, Sebastian Vollmer; Mike Innes in partnership with Julia Computing
 
