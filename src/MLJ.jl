@@ -41,6 +41,7 @@ import DataFrames: DataFrame, AbstractDataFrame, SubDataFrame, eltypes, names
 using  Query
 import Distributions
 import Base.==
+import CategoricalArrays
 
 # from Standard Library:
 using Statistics
@@ -134,6 +135,7 @@ Base.getindex(A::AbstractMatrix, ::Type{Names}) = 1:size(A, 2)
 Base.getindex(A::AbstractMatrix{T}, ::Type{Eltypes}) where T = [T for j in 1:size(A, 2)]
 
 Base.getindex(v::AbstractVector, ::Type{Rows}, r) = v[r]
+Base.getindex(v::CategoricalArrays.CategoricalArray, ::Type{Rows}, r) = @inbounds v[r]
 
 
 ## MODEL METADATA
