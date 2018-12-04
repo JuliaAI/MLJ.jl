@@ -45,10 +45,10 @@ end
 # TODO: replace linear tapes below with dependency trees to allow
 # better scheduling of training learning networks data.
 
-mutable struct NodalTrainableModel{B<:Model} <: AbstractTrainableModel
+mutable struct NodalTrainableModel{M<:Model} <: AbstractTrainableModel{M}
 
-    model::B
-    previous_model::B
+    model::M
+    previous_model::M
     fitresult
     cache
     args::Tuple{Vararg{AbstractNode}}
@@ -57,17 +57,17 @@ mutable struct NodalTrainableModel{B<:Model} <: AbstractTrainableModel
     frozen::Bool
     rows # for remembering the rows used in last call to `fit!`
     
-    function NodalTrainableModel{B}(model::B, args::AbstractNode...) where B<:Model
+    function NodalTrainableModel{M}(model::M, args::AbstractNode...) where M<:Model
 
         # check number of arguments for model subtypes:
-        !(B <: Supervised) || length(args) == 2 ||
+        !(M <: Supervised) || length(args) == 2 ||
             throw(error("Wrong number of arguments. "*
                         "Use NodalTrainableModel(model, X, y) for supervised learner models."))
-        !(B <: Unsupervised) || length(args) == 1 ||
+        !(M <: Unsupervised) || length(args) == 1 ||
             throw(error("Wrong number of arguments. "*
                         "Use NodalTrainableModel(model, X) for an unsupervised learner model."))
         
-        trainable_model = new{B}(model)
+        trainable_model = new{M}(model)
         trainable_model.frozen = false
         trainable_model.args = args
         trainable_model.report = Dict{Symbol,Any}()
@@ -89,7 +89,7 @@ mutable struct NodalTrainableModel{B<:Model} <: AbstractTrainableModel
 end
 
 # automatically detect type parameter:
-NodalTrainableModel(model::B, args...) where B<:Model = NodalTrainableModel{B}(model, args...)
+NodalTrainableModel(model::M, args...) where M<:Model = NodalTrainableModel{M}(model, args...)
 
 # to turn fit-through fitting off and on:
 function freeze!(trainable_model::NodalTrainableModel)
@@ -105,7 +105,7 @@ function is_stale(trainable_model::NodalTrainableModel)
         reduce(|,[is_stale(arg) for arg in trainable_model.args])
 end
 
-# fit method:
+# fit method, general case (no coercion of arguments):
 function fit!(trainable_model::NodalTrainableModel; rows=nothing, verbosity=1)
 
     if trainable_model.frozen 
@@ -124,18 +124,18 @@ function fit!(trainable_model::NodalTrainableModel; rows=nothing, verbosity=1)
         end
         args = [arg(rows=rows) for arg in trainable_model.args]
         trainable_model.fitresult, trainable_model.cache, report =
-            fit(trainable_model.model, verbosity, coerce_training(trainable_model.model, args...)...)
+            fit(trainable_model.model, verbosity, args...)
         trainable_model.rows = deepcopy(rows)
     else
         if rows == nothing # (ie rows not specified) update:
             args = [arg(rows=trainable_model.rows) for arg in trainable_model.args]
             trainable_model.fitresult, trainable_model.cache, report =
                 update(trainable_model.model, verbosity, trainable_model.fitresult,
-                       trainable_model.cache, coerce_training(trainable_model.model, args...)...)
+                       trainable_model.cache, args...)
         else # retrain from scratch:
             args = [arg(rows=rows) for arg in trainable_model.args]
             trainable_model.fitresult, trainable_model.cache, report =
-                fit(trainable_model.model, verbosity, coerce_training(trainable_model.model, args...)...)
+                fit(trainable_model.model, verbosity, args...)
             trainable_model.rows = deepcopy(rows)
         end
     end
@@ -150,37 +150,50 @@ function fit!(trainable_model::NodalTrainableModel; rows=nothing, verbosity=1)
 
 end
 
-# TODO: avoid repeated code below using macro and possibly move out of
-# networks.jl
+# fit method, supervised case (input data coerced):
+function fit!(trainable_model::NodalTrainableModel{M}; rows=nothing, verbosity=1) where M<:Supervised
 
-# # predict method for trainable models (X data):
-# function predict(trainable_model::NodalTrainableModel, X) 
-#     if isdefined(trainable_model, :fitresult)
-#         return predict(trainable_model.model, trainable_model.fitresult, X)
-#     else
-#         throw(error("$trainable_model with model $(trainable_model.model) is not trained and so cannot predict."))
-#     end
-# end
+    if trainable_model.frozen 
+#        verbosity < 0 || @warn "$trainable_model with model $(trainable_model.model) "*
+        verbosity < 0 || @warn "$trainable_model "*
+        "not trained as it is frozen."
+        return trainable_model
+    end
+        
+#    verbosity < 1 || @info "Training $trainable_model whose model is $(trainable_model.model)."
+    verbosity < 1 || @info "Training $trainable_model."
 
-# # a transform method for trainable models (X data):
-# function transform(trainable_model::NodalTrainableModel, X)
-#     if isdefined(trainable_model, :fitresult)
-#         return transform(trainable_model.model, trainable_model.fitresult, X)
-#     else
-#         throw(error("$trainable_model with model $(trainable_model.model) is not trained and so cannot transform."))
-#     end
-# end
+    if !isdefined(trainable_model, :fitresult)
+        if rows == nothing
+            rows=(:) # error("An untrained NodalTrainableModel requires rows to fit.")
+        end
+        args = [arg(rows=rows) for arg in trainable_model.args]
+        trainable_model.fitresult, trainable_model.cache, report =
+            fit(trainable_model.model, verbosity, args...)
+        trainable_model.rows = deepcopy(rows)
+    else
+        if rows == nothing # (ie rows not specified) update:
+            args = [arg(rows=trainable_model.rows) for arg in trainable_model.args]
+            trainable_model.fitresult, trainable_model.cache, report =
+                update(trainable_model.model, verbosity, trainable_model.fitresult,
+                       trainable_model.cache, args...)
+        else # retrain from scratch:
+            args = [arg(rows=rows) for arg in trainable_model.args]
+            trainable_model.fitresult, trainable_model.cache, report =
+                fit(trainable_model.model, verbosity, args...)
+            trainable_model.rows = deepcopy(rows)
+        end
+    end
 
-# # an inverse-transform method for trainable models (X data):
-# function inverse_transform(trainable_model::NodalTrainableModel, X)
-#     if isdefined(trainable_model, :fitresult)
-#         return inverse_transform(trainable_model.model, trainable_model.fitresult, X)
-#     else
-#         throw(error("$trainable_model with model $(trainable_model.model) is not trained and so cannot inverse_transform."))
-#     end
-# end
+    trainable_model.previous_model = deepcopy(trainable_model.model)
+    
+    if report != nothing
+        merge!(trainable_model.report, report)
+    end
 
-# TODO: predict_proba method for classifier models:
+    return trainable_model
+
+end
 
 
 ## NODES
@@ -193,7 +206,7 @@ struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
     sources::Set{Source}
     tape::Vector{NodalTrainableModel}    # for tracking dependencies
 
-    function Node{M}(operation, trainable_model::M, args::AbstractNode...) where {B<:Model, M<:Union{NodalTrainableModel{B},Nothing}}
+    function Node{M}(operation, trainable_model::M, args::AbstractNode...) where {M<:Model, M<:Union{NodalTrainableModel{M},Nothing}}
 
         # check the number of arguments:
         if trainable_model == nothing
@@ -242,10 +255,6 @@ Node(operation, trainable_model::M, args...) where M<:Union{NodalTrainableModel,
 
 # constructor for static operations:
 Node(operation, args::AbstractNode...) = Node(operation, nothing, args...)
-
-# note: the following two methods only work as expected if the
-# Node `y` has a single source.  TODO: track the source and
-# make sure it is unique
 
 # make nodes callable:
 (y::Node)(; rows=:) = (y.operation)(y.trainable, [arg(rows=rows) for arg in y.args]...)

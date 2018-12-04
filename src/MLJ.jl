@@ -242,33 +242,49 @@ include("datasets.jl")
 # ones not dependent on external packages) are contained in
 # "/src/builtins.jl"
 
-# methods to be dispatched on `Model` instances:
+# every model interface must implement this method, used to generate
+# fit-results:
 function fit end
-function update end
 
-# see "src/operations.jl" for list of all operations to be dispatched
-# on `Model`s and a fit-result.
+# each model interface may optionally overload the following refitting
+# method:
+update(model::Model, verbosity, fitresult, cache, rows, args...) =
+    fit(model, verbosity, rows, args...)
 
-# methods to be dispatched on `Model` subtypes:
+# methods dispatched on a model and fit-result are called *operations*.
+# supervised models must implement this operation:
+function predict end
+
+# supervised methods may implement this operation:
+function predict_proba end
+
+# unsupervised methods must implement this operation:
+function transform end
+
+# unsupervised methods may implement this operation:
+function inverse_transform end
+
+# operations implemented by some meta-models:
+function se end
+function evaluate end
+
+# supervised model interfaces buying into introspection should
+# implement the following "metadata" methods, dispatched on model
+# *type* (see `Properties` below):
 function operations end 
 function inputs_can_be end
 function outputs_are end
 function properties end
 
-# fallback method for coercing generic data into form required by fit:
-coerce(model::Model, args...) = args
-coerce_training(model::Model, args...) = args
-
-# fallback method to correct invalid hyperparameters and return
-# a warning (in this case empty):
+# a model wishing invalid hyperparameters to be corrected with a
+# warning should overload this method (return value is the warning
+# message):
 clean!(fitresult::Model) = ""
 
-# fallback method for refitting:
-update(model::Model, verbosity, fitresult, cache, rows, args...) =
-    fit(model, verbosity, rows, args...)
-
-# fallback for properties:
-properties(model::Model) = Property[]
+# supervised models may need to overload the following method to
+# ensure Tables.jl compliant input data supplied by user is coerced
+# into the form required by its `fit` method and operations:
+coerce(model::Model, Xtable) = array(Xtable)
 
 # models are `==` if they have the same type and their field values are `==`:
 function ==(m1::M, m2::M) where M<:Model
@@ -279,26 +295,6 @@ function ==(m1::M, m2::M) where M<:Model
     return ret
 end
 
-# TODO: not sure we need this:
-"""
-    copy(model::Model, fld1=>val1, fld2=>val2, ...)
-
-Return a replica of `model` with the values of fields `fld1`, `fld2`,
-... replaced with `val1`, `val2`, ... respectively.
-
-"""
-function Base.copy(model::T, field_value_pairs::Vararg{Pair{Symbol}}) where T<:Model
-    value_given_field = Dict(field_value_pairs)
-    fields = keys(value_given_field)
-    constructor_args = map(fieldnames(typeof(model))) do fld
-        if fld in fields
-            value_given_field[fld]
-        else
-            getfield(model, fld)
-        end
-    end
-    return T(constructor_args...)
-end
 
 ## LOAD VARIOUS INTERFACE COMPONENTS
 

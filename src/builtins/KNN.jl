@@ -55,9 +55,6 @@ function MLJ.fit(model::KNNRegressor
     return fitresult, cache, report 
 end
 
-MLJ.coerce(model::KNNRegressor, X) = (MLJ.array(X),)
-MLJ.coerce_training(model::KNNRegressor, X, y) = (MLJ.array(X), [y...])
-                                       
 first_component_is_less_than(v, w) = isless(v[1], w[1])
 
 # TODO: there is way smarter way to do without sorting. Alternatively,
