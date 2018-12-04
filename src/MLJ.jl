@@ -108,7 +108,7 @@ function array(X)
         @select row
         @collect DataFrame
     end
-    return convert(Array, df)
+    return convert(Array{Float64}, df)
 end
 array(X::AbstractArray) = X
 

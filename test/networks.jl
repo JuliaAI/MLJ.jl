@@ -3,6 +3,7 @@ module TestLearningNetworks
 # using Revise
 using Test
 using MLJ
+using CategoricalArrays
 
 
 # TRAINABLE MODELS
@@ -153,11 +154,11 @@ tree = fitresult.args[1].trainable
 selector = fitresult.args[1].trainable
 
 # this should trigger no retraining:
-fitresult, cache, report = update(composite, 3, fitresult, cache, Xtrain, ytrain)
+fitresult, cache, report = update(composite, 3, fitresult, cache, Xtrain, ytrain);
 
 # this should trigger retraining of encoder and tree
 encoder_.initial_label = 14
-fitresult, cache, report = update(composite, 3, fitresult, cache, Xtrain, ytrain)
+fitresult, cache, report = update(composite, 3, fitresult, cache, Xtrain, ytrain);
 
 # this should trigger retraining of selector and tree:
 selector_.features = [:petal_length, :petal_width] 

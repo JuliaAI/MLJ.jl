@@ -50,7 +50,7 @@ macro extend_to_trainable_models(operation)
     end
 end
 
-macro sugar_for_nodal_trainable_models(operation)
+macro sugar(operation)
     quote
         $(esc(operation))(trainable_model::NodalTrainableModel, args::AbstractNode...) =
             node($(esc(operation)), trainable_model, args...)
@@ -65,11 +65,11 @@ end
 @extend_to_trainable_models se
 @extend_to_trainable_models evaluate
 
-@sugar_for_nodal_trainable_models predict
-@sugar_for_nodal_trainable_models transform
-@sugar_for_nodal_trainable_models inverse transform
-@sugar_for_nodal_trainable_models predict_proba
-@sugar_for_nodal_trainable_models se
+@sugar predict
+@sugar transform
+@sugar inverse_transform
+@sugar predict_proba
+@sugar se
 
 
 

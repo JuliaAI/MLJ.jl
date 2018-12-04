@@ -98,17 +98,13 @@ end
 #> A required `fit` method returns `fitresult, cache, report`. (Return
 #> `cache=nothing` unless you are overloading `update`)
 function MLJ.fit(model::DecisionTreeClassifier{T2}
-             , verbosity            #> must be here even if unsupported in pkg (as here)
+             , verbosity   #> must be here even if unsupported in pkg (as here)
              , X::Matrix{Float64}
              , y::Vector{T}) where {T,T2}
 
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
 
-    
-    
-    
-    
     fitresult = DecisionTree.build_tree(y
                                         , X
                                         , model.n_subfeatures
@@ -117,12 +113,11 @@ function MLJ.fit(model::DecisionTreeClassifier{T2}
                                         , model.min_samples_split
                                         , model.min_purity_increase)
 
-
     if model.post_prune 
         fitresult = DecisionTree.prune_tree(fitresult, model.merge_purity_threshold)
     end
     
-    verbosity < 2 || DecisionTree.print_tree(fitresult, model.display_depth)
+    verbosity < 3 || DecisionTree.print_tree(fitresult, model.display_depth)
 
     #> return package-specific statistics (eg, feature rankings,
     #> internal estimates of generalization error) in `report`, which
@@ -136,8 +131,7 @@ function MLJ.fit(model::DecisionTreeClassifier{T2}
 end
 
 #> method to coerce generic data into form required by fit:
-MLJ.coerce(model::DecisionTreeClassifier, X) = (MLJ.array(X),)
-MLJ.coerce_training(model::DecisionTreeClassifier, X, y) = (MLJ.array(X), [y...]) 
+MLJ.coerce(model::DecisionTreeClassifier, Xtable) = MLJ.array(Xtable)
 
 MLJ.predict(model::DecisionTreeClassifier 
         , fitresult

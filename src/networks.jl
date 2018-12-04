@@ -163,24 +163,28 @@ function fit!(trainable_model::NodalTrainableModel{M}; rows=nothing, verbosity=1
 #    verbosity < 1 || @info "Training $trainable_model whose model is $(trainable_model.model)."
     verbosity < 1 || @info "Training $trainable_model."
 
+    args = trainable_model.args
     if !isdefined(trainable_model, :fitresult)
         if rows == nothing
             rows=(:) # error("An untrained NodalTrainableModel requires rows to fit.")
         end
-        args = [arg(rows=rows) for arg in trainable_model.args]
+        X = coerce(trainable_model.model, args[1](rows=rows))
+        y = args[2](rows=rows)
         trainable_model.fitresult, trainable_model.cache, report =
-            fit(trainable_model.model, verbosity, args...)
+            fit(trainable_model.model, verbosity, X, y)
         trainable_model.rows = deepcopy(rows)
     else
         if rows == nothing # (ie rows not specified) update:
-            args = [arg(rows=trainable_model.rows) for arg in trainable_model.args]
+            X = coerce(trainable_model.model, args[1](rows=trainable_model.rows))
+            y = args[2](rows=trainable_model.rows)
             trainable_model.fitresult, trainable_model.cache, report =
                 update(trainable_model.model, verbosity, trainable_model.fitresult,
-                       trainable_model.cache, args...)
+                       trainable_model.cache, X, y)
         else # retrain from scratch:
-            args = [arg(rows=rows) for arg in trainable_model.args]
+            X = coerce(trainable_model.model, args[1](rows=rows))
+            y = args[2](rows=rows)
             trainable_model.fitresult, trainable_model.cache, report =
-                fit(trainable_model.model, verbosity, args...)
+                fit(trainable_model.model, verbosity, X, y)
             trainable_model.rows = deepcopy(rows)
         end
     end
@@ -198,15 +202,17 @@ end
 
 ## NODES
 
-struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
+struct Node{T<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
 
     operation             # that can be dispatched on a fit-result (eg, `predict`) or a static operation
-    trainable::M          # is `nothing` for static operations
+    trainable::T          # is `nothing` for static operations
     args::Tuple{Vararg{AbstractNode}}       # nodes where `operation` looks for its arguments
     sources::Set{Source}
     tape::Vector{NodalTrainableModel}    # for tracking dependencies
 
-    function Node{M}(operation, trainable_model::M, args::AbstractNode...) where {M<:Model, M<:Union{NodalTrainableModel{M},Nothing}}
+    function Node{T}(operation,
+                     trainable_model::T,
+                     args::AbstractNode...) where {M<:Model, T<:Union{NodalTrainableModel{M},Nothing}}
 
         # check the number of arguments:
         if trainable_model == nothing
@@ -228,7 +234,7 @@ struct Node{M<:Union{NodalTrainableModel, Nothing}} <: AbstractNode
             merge!(tape, get_tape(arg))
         end
 
-        return new{M}(operation, trainable_model, args, sources, tape)
+        return new{T}(operation, trainable_model, args, sources, tape)
 
     end
 end
@@ -381,11 +387,14 @@ import Base.+
 
 ## COMPOSITE MODELS
 
-# fall-back for updating composite models (learning networks wrapped
-# as models):
+# When a supervised training network is wrapped as a stand-alone
+# model plus interface, it is called a composite model.
 
+# fall-back for updating supervised composite models:
 function update(model::Supervised{Node}, verbosity, fitresult, cache, args...)
     fit!(fitresult; verbosity=verbosity)
     return fitresult, cache, nothing
 end
 
+# fall-back for coercion of data in supervised composite models:
+coerce(model::Supervised{Node}, Xtable) = Xtable
