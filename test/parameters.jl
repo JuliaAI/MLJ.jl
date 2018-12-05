@@ -59,3 +59,4 @@ p2 = ParamRange(dummy_model, :kernel, values=['c', 'd', 'k', 'r'])
 @test collect(MLJ.iterator(p2)) == [p2.values...]
 
 end
+true
