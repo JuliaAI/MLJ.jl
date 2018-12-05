@@ -1,4 +1,4 @@
-module TestDecisionTree
+tmodule TestDecisionTree
 
 # using Revise
 using MLJ
@@ -43,3 +43,4 @@ fit!(tree)
 predict(tree, X[1:3,:])
 
 end
+true
