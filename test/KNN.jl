@@ -32,3 +32,4 @@ fit!(knn_trainable)
 predict(knn_trainable, X[1:10,:])
 
 end
+true
