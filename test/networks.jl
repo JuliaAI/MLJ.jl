@@ -107,6 +107,7 @@ composite = WetSupervised(tree_, selector_, encoder_)
 
 Xin, yin = X_and_y(load_iris());
 train, test = partition(eachindex(yin), 0.7);
+true
 Xtrain = Xin[train,:];
 ytrain = yin[train];
 
@@ -185,3 +186,4 @@ fit!(yhat, verbosity=3)
 yhat(Xin[test,:])
 
 end
+true

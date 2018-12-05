@@ -13,12 +13,35 @@ operations(KNNRegressor)
 inputs_can_be(KNNRegressor)
 outputs_are(KNNRegressor)
 
-include("metrics.jl")
-include("datasets.jl")
-include("KNN.jl")
-include("parameters.jl")
-include("networks.jl")
-include("Transformers.jl")
-include("DecisionTree.jl")
+@testset "metrics" begin
+  @test include("metrics.jl")
+end
 
+@testset "datasets" begin
+  @test include("datasets.jl")
+end
+
+@testset "KNN" begin
+  @test include("KNN.jl")
+end
+
+@testset "parameters" begin
+  @test include("parameters.jl")
+end
+
+@testset "networks" begin
+  @test include("networks.jl")
+end
+
+@testset "Transformers" begin
+  @test include("Transformers.jl")
+end
+
+@testset "DecisionTree" begin
+  @test include("DecisionTree.jl")
+end
+
+@testset "TrainableModels" begin
+  @test include("trainable_models.jl")
+end
 
