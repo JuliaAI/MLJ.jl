@@ -131,7 +131,7 @@ function MLJ.fit(model::DecisionTreeClassifier{T2}
 end
 
 #> method to coerce generic data into form required by fit:
-MLJ.coerce(model::DecisionTreeClassifier, Xtable) = MLJ.array(Xtable)
+MLJ.coerce(model::DecisionTreeClassifier, Xtable) = MLJ.matrix(Xtable)
 
 MLJ.predict(model::DecisionTreeClassifier 
         , fitresult

@@ -7,7 +7,7 @@ export Numeric, Nominal, Weights, NAs
 export properties, operations, inputs_can_be, outputs_are
 export SupervisedTask, UnsupervisedTask, nrows
 export Supervised, Unsupervised
-export array
+export matrix
 
 # defined here but extended by files in "interfaces/" (lazily loaded)
 export predict, transform, inverse_transform, predict_proba, se, evaluate
@@ -44,6 +44,7 @@ using  Query
 import Distributions
 import Base.==
 import CategoricalArrays
+import TableTraits
 
 # from Standard Library:
 using Statistics
@@ -91,31 +92,28 @@ include("metrics.jl")
 
 ## UNIVERSAL ADAPTOR FOR DATA CONTAINERS
 
-# Note: By *generic table* we mean any source, supported by Query.jl,
-# for which @from iterates over rows. In particular `Matrix` objects
-# are not generic tables.
+# The following is temporary. When the queryverse columns-view
+# interface becomes widely implemented, a better solution, removing
+# specific container dependencies, will be possible.
 
-# TODO: Must be a better way to do this?
 """" 
-    MLJ.array(X)
+    MLJ.matrix(X)
 
-Convert a tabular data source `X`, of type supported by Query.jl, into
-an `Array`; or, if `X` is an `AbstractArray`, return `X`.
+Convert an iteratable table source `X` into an `Matrix`; or, if `X` is
+an `Matrix`, return `X`.
 
 """
-function array(X)
+function matrix(X)
+    TableTraits.isiterabletable(X) || error("Argument is not an iterable table.")
+
     df= @from row in X begin
         @select row
         @collect DataFrame
     end
-    return convert(Array{Float64}, df)
+    return convert(Matrix, df)
+    
 end
-array(X::AbstractArray) = X
-
-# For vectors and tabular data containers `df`:
-# `df[Rows, r]` gets rows of `df` at `r` (single integer, integer range, or colon)
-# `df[Cols, c]` selects features of df at `c` (single integer or symbol, vector of symbols, integer range or colon); not supported for vectors
-# `df[Names]` returns names of all features of `df` (or indices if unsupported)
+matrix(X::Matrix) = X
 
 struct Rows end
 struct Cols end
@@ -127,10 +125,9 @@ Base.getindex(df::AbstractDataFrame, ::Type{Cols}, c) = df[c]
 Base.getindex(df::AbstractDataFrame, ::Type{Names}) = names(df)
 Base.getindex(df::AbstractDataFrame, ::Type{Eltypes}) = eltypes(df)
 
-# Base.getindex(df::JuliaDB.Table, ::Type{Rows}, r) = df[r]
-# Base.getindex(df::JuliaDB.Table, ::Type{Cols}, c) = select(df, c)
-# Base.getindex(df::JuliaDB.Table, ::Type{Names}) = getfields(typeof(df.columns.columns))
-# Base.getindex(df::JuliaDB.Table, ::Type{Echo}, dg) = dg
+#Base.getindex(df::JuliaDB.NextTable, ::Type{Rows}, r) = df[r]
+#Base.getindex(df::JuliaDB.NextTable, ::Type{Cols}, c) = select(df, c)
+#Base.getindex(df::JuliaDB.NextTable, ::Type{Names}) = getfields(typeof(df.columns.columns))
 
 Base.getindex(A::AbstractMatrix, ::Type{Rows}, r) = A[r,:]
 Base.getindex(A::AbstractMatrix, ::Type{Cols}, c) = A[:,c]
@@ -138,7 +135,7 @@ Base.getindex(A::AbstractMatrix, ::Type{Names}) = 1:size(A, 2)
 Base.getindex(A::AbstractMatrix{T}, ::Type{Eltypes}) where T = [T for j in 1:size(A, 2)]
 
 Base.getindex(v::AbstractVector, ::Type{Rows}, r) = v[r]
-Base.getindex(v::CategoricalArrays.CategoricalArray, ::Type{Rows}, r) = @inbounds v[r]
+Base.getindex(v::CategoricalArrays.CategoricalArray{T,1,S} where {T,S}, ::Type{Rows}, r) = @inbounds v[r]
 
 
 ## MODEL METADATA
@@ -284,7 +281,7 @@ clean!(fitresult::Model) = ""
 # supervised models may need to overload the following method to
 # ensure Tables.jl compliant input data supplied by user is coerced
 # into the form required by its `fit` method and operations:
-coerce(model::Model, Xtable) = array(Xtable)
+coerce(model::Model, Xtable) = Xtable
 
 # models are `==` if they have the same type and their field values are `==`:
 function ==(m1::M, m2::M) where M<:Model

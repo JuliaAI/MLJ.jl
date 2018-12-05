@@ -6,7 +6,7 @@ using Test
 using Statistics
 
 X_frame, y = datanow();
-X = array(X_frame)
+X = matrix(X_frame)
 train, test = partition(eachindex(y), 0.7);
 
 t = TrainableModel(KNNRegressor(K=4), X, y)

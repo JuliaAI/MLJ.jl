@@ -367,7 +367,7 @@ trainable(model::Model, X::AbstractNode, y) = NodalTrainableModel(model, X, sour
 # transform(trainable_model::NodalTrainableModel, X::AbstractNode) = node(transform, trainable_model, X)
 # inverse_transform(trainable_model::NodalTrainableModel, X::AbstractNode) = node(inverse_transform, trainable_model, X)
 
-array(X::AbstractNode) = node(array, X)
+matrix(X::AbstractNode) = node(matrix, X)
 
 Base.log(v::Vector{<:Number}) = log.(v)
 Base.exp(v::Vector{<:Number}) = exp.(v)
@@ -396,5 +396,3 @@ function update(model::Supervised{Node}, verbosity, fitresult, cache, args...)
     return fitresult, cache, nothing
 end
 
-# fall-back for coercion of data in supervised composite models:
-coerce(model::Supervised{Node}, Xtable) = Xtable

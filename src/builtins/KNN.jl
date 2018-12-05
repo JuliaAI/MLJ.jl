@@ -42,6 +42,8 @@ function MLJ.clean!(model::KNNRegressor)
     return message
 end
 
+MLJ.coerce(model::KNNRegressor, Xtable) = MLJ.matrix(Xtable)
+
 function MLJ.fit(model::KNNRegressor
              , verbosity
              , X::Matrix{Float64}
