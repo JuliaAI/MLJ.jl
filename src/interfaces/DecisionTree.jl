@@ -18,6 +18,9 @@ import MLJ
 import MLJ: CanWeightTarget, CanRankFeatures
 import MLJ: Nominal, Numeric, NA, Probababilistic, Multivariate,  Multiclass
 
+#> for all classifiers:
+using CategoricalArrays
+
 #> import package:
 import DecisionTree                
 
@@ -27,15 +30,18 @@ import DecisionTree
 #> type that depends on the target type, here denoted `T` (and the
 #> fit-result type of a supervised model must be declared).
 
+
+# TODO: replace float64 with type parameter
+
 DecisionTreeClassifierFitResultType{T} =
-    Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}}
+    Tuple{Union{DecisionTree.Node{Float64,UInt32}, DecisionTree.Leaf{UInt32}}, CategoricalPool{T,UInt32,T}}
 
 """
 [https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md](https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md)
 
 """
 mutable struct DecisionTreeClassifier{T} <: MLJ.Supervised{DecisionTreeClassifierFitResultType{T}}
-    target_type::Type{T}
+    target_type::Type{T}  # target is CategoricalArray{target_type}
     pruning_purity::Float64 
     max_depth::Int
     min_samples_leaf::Int
@@ -100,24 +106,25 @@ end
 function MLJ.fit(model::DecisionTreeClassifier{T2}
              , verbosity   #> must be here even if unsupported in pkg (as here)
              , X::Matrix{Float64}
-             , y::Vector{T}) where {T,T2}
+             , y::CategoricalVector{T}) where {T,T2}
 
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
-
-    fitresult = DecisionTree.build_tree(y
-                                        , X
-                                        , model.n_subfeatures
-                                        , model.max_depth
-                                        , model.min_samples_leaf
-                                        , model.min_samples_split
-                                        , model.min_purity_increase)
-
+    
+    tree = DecisionTree.build_tree(y.refs
+                                   , X
+                                   , model.n_subfeatures
+                                   , model.max_depth
+                                   , model.min_samples_leaf
+                                   , model.min_samples_split
+                                   , model.min_purity_increase)
     if model.post_prune 
-        fitresult = DecisionTree.prune_tree(fitresult, model.merge_purity_threshold)
+        tree = DecisionTree.prune_tree(tree, model.merge_purity_threshold)
     end
     
-    verbosity < 3 || DecisionTree.print_tree(fitresult, model.display_depth)
+    verbosity < 3 || DecisionTree.print_tree(tree, model.display_depth)
+
+    fitresult = (tree, y.pool)
 
     #> return package-specific statistics (eg, feature rankings,
     #> internal estimates of generalization error) in `report`, which
@@ -133,10 +140,12 @@ end
 #> method to coerce generic data into form required by fit:
 MLJ.coerce(model::DecisionTreeClassifier, Xtable) = MLJ.matrix(Xtable)
 
-MLJ.predict(model::DecisionTreeClassifier 
-        , fitresult
-        , Xnew) = 
-            DecisionTree.apply_tree(fitresult, Xnew)
+function MLJ.predict(model::DecisionTreeClassifier{T} 
+                     , fitresult
+                     , Xnew) where T
+    tree, pool = fitresult
+    return CategoricalArray{T,1}(DecisionTree.apply_tree(tree, Xnew), pool)
+end
 
 # metadata:           
 MLJ.properties(::Type{DecisionTreeClassifier}) = ()

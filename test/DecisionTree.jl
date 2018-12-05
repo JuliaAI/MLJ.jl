@@ -12,7 +12,7 @@ X_array = convert(Array{Float64}, X);
  
 import DecisionTree
 import CategoricalArrays
-baretree = DecisionTreeClassifier(target_type=CategoricalArrays.CategoricalString{UInt32})
+baretree = DecisionTreeClassifier(target_type=String)
 
 # split the rows:
 allrows = eachindex(y)

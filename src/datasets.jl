@@ -21,7 +21,7 @@ function load_iris()
     df = CSV.read(joinpath(datadir, "iris.csv"),
                   categorical=true, allowmissing=:none)
     # TODO: fix things so that next line can be deleted
-    df[:target] = [df[:target]...] # change CategoricalArray to Array, keeping categ eltype
+#    df[:target] = [df[:target]...] # change CategoricalArray to Array, keeping categ eltype
     return SupervisedTask(data=df, target=:target, properties=())
 end
 
