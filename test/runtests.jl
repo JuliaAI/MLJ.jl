@@ -16,6 +16,7 @@ outputs_are(KNNRegressor)
 @testset "metrics" begin
   @test include("metrics.jl")
 end
+
 @testset "datasets" begin
   @test include("datasets.jl")
 end
@@ -35,7 +36,12 @@ end
 @testset "Transformers" begin
   @test include("Transformers.jl")
 end
+
 @testset "DecisionTree" begin
   @test include("DecisionTree.jl")
+end
+
+@testset "TrainableModels" begin
+  @test include("trainable_models.jl")
 end
 
