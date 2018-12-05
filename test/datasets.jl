@@ -8,3 +8,4 @@ load_boston()
 load_iris()
 
 end # module
+true

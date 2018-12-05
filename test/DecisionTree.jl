@@ -43,3 +43,4 @@ fit!(tree)
 predict(tree, X[1:3,:])
 
 end
+true

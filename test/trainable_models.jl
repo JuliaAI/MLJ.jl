@@ -17,3 +17,4 @@ predict(t, X[test,:])
 @test rms(predict(t, X[test,:]), y[test]) < std(y)
 
 end # module
+true
