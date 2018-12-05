@@ -1,3 +1,4 @@
+
 # It is suggested that test code for MLJ.jl include files be placed in
 # a file of the same name under "test/" (and included below) and that
 # this test code be wrapped in a module. Any new module name will do -
@@ -13,7 +14,9 @@ operations(KNNRegressor)
 inputs_can_be(KNNRegressor)
 outputs_are(KNNRegressor)
 
-include("metrics.jl")
+@testset "metrics" begin
+  @test include("metrics.jl")
+end
 include("datasets.jl")
 include("KNN.jl")
 include("parameters.jl")
