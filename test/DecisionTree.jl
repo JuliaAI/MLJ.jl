@@ -1,4 +1,4 @@
-tmodule TestDecisionTree
+module TestDecisionTree
 
 # using Revise
 using MLJ
