@@ -62,7 +62,7 @@ const DEFAULT_SHOW_DEPTH = 2      # how deep to display fields of `MLJType` obje
 
 ## GENERAL PURPOSE UTILITIES
 
-include("utilities.jl")
+include("utilities.jl")    
 
 
 ## ABSTRACT TYPES
@@ -83,6 +83,30 @@ abstract type Unsupervised <: Model  end
 # tasks:
 abstract type Task <: MLJType end 
 abstract type Property end # subtypes are the allowable model properties
+
+
+## UTILITIES FOR DEALING WITH CATEGORICAL DATA
+
+struct CategoricalDecoder{I<:Real,T,N,R<:Integer}  # I the output eltype
+    shell::CategoricalArray{T,N,R} # abstract type, not optimal
+    CategoricalDecoder{I,T,N,R}(X::CategoricalArray{T,N,R}) where {I,T,N,R}  = new(X[1:0])
+end
+
+CategoricalDecoder(X::CategoricalArray{T,N,R}; eltype=Float64) where {T,N,R} =
+    CategoricalDecoder{eltype,T,N,R}(X)
+
+function transform(decoder::CategoricalDecoder{I,T,N,R}, C::CategoricalArray) where {I,T,N,R}
+    return broadcast(C.refs) do element
+        ref = convert(I, element)
+    end
+end
+
+function inverse_transform(decoder::CategoricalDecoder{I,T,N,R}, A::Array{I}) where {I,T,N,R}
+    refs = broadcast(A) do element
+        round(R, element)
+    end
+    return CategoricalArray{T,N}(refs, decoder.shell.pool)
+end
 
 
 ## LOSS FUNCTIONS
