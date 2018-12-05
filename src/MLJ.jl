@@ -43,7 +43,7 @@ import DataFrames: DataFrame, AbstractDataFrame, SubDataFrame, eltypes, names
 using  Query
 import Distributions
 import Base.==
-import CategoricalArrays
+using CategoricalArrays
 import TableTraits
 
 # from Standard Library:
@@ -85,11 +85,37 @@ abstract type Task <: MLJType end
 abstract type Property end # subtypes are the allowable model properties
 
 
-## UTILITIES FOR DEALING WITH CATEGORICAL DATA
 
+## LOSS FUNCTIONS
+
+include("metrics.jl")
+
+
+## DATA INTERFACES
+
+"""
+    CategoricalDecoder(X::CategoricalArray; eltype=Float64)
+
+Construct a decoder for transforming `CategoricalArrays` into numeric
+arrays of given `eltype<:Real` (but whose elements are promoted
+integers), and for re-encoding numeric arrays back into a
+`CategoricalArray` with the original levels (and pool), as extracted
+from `X` during construction.
+
+    transform(decoder::CategoricalDecoder, X::CategoricalArray)
+
+Transform `X` into a numeric array of the eltype passed to the constuctor of `encoder`.
+
+    inverse_transform(decoder::CategoricalDecoder, C::Array)
+
+Transform a numeric array that is suitably compatible with `decoder`
+into a `CategoricalArray` having the same levels as the
+`CategoricalArray` passed in the construction of `decoder`.
+
+"""
 struct CategoricalDecoder{I<:Real,T,N,R<:Integer}  # I the output eltype
-    shell::CategoricalArray{T,N,R} # abstract type, not optimal
-    CategoricalDecoder{I,T,N,R}(X::CategoricalArray{T,N,R}) where {I,T,N,R}  = new(X[1:0])
+    pool::CategoricalPool{T,R} # abstract type, not optimal
+    CategoricalDecoder{I,T,N,R}(X::CategoricalArray{T,N,R}) where {I,T,N,R}  = new(X.pool)
 end
 
 CategoricalDecoder(X::CategoricalArray{T,N,R}; eltype=Float64) where {T,N,R} =
@@ -105,20 +131,13 @@ function inverse_transform(decoder::CategoricalDecoder{I,T,N,R}, A::Array{I}) wh
     refs = broadcast(A) do element
         round(R, element)
     end
-    return CategoricalArray{T,N}(refs, decoder.shell.pool)
+    return CategoricalArray{T,N}(refs, decoder.pool)
 end
 
-
-## LOSS FUNCTIONS
-
-include("metrics.jl")
-
-
-## UNIVERSAL ADAPTOR FOR DATA CONTAINERS
-
-# The following is temporary. When the queryverse columns-view
-# interface becomes widely implemented, a better solution, removing
-# specific container dependencies, will be possible.
+# Some of what follows is a poor-man's stab at agnostic data
+# containers. When the Queryverse columns-view interface becomes
+# widely implemented, a better solution, removing specific container
+# dependencies, will be possible.
 
 """" 
     MLJ.matrix(X)
@@ -138,6 +157,7 @@ function matrix(X)
     
 end
 matrix(X::Matrix) = X
+
 
 struct Rows end
 struct Cols end
