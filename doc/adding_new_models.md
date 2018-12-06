@@ -27,18 +27,22 @@ way is given at the end; a template is given here:
 
 ## Models
 
-A *model* is an object storing hyperparameters associated with some
+A *model* is an object storing hyper-parameters associated with some
 machine learning algorithm, where "learning algorithm" is
-broadly interpreted.  In MLJ, hyperparameters include configuration
+broadly interpreted.  In MLJ, hyper-parameters include configuration
 parameters, like the number of threads, which may not affect the final
 learning outcome.  However, the logging level, `verbosity`, is
 excluded.
 
 The name of the Julia type associated with a model indicates the
-associated algorithm (e.g., `DecisionTreeClassifier`). The ultimate
-supertype of all models is `MLJ.Model`.
+associated algorithm (e.g., `DecisionTreeClassifier`). The outcome of
+training a learning algorithm is here called a *fit-result*. For a
+linear model, for example, this would be the coefficients and
+intercept.  
 
-Most models fall into one of two subtypes: `MLJ.Supervised` and
+The ultimate supertype of all models is `MLJ.Model`.
+
+Models defined outside of `MLJ` will fall into one of two subtypes: `MLJ.Supervised` and
 `MLJ.Unsupervised`:
 
 ````julia
@@ -46,31 +50,21 @@ abstract type Supervised{R} <: Model end
 abstract type Unsupervised <: Model end
 ````
 
-Here the parameter `R` refers to the fit-result type (concrete if
-possible); see below.
-
-<!-- In addition to basic learning algorithms are "meta-algorithms" -->
-<!-- defined in MLJ itself, such as estimating performance by -->
-<!-- cross-validation, and hyperparameter tuning, which have also -->
-<!-- hyperparameters (e.g., number of folds for cross-validation) and so -->
-<!-- have associated models. -->
+Here the parameter `R` refers to a fit-result type. By declaring a
+model to be a subtype of `Supervised{R}` you guarantee the fit-result
+to be of type `R` and, if `R` is concrete, one may improve the
+performance of homogeneous ensembles of the model (as defined by the
+built-in MLJ module `Ensembles`). There is no abstract type for
+fit-results because these types are generally declared outside of MLJ.
 
 Associated with every concrete subtype of `Model` there must be a
-`fit` method, which implements the associated algorithm to produce a
-*fit-result* (see below). At least one method dispatched on model
-instances and a fit-result (typically `predict` for supervised
+`fit` method, which implements the associated algorithm to produce the
+fit-result. At least one method dispatched on model
+instances and a fit-result (`predict` for supervised
 algorithms) must also be provided. Such methods, here called
 *operations*, can have one of the following names: `predict`,
-`predict_probability`, `transform`, `inverse_transform`, `se`, or
+`predict_proba`, `transform`, `inverse_transform`, `se`, or
 `evaluate`. 
-
-The outcome of training a learning algorithm is here called a
-*fit-result*. For a linear model, for example, this would be the
-coefficients and intercept.  There is no abstract type for fit-results
-because these types are generally declared in external
-packages. However, in MLJ the abstract supervised model type is
-parameterized by the fit-result type `R`, for efficient implementation
-of large ensembles of models of uniform type. 
 
 
 ## The Model API
@@ -90,9 +84,11 @@ Here is an example of a concrete model type declaration:
 ````julia
 import MLJ
 
-R = Tuple{Matrix{Float64},Vector{Float64}}
+R{S,T} = Tuple{Matrix{S},Vector{T}} where {S<:AbstractFloat,T<:AbstractFloat}
 
-mutable struct KNNRegressor{M,K} <: MLJ.Superivsed{R}
+mutable struct KNNRegressor{S,T,M,K} <: MLJ.Supervised{R{S,T}}
+    source_type::S
+    target_type::T
     K::Int          
     metric::M
     kernel::K
@@ -102,7 +98,7 @@ end
 Models (which are mutable) should not be given internal
 constructors. It is recommended that they be given an external lazy
 keyword constructor of the same name that defines default values (for
-every field) and checks their validity, by calling `clean!` (see
+every field) and checks their validity, by calling a `clean!` (see
 below).
 
 
@@ -149,7 +145,7 @@ Here `fitresult::R` is the fit-result in the sense above. Any
 training-related statistics, such as internal estimates of the
 generalization error, feature rankings, and coefficients in linear
 models, should be returned in the `report` object. How, or if, these
-are generated should be controlled by hyperparameters. The `report`
+are generated should be controlled by hyper-parameters. The `report`
 object returned is either a `Dict{Symbol,Any}` object, or `nothing` if
 there is nothing to report. So for example, `fit` might declare
 `report[:feature_importances] = ...`.  Reports get merged with those
@@ -162,13 +158,13 @@ It is not necessary for `fit` and `predict` methods to provide
 dimension matching checks or to call `clean!` on the model; MLJ will
 carry out such checks.
 
-The method `fit` should never alter hyperparameter values. If the
-package is able to suggest better hyperparameters, as a byproduct of
+The method `fit` should never alter hyper-parameter values. If the
+package is able to suggest better hyper-parameters, as a byproduct of
 training, return these in the report field.
 
 The `verbosity` level (0 for silent) is for passing to learning
-algorithm itself. The `fit` method should generally avoid doing its
-own logging.
+algorithm itself. A `fit` method wrapping such an algorithm should
+generally avoid doing any of its own logging.
 
 ````julia
 yhat = MLJ.predict(model::SomeSupervisedModelType, fitresult, Xnew)
@@ -194,16 +190,16 @@ levels in mind, MLJ provides a utility `CategoricalDecoder` which can
 decode a `CategoricalArray` into a plain array, and re-encode a
 prediction with the original levels intact. The `CategoricalDecoder`
 object created during `fit` will need to be bundled with `fitresult`
-to make it available to `predict` during re-endcoding.
+to make it available to `predict` during re-encoding.
 
 
 #### Optional methods
 
-**Metadata** Ideally methods encoding certain model-type metadata
+**Metadata.** Ideally methods encoding certain model-type metadata
 should be provided. This allows the `MLJ` user, through the `Task`
-interface, to discover models meeting that meet the task
-specification. For example, in the current `DecisionTreeClassifier`,
-metadata is declared as follows:
+interface, to discover models that meet the task specification. For
+example, in the current `DecisionTreeClassifier`, metadata is declared
+as follows:
 
 ````julia
 MLJ.properties(::Type{DecisionTreeClassifier}) = ()
@@ -214,7 +210,7 @@ MLJ.outputs_are(::Type{DecisionTreeClassifier}) = (Nominal())
 
 Available options can be gleaned from this code extract:
 
-````
+````julia
 # `property(SomeModelType)` is a tuple of instances of:
 """ Classification models with this property allow weighting of the target classes """
 struct CanWeightTarget <: Property end
@@ -239,8 +235,9 @@ struct Multiclass <: Property end # can handle more than two classes
 **Binary classifiers.** If `Probabilistic()` is in the tuple returned
 by `outputs_are` then a `predict_proba` method must be provided (in
 addition to `predict`) to predict probabilities instead of labels. It
-should return a `Vector` of probabilities (one probability
-per input pattern).
+should return a `Vector` of probabilities (one probability per input
+pattern), this probability corresponding to the *first* level in
+`levels(y)`.
 
 **Multilabel classifiers.** If `Probability()` and `Multiclass()` are
 both in the tuple returned by `outputs_are` then a `predict_proba`
@@ -248,13 +245,14 @@ method is to be implemented but its return value `yhat` must be an
 `Array` object of size `(nrows, k)` where `nrows` is the number of
 input patterns (the number of rows of the input data `Xnew`) and
 `k=levels(y)`, where `y` is the data presented in training. The order
-of the columns should coincide with the order of `levels(y)`.
+of the columns should coincide with the order of `levels(y)`. However,
+in the special case `k=1` a single column should be output.
 
 ````julia
 MLJ.clean!(model::Supervised) -> message::String
 ````
 
-Checks and corrects for invalid fields (hyperparameters), returning a
+This method checks and corrects for invalid fields (hyper-parameters), returning a
 warning `message`. Should only throw an exception as a last
 resort. This method is called by the model constructor, and by MLJ
 before any `fit` call.
@@ -268,11 +266,11 @@ An `update` method may be overloaded to enable a call by MLJ to
 retrain a model (on the same training data) to avoid repeating
 computations unnecessarily. (A fallback just calls `fit`.)  Composite
 models (subtypes of `Supervised{Node}`) constitute one use-case
-(component models are only retrained when new hyperparameter values
+(component models are only retrained when new hyper-parameter values
 make this necessary) and in this case MLJ provides a fallback. A
 second important use-case is iterative models, where calls to increase
 the number of iterations only restarts the iterative procedure if
-other hyperparameters have also changed. For an example see
+other hyper-parameters have also changed. For an example see
 `builtins/Ensembles.jl`.
 
 In the event that the argument `fitresult` (returned by a preceding
@@ -285,7 +283,7 @@ to the `update` method.
 ##  Checklist for new adding models 
 
 At present the following checklist is just for supervised models in
-lazily loaded external packages.
+lazily loaded interface implementations.
 
 - Copy and edit file
 ["src/interfaces/DecisionTree.jl"](../src/interfaces/DecisionTree.jl)
@@ -322,7 +320,7 @@ for an example.
   `Project.toml` and add the package name to `test = [Test", "DecisionTree",
   ...]`.
 
-- Add a line to ["test/runtests.jl"](../test/runtests.jl) to
+- Add suitable lines to ["test/runtests.jl"](../test/runtests.jl) to
 `include` your test file, for the purpose of testing MLJ core and all
 currently supported packages, including yours. You can Test your code
 by running `test MLJ` from the Julia interactive package manager. You
