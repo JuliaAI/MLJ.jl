@@ -100,6 +100,8 @@ end
 ## METHODS TO SUPRESS THE DISPLAY OF LARGE NON-BASETYPE OBJECTS
 
 istoobig(::Any) = true
+istoobig(::DataType) = false
+istoobig(::Union) = false
 istoobig(::Number) = false
 istoobig(::Char) = false
 istoobig(::Function) = false

@@ -18,7 +18,9 @@ export @more, @constant                              # "show.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
 export Params, get_params, set_params!, ParamRange   # "parameters.jl"
+export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
 export KNNRegressor                                  # "builtins/KNN.jl":
+
 
 # defined in include files "trainable_models.jl" and "networks.jl":
 export TrainableModel, NodalTrainableModel, trainable
@@ -217,19 +219,22 @@ Base.getindex(df::AbstractDataFrame, ::Type{Rows}, r) = df[r,:]
 Base.getindex(df::AbstractDataFrame, ::Type{Cols}, c) = df[c]
 Base.getindex(df::AbstractDataFrame, ::Type{Names}) = names(df)
 Base.getindex(df::AbstractDataFrame, ::Type{Eltypes}) = eltypes(df)
+nrows(df::AbstractDataFrame) = size(df, 1)
 
 #Base.getindex(df::JuliaDB.NextTable, ::Type{Rows}, r) = df[r]
 #Base.getindex(df::JuliaDB.NextTable, ::Type{Cols}, c) = select(df, c)
 #Base.getindex(df::JuliaDB.NextTable, ::Type{Names}) = getfields(typeof(df.columns.columns))
+# nrows(df::JuliaDB.NextTable) = length(df)
 
 Base.getindex(A::AbstractMatrix, ::Type{Rows}, r) = A[r,:]
 Base.getindex(A::AbstractMatrix, ::Type{Cols}, c) = A[:,c]
 Base.getindex(A::AbstractMatrix, ::Type{Names}) = 1:size(A, 2)
 Base.getindex(A::AbstractMatrix{T}, ::Type{Eltypes}) where T = [T for j in 1:size(A, 2)]
+nrows(A::AbstractMatrix) = size(A, 1)
 
 Base.getindex(v::AbstractVector, ::Type{Rows}, r) = v[r]
 Base.getindex(v::CategoricalArrays.CategoricalArray{T,1,S} where {T,S}, ::Type{Rows}, r) = @inbounds v[r]
-
+nrows(v::AbstractVector) = length(v)
 
 ## MODEL METADATA
 
@@ -325,13 +330,6 @@ include("datasets.jl")
 
 ## MODEL INTERFACE 
 
-# Most concrete model types, and their associated low-level methods,
-# are defined in package interfaces, located in
-# "/src/interfaces.jl". These are are lazily loaded (see the end of
-# this file). Built-in model definitions and associated methods (ie,
-# ones not dependent on external packages) are contained in
-# "/src/builtins.jl"
-
 # every model interface must implement this method, used to generate
 # fit-results:
 function fit end
@@ -372,7 +370,7 @@ function properties end
 clean!(fitresult::Model) = ""
 
 # supervised models may need to overload the following method to
-# ensure Tables.jl compliant input data supplied by user is coerced
+# ensure iterable tables compliant input data supplied by user is coerced
 # into the form required by its `fit` method and operations:
 coerce(model::Model, Xtable) = Xtable
 
@@ -396,6 +394,7 @@ include("parameters.jl")
 ## LOAD BUILT-IN MODELS
 
 include("builtins/Transformers.jl")
+include("builtins/Constant.jl")
 include("builtins/KNN.jl")
 
 

@@ -25,8 +25,6 @@ decoder = MLJ.CategoricalDecoder(X, eltype=Float16)
 decoder = MLJ.CategoricalDecoder(X)
 @test inverse_transform(decoder, transform(decoder, Xsmall)) == Xsmall
 
-
-
 @testset "metrics" begin
   @test include("metrics.jl")
 end
@@ -37,6 +35,10 @@ end
 
 @testset "KNN" begin
   @test include("KNN.jl")
+end
+
+@testset "Constant" begin
+    @test include("Constant.jl")
 end
 
 @testset "parameters" begin

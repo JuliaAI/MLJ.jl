@@ -134,7 +134,9 @@ iterable table.
 
 In contrast, the target data `y` passed to training will always be a
 `Vector{F}` for some `F<:Real`, in the case of regressors, and a
-`CategoricalVector`, in the case of classifiers.
+`CategoricalVector`, in the case of classifiers. (At present only
+target `CategoricalVector`s of the default reference type `UInt32` are
+supported.)
 
 #### Compulsory methods
 
