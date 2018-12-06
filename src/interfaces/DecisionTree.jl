@@ -24,19 +24,14 @@ using CategoricalArrays
 #> import package:
 import DecisionTree                
 
-#> The DecisionTreeClassifier model type declared below is a
-#> parameterized type (not necessary for models in general). This is
-#> because the classifier built by DecisionTree.jl has a fit-result
-#> type that depends on the target type, here denoted `T` (and the
-#> fit-result type of a supervised model must be declared).
-
-
-# TODO: replace float64 with type parameter
+# TODO: replace Float64 with type parameter
 
 DecisionTreeClassifierFitResultType{T} =
-    Tuple{Union{DecisionTree.Node{Float64,UInt32}, DecisionTree.Leaf{UInt32}}, CategoricalPool{T,UInt32,T}}
+    Tuple{Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}}, MLJ.CategoricalDecoder{UInt32,T,1,UInt32}}
 
 """
+    DecisionTreeClassifer(; kwargs...)
+
 [https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md](https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md)
 
 """
@@ -110,8 +105,11 @@ function MLJ.fit(model::DecisionTreeClassifier{T2}
 
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
+
+    decoder = MLJ.CategoricalDecoder(y)
+    y_plain = MLJ.transform(decoder, y)
     
-    tree = DecisionTree.build_tree(y.refs
+    tree = DecisionTree.build_tree(y_plain
                                    , X
                                    , model.n_subfeatures
                                    , model.max_depth
@@ -124,7 +122,7 @@ function MLJ.fit(model::DecisionTreeClassifier{T2}
     
     verbosity < 3 || DecisionTree.print_tree(tree, model.display_depth)
 
-    fitresult = (tree, y.pool)
+    fitresult = (tree, decoder)
 
     #> return package-specific statistics (eg, feature rankings,
     #> internal estimates of generalization error) in `report`, which
@@ -143,8 +141,8 @@ MLJ.coerce(model::DecisionTreeClassifier, Xtable) = MLJ.matrix(Xtable)
 function MLJ.predict(model::DecisionTreeClassifier{T} 
                      , fitresult
                      , Xnew) where T
-    tree, pool = fitresult
-    return CategoricalArray{T,1}(DecisionTree.apply_tree(tree, Xnew), pool)
+    tree, decoder = fitresult
+    return MLJ.inverse_transform(decoder, DecisionTree.apply_tree(tree, Xnew))
 end
 
 # metadata:           

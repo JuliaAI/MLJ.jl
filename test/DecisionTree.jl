@@ -31,7 +31,7 @@ yhat = predict(baretree, fitresult, X_array);
 # but pruning upsets this:
 baretree.post_prune = true
 baretree.merge_purity_threshold=0.1
-fitresult, cache, report = MLJ.update(baretree, 1, fitresult, cache, X_array, y)
+fitresult, cache, report = MLJ.update(baretree, 2, fitresult, cache, X_array, y)
 yhat = predict(baretree, fitresult, X_array);
 @test yhat != y
 

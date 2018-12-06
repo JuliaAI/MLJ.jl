@@ -70,8 +70,7 @@ coefficients and intercept.  There is no abstract type for fit-results
 because these types are generally declared in external
 packages. However, in MLJ the abstract supervised model type is
 parameterized by the fit-result type `R`, for efficient implementation
-of large ensembles of models of uniform type. If performance is not an
-issue, use `R=Any`.
+of large ensembles of models of uniform type. 
 
 
 ## The Model API
@@ -100,10 +99,11 @@ mutable struct KNNRegressor{M,K} <: MLJ.Superivsed{R}
 end
 ````
 
-Models (which are mutable) should never have internally defined
-constructors. It is recommended that they be given an external lazy keyword
-constructor of the same name that defines default values (for every
-field) and checks their validity, by calling `clean!` (see below).
+Models (which are mutable) should not be given internal
+constructors. It is recommended that they be given an external lazy
+keyword constructor of the same name that defines default values (for
+every field) and checks their validity, by calling `clean!` (see
+below).
 
 
 ### Supervised models

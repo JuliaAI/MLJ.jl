@@ -151,7 +151,7 @@ end
 
 function CategoricalDecoder(X::CategoricalArray{T,N,R}; eltype=nothing) where {T,N,R}
     if eltype ==  nothing
-        eltype = Int64 # any integer type will do here; not used
+        eltype = R # any integer type will do here; not used
         use_original_type = true
     else
         use_original_type = false
