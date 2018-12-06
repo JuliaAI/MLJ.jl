@@ -22,6 +22,11 @@ Xsmall = X[2:5,3:4]
 decoder = MLJ.CategoricalDecoder(X, eltype=Float16)
 @test inverse_transform(decoder, transform(decoder, Xsmall)) == Xsmall
 
+decoder = MLJ.CategoricalDecoder(X)
+@test inverse_transform(decoder, transform(decoder, Xsmall)) == Xsmall
+
+
+
 @testset "metrics" begin
   @test include("metrics.jl")
 end
