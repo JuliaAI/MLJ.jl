@@ -76,7 +76,7 @@ zhat = predict(knn, Xa)
 yhat = inverse_transform(uscale, zhat)
 
 # fit-through training:
-fit!(yhat, rows=1:100, verbosity=2)
+fit!(yhat, rows=1:50, verbosity=2)
 fit!(yhat, rows=:, verbosity=2) # will retrain 
 fit!(yhat, verbosity=2) # will not retrain; nothing changed
 knn_.K =4

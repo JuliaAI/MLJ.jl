@@ -46,6 +46,9 @@ TrainableModel(model::M, args...) where M<:Model = TrainableModel{M}(model, args
 
 function fit!(trainable_model::TrainableModel; rows=nothing, verbosity=1)
 
+    warning = clean!(trainable_model.model)
+    isempty(warning) || verbosity < 0 || @warn warning 
+    
 #    verbosity < 1 || @info "Training $trainable_model whose model is $(trainable_model.model)."
     verbosity < 1 || @info "Training $trainable_model."
 

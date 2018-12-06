@@ -114,6 +114,9 @@ function fit!(trainable_model::NodalTrainableModel; rows=nothing, verbosity=1)
         "not trained as it is frozen."
         return trainable_model
     end
+
+    warning = clean!(trainable_model.model)
+    isempty(warning) || verbosity < 0 || @warn warning 
         
 #    verbosity < 1 || @info "Training $trainable_model whose model is $(trainable_model.model)."
     verbosity < 1 || @info "Training $trainable_model."

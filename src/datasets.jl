@@ -26,6 +26,9 @@ function load_iris()
 end
 
 """Get some supervised data now!!"""
-datanow() =  X_and_y(load_boston())
+function datanow()
+    X, y = X_and_y(load_boston())
+    return X[1:75,:], y[1:75]
+end
 
 
