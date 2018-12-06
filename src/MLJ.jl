@@ -28,7 +28,8 @@ export source, node, fit!, freeze!, thaw!
 # defined in include file "builtins/Transformers.jl":
 export FeatureSelector
 export ToIntTransformer                     
-export UnivariateStandardizer, Standardizer 
+export UnivariateStandardizer, Standardizer
+export UnivariateBoxCoxTransformer
 # export OneHotEncoder
 # export UnivariateBoxCoxTransformer, BoxCoxTransformer
 # export DataFrameToArrayTransformer, RegressionTargetTransformer
@@ -289,8 +290,8 @@ function fit end
 
 # each model interface may optionally overload the following refitting
 # method:
-update(model::Model, verbosity, fitresult, cache, rows, args...) =
-    fit(model, verbosity, rows, args...)
+update(model::Model, verbosity, fitresult, cache, args...) =
+    fit(model, verbosity, args...)
 
 # methods dispatched on a model and fit-result are called *operations*.
 # supervised models must implement this operation:
