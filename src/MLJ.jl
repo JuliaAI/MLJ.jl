@@ -13,7 +13,7 @@ export matrix
 export predict, transform, inverse_transform, predict_proba, se, evaluate
 
 # defined in include files:
-export partition, @curve, @pcurve                    # "utilities.jl"
+export partition, @curve, @pcurve, readlibsvm        # "utilities.jl"
 export @more, @constant                              # "show.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
@@ -29,7 +29,7 @@ export source, node, fit!, freeze!, thaw!
 
 # defined in include file "builtins/Transformers.jl":
 export FeatureSelector
-export ToIntTransformer                     
+export ToIntTransformer
 export UnivariateStandardizer, Standardizer
 export UnivariateBoxCoxTransformer
 # export OneHotEncoder
@@ -57,15 +57,15 @@ using LinearAlgebra
 
 ## CONSTANTS
 
-const srcdir = dirname(@__FILE__) # the directory containing this file 
-const TREE_INDENT = 2 # indentation for tree-based display of learning networks 
+const srcdir = dirname(@__FILE__) # the directory containing this file
+const TREE_INDENT = 2 # indentation for tree-based display of learning networks
 const COLUMN_WIDTH = 24           # for displaying dictionaries with `show`
 const DEFAULT_SHOW_DEPTH = 2      # how deep to display fields of `MLJType` objects
 
 
 ## GENERAL PURPOSE UTILITIES
 
-include("utilities.jl")    
+include("utilities.jl")
 
 
 ## ABSTRACT TYPES
@@ -84,7 +84,7 @@ abstract type Supervised{R} <: Model end # parameterized by fit-result `R`
 abstract type Unsupervised <: Model  end
 
 # tasks:
-abstract type Task <: MLJType end 
+abstract type Task <: MLJType end
 abstract type Property end # subtypes are the allowable model properties
 
 
@@ -190,7 +190,7 @@ end
 # widely implemented, a better solution, removing specific container
 # dependencies, will be possible.
 
-"""" 
+""""
     MLJ.matrix(X)
 
 Convert an iteratable table source `X` into an `Matrix`; or, if `X` is
@@ -205,7 +205,7 @@ function matrix(X)
         @collect DataFrame
     end
     return convert(Matrix, df)
-    
+
 end
 matrix(X::Matrix) = X
 
@@ -275,7 +275,7 @@ function UnsupervisedTask(
     , ignore=Symbol[]
     , operation=predict
     , properties=())
-    
+
     data != nothing         || throw(error("You must specify data=..."))
 
     return SupervisedTask(data, ignore, operation, properties)
@@ -295,7 +295,7 @@ function SupervisedTask(
     , ignore=Symbol[]
     , operation=predict
     , properties=())
-    
+
     data != nothing         || throw(error("You must specify data=..."))
     target != nothing       || throw(error("You must specify target=..."))
     target in names(data)   || throw(error("Supplied data does not have $target as field."))
@@ -328,7 +328,7 @@ X_and_y(task::SupervisedTask) = (task.data[Cols, features(task)],
 include("datasets.jl")
 
 
-## MODEL INTERFACE 
+## MODEL INTERFACE
 
 # every model interface must implement this method, used to generate
 # fit-results:
@@ -359,7 +359,7 @@ function evaluate end
 # supervised model interfaces buying into introspection should
 # implement the following "metadata" methods, dispatched on model
 # *type* (see `Properties` below):
-function operations end 
+function operations end
 function inputs_can_be end
 function outputs_are end
 function properties end
@@ -386,7 +386,7 @@ end
 
 ## LOAD VARIOUS INTERFACE COMPONENTS
 
-include("trainable_models.jl") 
+include("trainable_models.jl")
 include("networks.jl")
 include("operations.jl")
 include("parameters.jl")
@@ -402,7 +402,7 @@ include("builtins/KNN.jl")
 
 # note: presently an MLJ interface to a package, eg `DecisionTree`,
 # is not loaded by `using MLJ` alone; one must additionally call
-# `import DecisionTree`. 
+# `import DecisionTree`.
 
 # files containing a pkg interface must have same name as pkg plus ".jl"
 
@@ -428,6 +428,5 @@ function __init__()
 end
 
 @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=false
-
+@load_interface XGBoost "009559a3-9522-5dbb-924b-0b6ed2b22bb9" lazy=false
 end # module
-
