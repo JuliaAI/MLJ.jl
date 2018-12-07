@@ -431,5 +431,5 @@ function __init__()
 end
 
 @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=false
-@load_interface XGBoost "009559a3-9522-5dbb-924b-0b6ed2b22bb9" lazy=false
+#@load_interface XGBoost "009559a3-9522-5dbb-924b-0b6ed2b22bb9" lazy=false
 end # module
