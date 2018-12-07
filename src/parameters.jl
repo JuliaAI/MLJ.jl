@@ -8,6 +8,8 @@ struct Params
     Params(args::Pair...) = new(args)
 end
 
+Base.isempty(p::Params) = isempty(p.pairs)
+
 ==(pairs1::Params, pairs2::Params) = pairs1.pairs == pairs2.pairs
 
 function Base.show(stream::IO, pairs::Params)

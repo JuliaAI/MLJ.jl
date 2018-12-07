@@ -12,14 +12,13 @@ end
 
 mutable struct Holdout <: ResamplingStrategy
     fraction_train::Float64
-    metric
-    function Holdout(fraction_train, metric)
+    function Holdout(fraction_train)
         0 < fraction_train && fraction_train < 1 ||
             error("fraction_train must be between 0 and 1.")
-        return new(fraction_train, metric)
+        return new(fraction_train)
     end
 end
-Holdout(; fraction_train=0.7, metric=rms) = Holdout(fraction_train, metric)
+Holdout(; fraction_train=0.7) = Holdout(fraction_train)
 
 mutable struct CV <: ResamplingStrategy
     n_folds::Int
@@ -29,9 +28,10 @@ CV(; n_folds=6) = CV(n_folds)
 mutable struct Resampler{S,M<:Supervised} <: Model
     model::M
     strategy::S
+    metric
 end
-Resampler(;model=ConstantRegressor(), strategy=Holdout()) =
-    Resampler(model, strategy) 
+Resampler(;model=ConstantRegressor(), strategy=Holdout(), metric=rms) =
+    Resampler(model, strategy, metric) 
 
 function fit(resampler::Resampler{Holdout}, verbosity, X, y)
 
@@ -40,12 +40,13 @@ function fit(resampler::Resampler{Holdout}, verbosity, X, y)
     train, test = partition(eachindex(y), resampler.strategy.fraction_train)
     fit!(trainable_model, rows=train, verbosity=verbosity-1)
     yhat = predict(trainable_model, X[Rows, test])    
-    fitresult = resampler.strategy.metric(y[test], yhat)
+    fitresult = resampler.metric(y[test], yhat)
 
     # remember model and strategy for calls to update
     cache = (trainable_model,
              deepcopy(resampler.model),
              deepcopy(resampler.strategy),
+             resampler.metric,
              test)
     report = nothing
 
@@ -55,11 +56,12 @@ end
 
 function update(resampler::Resampler{Holdout}, verbosity, fitresult, cache, X, y)
 
-    trainable_model, oldmodel, oldstrategy, oldtest = cache
+    trainable_model, oldmodel, oldstrategy, oldmetric, oldtest = cache
 
-    if resampler.strategy == oldstrategy && resampler.model == oldmodel
+    if resampler.strategy == oldstrategy && resampler.model == oldmodel &&
+        resampler.metric == oldmetric
         return fitresult, cache, nothing
-    elseif resampler.strategy != oldstrategy
+    elseif resampler.strategy != oldstrategy 
         train, test = partition(eachindex(y), resampler.strategy.fraction_train)
         fit!(trainable_model, rows=train, verbosity=verbosity-1)
     elseif resampler.model != oldmodel
@@ -67,11 +69,12 @@ function update(resampler::Resampler{Holdout}, verbosity, fitresult, cache, X, y
         test = oldtest
     end
     yhat = predict(trainable_model, X[Rows, test])    
-    fitresult = resampler.strategy.metric(y[test], yhat)
+    fitresult = resampler.metric(y[test], yhat)
 
     cache = (trainable_model,
              deepcopy(resampler.model),
              deepcopy(resampler.strategy),
+             resampler.metric,
              test)
     
     report = nothing    
@@ -81,8 +84,6 @@ function update(resampler::Resampler{Holdout}, verbosity, fitresult, cache, X, y
 end
 
 evaluate(model::Resampler{Holdout}, fitresult) = fitresult
-
-             
 
 
 
@@ -98,7 +99,7 @@ evaluate(model::Resampler{Holdout}, fitresult) = fitresult
 #     train, test = partition(rows, strategy.fraction_train)
 #     fit!(trainable_model, rows=train)
 #     yhat = predict(trainable_model, X[Rows, test])
-#     return metric(y, yhat)
+#     return metric(y[test], yhat)
 # end
 
 # # universal keyword version:
