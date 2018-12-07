@@ -1,9 +1,11 @@
 # note: this file defines *and* imports one module; see end
+
 module Transformers
 
 export FeatureSelector
 export ToIntTransformer
 export UnivariateStandardizer, Standardizer
+export UnivariateBoxCoxTransformer
 
 import MLJ: CanWeightTarget, CanRankFeatures
 import MLJ: Nominal, Numeric, NA, Probababilistic, Multivariate,  Multiclass
@@ -16,7 +18,6 @@ using Tables
 
 # to be extended:
 import MLJ: fit, transform, inverse_transform, properties, operations, inputs_can_be
-
 
 
 ## CONSTANTS
@@ -283,6 +284,123 @@ function transform(transformer::Standardizer, fitresult, X)
     return Xnew
 
 end    
+
+## UNIVARIATE BOX-COX TRANSFORMATIONS
+
+function standardize(v)
+    map(v) do x
+        (x - mean(v))/std(v)
+    end
+end
+                   
+function midpoints(v::AbstractVector{T}) where T <: Real
+    return [0.5*(v[i] + v[i + 1]) for i in 1:(length(v) -1)]
+end
+
+function normality(v)
+
+    n  = length(v)
+    v = standardize(convert(Vector{Float64}, v))
+
+    # sort and replace with midpoints
+    v = midpoints(sort!(v))
+
+    # find the (approximate) expected value of the size (n-1)-ordered statistics for
+    # standard normal:
+    d = Distributions.Normal(0,1)
+    w= map(collect(1:(n-1))/n) do x
+        quantile(d, x)
+    end
+
+    return cor(v, w)
+
+end
+
+function boxcox(lambda, c, x::Real) 
+    c + x >= 0 || throw(DomainError)
+    if lambda == 0.0
+        c + x > 0 || throw(DomainError)
+        return log(c + x)
+    end
+    return ((c + x)^lambda - 1)/lambda
+end
+
+boxcox(lambda, c, v::AbstractVector{T}) where T <: Real =
+    [boxcox(lambda, c, x) for x in v]    
+
+
+"""
+    UnivariateBoxCoxTransformer(; n=171, shift=false)
+
+Construct a `Unsupervised` model specifying a univariate Box-Cox
+transformation of a single variable taking non-negative values, with a
+possible preliminary shift. Such a transformation is of the form
+
+    x -> ((x + c)^λ - 1)/λ for λ not 0
+    x -> log(x + c) for λ = 0
+
+On fitting to data `n` different values of the Box-Cox
+exponent λ (between `-0.4` and `3`) are searched to fix the value
+maximizing normality. If `shift=true` and zero values are encountered
+in the data then the transformation sought includes a preliminary
+positive shift by `0.2` times the data mean. If there are no zero
+values, then no shift is applied.
+
+See also `BoxCoxEstimator` a transformer for selected ordinals in a
+an iterable table.
+
+"""
+mutable struct UnivariateBoxCoxTransformer <: Unsupervised
+    n::Int      # nbr values tried in optimizing exponent lambda
+    shift::Bool # whether to shift data away from zero
+end
+
+# lazy keyword constructor:
+UnivariateBoxCoxTransformer(; n=171, shift=false) = UnivariateBoxCoxTransformer(n, shift)
+
+function fit(transformer::UnivariateBoxCoxTransformer, verbosity, v::AbstractVector{T}) where T <: Real 
+
+    m = minimum(v)
+    m >= 0 || error("Cannot perform a Box-Cox transformation on negative data.")
+
+    c = 0.0 # default
+    if transformer.shift
+        if m == 0
+            c = 0.2*mean(v)
+        end
+    else
+        m != 0 || error("Zero value encountered in data being Box-Cox transformed.\n"*
+                        "Consider calling `fit!` with `shift=true`.")
+    end
+  
+    lambdas = range(-0.4, stop=3, length=transformer.n)
+    scores = Float64[normality(boxcox(l, c, v)) for l in lambdas]
+    lambda = lambdas[argmax(scores)]
+
+    return  (lambda, c), nothing, nothing
+
+end
+
+# for X scalar or vector:
+transform(transformer::UnivariateBoxCoxTransformer, fitresult, X) =
+    boxcox(fitresult..., X)
+
+# scalar case:
+function inverse_transform(transformer::UnivariateBoxCoxTransformer,
+                           fitresult, x::Real)
+    lambda, c = fitresult
+    if lambda == 0
+        return exp(x) - c
+    else
+        return (lambda*x + 1)^(1/lambda) - c
+    end
+end
+
+# vector case:
+function inverse_transform(transformer::UnivariateBoxCoxTransformer,
+                           fitresult, w::AbstractVector{T}) where T <: Real
+    return [inverse_transform(transformer, fitresult, y) for y in w]
+end
 
 end # end module
 

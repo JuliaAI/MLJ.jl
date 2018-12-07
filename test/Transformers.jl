@@ -56,4 +56,16 @@ fitresult, cache, report = MLJ.fit(stand, 1, X)
 @test fitresult.features[fitresult.is_transformed] == [:GrLivArea]
 transform(stand, fitresult, X)
 
+# `UnivariateBoxCoxTransformer`
+
+# create skewed non-negative vector with a zero value:
+v = abs.(randn(1000))
+v = v .- minimum(v)
+MLJ.Transformers.normality(v)
+
+t = UnivariateBoxCoxTransformer(shift=true)
+fitresult, cache, report = MLJ.fit(t, 2, v)
+@test sum(abs.(v - MLJ.inverse_transform(t, fitresult, MLJ.transform(t, fitresult, v)))) <= 5000*eps()
+
 end
+true

@@ -18,24 +18,25 @@ import MLJ
 import MLJ: CanWeightTarget, CanRankFeatures
 import MLJ: Nominal, Numeric, NA, Probababilistic, Multivariate,  Multiclass
 
+#> for all classifiers:
+using CategoricalArrays
+
 #> import package:
 import DecisionTree                
 
-#> The DecisionTreeClassifier model type declared below is a
-#> parameterized type (not necessary for models in general). This is
-#> because the classifier built by DecisionTree.jl has a fit-result
-#> type that depends on the target type, here denoted `T` (and the
-#> fit-result type of a supervised model must be declared).
+# TODO: replace Float64 with type parameter
 
 DecisionTreeClassifierFitResultType{T} =
-    Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}}
+    Tuple{Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}}, MLJ.CategoricalDecoder{UInt32,T,1,UInt32}}
 
 """
+    DecisionTreeClassifer(; kwargs...)
+
 [https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md](https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md)
 
 """
 mutable struct DecisionTreeClassifier{T} <: MLJ.Supervised{DecisionTreeClassifierFitResultType{T}}
-    target_type::Type{T}
+    target_type::Type{T}  # target is CategoricalArray{target_type}
     pruning_purity::Float64 
     max_depth::Int
     min_samples_leaf::Int
@@ -98,31 +99,30 @@ end
 #> A required `fit` method returns `fitresult, cache, report`. (Return
 #> `cache=nothing` unless you are overloading `update`)
 function MLJ.fit(model::DecisionTreeClassifier{T2}
-             , verbosity            #> must be here even if unsupported in pkg (as here)
+             , verbosity   #> must be here even if unsupported in pkg (as here)
              , X::Matrix{Float64}
-             , y::Vector{T}) where {T,T2}
+             , y::CategoricalVector{T}) where {T,T2}
 
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
 
+    decoder = MLJ.CategoricalDecoder(y)
+    y_plain = MLJ.transform(decoder, y)
     
-    
-    
-    
-    fitresult = DecisionTree.build_tree(y
-                                        , X
-                                        , model.n_subfeatures
-                                        , model.max_depth
-                                        , model.min_samples_leaf
-                                        , model.min_samples_split
-                                        , model.min_purity_increase)
-
-
+    tree = DecisionTree.build_tree(y_plain
+                                   , X
+                                   , model.n_subfeatures
+                                   , model.max_depth
+                                   , model.min_samples_leaf
+                                   , model.min_samples_split
+                                   , model.min_purity_increase)
     if model.post_prune 
-        fitresult = DecisionTree.prune_tree(fitresult, model.merge_purity_threshold)
+        tree = DecisionTree.prune_tree(tree, model.merge_purity_threshold)
     end
     
-    verbosity < 2 || DecisionTree.print_tree(fitresult, model.display_depth)
+    verbosity < 3 || DecisionTree.print_tree(tree, model.display_depth)
+
+    fitresult = (tree, decoder)
 
     #> return package-specific statistics (eg, feature rankings,
     #> internal estimates of generalization error) in `report`, which
@@ -136,13 +136,14 @@ function MLJ.fit(model::DecisionTreeClassifier{T2}
 end
 
 #> method to coerce generic data into form required by fit:
-MLJ.coerce(model::DecisionTreeClassifier, X) = (MLJ.array(X),)
-MLJ.coerce_training(model::DecisionTreeClassifier, X, y) = (MLJ.array(X), [y...]) 
+MLJ.coerce(model::DecisionTreeClassifier, Xtable) = MLJ.matrix(Xtable)
 
-MLJ.predict(model::DecisionTreeClassifier 
-        , fitresult
-        , Xnew) = 
-            DecisionTree.apply_tree(fitresult, Xnew)
+function MLJ.predict(model::DecisionTreeClassifier{T} 
+                     , fitresult
+                     , Xnew) where T
+    tree, decoder = fitresult
+    return MLJ.inverse_transform(decoder, DecisionTree.apply_tree(tree, Xnew))
+end
 
 # metadata:           
 MLJ.properties(::Type{DecisionTreeClassifier}) = ()

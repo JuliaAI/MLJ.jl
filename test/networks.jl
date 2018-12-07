@@ -3,12 +3,13 @@ module TestLearningNetworks
 # using Revise
 using Test
 using MLJ
+using CategoricalArrays
 
 
 # TRAINABLE MODELS
 
 X_frame, y = datanow();  # boston data
-X = array(X_frame)
+X = matrix(X_frame)
 
 knn_ = KNNRegressor(K=7)
 
@@ -62,7 +63,7 @@ scale = trainable(scale_, XX) # no need to fit
 Xt = transform(scale, XX)
 
 # convert DataFrame Xt to an array:
-Xa = array(Xt)
+Xa = matrix(Xt)
 
 # choose a learner and make it trainable:
 knn_ = KNNRegressor(K=7) # just a container for hyperparameters
@@ -75,7 +76,7 @@ zhat = predict(knn, Xa)
 yhat = inverse_transform(uscale, zhat)
 
 # fit-through training:
-fit!(yhat, rows=1:100, verbosity=2)
+fit!(yhat, rows=1:50, verbosity=2)
 fit!(yhat, rows=:, verbosity=2) # will retrain 
 fit!(yhat, verbosity=2) # will not retrain; nothing changed
 knn_.K =4
@@ -97,16 +98,17 @@ mutable struct WetSupervised{L<:Supervised,
     transformer_y::Ty
 end
 
-import DecisionTree
+# import DecisionTree
 
-tree_ = DecisionTreeClassifier(target_type=Int)
+knn_ = KNNRegressor(K=4)
 selector_ = FeatureSelector()
-encoder_ = ToIntTransformer()
+encoder_ = UnivariateBoxCoxTransformer()
 
-composite = WetSupervised(tree_, selector_, encoder_)
+composite = WetSupervised(knn_, selector_, encoder_)
 
-Xin, yin = X_and_y(load_iris());
+Xin, yin = datanow(); # boston
 train, test = partition(eachindex(yin), 0.7);
+true
 Xtrain = Xin[train,:];
 ytrain = yin[train];
 
@@ -149,26 +151,26 @@ fitresult, cache, report = fit(composite, 3, Xtrain, ytrain)
 
 # to check internals:
 encoder = fitresult.trainable
-tree = fitresult.args[1].trainable
+knn = fitresult.args[1].trainable
 selector = fitresult.args[1].trainable
 
 # this should trigger no retraining:
-fitresult, cache, report = update(composite, 3, fitresult, cache, Xtrain, ytrain)
+fitresult, cache, report = update(composite, 3, fitresult, cache, Xtrain, ytrain);
 
-# this should trigger retraining of encoder and tree
-encoder_.initial_label = 14
-fitresult, cache, report = update(composite, 3, fitresult, cache, Xtrain, ytrain)
+# this should trigger retraining of encoder and knn
+encoder_.n = 14
+fitresult, cache, report = update(composite, 3, fitresult, cache, Xtrain, ytrain);
 
-# this should trigger retraining of selector and tree:
-selector_.features = [:petal_length, :petal_width] 
+# this should trigger retraining of selector and knn:
+selector_.features = [:Crim, :Rm] 
 fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
 
-# this should trigger retraining of tree only:
-tree_.max_depth = 2
+# this should trigger retraining of knn only:
+knn_.K = 3
 fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
 
 # this should trigger retraining of all parts:
-encoder_.initial_label = 43
+encoder_.n = 19
 selector_.features = []
 fitresult, cache, report = update(composite, 2, fitresult, cache, Xtrain, ytrain)
 
@@ -178,10 +180,11 @@ XXX = source(Xin[train,:])
 yyy = source(yin[train])
 
 composite_ = trainable(composite, XXX, yyy)
-yhat = predict(composite_, XX)
+yhat = predict(composite_, XXX)
 fit!(yhat, verbosity=3)
-composite.transformer_X.features = [:petal_length]
+composite.transformer_X.features = [:NOx, :Zn]
 fit!(yhat, verbosity=3)
 yhat(Xin[test,:])
 
 end
+true

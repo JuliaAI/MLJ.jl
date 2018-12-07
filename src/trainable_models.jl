@@ -1,6 +1,6 @@
-abstract type AbstractTrainableModel <: MLJType end
+abstract type AbstractTrainableModel{M} <: MLJType end
 
-mutable struct TrainableModel{M<:Model} <: AbstractTrainableModel
+mutable struct TrainableModel{M<:Model} <: AbstractTrainableModel{M}
 
     model::M
     fitresult
@@ -20,7 +20,15 @@ mutable struct TrainableModel{M<:Model} <: AbstractTrainableModel
                         "Use NodalTrainableModel(model, X) for an unsupervised learner model."))
         
         trainable_model = new{M}(model)
-        trainable_model.args = coerce_training(model, args...)
+
+        if M <: Supervised
+            X = coerce(model, args[1])
+            y = args[2]
+            trainable_model.args = (X, y)
+        else
+            trainable_model.args = args
+        end
+        
         trainable_model.report = Dict{Symbol,Any}()
 
         return trainable_model
@@ -32,13 +40,17 @@ end
 TrainableModel(model::M, args...) where M<:Model = TrainableModel{M}(model, args...)
 
 # constructor for tasks instead of bare data:
-TrainableModel(model::Model, task::SupervisedTask) = TrainableModel(model, X_and_y(task)...)
-TrainableModel(model::Model, task::UnsupervisedTask) = TrainableModel(model, task.data)
+# TrainableModel(model::Model, task::SupervisedTask) = TrainableModel(model, X_and_y(task)...)
+# TrainableModel(model::Model, task::UnsupervisedTask) = TrainableModel(model, task.data)
 
 
 function fit!(trainable_model::TrainableModel; rows=nothing, verbosity=1)
 
-    verbosity < 1 || @info "Training $trainable_model whose model is $(trainable_model.model)."
+    warning = clean!(trainable_model.model)
+    isempty(warning) || verbosity < 0 || @warn warning 
+    
+#    verbosity < 1 || @info "Training $trainable_model whose model is $(trainable_model.model)."
+    verbosity < 1 || @info "Training $trainable_model."
 
     if !isdefined(trainable_model, :fitresult)
         if rows == nothing

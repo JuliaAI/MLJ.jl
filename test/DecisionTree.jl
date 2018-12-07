@@ -12,7 +12,7 @@ X_array = convert(Array{Float64}, X);
  
 import DecisionTree
 import CategoricalArrays
-baretree = DecisionTreeClassifier(target_type=CategoricalArrays.CategoricalString{UInt32})
+baretree = DecisionTreeClassifier(target_type=String)
 
 # split the rows:
 allrows = eachindex(y)
@@ -31,7 +31,7 @@ yhat = predict(baretree, fitresult, X_array);
 # but pruning upsets this:
 baretree.post_prune = true
 baretree.merge_purity_threshold=0.1
-fitresult, cache, report = MLJ.update(baretree, 1, fitresult, cache, X_array, y)
+fitresult, cache, report = MLJ.update(baretree, 2, fitresult, cache, X_array, y)
 yhat = predict(baretree, fitresult, X_array);
 @test yhat != y
 
@@ -43,3 +43,4 @@ fit!(tree)
 predict(tree, X[1:3,:])
 
 end
+true

@@ -20,11 +20,15 @@ end
 function load_iris()
     df = CSV.read(joinpath(datadir, "iris.csv"),
                   categorical=true, allowmissing=:none)
-    df[:target] = [df[:target]...] # change CategoricalArray to Array, keeping categ eltype
+    # TODO: fix things so that next line can be deleted
+#    df[:target] = [df[:target]...] # change CategoricalArray to Array, keeping categ eltype
     return SupervisedTask(data=df, target=:target, properties=())
 end
 
 """Get some supervised data now!!"""
-datanow() =  X_and_y(load_boston())
+function datanow()
+    X, y = X_and_y(load_boston())
+    return X[1:75,:], y[1:75]
+end
 
 
