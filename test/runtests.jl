@@ -61,3 +61,6 @@ end
   @test include("trainable_models.jl")
 end
 
+@testset "XGBoost" begin
+  @test include("XGBoost.jl")
+end
