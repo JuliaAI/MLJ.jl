@@ -45,6 +45,10 @@ end
   @test include("parameters.jl")
 end
 
+@testset "resampling" begin
+    @test include("resampling.jl")
+end
+
 @testset "networks" begin
   @test include("networks.jl")
 end

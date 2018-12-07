@@ -17,6 +17,7 @@ export partition, @curve, @pcurve                    # "utilities.jl"
 export @more, @constant                              # "show.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
+export Holdout, CV, Resampler                        # "resampling.jl"
 export Params, get_params, set_params!, ParamRange   # "parameters.jl"
 export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
 export KNNRegressor                                  # "builtins/KNN.jl":
@@ -88,8 +89,7 @@ abstract type Task <: MLJType end
 abstract type Property end # subtypes are the allowable model properties
 
 
-
-## LOSS FUNCTIONS
+## METRICS
 
 include("metrics.jl")
 
@@ -235,6 +235,7 @@ nrows(A::AbstractMatrix) = size(A, 1)
 Base.getindex(v::AbstractVector, ::Type{Rows}, r) = v[r]
 Base.getindex(v::CategoricalArrays.CategoricalArray{T,1,S} where {T,S}, ::Type{Rows}, r) = @inbounds v[r]
 nrows(v::AbstractVector) = length(v)
+
 
 ## MODEL METADATA
 
@@ -389,7 +390,9 @@ end
 include("trainable_models.jl") 
 include("networks.jl")
 include("operations.jl")
+include("resampling.jl")
 include("parameters.jl")
+
 
 ## LOAD BUILT-IN MODELS
 
