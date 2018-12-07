@@ -354,6 +354,8 @@ version = "0.5.3"
 
 [[XGBoost]]
 deps = ["BinDeps", "Libdl", "Printf", "Random", "SparseArrays", "Statistics", "Test"]
-git-tree-sha1 = "ccb9d103450a66f0fe0f32d6ce8a383a4ed14d38"
+git-tree-sha1 = "f3f543992034dee07d15fec650a6c7afd2808f8d"
+repo-rev = "master"
+repo-url = "https://github.com/dmlc/XGBoost.jl"
 uuid = "009559a3-9522-5dbb-924b-0b6ed2b22bb9"
 version = "0.2.0+"
