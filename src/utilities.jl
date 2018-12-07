@@ -39,9 +39,9 @@ end
 """
 ## `@curve`
 
-The code, 
- 
-    @curve var range code 
+The code,
+
+    @curve var range code
 
 evaluates `code`, replacing appearances of `var` therein with each
 value in `range`. The range and corresponding evaluations are returned
@@ -49,7 +49,7 @@ as a tuple of arrays. For example,
 
     @curve  x 1:3 (x^2 + 1)
 
-evaluates to 
+evaluates to
 
     ([1,2,3], [2, 5, 10])
 
@@ -89,7 +89,7 @@ macro curve(var1, range, code)
             local $(esc(var1)) = $(esc(range))[i]
             print((@colon $var1), "=", $(esc(var1)), "                   \r")
             flush(stdout)
-            # print(i,"\r"); flush(stdout) 
+            # print(i,"\r"); flush(stdout)
             push!(output, $(esc(code)))
         end
         collect($(esc(range))), [x for x in output]
@@ -121,10 +121,29 @@ macro pcurve(var1, range, code)
             local $(esc(var1)) = $(esc(range))[i]
 #            print((@colon $var1), "=", $(esc(var1)), "                    \r")
 #            flush(stdout)
-#            print(i,"\r"); flush(stdout) 
+#            print(i,"\r"); flush(stdout)
             [( $(esc(range))[i], $(esc(code)) )]
         end
         sort!(pairs, by=first)
         collect(map(first,pairs)), collect(map(last, pairs))
     end
+end
+
+function readlibsvm(fname::String, shape)
+    dmx = zeros(Float32, shape)
+    label = Float32[]
+    fi = open(fname, "r")
+    cnt = 1
+    for line in eachline(fi)
+        line = split(line, " ")
+        push!(label, parse(Float64, line[1]))
+        line = line[2:end]
+        for itm in line
+            itm = split(itm, ":")
+            dmx[cnt, parse(Int, itm[1]) + 1] = float(parse(Int, itm[2]))
+        end
+        cnt += 1
+    end
+    close(fi)
+    return (dmx, label)
 end
