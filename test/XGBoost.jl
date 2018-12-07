@@ -5,11 +5,11 @@ using Test
 import XGBoost
 
 
-train_X, train_Y = readlibsvm("./data/agaricus.txt.train", (6513, 126))
-test_X, test_Y = readlibsvm("./data/agaricus.txt.test", (1611, 126))
+train_X, train_Y = readlibsvm("../data/agaricus.txt.train", (6513, 126))
+test_X, test_Y = readlibsvm("../data/agaricus.txt.test", (1611, 126))
 
-dtrain = XGBoost.DMatrix("./data/agaricus.txt.train")
-dtest = XGBoost.DMatrix("./data/agaricus.txt.test")
+dtrain = XGBoost.DMatrix("../data/agaricus.txt.train")
+dtest = XGBoost.DMatrix("../data/agaricus.txt.test")
 
 
 
