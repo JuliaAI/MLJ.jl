@@ -354,6 +354,5 @@ version = "0.5.3"
 
 [[XGBoost]]
 deps = ["BinDeps", "Libdl", "Printf", "Random", "SparseArrays", "Statistics", "Test"]
-git-tree-sha1 = "ccb9d103450a66f0fe0f32d6ce8a383a4ed14d38"
 uuid = "009559a3-9522-5dbb-924b-0b6ed2b22bb9"
 version = "0.2.0+"
