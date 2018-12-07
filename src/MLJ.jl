@@ -97,7 +97,7 @@ include("metrics.jl")
 ## DATA INTERFACES
 
 """
-    CategoricalDecoder(X::CategoricalArray; eltype=nothing)
+    CategoricalDecoder(C::CategoricalArray; eltype=nothing)
 
 Construct a decoder for transforming a `CategoricalArray{T}` object
 into an ordinary array, and for re-encoding similar arrays back into a

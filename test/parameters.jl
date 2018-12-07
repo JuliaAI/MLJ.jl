@@ -53,10 +53,53 @@ tree = get_params(super_model)
           :model2 => Params(:K => 6, :metric => 20, :kernel => 'x'))
 
 
-p1 = ParamRange(dummy_model, :K, lower=1, upper=10, transform=exp)
-p2 = ParamRange(dummy_model, :kernel, values=['c', 'd', 'k', 'r'])
-@test typeof(collect(MLJ.iterator(p1, 5))[1])  == Int
-@test collect(MLJ.iterator(p2)) == [p2.values...]
+p1 = ParamRange(dummy_model, :K, lower=1, upper=10, scale=:log10)
+p2 = ParamRange(dummy_model, :kernel, values=['c', 'd'])
+p3 = ParamRange(super_model, :lambda, lower=0.1, upper=1, scale=:log2)
+
+@test MLJ.iterator(p1, 5)  == [1, 2, 3, 6, 10]
+@test MLJ.iterator(p2) == collect(p2.values)
+u = 2^(log2(0.1)/2)
+@test MLJ.iterator(p3, 3) ≈ [0.1, u, 1]
+
+# test unwinding of iterators
+iterators = ([1, 2], ["a","b"], ["x", "y", "z"])
+@test MLJ.unwind(iterators...) ==
+[1  "a"  "x";
+ 2  "a"  "x";
+ 1  "b"  "x";
+ 2  "b"  "x";
+ 1  "a"  "y";
+ 2  "a"  "y";
+ 1  "b"  "y";
+ 2  "b"  "y";
+ 1  "a"  "z";
+ 2  "a"  "z";
+ 1  "b"  "z";
+ 2  "b"  "z"]
+
+# test iterator of a param_space_it
+param_space_its = Params(:lambda => MLJ.iterator(p3, 2),
+                        :model1 => Params(:K => MLJ.iterator(p1, 2),
+                                         :kernel => MLJ.iterator(p2)))
+models = MLJ.iterator(super_model, param_space_its)
+@test map(MLJ.get_params, models) ==
+    [Params(:lambda => 0.1, :model1 => Params(:K => 1, :metric => 9.5, :kernel => 'c'),
+            :model2 => Params(:K => 3, :metric => 9.5, :kernel => 'k')), 
+     Params(:lambda => 1.0, :model1 => Params(:K => 1, :metric => 9.5, :kernel => 'c'),
+            :model2 => Params(:K => 3, :metric => 9.5, :kernel => 'k')), 
+     Params(:lambda => 0.1, :model1 => Params(:K => 10, :metric => 9.5, :kernel => 'c'),
+            :model2 => Params(:K => 3, :metric => 9.5, :kernel => 'k')),
+     Params(:lambda => 1.0, :model1 => Params(:K => 10, :metric => 9.5, :kernel => 'c'),
+            :model2 => Params(:K => 3, :metric => 9.5, :kernel => 'k')),
+     Params(:lambda => 0.1, :model1 => Params(:K => 1, :metric => 9.5, :kernel => 'd'),
+            :model2 => Params(:K => 3, :metric => 9.5, :kernel => 'k')), 
+     Params(:lambda => 1.0, :model1 => Params(:K => 1, :metric => 9.5, :kernel => 'd'),
+            :model2 => Params(:K => 3, :metric => 9.5, :kernel => 'k')), 
+     Params(:lambda => 0.1, :model1 => Params(:K => 10, :metric => 9.5, :kernel => 'd'),
+            :model2 => Params(:K => 3, :metric => 9.5, :kernel => 'k')),
+     Params(:lambda => 1.0, :model1 => Params(:K => 10, :metric => 9.5, :kernel => 'd'),
+            :model2 => Params(:K => 3, :metric => 9.5, :kernel => 'k'))]
 
 end
 true
