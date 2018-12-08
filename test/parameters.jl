@@ -53,14 +53,16 @@ tree = get_params(super_model)
           :model2 => Params(:K => 6, :metric => 20, :kernel => 'x'))
 
 
-p1 = ParamRange(dummy_model, :K, lower=1, upper=10, scale=:log10)
-p2 = ParamRange(dummy_model, :kernel, values=['c', 'd'])
-p3 = ParamRange(super_model, :lambda, lower=0.1, upper=1, scale=:log2)
+p1 = param_range(dummy_model, :K, lower=1, upper=10, scale=:log10)
+p2 = param_range(dummy_model, :kernel, values=['c', 'd'])
+p3 = param_range(super_model, :lambda, lower=0.1, upper=1, scale=:log2)
+p4 = param_range(dummy_model, :K, lower=1, upper=3, scale=x->2x)
 
 @test MLJ.iterator(p1, 5)  == [1, 2, 3, 6, 10]
 @test MLJ.iterator(p2) == collect(p2.values)
 u = 2^(log2(0.1)/2)
 @test MLJ.iterator(p3, 3) ≈ [0.1, u, 1]
+@test MLJ.iterator(p4, 3) == [2, 4, 6]
 
 # test unwinding of iterators
 iterators = ([1, 2], ["a","b"], ["x", "y", "z"])
@@ -78,7 +80,7 @@ iterators = ([1, 2], ["a","b"], ["x", "y", "z"])
  1  "b"  "z";
  2  "b"  "z"]
 
-# test iterator of a param_space_it
+# test iterator of a param_space_its
 param_space_its = Params(:lambda => MLJ.iterator(p3, 2),
                         :model1 => Params(:K => MLJ.iterator(p1, 2),
                                          :kernel => MLJ.iterator(p2)))

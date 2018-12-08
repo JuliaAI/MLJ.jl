@@ -38,7 +38,8 @@ The name of the Julia type associated with a model indicates the
 associated algorithm (e.g., `DecisionTreeClassifier`). The outcome of
 training a learning algorithm is here called a *fit-result*. For a
 linear model, for example, this would be the coefficients and
-intercept.  
+intercept. For a supervised model, it is the information needed to make
+new predictions.
 
 The ultimate supertype of all models is `MLJ.Model`.
 
@@ -129,7 +130,7 @@ tightest common type of elements of `Xtable`, and `Xtable` is any
 iterable table.
 
 In contrast, the target data `y` passed to training will always be a
-`Vector{F}` for some `F<:AbstractFloat` - in the case of regressors - and a
+`Vector{F}` for some `F<:AbstractFloat` - in the case of regressors - or a
 `CategoricalVector` - in the case of classifiers. (At present only
 target `CategoricalVector`s of the default reference type `UInt32` are
 supported.)

@@ -18,7 +18,7 @@ export @more, @constant                              # "show.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
 export Holdout, CV, Resampler                        # "resampling.jl"
-export Params, get_params, set_params!, ParamRange   # "parameters.jl"
+export Params, get_params, set_params!, param_range  # "parameters.jl"
 export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
 export KNNRegressor                                  # "builtins/KNN.jl":
 

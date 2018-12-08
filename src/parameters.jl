@@ -1,6 +1,3 @@
-#abstract type MLJType end
-
-
 ## NESTED PARAMATER INTERFACE
 
 struct Params 
@@ -119,26 +116,49 @@ end
 
 ## PARAMETER RANGES
 
+""" 
+    Scale = SCALE()
+
+Object for dispatching on scales and functions when generating
+parameter ranges. We require different behaviour for scales and
+functions:
+
+     transform(Scale, scale(:log), 100) = 2
+     inverse_transform(Scale, scale(:log), 2) = 100
+
+but
+    transform(Scale, scale(log), 100) = 100       # identity
+    inverse_transform(Scale, scale(log), 100) = 2 
+
+
+See also: param_range
+
+"""
+struct SCALE end
+Scale = SCALE()
+scale(s::Symbol) = Val(s)
+scale(f::Function) = f
+MLJ.transform(::SCALE, ::Val{:linear}, x) = x
+MLJ.inverse_transform(::SCALE, ::Val{:linear}, x) = x
+MLJ.transform(::SCALE, ::Val{:log}, x) = log(x)
+MLJ.inverse_transform(::SCALE, ::Val{:log}, x) = exp(x)
+MLJ.transform(::SCALE, ::Val{:log10}, x) = log10(x) 
+MLJ.inverse_transform(::SCALE, ::Val{:log10}, x) = 10^x
+MLJ.transform(::SCALE, ::Val{:log2}, x) = log2(x) 
+MLJ.inverse_transform(::SCALE, ::Val{:log2}, x) = 2^x
+MLJ.transform(::SCALE, f::Function, x) = x            # not a typo! see param_range code and docs
+MLJ.inverse_transform(::SCALE, f::Function, x) = f(x) # not a typo! see param_range code and docs
+
 abstract type ParamRange <: MLJType end
 
 struct NominalRange{T} <: ParamRange
     values::Tuple{Vararg{T}}
 end
 
-# for dispatching on scales (eg, transform(Val(:log10), 100) = 2):
-MLJ.transform(::Val{:identity}, x) = x
-MLJ.inverse_transform(::Val{:identity}, x) = x
-MLJ.transform(::Val{:log}, x) = log(x)
-MLJ.inverse_transform(::Val{:log}, x) = exp(x)
-MLJ.transform(::Val{:log10}, x) = log10(x) 
-MLJ.inverse_transform(::Val{:log10}, x) = 10^x
-MLJ.transform(::Val{:log2}, x) = log2(x) 
-MLJ.inverse_transform(::Val{:log2}, x) = 2^x
-
-struct NumericRange{T} <: ParamRange
+struct NumericRange{T,D} <: ParamRange
     lower::T
     upper::T
-    scale::Symbol
+    scale::D
 end
 
 """ 
@@ -156,13 +176,35 @@ function get_type(T, field::Symbol)
     return T.types[position]
 end
 
-function ParamRange(model, field::Symbol; values=nothing,
-                    lower=nothing, upper=nothing, scale=:identity)
+"""
+    r = param_range(model, :hyper; values=nothing)
+
+Construct a `NominalRange` object for generating iterators over values
+of the nominal hyper-parameter `model.hyper`. The corresponding
+deterministic iterator `iterator(r)` simply iterates over `values`.
+
+    r= param_range(model, :hyper; upper=nothing, lower=nothing, scale=:linear)
+
+Construct a `NunericRange` object for generating iterators over values
+of the numeric hyper-parameter `model.hyper`. The deterministic
+iterator `iterator(r, n)` iterates over `n` values between `lower` and
+`upper` values, according to the specified `scale`. The supported
+scales are `:linear, :log, :log10, :log2`. Values for `Integer` types
+are rounded (with duplicate values removed).
+
+Alternatively, if a function `f` is provided as `scale`, then
+`iterator(r, n)` iterates over the values `[f(x1), f(x2), ... ,
+f(xn)]`, where `x1, x2, ..., xn` are linearly spaced between `lower`
+and `upper`.
+
+"""
+function param_range(model::MLJType, field::Symbol; values=nothing,
+                    lower=nothing, upper=nothing, scale::D=:linear) where D
     T = get_type(typeof(model), field)
     if T <: Real
         lower !=nothing && upper != nothing ||
             error("You must specify lower=... and upper=... .")
-        return NumericRange{T}(lower, upper, scale)
+        return NumericRange{T,D}(lower, upper, scale)
     else
         values !=nothing || error("You must specify values=... .")
         return NominalRange{T}(Tuple(values))
@@ -175,24 +217,24 @@ end
 iterator(param_range::NominalRange) = collect(param_range.values)
 
 function iterator(param_range::NumericRange{<:Real}, n::Int)
-    scale = Val(param_range.scale) 
-    transformed = range(transform(scale, param_range.lower),
-                stop=transform(scale, param_range.upper),
+    s = scale(param_range.scale) 
+    transformed = range(transform(Scale, s, param_range.lower),
+                stop=transform(Scale, s, param_range.upper),
                 length=n)
     inverse_transformed = map(transformed) do value
-        inverse_transform(scale, value)
+        inverse_transform(Scale, s, value)
     end
     return unique(inverse_transformed)
 end
 
 # in special case of integers, round to nearest integer:
 function iterator(param_range::NumericRange{I}, n::Int) where I<:Integer
-    scale = Val(param_range.scale) 
-    transformed = range(transform(scale, param_range.lower),
-                stop=transform(scale, param_range.upper),
+    s = scale(param_range.scale) 
+    transformed = range(transform(Scale, s, param_range.lower),
+                stop=transform(Scale, s, param_range.upper),
                 length=n)
     inverse_transformed =  map(transformed) do value
-        round(I, inverse_transform(scale, value))
+        round(I, inverse_transform(Scale, s, value))
     end
     return unique(inverse_transformed)
 end
