@@ -147,3 +147,13 @@ function readlibsvm(fname::String, shape)
     close(fi)
     return (dmx, label)
 end
+
+function keys_ordered_by_values(d::Dict{T,S}) where {T, S<:Real}
+
+    items = collect(d) # 1d array containing the (key, value) pairs
+    sort!(items, by=pair->pair[2], alg=QuickSort)
+
+    return T[pair[1] for pair in items]
+
+end
+

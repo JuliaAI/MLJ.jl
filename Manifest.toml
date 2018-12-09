@@ -178,9 +178,9 @@ version = "0.9.6"
 
 [[Parsers]]
 deps = ["Dates", "Mmap", "Test", "WeakRefStrings"]
-git-tree-sha1 = "949ca36d47010bee093254467166487c921d490b"
+git-tree-sha1 = "9c2b96d07344f9f716fee1c4a7258ac327d08a6c"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "0.2.14"
+version = "0.2.15"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
@@ -351,12 +351,3 @@ deps = ["Missings", "Random", "Test"]
 git-tree-sha1 = "1087e8be380f2c8b96434b02bb1150fc1c511135"
 uuid = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
 version = "0.5.3"
-
-#Comment out until fix is found for earlier versions of mac osx?
-#[[XGBoost]]
-#deps = ["BinDeps", "Libdl", "Printf", "Random", "SparseArrays", "Statistics", "Test"]
-#git-tree-sha1 = "f3f543992034dee07d15fec650a6c7afd2808f8d"
-#repo-rev = "master"
-#repo-url = "https://github.com/dmlc/XGBoost.jl"
-#uuid = "009559a3-9522-5dbb-924b-0b6ed2b22bb9"
-#version = "0.2.0+"
