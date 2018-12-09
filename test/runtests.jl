@@ -49,10 +49,6 @@ end
     @test include("resampling.jl")
 end
 
-@testset "networks" begin
-  @test include("networks.jl")
-end
-
 @testset "Transformers" begin
   @test include("Transformers.jl")
 end
@@ -63,6 +59,14 @@ end
 
 @testset "TrainableModels" begin
   @test include("trainable_models.jl")
+end
+
+@testset "networks" begin
+  @test include("networks.jl")
+end
+
+@testset "composites" begin
+  @test include("composites.jl")
 end
 
 @testset "XGBoost" begin

@@ -1,6 +1,3 @@
-## CONSTANTS
-
-
 ## REGISTERING LABELS OF OBJECTS DURING ASSIGNMENT
 
 const handle_given_id = Dict{UInt64,Symbol}()

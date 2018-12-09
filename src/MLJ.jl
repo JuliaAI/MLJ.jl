@@ -17,11 +17,11 @@ export partition, @curve, @pcurve, readlibsvm        # "utilities.jl"
 export @more, @constant                              # "show.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
+export SimpleCompositeRegressor                      # "composites.jl"
 export Holdout, CV, Resampler                        # "resampling.jl"
 export Params, get_params, set_params!, param_range  # "parameters.jl"
 export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
 export KNNRegressor                                  # "builtins/KNN.jl":
-
 
 # defined in include files "trainable_models.jl" and "networks.jl":
 export TrainableModel, NodalTrainableModel, trainable
@@ -59,9 +59,9 @@ using LinearAlgebra
 ## CONSTANTS
 
 const srcdir = dirname(@__FILE__) # the directory containing this file
-const TREE_INDENT = 2 # indentation for tree-based display of learning networks
+# const TREE_INDENT = 2 # indentation for tree-based display of learning networks
 const COLUMN_WIDTH = 24           # for displaying dictionaries with `show`
-const DEFAULT_SHOW_DEPTH = 2      # how deep to display fields of `MLJType` objects
+const DEFAULT_SHOW_DEPTH = 1      # how deep to display fields of `MLJType` objects
 
 
 ## GENERAL PURPOSE UTILITIES
@@ -389,6 +389,7 @@ end
 
 include("trainable_models.jl")
 include("networks.jl")
+include("composites.jl")
 include("operations.jl")
 include("resampling.jl")
 include("parameters.jl")

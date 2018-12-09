@@ -388,14 +388,3 @@ import Base.+
 +(y1::AbstractNode, y2) = node(+, y1, y2)
 
 
-## COMPOSITE MODELS
-
-# When a supervised training network is wrapped as a stand-alone
-# model plus interface, it is called a composite model.
-
-# fall-back for updating supervised composite models:
-function update(model::Supervised{Node}, verbosity, fitresult, cache, args...)
-    fit!(fitresult; verbosity=verbosity)
-    return fitresult, cache, nothing
-end
-

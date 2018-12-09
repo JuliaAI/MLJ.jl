@@ -212,7 +212,7 @@ function param_range(model::MLJType, field::Symbol; values=nothing,
 end
 
 
-## ITERATORS FROM PARAMRANGES
+## ITERATORS FROM A PARAMETER RANGE
 
 iterator(param_range::NominalRange) = collect(param_range.values)
 
@@ -296,23 +296,22 @@ function unwind(iterators...)
     return A
 end
 
-# TODO: Make this a sequential iterator and avoid copying `model`
-# more than once.
-
 """
-    iterator(model::Model, param_space_its::Params)
+    iterator(model::Model, param_iterators::Params)
 
 Object iterating over all models of type `typeof(model)` defined by
-`param_space_its`.  
+`param_iterators`.
 
-Each `name` in the nested `:name => value` pairs of `param_space_its`
+Each `name` in the nested `:name => value` pairs of `param_iterators`
 should be the name of a nested field of `model`; and each element of
-`flat_values(param_space_its)` (which consists of `value`s) should be
+`flat_values(param_iterators)` (which consists of `value`s) should be
 an iterator over values of some nested field of `model`.
 
+See also `iterator` and `param_range`.
+
 """
-function iterator(model::M, param_space_its::Params) where M<:Model
-    iterators = flat_values(param_space_its)
+function iterator(model::M, param_iterators::Params) where M<:Model
+    iterators = flat_values(param_iterators)
     A = unwind(iterators...)
 
     # initialize iterator (vector) to be returned:
@@ -320,7 +319,7 @@ function iterator(model::M, param_space_its::Params) where M<:Model
     it = Vector{M}(undef, L)
 
     for i in 1:L
-        params = copy(param_space_its, Tuple(A[i,:]))
+        params = copy(param_iterators, Tuple(A[i,:]))
         clone = deepcopy(model)
         it[i] = set_params!(clone, params)
     end

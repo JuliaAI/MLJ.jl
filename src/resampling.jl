@@ -28,10 +28,10 @@ CV(; n_folds=6) = CV(n_folds)
 mutable struct Resampler{S,M<:Supervised} <: Model
     model::M
     strategy::S
-    metric
+    measure
 end
-Resampler(;model=ConstantRegressor(), strategy=Holdout(), metric=rms) =
-    Resampler(model, strategy, metric) 
+Resampler(;model=ConstantRegressor(), strategy=Holdout(), measure=rms) =
+    Resampler(model, strategy, measure) 
 
 function fit(resampler::Resampler{Holdout}, verbosity, X, y)
 
@@ -40,13 +40,13 @@ function fit(resampler::Resampler{Holdout}, verbosity, X, y)
     train, test = partition(eachindex(y), resampler.strategy.fraction_train)
     fit!(trainable_model, rows=train, verbosity=verbosity-1)
     yhat = predict(trainable_model, X[Rows, test])    
-    fitresult = resampler.metric(y[test], yhat)
+    fitresult = resampler.measure(y[test], yhat)
 
     # remember model and strategy for calls to update
     cache = (trainable_model,
              deepcopy(resampler.model),
              deepcopy(resampler.strategy),
-             resampler.metric,
+             resampler.measure,
              test)
     report = nothing
 
@@ -56,10 +56,10 @@ end
 
 function update(resampler::Resampler{Holdout}, verbosity, fitresult, cache, X, y)
 
-    trainable_model, oldmodel, oldstrategy, oldmetric, oldtest = cache
+    trainable_model, oldmodel, oldstrategy, oldmeasure, oldtest = cache
 
     if resampler.strategy == oldstrategy && resampler.model == oldmodel &&
-        resampler.metric == oldmetric
+        resampler.measure == oldmeasure
         return fitresult, cache, nothing
     elseif resampler.strategy != oldstrategy 
         train, test = partition(eachindex(y), resampler.strategy.fraction_train)
@@ -69,12 +69,12 @@ function update(resampler::Resampler{Holdout}, verbosity, fitresult, cache, X, y
         test = oldtest
     end
     yhat = predict(trainable_model, X[Rows, test])    
-    fitresult = resampler.metric(y[test], yhat)
+    fitresult = resampler.measure(y[test], yhat)
 
     cache = (trainable_model,
              deepcopy(resampler.model),
              deepcopy(resampler.strategy),
-             resampler.metric,
+             resampler.measure,
              test)
     
     report = nothing    
@@ -91,7 +91,7 @@ evaluate(model::Resampler{Holdout}, fitresult) = fitresult
 ## DIRECT EVALUTATING OF TRAINABLE MODELS
 
 # # holdout evaluation:
-# function evaluate(trainable_model, strategy::Holdout, metric, rows)
+# function evaluate(trainable_model, strategy::Holdout, measure, rows)
 #     X, y = trainable_model.args
 #     if rows == nothing
 #         rows = eachindex(y)
@@ -99,15 +99,15 @@ evaluate(model::Resampler{Holdout}, fitresult) = fitresult
 #     train, test = partition(rows, strategy.fraction_train)
 #     fit!(trainable_model, rows=train)
 #     yhat = predict(trainable_model, X[Rows, test])
-#     return metric(y[test], yhat)
+#     return measure(y[test], yhat)
 # end
 
 # # universal keyword version:
 # evaluate(trainable_model::TrainableModel{<:Supervised};
 #          strategy=Holdout,
-#          metric=rms,
+#          measure=rms,
 #          rows=nothing) =
-#              evaluate(trainable_model, strategy, metric, rows)
+#              evaluate(trainable_model, strategy, measure, rows)
 
 
     
