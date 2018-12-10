@@ -1,6 +1,6 @@
 ## NESTED PARAMATER INTERFACE
 
-struct Params <: MLJ.MLJType
+struct Params
     pairs::Tuple{Vararg{Pair{Symbol}}}
     Params(args::Pair...) = new(args)
 end
@@ -131,7 +131,7 @@ but
     inverse_transform(Scale, scale(log), 100) = 2 
 
 
-See also: param_range
+See also: param_range_pair
 
 """
 struct SCALE end
@@ -146,8 +146,8 @@ MLJ.transform(::SCALE, ::Val{:log10}, x) = log10(x)
 MLJ.inverse_transform(::SCALE, ::Val{:log10}, x) = 10^x
 MLJ.transform(::SCALE, ::Val{:log2}, x) = log2(x) 
 MLJ.inverse_transform(::SCALE, ::Val{:log2}, x) = 2^x
-MLJ.transform(::SCALE, f::Function, x) = x            # not a typo! see param_range code and docs
-MLJ.inverse_transform(::SCALE, f::Function, x) = f(x) # not a typo! see param_range code and docs
+MLJ.transform(::SCALE, f::Function, x) = x            # not a typo!
+MLJ.inverse_transform(::SCALE, f::Function, x) = f(x) # not a typo!
 
 abstract type ParamRange <: MLJType end
 
@@ -177,17 +177,17 @@ function get_type(T, field::Symbol)
 end
 
 """
-    r = param_range(model, :hyper; values=nothing)
+    param_range_pair(model, :hyper; values=nothing)
 
-Construct a `NominalRange` object for generating iterators over values
-of the nominal hyper-parameter `model.hyper`. The corresponding
-deterministic iterator `iterator(r)` simply iterates over `values`.
+For a nominal field `hyper` of `model`, returns a pair `:hyper => r` where `r`
+is a `NominalRange` object.  The corresponding deterministic iterator
+`iterator(r)` simply iterates over `values`.
 
-    r= param_range(model, :hyper; upper=nothing, lower=nothing, scale=:linear)
+    param_range_pair(model, :hyper; upper=nothing, lower=nothing, scale=:linear)
 
-Construct a `NunericRange` object for generating iterators over values
-of the numeric hyper-parameter `model.hyper`. The deterministic
-iterator `iterator(r, n)` iterates over `n` values between `lower` and
+For a nominal field `hyper` of `model`, returns a pair `:hyper => r`
+where `r` is a `NumericRange` object.  The deterministic iterator
+`iterator(r, n)` then iterates over `n` values between `lower` and
 `upper` values, according to the specified `scale`. The supported
 scales are `:linear, :log, :log10, :log2`. Values for `Integer` types
 are rounded (with duplicate values removed).
@@ -198,16 +198,16 @@ f(xn)]`, where `x1, x2, ..., xn` are linearly spaced between `lower`
 and `upper`.
 
 """
-function param_range(model::MLJType, field::Symbol; values=nothing,
+function param_range_pair(model::MLJType, field::Symbol; values=nothing,
                     lower=nothing, upper=nothing, scale::D=:linear) where D
     T = get_type(typeof(model), field)
     if T <: Real
         lower !=nothing && upper != nothing ||
             error("You must specify lower=... and upper=... .")
-        return NumericRange{T,D}(lower, upper, scale)
+        return field => NumericRange{T,D}(lower, upper, scale)
     else
         values !=nothing || error("You must specify values=... .")
-        return NominalRange{T}(Tuple(values))
+        return field => NominalRange{T}(Tuple(values))
     end
 end
 

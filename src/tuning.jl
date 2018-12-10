@@ -106,6 +106,6 @@ function MLJ.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) where M
     
 end
 
-MLJ.predict(tuned_model::TunedModel, fitresult, Xnew) = predict(tuned_model.model, fitresult, Xnew)
+MLJ.predict(tuned_model::TunedModel, fitresult, Xnew) = predict(fitresult, Xnew)
 MLJ.best(model::TunedModel, fitresult) = fitresult.model
     

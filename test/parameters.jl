@@ -53,10 +53,10 @@ tree = get_params(super_model)
           :model2 => Params(:K => 6, :metric => 20, :kernel => 'x'))
 
 
-p1 = param_range(dummy_model, :K, lower=1, upper=10, scale=:log10)
-p2 = param_range(dummy_model, :kernel, values=['c', 'd'])
-p3 = param_range(super_model, :lambda, lower=0.1, upper=1, scale=:log2)
-p4 = param_range(dummy_model, :K, lower=1, upper=3, scale=x->2x)
+p1 = param_range_pair(dummy_model, :K, lower=1, upper=10, scale=:log10) |> last
+p2 = param_range_pair(dummy_model, :kernel, values=['c', 'd']) |> last
+p3 = param_range_pair(super_model, :lambda, lower=0.1, upper=1, scale=:log2) |> last
+p4 = param_range_pair(dummy_model, :K, lower=1, upper=3, scale=x->2x) |> last
 
 @test MLJ.iterator(p1, 5)  == [1, 2, 3, 6, 10]
 @test MLJ.iterator(p2) == collect(p2.values)

@@ -53,8 +53,6 @@ end
 evaluate(model::Resampler{Holdout}, fitresult) = fitresult
 
 
-
-
 ## DIRECT EVALUTATING OF TRAINABLE MODELS
 
 # # holdout evaluation:

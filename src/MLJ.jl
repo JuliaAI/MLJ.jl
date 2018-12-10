@@ -19,7 +19,8 @@ export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
 export SimpleCompositeRegressor                      # "composites.jl"
 export Holdout, CV, Resampler                        # "resampling.jl"
-export Params, get_params, set_params!, param_range  # "parameters.jl"
+export Params, get_params, set_params!               # "parameters.jl"
+export param_range_pair                              # "parameters.jl"
 export Grid, TunedModel                              # "tuning.jl"
 export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
 export KNNRegressor                                  # "builtins/KNN.jl":
