@@ -33,7 +33,7 @@ tuned_model = TunedModel(model=composite, tuning=grid, resampling=holdout,
 # tuned_model = TunedModel(model=ridge, tuning=grid, resampling=holdout,
 #                          param_ranges=Params(:lambda=>param_range_pair(ridge,:lambda,lower=0.05,upper=0.1)))
 
-tuned_modelT = trainable(tuned_model, X, y)
+tuned_modelT = machine(tuned_model, X, y)
 
 fit!(tuned_modelT)
 b = best(tuned_modelT)

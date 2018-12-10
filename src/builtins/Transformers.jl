@@ -201,7 +201,7 @@ inverse_transform(transformer::UnivariateStandardizer, fitresult, w) =
 
 # TODO: reimplement in simpler, safer way: fitresult is two vectors:
 # one of features that are transformed, one of corresponding
-# univariate trainable models. Make data container agnostic.
+# univariate machines. Make data container agnostic.
 
 """ Standardizes the columns of eltype <: AbstractFloat unless non-empty `features` specfied."""
 mutable struct Standardizer <: Unsupervised

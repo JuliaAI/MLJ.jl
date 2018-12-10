@@ -21,7 +21,7 @@ y = A*coefficients
 # standardization of target:
 ridge = RidgeRegressor(lambda=0.0)
 
-ridgeM = trainable(ridge, Xtable, y)
+ridgeM = machine(ridge, Xtable, y)
 fit!(ridgeM)
 
 # Training error:
@@ -42,8 +42,8 @@ train, test = partition(eachindex(y), 0.7); # 70:30 split
 # Instantiate a model:
 ridge = RidgeRegressor(lambda=0.1)
 
-# Build a trainable model:
-ridgeM = trainable(ridge, Xtable, y)
+# Build a machine:
+ridgeM = machine(ridge, Xtable, y)
 
 fit!(ridgeM, rows=train)
 

@@ -24,7 +24,7 @@ ytrain = y[train]
 Xs = source(Xtrain)
 ys = source(ytrain)
 
-knn1 = trainable(knn_, Xs, ys)
+knn1 = machine(knn_, Xs, ys)
 fit!(knn1, verbosity=3)
 knn_.K = 5
 fit!(knn1, rows=train[1:end-10], verbosity=2)
@@ -50,14 +50,14 @@ yy = source(y[train])
 
 # construct a transformer to standardize the target:
 uscale_ = UnivariateStandardizer()
-uscale = trainable(uscale_, yy)
+uscale = machine(uscale_, yy)
 
 # get the transformed inputs, as if `uscale` were already fit:
 z = transform(uscale, yy)
 
 # construct a transformer to standardize the inputs:
 scale_ = Standardizer() 
-scale = trainable(scale_, XX) # no need to fit
+scale = machine(scale_, XX) # no need to fit
 
 # get the transformed inputs, as if `scale` were already fit:
 Xt = transform(scale, XX)
@@ -65,9 +65,9 @@ Xt = transform(scale, XX)
 # convert DataFrame Xt to an array:
 Xa = matrix(Xt)
 
-# choose a learner and make it trainable:
+# choose a learner and make it machine:
 knn_ = KNNRegressor(K=7) # just a container for hyperparameters
-knn = trainable(knn_, Xa, z) # no need to fit
+knn = machine(knn_, Xa, z) # no need to fit
 
 # get the predictions, as if `knn` already fit:
 zhat = predict(knn, Xa)

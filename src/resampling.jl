@@ -35,11 +35,11 @@ Resampler(;model=ConstantRegressor(), tuning=Holdout(), measure=rms) =
 
 function fit(resampler::Resampler{Holdout}, verbosity, X, y)
 
-    trainable_model = trainable(resampler.model, X, y)
+    mach = machine(resampler.model, X, y)
 
     train, test = partition(eachindex(y), resampler.tuning.fraction_train)
-    fit!(trainable_model, rows=train, verbosity=verbosity-1)
-    yhat = predict(trainable_model, X[Rows, test])    
+    fit!(mach, rows=train, verbosity=verbosity-1)
+    yhat = predict(mach, X[Rows, test])    
     fitresult = resampler.measure(y[test], yhat)
 
     # remember model and tuning stragegy for calls to update
@@ -56,23 +56,23 @@ evaluate(model::Resampler{Holdout}, fitresult) = fitresult
 ## DIRECT EVALUTATING OF TRAINABLE MODELS
 
 # # holdout evaluation:
-# function evaluate(trainable_model, tuning::Holdout, measure, rows)
-#     X, y = trainable_model.args
+# function evaluate(mach, tuning::Holdout, measure, rows)
+#     X, y = mach.args
 #     if rows == nothing
 #         rows = eachindex(y)
 #     end
 #     train, test = partition(rows, tuning.fraction_train)
-#     fit!(trainable_model, rows=train)
-#     yhat = predict(trainable_model, X[Rows, test])
+#     fit!(mach, rows=train)
+#     yhat = predict(mach, X[Rows, test])
 #     return measure(y[test], yhat)
 # end
 
 # # universal keyword version:
-# evaluate(trainable_model::TrainableModel{<:Supervised};
+# evaluate(mach::Machine{<:Supervised};
 #          tuning=Holdout,
 #          measure=rms,
 #          rows=nothing) =
-#              evaluate(trainable_model, tuning, measure, rows)
+#              evaluate(mach, tuning, measure, rows)
 
 
     

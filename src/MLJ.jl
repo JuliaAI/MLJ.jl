@@ -25,8 +25,8 @@ export Grid, TunedModel                              # "tuning.jl"
 export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
 export KNNRegressor                                  # "builtins/KNN.jl":
 
-# defined in include files "trainable_models.jl" and "networks.jl":
-export TrainableModel, NodalTrainableModel, trainable
+# defined in include files "machines.jl" and "networks.jl":
+export Machine, NodalMachine, machine
 export source, node, fit!, freeze!, thaw!
 
 
@@ -390,7 +390,7 @@ end
 
 ## LOAD VARIOUS INTERFACE COMPONENTS
 
-include("trainable_models.jl")
+include("machines.jl")
 include("networks.jl")
 include("composites.jl")
 include("operations.jl")

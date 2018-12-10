@@ -35,10 +35,10 @@ fitresult, cache, report = MLJ.update(baretree, 2, fitresult, cache, X_array, y)
 yhat = predict(baretree, fitresult, X_array);
 @test yhat != y
 
-# to test coercion methods, we construct a trainable_model and test on
+# to test coercion methods, we construct a machine and test on
 # untransformed data:
 
-tree = trainable(baretree, X, y)
+tree = machine(baretree, X, y)
 fit!(tree)
 predict(tree, X[1:3,:])
 

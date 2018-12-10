@@ -53,8 +53,8 @@ end
   @test include("DecisionTree.jl")
 end
 
-@testset "TrainableModels" begin
-  @test include("trainable_models.jl")
+@testset "Machines" begin
+  @test include("machines.jl")
 end
 
 @testset "networks" begin

@@ -6,9 +6,9 @@ end
 
 Grid(;resolution=10) = Grid(resolution)
 
-# TODO: make fitresult type `TrainableModel` more concrete.
+# TODO: make fitresult type `Machine` more concrete.
 
-mutable struct TunedModel{T,M<:MLJ.Model} <: MLJ.Supervised{MLJ.TrainableModel}
+mutable struct TunedModel{T,M<:MLJ.Model} <: MLJ.Supervised{MLJ.Machine}
     model::M
     tuning::T
     resampling
@@ -34,7 +34,7 @@ function MLJ.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) where M
                           tuning=tuned_model.resampling,
                           measure=tuned_model.measure)
 
-    trainable_resampler = trainable(resampler, X, y)
+    resampling_machine = machine(resampler, X, y)
 
     # tuple of `ParamRange` objects:
     ranges = MLJ.flat_values(tuned_model.param_ranges)
@@ -73,9 +73,9 @@ function MLJ.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) where M
             print("model number: $m")
         end
         
-        trainable_resampler.model.model = model
-        fit!(trainable_resampler, verbosity=verbosity-1)
-        e = evaluate(trainable_resampler)
+        resampling_machine.model.model = model
+        fit!(resampling_machine, verbosity=verbosity-1)
+        e = evaluate(resampling_machine)
         verbosity < 1 || println("\t measurement: $e    ")
         measurements[m] = e
         if e < best_measurement
@@ -88,7 +88,7 @@ function MLJ.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) where M
     verbosity < 1 || println("Training best model on all supplied data...")
 
     # tune best model on all the data:
-    fitresult = trainable(best_model, X, y)
+    fitresult = machine(best_model, X, y)
     fit!(fitresult)
 
     if tuned_model.report_measurements

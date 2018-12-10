@@ -20,11 +20,11 @@ holdout.fraction_train = 0.75
 fitresult, cache, report = MLJ.update(resampler, 2, fitresult, cache, X, y)
 @test fitresult ≈ 2/3
 
-# resampler as trainable model:
+# resampler as machine:
 resampler = Resampler(tuning=holdout, model=model)
-trainable_resampler = trainable(resampler, X, y)
-fit!(trainable_resampler, verbosity=2)
-@test evaluate(trainable_resampler) ≈ 2/3
+resampling_machine = machine(resampler, X, y)
+fit!(resampling_machine, verbosity=2)
+@test evaluate(resampling_machine) ≈ 2/3
 
 
 

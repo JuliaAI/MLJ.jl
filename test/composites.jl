@@ -21,9 +21,9 @@ composite = SimpleCompositeRegressor(regressor=knn_model,
 fitresult, cache, report = MLJ.fit(composite, 3, Xtrain, ytrain)
 
 # to check internals:
-boxcox = fitresult.trainable
-knn = fitresult.args[1].trainable
-selector = fitresult.args[1].trainable
+boxcox = fitresult.machine
+knn = fitresult.args[1].machine
+selector = fitresult.args[1].machine
 
 # this should trigger no retraining:
 fitresult, cache, report = MLJ.update(composite, 3, fitresult, cache, Xtrain, ytrain);
@@ -50,7 +50,7 @@ predict(composite, fitresult, Xin[test,:])
 XXX = source(Xin[train,:])
 yyy = source(yin[train])
 
-composite_model = trainable(composite, XXX, yyy)
+composite_model = machine(composite, XXX, yyy)
 yhat = predict(composite_model, XXX)
 fit!(yhat, verbosity=3)
 composite.transformer_X.features = [:NOx, :Zn]
