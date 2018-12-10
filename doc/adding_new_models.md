@@ -11,6 +11,11 @@ of the MLJ.jl repository. A checklist for adding models in this latter
 way is given at the end; a template is given here:
 ["src/interfaces/DecisionTree.jl"](https://github.com/alan-turing-institute/MLJ.jl/tree/master/src/interfaces/DecisionTree.jl).
 
+In MLJ the most elementary interface exposed to the user (built atop
+the model interface described here) is the *machine interface*. Those
+implementing the MLJ model interface for new algorithms may benefit
+from the the simplified description of this interface appearing under
+["MLJ Internals"](internals.md).
 
 <!-- ### MLJ types -->
 
