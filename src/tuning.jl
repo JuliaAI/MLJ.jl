@@ -10,28 +10,28 @@ Grid(;resolution=10) = Grid(resolution)
 
 mutable struct TunedModel{T,M<:MLJ.Model} <: MLJ.Supervised{MLJ.TrainableModel}
     model::M
-    tuning_strategy::T
-    resampling_strategy
+    tuning::T
+    resampling
     measure
     param_ranges::Params
     report_measurements::Bool
 end
 
 function TunedModel(;model=ConstantRegressor(),
-                    tuning_strategy=Grid(),
-                    resampling_strategy=Holdout(),
+                    tuning=Grid(),
+                    resampling=Holdout(),
                     measure=rms,
                     param_ranges=Params(),
                     report_measurements=true)
     !isempty(param_ranges) || @warn "Field param_ranges not specified."
-    return TunedModel(model, tuning_strategy, resampling_strategy,
+    return TunedModel(model, tuning, resampling,
                       measure, param_ranges, report_measurements)
 end
 
 function MLJ.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) where M
 
     resampler = Resampler(model=tuned_model.model,
-                          strategy=tuned_model.resampling_strategy,
+                          tuning=tuned_model.resampling,
                           measure=tuned_model.measure)
 
     trainable_resampler = trainable(resampler, X, y)
@@ -44,7 +44,7 @@ function MLJ.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) where M
         if range isa MLJ.NominalRange
             MLJ.iterator(range)
         elseif range isa MLJ.NumericRange
-            MLJ.iterator(range, tuned_model.tuning_strategy.resolution)
+            MLJ.iterator(range, tuned_model.tuning.resolution)
         else
             throw(TypeError(:iterator, "", MLJ.ParamRange, rrange))            
         end
@@ -65,7 +65,7 @@ function MLJ.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) where M
     best_model = tuned_model.model
     best_measurement = Inf
 
-    # evaluate all the models using specified resampling_strategy:
+    # evaluate all the models using specified resampling:
 
     verbosity < 1 || println("Searching for best model...")
     for model in model_iterator

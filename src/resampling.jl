@@ -27,25 +27,25 @@ CV(; n_folds=6) = CV(n_folds)
 
 mutable struct Resampler{S,M<:Supervised} <: Model
     model::M
-    strategy::S
+    tuning::S
     measure
 end
-Resampler(;model=ConstantRegressor(), strategy=Holdout(), measure=rms) =
-    Resampler(model, strategy, measure) 
+Resampler(;model=ConstantRegressor(), tuning=Holdout(), measure=rms) =
+    Resampler(model, tuning, measure) 
 
 function fit(resampler::Resampler{Holdout}, verbosity, X, y)
 
     trainable_model = trainable(resampler.model, X, y)
 
-    train, test = partition(eachindex(y), resampler.strategy.fraction_train)
+    train, test = partition(eachindex(y), resampler.tuning.fraction_train)
     fit!(trainable_model, rows=train, verbosity=verbosity-1)
     yhat = predict(trainable_model, X[Rows, test])    
     fitresult = resampler.measure(y[test], yhat)
 
-    # remember model and strategy for calls to update
+    # remember model and tuning stragegy for calls to update
     cache = (trainable_model,
              deepcopy(resampler.model),
-             deepcopy(resampler.strategy),
+             deepcopy(resampler.tuning),
              resampler.measure)
     report = nothing
 
@@ -61,12 +61,12 @@ evaluate(model::Resampler{Holdout}, fitresult) = fitresult
 ## DIRECT EVALUTATING OF TRAINABLE MODELS
 
 # # holdout evaluation:
-# function evaluate(trainable_model, strategy::Holdout, measure, rows)
+# function evaluate(trainable_model, tuning::Holdout, measure, rows)
 #     X, y = trainable_model.args
 #     if rows == nothing
 #         rows = eachindex(y)
 #     end
-#     train, test = partition(rows, strategy.fraction_train)
+#     train, test = partition(rows, tuning.fraction_train)
 #     fit!(trainable_model, rows=train)
 #     yhat = predict(trainable_model, X[Rows, test])
 #     return measure(y[test], yhat)
@@ -74,10 +74,10 @@ evaluate(model::Resampler{Holdout}, fitresult) = fitresult
 
 # # universal keyword version:
 # evaluate(trainable_model::TrainableModel{<:Supervised};
-#          strategy=Holdout,
+#          tuning=Holdout,
 #          measure=rms,
 #          rows=nothing) =
-#              evaluate(trainable_model, strategy, measure, rows)
+#              evaluate(trainable_model, tuning, measure, rows)
 
 
     

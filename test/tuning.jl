@@ -25,10 +25,10 @@ param_ranges = Params(:transformer_X => Params(:features => features_), :regress
 holdout = Holdout(fraction_train=0.8)
 grid = Grid(resolution=3)
 
-tuned_model = TunedModel(model=composite, tuning_strategy=grid, resampling_strategy=holdout,
+tuned_model = TunedModel(model=composite, tuning=grid, resampling=holdout,
                          param_ranges=param_ranges)
 
-# tuned_model = TunedModel(model=ridge, tuning_strategy=grid, resampling_strategy=holdout,
+# tuned_model = TunedModel(model=ridge, tuning=grid, resampling=holdout,
 #                          param_ranges=Params(:lambda=>param_range(ridge,:lambda,lower=0.05,upper=0.1)))
 
 tuned_modelT = trainable(tuned_model, X, y)
