@@ -45,10 +45,6 @@ end
   @test include("parameters.jl")
 end
 
-@testset "resampling" begin
-    @test include("resampling.jl")
-end
-
 @testset "Transformers" begin
   @test include("Transformers.jl")
 end
@@ -67,6 +63,14 @@ end
 
 @testset "composites" begin
   @test include("composites.jl")
+end
+
+@testset "resampling" begin
+    @test include("resampling.jl")
+end
+
+@testset "tuning" begin
+    @test include("tuning.jl")
 end
 
 @testset "XGBoost" begin

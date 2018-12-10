@@ -46,41 +46,11 @@ function fit(resampler::Resampler{Holdout}, verbosity, X, y)
     cache = (trainable_model,
              deepcopy(resampler.model),
              deepcopy(resampler.strategy),
-             resampler.measure,
-             test)
+             resampler.measure)
     report = nothing
 
     return fitresult, cache, nothing
     
-end
-
-function update(resampler::Resampler{Holdout}, verbosity, fitresult, cache, X, y)
-
-    trainable_model, oldmodel, oldstrategy, oldmeasure, oldtest = cache
-
-    if resampler.strategy == oldstrategy && resampler.model == oldmodel &&
-        resampler.measure == oldmeasure
-        return fitresult, cache, nothing
-    elseif resampler.strategy != oldstrategy 
-        train, test = partition(eachindex(y), resampler.strategy.fraction_train)
-        fit!(trainable_model, rows=train, verbosity=verbosity-1)
-    elseif resampler.model != oldmodel
-        fit!(trainable_model, verbosity=verbosity-1)
-        test = oldtest
-    end
-    yhat = predict(trainable_model, X[Rows, test])    
-    fitresult = resampler.measure(y[test], yhat)
-
-    cache = (trainable_model,
-             deepcopy(resampler.model),
-             deepcopy(resampler.strategy),
-             resampler.measure,
-             test)
-    
-    report = nothing    
-        
-    return fitresult, cache, nothing
-
 end
 
 evaluate(model::Resampler{Holdout}, fitresult) = fitresult

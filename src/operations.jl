@@ -64,6 +64,7 @@ end
 @extend_to_trainable_models predict_proba
 @extend_to_trainable_models se
 @extend_to_trainable_models evaluate
+@extend_to_trainable_models best
 
 @sugar predict
 @sugar transform

@@ -10,7 +10,7 @@ export Supervised, Unsupervised
 export matrix
 
 # defined here but extended by files in "interfaces/" (lazily loaded)
-export predict, transform, inverse_transform, predict_proba, se, evaluate
+export predict, transform, inverse_transform, predict_proba, se, evaluate, best
 
 # defined in include files:
 export partition, @curve, @pcurve, readlibsvm        # "utilities.jl"
@@ -20,6 +20,7 @@ export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
 export SimpleCompositeRegressor                      # "composites.jl"
 export Holdout, CV, Resampler                        # "resampling.jl"
 export Params, get_params, set_params!, param_range  # "parameters.jl"
+export Grid, TunedModel                              # "tuning.jl"
 export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
 export KNNRegressor                                  # "builtins/KNN.jl":
 
@@ -356,6 +357,7 @@ function inverse_transform end
 # operations implemented by some meta-models:
 function se end
 function evaluate end
+function best end
 
 # supervised model interfaces buying into introspection should
 # implement the following "metadata" methods, dispatched on model
@@ -393,6 +395,7 @@ include("composites.jl")
 include("operations.jl")
 include("resampling.jl")
 include("parameters.jl")
+include("tuning.jl")
 
 
 ## LOAD BUILT-IN MODELS

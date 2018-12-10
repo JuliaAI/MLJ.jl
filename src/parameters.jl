@@ -1,6 +1,6 @@
 ## NESTED PARAMATER INTERFACE
 
-struct Params 
+struct Params <: MLJ.MLJType
     pairs::Tuple{Vararg{Pair{Symbol}}}
     Params(args::Pair...) = new(args)
 end
