@@ -43,13 +43,10 @@ function fit(resampler::Resampler{Holdout}, verbosity, X, y)
     fitresult = resampler.measure(y[test], yhat)
 
     # remember model and tuning stragegy for calls to update
-    cache = (trainable_model,
-             deepcopy(resampler.model),
-             deepcopy(resampler.tuning),
-             resampler.measure)
+    cache = nothing
     report = nothing
 
-    return fitresult, cache, nothing
+    return fitresult, cache, report
     
 end
 
