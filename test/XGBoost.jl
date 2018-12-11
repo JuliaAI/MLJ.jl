@@ -3,7 +3,7 @@ module TestXGBoost
 using MLJ
 using Test
 using Pkg
-Pkg.add("https://github.com/dmlc/XGBoost.jl")
+Pkg.clone("https://github.com/dmlc/XGBoost.jl")
 import XGBoost
 
 
