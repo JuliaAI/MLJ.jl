@@ -12,10 +12,11 @@ way is given at the end; a template is given here:
 ["src/interfaces/DecisionTree.jl"](https://github.com/alan-turing-institute/MLJ.jl/tree/master/src/interfaces/DecisionTree.jl).
 
 In MLJ the most elementary interface exposed to the user, built atop
-the model interface described here, is the *machine interface*. Those
-implementing the MLJ model interface for new algorithms may benefit
-from the simplified description of this interface appearing under
-["MLJ Internals"](internals.md).
+the model interface described here, is the *machine interface*. After
+a first reading of this document, those implementing the MLJ model
+interface for new algorithms may want to refer to the simplified
+description of this interface appearing under ["MLJ
+Internals"](internals.md).
 
 <!-- ### MLJ types -->
 
@@ -236,9 +237,10 @@ A classifier (supervised model whose outputs are "nominal") is
 
 **Binary classifiers.** A classifier with "probabalistic" outputs must
 define a `predict_proba` method (listed as an "operation") that
-predicts probabilities instead of labels. The method should return a `Vector`
-of probabilities (one probability per input pattern), this probability
-corresponding to the *first* level in `levels(y)`.
+predicts probabilities instead of labels. The method should return a
+`Vector{<:AbstractFloat}` of probabilities (one probability per input
+pattern), this probability corresponding to the *first* level in
+`levels(y)`.
 
 **Multilabel classifiers.** If additionally a classifier is
 "multivariate", and `fit` is called on a training vector `y` with more
@@ -278,7 +280,8 @@ In the event that the argument `fitresult` (returned by a preceding
 call to `fit`) is not sufficient for performing an update, the author
 can arrange for `fit` to output in its `cache` return value any
 additional information required, as this is also passed as an argument
-to the `update` method.
+to the `update` method. For context, see  ["MLJ
+Internals"](internals.md).
 
 
 ##  Checklist for new adding models 
