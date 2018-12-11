@@ -145,11 +145,17 @@ function MLJ.predict(model::DecisionTreeClassifier{T}
     return MLJ.inverse_transform(decoder, DecisionTree.apply_tree(tree, Xnew))
 end
 
-# metadata:           
-MLJ.properties(::Type{DecisionTreeClassifier}) = ()
-MLJ.operations(::Type{DecisionTreeClassifier}) = (MLJ.predict,)
-MLJ.inputs_can_be(::Type{DecisionTreeClassifier}) = (Numeric())
-MLJ.outputs_are(::Type{DecisionTreeClassifier}) = (Nominal())
+# metadata:
+function MLJ.metadata(::Type{DecisionTreeClassifier})
+    d = Dict()
+    d["package name"] = "DecisionTree"
+    d["package uuid"] = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+    d["properties"] = []
+    d["operations"] = ["predict",]
+    d["inputs_can_be"] = ["numeric"]
+    d["outputs_are"] = ["nominal"]
+    return d
+end
 
 end # module
 

@@ -28,6 +28,17 @@ end
 
 MLJ.predict(model::ConstantRegressor, fitresult, Xnew) = fill(fitresult, MLJ.nrows(Xnew))
 
+# metadata:
+function MLJ.metadata(::Type{ConstantRegressor})
+    d = Dict()
+    d["package name"] = "MLJ"
+    d["package uuid"] = ""
+    d["properties"] = []
+    d["operations"] = ["predict"]
+    d["inputs_can_be"] = ["numeric, nominal, missing"]
+    d["outputs_are"] = ["numeric"]
+    return d
+end
 
 ## THE CONSTANT CLASSIFIER
 
@@ -57,6 +68,18 @@ function MLJ.predict(model::ConstantClassifier{T}, fitresult, Xnew) where T
     ref = fitresult.level
     refs = fill(ref, MLJ.nrows(Xnew))
     CategoricalArray{T,1}(refs, fitresult.pool)
+end
+
+# metadata:
+function MLJ.metadata(::Type{ConstantClassifier})
+    d = Dict()
+    d["package name"] = "MLJ"
+    d["package uuid"] = ""
+    d["properties"] = []
+    d["operations"] = ["predict"]
+    d["inputs_can_be"] = ["numeric, nominal, missing"]
+    d["outputs_are"] = ["nominal"]
+    return d
 end
 
 end # module

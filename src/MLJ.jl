@@ -4,7 +4,6 @@ export Rows, Cols, Names
 export features, X_and_y
 export Property, Regressor, TwoClass, MultiClass
 export Numeric, Nominal, Weights, NAs
-export properties, operations, inputs_can_be, outputs_are
 export SupervisedTask, UnsupervisedTask, nrows
 export Supervised, Unsupervised
 export matrix
@@ -239,29 +238,6 @@ Base.getindex(v::CategoricalArrays.CategoricalArray{T,1,S} where {T,S}, ::Type{R
 nrows(v::AbstractVector) = length(v)
 
 
-## MODEL METADATA
-
-# `property(SomeModelType)` is a tuple of instances of:
-""" Classfication models with this property allow weighting of the target classes """
-struct CanWeightTarget <: Property end
-""" Models with this property can provide feature rankings or importance scores """
-struct CanRankFeatures <: Property end
-
-# `inputs_can_be(SomeModelType)` and `outputs_are(SomeModelType)` are tuples of
-# instances of:
-struct Nominal <: Property end
-struct Numeric <: Property end
-struct NA <: Property end
-
-# additionally, `outputs_are(SomeModelType)` can include:
-struct Probababilistic <: Property end
-struct Multivariate <: Property end
-
-# for `Model`s with nominal targets (classifiers)
-# `outputs_are(SomeModelType)` could also include:
-struct Multiclass <: Property end # can handle more than two classes
-
-
 ## CONCRETE TASK SUBTYPES
 
 # TODO: add evaluation metric:
@@ -360,13 +336,10 @@ function se end
 function evaluate end
 function best end
 
-# supervised model interfaces buying into introspection should
-# implement the following "metadata" methods, dispatched on model
-# *type* (see `Properties` below):
-function operations end
-function inputs_can_be end
-function outputs_are end
-function properties end
+# models buying into introspection should
+# implement the following method, dispatched on model
+# *type*:
+function metadata end
 
 # a model wishing invalid hyperparameters to be corrected with a
 # warning should overload this method (return value is the warning

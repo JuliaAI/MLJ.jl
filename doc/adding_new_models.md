@@ -11,10 +11,10 @@ of the MLJ.jl repository. A checklist for adding models in this latter
 way is given at the end; a template is given here:
 ["src/interfaces/DecisionTree.jl"](https://github.com/alan-turing-institute/MLJ.jl/tree/master/src/interfaces/DecisionTree.jl).
 
-In MLJ the most elementary interface exposed to the user (built atop
-the model interface described here) is the *machine interface*. Those
+In MLJ the most elementary interface exposed to the user, built atop
+the model interface described here, is the *machine interface*. Those
 implementing the MLJ model interface for new algorithms may benefit
-from the the simplified description of this interface appearing under
+from the simplified description of this interface appearing under
 ["MLJ Internals"](internals.md).
 
 <!-- ### MLJ types -->
@@ -201,58 +201,53 @@ to make it available to `predict` during re-encoding.
 
 #### Optional methods
 
-**Metadata.** Ideally methods encoding certain model-type metadata
-should be provided. This allows the `MLJ` user, through the `Task`
-interface, to discover models that meet the task specification. For
-example, in the current `DecisionTreeClassifier`, metadata is declared
-as follows:
+**Metadata.** Ideally, a model `metadata` method should be
+provided. This allows the `MLJ` user, through the `Task` interface, to
+discover models that meet a given task specification. For a supervised
+model type `SomeModelType`, `metadata(SomeModelType)` should return a
+dictionary with all keys shown in the example below:
 
 ````julia
-MLJ.properties(::Type{DecisionTreeClassifier}) = ()
-MLJ.operations(::Type{DecisionTreeClassifier}) = (MLJ.predict, MLJ.predict_proba)
-MLJ.inputs_can_be(::Type{DecisionTreeClassifier}) = (Numeric())
-MLJ.outputs_are(::Type{DecisionTreeClassifier}) = (Nominal())
+function MLJ.metadata(::Type{RidgeRegressor})
+    d = Dict()
+    d["package name"] = "MultivariateStats"
+    d["package uuid"] = "6f286f6a-111f-5878-ab1e-185364afe411"
+    d["properties"] = ["can rank feature importances"]
+    d["operations"] = ["predict"]
+    d["inputs_can_be"] = ["numeric"]
+    d["outputs_are"] = ["numeric"]
+    return d
+end
 ````
 
-Available options can be gleaned from this code extract:
+`metadata(SomeModelType)[key]` is a string for the first two keys
+shown, and a (possibly empty) vector of strings otherwise. 
+Permitted elements are indicated below:
 
-````julia
-# `property(SomeModelType)` is a tuple of instances of:
-""" Classification models with this property allow weighting of the target classes """
-struct CanWeightTarget <: Property end
-""" Models with this property can provide feature rankings or importance scores """
-struct CanRankFeatures <: Property end
+key              | permitted values
+-----------------|----------------------------------------------------
+`"properties"`   | unrestricted
+`"operations"`   | `"predict"`, `"predict_proba"`, `"transform"`, `"inverse_transform"`,  `"se"`, `"evaluate"`, `"best"`
+`"inputs_can_be"`| `"numeric"`, `"nominal"`, `"missing"`
+`"outputs_are"`  | `"numeric"`, `"nominal"`, `"probababilistic"`, `"multivariate"`
 
-# `inputs_can_be(SomeModelType)` and `outputs_are(SomeModelType)` are tuples of
-# instances of:
-struct Nominal <: Property end
-struct Numeric <: Property end
-struct NA <: Property end
+A classifier (supervised model whose outputs are "nominal") is
+"multivariate" if prediction of more than two classes is supported.
 
-# additionally, `outputs_are(SomeModelType)` can include:
-struct Probabilistic <: Property end
-struct Multivariate <: Property end
+**Binary classifiers.** A classifier with "probabalistic" outputs must
+define a `predict_proba` method (listed as an "operation") that
+predicts probabilities instead of labels. The method should return a `Vector`
+of probabilities (one probability per input pattern), this probability
+corresponding to the *first* level in `levels(y)`.
 
-# for `Model`s with nominal targets (classifiers)
-# `outputs_are(SomeModelType)` could also include:
-struct Multiclass <: Property end # can handle more than two classes
-````
-
-**Binary classifiers.** If `Probabilistic()` is in the tuple returned
-by `outputs_are` then a `predict_proba` method must be provided (in
-addition to `predict`) to predict probabilities instead of labels. It
-should return a `Vector` of probabilities (one probability per input
-pattern), this probability corresponding to the *first* level in
-`levels(y)`.
-
-**Multilabel classifiers.** If `Probability()` and `Multiclass()` are
-both in the tuple returned by `outputs_are` then a `predict_proba`
-method is to be implemented but its return value `yhat` must be an
-`Array` object of size `(nrows, k)` where `nrows` is the number of
-input patterns (the number of rows of the input data `Xnew`) and
-`k=levels(y)`, where `y` is the data presented in training. The order
-of the columns should coincide with the order of `levels(y)`. However,
-in the special case `k=1` a single column should be output.
+**Multilabel classifiers.** If additionally a classifier is
+"multivariate", and `fit` is called on a training vector `y` with more
+than two labels, then `predict_proba` must return an
+`Array{<:AbstractFloat}` object of size `(nrows, k)` where `nrows` is
+the number of input patterns (the number of rows of the input data
+`Xnew`) and `k=levels(y)`. The order of the columns should coincide
+with the order of `levels(y)`. However, in the special case `k=1` a
+single column should be output.
 
 ````julia
 MLJ.clean!(model::Supervised) -> message::String

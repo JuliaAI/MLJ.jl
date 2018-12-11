@@ -95,6 +95,18 @@ end
 
 end # of module
 
+# metadata:
+function MLJ.metadata(::Type{RidgeRegressor})
+    d = Dict()
+    d["package name"] = "MultivariateStats"
+    d["package uuid"] = "6f286f6a-111f-5878-ab1e-185364afe411"
+    d["properties"] = ["can rank feature importances"]
+    d["operations"] = ["predict"]
+    d["inputs_can_be"] = ["numeric"]
+    d["outputs_are"] = ["numeric"]
+    return d
+end
+
 
 ## EXPOSE THE INTERFACE
 

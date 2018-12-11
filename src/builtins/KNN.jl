@@ -93,10 +93,16 @@ MLJ.predict(model::KNNRegressor, fitresult, Xnew) =
     [predict_on_pattern(model, fitresult, Xnew[i,:]) for i in 1:size(Xnew,1)]
     
 # metadata:
-MLJ.properties(::Type{KNNRegressor}) = ()
-MLJ.operations(::Type{KNNRegressor}) = (MLJ.predict,)
-MLJ.inputs_can_be(::Type{KNNRegressor}) = (Numeric(),)
-MLJ.outputs_are(::Type{KNNRegressor}) = (Numeric(),)
+function MLJ.metadata(::Type{DecisionTreeClassifier})
+    d = Dict()
+    d["package name"] = "MLJ"
+    d["package uuid"] = ""
+    d["properties"] = []
+    d["operations"] = ["predict"]
+    d["inputs_can_be"] = ["numeric"]
+    d["outputs_are"] = ["numeric"]
+    return d
+end
 
 end # module
 
