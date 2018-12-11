@@ -74,7 +74,7 @@ function DecisionTreeClassifier(
         , post_prune
         , merge_purity_threshold)
 
-    message = MLJ.clean!(model)           #> future proof by including these 
+    message = MLJ.clean!(model)       #> future proof by including these 
     isempty(message) || @warn message #> two lines even if no clean! defined below
 
     return model

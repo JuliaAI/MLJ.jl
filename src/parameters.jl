@@ -131,7 +131,7 @@ but
     inverse_transform(Scale, scale(log), 100) = 2 
 
 
-See also: param_range_pair
+See also: strange
 
 """
 struct SCALE end
@@ -177,39 +177,52 @@ function get_type(T, field::Symbol)
 end
 
 """
-    param_range_pair(model, :hyper; values=nothing)
+    r = range(model, :hyper; values=nothing)
 
-For a nominal field `hyper` of `model`, returns a pair `:hyper => r` where `r`
-is a `NominalRange` object.  The corresponding deterministic iterator
-`iterator(r)` simply iterates over `values`.
+Defines a `NominalRange` object for a field `hyper` of `model`. Note
+that `r` is not directly iterable but `iterator(r)` iterates over
+`values`.
 
-    param_range_pair(model, :hyper; upper=nothing, lower=nothing, scale=:linear)
+    r = range(model, :hyper; upper=nothing, lower=nothing, scale=:linear)
 
-For a nominal field `hyper` of `model`, returns a pair `:hyper => r`
-where `r` is a `NumericRange` object.  The deterministic iterator
-`iterator(r, n)` then iterates over `n` values between `lower` and
-`upper` values, according to the specified `scale`. The supported
-scales are `:linear, :log, :log10, :log2`. Values for `Integer` types
-are rounded (with duplicate values removed).
+Defines a `NumericRange` object for a field `hyper` of `model`.  Note
+that `r` is not directly iteratable but `iterator(r, n)` iterates over
+`n` values between `lower` and `upper` values, according to the
+specified `scale`. The supported scales are `:linear, :log, :log10,
+:log2`. Values for `Integer` types are rounded (with duplicate values
+removed, resulting in possibly less than `n` values).
 
 Alternatively, if a function `f` is provided as `scale`, then
 `iterator(r, n)` iterates over the values `[f(x1), f(x2), ... ,
 f(xn)]`, where `x1, x2, ..., xn` are linearly spaced between `lower`
 and `upper`.
 
+See also: strange, iterator
+
 """
-function param_range_pair(model::MLJType, field::Symbol; values=nothing,
+function Base.range(model::MLJType, field::Symbol; values=nothing,
                     lower=nothing, upper=nothing, scale::D=:linear) where D
     T = get_type(typeof(model), field)
     if T <: Real
         lower !=nothing && upper != nothing ||
             error("You must specify lower=... and upper=... .")
-        return field => NumericRange{T,D}(lower, upper, scale)
+        return NumericRange{T,D}(lower, upper, scale)
     else
         values !=nothing || error("You must specify values=... .")
-        return field => NominalRange{T}(Tuple(values))
+        return NominalRange{T}(Tuple(values))
     end
 end
+
+"""
+    strange(model, :hyper; kwargs...)
+
+Returns the pair `:hyper => range(model, :hyper; kwargs...)`;
+"strange" is short for "set to range".
+
+See also: range
+
+"""
+strange(model::Model, field::Symbol; kwargs...) = field => range(model, field; kwargs...)
 
 
 ## ITERATORS FROM A PARAMETER RANGE
