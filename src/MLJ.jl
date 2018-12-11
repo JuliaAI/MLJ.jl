@@ -435,6 +435,7 @@ end
 function __init__()
     @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=true
     @load_interface  MultivariateStats "6f286f6a-111f-5878-ab1e-185364afe411" lazy=true
+    @load_interface XGBoost "009559a3-9522-5dbb-924b-0b6ed2b22bb9" lazy=false
 end
 
 #@load_interface XGBoost "009559a3-9522-5dbb-924b-0b6ed2b22bb9" lazy=false
