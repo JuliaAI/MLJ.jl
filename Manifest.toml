@@ -351,3 +351,11 @@ deps = ["Missings", "Random", "Test"]
 git-tree-sha1 = "1087e8be380f2c8b96434b02bb1150fc1c511135"
 uuid = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
 version = "0.5.3"
+
+[[XGBoost]]
+deps = ["BinDeps", "Libdl", "Printf", "Random", "SparseArrays", "Statistics", "Test"]
+git-tree-sha1 = "f3f543992034dee07d15fec650a6c7afd2808f8d"
+repo-rev = "master"
+repo-url = "https://github.com/dmlc/XGBoost.jl"
+uuid = "009559a3-9522-5dbb-924b-0b6ed2b22bb9"
+version = "0.2.0+"
