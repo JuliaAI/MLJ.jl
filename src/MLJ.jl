@@ -10,20 +10,23 @@ export Supervised, Unsupervised
 export matrix
 
 # defined here but extended by files in "interfaces/" (lazily loaded)
-export predict, transform, inverse_transform, predict_proba, se, evaluate
+export predict, transform, inverse_transform, predict_proba, se, evaluate, best
 
 # defined in include files:
 export partition, @curve, @pcurve, readlibsvm        # "utilities.jl"
 export @more, @constant                              # "show.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
-export Params, get_params, set_params!, ParamRange   # "parameters.jl"
+export SimpleCompositeRegressor                      # "composites.jl"
+export Holdout, CV, Resampler                        # "resampling.jl"
+export Params, get_params, set_params!               # "parameters.jl"
+export param_range_pair                              # "parameters.jl"
+export Grid, TunedModel                              # "tuning.jl"
 export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
 export KNNRegressor                                  # "builtins/KNN.jl":
 
-
-# defined in include files "trainable_models.jl" and "networks.jl":
-export TrainableModel, NodalTrainableModel, trainable
+# defined in include files "machines.jl" and "networks.jl":
+export Machine, NodalMachine, machine
 export source, node, fit!, freeze!, thaw!
 
 
@@ -58,9 +61,9 @@ using LinearAlgebra
 ## CONSTANTS
 
 const srcdir = dirname(@__FILE__) # the directory containing this file
-const TREE_INDENT = 2 # indentation for tree-based display of learning networks
+# const TREE_INDENT = 2 # indentation for tree-based display of learning networks
 const COLUMN_WIDTH = 24           # for displaying dictionaries with `show`
-const DEFAULT_SHOW_DEPTH = 2      # how deep to display fields of `MLJType` objects
+const DEFAULT_SHOW_DEPTH = 1      # how deep to display fields of `MLJType` objects
 
 
 ## GENERAL PURPOSE UTILITIES
@@ -88,8 +91,7 @@ abstract type Task <: MLJType end
 abstract type Property end # subtypes are the allowable model properties
 
 
-
-## LOSS FUNCTIONS
+## METRICS
 
 include("metrics.jl")
 
@@ -97,7 +99,7 @@ include("metrics.jl")
 ## DATA INTERFACES
 
 """
-    CategoricalDecoder(X::CategoricalArray; eltype=nothing)
+    CategoricalDecoder(C::CategoricalArray; eltype=nothing)
 
 Construct a decoder for transforming a `CategoricalArray{T}` object
 into an ordinary array, and for re-encoding similar arrays back into a
@@ -236,6 +238,7 @@ Base.getindex(v::AbstractVector, ::Type{Rows}, r) = v[r]
 Base.getindex(v::CategoricalArrays.CategoricalArray{T,1,S} where {T,S}, ::Type{Rows}, r) = @inbounds v[r]
 nrows(v::AbstractVector) = length(v)
 
+
 ## MODEL METADATA
 
 # `property(SomeModelType)` is a tuple of instances of:
@@ -355,6 +358,7 @@ function inverse_transform end
 # operations implemented by some meta-models:
 function se end
 function evaluate end
+function best end
 
 # supervised model interfaces buying into introspection should
 # implement the following "metadata" methods, dispatched on model
@@ -386,10 +390,14 @@ end
 
 ## LOAD VARIOUS INTERFACE COMPONENTS
 
-include("trainable_models.jl")
+include("machines.jl")
 include("networks.jl")
+include("composites.jl")
 include("operations.jl")
+include("resampling.jl")
 include("parameters.jl")
+include("tuning.jl")
+
 
 ## LOAD BUILT-IN MODELS
 
@@ -425,8 +433,10 @@ end
 
 
 function __init__()
+    @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=true
+    @load_interface  MultivariateStats "6f286f6a-111f-5878-ab1e-185364afe411" lazy=true
 end
 
-@load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=false
-@load_interface XGBoost "009559a3-9522-5dbb-924b-0b6ed2b22bb9" lazy=false
+#@load_interface XGBoost "009559a3-9522-5dbb-924b-0b6ed2b22bb9" lazy=false
+
 end # module

@@ -1,5 +1,7 @@
 ## Rough outline of the learning networks API
 
+NEEDS UPDATING
+
 The API detailed here is probably not intended for the beginner user
 but allows advanced users and MLJ developers to build composite models
 of a fairly general variety (e.g., learners wrapped in transformations,
@@ -70,7 +72,7 @@ A source node `X` is callable, with this behaviour: `X() = X.data`
 (usually training data) and `X(Xnew) = Xnew`.
 
 Learning networks are defined by `LearningNode`s. Inside each
-`LearningNode` is a `TrainableModel` and the definitions of the two
+`LearningNode` is a `Machine` and the definitions of the two
 types are coupled.
 
 We presently constrain each connected component of a learning network
@@ -85,16 +87,16 @@ learning network, up to node `X`, to the data at the source of
 the data at the source of `X` were to be replaced with `Xnew`.
 
 
-### trainable models
+### machines
 
 ````julia
-mutable struct TrainableModel{M<:Model}
+mutable struct Machine{M<:Model}
     model::M
     fitresult
     cache
     args::Vector{Node}
     report
-    tape::Vector{TrainableModel}
+    tape::Vector{Machine}
     frozen::Bool
 end
 ````
@@ -103,25 +105,25 @@ Elements of `args` (the *training arguments*) can be `SourceNode`s or
 `LearningNode`s, which have the common supertype `Node`. We have a constructor,
 
 ````julia 
-trainable(model::Model, args::Node...)
+machine(model::Model, args::Node...)
 ````
  
 which computes its dependency `tape`, and sets `frozen=false`, and
-leaves other fields undefined.  Methods `freeze!(::TrainableModel)`
-and `thaw!(::TrainableModel)` reset the `frozen` flag accordingly.
+leaves other fields undefined.  Methods `freeze!(::Machine)`
+and `thaw!(::Machine)` reset the `frozen` flag accordingly.
 
 ````julia
-fit!(trainable::TrainableModel, verbosity; kwargs...)
-fit!(trainable::TrainableModel; kwargs...)
+fit!(machine::Machine, verbosity; kwargs...)
+fit!(machine::Machine; kwargs...)
 ````
 
-Computes or updates the `fitresult` field in `TrainableModel` (as well
+Computes or updates the `fitresult` field in `Machine` (as well
 as `cache`) by calling `fit` or `update` on its model (with the
 specified `kwargs` if any). To obtain our training data we reach back
 to the source nodes of each argument. The method throws an error if
-any other trainable model on which `trainable` depends has not itself
+any other machine on which `machine` depends has not itself
 been trained yet. (The responsibility for scheduling lies not with a
-trainable model but with the learning nodes that point to them.) If no
+machine but with the learning nodes that point to them.) If no
 `verbosity` is specified, a default of `1` is used.
 
 > **Implementation detail:** The data arguments provided the
@@ -129,18 +131,18 @@ trainable model but with the learning nodes that point to them.) If no
 
 For each operation supported by a model `M` (e.g, `predict`,
 `inverse_transform`) the learning networkds API defines a
-corresponding operation for a `TrainableModel{M}` object. So, for
+corresponding operation for a `Machine{M}` object. So, for
 example:
 
 ````julia
-predict(trainable::TrainableModel{M<:Supervised}, Xnew) = 
-    predict(trainable.model, trainable.fitresult, Xnew)
+predict(machine::Machine{M<:Supervised}, Xnew) = 
+    predict(machine.model, machine.fitresult, Xnew)
 ````
 and
 
 ````julia
-inverse_transform(trainable::TrainableModel{T<:Transformer}, Xnew) = 
-    inverse_transform(trainable.model, trainable.fitrestult, Xnew)
+inverse_transform(machine::Machine{T<:Transformer}, Xnew) = 
+    inverse_transform(machine.model, machine.fitrestult, Xnew)
 ````
 
 where `Xnew` is just data. 
@@ -155,23 +157,23 @@ learning) indicating its upstream connections; these constitute its
 `args` field (internal constructor omitted):
 
 ````julia
-struct LearningNode{M<:Union{TrainableModel, Nothing}} <: Node
+struct LearningNode{M<:Union{Machine, Nothing}} <: Node
 
-    operation::Function   # that can be dispatched on `trainable`(eg, `predict`) or a static operation
-    trainable::M          # is `nothing` for static operations
+    operation::Function   # that can be dispatched on `machine`(eg, `predict`) or a static operation
+    machine::M          # is `nothing` for static operations
     args                  # nodes where `operation` looks for its arguments
-    tape::Vector{TrainableModel}    # for tracking dependencies
+    tape::Vector{Machine}    # for tracking dependencies
     depth::Int64       
 
 end
 ````
 
-The dependency `tape` (e.g., a DAG of trainable models) is computed on
+The dependency `tape` (e.g., a DAG of machines) is computed on
 construction, by merging the `tape`s of its `args` and incorporating the new
-trainable model `trainable`:
+machine `machine`:
 
 ````julia
-LearningNode(operation, trainable::TrainableModel, args::Node...)`
+LearningNode(operation, machine::Machine, args::Node...)`
 LearningNode(operation, args::Node...) = LearningNode(operation, nothing, args::Node...)
 ````
 
@@ -181,16 +183,16 @@ applying the operations of the complete learning network, up to node
 were replaced by `Xnew`. 
 
 > **implementation detail:** We recursively define `z(Xnew) =
-> z.operation(z.trainable, args[1](Xnew), args[2](Xnew), ...,
+> z.operation(z.machine, args[1](Xnew), args[2](Xnew), ...,
 > args[k](Xnew)`), remembering that if `arg` is a source node, then
 > `arg(Xnew)=Xnew`.
 
 We furthermore introduce the following additional syntax, in the case that 
-`trainable` is a `Trainable{<:Supervised}` object:
+`machine` is a `Machine{<:Supervised}` object:
 
 ````julia
-predict(trainable::TrainableModel, X::Union{LearningNode,Source}) =
-    LearningNode(predict, trainable, X)
+predict(machine::Machine, X::Union{LearningNode,Source}) =
+    LearningNode(predict, machine, X)
 ````
 
 This extends syntax introduced above, where `X` was just data and the
@@ -201,20 +203,20 @@ models).
 If, for example, `X` is a learning node, then the binding
 
 ````julia
-yhat = predict(trainable, X)
+yhat = predict(machine, X)
 ````
 
 means 
 
 ````julia
-yhat(Xnew) == predict(trainable.model, trainable.fitresult, X(Xnew))
+yhat(Xnew) == predict(machine.model, machine.fitresult, X(Xnew))
 ````
 
 What `X(Xnew)` means depends, in turn, on whether `X` is another
 learning node, or a source node. Recall that in the source node case
 `X(Xnew) = Xnew`. 
 
-If `X` is just data, then `yhat=predict(trainable, X)` falls back to
+If `X` is just data, then `yhat=predict(machine, X)` falls back to
 have its earlier meaning, so that `yhat` is also just data.
 
 ````
@@ -222,10 +224,10 @@ function fit!(X::LearningNode, verbosity; kwargs...)
 function fit!(X::LearningNode; kwargs...)
 ````
 
-Call `fit!` on all trainable models in the dependency `tape` of `X` in
+Call `fit!` on all machines in the dependency `tape` of `X` in
 an appropriate order (in the future using a scheduler) unless a
-trainable model has been previously fit and is frozen. The `kwargs`
-are passed to the the `fit!` call to `X.trainable` only. For data, use
+machine has been previously fit and is frozen. The `kwargs`
+are passed to the the `fit!` call to `X.machine` only. For data, use
 what is currently located at each source node on which the learning
 node depends. Remember, that for training purposes, multiple sources
 are possible (our use case below being a case in point). No
@@ -240,14 +242,14 @@ composite model.
 
 
 ````julia
-import LearningNode, TrainableModel, fit, predict
+import LearningNode, Machine, fit, predict
 
-# 1st three fields for each component's trainable model; 2nd three
+# 1st three fields for each component's machine; 2nd three
 # fields for copies of corresponding models (hyperparameters) used in last training:
 mutable struct WetSupervisedCache{L,TX,Ty} <: MLJType
-    t_X::TrainableModel{TX}   
-    t_y::TrainableModel{Ty}
-    l::TrainableModel{L}
+    t_X::Machine{TX}   
+    t_y::Machine{Ty}
+    l::Machine{L}
     transformer_X::TX      
     transformer_y::Ty
     learner::L
@@ -258,13 +260,13 @@ function fit(composite::WetSupervised, verbosity, Xtrain, ytrain)
     X = node(Xtrain) # instantiates a source node
     y = node(ytrain)
     
-    t_X = trainable(composite.transformer_X, X)
-    t_y = trainable(composite.transformer_y, y)
+    t_X = machine(composite.transformer_X, X)
+    t_y = machine(composite.transformer_y, y)
 
     Xt = array(transform(t_X, X))
     yt = transform(t_y, y)
 
-    l = trainable(composite.learner, Xt, yt)
+    l = machine(composite.learner, Xt, yt)
     zhat = predict(l, Xt)
 
     yhat = inverse_transform(t_y, zhat)
@@ -291,7 +293,7 @@ function update(composite::WetSupervised, verbosity, old_fitresult, old_cache, X
     case2 = (composite.transformer_y == transformer_y) # true if `transformer_y` has not changed
     case3 = (composite.learner == learner) # true if `learner` has not changed
 
-    # we initially activate all trainable models, but leave them in the
+    # we initially activate all machines, but leave them in the
     # state needed for this call to update (for post-train inspection):
     thaw!(t_X); thaw!(t_y); thaw!(l)
     

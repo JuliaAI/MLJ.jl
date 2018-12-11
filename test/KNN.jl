@@ -27,9 +27,9 @@ fitresult, cache, report = MLJ.update(knn, 0, fitresult, cache, X, y);
 
 # test that coerce methods work:
 X, y = X_and_y(load_boston())
-knn_trainable = trainable(knn, X, y)
-fit!(knn_trainable)
-predict(knn_trainable, X[1:10,:])
+knnM = machine(knn, X, y)
+fit!(knnM)
+predict(knnM, X[1:10,:])
 
 end
 true

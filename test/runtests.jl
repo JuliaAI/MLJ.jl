@@ -45,10 +45,6 @@ end
   @test include("parameters.jl")
 end
 
-@testset "networks" begin
-  @test include("networks.jl")
-end
-
 @testset "Transformers" begin
   @test include("Transformers.jl")
 end
@@ -57,10 +53,30 @@ end
   @test include("DecisionTree.jl")
 end
 
-@testset "TrainableModels" begin
-  @test include("trainable_models.jl")
+@testset "Machines" begin
+  @test include("machines.jl")
+end
+
+@testset "networks" begin
+  @test include("networks.jl")
+end
+
+@testset "composites" begin
+  @test include("composites.jl")
+end
+
+@testset "resampling" begin
+    @test include("resampling.jl")
+end
+
+@testset "tuning" begin
+    @test include("tuning.jl")
 end
 
 @testset "XGBoost" begin
-  @test include("XGBoost.jl")
+  @test_broken include("XGBoost.jl")
+end
+
+@testset "MultivariateStats" begin
+  @test include("MultivariateStats.jl")
 end
