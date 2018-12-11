@@ -11,7 +11,7 @@ mutable struct DummyModel <: Supervised{Int}
 end
 
 dummy_model = DummyModel(4, 9.5, 'k')
-@test get_params(dummy_model) ==
+@test params(dummy_model) ==
     Params(:K => 4, :metric => 9.5, :kernel => 'k')
 
 
@@ -24,29 +24,29 @@ end
 dummy1 = DummyModel(1, 9.5, 'k')
 dummy2 = DummyModel(2, 9.5, 'k')
 super_model = SuperModel(0.5, dummy1, dummy2) 
-get_params(super_model)
+params(super_model)
 
 changes = Params(:lambda => 1.0, :model2 => Params(:K => 3))
 set_params!(super_model, changes)
 
-@test get_params(super_model) == Params(:lambda => 1.0,
+@test params(super_model) == Params(:lambda => 1.0,
       :model1 => Params(:K => 1, :metric => 9.5, :kernel => 'k'),
       :model2 => Params(:K => 3, :metric => 9.5, :kernel => 'k'))
 
 
 @test length(changes) == 2 
-@test length(get_params(super_model)) == 7
+@test length(params(super_model)) == 7
 
-@test MLJ.flat_values(get_params(dummy_model)) == (4, 9.5, 'k')
-@test MLJ.flat_values(get_params(super_model)) ==
+@test MLJ.flat_values(params(dummy_model)) == (4, 9.5, 'k')
+@test MLJ.flat_values(params(super_model)) ==
     (1.0, 1, 9.5, 'k', 3, 9.5, 'k')
 @test MLJ.flat_values(changes) == (1.0, 3)
 
 @test copy(changes) == changes
 
-tree = get_params(super_model)
+tree = params(super_model)
 
-@test copy(get_params(dummy_model), (42, 7.2, 'r')) ==
+@test copy(params(dummy_model), (42, 7.2, 'r')) ==
     Params(:K => 42, :metric => 7.2, :kernel => 'r')
 @test copy(tree, (2.0, 2, 19, 'z', 6, 20, 'x')) ==
     Params(:lambda => 2.0, :model1 => Params(:K => 2, :metric => 19, :kernel => 'z'),
@@ -85,7 +85,7 @@ param_space_its = Params(:lambda => MLJ.iterator(p3, 2),
                         :model1 => Params(:K => MLJ.iterator(p1, 2),
                                          :kernel => MLJ.iterator(p2)))
 models = MLJ.iterator(super_model, param_space_its)
-@test map(MLJ.get_params, models) ==
+@test map(MLJ.params, models) ==
     [Params(:lambda => 0.1, :model1 => Params(:K => 1, :metric => 9.5, :kernel => 'c'),
             :model2 => Params(:K => 3, :metric => 9.5, :kernel => 'k')), 
      Params(:lambda => 1.0, :model1 => Params(:K => 1, :metric => 9.5, :kernel => 'c'),

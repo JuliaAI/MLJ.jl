@@ -61,7 +61,7 @@ function Base.show(stream::IO, object::MLJType)
     #   description = string(typeof(object))
     str = "$description @ $(handle(object))"
     if !isempty(fieldnames(typeof(object)))
-        printstyled(IOContext(stream, :color=> true), str, bold=true)
+        printstyled(IOContext(stream, :color=> true), str, color=:blue)#bold=true)
     else
         print(stream, str)
     end

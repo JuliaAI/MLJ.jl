@@ -22,12 +22,12 @@ function Base.show(stream::IO, params::Params)
     print(stream, ")")
 end
 
-get_params(field) = field
-function get_params(model::M) where M<:Model
+params(field) = field
+function params(model::M) where M<:Model
     pairs = Pair{Symbol,Any}[]
     for field in fieldnames(M)
         value = getfield(model, field)
-        push!(pairs, field => get_params(value))
+        push!(pairs, field => params(value))
     end
     return Params(pairs...)
 end
