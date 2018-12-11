@@ -24,6 +24,7 @@ CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
 DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+XGBoost = "009559a3-9522-5dbb-924b-0b6ed2b22bb9"
 
 [targets]
-test = ["Test", "DecisionTree", "CategoricalArrays", "MultivariateStats"]
+test = ["Test", "DecisionTree", "CategoricalArrays", "MultivariateStats","XGBoost"]
