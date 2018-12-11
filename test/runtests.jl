@@ -8,10 +8,6 @@ using MLJ
 using Test
 
 @constant junk=KNNRegressor()
-properties(KNNRegressor)
-operations(KNNRegressor)
-inputs_can_be(KNNRegressor)
-outputs_are(KNNRegressor)
 
 import CategoricalArrays
 

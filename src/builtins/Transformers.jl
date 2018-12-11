@@ -7,9 +7,6 @@ export ToIntTransformer
 export UnivariateStandardizer, Standardizer
 export UnivariateBoxCoxTransformer
 
-import MLJ: CanWeightTarget, CanRankFeatures
-import MLJ: Nominal, Numeric, NA, Probababilistic, Multivariate,  Multiclass
-
 import MLJ: MLJType, Unsupervised
 import DataFrames: names, AbstractDataFrame, DataFrame, eltypes
 import Distributions
@@ -17,7 +14,7 @@ using Statistics
 using Tables
 
 # to be extended:
-import MLJ: fit, transform, inverse_transform, properties, operations, inputs_can_be
+import MLJ: fit, transform, inverse_transform, metadata
 
 
 ## CONSTANTS
@@ -41,10 +38,6 @@ present in the transformation input.
 mutable struct FeatureSelector <: Unsupervised
     features::Vector{Symbol} 
 end
-
-# metadata:
-operations(::Type{FeatureSelector}) = (transform,)
-inputs_can_be(::Type{FeatureSelector}) = (Nominal(), Ordinal(), NA())
 
 FeatureSelector(;features=Symbol[]) = FeatureSelector(features)
 
@@ -78,10 +71,6 @@ mutable struct ToIntTransformer <: Unsupervised
     initial_label::Int # ususally 0 or 1
     map_unseen_to_minus_one::Bool # unseen inputs are transformed to -1
 end
-
-# metadata:
-operations(::Type{ToIntTransformer}) = (transform, inverse_transform)
-inputs_can_be(::Type{ToIntTransformer}) = (Nominal(), NA())
 
 ToIntTransformer(; sorted=true, initial_label=1
                  , map_unseen_to_minus_one=false) =
@@ -162,10 +151,6 @@ inverse_transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T},
 mutable struct UnivariateStandardizer <: Unsupervised
 end
 
-# metadata:
-operations(::Type{UnivariateStandardizer}) = (transform, inverse_transform)
-inputs_can_be(::Type{UnivariateStandardizer}) = (Numeric(),)
-
 function fit(transformer::UnivariateStandardizer, verbosity, v::AbstractVector{T}) where T<:Real
     std(v) > eps(Float64) || 
         @warn "Extremely small standard deviation encountered in standardization."
@@ -207,10 +192,6 @@ inverse_transform(transformer::UnivariateStandardizer, fitresult, w) =
 mutable struct Standardizer <: Unsupervised
     features::Vector{Symbol} # features to be standardized; empty means all of
 end
-
-# metadata:
-operations(::Type{Standardizer}) = (transform, inverse_transform)
-inputs_can_be(::Type{Standardizer}) = (Numeric(), Nominal(), NA())
 
 # lazy keyword constructor:
 Standardizer(; features=Symbol[]) = Standardizer(features)

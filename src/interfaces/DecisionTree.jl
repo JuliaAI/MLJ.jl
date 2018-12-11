@@ -15,8 +15,6 @@ export DecisionTreeClassifier
 
 #> for all Supervised models:
 import MLJ
-import MLJ: CanWeightTarget, CanRankFeatures
-import MLJ: Nominal, Numeric, NA, Probababilistic, Multivariate,  Multiclass
 
 #> for all classifiers:
 using CategoricalArrays

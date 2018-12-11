@@ -5,8 +5,6 @@ module KNN
 export KNNRegressor
 
 import MLJ
-import MLJ: CanWeightTarget, CanRankFeatures
-import MLJ: Nominal, Numeric, NA, Probababilistic, Multivariate,  Multiclass
 
 using LinearAlgebra
 
@@ -93,7 +91,7 @@ MLJ.predict(model::KNNRegressor, fitresult, Xnew) =
     [predict_on_pattern(model, fitresult, Xnew[i,:]) for i in 1:size(Xnew,1)]
     
 # metadata:
-function MLJ.metadata(::Type{DecisionTreeClassifier})
+function MLJ.metadata(::Type{KNNRegressor})
     d = Dict()
     d["package name"] = "MLJ"
     d["package uuid"] = ""

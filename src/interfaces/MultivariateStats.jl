@@ -93,8 +93,6 @@ function MLJ.predict(model::RidgeRegressor, fitresult::LinearFitresult, Xnew)
     return X*fitresult.coefficients .+ fitresult.bias
 end
 
-end # of module
-
 # metadata:
 function MLJ.metadata(::Type{RidgeRegressor})
     d = Dict()
@@ -106,6 +104,8 @@ function MLJ.metadata(::Type{RidgeRegressor})
     d["outputs_are"] = ["numeric"]
     return d
 end
+
+end # of module
 
 
 ## EXPOSE THE INTERFACE

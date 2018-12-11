@@ -2,8 +2,6 @@ module MLJ
 
 export Rows, Cols, Names
 export features, X_and_y
-export Property, Regressor, TwoClass, MultiClass
-export Numeric, Nominal, Weights, NAs
 export SupervisedTask, UnsupervisedTask, nrows
 export Supervised, Unsupervised
 export matrix
@@ -403,7 +401,6 @@ macro load_interface(pkgname, uuid::String, load_instr)
         end
     end
 end
-
 
 function __init__()
     @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=true
