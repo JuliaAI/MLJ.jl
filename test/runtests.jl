@@ -74,7 +74,7 @@ end
 end
 
 @testset "XGBoost" begin
-  @test_broken include("XGBoost.jl")
+  @test include("XGBoost.jl")
 end
 
 @testset "MultivariateStats" begin
