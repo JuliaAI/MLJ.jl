@@ -15,7 +15,7 @@ using CategoricalArrays
 struct ConstantRegressor{F} <: MLJ.Supervised{F}
     target_type::Type{F}
 end
-ConstantRegressor(;target_type=Float64) = ConstantRegressor{target_type}(target_type)
+ConstantRegressor(;target_type=Float64) = ConstantRegressor(target_type)
 
 function MLJ.fit(model::ConstantRegressor{F}, verbosity, X, y::Vector{F2}) where {F,F2}
     F == F2 || error("Model specifies target_type=$F but target type is $F2.")

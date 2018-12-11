@@ -17,9 +17,9 @@ stand = UnivariateStandardizer()
 ridge = RidgeRegressor()
 composite = SimpleCompositeRegressor(transformer_X=sel, transformer_y=stand, regressor=ridge)
 
-features_ = param_range_pair(sel, :features,
+features_ = strange(sel, :features,
                              values=[[:x1], [:x1, :x2], [:x2, :x3], [:x1, :x2, :x3]])
-lambda_ = param_range_pair(ridge, :lambda,
+lambda_ = strange(ridge, :lambda,
                            lower=1e-6, upper=1e-1, scale=:log10)
 
 param_ranges = Params(:transformer_X => Params(features_), :regressor => Params(lambda_)) 
@@ -31,7 +31,7 @@ tuned_model = TunedModel(model=composite, tuning=grid, resampling=holdout,
                          param_ranges=param_ranges)
 
 # tuned_model = TunedModel(model=ridge, tuning=grid, resampling=holdout,
-#                          param_ranges=Params(:lambda=>param_range_pair(ridge,:lambda,lower=0.05,upper=0.1)))
+#                          param_ranges=Params(:lambda=>strange(ridge,:lambda,lower=0.05,upper=0.1)))
 
 tuned_modelT = machine(tuned_model, X, y)
 
