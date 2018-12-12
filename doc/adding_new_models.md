@@ -202,6 +202,21 @@ to make it available to `predict` during re-encoding.
 
 #### Optional methods
 
+**Binary classifiers.** A classifier may implement a `predict_proba` method
+which predicts probabilities instead of labels. The method should return a
+`Vector{<:AbstractFloat}` of probabilities (one probability per input
+pattern), this probability corresponding to the *first* level in
+`levels(y)`.
+
+**Multilabel classifiers.** For a multilabel classifier ( i.e., a
+classifier capable of predicting more than two classes) the
+`predict_proba` method must return an `Array{<:AbstractFloat}` object
+of size `(nrows, k)` where `nrows` is the number of input patterns
+(the number of rows of the input data `Xnew`) and `k=levels(y)`. The
+order of the columns should coincide with the order of
+`levels(y)`. However, in the special binary case, `k=2`, a single
+column should be output as above.
+
 **Metadata.** Ideally, a model `metadata` method should be
 provided. This allows the `MLJ` user, through the `Task` interface, to
 discover models that meet a given task specification. For a supervised
@@ -230,26 +245,13 @@ key              | permitted values
 `"properties"`   | unrestricted
 `"operations"`   | `"predict"`, `"predict_proba"`, `"transform"`, `"inverse_transform"`,  `"se"`, `"evaluate"`, `"best"`
 `"inputs_can_be"`| `"numeric"`, `"nominal"`, `"missing"`
-`"outputs_are"`  | `"numeric"`, `"nominal"`, `"probababilistic"`, `"multivariate"`
+`"outputs_are"`  | `"numeric"`, `"nominal"`, `"multiclass"`, `"multivariate"`
 
-A classifier (supervised model whose outputs are "nominal") is
-"multivariate" if prediction of more than two classes is supported.
+A supervised model is "multivariate" if it can handle multiple
+targets. A classifier (supervised model whose outputs are "nominal")
+is "multiclass" if prediction of more than two classes in the
+target(s) is supported.
 
-**Binary classifiers.** A classifier with "probabalistic" outputs must
-define a `predict_proba` method (listed as an "operation") that
-predicts probabilities instead of labels. The method should return a
-`Vector{<:AbstractFloat}` of probabilities (one probability per input
-pattern), this probability corresponding to the *first* level in
-`levels(y)`.
-
-**Multilabel classifiers.** If additionally a classifier is
-"multivariate", and `fit` is called on a training vector `y` with more
-than two labels, then `predict_proba` must return an
-`Array{<:AbstractFloat}` object of size `(nrows, k)` where `nrows` is
-the number of input patterns (the number of rows of the input data
-`Xnew`) and `k=levels(y)`. The order of the columns should coincide
-with the order of `levels(y)`. However, in the special case `k=1` a
-single column should be output.
 
 ````julia
 MLJ.clean!(model::Supervised) -> message::String
