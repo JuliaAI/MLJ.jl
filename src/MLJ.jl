@@ -193,7 +193,7 @@ end
     MLJ.matrix(X)
 
 Convert an iteratable table source `X` into an `Matrix`; or, if `X` is
-an `Matrix`, return `X`.
+a `Matrix`, return `X`.
 
 """
 function matrix(X)
@@ -208,13 +208,29 @@ function matrix(X)
 end
 matrix(X::Matrix) = X
 
-
 struct Rows end
 struct Cols end
 struct Names end
 struct Eltypes end
 
-Base.getindex(df::AbstractDataFrame, ::Type{Rows}, r) = df[r,:]
+# select rows of any iterable table `X` with `X[Rows, r]`:
+function Base.getindex(X::T, ::Type{Rows}, r) where T
+
+    TableTraits.isiterabletable(X) || error("Argument is not an iterable table.")
+
+    row_iterator = @from row in X begin
+        @select row
+        @collect
+    end
+                    
+    return @from row in row_iterator[r] begin
+        @select row
+        @collect T
+    end
+
+end
+
+#Base.getindex(df::AbstractDataFrame, ::Type{Rows}, r) = df[r,:]
 Base.getindex(df::AbstractDataFrame, ::Type{Cols}, c) = df[c]
 Base.getindex(df::AbstractDataFrame, ::Type{Names}) = names(df)
 Base.getindex(df::AbstractDataFrame, ::Type{Eltypes}) = eltypes(df)
