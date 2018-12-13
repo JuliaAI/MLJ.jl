@@ -29,9 +29,10 @@ mutable struct Resampler{S,M<:Supervised} <: Model
     model::M
     tuning::S
     measure
+    operation
 end
-Resampler(;model=ConstantRegressor(), tuning=Holdout(), measure=rms) =
-    Resampler(model, tuning, measure) 
+Resampler(;model=ConstantRegressor(), tuning=Holdout(), measure=rms, operation=predict) =
+    Resampler(model, tuning, measure, operation) 
 
 function fit(resampler::Resampler{Holdout}, verbosity, X, y)
 
@@ -39,7 +40,7 @@ function fit(resampler::Resampler{Holdout}, verbosity, X, y)
 
     train, test = partition(eachindex(y), resampler.tuning.fraction_train)
     fit!(mach, rows=train, verbosity=verbosity-1)
-    yhat = predict(mach, X[Rows, test])    
+    yhat = resampler.operation(mach, X[Rows, test])    
     fitresult = resampler.measure(y[test], yhat)
 
     # remember model and tuning stragegy for calls to update
