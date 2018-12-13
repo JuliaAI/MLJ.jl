@@ -1,8 +1,13 @@
-# fall-back for updating supervised composite models:
+# fall-back for updating learning networks exported as models:
 function update(model::Supervised{Node}, verbosity, fitresult, cache, args...)
     fit!(fitresult; verbosity=verbosity)
     return fitresult, cache, nothing
 end
+
+# fall-back for predicting on learning networkds exported as models
+MLJ.predict(composite::Supervised{Node}, verbosity, fitresult, Xnew) =
+    fitresult(coerce(composite, Xnew))
+
 
 """
     SimpleCompositeRegressor(;regressor=ConstantRegressor(), 
