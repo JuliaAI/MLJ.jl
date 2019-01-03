@@ -1,24 +1,49 @@
-## MLJ Machine Learning Models Tuning Library - 100% Made in Julia
+## MLJ
+
+A pure Julia machine learning framework.
 
 [![Build Status](https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master)](https://travis-ci.com/alan-turing-institute/MLJ.jl)
 [![Slack Channel mlj](https://img.shields.io/badge/chat-on%20slack-yellow.svg)](https://slackinvite.julialang.org/)
 
-MLJ is an attempt to create a framework capable of easily tuning
-machine learning models.  Thanks to a solid abstraction layer, it
-will allows user to easily add new models to its framework, without losing
-any of the features. We are also looking for new [collaborators](#collaborators) to assist in this.
+MLJ aims to be a flexible framework for building and tuning machine
+learning models, written entirely in the high performance, rapid development, scientific programming language, Julia. This is a work in progress and new 
+[collaborators](#collaborators) are being sought.
 
 
-We are not trying to __reinvent the wheel__ instead we are heavily
-inspired by [mlR](https://pat-s.github.io/mlr/index.html) ( [recent
-slides 7/18](https://github.com/mlr-org/mlr-outreach). )
+In large measure the MLJ project is inspired by 
+inspired by [mlR](https://pat-s.github.io/mlr/index.html) ([recent
+slides 7/18](https://github.com/mlr-org/mlr-outreach).)
 
 
-The current repository (master branch) is under considerable redevelopment. For an
-earlier proof-of-concept, see
+For an earlier proof-of-concept, see
 [this](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
-branch and **this summary [POSTER](material/MLJ-JuliaCon2018-poster.pdf)**
+branch and this [poster](material/MLJ-JuliaCon2018-poster.pdf)
+summary.
 
+
+### Features to include:
+
+- Automated tuning of hyperparameters, including
+  composite models with nested parameters. Tuning implemented as a
+  wrapper, allowing composition with other meta-algorithms. &#10004;
+
+- Intuitive syntax for building arbitrarily complicated
+  learning networks. &#10004;
+  
+- Hyperparameter tuning using gradient descent via automatic
+  differentiation (for learing algorithms written in Julia).
+
+- Learning networks can be exported as self-contained composite models, but
+  common networks (e.g., linear pipelines, stacks) come ready to plug-and-play. &#10004;
+
+- Performant parallel implementation of large homogeneous ensembles
+  of arbitrary models (e.g., random forests).
+
+- "Task" interface matches machine learning problem to available models.
+
+- Benchmarking a battery of assorted models for a given task.
+
+- Automated estimates of cpu and memory requirements for given task/model.
 
 
 
@@ -29,32 +54,131 @@ Julia 0.7
 
 ### Installation
 
-To install, open Julia, open the package manager (with `]`) and run
+In the Julia REPL run:
 
 ````julia
-(v0.7) pkg> add https://github.com/alan-turing-institute/MLJ.jl.git
+]add https://github.com/alan-turing-institute/MLJ.jl.git
 ````
 
-Or add MLJ to your current Julia project by first activating your
-Project.toml file. Developers, clone the repository and `dev` your
-local clone. Test with `test MLJ` at the package manager prompt. 
+
+### Basic train and test
+
+```julia
+using MLJ
+
+X, y = datanow(); # boston dataset
+train, test = partition(eachindex(y), 0.5); # 70:30 split
+```
+
+A *model* is a container for hyperparameters:
+
+```julia
+knn_model=KNNRegressor(K=10)
+
+# KNNRegressor @ 1…94: 
+K                       =>   10
+metric                  =>   euclidean (generic function with 1 method)
+kernel                  =>   reciprocal (generic function with 1 method)
+```
+Wrapping the model in data creates a *machine*, which is what stores the results of training, on which predictions on new data are based:
 
 
-### Usage
+```julia
+knn = machine(knn_model, X, y);
+fit!(knn, rows=train);
+yhat = predict(knn, X[test,:])
+rms(y[test], yhat)
 
-For usage examples, please consult the [tests](https://github.com/alan-turing-institute/MLJ.jl/tree/master/test).
+┌ Info: Training Machine{KNNRegressor} @ 5…64.
+└ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:98
+
+5.114498666132261
+```
+Changing a hyper-parameter and re-evaluating:
+
+```julia
+knn_model.K = 20
+fit!(knn)
+yhat = predict(knn, X[test,:])
+rms(y[test], yhat)
+
+┌ Info: Training Machine{KNNRegressor} @ 5…64.
+└ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:98
+
+4.884523266056419
+```
+
+### Systematic tuning
+
+```julia
+K_range = range(knn_model, :K, lower=1, upper=100, scale=:log10)
+
+# NumericRange @ 1…77: 
+lower                   =>   1
+upper                   =>   100
+scale                   =>   :log10
+```
+A *tuned model* is just a regular model wrapped in a resampling strategy and a tuning strategy:
+
+```julia
+param_ranges = Params(:K => K_range)
+tuning = Grid(resolution=8)
+resampling = Holdout(fraction_train=0.8)
+tuned_knn_model = TunedModel(model=knn_model, 
+    tuning=tuning, resampling=resampling, param_ranges=param_ranges);
+```
+Fitting the corresponding machine tunes the underlying model and retrains on all supplied data:
+
+```julia
+tuned_knn = machine(tuned_knn_model, X[train,:], y[train])
+fit!(tuned_knn);
+
+┌ Info: Training Machine{TunedModel{Grid,KNNRegre…} @ 1…27.
+└ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:98
+
+Searching for best model...
+model number: 1	 measurement: 2.0303940504246962    
+model number: 2	 measurement: 1.9828439251201737    
+model number: 3	 measurement: 2.6425280736693972    
+model number: 4	 measurement: 2.973368220376769    
+model number: 5	 measurement: 3.1908319369192526    
+model number: 6	 measurement: 4.175863415495205    
+model number: 7	 measurement: 4.731343943808259    
+model number: 8	 measurement: 4.731343943808259    
+    
+Training best model on all supplied data...
+
+┌ Info: Training Machine{KNNRegressor} @ 1…48.
+└ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:98
+
+best(tuned_knn)
+
+# KNNRegressor @ 1…28: 
+K                       =>   2
+metric                  =>   euclidean (generic function with 1 method)
+kernel                  =>   reciprocal (generic function with 1 method)
+    
+yhat = predict(tuned_knn, X[test,:])
+rms(yhat, y[test])
+
+7.506195536032624
+```
+
 
 ### Collaborators
-We are looking for collaborators @ the Alan Turing Institute! 
- * Finalising API design and user interaction patterns! 
- * Backend improvement! (Scheduling, Dagger, JuliaDB, Queryverse)
-   * Store learner meta info in METADATA.JL fashion (ideally open.ml compatible)
- * Feature Improvement 
-   * Bootstrapping from Sklearn and mlr by wrapping with task info
-   * Pipelining an composition meta-interface
-   * Implementation of unsupported learners
 
+Diego Arenas, Edoardo Barp, Anthony Blaom, Gergö Bohner, Valentin
+Churvay, Harvey Devereux, Thibaut Lienart, Franz J Király, Mohammed
+Nook, Annika Stechemesser, Yiannis Simillides, Sebastian Vollmer; Mike
+Innes in partnership with Julia Computing
 
+We are looking for new collaborators @ the Alan Turing Institute! 
+  * Implementation of unsupported learners
+  * Backend improvement! (Scheduling, Dagger, JuliaDB, Queryverse)
+  * Store learner meta info in METADATA.JL fashion (ideally open.ml compatible)
+  * Feature Improvement 
+  * Bootstrapping from Sklearn and mlr by wrapping with task info
+  
 
 ### History
 
@@ -74,23 +198,4 @@ Further work culminated in the first MLJ
 [proof-of-concept](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
 
 
-### Proof of concept landmarks:
-
-- [x] Implement first basic structure
-- [x] Implement tuning for continuous parameters
-- [x] Implement tuning for discrete parameters
-- [x] Basic custom sampling method (K-fold)
-- [x] Basic CV with custom score
-- [x] Wrap at least a handful of models for regression & classification
-- [x] Add multivariable regression methods
-- [x] Add automatic labelling for classifiers
-- [x] Upgrade it to Julia 1.0 [issue #4](https://github.com/alan-turing-institute/MLJ/issues/4)
-- [ ] Find a way to make it clear what arguments a model expects
-- [ ] Allow any sampling methods from `MLBase.jl`
-- [ ] Add compatibility with multiple targets
-- [ ] move to more dispatch based system as outlined [HERE](https://nbviewer.jupyter.org/github/gbohner/Julia-Machine-Learning-Review/blob/f3482badf1f275e2a98bf7e338d406d399609f37/MLR/TuningDispatch_framework.ipynb)
-
-### Contributors
-
-Diego Arenas, Edoardo Barp, Anthony Blaom, Gergö Bohner, Valentin Churvay, Harvey Devereux, Thibaut Lienart, Franz J Király, Mohammed Nook, Annika Stechemesser, Yiannis Simillides, Sebastian Vollmer; Mike Innes in partnership with Julia Computing
 
