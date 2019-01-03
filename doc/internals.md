@@ -81,17 +81,19 @@ function predict(machine::Machine{<:Supervised}, Xnew)
             end
         end
 
-# predict_proba method:
-function predict_proba(machine::Machine{<:Supervised}, Xnew)
-            if isdefined(machine, :fitresult)
-                return predict_proba(machine.model,
-                               machine.fitresult,
-                               coerce(machine.model, Xnew))
-            else
-                throw(error("$machine is not trained and so cannot predict."))
-            end
-        end
-
 ````
+
+<!-- # predict_proba method: -->
+<!-- function predict_proba(machine::Machine{<:Supervised}, Xnew) -->
+<!--             if isdefined(machine, :fitresult) -->
+<!--                 return predict_proba(machine.model, -->
+<!--                                machine.fitresult, -->
+<!--                                coerce(machine.model, Xnew)) -->
+<!--             else -->
+<!--                 throw(error("$machine is not trained and so cannot predict.")) -->
+<!--             end -->
+<!--         end -->
+
+
 
 
