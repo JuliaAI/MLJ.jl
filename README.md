@@ -54,7 +54,6 @@ Julia 0.7
 ### Installation
 
 In the Julia REPL run  `]add https://github.com/alan-turing-institute/MLJ.jl.git`
-````
 
 
 ### Basic train and test
