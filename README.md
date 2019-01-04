@@ -10,8 +10,7 @@ learning models, written entirely in the high performance, rapid development, sc
 [collaborators](#collaborators) are being sought.
 
 
-In large measure the MLJ project is inspired by 
-inspired by [mlR](https://pat-s.github.io/mlr/index.html) ([recent
+In large measure the MLJ project is inspired by [mlR](https://pat-s.github.io/mlr/index.html) ([recent
 slides 7/18](https://github.com/mlr-org/mlr-outreach).)
 
 
