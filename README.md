@@ -31,10 +31,10 @@ summary.
   learning networks. &#10004;
   
 - Hyperparameter tuning using gradient descent via automatic
-  differentiation (for learing algorithms written in Julia).
+  differentiation (for learning algorithms written in Julia).
 
-- Learning networks can be exported as self-contained composite models, but
-  common networks (e.g., linear pipelines, stacks) come ready to plug-and-play. &#10004;
+- Learning networks can be exported as self-contained composite models &#10004;, but
+  common networks (e.g., linear pipelines, stacks) come ready to plug-and-play.
 
 - Performant parallel implementation of large homogeneous ensembles
   of arbitrary models (e.g., random forests).
@@ -54,10 +54,7 @@ Julia 0.7
 
 ### Installation
 
-In the Julia REPL run:
-
-````julia
-]add https://github.com/alan-turing-institute/MLJ.jl.git
+In the Julia REPL run  `]add https://github.com/alan-turing-institute/MLJ.jl.git`
 ````
 
 
