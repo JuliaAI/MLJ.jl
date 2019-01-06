@@ -101,7 +101,7 @@ function MLJ.metadata(::Type{RidgeRegressor})
     d["properties"] = ["can rank feature importances"]
     d["operations"] = ["predict"]
     d["inputs_can_be"] = ["numeric"]
-    d["outputs_are"] = ["numeric"]
+    d["outputs_are"] = ["numeric", "deterministic", "univariate"]
     return d
 end
 

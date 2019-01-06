@@ -7,6 +7,10 @@ using MLJ
 # using Revise
 using Test
 
+@testset "distributions" begin
+  @test include("distributions.jl")
+end
+
 @constant junk=KNNRegressor()
 
 import CategoricalArrays

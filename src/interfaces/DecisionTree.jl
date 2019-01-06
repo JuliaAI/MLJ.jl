@@ -145,13 +145,13 @@ end
 
 # metadata:
 function MLJ.metadata(::Type{DecisionTreeClassifier})
-    d = Dict()
+    d = Dict{String,String}()
     d["package name"] = "DecisionTree"
     d["package uuid"] = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
     d["properties"] = []
     d["operations"] = ["predict",]
-    d["inputs_can_be"] = ["numeric"]
-    d["outputs_are"] = ["nominal"]
+    d["inputs_can_be"] = ["numeric",]
+    d["outputs_are"] = ["nominal", "multiclass", "deterministic", "univariate"]
     return d
 end
 

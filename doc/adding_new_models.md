@@ -35,11 +35,11 @@ Internals"](internals.md).
 ## Models
 
 A *model* is an object storing hyper-parameters associated with some
-machine learning algorithm, where "learning algorithm" is
-broadly interpreted.  In MLJ, hyper-parameters include configuration
-parameters, like the number of threads, which may not affect the final
-learning outcome.  However, the logging level, `verbosity`, is
-excluded.
+machine learning algorithm, where "learning algorithm" is broadly
+interpreted.  In MLJ, hyper-parameters include configuration
+parameters, like the number of threads or the target element type, which
+may or may not affect the final learning outcome.  However, the logging
+level, `verbosity`, is excluded.
 
 The name of the Julia type associated with a model indicates the
 associated algorithm (e.g., `DecisionTreeClassifier`). The outcome of
@@ -187,7 +187,7 @@ MLJ.predict(model::SomeSupervisedModelType, fitresult, Xnew) -> yhat
 Here `Xnew` is understood to be of the same type as `X` in the `fit`
 method (MLJ will call `coerce` on the data provided by the user). 
 
-**Predict return types for deterministic responses.** If the learning
+**Prediction types for deterministic responses.** If the learning
 algorithm predicts ordinary "point" values (as opposed to
 probabilities) then `yhat` must have the same type as the target `y`
 passed to the `fit` method. Note, in particular, that for point-value
@@ -229,28 +229,30 @@ end
 ````
 Query `?MLJ.DecodeCategorical` for more information.
 
-**Predict return types for probablistic responses.** If, instead, an algorithm
+**Prediction types for probablistic responses.** If, instead, an algorithm
 learns a probability distribution (as in classification by logistic
 regression, for example) then `yhat` must be a `Vector` whose elements
 are distributions (one distribution per row of `Xnew`). 
 
 A *distribution* is any instance of a subtype of
-`Distributions.Distribution` from the package Distributions.jl,
-including the additional type `Distributions.NamedCategorical` defined
-in MLJInterface.jl. (Custom distributions may be defined by similarly
-subtyping `Distributions.Distribution` types.) This last type should
-be used for probabilistic classifiers with nominal targets. For
-example, suppose `levels(y)=["yes", "no", "maybe"]` and set
-`classes=levels(y)`. Then, if the predicted probabilities for some
-input pattern are `[0.1, 0.7, 0.2]`, respectively, then the prediction
-returned for that pattern will be
-`Distributions.NamedCategorical(classes, [0.1, 0.7, 0.2])`.
+`Distributions.Distribution` from the package Distributions.jl, or an
+instance of the additional types `UnivariateNominal` and
+`MultivariateNominal` defined in MLJInterface.jl (or any other type
+having, as a bare minimum, implementations of `Base.rand` and
+`Distributions.pdf`). Use `UnivariateNominal` for probabilistic
+classifiers with a single nominal target. For example, suppose
+`levels(y)=["yes", "no", "maybe"]` and set `L=levels(y)`. Then, if the
+predicted probabilities for some input pattern are `[0.1, 0.7, 0.2]`,
+respectively, then the prediction returned for that pattern will be
+`UnivariateNominal(L, [0.1, 0.7, 0.2])`. Query `?UnivariateNominal`
+for more information.
 
 
 #### Optional methods
 
-Probabilistic classifiers (in the sense above) may optionally implement a
-`predict_class` operation that returns point estimates instead of probabilites.
+Probabilistic models (in the sense above) may optionally implement a
+`predict_mode` (classifiers) or `predict_mean` (regressors) operation
+that returns point estimates instead of a probability distribution.
 
 **Metadata.** Ideally, a model `metadata` method should be
 provided. This allows the `MLJ` user, through the `Task` interface, to
@@ -260,14 +262,14 @@ dictionary with all keys shown in the example below:
 
 ````julia
 function MLJ.metadata(::Type{RidgeRegressor})
-    d = Dict()
+    d = Dict{String,String}()
     d["package name"] = "MultivariateStats"
     d["package uuid"] = "6f286f6a-111f-5878-ab1e-185364afe411"
-	d["is_pure_julia"] = true
-    d["properties"] = ["can rank feature importances"]
-    d["operations"] = ["predict"]
-    d["inputs_can_be"] = ["numeric"]
-    d["outputs_are"] = ["numeric", "univariate"]
+	d["is_pure_julia"] = "yes"
+    d["properties"] = ["can rank feature importances",]
+    d["operations"] = ["predict",]
+    d["inputs_can_be"] = ["numeric",]
+    d["outputs_are"] = ["numeric", "deterministic", "univariate"]
     return d
 end
 ````
@@ -277,12 +279,19 @@ vector of strings.  Permitted elements are indicated below:
 
 key              | permitted values
 -----------------|----------------------------------------------------
+`"is_pure_julia"`| `"yes"`, `"no"`
 `"properties"`   | unrestricted
-`"operations"`   | `"predict"`, `"predict_class"`, `"transform"`, `"inverse_transform"
+`"operations"`   | `"predict"`, `"predict_mean"`, `"predict_mode"`, `"transform"`, `"inverse_transform"`
 `"inputs_can_be"`| `"numeric"`, `"nominal"`, `"missing"`
-`"outputs_are"`  | `"numeric"`/`"nominal"`, `"binary"`/`"multiclass"`, `"univariate"`/`multivariate"`
+`"outputs_are"`  | `"numeric"`/`"nominal"`, `"binary"`/`"multiclass"`, `"deterministic"`/`"probabilistic"`, `"univariate"`/`multivariate"`
 
-A supervised model is "multivariate" if it can handle multiple targets.
+For `metadata(SomeModelType)["inputs_are"]` list all that apply. For
+`metadata(SomeModelType)["outputs_are"]` you must specify one from
+each pair of values shown, with the exception of
+`"binary"`/`"multiclass"` if `SomeModelType` is a regressor.  
+
+A supervised model is "multivariate" if it can handle multiple targets
+(see below).
 
 **The clean! method.**
 
@@ -322,6 +331,7 @@ to the `update` method.
 
 #### Multivariate models
 
+TODO
 
 <!-- ##  Checklist for new adding models  -->
 

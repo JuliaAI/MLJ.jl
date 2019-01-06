@@ -30,13 +30,14 @@ MLJ.predict(model::ConstantRegressor, fitresult, Xnew) = fill(fitresult, MLJ.nro
 
 # metadata:
 function MLJ.metadata(::Type{ConstantRegressor})
-    d = Dict()
+    d = Dict{String,String}()
     d["package name"] = "MLJ"
     d["package uuid"] = ""
-    d["properties"] = []
+    d["properties"] = String[]
+    d["is_pure_julia"] = "yes"
     d["operations"] = ["predict"]
     d["inputs_can_be"] = ["numeric, nominal, missing"]
-    d["outputs_are"] = ["numeric"]
+    d["outputs_are"] = ["numeric", "deterministic", "univariate"]
     return d
 end
 
@@ -72,13 +73,14 @@ end
 
 # metadata:
 function MLJ.metadata(::Type{ConstantClassifier})
-    d = Dict()
+    d = Dict{String,String}()
     d["package name"] = "MLJ"
     d["package uuid"] = ""
-    d["properties"] = []
+    d["is_pure_julia"] = "yes"
+    d["properties"] = String[]
     d["operations"] = ["predict"]
-    d["inputs_can_be"] = ["numeric, nominal, missing"]
-    d["outputs_are"] = ["nominal"]
+    d["inputs_can_be"] = ["numeric", "nominal", "missing"]
+    d["outputs_are"] = ["nominal", "multiclass", "deterministic", "univariate"]
     return d
 end
 

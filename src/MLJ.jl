@@ -11,6 +11,7 @@ export predict, transform, inverse_transform, predict_proba, se, evaluate, best
 
 # defined in include files:
 export partition, @curve, @pcurve, readlibsvm        # "utilities.jl"
+export UnivariateNominal                             # "distributions.jl"
 export @more, @constant                              # "show.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
@@ -26,7 +27,6 @@ export KNNRegressor                                  # "builtins/KNN.jl":
 export Machine, NodalMachine, machine
 export source, node, fit!, freeze!, thaw!
 
-
 # defined in include file "builtins/Transformers.jl":
 export FeatureSelector
 export ToIntTransformer
@@ -40,11 +40,15 @@ export UnivariateBoxCoxTransformer
 # export IntegerToInt64Transformer
 # export UnivariateDiscretizer, Discretizer
 
+# methods from other packages to be rexported:
+export pdf, mean, mode
+
 import Requires.@require  # lazy code loading package
 import CSV
 import DataFrames: DataFrame, AbstractDataFrame, SubDataFrame, eltypes, names
 using  Query
 import Distributions
+import Distributions: pdf, mode
 import Base.==
 using CategoricalArrays
 import TableTraits
@@ -57,25 +61,21 @@ using LinearAlgebra
 
 ## CONSTANTS
 
-const srcdir = dirname(@__FILE__) # the directory containing this file
-# const TREE_INDENT = 2 # indentation for tree-based display of learning networks
-const COLUMN_WIDTH = 24           # for displaying dictionaries with `show`
-const DEFAULT_SHOW_DEPTH = 1      # how deep to display fields of `MLJType` objects
+# the directory containing this file:
+const srcdir = dirname(@__FILE__)
+# horizontal space for field names in `MLJType` object display:
+const COLUMN_WIDTH = 24
+# how deep to display fields of `MLJType` objects:
+const DEFAULT_SHOW_DEPTH = 1
 
 
-## GENERAL PURPOSE UTILITIES
-
-include("utilities.jl")
+include("utilities.jl")     # general purpose utilities
 
 
 ## ABSTRACT TYPES
 
 # overarching MLJ type:
 abstract type MLJType end
-
-# overload `show` method for MLJType (which becomes the fall-back for
-# all subtypes):
-include("show.jl")
 
 # for storing hyperparameters:
 abstract type Model <: MLJType end
@@ -86,6 +86,10 @@ abstract type Unsupervised <: Model  end
 # tasks:
 abstract type Task <: MLJType end
 abstract type Property end # subtypes are the allowable model properties
+
+
+include("distributions.jl") # distributions not provided by Distributions.jl package
+include("show.jl") # for displaying objects of `MLJType`
 
 
 ## METRICS
