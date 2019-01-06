@@ -57,19 +57,20 @@ macro sugar(operation)
     end
 end
 
-
 @extend_to_machines predict
+@extend_to_machines predict_mode
+@extend_to_machines predict_mean
 @extend_to_machines transform
 @extend_to_machines inverse_transform
-@extend_to_machines predict_proba
 @extend_to_machines se
 @extend_to_machines evaluate
 @extend_to_machines best
 
 @sugar predict
+@sugar predict_mode
+@sugar predict_mean
 @sugar transform
 @sugar inverse_transform
-@sugar predict_proba
 @sugar se
 
 

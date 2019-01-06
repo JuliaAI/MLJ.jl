@@ -7,7 +7,7 @@ export Supervised, Unsupervised
 export matrix
 
 # defined here but extended by files in "interfaces/" (lazily loaded)
-export predict, transform, inverse_transform, predict_proba, se, evaluate, best
+export predict, predict_mean, predict_mode, transform, inverse_transform, se, evaluate, best
 
 # defined in include files:
 export partition, @curve, @pcurve, readlibsvm        # "utilities.jl"
@@ -340,8 +340,11 @@ update(model::Model, verbosity, fitresult, cache, args...) =
 # supervised models must implement this operation:
 function predict end
 
-# supervised methods may implement this operation:
-function predict_proba end
+# supervised models that predict probabilities by default may also
+# implement one of these operations to do "point" predictions:
+function predict_mode end # classifiers
+function predict_mean end # regressors
+# TODO: provide fallbacks for these
 
 # unsupervised methods must implement this operation:
 function transform end

@@ -1,3 +1,14 @@
+abstract type Distribution <: MLJType end
+
+function ==(d1::D, d2::D) where D<:Distribution
+    ret = true
+    for fld in fieldnames(D)
+        ret = ret && getfield(d1, fld) == getfield(d2, fld)
+    end
+    return ret
+end
+
+
 ## UNIVARIATE NOMINAL PROBABILITY DISTRIBUTION
 
 """
@@ -22,7 +33,7 @@ rand(d, 5) # ["maybe", "no", "maybe", "maybe", "no"]
 ````
 
 """
-struct UnivariateNominal{L,T<:Real} <: MLJ.MLJType
+struct UnivariateNominal{L,T<:Real} <: Distribution
     prob_given_label::Dict{L,T}
 end
 

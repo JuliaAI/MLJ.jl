@@ -23,16 +23,20 @@ y = Union{Missing,Float32}[1.0, 1.0, 2.0, 2.0, missing]
 ## CLASSIFIER
 
 X = nothing # X is never used by constant regressors/classifiers
-yraw = Union{Missing,String}["Perry", "Anthony", "Perry", "Skater", missing]
+yraw = Union{Missing,String}["Perry", "Antonia", "Perry", "Skater", missing]
 y = categorical(yraw)
 
 model = ConstantClassifier(target_type=Union{Missing,String})
 fitresult, cache, report = MLJ.fit(model, 1, X, y)
-@test fitresult == y[1]
+d = MLJ.UnivariateNominal(["Perry", "Antonia", "Skater"], [0.5, 0.25, 0.25]) 
+@test fitresult == d
 
-yhat = predict(model, fitresult, ones(10, 2))
+yhat = predict_mode(model, fitresult, ones(10, 2))
 @test yhat[5] == y[1] 
 @test length(yhat) == 10
+
+yhat = predict(model, fitresult, ones(10, 2))
+@test yhat == fill(d, 10)
 
 end # module
 true

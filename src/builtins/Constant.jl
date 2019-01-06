@@ -43,21 +43,32 @@ end
 
 ## THE CONSTANT CLASSIFIER
 
-R{T} = Union{CategoricalString{UInt32},CategoricalValue{T,UInt32}}
+# fit-result type:
+R{L} = MLJ.UnivariateNominal{L,Float64}
 
-struct ConstantClassifier{T} <: MLJ.Supervised{R{T}}
-    target_type::Type{T}
+struct ConstantClassifier{L} <: MLJ.Supervised{R{L}}
+    target_type::Type{L}
 end
 ConstantClassifier(;target_type=Bool) = ConstantClassifier{target_type}(target_type)
 
-function MLJ.fit(model::ConstantClassifier{T},
+function MLJ.fit(model::ConstantClassifier{L},
                  verbosity,
                  X,
-                 y::CategoricalVector{T2}) where {T,T2}
+                 y::CategoricalVector{L2,R,L2_pure}) where {L,R,L2,L2_pure}
 
-    T == T2 || error("Model specifies target_type=$T but target type is $T2.")
-    fitresult = StatsBase.mode(collect(skipmissing(y)))
-    verbosity < 1 || @info "target mode = $fitresult."
+    L == L2 || error("Model specifies target_type=$L but target type is $L2.")
+
+    y_pure = skipmissing(y) |> collect
+    N = length(y_pure)
+    count_given_label = countmap(y_pure)
+    prob_given_label = Dict{L2_pure,Float64}()
+    for (x, c) in count_given_label
+        prob_given_label[x] = c/N
+    end
+    
+    fitresult = MLJ.UnivariateNominal(prob_given_label)
+
+    verbosity < 1 || @info "probabilities: \n$prob_given_label"
     cache = nothing
     report = nothing
 
@@ -65,11 +76,21 @@ function MLJ.fit(model::ConstantClassifier{T},
 
 end
 
-function MLJ.predict(model::ConstantClassifier{T}, fitresult, Xnew) where T
-    ref = fitresult.level
-    refs = fill(ref, MLJ.nrows(Xnew))
-    CategoricalArray{T,1}(refs, fitresult.pool)
+function MLJ.predict(model::ConstantClassifier{L}, fitresult, Xnew) where L
+    return fill(fitresult, MLJ.nrows(Xnew))
 end
+
+function MLJ.predict_mode(model::ConstantClassifier{L}, fitresult, Xnew) where L
+    m = mode(fitresult)
+    labels = fitresult.prob_given_label |> keys |> collect
+    N = MLJ.nrows(Xnew)    
+    
+    # to get a categorical array with all the levels we append the 
+    # distribution labels to the prediction vector and truncate afterwards:
+    yhat = vcat(fill(m, N), labels) |> categorical
+    return yhat[1:N]
+end
+
 
 # metadata:
 function MLJ.metadata(::Type{ConstantClassifier})
