@@ -1,16 +1,12 @@
 # TODO change these names to match MLR or MLMetrics?
 
-function rms(y, yhat, rows)
-    length(y) == length(yhat) || throw(DimensionMismatch())
-    ret = 0.0
-    for i in rows
-        dev = y[i] - yhat[i]
-        ret += dev*dev
-    end
-    return sqrt(ret/length(rows))
-end
+## REGRESSOR METRICS
 
-function rms(y, yhat)
+# Note: Each regressor metric is overloaded with a probabilistic
+# version which converts `yhat` (an array of distributions) to
+# corresponding mean values before applying the usual metric.
+
+function rms(y, yhat::AbstractVector{<:Real})
     length(y) == length(yhat) || throw(DimensionMismatch())
     ret = 0.0
     for i in eachindex(y)
@@ -19,18 +15,9 @@ function rms(y, yhat)
     end
     return sqrt(ret/length(y))
 end
+rms(y, yhat) = rms(y, Distributions.mean.(yhat)) 
 
-function rmsl(y, yhat, rows)
-    length(y) == length(yhat) || throw(DimensionMismatch())
-    ret = 0.0
-    for i in rows
-        dev = log(y[i]) - log(yhat[i])
-        ret += dev*dev
-    end
-    return sqrt(ret/length(rows))
-end
-
-function rmsl(y, yhat)
+function rmsl(y, yhat::AbstractVector{<:Real})
     length(y) == length(yhat) || throw(DimensionMismatch())
     ret = 0.0
     for i in eachindex(y)
@@ -39,18 +26,9 @@ function rmsl(y, yhat)
     end
     return sqrt(ret/length(y))
 end
+rmsl(y, yhat) = rmsl(y, Distributions.mean.(yhat)) 
 
-function rmslp1(y, yhat, rows)
-    length(y) == length(yhat) || throw(DimensionMismatch())
-    ret = 0.0
-    for i in rows
-        dev = log(y[i] + 1) - log(yhat[i] + 1)
-        ret += dev*dev
-    end
-    return sqrt(ret/length(rows))
-end
-
-function rmslp1(y, yhat)
+function rmslp1(y, yhat::AbstractVector{<:Real})
     length(y) == length(yhat) || throw(DimensionMismatch())
     ret = 0.0
     for i in eachindex(y)
@@ -59,23 +37,11 @@ function rmslp1(y, yhat)
     end
     return sqrt(ret/length(y))
 end
+rmslp1(y, yhat) = rmslp1(y, Distributions.mean.(yhat)) 
+
 
 """ Root mean squared percentage loss """
-function rmsp(y, yhat, rows)
-    length(y) == length(yhat) || throw(DimensionMismatch())
-    ret = 0.0
-    count = 0
-    for i in rows
-        if y[i] != 0.0
-            dev = (y[i] - yhat[i])/y[i]
-            ret += dev*dev
-            count += 1
-        end
-    end
-    return sqrt(ret/count)
-end
-
-function rmsp(y, yhat)
+function rmsp(y, yhat::AbstractVector{<:Real})
     length(y) == length(yhat) || throw(DimensionMismatch())
     ret = 0.0
     count = 0
@@ -88,6 +54,7 @@ function rmsp(y, yhat)
     end
     return sqrt(ret/count)
 end
+rmsp(y, yhat) = rmsp(y, Distributions.mean.(yhat)) 
 
 # function auc(truelabel::L) where L
 #     _auc(y::AbstractVector{L}, yhat::AbstractVector{T}) where T<:Real = 
