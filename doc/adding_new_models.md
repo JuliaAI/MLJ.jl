@@ -235,17 +235,19 @@ regression, for example) then `yhat` must be a `Vector` whose elements
 are distributions (one distribution per row of `Xnew`). 
 
 A *distribution* is any instance of a subtype of
-`Distributions.Distribution` from the package Distributions.jl, or an
+`Distributions.Distribution` from the package Distributions.jl, or any
 instance of the additional types `UnivariateNominal` and
 `MultivariateNominal` defined in MLJInterface.jl (or any other type
-having, as a bare minimum, implementations of `Base.rand` and
-`Distributions.pdf`). Use `UnivariateNominal` for probabilistic
-classifiers with a single nominal target. For example, suppose
-`levels(y)=["yes", "no", "maybe"]` and set `L=levels(y)`. Then, if the
-predicted probabilities for some input pattern are `[0.1, 0.7, 0.2]`,
-respectively, then the prediction returned for that pattern will be
-`UnivariateNominal(L, [0.1, 0.7, 0.2])`. Query `?UnivariateNominal`
-for more information.
+`D` for which `MLJ.isdistribution(::D) = true`, meaning `Base.rand`
+and `Distributions.pdf` are implemented, as well
+`Distributions.mean` and/or `Distributions.mode`).
+
+Use `UnivariateNominal` for probabilistic classifiers with a single
+nominal target. For example, suppose `levels(y)=["yes", "no",
+"maybe"]` and set `L=levels(y)`. Then, if the predicted probabilities
+for some input pattern are `[0.1, 0.7, 0.2]`, respectively, then the
+prediction returned for that pattern will be `UnivariateNominal(L,
+[0.1, 0.7, 0.2])`. Query `?UnivariateNominal` for more information.
 
 
 #### Optional methods

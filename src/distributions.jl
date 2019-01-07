@@ -9,6 +9,15 @@ function ==(d1::D, d2::D) where D<:Distribution
 end
 
 
+# DISTRIBUTION AS TRAIT
+
+# for distributions in Distributions.jl:
+isdistribution(::Distributions.Distribution) = true
+
+# for MLJ custom distibutions defined below:
+isdistribution(::Distribution) = true  
+
+
 ## UNIVARIATE NOMINAL PROBABILITY DISTRIBUTION
 
 """
