@@ -5,6 +5,7 @@ module Constant
 export ConstantRegressor, ConstantClassifier
 
 import MLJ
+import Distributions
 using StatsBase
 using Statistics
 using CategoricalArrays
@@ -12,21 +13,24 @@ using CategoricalArrays
 
 ## THE CONSTANT REGRESSOR
 
-struct ConstantRegressor{F} <: MLJ.Supervised{F}
+struct ConstantRegressor{F,D} <: MLJ.Supervised{D}
     target_type::Type{F}
+    distribution_type::Type{D}
 end
-ConstantRegressor(;target_type=Float64) = ConstantRegressor(target_type)
+ConstantRegressor(;target_type=Float64, distribution_type=Distributions.Normal) =
+    ConstantRegressor(target_type, distribution_type)
 
-function MLJ.fit(model::ConstantRegressor{F}, verbosity, X, y::Vector{F2}) where {F,F2}
+function MLJ.fit(model::ConstantRegressor{F,D}, verbosity, X, y::Vector{F2}) where {F,D,F2}
     F == F2 || error("Model specifies target_type=$F but target type is $F2.")
-    fitresult = mean(skipmissing(y))
-    verbosity < 1 || @info "Mean of target = $fitresult."
+    fitresult = Distributions.fit(D, collect(skipmissing(y)))
+    verbosity < 1 || @info "Fitted a constant probability distribution, $fitresult."
     cache = nothing
     report = nothing
     return fitresult, cache, report
 end
 
 MLJ.predict(model::ConstantRegressor, fitresult, Xnew) = fill(fitresult, MLJ.nrows(Xnew))
+MLJ.predict_mean(model::ConstantRegressor, fitresult, Xnew) = fill(Distributions.mean(fitresult), MLJ.nrows(Xnew))
 
 # metadata:
 function MLJ.metadata(::Type{ConstantRegressor})
@@ -35,11 +39,12 @@ function MLJ.metadata(::Type{ConstantRegressor})
     d["package uuid"] = ""
     d["properties"] = String[]
     d["is_pure_julia"] = "yes"
-    d["operations"] = ["predict"]
+    d["operations"] = ["predict","predict_mean"]
     d["inputs_can_be"] = ["numeric, nominal, missing"]
-    d["outputs_are"] = ["numeric", "deterministic", "univariate"]
+    d["outputs_are"] = ["numeric", "probabilistic", "univariate"]
     return d
 end
+
 
 ## THE CONSTANT CLASSIFIER
 
@@ -99,7 +104,7 @@ function MLJ.metadata(::Type{ConstantClassifier})
     d["package uuid"] = ""
     d["is_pure_julia"] = "yes"
     d["properties"] = String[]
-    d["operations"] = ["predict"]
+    d["operations"] = ["predict", "predict_mode"]
     d["inputs_can_be"] = ["numeric", "nominal", "missing"]
     d["outputs_are"] = ["nominal", "multiclass", "deterministic", "univariate"]
     return d

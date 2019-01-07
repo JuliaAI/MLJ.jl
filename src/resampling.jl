@@ -31,7 +31,7 @@ mutable struct Resampler{S,M<:Supervised} <: Model
     measure
     operation
 end
-Resampler(;model=ConstantRegressor(), tuning=Holdout(), measure=rms, operation=predict) =
+Resampler(;model=RidgeRegressor(), tuning=Holdout(), measure=rms, operation=predict_mean) =
     Resampler(model, tuning, measure, operation) 
 
 function fit(resampler::Resampler{Holdout}, verbosity, X, y)

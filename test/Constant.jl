@@ -4,7 +4,7 @@ module TestConstant
 using Test
 using MLJ
 using CategoricalArrays
-
+import Distributions
 
 ## REGRESSOR
 
@@ -13,11 +13,10 @@ y = Union{Missing,Float32}[1.0, 1.0, 2.0, 2.0, missing]
 
 model = ConstantRegressor(target_type=Union{Missing,Float32})
 fitresult, cache, report = MLJ.fit(model, 1, X, y)
-@test fitresult ≈ 1.5
-@test predict(model, fitresult, ones(10,2)) ≈ fill(1.5, 10)
-
-X = nothing # X is never used by constant regressors/classifiers
-y = Union{Missing,Float32}[1.0, 1.0, 2.0, 2.0, missing]
+d=Distributions.Normal(1.5, 0.5)
+@test fitresult == d
+@test predict(model, fitresult, ones(10,2)) == fill(d, 10)
+@test predict_mean(model, fitresult, ones(10,2)) == fill(1.5, 10)
 
 
 ## CLASSIFIER
