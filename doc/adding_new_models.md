@@ -69,11 +69,13 @@ Associated with every concrete subtype of `Model` there must be a
 `fit` method, which implements the associated algorithm to produce the
 fit-result. Additionally, every `Supervised` model has a `predict`
 method, while `Unsupersvised` models generally have a `transform`
-method. More generally, methods such as these that are dispatched on a
-model instance and a fit-result (plus other data) are called
-*operations*. At present classifiers that predict probabilities may
-optionally implement a `predict_class` operation, and `Unsupervised`
-models may implement an `inverse_transform` operation.
+method. More generally, methods such as these, that are dispatched on
+a model instance and a fit-result (plus other data), are called
+*operations*. At present `Supervised` models that predict probability
+distributions (rather than point values) may optionally implement a
+`predict_mode` (classifiers) or `predict_mean` (regressors) operation,
+while `Unsupervised` models may implement an `inverse_transform`
+operation.
 
 ## The Model API
 
