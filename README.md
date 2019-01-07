@@ -26,12 +26,16 @@ summary.
   composite models with nested parameters. Tuning implemented as a
   wrapper, allowing composition with other meta-algorithms. &#10004;
 
-- Intuitive syntax for building arbitrarily complicated
-  learning networks. &#10004;
-  
 - Hyperparameter tuning using gradient descent via automatic
   differentiation (for learning algorithms written in Julia).
 
+- Data agnostic: Train models on any data supported by the Queryverse
+[iterable tables
+interface](https://github.com/queryverse/IterableTables.jl). &#10004;
+
+- Intuitive syntax for building arbitrarily complicated
+  learning networks. &#10004;
+  
 - Learning networks can be exported as self-contained composite models &#10004;, but
   common networks (e.g., linear pipelines, stacks) come ready to plug-and-play.
 
