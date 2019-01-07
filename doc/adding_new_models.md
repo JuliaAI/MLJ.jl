@@ -68,7 +68,7 @@ fit-results because these types are generally declared outside of MLJ.
 Associated with every concrete subtype of `Model` there must be a
 `fit` method, which implements the associated algorithm to produce the
 fit-result. Additionally, every `Supervised` model has a `predict`
-method, while `Unsupersvised` models generally have a `transform`
+method, while `Unsupersvised` models must have a `transform`
 method. More generally, methods such as these, that are dispatched on
 a model instance and a fit-result (plus other data), are called
 *operations*. At present `Supervised` models that predict probability

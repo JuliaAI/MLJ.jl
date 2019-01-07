@@ -85,7 +85,6 @@ abstract type Unsupervised <: Model  end
 
 # tasks:
 abstract type Task <: MLJType end
-abstract type Property end # subtypes are the allowable model properties
 
 
 include("distributions.jl") # distributions not provided by Distributions.jl package
