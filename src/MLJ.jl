@@ -359,7 +359,7 @@ function best end
 # models buying into introspection should
 # implement the following method, dispatched on model
 # *type*:
-function metadata end
+function info end
 
 # a model wishing invalid hyperparameters to be corrected with a
 # warning should overload this method (return value is the warning

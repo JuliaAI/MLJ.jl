@@ -144,7 +144,7 @@ function MLJ.predict(model::DecisionTreeClassifier{T}
 end
 
 # metadata:
-function MLJ.metadata(::Type{DecisionTreeClassifier})
+function MLJ.info(::Type{DecisionTreeClassifier})
     d = Dict{String,String}()
     d["package name"] = "DecisionTree"
     d["package uuid"] = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"

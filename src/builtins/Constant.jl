@@ -41,7 +41,7 @@ MLJ.predict(model::ConstantRegressor, fitresult, Xnew) = fill(fitresult, MLJ.nro
 MLJ.predict_mean(model::ConstantRegressor, fitresult, Xnew) = fill(Distributions.mean(fitresult), MLJ.nrows(Xnew))
 
 # metadata:
-function MLJ.metadata(::Type{ConstantRegressor})
+function MLJ.info(::Type{ConstantRegressor})
     d = Dict{String,String}()
     d["package name"] = "MLJ"
     d["package uuid"] = ""
@@ -111,7 +111,7 @@ end
 
 
 # metadata:
-function MLJ.metadata(::Type{ConstantClassifier})
+function MLJ.info(::Type{ConstantClassifier})
     d = Dict{String,String}()
     d["package name"] = "MLJ"
     d["package uuid"] = ""

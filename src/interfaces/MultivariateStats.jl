@@ -94,7 +94,7 @@ function MLJ.predict(model::RidgeRegressor, fitresult::LinearFitresult, Xnew)
 end
 
 # metadata:
-function MLJ.metadata(::Type{RidgeRegressor})
+function MLJ.info(::Type{RidgeRegressor})
     d = Dict()
     d["package name"] = "MultivariateStats"
     d["package uuid"] = "6f286f6a-111f-5878-ab1e-185364afe411"

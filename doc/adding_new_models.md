@@ -259,14 +259,14 @@ Probabilistic models (in the sense above) may optionally implement a
 `predict_mode` (classifiers) or `predict_mean` (regressors) operation
 that returns point estimates instead of a probability distribution.
 
-**Metadata.** Ideally, a model `metadata` method should be
+**Model metadata.** Ideally, a model `info` method should be
 provided. This allows the `MLJ` user, through the `Task` interface, to
 discover models that meet a given task specification. For a supervised
-model type `SomeModelType`, `metadata(SomeModelType)` should return a
+model type `SomeModelType`, `info(SomeModelType)` should return a
 dictionary with all keys shown in the example below:
 
 ````julia
-function MLJ.metadata(::Type{RidgeRegressor})
+function MLJ.info(::Type{RidgeRegressor})
     d = Dict{String,String}()
     d["package name"] = "MultivariateStats"
     d["package uuid"] = "6f286f6a-111f-5878-ab1e-185364afe411"
@@ -279,7 +279,7 @@ function MLJ.metadata(::Type{RidgeRegressor})
 end
 ````
 
-Note that for the last four keys, `metadata(SomeModelType)[key]` is a
+Note that for the last four keys, `info(SomeModelType)[key]` is a
 vector of strings.  Permitted elements are indicated below:
 
 key              | permitted values
@@ -290,10 +290,9 @@ key              | permitted values
 `"inputs_can_be"`| `"numeric"`, `"nominal"`, `"missing"`
 `"outputs_are"`  | `"numeric"`/`"nominal"`, `"binary"`/`"multiclass"`, `"deterministic"`/`"probabilistic"`, `"univariate"`/`multivariate"`
 
-For `metadata(SomeModelType)["inputs_are"]` list all that apply. For
-`metadata(SomeModelType)["outputs_are"]` you must specify one from
-each pair of values shown, with the exception of
-`"binary"`/`"multiclass"` if `SomeModelType` is a regressor.  
+For the `"inputs_are"` vector, list all that apply. For the
+`"outputs_are"` vector, specify one string from each pair of values
+that apply (which, for classifiers, is all pairs).
 
 A supervised model is "multivariate" if it can handle multiple targets
 (see below).
