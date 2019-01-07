@@ -13,6 +13,14 @@ using CategoricalArrays
 
 ## THE CONSTANT REGRESSOR
 
+"""
+    ConstantRegressor(; target_type=Float64, distribution_type=Distributions.Normal)
+
+A regressor that, for any new input pattern, predicts the univariate
+probability distribution best fitting the training target data. Use
+`predict_mean` to predict the mean value instead.
+
+"""
 struct ConstantRegressor{F,D} <: MLJ.Supervised{D}
     target_type::Type{F}
     distribution_type::Type{D}
@@ -51,6 +59,16 @@ end
 # fit-result type:
 R{L} = MLJ.UnivariateNominal{L,Float64}
 
+"""
+    ConstantClassifier(; target_type=Bool)
+
+A classifier that, for any new input pattern, `predict`s the
+`UnivariateNominal` probability distribution `d` best fitting the
+training target data. So, `pdf(d, label)` is the proportion of labels
+in the training data coinciding with `label`. Use `predict_mode` to
+obtain the training target mode instead.
+
+"""
 struct ConstantClassifier{L} <: MLJ.Supervised{R{L}}
     target_type::Type{L}
 end
@@ -63,17 +81,12 @@ function MLJ.fit(model::ConstantClassifier{L},
 
     L == L2 || error("Model specifies target_type=$L but target type is $L2.")
 
-    y_pure = skipmissing(y) |> collect
-    N = length(y_pure)
-    count_given_label = countmap(y_pure)
-    prob_given_label = Dict{L2_pure,Float64}()
-    for (x, c) in count_given_label
-        prob_given_label[x] = c/N
-    end
-    
-    fitresult = MLJ.UnivariateNominal(prob_given_label)
+    # dump missing target values and make into a regular array:
+    y_pure = Array{L2_pure}(skipmissing(y) |> collect)
 
-    verbosity < 1 || @info "probabilities: \n$prob_given_label"
+    fitresult = Distributions.fit(MLJ.UnivariateNominal, y_pure)
+
+    verbosity < 1 || @info "probabilities: \n$(fitresult.prob_given_label)"
     cache = nothing
     report = nothing
 
@@ -90,7 +103,7 @@ function MLJ.predict_mode(model::ConstantClassifier{L}, fitresult, Xnew) where L
     labels = fitresult.prob_given_label |> keys |> collect
     N = MLJ.nrows(Xnew)    
     
-    # to get a categorical array with all the levels we append the 
+    # to get a categorical array with all the original levels we append the 
     # distribution labels to the prediction vector and truncate afterwards:
     yhat = vcat(fill(m, N), labels) |> categorical
     return yhat[1:N]

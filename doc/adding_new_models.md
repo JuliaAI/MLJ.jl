@@ -318,10 +318,10 @@ retrain a model (on the same training data) to avoid repeating
 computations unnecessarily.  For context, see ["MLJ
 Internals"](internals.md). A fallback just calls `fit`.  Learning
 networks wrapped as models constitute one use-case: One would
-like component models to be retrained only when new hyper-parameter
+like each component model to be retrained only when new hyper-parameter
 values make this necessary. In this case MLJ provides a fallback
 (specifically, the fallback is for any subtype of
-`Supervised{Node}`. A second important use-case is iterative models,
+`Supervised{Node}`). A second important use-case is iterative models,
 where calls to increase the number of iterations only restarts the
 iterative procedure if other hyper-parameters have also changed. For
 an example see `builtins/Ensembles.jl`.
@@ -331,6 +331,7 @@ call to `fit`) is not sufficient for performing an update, the author
 can arrange for `fit` to output in its `cache` return value any
 additional information required, as this is also passed as an argument
 to the `update` method.
+
 
 #### Multivariate models
 
