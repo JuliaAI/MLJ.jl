@@ -154,7 +154,8 @@ supported.)
 MLJ.fit(model::SomeSupervisedModelType, verbosity::Int, X, y) -> fitresult, cache, report 
 ````
 
-Here `fitresult::R` is the fit-result in the sense above. Any
+Here `fitresult::R` is the fit-result in the sense above (which
+becomes an argument for `predict` discussed below). Any
 training-related statistics, such as internal estimates of the
 generalization error, feature rankings, and coefficients in linear
 models, should be returned in the `report` object. How, or if, these

@@ -39,6 +39,8 @@ d = UnivariateNominal(["yes", "no", "maybe"], [0.1, 0.2, 0.7])
 pdf(d, "no") # 0.2
 mode(d) # "maybe"
 rand(d, 5) # ["maybe", "no", "maybe", "maybe", "no"]
+d = fit(UnivariateNominal, ["maybe", "no", "maybe", "yes"])
+pdf(d, "maybe") ≈ 0.5 # true
 ````
 
 """
@@ -128,6 +130,14 @@ function Base.rand(d::UnivariateNominal, n::Int)
     return [labels[_rand(p_cummulative)] for i in 1:n]
 end
     
-        
+function Distributions.fit(d::Type{UnivariateNominal}, v::AbstractVector{L}) where L
+    N = length(v)
+    count_given_label = Distributions.countmap(v)
+    prob_given_label = Dict{L,Float64}()
+    for (x, c) in count_given_label
+        prob_given_label[x] = c/N
+    end
+    return UnivariateNominal(prob_given_label)
+end
     
     
