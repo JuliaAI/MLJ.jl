@@ -10,42 +10,39 @@ MLJ.predict(composite::Supervised{Node}, verbosity, fitresult, Xnew) =
 
 
 """
-    SimpleCompositeRegressor(;regressor=ConstantRegressor(), 
-                              transformer_X=FeatureSelector(),
-                              transformer_y=UnivariateStandardizer())
+    SimpleComposite(;regressor=ConstantRegressor(), 
+                              transformer=FeatureSelector())
 
-Construct a composite model which wraps `regressor` in a
-pre-transformation of the input features, defined by the unsuperived
-learner `transformer_X`, and a pre-transformation of the target,
-defined by the unsupervised learner `transformer_y`, which is also
-used to inverse-transform the regressor predictions.
+Construct a composite model consisting of a transformer
+(`Unsupervised` model) followed by a `Supervised` model.
 
 """
-mutable struct SimpleCompositeRegressor{L<:Supervised,
-                             TX<:Unsupervised,
-                             Ty<:Unsupervised} <: Supervised{Node}
-    regressor::L
-    transformer_X::TX
-    transformer_y::Ty
+mutable struct SimpleComposite{L<:Supervised,
+                             T<:Unsupervised} <: Supervised{Node}
+    model::L
+    transformer::T
+    
 end
 
-SimpleCompositeRegressor(; regressor=ConstantRegressor(), 
-                          transformer_X=FeatureSelector(),
-                          transformer_y=UnivariateStandardizer()) =
-                              SimpleCompositeRegressor(regressor,
-                                                       transformer_X,
-                                                       transformer_y)
+function SimpleComposite(; model=ConstantRegressor(), 
+                          transformer=FeatureSelector())
 
-function MLJ.fit(composite::SimpleCompositeRegressor, verbosity, Xtrain, ytrain)
+    composite =  SimpleComposite(model, transformer)
+
+    message = MLJ.clean!(composite)
+    isempty(message) || @warn message
+
+    return composite
+
+end
+
+function MLJ.fit(composite::SimpleComposite, verbosity, Xtrain, ytrain)
     X = source(Xtrain) # instantiates a source node
     y = source(ytrain)
-    t_X = machine(composite.transformer_X, X)
-    t_y = machine(composite.transformer_y, y)
-    Xt = transform(t_X, X)
-    yt = transform(t_y, y)
-    l = machine(composite.regressor, Xt, yt)
-    zhat = predict(l, Xt)
-    yhat = inverse_transform(t_y, zhat)
+    t = machine(composite.transformer, X)
+    Xt = transform(t, X)
+    l = machine(composite.model, Xt, y)
+    yhat = predict(l, Xt)
     fit!(yhat, verbosity=verbosity)
     fitresult = yhat
     report = l.report
@@ -53,5 +50,5 @@ function MLJ.fit(composite::SimpleCompositeRegressor, verbosity, Xtrain, ytrain)
     return fitresult, cache, report
 end
 
-MLJ.predict(composite::SimpleCompositeRegressor, fitresult, Xnew) = fitresult(Xnew)
+MLJ.predict(composite::SimpleComposite, fitresult, Xnew) = fitresult(Xnew)
 
