@@ -9,7 +9,7 @@ using CategoricalArrays
 # TRAINABLE MODELS
 
 X_frame, y = datanow();  # boston data
-X = matrix(X_frame)
+X = MLJ.matrix(X_frame)
 
 knn_ = KNNRegressor(K=7)
 
@@ -63,7 +63,7 @@ scale = machine(scale_, XX) # no need to fit
 Xt = transform(scale, XX)
 
 # convert DataFrame Xt to an array:
-Xa = matrix(Xt)
+Xa = MLJ.matrix(Xt)
 
 # choose a learner and make it machine:
 knn_ = KNNRegressor(K=7) # just a container for hyperparameters
