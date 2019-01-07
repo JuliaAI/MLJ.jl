@@ -98,6 +98,7 @@ end
 
 istoobig(::Any) = true
 istoobig(::DataType) = false
+istoobig(::UnionAll) = false
 istoobig(::Union) = false
 istoobig(::Number) = false
 istoobig(::Char) = false

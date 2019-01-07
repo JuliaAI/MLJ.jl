@@ -99,7 +99,7 @@ function MLJ.metadata(::Type{ConstantClassifier})
     d["package uuid"] = ""
     d["is_pure_julia"] = "yes"
     d["properties"] = String[]
-    d["operations"] = ["predict"]
+    d["operations"] = ["predict", "predict_mode"]
     d["inputs_can_be"] = ["numeric", "nominal", "missing"]
     d["outputs_are"] = ["nominal", "multiclass", "deterministic", "univariate"]
     return d
