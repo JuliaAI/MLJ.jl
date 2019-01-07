@@ -1,7 +1,11 @@
 module TestMetrics
 
+# using Revise
 using Test
 using MLJ
+import Distributions
+
+## REGRESSOR METRICS
 
 y = [1, 2, 3, 4]
 yhat = y .+ 1
@@ -11,6 +15,19 @@ yhat = y .+ 1
 @test isapprox(rmslp1(y, yhat),
                sqrt((log(2/3)^2 + log(3/4)^2 + log(4/5)^2 + log(5/6)^2)/4))
 @test isapprox(rmsp(y, yhat), sqrt((1 + 1/4 + 1/9 + 1/16)/4))
+
+# probababilistic versions:
+N = Distributions.Normal
+yhat = N.(yhat)
+@test isapprox(rms(y, yhat), 1.0)
+@test isapprox(rmsl(y, yhat),
+               sqrt((log(1/2)^2 + log(2/3)^2 + log(3/4)^2 + log(4/5)^2)/4))
+@test isapprox(rmslp1(y, yhat),
+               sqrt((log(2/3)^2 + log(3/4)^2 + log(4/5)^2 + log(5/6)^2)/4))
+@test isapprox(rmsp(y, yhat), sqrt((1 + 1/4 + 1/9 + 1/16)/4))
+
+
+## CLASSIFIER METRICS
 
 # for when ROC is added as working dependency:
 # y = ["n", "p", "n", "p", "n", "p"]

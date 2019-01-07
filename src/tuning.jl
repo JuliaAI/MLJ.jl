@@ -67,7 +67,7 @@ function MLJ.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) where M
 
     # evaluate all the models using specified resampling:
 
-    verbosity < 1 || println("Searching for best model...")
+    verbosity < 1 || println("Searching for best model:")
     for model in model_iterator
         if verbosity > 0
             print("model number: $m")
@@ -85,11 +85,11 @@ function MLJ.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) where M
         m += 1
     end
     verbosity < 1 || println()
-    verbosity < 1 || println("Training best model on all supplied data...")
+    verbosity < 1 || println("Training best model on all supplied data.")
 
     # tune best model on all the data:
     fitresult = machine(best_model, X, y)
-    fit!(fitresult)
+    fit!(fitresult, verbosity=verbosity-1)
 
     if tuned_model.report_measurements
         report = Dict{Symbol, Any}()
