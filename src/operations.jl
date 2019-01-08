@@ -60,6 +60,7 @@ end
 @extend_to_machines predict
 @extend_to_machines predict_mode
 @extend_to_machines predict_mean
+@extend_to_machines predict_median
 @extend_to_machines transform
 @extend_to_machines inverse_transform
 @extend_to_machines se
@@ -69,6 +70,7 @@ end
 @sugar predict
 @sugar predict_mode
 @sugar predict_mean
+@sugar predict_median
 @sugar transform
 @sugar inverse_transform
 @sugar se

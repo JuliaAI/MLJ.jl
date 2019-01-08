@@ -279,7 +279,7 @@ function MLJ.info(::Type{RidgeRegressor})
     d = Dict{String,String}()
     d["package name"] = "MultivariateStats"
     d["package uuid"] = "6f286f6a-111f-5878-ab1e-185364afe411"
-	d["is_pure_julia"] = "yes"
+    d["is_pure_julia"] = "yes"
     d["properties"] = ["can rank feature importances",]
     d["operations"] = ["predict",]
     d["inputs_can_be"] = ["numeric",]
