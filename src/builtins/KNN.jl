@@ -14,7 +14,7 @@ KNNFitResultType = Tuple{Matrix{Float64},Vector{Float64}}
 
 # TODO: introduce type parameters for the function fields (metric, kernel)
 
-mutable struct KNNRegressor <: MLJ.Supervised{KNNFitResultType}
+mutable struct KNNRegressor <: MLJ.Deterministic{KNNFitResultType}
     K::Int           # number of local target values averaged
     metric::Function
     kernel::Function 

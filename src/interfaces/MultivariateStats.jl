@@ -41,7 +41,7 @@ function coef_info(fitresult::LinearFitresult, features)
     return df
 end
 
-mutable struct RidgeRegressor <: MLJ.Supervised{LinearFitresult}
+mutable struct RidgeRegressor <: MLJ.Deterministic{LinearFitresult}
     lambda::Float64
 end
 

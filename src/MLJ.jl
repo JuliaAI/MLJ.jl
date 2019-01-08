@@ -3,7 +3,7 @@ module MLJ
 export Rows, Cols, Names
 export features, X_and_y
 export SupervisedTask, UnsupervisedTask, nrows
-export Supervised, Unsupervised
+export Supervised, Unsupervised, Deterministic, Probabilistic
 export matrix
 
 # defined here but extended by files in "interfaces/" (lazily loaded)
@@ -82,6 +82,12 @@ abstract type Model <: MLJType end
 
 abstract type Supervised{R} <: Model end # parameterized by fit-result `R`
 abstract type Unsupervised <: Model  end
+
+# supervised models that `predict` probability distributions are of:
+abstract type Probabilistic{R} <: Supervised{R} end
+
+# supervsied models that `predict` point-values are of:
+abstract type Deterministic{R} <: Supervised{R} end
 
 # tasks:
 abstract type Task <: MLJType end

@@ -21,7 +21,7 @@ probability distribution best fitting the training target data. Use
 `predict_mean` to predict the mean value instead.
 
 """
-struct ConstantRegressor{F,D} <: MLJ.Supervised{D}
+struct ConstantRegressor{F,D} <: MLJ.Probabilistic{D}
     target_type::Type{F}
     distribution_type::Type{D}
 end
@@ -69,7 +69,7 @@ in the training data coinciding with `label`. Use `predict_mode` to
 obtain the training target mode instead.
 
 """
-struct ConstantClassifier{L} <: MLJ.Supervised{R{L}}
+struct ConstantClassifier{L} <: MLJ.Probabilistic{R{L}}
     target_type::Type{L}
 end
 ConstantClassifier(;target_type=Bool) = ConstantClassifier{target_type}(target_type)

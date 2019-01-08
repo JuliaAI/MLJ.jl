@@ -12,22 +12,15 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
     function Machine{M}(model::M, args...) where M<:Model
 
         # check number of arguments for model subtypes:
-        !(M <: Supervised) || length(args) == 2 ||
+        !(M <: Supervised) || length(args) > 1 ||
             throw(error("Wrong number of arguments. "*
-                        "Use NodalMachine(model, X, y) for supervised learner models."))
+                        "You must provide target(s) for supervised models."))
         !(M <: Unsupervised) || length(args) == 1 ||
             throw(error("Wrong number of arguments. "*
-                        "Use NodalMachine(model, X) for an unsupervised learner model."))
+                        "Use NodalMachine(model, X) for an unsupervised  model."))
         
         machine = new{M}(model)
 
-        # if M <: Supervised
-        #     X = coerce(model, args[1])
-        #     y = args[2]
-        #     machine.args = (X, y)
-        # else
-        #     machine.args = args
-        # end
         machine.args = args
         
         machine.report = Dict{Symbol,Any}()
@@ -93,32 +86,32 @@ function fit!(machine::Machine{M};
 
     warning = clean!(machine.model)
     isempty(warning) || verbosity < 0 || @warn warning 
-    
+
 #    verbosity < 1 || @info "Training $machine whose model is $(machine.model)."
     verbosity < 1 || @info "Training $machine."
 
     args = machine.args
     if !isdefined(machine, :fitresult)
         if rows == nothing
-            rows = (:) # error("An untrained Machine requires rows to fit.")
+            rows = (:) 
         end
         X = coerce(machine.model, args[1][Rows, rows])
-        y = args[2][rows]
+        ys = [arg[rows] for arg in args[2:end]]
         machine.fitresult, machine.cache, report =
-            fit(machine.model, verbosity, X, y)
+            fit(machine.model, verbosity, X, ys...)
         machine.rows = rows
     else
         if rows == nothing # (ie rows not specified) update:
             X = coerce(machine.model, args[1][Rows, machine.rows])
-            y = args[2][machine.rows]
+            ys = [arg[machine.rows] for arg in args[2:end]]
             machine.fitresult, machine.cache, report =
                 update(machine.model, verbosity, machine.fitresult,
-                       machine.cache, X, y)
+                       machine.cache, X, ys...)
         else # retrain from scratch:
             X = coerce(machine.model, args[1][Rows, rows])
-            y = args[2][rows]
+            ys = [arg[rows] for arg in args[2:end]]
             machine.fitresult, machine.cache, report =
-                fit(machine.model, verbosity, X, y)
+                fit(machine.model, verbosity, X, ys...)
             machine.rows = rows
         end
     end

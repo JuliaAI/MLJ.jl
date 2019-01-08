@@ -4,7 +4,7 @@ module TestParameters
 using MLJ
 using Test
 
-mutable struct DummyModel <: Supervised{Int}
+mutable struct DummyModel <: Deterministic{Int}
     K::Int
     metric::Float64
     kernel::Char
@@ -15,7 +15,7 @@ dummy_model = DummyModel(4, 9.5, 'k')
     Params(:K => 4, :metric => 9.5, :kernel => 'k')
 
 
-mutable struct SuperModel <: Supervised{Any}
+mutable struct SuperModel <: Deterministic{Any}
     lambda::Float64
     model1::DummyModel
     model2::DummyModel

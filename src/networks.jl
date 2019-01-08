@@ -60,12 +60,13 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
     function NodalMachine{M}(model::M, args::AbstractNode...) where M<:Model
 
         # check number of arguments for model subtypes:
-        !(M <: Supervised) || length(args) == 2 ||
+        !(M <: Supervised) || length(args) > 1 ||
             throw(error("Wrong number of arguments. "*
-                        "Use NodalMachine(model, X, y) for supervised learner models."))
+                        "You must provide target(s) for supervised models."))
+
         !(M <: Unsupervised) || length(args) == 1 ||
             throw(error("Wrong number of arguments. "*
-                        "Use NodalMachine(model, X) for an unsupervised learner model."))
+                        "Use NodalMachine(model, X) for an unsupervised model."))
         
         machine = new{M}(model)
         machine.frozen = false
@@ -172,22 +173,22 @@ function fit!(machine::NodalMachine{M}; rows=nothing, verbosity=1) where M<:Supe
             rows=(:) # error("An untrained NodalMachine requires rows to fit.")
         end
         X = coerce(machine.model, args[1](rows=rows))
-        y = args[2](rows=rows)
+        ys = [arg(rows=rows) for arg in args[2:end]]
         machine.fitresult, machine.cache, report =
-            fit(machine.model, verbosity, X, y)
+            fit(machine.model, verbosity, X, ys...)
         machine.rows = deepcopy(rows)
     else
         if rows == nothing # (ie rows not specified) update:
             X = coerce(machine.model, args[1](rows=machine.rows))
-            y = args[2](rows=machine.rows)
+            ys = [arg(rows=machine.rows) for arg in args[2:end]]
             machine.fitresult, machine.cache, report =
                 update(machine.model, verbosity, machine.fitresult,
-                       machine.cache, X, y)
+                       machine.cache, X, ys...)
         else # retrain from scratch:
             X = coerce(machine.model, args[1](rows=rows))
-            y = args[2](rows=rows)
+            ys = [arg(rows=rows) for arg in args[2:end]]
             machine.fitresult, machine.cache, report =
-                fit(machine.model, verbosity, X, y)
+                fit(machine.model, verbosity, X, ys...)
             machine.rows = deepcopy(rows)
         end
     end

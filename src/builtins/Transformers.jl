@@ -14,7 +14,7 @@ using Statistics
 using Tables
 
 # to be extended:
-import MLJ: fit, transform, inverse_transform, metadata
+import MLJ: fit, transform, inverse_transform
 
 
 ## CONSTANTS

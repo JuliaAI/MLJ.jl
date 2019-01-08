@@ -4,9 +4,9 @@ function update(model::Supervised{Node}, verbosity, fitresult, cache, args...)
     return fitresult, cache, nothing
 end
 
-# fall-back for predicting on learning networkds exported as models
+# fall-back for predicting on learning networks exported as models
 MLJ.predict(composite::Supervised{Node}, verbosity, fitresult, Xnew) =
-    fitresult(coerce(composite, Xnew))
+    fitresult(Xnew)
 
 
 """

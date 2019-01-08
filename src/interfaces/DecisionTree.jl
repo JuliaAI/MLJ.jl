@@ -33,7 +33,7 @@ DecisionTreeClassifierFitResultType{T} =
 [https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md](https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md)
 
 """
-mutable struct DecisionTreeClassifier{T} <: MLJ.Supervised{DecisionTreeClassifierFitResultType{T}}
+mutable struct DecisionTreeClassifier{T} <: MLJ.Deterministic{DecisionTreeClassifierFitResultType{T}}
     target_type::Type{T}  # target is CategoricalArray{target_type}
     pruning_purity::Float64 
     max_depth::Int
