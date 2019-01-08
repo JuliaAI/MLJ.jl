@@ -14,7 +14,7 @@ module DecisionTree_
 export DecisionTreeClassifier
 
 #> for all Supervised models:
-import MLJ
+import MLJInterface
 
 #> for all classifiers:
 using CategoricalArrays
@@ -25,7 +25,7 @@ import DecisionTree
 # TODO: replace Float64 with type parameter
 
 DecisionTreeClassifierFitResultType{T} =
-    Tuple{Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}}, MLJ.CategoricalDecoder{UInt32,T,1,UInt32}}
+    Tuple{Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}}, MLJInterface.CategoricalDecoder{UInt32,T,1,UInt32}}
 
 """
     DecisionTreeClassifer(; kwargs...)
@@ -33,7 +33,7 @@ DecisionTreeClassifierFitResultType{T} =
 [https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md](https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md)
 
 """
-mutable struct DecisionTreeClassifier{T} <: MLJ.Deterministic{DecisionTreeClassifierFitResultType{T}}
+mutable struct DecisionTreeClassifier{T} <: MLJInterface.Deterministic{DecisionTreeClassifierFitResultType{T}}
     target_type::Type{T}  # target is CategoricalArray{target_type}
     pruning_purity::Float64 
     max_depth::Int
@@ -72,7 +72,7 @@ function DecisionTreeClassifier(
         , post_prune
         , merge_purity_threshold)
 
-    message = MLJ.clean!(model)       #> future proof by including these 
+    message = MLJInterface.clean!(model)       #> future proof by including these 
     isempty(message) || @warn message #> two lines even if no clean! defined below
 
     return model
@@ -81,7 +81,7 @@ end
 #> The following optional method (the fallback does nothing, returns
 #> empty warning) is called by the constructor above but also by the
 #> fit methods below:
-function MLJ.clean!(model::DecisionTreeClassifier)
+function MLJInterface.clean!(model::DecisionTreeClassifier)
     warning = ""
     if  model.pruning_purity > 1
         warning *= "Need pruning_purity < 1. Resetting pruning_purity=1.0.\n"
@@ -96,7 +96,7 @@ end
 
 #> A required `fit` method returns `fitresult, cache, report`. (Return
 #> `cache=nothing` unless you are overloading `update`)
-function MLJ.fit(model::DecisionTreeClassifier{T2}
+function MLJInterface.fit(model::DecisionTreeClassifier{T2}
              , verbosity   #> must be here even if unsupported in pkg (as here)
              , X::Matrix{Float64}
              , y::CategoricalVector{T}) where {T,T2}
@@ -104,8 +104,8 @@ function MLJ.fit(model::DecisionTreeClassifier{T2}
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
 
-    decoder = MLJ.CategoricalDecoder(y)
-    y_plain = MLJ.transform(decoder, y)
+    decoder = MLJInterface.CategoricalDecoder(y)
+    y_plain = MLJInterface.transform(decoder, y)
     
     tree = DecisionTree.build_tree(y_plain
                                    , X
@@ -134,21 +134,22 @@ function MLJ.fit(model::DecisionTreeClassifier{T2}
 end
 
 #> method to coerce generic data into form required by fit:
-MLJ.coerce(model::DecisionTreeClassifier, Xtable) = MLJ.matrix(Xtable)
+MLJInterface.coerce(model::DecisionTreeClassifier, Xtable) = MLJInterface.matrix(Xtable)
 
-function MLJ.predict(model::DecisionTreeClassifier{T} 
+function MLJInterface.predict(model::DecisionTreeClassifier{T} 
                      , fitresult
                      , Xnew) where T
     tree, decoder = fitresult
-    return MLJ.inverse_transform(decoder, DecisionTree.apply_tree(tree, Xnew))
+    return MLJInterface.inverse_transform(decoder, DecisionTree.apply_tree(tree, Xnew))
 end
 
 # metadata:
-function MLJ.info(::Type{DecisionTreeClassifier})
+function MLJInterface.info(::Type{DecisionTreeClassifier})
     d = Dict{String,String}()
     d["package name"] = "DecisionTree"
     d["package uuid"] = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
     d["properties"] = []
+    d["is_pure_julia"] = "yes"
     d["operations"] = ["predict",]
     d["inputs_can_be"] = ["numeric",]
     d["outputs_are"] = ["nominal", "multiclass", "deterministic", "univariate"]

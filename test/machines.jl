@@ -6,7 +6,7 @@ using Test
 using Statistics
 
 X_frame, y = datanow();
-X = MLJ.matrix(X_frame)
+X = MLJInterface.matrix(X_frame)
 train, test = partition(eachindex(y), 0.7);
 
 t = Machine(KNNRegressor(K=4), X, y)

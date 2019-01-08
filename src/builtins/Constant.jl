@@ -4,7 +4,8 @@ module Constant
 
 export ConstantRegressor, ConstantClassifier
 
-import MLJ
+import MLJInterface
+import MLJ # needed for `nrows` 
 import Distributions
 using StatsBase
 using Statistics
@@ -21,14 +22,14 @@ probability distribution best fitting the training target data. Use
 `predict_mean` to predict the mean value instead.
 
 """
-struct ConstantRegressor{F,D} <: MLJ.Probabilistic{D}
+struct ConstantRegressor{F,D} <: MLJInterface.Probabilistic{D}
     target_type::Type{F}
     distribution_type::Type{D}
 end
 ConstantRegressor(;target_type=Float64, distribution_type=Distributions.Normal) =
     ConstantRegressor(target_type, distribution_type)
 
-function MLJ.fit(model::ConstantRegressor{F,D}, verbosity, X, y::Vector{F2}) where {F,D,F2}
+function MLJInterface.fit(model::ConstantRegressor{F,D}, verbosity, X, y::Vector{F2}) where {F,D,F2}
     F == F2 || error("Model specifies target_type=$F but target type is $F2.")
     fitresult = Distributions.fit(D, collect(skipmissing(y)))
     verbosity < 1 || @info "Fitted a constant probability distribution, $fitresult."
@@ -37,11 +38,11 @@ function MLJ.fit(model::ConstantRegressor{F,D}, verbosity, X, y::Vector{F2}) whe
     return fitresult, cache, report
 end
 
-MLJ.predict(model::ConstantRegressor, fitresult, Xnew) = fill(fitresult, MLJ.nrows(Xnew))
-MLJ.predict_mean(model::ConstantRegressor, fitresult, Xnew) = fill(Distributions.mean(fitresult), MLJ.nrows(Xnew))
+MLJInterface.predict(model::ConstantRegressor, fitresult, Xnew) = fill(fitresult, MLJ.nrows(Xnew))
+MLJInterface.predict_mean(model::ConstantRegressor, fitresult, Xnew) = fill(Distributions.mean(fitresult), MLJ.nrows(Xnew))
 
 # metadata:
-function MLJ.info(::Type{ConstantRegressor})
+function MLJInterface.info(::Type{ConstantRegressor})
     d = Dict{String,String}()
     d["package name"] = "MLJ"
     d["package uuid"] = ""
@@ -57,7 +58,7 @@ end
 ## THE CONSTANT CLASSIFIER
 
 # fit-result type:
-R{L} = MLJ.UnivariateNominal{L,Float64}
+R{L} = MLJInterface.UnivariateNominal{L,Float64}
 
 """
     ConstantClassifier(; target_type=Bool)
@@ -69,12 +70,12 @@ in the training data coinciding with `label`. Use `predict_mode` to
 obtain the training target mode instead.
 
 """
-struct ConstantClassifier{L} <: MLJ.Probabilistic{R{L}}
+struct ConstantClassifier{L} <: MLJInterface.Probabilistic{R{L}}
     target_type::Type{L}
 end
 ConstantClassifier(;target_type=Bool) = ConstantClassifier{target_type}(target_type)
 
-function MLJ.fit(model::ConstantClassifier{L},
+function MLJInterface.fit(model::ConstantClassifier{L},
                  verbosity,
                  X,
                  y::CategoricalVector{L2,R,L2_pure}) where {L,R,L2,L2_pure}
@@ -84,7 +85,7 @@ function MLJ.fit(model::ConstantClassifier{L},
     # dump missing target values and make into a regular array:
     y_pure = Array{L2_pure}(skipmissing(y) |> collect)
 
-    fitresult = Distributions.fit(MLJ.UnivariateNominal, y_pure)
+    fitresult = Distributions.fit(MLJInterface.UnivariateNominal, y_pure)
 
     verbosity < 1 || @info "probabilities: \n$(fitresult.prob_given_label)"
     cache = nothing
@@ -94,11 +95,11 @@ function MLJ.fit(model::ConstantClassifier{L},
 
 end
 
-function MLJ.predict(model::ConstantClassifier{L}, fitresult, Xnew) where L
+function MLJInterface.predict(model::ConstantClassifier{L}, fitresult, Xnew) where L
     return fill(fitresult, MLJ.nrows(Xnew))
 end
 
-function MLJ.predict_mode(model::ConstantClassifier{L}, fitresult, Xnew) where L
+function MLJInterface.predict_mode(model::ConstantClassifier{L}, fitresult, Xnew) where L
     m = mode(fitresult)
     labels = fitresult.prob_given_label |> keys |> collect
     N = MLJ.nrows(Xnew)    
@@ -111,7 +112,7 @@ end
 
 
 # metadata:
-function MLJ.info(::Type{ConstantClassifier})
+function MLJInterface.info(::Type{ConstantClassifier})
     d = Dict{String,String}()
     d["package name"] = "MLJ"
     d["package uuid"] = ""

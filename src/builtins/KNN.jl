@@ -4,7 +4,7 @@ module KNN
 
 export KNNRegressor
 
-import MLJ
+import MLJInterface
 
 using LinearAlgebra
 
@@ -14,7 +14,7 @@ KNNFitResultType = Tuple{Matrix{Float64},Vector{Float64}}
 
 # TODO: introduce type parameters for the function fields (metric, kernel)
 
-mutable struct KNNRegressor <: MLJ.Deterministic{KNNFitResultType}
+mutable struct KNNRegressor <: MLJInterface.Deterministic{KNNFitResultType}
     K::Int           # number of local target values averaged
     metric::Function
     kernel::Function 
@@ -26,12 +26,12 @@ reciprocal(d) = d < eps(Float64) ? sign(d)/eps(Float64) : 1/d
 # lazy keywork constructor:
 function KNNRegressor(; K=1, metric=euclidean, kernel=reciprocal)
     model = KNNRegressor(K, metric, kernel)
-    message = MLJ.clean!(model)
+    message = MLJInterface.clean!(model)
     isempty(message) || @warn message
     return model
 end
     
-function MLJ.clean!(model::KNNRegressor)
+function MLJInterface.clean!(model::KNNRegressor)
     message = ""
     if model.K <= 0
         model.K = 1
@@ -40,9 +40,9 @@ function MLJ.clean!(model::KNNRegressor)
     return message
 end
 
-MLJ.coerce(model::KNNRegressor, Xtable) = MLJ.matrix(Xtable)
+MLJInterface.coerce(model::KNNRegressor, Xtable) = MLJInterface.matrix(Xtable)
 
-function MLJ.fit(model::KNNRegressor
+function MLJInterface.fit(model::KNNRegressor
              , verbosity
              , X::Matrix{Float64}
              , y::Vector{Float64})
@@ -87,18 +87,19 @@ function predict_on_pattern(model, fitresult, pattern)
     return sum(wts .* ytrain[indices])
 end
 
-MLJ.predict(model::KNNRegressor, fitresult, Xnew) = 
+MLJInterface.predict(model::KNNRegressor, fitresult, Xnew) = 
     [predict_on_pattern(model, fitresult, Xnew[i,:]) for i in 1:size(Xnew,1)]
     
 # metadata:
-function MLJ.info(::Type{KNNRegressor})
+function MLJInterface.info(::Type{KNNRegressor})
     d = Dict()
     d["package name"] = "MLJ"
     d["package uuid"] = ""
     d["properties"] = []
+    d["is_pure_julia"] = "yes"
     d["operations"] = ["predict"]
     d["inputs_can_be"] = ["numeric"]
-    d["outputs_are"] = ["numeric"]
+    d["outputs_are"] = ["numeric","deterministic","univariate"]
     return d
 end
 

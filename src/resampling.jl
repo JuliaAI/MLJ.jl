@@ -34,7 +34,7 @@ end
 Resampler(;model=RidgeRegressor(), tuning=Holdout(), measure=rms, operation=predict) =
     Resampler(model, tuning, measure, operation) 
 
-function fit(resampler::Resampler{Holdout}, verbosity, X, y)
+function MLJInterface.fit(resampler::Resampler{Holdout}, verbosity, X, y)
 
     mach = machine(resampler.model, X, y)
 
@@ -51,7 +51,7 @@ function fit(resampler::Resampler{Holdout}, verbosity, X, y)
     
 end
 
-evaluate(model::Resampler{Holdout}, fitresult) = fitresult
+MLJInterface.evaluate(model::Resampler{Holdout}, fitresult) = fitresult
 
 
 ## DIRECT EVALUTATING OF TRAINABLE MODELS
