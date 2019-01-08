@@ -58,12 +58,22 @@ abstract type Supervised{R} <: Model end
 abstract type Unsupervised <: Model end
 ````
 
-Here the parameter `R` refers to a fit-result type. By declaring a
-model to be a subtype of `Supervised{R}` you guarantee the fit-result
-to be of type `R` and, if `R` is concrete, one may improve the
-performance of homogeneous ensembles of the model (as defined by the
-built-in MLJ module `Ensembles`). There is no abstract type for
+Here the parameter `R` refers to a fit-result type. By
+declaring a model to be a subtype of `Supervised{R}` you guarantee the
+fit-result to be of type `R` and, if `R` is concrete, one may improve
+the performance of homogeneous ensembles of the model (as defined by
+the built-in MLJ module `Ensembles`). There is no abstract type for
 fit-results because these types are generally declared outside of MLJ.
+
+`Supervised` models are further divided according to whether they are
+able to furnish probabilistic predictions of the target(s) (which they
+will do so by default) or directly predict "point" estimates, for each
+new input pattern:
+
+````julia
+abstract type Probabilistic{R} <: Supervised{R} end
+abstract type Deterministic{R} <: Supervised{R} end
+````
 
 Associated with every concrete subtype of `Model` there must be a
 `fit` method, which implements the associated algorithm to produce the
@@ -71,11 +81,12 @@ fit-result. Additionally, every `Supervised` model has a `predict`
 method, while `Unsupersvised` models must have a `transform`
 method. More generally, methods such as these, that are dispatched on
 a model instance and a fit-result (plus other data), are called
-*operations*. At present `Supervised` models that predict probability
-distributions (rather than point values) may optionally implement a
-`predict_mode` (classifiers) or `predict_mean` (regressors) operation,
-while `Unsupervised` models may implement an `inverse_transform`
-operation.
+*operations*. `Probababilistic` supervised models optionally implement
+a `predict_mode` operation (in the case of classifiers) or a
+`predict_mean` operation (in the case of regressors) overiding
+obvious fallbacks. `Unsupervised` models may implement an
+`inverse_transform` operation
+
 
 ## The Model API
 
@@ -190,13 +201,12 @@ MLJ.predict(model::SomeSupervisedModelType, fitresult, Xnew) -> yhat
 Here `Xnew` is understood to be of the same type as `X` in the `fit`
 method (MLJ will call `coerce` on the data provided by the user). 
 
-**Prediction types for deterministic responses.** If the learning
-algorithm predicts ordinary "point" values (as opposed to
-probabilities) then `yhat` must have the same type as the target `y`
-passed to the `fit` method. Note, in particular, that for point-value
-predicting classifiers, the categorical vector returned by `predict`
-**must have the same levels of the target data presented in
-training**, even if not all levels appear in the prediction
+**Prediction types for deterministic responses.** In the case of
+`Deterministic` models, `yhat` must have the same type as the target
+`y` passed to the `fit` method. Note, in particular, that for
+point-value predicting classifiers, the categorical vector returned by
+`predict` *must have the same levels of the target data presented in
+training*, even if not all levels appear in the prediction
 itself. That is, we require `levels(yhat) == levels(y)`.
 
 For code not written with the preservation of categorical
@@ -232,10 +242,9 @@ end
 ````
 Query `?MLJ.DecodeCategorical` for more information.
 
-**Prediction types for probablistic responses.** If, instead, an algorithm
-learns a probability distribution (as in classification by logistic
-regression, for example) then `yhat` must be a `Vector` whose elements
-are distributions (one distribution per row of `Xnew`). 
+**Prediction types for probablistic responses.** In the case of
+`Probabilistic` models, `yhat` must be a `Vector` whose elements are
+distributions (one distribution per row of `Xnew`).
 
 A *distribution* is any instance of a subtype of
 `Distributions.Distribution` from the package Distributions.jl, or any
@@ -245,7 +254,7 @@ instance of the additional types `UnivariateNominal` and
 and `Distributions.pdf` are implemented, as well
 `Distributions.mean` and/or `Distributions.mode`).
 
-Use `UnivariateNominal` for probabilistic classifiers with a single
+Use `UnivariateNominal` for `Probabilistic` classifiers with a single
 nominal target. For example, suppose `levels(y)=["yes", "no",
 "maybe"]` and set `L=levels(y)`. Then, if the predicted probabilities
 for some input pattern are `[0.1, 0.7, 0.2]`, respectively, then the
@@ -255,7 +264,7 @@ prediction returned for that pattern will be `UnivariateNominal(L,
 
 #### Optional methods
 
-Probabilistic models (in the sense above) may optionally implement a
+As mentioned already, `Probabilistic` models may optionally implement a
 `predict_mode` (classifiers) or `predict_mean` (regressors) operation
 that returns point estimates instead of a probability distribution.
 
@@ -292,7 +301,10 @@ key              | permitted values
 
 For the `"inputs_are"` vector, list all that apply. For the
 `"outputs_are"` vector, specify one string from each pair of values
-that apply (which, for classifiers, is all pairs).
+that apply (which, for classifiers, is all pairs). Of course
+`Deterministic` models must include "deterministic", and
+`Probabilistic` models must include "probabilistic" in their
+"outputs_are" vectors.
 
 A supervised model is "multivariate" if it can handle multiple targets
 (see below).
