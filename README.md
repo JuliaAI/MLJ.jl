@@ -14,11 +14,13 @@ progress and new [collaborators](#collaborators) are being sought.
 In large measure the MLJ project is inspired by [mlR](https://pat-s.github.io/mlr/index.html) ([recent
 slides 7/18](https://github.com/mlr-org/mlr-outreach).)
 
-
 For an earlier proof-of-concept, see
 [this branch](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
 and [this poster summary](material/MLJ-JuliaCon2018-poster.pdf).
 
+Packages wishing to implement the MLJ API for their algorithms should
+import `MLJInterface`, which has its own
+[repository](https://github.com/alan-turing-institute/MLJInterface.jl).
 
 ### Features to include:
 
