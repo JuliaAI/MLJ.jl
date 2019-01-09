@@ -16,9 +16,8 @@ slides 7/18](https://github.com/mlr-org/mlr-outreach).)
 
 
 For an earlier proof-of-concept, see
-[this](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
-branch and this [poster](material/MLJ-JuliaCon2018-poster.pdf)
-summary.
+[this branch](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
+and [this poster summary](material/MLJ-JuliaCon2018-poster.pdf).
 
 
 ### Features to include:
@@ -186,10 +185,8 @@ Predecessors of the current package are
 and [Orchestra.jl](https://github.com/svs14/Orchestra.jl). Work
 continued as a research study group at the Univeristy of Warwick,
 beginning with a review of existing ML Modules that are available in
-Julia
-[in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational)
-and
-[overview](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Package%20Review).
+Julia ([in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational),
+[overview](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Package%20Review)).
 
 ![alt text](material/packages.jpg)
 
