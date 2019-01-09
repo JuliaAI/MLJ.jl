@@ -1,7 +1,7 @@
 # Implementing the MLJ interface for a learning algorithm 
 
 This guide outlines the specification of the MLJ model interface. The
-machine learning tools provided by MLJ.jl can be applied to the models
+machine learning tools provided by MLJ can be applied to the models
 in any package that imports the module
 [MLJInterface](https://github.com/alan-turing-institute/MLJInterface.jl)
 and implements the API defined there as outlined below.
@@ -36,14 +36,14 @@ Internals"](internals.md).
 <!-- binding, which is reflected in the output of `show`. -->
 
 
-## Models
+## Overview
 
 A *model* is an object storing hyper-parameters associated with some
 machine learning algorithm, where "learning algorithm" is broadly
 interpreted.  In MLJ, hyper-parameters include configuration
 parameters, like the number of threads or the target element type, which
 may or may not affect the final learning outcome.  However, the logging
-level, `verbosity`, is excluded.
+level (`verbosity` below) is excluded.
 
 The name of the Julia type associated with a model indicates the
 associated algorithm (e.g., `DecisionTreeClassifier`). The outcome of
@@ -52,22 +52,22 @@ ordinary multilinear regression, for example, this would be the
 coefficients and intercept. For a general supervised model, it is the
 (generally minimal) information needed to make new predictions.
 
-The ultimate supertype of all models is `MLJ.Model`.
-
-Models defined outside of `MLJ` will fall into one of two subtypes:
-`MLJ.Supervised` and `MLJ.Unsupervised`:
+The ultimate supertype of all models is `MLJInterface.Model`, which
+has two abstract subtypes; quoting MLJInterface.jl:
 
 ````julia
+abstract type MLJType end
 abstract type Supervised{R} <: Model end
 abstract type Unsupervised <: Model end
 ````
 
-Here the parameter `R` refers to a fit-result type. By
-declaring a model to be a subtype of `Supervised{R}` you guarantee the
-fit-result to be of type `R` and, if `R` is concrete, one may improve
-the performance of homogeneous ensembles of the model (as defined by
-the built-in MLJ module `Ensembles`). There is no abstract type for
-fit-results because these types are generally declared outside of MLJ.
+Here the parameter `R` refers to a fit-result type. By declaring a
+model to be a subtype of `MLJInterface.Supervised{R}` you guarantee
+the fit-result to be of type `R` and, if `R` is concrete, one may
+improve the performance of homogeneous ensembles of the model (as
+defined by the built-in MLJ module `Ensembles`). There is no abstract
+type for fit-results because these types are generally declared
+outside of MLJInterface.
 
 `Supervised` models are further divided according to whether they are
 able to furnish probabilistic predictions of the target(s) (which they
@@ -87,9 +87,10 @@ method. More generally, methods such as these, that are dispatched on
 a model instance and a fit-result (plus other data), are called
 *operations*. `Probababilistic` supervised models optionally implement
 a `predict_mode` operation (in the case of classifiers) or a
-`predict_mean` operation (in the case of regressors) overiding
-obvious fallbacks. `Unsupervised` models may implement an
-`inverse_transform` operation
+`predict_mean` and/or `predict_median` operations (in the case of
+regressors) overiding obvious fallbacks provided by
+`MLJInterface`. `Unsupervised` models may implement an
+`inverse_transform` operation.
 
 
 ## The Model API
@@ -111,7 +112,7 @@ import MLJ
 
 R{S,T} = Tuple{Matrix{S},Vector{T}} where {S<:AbstractFloat,T<:AbstractFloat}
 
-mutable struct KNNRegressor{S,T,M,K} <: MLJ.Supervised{R{S,T}}
+mutable struct KNNRegressor{S,T,M,K} <: MLJInterface.Supervised{R{S,T}}
     source_type::S
     target_type::T
     K::Int          
@@ -130,7 +131,7 @@ every field) and checks their validity, by calling a `clean!` method
 ### Supervised models
 
 Below we describe the compulsory and optional methods to be specified
-for each concrete type `SomeSupervisedModel{R} <: Supervised{R}`. We
+for each concrete type `SomeSupervisedModel{R} <: MLJInterface.Supervised{R}`. We
 restrict attention to algorithms handling a *single* (univariate)
 target. Differences in the multivariate case are described later.
 
@@ -148,11 +149,11 @@ specific form, one must overload the following method (whose fallback
 just returns `Xtable`):
 
 ````julia
-MLJ.coerce(model::Supervised{R}, Xtable) -> X
+MLJInterface.coerce(model::Supervised{R}, Xtable) -> X
 ````
 
-To this end, MLJ provides the convenience method `MLJ.matrix`;
-`MLJ.matrix(Xtable)` is a two-dimensional `Array{T}` where `T` is the
+To this end, MLJ provides the convenience method `MLJInterface.matrix`;
+`MLJInterface.matrix(Xtable)` is a two-dimensional `Array{T}` where `T` is the
 tightest common type of elements of `Xtable`, and `Xtable` is any
 iterable table.
 
@@ -168,7 +169,7 @@ supported.)
 **The fit method.** The `fit` method returns three objects:
 
 ````julia 
-MLJ.fit(model::SomeSupervisedModelType, verbosity::Int, X, y) -> fitresult, cache, report 
+MLJInterface.fit(model::SomeSupervisedModelType, verbosity::Int, X, y) -> fitresult, cache, report 
 ````
 
 Here `fitresult::R` is the fit-result in the sense above (which
@@ -199,11 +200,11 @@ generally avoid doing any of its own logging.
 **The predict method.**
 
 ````julia
-MLJ.predict(model::SomeSupervisedModelType, fitresult, Xnew) -> yhat
+MLJInterface.predict(model::SomeSupervisedModelType, fitresult, Xnew) -> yhat
 ````
 
 Here `Xnew` is understood to be of the same type as `X` in the `fit`
-method (MLJ will call `coerce` on the data provided by the user). 
+method (MLJ will call `coerce` on the data provided by the user to obtain `Xnew`). 
 
 **Prediction types for deterministic responses.** In the case of
 `Deterministic` models, `yhat` must have the same type as the target
@@ -225,8 +226,8 @@ a nominal target `yint` of type `Vector{Int64}` then the `fit` method
 may look something like this:
 
 ````julia
-function MLJ.fit(model::SomeSupervisedModelType, verbosity, X, y)
-    decoder = MLJ.CategoricalDecoder(y, eltype=Int64)
+function MLJInterface.fit(model::SomeSupervisedModelType, verbosity, X, y)
+    decoder = MLJInterface.CategoricalDecoder(y, eltype=Int64)
 	yint = transform(decoder, y)
 	core_fitresult = SomePackage.fit(X, yint, verbosity=verbosity)
 	fitresult = (decoder, core_fitresult)
@@ -238,13 +239,13 @@ end
 while the corresponding `predict` operation might look like this:
 
 ````julia
-function MLJ.predict(model::SomeSupervisedModelType, fitresult, Xnew)
+function MLJInterface.predict(model::SomeSupervisedModelType, fitresult, Xnew)
     decoder, core_fitresult = fitresult
     yhat = SomePackage.predict(core_fitresult, Xnew)
 	return inverse_transform(decoder, yhat)
 end
 ````
-Query `?MLJ.DecodeCategorical` for more information.
+Query `?MLJInterface.DecodeCategorical` for more information.
 
 **Prediction types for probablistic responses.** In the case of
 `Probabilistic` models, `yhat` must be a `Vector` whose elements are
@@ -254,9 +255,9 @@ A *distribution* is any instance of a subtype of
 `Distributions.Distribution` from the package Distributions.jl, or any
 instance of the additional types `UnivariateNominal` and
 `MultivariateNominal` defined in MLJInterface.jl (or any other type
-`D` for which `MLJ.isdistribution(::D) = true`, meaning `Base.rand`
+`D` for which `MLJInterface.isdistribution(::D) = true`, meaning `Base.rand`
 and `Distributions.pdf` are implemented, as well
-`Distributions.mean` and/or `Distributions.mode`).
+`Distributions.mean`/`Distribution.median` or `Distributions.mode`).
 
 Use `UnivariateNominal` for `Probabilistic` classifiers with a single
 nominal target. For example, suppose `levels(y)=["yes", "no",
@@ -268,9 +269,10 @@ prediction returned for that pattern will be `UnivariateNominal(L,
 
 #### Optional methods
 
-As mentioned already, `Probabilistic` models may optionally implement a
-`predict_mode` (classifiers) or `predict_mean` (regressors) operation
-that returns point estimates instead of a probability distribution.
+As mentioned already, `Probabilistic` models may optionally implement
+a `predict_mode` operation (for classifiers) or `predict_mean` and/or
+`predict_median` operations (regressors)  returning point
+estimates instead of a probability distribution.
 
 **Model metadata.** Ideally, a model `info` method should be
 provided. This allows the `MLJ` user, through the `Task` interface, to
@@ -279,7 +281,7 @@ model type `SomeModelType`, `info(SomeModelType)` should return a
 dictionary with all keys shown in the example below:
 
 ````julia
-function MLJ.info(::Type{RidgeRegressor})
+function MLJInterface.info(::Type{RidgeRegressor})
     d = Dict{String,String}()
     d["package name"] = "MultivariateStats"
     d["package uuid"] = "6f286f6a-111f-5878-ab1e-185364afe411"
@@ -299,7 +301,7 @@ key              | permitted values
 -----------------|----------------------------------------------------
 `"is_pure_julia"`| `"yes"`, `"no"`
 `"properties"`   | unrestricted
-`"operations"`   | `"predict"`, `"predict_mean"`, `"predict_mode"`, `"transform"`, `"inverse_transform"`
+`"operations"`   | `"predict"`, `"predict_mean"`, `"predict_median"`, `"predict_mode"`, `"transform"`, `"inverse_transform"`
 `"inputs_can_be"`| `"numeric"`, `"nominal"`, `"missing"`
 `"outputs_are"`  | `"numeric"`/`"nominal"`, `"binary"`/`"multiclass"`, `"deterministic"`/`"probabilistic"`, `"univariate"`/`multivariate"`
 
@@ -316,18 +318,46 @@ A supervised model is "multivariate" if it can handle multiple targets
 **The clean! method.**
 
 ````julia
-MLJ.clean!(model::Supervised) -> message::String
+MLJInterface.clean!(model::Supervised) -> message::String
 ````
 
-This method checks and corrects for invalid fields (hyper-parameters),
-returning a warning `message` explaining what has been changed. It should
-only throw an exception as a last resort. This method is called by the
-model constructor, and by MLJ before any `fit` call.
+This method is for checking and correcting invalid fields
+(hyper-parameters) of the model, returning a warning `message`
+explaining what has been changed. It should only throw an exception as
+a last resort. This method should be called by the model keyword
+constructor, as shown in the example below, and is called by MLJ
+before each call to `fit`.
+
+````julia
+mutable struct RidgeRegressor <: MLJInterface.Deterministic{Tuple{Vector{Float64}, Float64}}
+    lambda::Float64
+end
+
+function MLJInterface.clean!(model::RidgeRegressor)
+    warning = ""
+    if  model.lambda < 1
+	warning *= "Need lambda ≥ 0. Resetting lamda = 0.\n"
+        model.pruning_purity = 1.0
+    end
+    return warning
+end
+
+function RidgeRegressor(; lambda=0.0) 
+    model =  RidgeRegressor(lambda)
+    message = MLJInterface.clean!(model)     
+    isempty(message) || @warn message
+    return model
+end
+````
+
+
+
+
 
 **The update! method.**
 
 ````julia
-MLJ.update(model::SomeSupervisedModelType, verbosity, old_fitresult, old_cache, X, y) -> fitresult, cache, report
+MLJInterface.update(model::SomeSupervisedModelType, verbosity, old_fitresult, old_cache, X, y) -> fitresult, cache, report
 ````
 
 An `update` method may be overloaded to enable a call by MLJ to
