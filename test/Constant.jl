@@ -4,11 +4,12 @@ module TestConstant
 using Test
 using MLJ
 using CategoricalArrays
+using DataFrames
 import Distributions
 
 ## REGRESSOR
 
-X = nothing # X is never used by constant regressors/classifiers
+X = DataFrame(rand(10,3)) # X is never used by constant regressors/classifiers
 y = Union{Missing,Float32}[1.0, 1.0, 2.0, 2.0, missing]
 
 model = ConstantRegressor(target_type=Union{Missing,Float32})
@@ -21,7 +22,6 @@ d=Distributions.Normal(1.5, 0.5)
 
 ## CLASSIFIER
 
-X = nothing # X is never used by constant regressors/classifiers
 yraw = Union{Missing,String}["Perry", "Antonia", "Perry", "Skater", missing]
 y = categorical(yraw)
 

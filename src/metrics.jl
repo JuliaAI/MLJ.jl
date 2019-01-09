@@ -15,7 +15,7 @@ function rms(y, yhat::AbstractVector{<:Real})
     end
     return sqrt(ret/length(y))
 end
-rms(y, yhat) = rms(y, Distributions.mean.(yhat)) 
+rms(y, yhat) = rms(y, mean.(yhat)) 
 
 function rmsl(y, yhat::AbstractVector{<:Real})
     length(y) == length(yhat) || throw(DimensionMismatch())
@@ -26,7 +26,7 @@ function rmsl(y, yhat::AbstractVector{<:Real})
     end
     return sqrt(ret/length(y))
 end
-rmsl(y, yhat) = rmsl(y, Distributions.mean.(yhat)) 
+rmsl(y, yhat) = rmsl(y, mean.(yhat)) 
 
 function rmslp1(y, yhat::AbstractVector{<:Real})
     length(y) == length(yhat) || throw(DimensionMismatch())
@@ -37,7 +37,7 @@ function rmslp1(y, yhat::AbstractVector{<:Real})
     end
     return sqrt(ret/length(y))
 end
-rmslp1(y, yhat) = rmslp1(y, Distributions.mean.(yhat)) 
+rmslp1(y, yhat) = rmslp1(y, mean.(yhat)) 
 
 
 """ Root mean squared percentage loss """
@@ -54,7 +54,7 @@ function rmsp(y, yhat::AbstractVector{<:Real})
     end
     return sqrt(ret/count)
 end
-rmsp(y, yhat) = rmsp(y, Distributions.mean.(yhat)) 
+rmsp(y, yhat) = rmsp(y, mean.(yhat)) 
 
 # function auc(truelabel::L) where L
 #     _auc(y::AbstractVector{L}, yhat::AbstractVector{T}) where T<:Real = 

@@ -2,6 +2,7 @@ module TestMachines
 
 # using Revise
 using MLJ
+import MLJInterface
 using Test
 using Statistics
 

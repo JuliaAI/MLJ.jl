@@ -7,23 +7,7 @@ using MLJ
 # using Revise
 using Test
 
-@testset "distributions" begin
-  @test include("distributions.jl")
-end
-
 @constant junk=KNNRegressor()
-
-import CategoricalArrays
-
-A = broadcast(x->Char(65+mod(x,5)), rand(Int, 10,5))
-X = CategoricalArrays.categorical(A)
-Xsmall = X[2:5,3:4]
-
-decoder = MLJInterface.CategoricalDecoder(X, eltype=Float16)
-@test inverse_transform(decoder, transform(decoder, Xsmall)) == Xsmall
-
-decoder = MLJInterface.CategoricalDecoder(X)
-@test inverse_transform(decoder, transform(decoder, Xsmall)) == Xsmall
 
 @testset "metrics" begin
   @test include("metrics.jl")

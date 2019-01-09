@@ -3,6 +3,7 @@ module TestDistributions
 # using Revise
 using Test
 using MLJ
+import MLJInterface.UnivariateNominal
 import StatsBase
 import Distributions
 
@@ -25,8 +26,6 @@ d = Distributions.fit(UnivariateNominal, ['a', 'b', 'a', 'b', 'c', 'b', 'a', 'a'
 @test pdf(d, 'a') ≈ 0.5
 @test pdf(d, 'b') ≈ 0.375 
 @test pdf(d, 'c') ≈ 0.125
-
-
 
 end # module
 

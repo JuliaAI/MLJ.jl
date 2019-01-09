@@ -5,7 +5,7 @@ module MultivariateStats_
 export RidgeRegressor 
 
 import MLJInterface
-import MLJ: Names, keys_ordered_by_values
+import MLJ
 import MultivariateStats
 import DataFrames
 

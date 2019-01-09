@@ -300,14 +300,14 @@ istoobig(d::Tuple{AbstractNode}) = length(d) > 10
 # overload show method
 function _recursive_show(stream::IO, X::AbstractNode)
     if X isa Source
-        printstyled(IOContext(stream, :color=>true), handle(X), bold=true)
+        printstyled(IOContext(stream, :color=>true), MLJInterface.handle(X), bold=true)
     else
-        detail = (X.machine == nothing ? "(" : "($(handle(X.machine)), ")
+        detail = (X.machine == nothing ? "(" : "($(MLJInterface.handle(X.machine)), ")
         operation_name = typeof(X.operation).name.mt.name
         print(stream, operation_name, "(")
         if X.machine != nothing
             color = (X.machine.frozen ? :red : :green)
-            printstyled(IOContext(stream, :color=>true), handle(X.machine),
+            printstyled(IOContext(stream, :color=>true), MLJInterface.handle(X.machine),
                         bold=true)
             print(stream, ", ")
         end
@@ -325,7 +325,7 @@ end
 function Base.show(stream::IO, ::MIME"text/plain", X::AbstractNode)
     id = objectid(X) 
     description = string(typeof(X).name.name)
-    str = "$description @ $(handle(X))"
+    str = "$description @ $(MLJInterface.handle(X))"
     printstyled(IOContext(stream, :color=> true), str, bold=true)
     if !(X isa Source)
         print(stream, " = ")
@@ -336,14 +336,14 @@ end
 function Base.show(stream::IO, ::MIME"text/plain", machine::NodalMachine)
     id = objectid(machine) 
     description = string(typeof(machine).name.name)
-    str = "$description @ $(handle(machine))"
+    str = "$description @ $(MLJInterface.handle(machine))"
     printstyled(IOContext(stream, :color=> true), str, bold=true)
     print(stream, " = ")
     print(stream, "machine($(machine.model), ")
     n_args = length(machine.args)
     counter = 1
     for arg in machine.args
-        printstyled(IOContext(stream, :color=>true), handle(arg), bold=true)
+        printstyled(IOContext(stream, :color=>true), MLJInterface.handle(arg), bold=true)
         counter >= n_args || print(stream, ", ")
         counter += 1
     end

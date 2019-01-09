@@ -18,13 +18,13 @@ yhat = y .+ 1
 
 # probababilistic versions:
 N = Distributions.Normal
-yhat = N.(yhat)
-@test isapprox(rms(y, yhat), 1.0)
-@test isapprox(rmsl(y, yhat),
+zhat = N.(yhat)
+@test isapprox(rms(y, zhat), 1.0)
+@test isapprox(rmsl(y, zhat),
                sqrt((log(1/2)^2 + log(2/3)^2 + log(3/4)^2 + log(4/5)^2)/4))
-@test isapprox(rmslp1(y, yhat),
+@test isapprox(rmslp1(y, zhat),
                sqrt((log(2/3)^2 + log(3/4)^2 + log(4/5)^2 + log(5/6)^2)/4))
-@test isapprox(rmsp(y, yhat), sqrt((1 + 1/4 + 1/9 + 1/16)/4))
+@test isapprox(rmsp(y, zhat), sqrt((1 + 1/4 + 1/9 + 1/16)/4))
 
 
 ## CLASSIFIER METRICS
