@@ -5,9 +5,10 @@ A pure Julia machine learning framework.
 [![Build Status](https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master)](https://travis-ci.com/alan-turing-institute/MLJ.jl)
 [![Slack Channel mlj](https://img.shields.io/badge/chat-on%20slack-yellow.svg)](https://slackinvite.julialang.org/)
 
-MLJ aims to be a flexible framework for building and tuning machine
-learning models, written entirely in the high performance, rapid development, scientific programming language, Julia. This is a work in progress and new 
-[collaborators](#collaborators) are being sought.
+MLJ aims to be a flexible framework for combining and tuning machine
+learning models, written in the high performance, rapid
+development, scientific programming language, Julia. This is a work in
+progress and new [collaborators](#collaborators) are being sought.
 
 
 In large measure the MLJ project is inspired by [mlR](https://pat-s.github.io/mlr/index.html) ([recent
@@ -26,7 +27,7 @@ summary.
   composite models with nested parameters. Tuning implemented as a
   wrapper, allowing composition with other meta-algorithms. &#10004;
 
-- Hyperparameter tuning using gradient descent via automatic
+- Option to tune hyperparameters using gradient descent and automatic
   differentiation (for learning algorithms written in Julia).
 
 - Data agnostic: Train models on any data supported by the Queryverse
@@ -47,7 +48,6 @@ interface](https://github.com/queryverse/IterableTables.jl). &#10004;
 - Benchmarking a battery of assorted models for a given task.
 
 - Automated estimates of cpu and memory requirements for given task/model.
-
 
 
 ### Requirements
