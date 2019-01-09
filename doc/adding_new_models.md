@@ -2,7 +2,11 @@
 
 This guide outlines the specification of the MLJ model interface. The
 machine learning tools provided by MLJ.jl can be applied to the models
-in any package implementing this interface. 
+in any package that imports the module
+[MLJInterface](https://github.com/alan-turing-institute/MLJInterface.jl)
+and implements the API defined there as outlined below.
+
+For a quick and dirty implementation of user-defined models see [here]().
 
 <!-- As a temporary measure, -->
 <!-- the MLJ package also implements the MLJ interface for some -->
