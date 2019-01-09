@@ -147,7 +147,9 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MLJInterface]]
 deps = ["CategoricalArrays", "DataFrames", "Distributions", "Query", "Statistics", "TableTraits"]
-path = "../MLJInterface"
+git-tree-sha1 = "37840a9fef146508fc0bc1ce856941ac7f8d0df1"
+repo-rev = "master"
+repo-url = "https://github.com/alan-turing-institute/MLJInterface.jl"
 uuid = "277f73de-12c3-11e9-3be9-abad22855149"
 version = "0.1.0"
 
