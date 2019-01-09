@@ -4,7 +4,7 @@ module KNN
 
 export KNNRegressor
 
-import MLJInterface
+import MLJBase
 
 using LinearAlgebra
 
@@ -14,7 +14,7 @@ KNNFitResultType = Tuple{Matrix{Float64},Vector{Float64}}
 
 # TODO: introduce type parameters for the function fields (metric, kernel)
 
-mutable struct KNNRegressor <: MLJInterface.Deterministic{KNNFitResultType}
+mutable struct KNNRegressor <: MLJBase.Deterministic{KNNFitResultType}
     K::Int           # number of local target values averaged
     metric::Function
     kernel::Function 
@@ -26,12 +26,12 @@ reciprocal(d) = d < eps(Float64) ? sign(d)/eps(Float64) : 1/d
 # lazy keywork constructor:
 function KNNRegressor(; K=1, metric=euclidean, kernel=reciprocal)
     model = KNNRegressor(K, metric, kernel)
-    message = MLJInterface.clean!(model)
+    message = MLJBase.clean!(model)
     isempty(message) || @warn message
     return model
 end
     
-function MLJInterface.clean!(model::KNNRegressor)
+function MLJBase.clean!(model::KNNRegressor)
     message = ""
     if model.K <= 0
         model.K = 1
@@ -40,9 +40,9 @@ function MLJInterface.clean!(model::KNNRegressor)
     return message
 end
 
-MLJInterface.coerce(model::KNNRegressor, Xtable) = MLJInterface.matrix(Xtable)
+MLJBase.coerce(model::KNNRegressor, Xtable) = MLJBase.matrix(Xtable)
 
-function MLJInterface.fit(model::KNNRegressor
+function MLJBase.fit(model::KNNRegressor
              , verbosity
              , X::Matrix{Float64}
              , y::Vector{Float64})
@@ -87,11 +87,11 @@ function predict_on_pattern(model, fitresult, pattern)
     return sum(wts .* ytrain[indices])
 end
 
-MLJInterface.predict(model::KNNRegressor, fitresult, Xnew) = 
+MLJBase.predict(model::KNNRegressor, fitresult, Xnew) = 
     [predict_on_pattern(model, fitresult, Xnew[i,:]) for i in 1:size(Xnew,1)]
     
 # metadata:
-function MLJInterface.info(::Type{KNNRegressor})
+function MLJBase.info(::Type{KNNRegressor})
     d = Dict()
     d["package name"] = "MLJ"
     d["package uuid"] = ""

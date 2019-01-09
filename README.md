@@ -19,8 +19,8 @@ For an earlier proof-of-concept, see
 and [this poster summary](material/MLJ-JuliaCon2018-poster.pdf).
 
 Packages wishing to implement the MLJ API for their algorithms should
-import `MLJInterface`, which has its own
-[repository](https://github.com/alan-turing-institute/MLJInterface.jl).
+import `MLJBase`, which has its own
+[repository](https://github.com/alan-turing-institute/MLJBase.jl).
 
 ### Features to include:
 

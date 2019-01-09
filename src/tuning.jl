@@ -28,7 +28,7 @@ function TunedModel(;model=ConstantRegressor(),
                       measure, param_ranges, report_measurements)
 end
 
-function MLJInterface.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) where M
+function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) where M
 
     resampler = Resampler(model=tuned_model.model,
                           tuning=tuned_model.resampling,
@@ -106,6 +106,6 @@ function MLJInterface.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) wher
     
 end
 
-MLJInterface.predict(tuned_model::TunedModel, fitresult, Xnew) = predict(fitresult, Xnew)
-MLJInterface.best(model::TunedModel, fitresult) = fitresult.model
+MLJBase.predict(tuned_model::TunedModel, fitresult, Xnew) = predict(fitresult, Xnew)
+MLJBase.best(model::TunedModel, fitresult) = fitresult.model
     

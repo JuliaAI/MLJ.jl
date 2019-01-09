@@ -3,14 +3,14 @@ module TestLearningNetworks
 # using Revise
 using Test
 using MLJ
-import MLJInterface
+import MLJBase
 using CategoricalArrays
 
 
 # TRAINABLE MODELS
 
 X_frame, y = datanow();  # boston data
-X = MLJInterface.matrix(X_frame)
+X = MLJBase.matrix(X_frame)
 
 knn_ = KNNRegressor(K=7)
 
@@ -64,7 +64,7 @@ scale = machine(scale_, XX) # no need to fit
 Xt = transform(scale, XX)
 
 # convert DataFrame Xt to an array:
-Xa = node(MLJInterface.matrix, Xt)
+Xa = node(MLJBase.matrix, Xt)
 
 # choose a learner and make it machine:
 knn_ = KNNRegressor(K=7) # just a container for hyperparameters

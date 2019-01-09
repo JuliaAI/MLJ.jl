@@ -7,14 +7,14 @@ export ToIntTransformer
 export UnivariateStandardizer, Standardizer
 export UnivariateBoxCoxTransformer
 
-import MLJInterface: MLJType, Unsupervised
+import MLJBase: MLJType, Unsupervised
 import DataFrames: names, AbstractDataFrame, DataFrame, eltypes
 import Distributions
 using Statistics
 using Tables
 
 # to be extended:
-import MLJInterface: fit, transform, inverse_transform
+import MLJBase: fit, transform, inverse_transform
 
 
 ## CONSTANTS

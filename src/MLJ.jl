@@ -37,14 +37,14 @@ export UnivariateBoxCoxTransformer
 # rexport from other Statistics, Distributions:
 export pdf, mode, median, mean
 
-# reexport from MLJInterface:
+# reexport from MLJBase:
 export predict, predict_mean, predict_median, predict_mode, best, transform, inverse_transform, se, evaluate
 export @constant, @more, HANDLE_GIVEN_ID
 
-import MLJInterface: predict, predict_mean, predict_median, predict_mode, best, transform, inverse_transform, se, evaluate
-import MLJInterface: @constant, @more, HANDLE_GIVEN_ID
+import MLJBase: predict, predict_mean, predict_median, predict_mode, best, transform, inverse_transform, se, evaluate
+import MLJBase: @constant, @more, HANDLE_GIVEN_ID
 
-using MLJInterface
+using MLJBase
 
 import Requires.@require  # lazy code loading package
 import CategoricalArrays  # needed only for overloading index method in data.jl

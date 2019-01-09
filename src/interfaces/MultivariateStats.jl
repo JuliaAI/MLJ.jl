@@ -4,12 +4,12 @@ module MultivariateStats_
 
 export RidgeRegressor 
 
-import MLJInterface
+import MLJBase
 import MLJ
 import MultivariateStats
 import DataFrames
 
-struct LinearFitresult <: MLJInterface.MLJType
+struct LinearFitresult <: MLJBase.MLJType
     coefficients::Vector{Float64}
     bias::Float64
 end
@@ -42,16 +42,16 @@ function coef_info(fitresult::LinearFitresult, features)
     return df
 end
 
-mutable struct RidgeRegressor <: MLJInterface.Deterministic{LinearFitresult}
+mutable struct RidgeRegressor <: MLJBase.Deterministic{LinearFitresult}
     lambda::Float64
 end
 
 # lazy keywork constructor
 RidgeRegressor(; lambda=0.0) = RidgeRegressor(lambda)
 
-MLJInterface.coerce(model::RidgeRegressor, Xtable) = (MLJInterface.matrix(Xtable), Xtable[MLJ.Names])
+MLJBase.coerce(model::RidgeRegressor, Xtable) = (MLJBase.matrix(Xtable), Xtable[MLJ.Names])
 
-function MLJInterface.fit(model::RidgeRegressor, verbosity, Xplus, y::Vector{<:Real})
+function MLJBase.fit(model::RidgeRegressor, verbosity, Xplus, y::Vector{<:Real})
 
     X, features = Xplus
 
@@ -89,13 +89,13 @@ function MLJInterface.fit(model::RidgeRegressor, verbosity, Xplus, y::Vector{<:R
 
 end
 
-function MLJInterface.predict(model::RidgeRegressor, fitresult::LinearFitresult, Xnew)
+function MLJBase.predict(model::RidgeRegressor, fitresult::LinearFitresult, Xnew)
     X, features = Xnew
     return X*fitresult.coefficients .+ fitresult.bias
 end
 
 # metadata:
-function MLJInterface.info(::Type{RidgeRegressor})
+function MLJBase.info(::Type{RidgeRegressor})
     d = Dict()
     d["package name"] = "MultivariateStats"
     d["package uuid"] = "6f286f6a-111f-5878-ab1e-185364afe411"

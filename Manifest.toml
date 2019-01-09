@@ -145,12 +145,10 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
-[[MLJInterface]]
+[[MLJBase]]
 deps = ["CategoricalArrays", "DataFrames", "Distributions", "Query", "Statistics", "TableTraits"]
-git-tree-sha1 = "5f53faac75673c1ef582797c6fc6e2cc963651f2"
-repo-rev = "master"
-repo-url = "https://github.com/alan-turing-institute/MLJInterface.jl"
-uuid = "277f73de-12c3-11e9-3be9-abad22855149"
+path = "/Users/anthony/.julia/dev/MLJBase"
+uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 version = "0.1.0"
 
 [[MacroTools]]

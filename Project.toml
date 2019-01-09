@@ -11,7 +11,7 @@ Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-MLJInterface = "277f73de-12c3-11e9-3be9-abad22855149"
+MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
 Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
@@ -27,4 +27,4 @@ MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["DecisionTree", "CategoricalArrays", "MultivariateStats"]
+test = ["Test", "MultivariateStats", "DecisionTree", "CategoricalArrays"]

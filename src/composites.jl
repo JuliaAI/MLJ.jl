@@ -1,11 +1,11 @@
 # fall-back for updating learning networks exported as models:
-function MLJInterface.update(model::Supervised{Node}, verbosity, fitresult, cache, args...)
+function MLJBase.update(model::Supervised{Node}, verbosity, fitresult, cache, args...)
     fit!(fitresult; verbosity=verbosity)
     return fitresult, cache, nothing
 end
 
 # fall-back for predicting on learning networks exported as models
-MLJInterface.predict(composite::Supervised{Node}, verbosity, fitresult, Xnew) =
+MLJBase.predict(composite::Supervised{Node}, verbosity, fitresult, Xnew) =
     fitresult(Xnew)
 
 
@@ -36,7 +36,7 @@ function SimpleComposite(; model=ConstantRegressor(),
 
 end
 
-function MLJInterface.fit(composite::SimpleComposite, verbosity, Xtrain, ytrain)
+function MLJBase.fit(composite::SimpleComposite, verbosity, Xtrain, ytrain)
     X = source(Xtrain) # instantiates a source node
     y = source(ytrain)
     t = machine(composite.transformer, X)
@@ -50,5 +50,5 @@ function MLJInterface.fit(composite::SimpleComposite, verbosity, Xtrain, ytrain)
     return fitresult, cache, report
 end
 
-MLJInterface.predict(composite::SimpleComposite, fitresult, Xnew) = fitresult(Xnew)
+MLJBase.predict(composite::SimpleComposite, fitresult, Xnew) = fitresult(Xnew)
 
