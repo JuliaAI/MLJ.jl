@@ -7,6 +7,7 @@ export Supervised, Unsupervised, Deterministic, Probabilistic
 # defined in include files:
 export partition, @curve, @pcurve, readlibsvm        # "utilities.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
+export misclassification_rate, cross_entropy         # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
 export SimpleComposite                               # "composites.jl"
 export Holdout, CV, Resampler                        # "resampling.jl"
@@ -38,16 +39,18 @@ export UnivariateBoxCoxTransformer
 export pdf, mode, median, mean
 
 # reexport from MLJBase:
-export predict, predict_mean, predict_median, predict_mode, best, transform, inverse_transform, se, evaluate
-export @constant, @more, HANDLE_GIVEN_ID
+export predict, predict_mean, predict_median, predict_mode
+export best, transform, inverse_transform, se, evaluate
+export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 
-import MLJBase: predict, predict_mean, predict_median, predict_mode, best, transform, inverse_transform, se, evaluate
-import MLJBase: @constant, @more, HANDLE_GIVEN_ID
+import MLJBase: predict, predict_mean, predict_median, predict_mode
+import MLJBase: best, transform, inverse_transform, se, evaluate
+import MLJBase: @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 
 using MLJBase
 
 import Requires.@require  # lazy code loading package
-import CategoricalArrays  # needed only for overloading index method in data.jl
+using  CategoricalArrays  
 import CSV
 import DataFrames: DataFrame, AbstractDataFrame, SubDataFrame, eltypes, names
 import Distributions: pdf, mode

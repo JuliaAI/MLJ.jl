@@ -1,10 +1,14 @@
 # TODO change these names to match MLR or MLMetrics?
 
-## REGRESSOR METRICS
+# Note: If the `yhat` argument of a deterministic metric does not have
+# the expected type, the metric assumes it is a distribution and
+# attempts first to compute its mean or mode (according to whether the
+# metric is a regression metric or a classification metric). In this
+# way each deterministic metric is overloaded as a probabilistic one.
 
-# Note: Each regressor metric is overloaded with a probabilistic
-# version which converts `yhat` (an array of distributions) to
-# corresponding mean values before applying the usual metric.
+
+## REGRESSOR METRICS (FOR DETERMINISTIC PREDICTIONS)
+
 
 function rms(y, yhat::AbstractVector{<:Real})
     length(y) == length(yhat) || throw(DimensionMismatch())
@@ -56,8 +60,29 @@ function rmsp(y, yhat::AbstractVector{<:Real})
 end
 rmsp(y, yhat) = rmsp(y, mean.(yhat)) 
 
+
+## CLASSIFICATION METRICS (FOR DETERMINISTIC PREDICTIONS)
+
+misclassification_rate(y::CategoricalVector{L}, yhat::CategoricalVector{L}) where L =
+    mean(y .!= yhat)
+misclassification_rate(y::CategoricalArray, yhat) =
+    misclassification_rate(y, mode.(yhat))
+
+# TODO: multivariate case 
+
+
+## CLASSIFICATION METRICS (FOR PROBABILISTIC PREDICTIONS)
+
+# for single pattern:
+cross_entropy(y, d::UnivariateNominal) = -log(d.prob_given_label[y])
+
+cross_entropy(y::CategoricalVector{L}, yhat::Vector{<:UnivariateNominal{L}}) where L =
+    broadcast(cross_entropy, y, yhat) |> mean
+
+
 # function auc(truelabel::L) where L
 #     _auc(y::AbstractVector{L}, yhat::AbstractVector{T}) where T<:Real = 
 #         ROC.AUC(ROC.roc(yhat, y, truelabel))
 #     return _auc
 # end
+

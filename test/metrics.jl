@@ -4,6 +4,7 @@ module TestMetrics
 using Test
 using MLJ
 import Distributions
+using CategoricalArrays
 
 ## REGRESSOR METRICS
 
@@ -28,6 +29,20 @@ zhat = N.(yhat)
 
 
 ## CLASSIFIER METRICS
+
+y    = categorical(collect("asdfasdfaaassdd"))
+yhat = categorical(collect("asdfaadfaasssdf"))
+@test misclassification_rate(y, yhat) ≈ 0.2
+
+y = categorical(collect("abb"))
+L = ['a', 'b']
+d1 = UnivariateNominal(L, [0.1, 0.9])
+d2 = UnivariateNominal(L, [0.4, 0.6])
+d3 = UnivariateNominal(L, [0.2, 0.8])
+yhat = [d1, d2, d3]
+@test cross_entropy(y, yhat) ≈ -(log(0.1) + log(0.6) + log(0.8))/3
+
+
 
 # for when ROC is added as working dependency:
 # y = ["n", "p", "n", "p", "n", "p"]

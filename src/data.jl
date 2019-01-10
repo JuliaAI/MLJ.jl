@@ -57,5 +57,5 @@ Base.getindex(A::AbstractMatrix{T}, ::Type{Eltypes}) where T = [T for j in 1:siz
 nrows(A::AbstractMatrix) = size(A, 1)
 
 Base.getindex(v::AbstractVector, ::Type{Rows}, r) = v[r]
-Base.getindex(v::CategoricalArrays.CategoricalArray{T,1,S} where {T,S}, ::Type{Rows}, r) = @inbounds v[r]
+Base.getindex(v::CategoricalArray{T,1,S} where {T,S}, ::Type{Rows}, r) = @inbounds v[r]
 nrows(v::AbstractVector) = length(v)
