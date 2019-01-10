@@ -1,4 +1,4 @@
-# Implementing the MLJ interface for a learning algorithm 
+ Implementing the MLJ interface for a learning algorithm 
 
 This guide outlines the specification of the MLJ model interface. The
 machine learning tools provided by MLJ can be applied to the models
@@ -41,9 +41,10 @@ Internals"](internals.md).
 A *model* is an object storing hyper-parameters associated with some
 machine learning algorithm, where "learning algorithm" is broadly
 interpreted.  In MLJ, hyper-parameters include configuration
-parameters, like the number of threads or the target element type, which
-may or may not affect the final learning outcome.  However, the logging
-level (`verbosity` below) is excluded.
+parameters, like the number of threads, and special instructions, such
+as "compute feature rankings", which may or may not affect the final
+learning outcome.  However, the logging level (`verbosity` below) is
+excluded.
 
 The name of the Julia type associated with a model indicates the
 associated algorithm (e.g., `DecisionTreeClassifier`). The outcome of
@@ -82,13 +83,13 @@ abstract type Deterministic{R} <: Supervised{R} end
 Associated with every concrete subtype of `Model` there must be a
 `fit` method, which implements the associated algorithm to produce the
 fit-result. Additionally, every `Supervised` model has a `predict`
-method, while `Unsupersvised` models must have a `transform`
+method, while `Unsupervised` models must have a `transform`
 method. More generally, methods such as these, that are dispatched on
 a model instance and a fit-result (plus other data), are called
-*operations*. `Probababilistic` supervised models optionally implement
+*operations*. `Probabilistic` supervised models optionally implement
 a `predict_mode` operation (in the case of classifiers) or a
 `predict_mean` and/or `predict_median` operations (in the case of
-regressors) overiding obvious fallbacks provided by
+regressors) overriding obvious fallbacks provided by
 `MLJBase`. `Unsupervised` models may implement an
 `inverse_transform` operation.
 
@@ -112,7 +113,7 @@ import MLJ
 
 R{S,T} = Tuple{Matrix{S},Vector{T}} where {S<:AbstractFloat,T<:AbstractFloat}
 
-mutable struct KNNRegressor{S,T,M,K} <: MLJBase.Supervised{R{S,T}}
+mutable struct KNNRegressor{S,T,M,K} <: MLJBase.Deterministic{R{S,T}}
     source_type::S
     target_type::T
     K::Int          
@@ -136,7 +137,7 @@ restrict attention to algorithms handling a *single* (univariate)
 target. Differences in the multivariate case are described later.
 
 
-#### Data for training and prediction, and the coerce method
+#### The form of data for fitting and prediction, and the coerce method
 
 The MLJ model specification has no explicit requirement for the
 type of `X`, the argument representing input features appearing in the
@@ -164,9 +165,9 @@ target `CategoricalVector`s of the default reference type `UInt32` are
 supported.) 
 
 
-#### Compulsory methods
+#### The fit method
 
-**The fit method.** The `fit` method returns three objects:
+A compulsory `fit` method returns three objects:
 
 ````julia 
 MLJBase.fit(model::SomeSupervisedModelType, verbosity::Int, X, y) -> fitresult, cache, report 
@@ -197,8 +198,9 @@ The `verbosity` level (0 for silent) is for passing to learning
 algorithm itself. A `fit` method wrapping such an algorithm should
 generally avoid doing any of its own logging.
 
-**The predict method.**
+#### The predict method
 
+The compulsory predict method has the form
 ````julia
 MLJBase.predict(model::SomeSupervisedModelType, fitresult, Xnew) -> yhat
 ````
@@ -247,7 +249,7 @@ end
 ````
 Query `?MLJBase.DecodeCategorical` for more information.
 
-**Prediction types for probablistic responses.** In the case of
+**Prediction types for probabilistic responses.** In the case of
 `Probabilistic` models, `yhat` must be a `Vector` whose elements are
 distributions (one distribution per row of `Xnew`).
 
@@ -260,62 +262,56 @@ and `Distributions.pdf` are implemented, as well
 `Distributions.mean`/`Distribution.median` or `Distributions.mode`).
 
 Use `UnivariateNominal` for `Probabilistic` classifiers with a single
-nominal target. For example, suppose `levels(y)=["yes", "no",
-"maybe"]` and set `L=levels(y)`. Then, if the predicted probabilities
-for some input pattern are `[0.1, 0.7, 0.2]`, respectively, then the
-prediction returned for that pattern will be `UnivariateNominal(L,
-[0.1, 0.7, 0.2])`. Query `?UnivariateNominal` for more information.
+nominal target, whether binary or multiclass. For example, suppose
+`levels(y)=["yes", "no", "maybe"]` and set `L=levels(y)`. Then, if the
+predicted probabilities for some input pattern are `[0.1, 0.7, 0.2]`,
+respectively, then the prediction returned for that pattern will be
+`UnivariateNominal(L, [0.1, 0.7, 0.2])`. Query `?UnivariateNominal`
+for more information.
 
+#### Trait declarations
 
-#### Optional methods
-
-As mentioned already, `Probabilistic` models may optionally implement
-a `predict_mode` operation (for classifiers) or `predict_mean` and/or
-`predict_median` operations (regressors)  returning point
-estimates instead of a probability distribution.
-
-**Model metadata.** Ideally, a model `info` method should be
-provided. This allows the `MLJ` user, through the `Task` interface, to
-discover models that meet a given task specification. For a supervised
-model type `SomeModelType`, `info(SomeModelType)` should return a
-dictionary with all keys shown in the example below:
+There are a number of recommended trait declarations for each concrete
+subtype `SomeSupervisedModel <: Supervised`. Basic fitting, resampling
+and tuning in MLJ does not require these traits but some advanced MLJ
+meta-algorithms may require them now, or in the future. In particular,
+MLJ's `models(::Task)` method (matching models to user-specified
+tasks) can only identify models having a complete set of trait
+declarations. A full set of declarations are shown below for the
+`RidgeRegressor` type:
 
 ````julia
-function MLJBase.info(::Type{RidgeRegressor})
-    d = Dict{String,String}()
-    d["package name"] = "MultivariateStats"
-    d["package uuid"] = "6f286f6a-111f-5878-ab1e-185364afe411"
-    d["is_pure_julia"] = "yes"
-    d["properties"] = ["can rank feature importances",]
-    d["operations"] = ["predict",]
-    d["inputs_can_be"] = ["numeric",]
-    d["outputs_are"] = ["numeric", "deterministic", "univariate"]
-    return d
-end
+MLJBase.target_kind(::Type{RidgeRegressor}) = :numeric
+MLJBase.target_quantity(::Type{RidgeRegressor}) = :univariate
+MLJBase.inputs_can_be(::Type{RidgeRegressor}) = [:numeric, ]
+MLJBase.is_pure_julia(::Type{RidgeRegressor}) = :yes
+MLJBase.package_name(::Type{RidgeRegressor}) = "MultivariateStats"
+MLJBase.package_uuid(::Type{RidgeRegressor}) = "6f286f6a-111f-5878-ab1e-185364afe411"
 ````
 
-Note that for the last four keys, `info(SomeModelType)[key]` is a
-vector of strings.  Permitted elements are indicated below:
+method                   | return type       | declarable  return values | default value
+-------------------------|-------------------|---------------------------|------------------------
+`target_kind`            | `Symbol`          |`:numeric`, `:binary`, `:multiclass` | `:unknown`
+`target_quantity`        | `Symbol`          |`:univariate`, `:multivariate`| `:univariate`
+`inputs_can_be`          | `Vector{Symbol}`  | one or more of: `:numeric`, `:nominal`, `:missing` | `Symbol[]`
+`is_pure_julia`          | `Symbol`          | `:yes`, `:no`             | `:unknown`
+`package_name`           | `String`          | unrestricted              | "unknown"
+`package_uuid`           | `String`          | unrestricted              | "unknown"         | 
 
-key              | permitted values
------------------|----------------------------------------------------
-`"is_pure_julia"`| `"yes"`, `"no"`
-`"properties"`   | unrestricted
-`"operations"`   | `"predict"`, `"predict_mean"`, `"predict_median"`, `"predict_mode"`, `"transform"`, `"inverse_transform"`
-`"inputs_can_be"`| `"numeric"`, `"nominal"`, `"missing"`
-`"outputs_are"`  | `"numeric"`/`"nominal"`, `"binary"`/`"multiclass"`, `"deterministic"`/`"probabilistic"`, `"univariate"`/`multivariate"`
+Note that `:binary` does not mean *boolean*. Rather, it
+means the model is a classifier but is unable to classify targets with more than two
+classes. As explained above, all classifiers are passed training targets
+as `CategoricalVector`s, whose element types are
+arbitrary. 
 
-For the `"inputs_are"` vector, list all that apply. For the
-`"outputs_are"` vector, specify one string from each pair of values
-that apply (which, for classifiers, is all pairs). Of course
-`Deterministic` models must include "deterministic", and
-`Probabilistic` models must include "probabilistic" in their
-"outputs_are" vectors.
+You can test declarations of traits by calling `info(SomeModelType)`. 
 
-A supervised model is "multivariate" if it can handle multiple targets
-(see below).
 
-**The clean! method.**
+
+#### The clean! method
+
+A `clean!` method may optionally be overloaded (the default returns an
+empty message without changing model fields):
 
 ````julia
 MLJBase.clean!(model::Supervised) -> message::String
@@ -350,28 +346,26 @@ function RidgeRegressor(; lambda=0.0)
 end
 ````
 
+#### The update! method**
 
-
-
-
-**The update! method.**
+An `update` method may be overloaded to enable a call by MLJ to
+retrain a model (on the same training data) to avoid repeating
+computations unnecessarily.
 
 ````julia
 MLJBase.update(model::SomeSupervisedModelType, verbosity, old_fitresult, old_cache, X, y) -> fitresult, cache, report
 ````
 
-An `update` method may be overloaded to enable a call by MLJ to
-retrain a model (on the same training data) to avoid repeating
-computations unnecessarily.  For context, see ["MLJ
-Internals"](internals.md). A fallback just calls `fit`.  Learning
-networks wrapped as models constitute one use-case: One would
-like each component model to be retrained only when new hyper-parameter
-values make this necessary. In this case MLJ provides a fallback
-(specifically, the fallback is for any subtype of
-`Supervised{Node}`). A second important use-case is iterative models,
-where calls to increase the number of iterations only restarts the
-iterative procedure if other hyper-parameters have also changed. For
-an example see `builtins/Ensembles.jl`.
+A fallback just calls `fit`.  For context, see ["MLJ
+Internals"](internals.md). Learning networks wrapped as models
+constitute one use-case: One would like each component model to be
+retrained only when hyper-parameter changes "upstream" make this
+necessary. In this case MLJ provides a fallback (specifically, the
+fallback is for any subtype of `Supervised{Node}`). A second important
+use-case is iterative models, where calls to increase the number of
+iterations only restarts the iterative procedure if other
+hyper-parameters have also changed. For an example see
+`builtins/Ensembles.jl`.
 
 In the event that the argument `fitresult` (returned by a preceding
 call to `fit`) is not sufficient for performing an update, the author

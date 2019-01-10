@@ -42,5 +42,8 @@ tree = machine(baretree, X, y)
 fit!(tree)
 predict(tree, X[1:3,:])
 
+@show baretree
+display(info(baretree))
+
 end
 true

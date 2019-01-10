@@ -31,6 +31,8 @@ fit!(ridgeM)
 @test abs(ridgeM.fitresult.bias) < 1e-10
 @test norm(ridgeM.fitresult.coefficients - coefficients) < 1e-10
 
+@show ridge
+display(info(ridge))
 
 ## TEST OF OTHER METHODS ON REAL DATA
 

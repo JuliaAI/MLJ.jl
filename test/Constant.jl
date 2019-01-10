@@ -7,6 +7,7 @@ using CategoricalArrays
 using DataFrames
 import Distributions
 
+
 ## REGRESSOR
 
 X = DataFrame(rand(10,3)) # X is never used by constant regressors/classifiers
@@ -18,6 +19,9 @@ d=Distributions.Normal(1.5, 0.5)
 @test fitresult == d
 @test predict(model, fitresult, ones(10,2)) == fill(d, 10)
 @test predict_mean(model, fitresult, ones(10,2)) == fill(1.5, 10)
+
+@show model
+display(info(model))
 
 
 ## CLASSIFIER
@@ -36,6 +40,9 @@ yhat = predict_mode(model, fitresult, ones(10, 2))
 
 yhat = predict(model, fitresult, ones(10, 2))
 @test yhat == fill(d, 10)
+
+@show model
+display(info(model))
 
 end # module
 true

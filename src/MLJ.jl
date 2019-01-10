@@ -36,7 +36,7 @@ export UnivariateBoxCoxTransformer
 
 
 # rexport from other Statistics, Distributions:
-export pdf, mode, median, mean
+export pdf, mode, median, mean, info
 
 # reexport from MLJBase:
 export predict, predict_mean, predict_median, predict_mode
@@ -45,7 +45,7 @@ export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 
 import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: best, transform, inverse_transform, se, evaluate
-import MLJBase: @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
+import MLJBase: @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal, info
 
 using MLJBase
 

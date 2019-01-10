@@ -25,6 +25,9 @@ knn.K = 2
 fitresult, cache, report = MLJ.update(knn, 0, fitresult, cache, X, y); 
 @test predict(knn, fitresult, Xtest)[1] !=  ypred
 
+@show knn
+display(info(knn))
+
 # test that coerce methods work:
 X, y = X_and_y(load_boston())
 knnM = machine(knn, X, y)

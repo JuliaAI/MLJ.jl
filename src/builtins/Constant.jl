@@ -42,17 +42,12 @@ MLJBase.predict(model::ConstantRegressor, fitresult, Xnew) = fill(fitresult, MLJ
 MLJBase.predict_mean(model::ConstantRegressor, fitresult, Xnew) = fill(Distributions.mean(fitresult), MLJ.nrows(Xnew))
 
 # metadata:
-function MLJBase.info(::Type{ConstantRegressor})
-    d = Dict{String,String}()
-    d["package name"] = "MLJ"
-    d["package uuid"] = ""
-    d["properties"] = String[]
-    d["is_pure_julia"] = "yes"
-    d["operations"] = ["predict","predict_mean"]
-    d["inputs_can_be"] = ["numeric, nominal, missing"]
-    d["outputs_are"] = ["numeric", "probabilistic", "univariate"]
-    return d
-end
+MLJBase.package_name(::Type{<:ConstantRegressor}) = "MLJ"
+MLJBase.package_uuid(::Type{<:ConstantRegressor}) = ""
+MLJBase.is_pure_julia(::Type{<:ConstantRegressor}) = :yes
+MLJBase.inputs_can_be(::Type{<:ConstantRegressor}) = [:numeric, :nominal, :missing]
+MLJBase.target_kind(::Type{<:ConstantRegressor}) = :numeric
+MLJBase.target_quantity(::Type{<:ConstantRegressor}) = :univariate
 
 
 ## THE CONSTANT CLASSIFIER
@@ -112,17 +107,13 @@ end
 
 
 # metadata:
-function MLJBase.info(::Type{ConstantClassifier})
-    d = Dict{String,String}()
-    d["package name"] = "MLJ"
-    d["package uuid"] = ""
-    d["is_pure_julia"] = "yes"
-    d["properties"] = String[]
-    d["operations"] = ["predict", "predict_mode"]
-    d["inputs_can_be"] = ["numeric", "nominal", "missing"]
-    d["outputs_are"] = ["nominal", "multiclass", "deterministic", "univariate"]
-    return d
-end
+MLJBase.package_name(::Type{<:ConstantClassifier}) = "MLJ"
+MLJBase.package_uuid(::Type{<:ConstantClassifier}) = ""
+MLJBase.is_pure_julia(::Type{<:ConstantClassifier}) = :yes
+MLJBase.inputs_can_be(::Type{<:ConstantClassifier}) = [:numeric, :nominal, :missing]
+MLJBase.target_kind(::Type{<:ConstantClassifier}) = :multiclass
+MLJBase.target_quantity(::Type{<:ConstantClassifier}) = :univariate
+
 
 end # module
 

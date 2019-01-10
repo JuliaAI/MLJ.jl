@@ -91,17 +91,13 @@ MLJBase.predict(model::KNNRegressor, fitresult, Xnew) =
     [predict_on_pattern(model, fitresult, Xnew[i,:]) for i in 1:size(Xnew,1)]
     
 # metadata:
-function MLJBase.info(::Type{KNNRegressor})
-    d = Dict()
-    d["package name"] = "MLJ"
-    d["package uuid"] = ""
-    d["properties"] = []
-    d["is_pure_julia"] = "yes"
-    d["operations"] = ["predict"]
-    d["inputs_can_be"] = ["numeric"]
-    d["outputs_are"] = ["numeric","deterministic","univariate"]
-    return d
-end
+MLJBase.package_name(::Type{<:KNNRegressor}) = "MLJ"
+MLJBase.package_uuid(::Type{<:KNNRegressor}) = ""
+MLJBase.is_pure_julia(::Type{<:KNNRegressor}) = :yes
+MLJBase.inputs_can_be(::Type{<:KNNRegressor}) = [:numeric, ]
+MLJBase.target_kind(::Type{<:KNNRegressor}) = :numeric
+MLJBase.target_quantity(::Type{<:KNNRegressor}) = :univariate
+
 
 end # module
 

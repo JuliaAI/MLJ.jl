@@ -95,17 +95,12 @@ function MLJBase.predict(model::RidgeRegressor, fitresult::LinearFitresult, Xnew
 end
 
 # metadata:
-function MLJBase.info(::Type{RidgeRegressor})
-    d = Dict()
-    d["package name"] = "MultivariateStats"
-    d["package uuid"] = "6f286f6a-111f-5878-ab1e-185364afe411"
-    d["properties"] = ["can rank feature importances"]
-    d["is_pure_julia"] = "yes"
-    d["operations"] = ["predict"]
-    d["inputs_can_be"] = ["numeric"]
-    d["outputs_are"] = ["numeric", "deterministic", "univariate"]
-    return d
-end
+MLJBase.package_name(::Type{<:RidgeRegressor}) = "MultivariateStats"
+MLJBase.package_uuid(::Type{<:RidgeRegressor}) = "6f286f6a-111f-5878-ab1e-185364afe411"
+MLJBase.is_pure_julia(::Type{<:RidgeRegressor}) = :yes
+MLJBase.inputs_can_be(::Type{<:RidgeRegressor}) = [:numeric, ]
+MLJBase.target_kind(::Type{<:RidgeRegressor}) = :numeric
+MLJBase.target_quantity(::Type{<:RidgeRegressor}) = :univariate
 
 end # of module
 

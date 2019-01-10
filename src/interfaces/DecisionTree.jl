@@ -22,8 +22,6 @@ using CategoricalArrays
 #> import package:
 import DecisionTree                
 
-# TODO: replace Float64 with type parameter
-
 DecisionTreeClassifierFitResultType{T} =
     Tuple{Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}}, MLJBase.CategoricalDecoder{UInt32,T,1,UInt32}}
 
@@ -144,17 +142,12 @@ function MLJBase.predict(model::DecisionTreeClassifier{T}
 end
 
 # metadata:
-function MLJBase.info(::Type{DecisionTreeClassifier})
-    d = Dict{String,String}()
-    d["package name"] = "DecisionTree"
-    d["package uuid"] = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
-    d["properties"] = []
-    d["is_pure_julia"] = "yes"
-    d["operations"] = ["predict",]
-    d["inputs_can_be"] = ["numeric",]
-    d["outputs_are"] = ["nominal", "multiclass", "deterministic", "univariate"]
-    return d
-end
+MLJBase.package_name(::Type{<:DecisionTreeClassifier}) = "DecisionTree"
+MLJBase.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+MLJBase.is_pure_julia(::Type{<:DecisionTreeClassifier}) = :yes
+MLJBase.inputs_can_be(::Type{<:DecisionTreeClassifier}) = [:numeric, ]
+MLJBase.target_kind(::Type{<:DecisionTreeClassifier}) = :multiclass
+MLJBase.target_quantity(::Type{<:DecisionTreeClassifier}) = :univariate
 
 end # module
 
