@@ -1,4 +1,4 @@
- Implementing the MLJ interface for a learning algorithm 
+# Implementing the MLJ interface for a learning algorithm 
 
 This guide outlines the specification of the MLJ model interface. The
 machine learning tools provided by MLJ can be applied to the models
