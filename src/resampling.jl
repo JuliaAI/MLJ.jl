@@ -22,6 +22,7 @@ Holdout(; fraction_train=0.7) = Holdout(fraction_train)
 
 mutable struct CV <: ResamplingStrategy
     n_folds::Int
+    is_parallel::Bool
 end
 CV(; n_folds=6) = CV(n_folds)
 
@@ -34,7 +35,7 @@ end
 Resampler(;model=RidgeRegressor(), tuning=Holdout(), measure=rms, operation=predict) =
     Resampler(model, tuning, measure, operation) 
 
-function MLJBase.fit(resampler::Resampler{Holdout}, verbosity, X, y)
+function MLJBase.fit(resampler::Resampler{Holdout}, verbosity::Int, X, y)
 
     mach = machine(resampler.model, X, y)
 
