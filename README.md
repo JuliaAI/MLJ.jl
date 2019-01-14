@@ -67,7 +67,7 @@ In the Julia REPL run  `]add https://github.com/alan-turing-institute/MLJ.jl.git
 using MLJ
 
 X, y = datanow(); # boston dataset
-train, test = partition(eachindex(y), 0.5); # 70:30 split
+train, test = partition(eachindex(y), 0.7); # 70:30 split
 ```
 
 A *model* is a container for hyperparameters:
