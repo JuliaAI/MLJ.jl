@@ -44,7 +44,6 @@ function MLJBase.fit(resampler::Resampler{Holdout}, verbosity::Int, X, y)
     yhat = resampler.operation(mach, X[Rows, test])    
     fitresult = resampler.measure(y[test], yhat)
 
-    # remember model and tuning stragegy for calls to update
     cache = nothing
     report = nothing
 

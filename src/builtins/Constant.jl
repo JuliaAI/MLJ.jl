@@ -3,6 +3,7 @@
 module Constant
 
 export ConstantRegressor, ConstantClassifier
+export DeterministicConstantRegressor, DeterministicConstantClassifier
 
 import MLJBase
 import MLJ # needed for `nrows` 
@@ -22,16 +23,27 @@ probability distribution best fitting the training target data. Use
 `predict_mean` to predict the mean value instead.
 
 """
-struct ConstantRegressor{F,D} <: MLJBase.Probabilistic{D}
+struct ConstantRegressor{F,D} <: MLJBase.Probabilistic{D} 
     target_type::Type{F}
     distribution_type::Type{D}
 end
-ConstantRegressor(;target_type=Float64, distribution_type=Distributions.Normal) =
-    ConstantRegressor(target_type, distribution_type)
+function ConstantRegressor(;target_type=Float64, distribution_type=Distributions.Normal{Float64})
+    model = ConstantRegressor(target_type, distribution_type)
+    message = clean!(model)
+    isempty(message) || @warn message
+    return model
+end
 
-function MLJBase.fit(model::ConstantRegressor{F,D}, verbosity, X, y::Vector{F2}) where {F,D,F2}
+function clean!(model::ConstantRegressor)
+    message = ""
+    MLJBase.isdistribution(model.distribution_type) ||
+        error("$model.distribution_type is not a valid distribution_type.")
+    return message
+end
+
+function MLJBase.fit(model::ConstantRegressor{F,D}, verbosity::Int, X, y::Vector{F2}) where {F,D,F2}
     F == F2 || error("Model specifies target_type=$F but target type is $F2.")
-    fitresult = Distributions.fit(D, collect(skipmissing(y)))
+    fitresult = Distributions.fit(D, y)
     verbosity < 1 || @info "Fitted a constant probability distribution, $fitresult."
     cache = nothing
     report = nothing
@@ -48,6 +60,33 @@ MLJBase.is_pure_julia(::Type{<:ConstantRegressor}) = :yes
 MLJBase.inputs_can_be(::Type{<:ConstantRegressor}) = [:numeric, :nominal, :missing]
 MLJBase.target_kind(::Type{<:ConstantRegressor}) = :numeric
 MLJBase.target_quantity(::Type{<:ConstantRegressor}) = :univariate
+
+
+## THE CONSTANT DETERMINISTIC REGRESSOR
+
+struct DeterministicConstantRegressor{F} <: MLJBase.Deterministic{F}
+    target_type::Type{F}
+end
+DeterministicConstantRegressor(;target_type=Float64) =  DeterministicConstantRegressor(target_type)
+
+function MLJBase.fit(model::DeterministicConstantRegressor{F}, verbosity::Int, X, y::Vector{F2}) where {F,F2}
+    F == F2 || error("Model specifies target_type=$F but target type is $F2.")
+    fitresult = mean(y)
+    verbosity < 1 || @info "mean = $fitresult."
+    cache = nothing
+    report = nothing
+    return fitresult, cache, report
+end
+
+MLJBase.predict(model::DeterministicConstantRegressor, fitresult, Xnew) = fill(fitresult, MLJ.nrows(Xnew))
+
+# metadata:
+MLJBase.package_name(::Type{<:DeterministicConstantRegressor}) = "MLJ"
+MLJBase.package_uuid(::Type{<:DeterministicConstantRegressor}) = ""
+MLJBase.is_pure_julia(::Type{<:DeterministicConstantRegressor}) = :yes
+MLJBase.inputs_can_be(::Type{<:DeterministicConstantRegressor}) = [:numeric, :nominal, :missing]
+MLJBase.target_kind(::Type{<:DeterministicConstantRegressor}) = :numeric
+MLJBase.target_quantity(::Type{<:DeterministicConstantRegressor}) = :univariate
 
 
 ## THE CONSTANT CLASSIFIER
@@ -71,16 +110,13 @@ end
 ConstantClassifier(;target_type=Bool) = ConstantClassifier{target_type}(target_type)
 
 function MLJBase.fit(model::ConstantClassifier{L},
-                 verbosity,
+                 verbosity::Int,
                  X,
-                 y::CategoricalVector{L2,R,L2_pure}) where {L,R,L2,L2_pure}
+                 y::CategoricalVector{L2,R}) where {L,R,L2}
 
     L == L2 || error("Model specifies target_type=$L but target type is $L2.")
 
-    # dump missing target values and make into a regular array:
-    y_pure = Array{L2_pure}(skipmissing(y) |> collect)
-
-    fitresult = Distributions.fit(MLJBase.UnivariateNominal, y_pure)
+    fitresult = Distributions.fit(MLJBase.UnivariateNominal, y)
 
     verbosity < 1 || @info "probabilities: \n$(fitresult.prob_given_label)"
     cache = nothing
@@ -113,6 +149,49 @@ MLJBase.is_pure_julia(::Type{<:ConstantClassifier}) = :yes
 MLJBase.inputs_can_be(::Type{<:ConstantClassifier}) = [:numeric, :nominal, :missing]
 MLJBase.target_kind(::Type{<:ConstantClassifier}) = :multiclass
 MLJBase.target_quantity(::Type{<:ConstantClassifier}) = :univariate
+
+
+## DETERMINISTIC CONSTANT CLASSIFIER
+
+struct DeterministicConstantClassifier{L} <: MLJBase.Deterministic{Tuple{L,Vector{L}}}
+    target_type::Type{L}
+end
+DeterministicConstantClassifier(;target_type=Bool) = DeterministicConstantClassifier{target_type}(target_type)
+
+function MLJBase.fit(model::DeterministicConstantClassifier{L},
+                 verbosity::Int,
+                 X,
+                 y::CategoricalVector{L2,R,L2_pure}) where {L,R,L2,L2_pure}
+
+    L == L2 || error("Model specifies target_type=$L but target type is $L2.")
+
+    # dump missing target values and make into a regular array:
+    y_pure = Array{L2_pure}(skipmissing(y) |> collect)
+
+    fitresult = (mode(y_pure), levels(y))
+
+    verbosity < 1 || @info "mode = $fitresult"
+    cache = nothing
+    report = nothing
+
+    return fitresult, cache, report
+
+end
+
+function MLJBase.predict(model::DeterministicConstantClassifier{L}, fitresult, Xnew) where L
+    _mode, _levels = fitresult
+    nrows = MLJ.nrows(Xnew)
+    raw_predictions = fill(_mode, nrows)
+    return categorical(vcat(raw_predictions, _levels))[1:nrows]
+end
+
+# metadata:
+MLJBase.package_name(::Type{<:DeterministicConstantClassifier}) = "MLJ"
+MLJBase.package_uuid(::Type{<:DeterministicConstantClassifier}) = ""
+MLJBase.is_pure_julia(::Type{<:DeterministicConstantClassifier}) = :yes
+MLJBase.inputs_can_be(::Type{<:DeterministicConstantClassifier}) = [:numeric, :nominal, :missing]
+MLJBase.target_kind(::Type{<:DeterministicConstantClassifier}) = :multiclass
+MLJBase.target_quantity(::Type{<:DeterministicConstantClassifier}) = :univariate
 
 
 end # module

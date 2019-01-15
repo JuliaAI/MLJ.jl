@@ -15,7 +15,7 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
 sel = FeatureSelector()
 stand = UnivariateStandardizer()
 ridge = RidgeRegressor()
-composite = SimpleComposite(transformer=sel, model=ridge)
+composite = SimpleCompositeModel(transformer=sel, model=ridge)
 
 features_ = strange(sel, :features,
                              values=[[:x1], [:x1, :x2], [:x2, :x3], [:x1, :x2, :x3]])

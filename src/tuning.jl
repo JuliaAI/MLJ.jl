@@ -13,6 +13,7 @@ mutable struct TunedModel{T,M<:MLJ.Model} <: MLJ.Supervised{MLJ.Machine}
     tuning::T
     resampling
     measure
+    operation
     param_ranges::Params
     report_measurements::Bool
 end
@@ -21,18 +22,20 @@ function TunedModel(;model=ConstantRegressor(),
                     tuning=Grid(),
                     resampling=Holdout(),
                     measure=rms,
+                    operation=predict,
                     param_ranges=Params(),
                     report_measurements=true)
-    !isempty(param_ranges) || @warn "Field param_ranges not specified."
+    !isempty(param_ranges) || error("No param_ranges specified.")
     return TunedModel(model, tuning, resampling,
-                      measure, param_ranges, report_measurements)
+                      measure, operation, param_ranges, report_measurements)
 end
 
-function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity, X, y) where M
+function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) where M
 
     resampler = Resampler(model=tuned_model.model,
                           tuning=tuned_model.resampling,
-                          measure=tuned_model.measure)
+                          measure=tuned_model.measure,
+                          operation=tuned_model.operation)
 
     resampling_machine = machine(resampler, X, y)
 

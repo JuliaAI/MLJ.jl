@@ -1,5 +1,5 @@
 # We wish to extend operations to identically named methods dispatched
-# on `Machines` and `NodalMachine`. For example, we have
+# on `Machine`s and `NodalMachine`s. For example, we have
 #
 # `predict(model::M, fitresult, X) where M<:Supervised`
 #

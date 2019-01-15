@@ -95,7 +95,7 @@ end
 #> A required `fit` method returns `fitresult, cache, report`. (Return
 #> `cache=nothing` unless you are overloading `update`)
 function MLJBase.fit(model::DecisionTreeClassifier{T2}
-             , verbosity   #> must be here even if unsupported in pkg (as here)
+             , verbosity::Int   #> must be here (and typed) even if not used (as here)
              , X::Matrix{Float64}
              , y::CategoricalVector{T}) where {T,T2}
 

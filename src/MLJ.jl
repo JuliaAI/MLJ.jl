@@ -9,17 +9,22 @@ export partition, @curve, @pcurve, readlibsvm        # "utilities.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export misclassification_rate, cross_entropy         # "metrics.jl"
 export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
-export SimpleComposite                               # "composites.jl"
+export SimpleCompositeModel                          # "composites.jl"
 export Holdout, CV, Resampler                        # "resampling.jl"
 export Params, params, set_params!                   # "parameters.jl"
 export strange, iterator                             # "parameters.jl"
 export Grid, TunedModel                              # "tuning.jl"
+export DeterministicEnsembleModel                    # "ensembles.jl"
+export ProbabilisticEnsembleModel                    # "ensembles.jl"
+export EnsembleModel                                 # "ensembles.jl"
 export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
+export DeterministicConstantRegressor                # "builtins/Constant.jl
+export DeterministicConstantClassifier               # "builtins/Constant.jl
 export KNNRegressor                                  # "builtins/KNN.jl":
 
 # defined in include files "machines.jl" and "networks.jl":
 export Machine, NodalMachine, machine
-export source, node, fit!, freeze!, thaw!
+export source, node, fit!, freeze!, thaw!, Node
 
 # defined in include file "builtins/Transformers.jl":
 export FeatureSelector
@@ -43,10 +48,12 @@ export predict, predict_mean, predict_median, predict_mode
 export best, transform, inverse_transform, se, evaluate
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 
+import MLJBase: fit, update, clean!, info, coerce
 import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: best, transform, inverse_transform, se, evaluate
-import MLJBase: @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal, info
-
+import MLJBase: @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
+import MLJBase: average
+    
 using MLJBase
 
 import Requires.@require  # lazy code loading package
@@ -54,17 +61,22 @@ using  CategoricalArrays
 import CSV
 import DataFrames: DataFrame, AbstractDataFrame, SubDataFrame, eltypes, names
 import Distributions: pdf, mode
-import Base.==
-
+import Distributions
+import StatsBase
 using Query
 import TableTraits
+
+# to be extended:
+import Base.==
+
 
 # from Standard Library:
 using Statistics
 using LinearAlgebra
+using Random
+import Distributed: @distributed, nworkers, pmap
 
 const srcdir = dirname(@__FILE__) # the directory containing this file:
-
 
 include("utilities.jl")     # general purpose utilities
 include("metrics.jl")       # loss functions
@@ -78,7 +90,7 @@ include("operations.jl")    # syntactic sugar for operations (predict, transform
 include("resampling.jl")    # evaluating models by assorted resampling strategies
 include("parameters.jl")    # hyper-parameter range constructors and nested hyper-parameter API
 include("tuning.jl")        
-
+include("ensembles.jl")     # homogeneous ensembles
 
 ## LOAD BUILT-IN MODELS
 

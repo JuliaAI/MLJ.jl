@@ -173,6 +173,8 @@ A compulsory `fit` method returns three objects:
 MLJBase.fit(model::SomeSupervisedModelType, verbosity::Int, X, y) -> fitresult, cache, report 
 ````
 
+Note: The `Int` typing of `verbosity` cannot be omitted. 
+
 Here `fitresult::R` is the fit-result in the sense above (which
 becomes an argument for `predict` discussed below). Any
 training-related statistics, such as internal estimates of the
@@ -346,7 +348,7 @@ function RidgeRegressor(; lambda=0.0)
 end
 ````
 
-#### The update! method**
+#### The update! method
 
 An `update` method may be overloaded to enable a call by MLJ to
 retrain a model (on the same training data) to avoid repeating

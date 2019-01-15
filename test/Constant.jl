@@ -11,10 +11,11 @@ import Distributions
 ## REGRESSOR
 
 X = DataFrame(rand(10,3)) # X is never used by constant regressors/classifiers
-y = Union{Missing,Float32}[1.0, 1.0, 2.0, 2.0, missing]
+y = [1.0, 1.0, 2.0, 2.0]
 
-model = ConstantRegressor(target_type=Union{Missing,Float32})
+model = ConstantRegressor(target_type=Float64, distribution_type=Distributions.Normal{Float64})
 fitresult, cache, report = MLJ.fit(model, 1, X, y)
+
 d=Distributions.Normal(1.5, 0.5)
 @test fitresult == d
 @test predict(model, fitresult, ones(10,2)) == fill(d, 10)
@@ -26,15 +27,16 @@ display(info(model))
 
 ## CLASSIFIER
 
-yraw = Union{Missing,String}["Perry", "Antonia", "Perry", "Skater", missing]
+yraw = ["Perry", "Antonia", "Perry", "Skater"]
 y = categorical(yraw)
 
-model = ConstantClassifier(target_type=Union{Missing,String})
+model = ConstantClassifier(target_type=String)
 fitresult, cache, report = MLJ.fit(model, 1, X, y)
 d = MLJ.UnivariateNominal(["Perry", "Antonia", "Skater"], [0.5, 0.25, 0.25]) 
 @test fitresult == d
 
 yhat = predict_mode(model, fitresult, ones(10, 2))
+@test levels(yhat) == levels(y)
 @test yhat[5] == y[1] 
 @test length(yhat) == 10
 

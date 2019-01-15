@@ -41,7 +41,7 @@ end
 
 FeatureSelector(;features=Symbol[]) = FeatureSelector(features)
 
-function fit(transformer::FeatureSelector, verbosity, X::AbstractDataFrame)
+function fit(transformer::FeatureSelector, verbosity::Int, X::AbstractDataFrame)
     namesX = names(X)
     issubset(Set(transformer.features), Set(namesX)) ||
         throw(error("Attempting to select non-existent feature(s)."))
@@ -151,7 +151,7 @@ inverse_transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T},
 mutable struct UnivariateStandardizer <: Unsupervised
 end
 
-function fit(transformer::UnivariateStandardizer, verbosity, v::AbstractVector{T}) where T<:Real
+function fit(transformer::UnivariateStandardizer, verbosity::Int, v::AbstractVector{T}) where T<:Real
     std(v) > eps(Float64) || 
         @warn "Extremely small standard deviation encountered in standardization."
     fitresult = (mean(v), std(v))
@@ -339,7 +339,7 @@ end
 # lazy keyword constructor:
 UnivariateBoxCoxTransformer(; n=171, shift=false) = UnivariateBoxCoxTransformer(n, shift)
 
-function fit(transformer::UnivariateBoxCoxTransformer, verbosity, v::AbstractVector{T}) where T <: Real 
+function fit(transformer::UnivariateBoxCoxTransformer, verbosity::Int, v::AbstractVector{T}) where T <: Real 
 
     m = minimum(v)
     m >= 0 || error("Cannot perform a Box-Cox transformation on negative data.")

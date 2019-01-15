@@ -51,7 +51,7 @@ RidgeRegressor(; lambda=0.0) = RidgeRegressor(lambda)
 
 MLJBase.coerce(model::RidgeRegressor, Xtable) = (MLJBase.matrix(Xtable), Xtable[MLJ.Names])
 
-function MLJBase.fit(model::RidgeRegressor, verbosity, Xplus, y::Vector{<:Real})
+function MLJBase.fit(model::RidgeRegressor, verbosity::Int, Xplus, y::Vector{<:Real})
 
     X, features = Xplus
 

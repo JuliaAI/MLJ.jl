@@ -5,29 +5,29 @@ function MLJBase.update(model::Supervised{Node}, verbosity, fitresult, cache, ar
 end
 
 # fall-back for predicting on learning networks exported as models
-MLJBase.predict(composite::Supervised{Node}, verbosity, fitresult, Xnew) =
+MLJBase.predict(composite::Supervised{Node}, fitresult, Xnew) =
     fitresult(Xnew)
 
 
 """
-    SimpleComposite(;regressor=ConstantRegressor(), 
+    SimpleCompositeModel(;regressor=ConstantRegressor(), 
                               transformer=FeatureSelector())
 
 Construct a composite model consisting of a transformer
 (`Unsupervised` model) followed by a `Supervised` model.
 
 """
-mutable struct SimpleComposite{L<:Supervised,
+mutable struct SimpleCompositeModel{L<:Supervised,
                              T<:Unsupervised} <: Supervised{Node}
     model::L
     transformer::T
     
 end
 
-function SimpleComposite(; model=ConstantRegressor(), 
+function SimpleCompositeModel(; model=ConstantRegressor(), 
                           transformer=FeatureSelector())
 
-    composite =  SimpleComposite(model, transformer)
+    composite =  SimpleCompositeModel(model, transformer)
 
     message = MLJ.clean!(composite)
     isempty(message) || @warn message
@@ -36,7 +36,7 @@ function SimpleComposite(; model=ConstantRegressor(),
 
 end
 
-function MLJBase.fit(composite::SimpleComposite, verbosity, Xtrain, ytrain)
+function MLJBase.fit(composite::SimpleCompositeModel, verbosity::Int, Xtrain, ytrain)
     X = source(Xtrain) # instantiates a source node
     y = source(ytrain)
     t = machine(composite.transformer, X)
@@ -50,5 +50,5 @@ function MLJBase.fit(composite::SimpleComposite, verbosity, Xtrain, ytrain)
     return fitresult, cache, report
 end
 
-MLJBase.predict(composite::SimpleComposite, fitresult, Xnew) = fitresult(Xnew)
+MLJBase.predict(composite::SimpleCompositeModel, fitresult, Xnew) = fitresult(Xnew)
 

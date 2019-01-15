@@ -43,7 +43,7 @@ end
 MLJBase.coerce(model::KNNRegressor, Xtable) = MLJBase.matrix(Xtable)
 
 function MLJBase.fit(model::KNNRegressor
-             , verbosity
+             , verbosity::Int
              , X::Matrix{Float64}
              , y::Vector{Float64})
     

@@ -224,6 +224,7 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
         end
 
         sources = union([get_sources(arg) for arg in args]...)
+        length(sources) == 1 || @warn "Node with multiple sources defined."
 
         # get the machine's dependencies:
         tape = copy(get_tape(machine))
@@ -270,7 +271,7 @@ Node(operation, args::AbstractNode...) = Node(operation, nothing, args...)
 (y::Node)(; rows=:) = (y.operation)(y.machine, [arg(rows=rows) for arg in y.args]...)
 function (y::Node)(Xnew)
     length(y.sources) == 1 || error("Nodes with multiple sources are not callable on new data. "*
-                                    "Sources of node called = $(y.sources)")
+                                    "The sources of the node called are $(y.sources)")
     return (y.operation)(y.machine, [arg(Xnew) for arg in y.args]...)
 end
 

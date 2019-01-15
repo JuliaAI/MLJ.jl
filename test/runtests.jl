@@ -57,6 +57,10 @@ end
     @test include("tuning.jl")
 end
 
+@testset "ensembles" begin
+    @test include("ensembles.jl")
+end
+
 @testset "XGBoost" begin
   @test_broken include("XGBoost.jl")
 end

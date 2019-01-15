@@ -46,6 +46,7 @@ set_params!(super_model, changes)
 
 tree = params(super_model)
 
+# copy with changes:
 @test copy(params(dummy_model), (42, 7.2, 'r')) ==
     Params(:K => 42, :metric => 7.2, :kernel => 'r')
 @test copy(tree, (2.0, 2, 19, 'z', 6, 20, 'x')) ==
@@ -80,7 +81,7 @@ iterators = ([1, 2], ["a","b"], ["x", "y", "z"])
  1  "b"  "z";
  2  "b"  "z"]
 
-# test iterator of a param_space_its
+# test iterator of a param_space_its (parameter space iterators):
 param_space_its = Params(:lambda => MLJ.iterator(p3, 2),
                         :model1 => Params(:K => MLJ.iterator(p1, 2),
                                          :kernel => MLJ.iterator(p2)))
