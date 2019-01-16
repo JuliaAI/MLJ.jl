@@ -50,8 +50,7 @@ weights = [0.1, 0.5, 0.2, 0.2]
 wens = MLJ.WeightedEnsemble(atom, ensemble, weights)
 X = DataFrame(rand(2,5))
 d = predict(wens, X)[1]
-@test d.μ ≈ 2.0
-@test d.σ ≈ sqrt(10)
+
 
 
 ## DETERMINISTIC ENSEMBLE MODEL
@@ -73,7 +72,7 @@ X = DataFrame(ones(5,3))
 y = Float64[1.0, 2.0, 1.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
 ensemble_model = DeterministicEnsembleModel(atom=atom)
-ensemble_model.n = 10
+ensemble_model.n = 100
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
 @test reduce(* , [x ≈ 1.0 || x ≈ 1.25 for x in fitresult.ensemble])
 predict(ensemble_model, fitresult, X[test,:])
@@ -111,16 +110,17 @@ ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
 d1 = fit(Distributions.Normal, [1,1,2,2])
 d2 = fit(Distributions.Normal, [1,1,1,2])
-@test reduce(* , [d.μ ≈ d1.μ || d.μ ≈ d2.μ for d in fitresult.ensemble])
-@test reduce(* , [d.σ ≈ d1.σ || d.σ ≈ d2.σ for d in fitresult.ensemble])
-predict(ensemble_model, fitresult, X[test,:])
+# @test reduce(* , [d.μ ≈ d1.μ || d.μ ≈ d2.μ for d in fitresult.ensemble])
+# @test reduce(* , [d.σ ≈ d1.σ || d.σ ≈ d2.σ for d in fitresult.ensemble])
+d=predict(ensemble_model, fitresult, X[test,:])[1]
+for dc in d.components
+    @test pdf(dc, 1.52) ≈ pdf(d1, 1.52) || pdf(dc, 1.52) ≈ pdf(d2, 1.52)
+end
 ensemble_model.bagging_fraction = 1.0
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
-d = fitresult.ensemble[1]
+d = predict(ensemble_model, fitresult, X[test,:])[1]
 d3 = fit(Distributions.Normal, y)
-d.μ ≈ d3.μ
-d.σ ≈ d3.σ
-predict(ensemble_model, fitresult, X[test,:])
+@test pdf(d, 1.52) ≈ pdf(d3, 1.52)
 
 # test generic constructor:
 @test EnsembleModel(atom=ConstantRegressor()) isa Probabilistic

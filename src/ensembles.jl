@@ -92,16 +92,19 @@ function predict(wens::WeightedEnsemble, Xnew, ::Val{(:probabilistic, :numeric, 
 
     # a matrix of probability distributions:
     predictions = reduce(hcat, [predict(atom, fitresult, Xnew) for fitresult in ensemble])
-    n_rows = size(predictions, 1)
 
-    # the weighted average over the ensemble of the pdf means and pdf variances:
-    μs  = [sum([weights[k]*mean(predictions[i,k]) for k in 1:n_atoms]) for i in 1:n_rows]
-    σ2s = [sum([weights[k]*var(predictions[i,k]) for k in 1:n_atoms]) for i in 1:n_rows]
+    # n_rows = size(predictions, 1)
+    # # the weighted average over the ensemble of the pdf means and pdf variances:
+    # μs  = [sum([weights[k]*mean(predictions[i,k]) for k in 1:n_atoms]) for i in 1:n_rows]
+    # σ2s = [sum([weights[k]*var(predictions[i,k]) for k in 1:n_atoms]) for i in 1:n_rows]
 
-    # a vector of normal probability distributions:
-    prediction = [Distributions.Normal(μs[i], sqrt(σ2s[i])) for i in 1:n_rows]
+    # # a vector of normal probability distributions:
+    # prediction = [Distributions.Normal(μs[i], sqrt(σ2s[i])) for i in 1:n_rows]
+
+    prediction = [Distributions.MixtureModel(predictions[i,:], weights) for i in 1:size(predictions, 1)]
 
     return prediction
+    
 end
 
 
@@ -226,6 +229,26 @@ coerce(model::ProbabilisticEnsembleModel, Xtable) where R = coerce(model.atom, X
 
 ## COMMON CONSTRUCTOR
 
+"""
+    EnsembleModel(atom=nothing, bagging_fraction=0.8, rng_seed=0, n=100, parallel=true)
+
+Create a model for training an ensemble of `n` learners, each with
+associated model `atom`. Useful if `fit!(machine(atom, data...))` does
+not create identical models every call (stochastic models, such as
+DecisionTrees with randomized node selection criterion), or if
+`bagging_fraction` is set to a value not equal to 1.0. The constructor
+fails if no `atom` is specified.
+
+The ensemble model is `Deterministic` or `Probabilistic`, according to
+the corresponding supertype of `atom`. In the case of classifiers, the
+prediction is based a majority vote, and for regressors it is the
+usual average.  Probabilistic predictions are obtained by averaging
+the atomic probability distribution functions; in particular, for
+regressors, the ensemble prediction on each input pattern has type
+`Distributions.MixtureModel{VF,VS,D}`, where `D` is the type of
+predicted distribution for `atom`.
+
+"""
 function EnsembleModel(; args...)
     d = Dict(args)
     :atom in keys(d) || error("No atomic model specified. Use EnsembleModel(atom=...)")
@@ -236,6 +259,7 @@ function EnsembleModel(; args...)
     end
     error("$(d[:atom]) does not appear to be a Supervised model.")
 end
+
 
 
 ## THE COMMON FIT AND PREDICT METHODS
@@ -268,9 +292,9 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) wher
         left_over = mod(n, nworkers())
         ensemble =  @distributed (vcat) for i = 1:nworkers()
             if i != nworkers()
-                get_ensemble(atom, 0, X, ys, chunk_size, n_patterns, n_train, rng) # 0 means silent
+                get_ensemble(atom, verbosity - 1, X, ys, chunk_size, n_patterns, n_train, rng) # 0 means silent
             else
-                get_ensemble(atom, verbosity, X, ys, chunk_size + left_over, n_patterns, n_train, rng)
+                get_ensemble(atom, verbosity - 1, X, ys, chunk_size + left_over, n_patterns, n_train, rng)
             end
         end
     end
