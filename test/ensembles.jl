@@ -16,16 +16,16 @@ L = ['a', 'b', 'j']
 ensemble = [('a', L), ('j', L), ('j', L), ('b', L)]
 n=length(ensemble)
 weights = fill(1/n, n) # ignored by predict below
-wens = MLJ.WeightedEnsemble(atom, ensemble, weights)
+wens = MLJ.WeightedEnsemble(atom, ensemble)
 X = DataFrame(rand(3,5))
-@test predict(wens, X) == categorical(['j','j','j'])
+@test predict(wens, weights, X) == categorical(['j','j','j'])
 
 # target is :deterministic :numeric :univariate:
 atom = DeterministicConstantRegressor()
 ensemble = Float64[4, 7, 4, 4]
 weights = [0.1, 0.5, 0.2, 0.2]
-wens = MLJ.WeightedEnsemble(atom, ensemble, weights)
-@test predict(wens, X) ≈ [5.5, 5.5, 5.5]
+wens = MLJ.WeightedEnsemble(atom, ensemble)
+@test predict(wens, weights, X) ≈ [5.5, 5.5, 5.5]
 
 # target is :probabilistic :nominal :univariate:
 atom = ConstantClassifier(target_type=Char)
@@ -34,9 +34,9 @@ d1 = UnivariateNominal(L, [0.1, 0.2, 0.7])
 d2 = UnivariateNominal(L, [0.2, 0.3, 0.5])
 ensemble = [d2,  d1, d2, d2]
 weights = [0.1, 0.5, 0.2, 0.2]
-wens = MLJ.WeightedEnsemble(atom, ensemble, weights)
+wens = MLJ.WeightedEnsemble(atom, ensemble)
 X = DataFrame(rand(2,5))
-d = predict(wens, X)[1]
+d = predict(wens, weights, X)[1]
 @test pdf(d, 'a') ≈ 0.15
 @test pdf(d, 'b') ≈ 0.25
 @test pdf(d, 'j') ≈ 0.6
@@ -47,9 +47,9 @@ d1 = Distributions.Normal(1, 2)
 d2 = Distributions.Normal(3, 4)
 ensemble = [d2,  d1, d2, d2]
 weights = [0.1, 0.5, 0.2, 0.2]
-wens = MLJ.WeightedEnsemble(atom, ensemble, weights)
+wens = MLJ.WeightedEnsemble(atom, ensemble)
 X = DataFrame(rand(2,5))
-d = predict(wens, X)[1]
+d = predict(wens, weights, X)[1]
 
 
 
@@ -63,7 +63,10 @@ train, test = partition(1:length(y), 0.8);
 ensemble_model = DeterministicEnsembleModel(atom=atom)
 ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
-fitresult.ensemble
+predict(ensemble_model, fitresult, X[test,:])
+weights = rand(10)
+weights = weights/sum(weights)
+ensemble_model.weights = weights
 predict(ensemble_model, fitresult, X[test,:])
 
 # target is :deterministic :numeric :univariate:
@@ -72,13 +75,17 @@ X = DataFrame(ones(5,3))
 y = Float64[1.0, 2.0, 1.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
 ensemble_model = DeterministicEnsembleModel(atom=atom)
-ensemble_model.n = 100
+ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
 @test reduce(* , [x ≈ 1.0 || x ≈ 1.25 for x in fitresult.ensemble])
 predict(ensemble_model, fitresult, X[test,:])
 ensemble_model.bagging_fraction = 1.0
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
 @test unique(fitresult.ensemble) ≈ [1.2]
+predict(ensemble_model, fitresult, X[test,:])
+weights = rand(10)
+weights = weights/sum(weights)
+ensemble_model.weights = weights
 predict(ensemble_model, fitresult, X[test,:])
 
 # target is :probabilistic :nominal :univariate:
@@ -99,6 +106,10 @@ d = predict(ensemble_model, fitresult, X[test,:])[1]
 @test pdf(d, 's') ≈ 1/5
 @test pdf(d, 'd') ≈ 1/5
 @test pdf(d, 'f') ≈ 1/5
+weights = rand(10)
+weights = weights/sum(weights)
+ensemble_model.weights = weights
+predict(ensemble_model, fitresult, X[test,:])
 
 # target is :probabilistic :numeric :univariate:
 atom = ConstantRegressor(target_type=Float64)
@@ -121,10 +132,22 @@ fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model,
 d = predict(ensemble_model, fitresult, X[test,:])[1]
 d3 = fit(Distributions.Normal, y)
 @test pdf(d, 1.52) ≈ pdf(d3, 1.52)
+weights = rand(10)
+weights = weights/sum(weights)
+ensemble_model.weights = weights
+predict(ensemble_model, fitresult, X[test,:])
 
 # test generic constructor:
 @test EnsembleModel(atom=ConstantRegressor()) isa Probabilistic
 @test EnsembleModel(atom=DeterministicConstantRegressor()) isa Deterministic
+
+# test machine:
+X, y = datanow() # boston
+atom = KNNRegressor(K=7)
+ensemble_model = EnsembleModel(atom=atom)
+ensemble = machine(atom, X, y)
+fit!(ensemble, rows=train)
+@test !isnan(predict(ensemble, X[test,:])[1])
 
 # # check that providing fixed seed gives identical predictions each
 # # time if trees are deterministic:

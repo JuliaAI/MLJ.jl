@@ -6,19 +6,22 @@
 mutable struct WeightedEnsemble{R,Atom <: Supervised{R}} <: MLJType
     atom::Atom
     ensemble::Vector{R}
-    weights::Vector{Float64}
 end
 
-_target_kind(Atom::Type{<:Model}) = (target_kind(Atom) == :numeric ? :numeric : :nominal)
+_target_kind(Atom::Type{<:Model}) = target_kind(Atom) in [:binary, :multiclass] ? :nominal : target_kind(Atom)
+_target_kind(atom::Model) = _target_kind(typeof(atom))
 
 # trait functions to dispatch predict method:
 _target_is(Atom::Type{<:Deterministic}) = Val((:deterministic, _target_kind(Atom), target_quantity(Atom)))
 _target_is(Atom::Type{<:Probabilistic}) =  Val((:probabilistic, _target_kind(Atom), target_quantity(Atom)))
 
-predict(wens::WeightedEnsemble{R,Atom}, Xnew) where {R,Atom} = 
-    predict(wens, Xnew, _target_is(Atom))
+predict(wens::WeightedEnsemble{R,Atom}, weights, Xnew) where {R,Atom} = 
+    predict(wens, weights, Xnew, _target_is(Atom))
 
-function predict(wens::WeightedEnsemble, Xnew, ::Val{(:deterministic, :nominal, :univariate)})
+function predict(wens::WeightedEnsemble, weights, Xnew, ::Val{(:deterministic, :nominal, :univariate)})
+
+    # weights ignored in this case
+    
     ensemble = wens.ensemble
     atom = wens.atom
 
@@ -35,9 +38,8 @@ function predict(wens::WeightedEnsemble, Xnew, ::Val{(:deterministic, :nominal, 
     return prediction
 end
 
-function predict(wens::WeightedEnsemble, Xnew, ::Val{(:deterministic, :numeric, :univariate)})
+function predict(wens::WeightedEnsemble, weights, Xnew, ::Val{(:deterministic, :numeric, :univariate)})
     ensemble = wens.ensemble
-    weights = wens.weights
     
     atom = wens.atom
 
@@ -52,10 +54,9 @@ function predict(wens::WeightedEnsemble, Xnew, ::Val{(:deterministic, :numeric, 
     return prediction
 end
 
-function predict(wens::WeightedEnsemble, Xnew, ::Val{(:probabilistic, :nominal, :univariate)})
+function predict(wens::WeightedEnsemble, weights, Xnew, ::Val{(:probabilistic, :nominal, :univariate)})
 
     ensemble = wens.ensemble
-    weights = wens.weights
     
     atom = wens.atom
 
@@ -76,10 +77,9 @@ function predict(wens::WeightedEnsemble, Xnew, ::Val{(:probabilistic, :nominal, 
     return predictions
 end
 
-function predict(wens::WeightedEnsemble, Xnew, ::Val{(:probabilistic, :numeric, :univariate)})
+function predict(wens::WeightedEnsemble, weights, Xnew, ::Val{(:probabilistic, :numeric, :univariate)})
 
     ensemble = wens.ensemble
-    weights = wens.weights
     
     atom = wens.atom
 
@@ -132,7 +132,7 @@ end
 
 mutable struct DeterministicEnsembleModel{R,Atom<:Deterministic{R}} <: Deterministic{WeightedEnsemble{R,Atom}} 
     atom::Atom
-    weight_regularization::Float64
+    weights::Vector{Float64}
     bagging_fraction::Float64
     rng_seed::Int
     n::Int
@@ -148,15 +148,8 @@ function clean!(model::DeterministicEnsembleModel{R}) where R
         "in the range (0,1]. Reset to 1. "
         model.bagging_fraction = 1.0
     end
-    if model.weight_regularization > 1 || model.weight_regularization < 0
-        message = message*"`weight_regularization` should be "*
-        "in the range [0,1]. Reset to 1. "
-        model.weight_regularization = 1.0
-    end
-    if model.weight_regularization != 1.0 && target_kind(typeof(model.atom)) != :numeric
-            message = message*"Weight deregularization not currently supported for models with nominal target; "*
-            "Resetting weight_regularization to 1.0."
-            model.weight_regularization = 1.0
+    if _target_kind(model.atom) == :nominal && !isempty(model.weights)
+        message = message*"weights will be ignored to form predictions."
     end
 
     return message
@@ -164,16 +157,16 @@ function clean!(model::DeterministicEnsembleModel{R}) where R
 end
   
 # constructor to infer type automatically:
-DeterministicEnsembleModel(atom::Atom, weight_regularization,
+DeterministicEnsembleModel(atom::Atom, weights,
                            bagging_fraction, rng_seed, n, parallel) where {R, Atom<:Deterministic{R}} =
-                               DeterministicEnsembleModel{R, Atom}(atom, weight_regularization,
+                               DeterministicEnsembleModel{R, Atom}(atom, weights,
                                                                    bagging_fraction, rng_seed, n, parallel)
 
 # lazy keyword constructors:
-function DeterministicEnsembleModel(;atom=DeterministicConstantClassifier(), weight_regularization=1,
+function DeterministicEnsembleModel(;atom=DeterministicConstantClassifier(), weights=Float64[],
     bagging_fraction=0.8, rng_seed::Int=0, n::Int=100, parallel=true)
     
-    model = DeterministicEnsembleModel(atom, weight_regularization, bagging_fraction, rng_seed, n, parallel)
+    model = DeterministicEnsembleModel(atom, weights, bagging_fraction, rng_seed, n, parallel)
 
     message = clean!(model)
     isempty(message) || @warn message
@@ -188,6 +181,7 @@ coerce(model::DeterministicEnsembleModel, Xtable) where R = coerce(model.atom, X
 
 mutable struct ProbabilisticEnsembleModel{R,Atom<:Probabilistic{R}} <: Probabilistic{WeightedEnsemble{R,Atom}} 
     atom::Atom
+    weights::Vector{Float64}
     bagging_fraction::Float64
     rng_seed::Int
     n::Int
@@ -209,14 +203,14 @@ function clean!(model::ProbabilisticEnsembleModel{R}) where R
 end
   
 # constructor to infer type automatically:
-ProbabilisticEnsembleModel(atom::Atom, bagging_fraction, rng_seed, n, parallel) where {R, Atom<:Probabilistic{R}} =
-                               ProbabilisticEnsembleModel{R, Atom}(atom, bagging_fraction, rng_seed, n, parallel)
+ProbabilisticEnsembleModel(atom::Atom, weights, bagging_fraction, rng_seed, n, parallel) where {R, Atom<:Probabilistic{R}} =
+                               ProbabilisticEnsembleModel{R, Atom}(atom, weights, bagging_fraction, rng_seed, n, parallel)
 
 # lazy keyword constructor:
-function ProbabilisticEnsembleModel(;atom=ConstantProbabilisticClassifier(), 
+function ProbabilisticEnsembleModel(;atom=ConstantProbabilisticClassifier(), weights=Float64[],
     bagging_fraction=0.8, rng_seed::Int=0, n::Int=100, parallel=true)
     
-    model = ProbabilisticEnsembleModel(atom, bagging_fraction, rng_seed, n, parallel)
+    model = ProbabilisticEnsembleModel(atom, weights, bagging_fraction, rng_seed, n, parallel)
 
     message = clean!(model)
     isempty(message) || @warn message
@@ -230,7 +224,7 @@ coerce(model::ProbabilisticEnsembleModel, Xtable) where R = coerce(model.atom, X
 ## COMMON CONSTRUCTOR
 
 """
-    EnsembleModel(atom=nothing, bagging_fraction=0.8, rng_seed=0, n=100, parallel=true)
+    EnsembleModel(atom=nothing, weights=Float64[], bagging_fraction=0.8, rng_seed=0, n=100, parallel=true)
 
 Create a model for training an ensemble of `n` learners, each with
 associated model `atom`. Useful if `fit!(machine(atom, data...))` does
@@ -299,18 +293,25 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) wher
         end
     end
 
-    weights = fill(1/n, n)
-
-    fitresult = WeightedEnsemble(model.atom, ensemble, weights)
-    report = Dict{Symbol, Any}()
-    report[:weights] = weights
+    fitresult = WeightedEnsemble(model.atom, ensemble)
+    report = nothing
 
     return fitresult, deepcopy(model), report
     
 end
 
-predict(model::EitherEnsembleModel, fitresult, Xnew) = predict(fitresult, Xnew)
+function predict(model::EitherEnsembleModel, fitresult, Xnew)
+    n = model.n
+    if isempty(model.weights)
+        weights = fill(1/n, n)
+    else
+        length(model.weights) == n || error("Ensemble size and number of weights not the same.")
+        weights = model.weights
+    end
+    predict(fitresult, weights, Xnew)
+end
 
+### old KoalaEnsembles code for optimizing the weights in the deterministic regressor case:
 
 #     # Optimize weights:
 
