@@ -1,5 +1,5 @@
 # We wish to extend operations to identically named methods dispatched
-# on `Machine`s and `NodalMachine`s. For example, we have
+# on `Machine`s and `NodalMachine`s. For example, we have from the model API
 #
 # `predict(model::M, fitresult, X) where M<:Supervised`
 #
@@ -17,8 +17,8 @@
 #
 # (If an operation has zero arguments, we cannot achieve the last
 # desire because of ambiguity with the preceding one.)
-
-# The following macro is for this purpose.
+#
+# The following macros are for this purpose.
 
 macro extend_to_machines(operation)
     quote

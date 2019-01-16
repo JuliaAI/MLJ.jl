@@ -98,6 +98,7 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
         report = Dict{Symbol, Any}()
         report[:models] = collect(model_iterator)
         report[:measurements] = measurements
+        report[:best_model] = best_model
         report[:best_measurement] = best_measurement
     else
         report = nothing

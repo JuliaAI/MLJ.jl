@@ -245,15 +245,16 @@ bagging, each with associated model `atom`. Useful if
 repeated calls (ie, is a stochastic model, such as a decision tree
 with randomized node selection criteria), or if `bagging_fraction` is
 set to a value not equal to 1.0 (or both). The constructor fails if no
-`atom` is specified. 
+`atom` is specified.
 
 Predictions are weighted according to the vector `weights` (to allow
 for external optimization) except in the case that `atom` is a
-`Deterministic` classifier.
+`Deterministic` classifier. Uniform weights are used if `weight` has
+zero length.
 
 The ensemble model is `Deterministic` or `Probabilistic`, according to
 the corresponding supertype of `atom`. In the case of classifiers, the
-predictions majority votes, and for regressors they are ensemble
+predictions are majority votes, and for regressors they are ordinary
 averages.  Probabilistic predictions are obtained by averaging the
 atomic probability distribution functions; in particular, for
 regressors, the ensemble prediction on each input pattern has the type

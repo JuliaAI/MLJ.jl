@@ -16,6 +16,8 @@ struct Params
     Params(args::Pair...) = new(args)
 end
 
+MLJBase.istoobig(::Params) = false # for display functionality
+
 # since a "value" may be another Params object, we can build nested
 # Param objects. The symbols are the names of paramet
 
