@@ -16,7 +16,7 @@ L = ['a', 'b', 'j']
 ensemble = [('a', L), ('j', L), ('j', L), ('b', L)]
 n=length(ensemble)
 weights = fill(1/n, n) # ignored by predict below
-wens = MLJ.WeightedEnsemble(atom, ensemble)
+wens = MLJ.WrappedEnsemble(atom, ensemble)
 X = DataFrame(rand(3,5))
 @test predict(wens, weights, X) == categorical(['j','j','j'])
 
@@ -24,7 +24,7 @@ X = DataFrame(rand(3,5))
 atom = DeterministicConstantRegressor()
 ensemble = Float64[4, 7, 4, 4]
 weights = [0.1, 0.5, 0.2, 0.2]
-wens = MLJ.WeightedEnsemble(atom, ensemble)
+wens = MLJ.WrappedEnsemble(atom, ensemble)
 @test predict(wens, weights, X) ≈ [5.5, 5.5, 5.5]
 
 # target is :probabilistic :nominal :univariate:
@@ -34,7 +34,7 @@ d1 = UnivariateNominal(L, [0.1, 0.2, 0.7])
 d2 = UnivariateNominal(L, [0.2, 0.3, 0.5])
 ensemble = [d2,  d1, d2, d2]
 weights = [0.1, 0.5, 0.2, 0.2]
-wens = MLJ.WeightedEnsemble(atom, ensemble)
+wens = MLJ.WrappedEnsemble(atom, ensemble)
 X = DataFrame(rand(2,5))
 d = predict(wens, weights, X)[1]
 @test pdf(d, 'a') ≈ 0.15
@@ -47,7 +47,7 @@ d1 = Distributions.Normal(1, 2)
 d2 = Distributions.Normal(3, 4)
 ensemble = [d2,  d1, d2, d2]
 weights = [0.1, 0.5, 0.2, 0.2]
-wens = MLJ.WeightedEnsemble(atom, ensemble)
+wens = MLJ.WrappedEnsemble(atom, ensemble)
 X = DataFrame(rand(2,5))
 d = predict(wens, weights, X)[1]
 
@@ -65,7 +65,6 @@ ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
 predict(ensemble_model, fitresult, X[test,:])
 weights = rand(10)
-weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, X[test,:])
 
@@ -84,7 +83,6 @@ fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model,
 @test unique(fitresult.ensemble) ≈ [1.2]
 predict(ensemble_model, fitresult, X[test,:])
 weights = rand(10)
-weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, X[test,:])
 
@@ -107,7 +105,6 @@ d = predict(ensemble_model, fitresult, X[test,:])[1]
 @test pdf(d, 'd') ≈ 1/5
 @test pdf(d, 'f') ≈ 1/5
 weights = rand(10)
-weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, X[test,:])
 
@@ -133,7 +130,6 @@ d = predict(ensemble_model, fitresult, X[test,:])[1]
 d3 = fit(Distributions.Normal, y)
 @test pdf(d, 1.52) ≈ pdf(d3, 1.52)
 weights = rand(10)
-weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, X[test,:])
 

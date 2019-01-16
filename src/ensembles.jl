@@ -1,9 +1,8 @@
 ## WEIGHTED ENSEMBLES OF FITRESULTS
 
-# L is the target element type
 # R is atom fitresult type
 # Atom is atomic model type, eg, DecisionTree
-mutable struct WeightedEnsemble{R,Atom <: Supervised{R}} <: MLJType
+mutable struct WrappedEnsemble{R,Atom <: Supervised{R}} <: MLJType
     atom::Atom
     ensemble::Vector{R}
 end
@@ -15,10 +14,10 @@ _target_kind(atom::Model) = _target_kind(typeof(atom))
 _target_is(Atom::Type{<:Deterministic}) = Val((:deterministic, _target_kind(Atom), target_quantity(Atom)))
 _target_is(Atom::Type{<:Probabilistic}) =  Val((:probabilistic, _target_kind(Atom), target_quantity(Atom)))
 
-predict(wens::WeightedEnsemble{R,Atom}, weights, Xnew) where {R,Atom} = 
+predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom} = 
     predict(wens, weights, Xnew, _target_is(Atom))
 
-function predict(wens::WeightedEnsemble, weights, Xnew, ::Val{(:deterministic, :nominal, :univariate)})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:deterministic, :nominal, :univariate)})
 
     # weights ignored in this case
     
@@ -38,7 +37,7 @@ function predict(wens::WeightedEnsemble, weights, Xnew, ::Val{(:deterministic, :
     return prediction
 end
 
-function predict(wens::WeightedEnsemble, weights, Xnew, ::Val{(:deterministic, :numeric, :univariate)})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:deterministic, :numeric, :univariate)})
     ensemble = wens.ensemble
     
     atom = wens.atom
@@ -54,7 +53,7 @@ function predict(wens::WeightedEnsemble, weights, Xnew, ::Val{(:deterministic, :
     return prediction
 end
 
-function predict(wens::WeightedEnsemble, weights, Xnew, ::Val{(:probabilistic, :nominal, :univariate)})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:probabilistic, :nominal, :univariate)})
 
     ensemble = wens.ensemble
     
@@ -77,7 +76,7 @@ function predict(wens::WeightedEnsemble, weights, Xnew, ::Val{(:probabilistic, :
     return predictions
 end
 
-function predict(wens::WeightedEnsemble, weights, Xnew, ::Val{(:probabilistic, :numeric, :univariate)})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:probabilistic, :numeric, :univariate)})
 
     ensemble = wens.ensemble
     
@@ -130,7 +129,7 @@ end
 
 ## ENSEMBLE MODEL FOR DETERMINISTIC MODELS 
 
-mutable struct DeterministicEnsembleModel{R,Atom<:Deterministic{R}} <: Deterministic{WeightedEnsemble{R,Atom}} 
+mutable struct DeterministicEnsembleModel{R,Atom<:Deterministic{R}} <: Deterministic{WrappedEnsemble{R,Atom}} 
     atom::Atom
     weights::Vector{Float64}
     bagging_fraction::Float64
@@ -149,9 +148,15 @@ function clean!(model::DeterministicEnsembleModel{R}) where R
         model.bagging_fraction = 1.0
     end
     if _target_kind(model.atom) == :nominal && !isempty(model.weights)
-        message = message*"weights will be ignored to form predictions."
+        message = message*"weights will be ignored to form predictions. "
+    elseif !isempty(model.weights)
+        total = sum(model.weights)
+        if !(total ≈ 1.0)
+            message = message*"Weights should sum to one and are being automatically normalized. "
+            model.weights = model.weights/total
+        end
     end
-
+    
     return message
 
 end
@@ -179,7 +184,7 @@ coerce(model::DeterministicEnsembleModel, Xtable) where R = coerce(model.atom, X
 
 ## ENSEMBLE MODEL FOR PROBABILISTIC MODELS 
 
-mutable struct ProbabilisticEnsembleModel{R,Atom<:Probabilistic{R}} <: Probabilistic{WeightedEnsemble{R,Atom}} 
+mutable struct ProbabilisticEnsembleModel{R,Atom<:Probabilistic{R}} <: Probabilistic{WrappedEnsemble{R,Atom}} 
     atom::Atom
     weights::Vector{Float64}
     bagging_fraction::Float64
@@ -196,6 +201,14 @@ function clean!(model::ProbabilisticEnsembleModel{R}) where R
         message = message*"`bagging_fraction` should be "*
         "in the range (0,1]. Reset to 1. "
         model.bagging_fraction = 1.0
+    end
+
+    if !isempty(model.weights)
+        total = sum(model.weights)
+        if !(total ≈ 1.0)
+            message = message*"Weights should sum to one and are being automatically normalized. "
+            model.weights = model.weights/total
+        end
     end
 
     return message
@@ -226,21 +239,26 @@ coerce(model::ProbabilisticEnsembleModel, Xtable) where R = coerce(model.atom, X
 """
     EnsembleModel(atom=nothing, weights=Float64[], bagging_fraction=0.8, rng_seed=0, n=100, parallel=true)
 
-Create a model for training an ensemble of `n` learners, each with
-associated model `atom`. Useful if `fit!(machine(atom, data...))` does
-not create identical models every call (stochastic models, such as
-DecisionTrees with randomized node selection criterion), or if
-`bagging_fraction` is set to a value not equal to 1.0. The constructor
-fails if no `atom` is specified.
+Create a model for training an ensemble of `n` learners, with optional
+bagging, each with associated model `atom`. Useful if
+`fit!(machine(atom, data...))` does not create identical models on
+repeated calls (ie, is a stochastic model, such as a decision tree
+with randomized node selection criteria), or if `bagging_fraction` is
+set to a value not equal to 1.0 (or both). The constructor fails if no
+`atom` is specified. 
+
+Predictions are weighted according to the vector `weights` (to allow
+for external optimization) except in the case that `atom` is a
+`Deterministic` classifier.
 
 The ensemble model is `Deterministic` or `Probabilistic`, according to
 the corresponding supertype of `atom`. In the case of classifiers, the
-prediction is based a majority vote, and for regressors it is the
-usual average.  Probabilistic predictions are obtained by averaging
-the atomic probability distribution functions; in particular, for
-regressors, the ensemble prediction on each input pattern has type
-`Distributions.MixtureModel{VF,VS,D}`, where `D` is the type of
-predicted distribution for `atom`.
+predictions majority votes, and for regressors they are ensemble
+averages.  Probabilistic predictions are obtained by averaging the
+atomic probability distribution functions; in particular, for
+regressors, the ensemble prediction on each input pattern has the type
+`MixtureModel{VF,VS,D}` from the Distributions.jl package, where `D`
+is the type of predicted distribution for `atom`.
 
 """
 function EnsembleModel(; args...)
@@ -293,7 +311,7 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) wher
         end
     end
 
-    fitresult = WeightedEnsemble(model.atom, ensemble)
+    fitresult = WrappedEnsemble(model.atom, ensemble)
     report = nothing
 
     return fitresult, deepcopy(model), report
@@ -301,6 +319,11 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) wher
 end
 
 function predict(model::EitherEnsembleModel, fitresult, Xnew)
+
+    # because weights could have changed since last fit:
+    message = clean!(model)
+    isempty(message) || @warn message
+    
     n = model.n
     if isempty(model.weights)
         weights = fill(1/n, n)
@@ -366,7 +389,7 @@ end
 
 #     end
                 
-#     fitresult = WeightedEnsemble(model.atom, ensemble, weights)
+#     fitresult = WrappedEnsemble(model.atom, ensemble, weights)
 #     report = Dict{Symbol, Any}()
 #     report[:normalized_weights] = weights*length(weights)
 
@@ -379,7 +402,7 @@ end
 # predict(model::ProbabilisticEnsembleModel, fitresult, Xt, parallel, verbosity) =
 #     predict(fitresult, Xt)
 
-# function fit_weights!(mach::SupervisedMachine{WeightedEnsemble{R, Atom},
+# function fit_weights!(mach::SupervisedMachine{WrappedEnsemble{R, Atom},
 #                                               ProbabilisticEnsembleModel{R, Atom}};
 #               verbosity=1, parallel=true) where {R, Atom <: Supervised{R}}
 
@@ -393,7 +416,7 @@ end
 #     return mach
 # end
 
-# function weight_regularization_curve(mach::SupervisedMachine{WeightedEnsemble{R, Atom},
+# function weight_regularization_curve(mach::SupervisedMachine{WrappedEnsemble{R, Atom},
 #                                                            ProbabilisticEnsembleModel{R, Atom}},
 #                                      test_rows;
 #                                      verbosity=1, parallel=true,
