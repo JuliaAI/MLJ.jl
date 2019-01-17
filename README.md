@@ -98,7 +98,7 @@ Changing a hyper-parameter and re-evaluating:
 
 ```julia
 knn_model.K = 20
-fit!(knn)
+fit!(knn, rows=train)
 yhat = predict(knn, X[test,:])
 rms(y[test], yhat)
 
@@ -131,7 +131,7 @@ Fitting the corresponding machine tunes the underlying model and retrains on all
 
 ```julia
 tuned_knn = machine(tuned_knn_model, X[train,:], y[train])
-fit!(tuned_knn);
+fit!(tuned_knn); # fit using all provided data
 
 ┌ Info: Training Machine{TunedModel{Grid,KNNRegre…} @ 1…27.
 └ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:98
@@ -151,7 +151,7 @@ Training best model on all supplied data...
 ┌ Info: Training Machine{KNNRegressor} @ 1…48.
 └ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:98
 
-best(tuned_knn)
+tuned_knn.report[:best_model]
 
 # KNNRegressor @ 1…28: 
 K                       =>   2

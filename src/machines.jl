@@ -41,86 +41,57 @@ Machine(model::M, args...) where M<:Model = Machine{M}(model, args...)
 # fit code in networks.jl and we ought to combine the two by, say,
 # making generic data and vectors callable on rows.
 
-# fit method, general case (no coercion of arguments):
-function fit!(machine::Machine; rows=nothing, verbosity=1)
+function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
-    warning = clean!(machine.model)
+    if mach isa NodalMachine && mach.frozen 
+        verbosity < 0 || @warn "$mach not trained as it is frozen."
+        return mach
+    end
+
+    warning = clean!(mach.model)
     isempty(warning) || verbosity < 0 || @warn warning 
     
-#    verbosity < 1 || @info "Training $machine whose model is $(machine.model)."
-    verbosity < 1 || @info "Training $machine."
+    verbosity < 1 || @info "Training $mach."
 
-    if !isdefined(machine, :fitresult)
-        if rows == nothing
-            rows = (:) # error("An untrained Machine requires rows to fit.")
-        end
-        args = [arg[Rows, rows] for arg in machine.args]
-        machine.fitresult, machine.cache, report =
-            fit(machine.model, verbosity, args...)
-        machine.rows = rows
+    if rows == nothing
+        rows = (:) 
+    end
+
+    rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
+
+    if mach isa NodalMachine && !is_stale(mach) && !rows_have_changed && !force
+        return mach
+    end
+    
+    if mach.model isa Supervised
+            X = coerce(mach.model, mach.args[1][Rows, rows])
+            ys = [arg[Rows, rows] for arg in mach.args[2:end]]
+        args = (X, ys...)
     else
-        if rows == nothing # (ie rows not specified) update:
-            args = [arg[Rows, machine.rows] for arg in machine.args]
-            machine.fitresult, machine.cache, report =
-                update(machine.model, verbosity, machine.fitresult,
-                       machine.cache, args...)
-        else # retrain from scratch:
-            args = [arg[Rows, rows] for arg in machine.args]
-            machine.fitresult, machine.cache, report =
-                fit(machine.model, verbosity, args...)
-            machine.rows = rows
-        end
+        args = [arg[Rows, rows] for arg in mach.args]
     end
 
+    if !isdefined(mach, :fitresult) || rows_have_changed || force 
+        mach.fitresult, mach.cache, report =
+            fit(mach.model, verbosity, args...)
+    else # call `update`:
+        mach.fitresult, mach.cache, report =
+            update(mach.model, verbosity, mach.fitresult, mach.cache, args...)
+    end
+
+    if rows_have_changed
+        mach.rows = deepcopy(rows)
+    end
+
+    if mach isa NodalMachine
+        mach.previous_model = deepcopy(mach.model)
+    end
+    
     if report != nothing
-        merge!(machine.report, report)
+        merge!(mach.report, report)
     end
 
-    return machine
-
-end
-
-# fit method, supervised case (input data coerced):
-function fit!(machine::Machine{M};
-              rows=nothing, verbosity=1) where M<:Supervised
-
-    warning = clean!(machine.model)
-    isempty(warning) || verbosity < 0 || @warn warning 
-
-#    verbosity < 1 || @info "Training $machine whose model is $(machine.model)."
-    verbosity < 1 || @info "Training $machine."
-
-    args = machine.args
-    if !isdefined(machine, :fitresult)
-        if rows == nothing
-            rows = (:) 
-        end
-        X = coerce(machine.model, args[1][Rows, rows])
-        ys = [arg[rows] for arg in args[2:end]]
-        machine.fitresult, machine.cache, report =
-            fit(machine.model, verbosity, X, ys...)
-        machine.rows = rows
-    else
-        if rows == nothing # (ie rows not specified) update:
-            X = coerce(machine.model, args[1][Rows, machine.rows])
-            ys = [arg[machine.rows] for arg in args[2:end]]
-            machine.fitresult, machine.cache, report =
-                update(machine.model, verbosity, machine.fitresult,
-                       machine.cache, X, ys...)
-        else # retrain from scratch:
-            X = coerce(machine.model, args[1][Rows, rows])
-            ys = [arg[rows] for arg in args[2:end]]
-            machine.fitresult, machine.cache, report =
-                fit(machine.model, verbosity, X, ys...)
-            machine.rows = rows
-        end
-    end
-
-    if report != nothing
-        merge!(machine.report, report)
-    end
-
-    return machine
+    return mach
 
 end
 

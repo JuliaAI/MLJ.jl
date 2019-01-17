@@ -42,8 +42,7 @@ function Base.merge!(tape1::Vector, tape2::Vector)
     return tape1
 end
 
-# TODO: replace linear tapes below with dependency trees to allow
-# better scheduling of training learning networks data.
+# Note that `fit!` has already been defined for any  AbstractMachine in machines.jl
 
 mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
 
@@ -104,103 +103,6 @@ function is_stale(machine::NodalMachine)
     !isdefined(machine, :fitresult) ||
         machine.model != machine.previous_model ||
         reduce(|,[is_stale(arg) for arg in machine.args])
-end
-
-# fit method, general case (no coercion of arguments):
-function fit!(machine::NodalMachine; rows=nothing, verbosity=1)
-
-    if machine.frozen 
-#        verbosity < 0 || @warn "$machine with model $(machine.model) "*
-        verbosity < 0 || @warn "$machine "*
-        "not trained as it is frozen."
-        return machine
-    end
-
-    warning = clean!(machine.model)
-    isempty(warning) || verbosity < 0 || @warn warning 
-        
-#    verbosity < 1 || @info "Training $machine whose model is $(machine.model)."
-    verbosity < 1 || @info "Training $machine."
-
-    if !isdefined(machine, :fitresult)
-        if rows == nothing
-            rows=(:) # error("An untrained NodalMachine requires rows to fit.")
-        end
-        args = [arg(rows=rows) for arg in machine.args]
-        machine.fitresult, machine.cache, report =
-            fit(machine.model, verbosity, args...)
-        machine.rows = deepcopy(rows)
-    else
-        if rows == nothing # (ie rows not specified) update:
-            args = [arg(rows=machine.rows) for arg in machine.args]
-            machine.fitresult, machine.cache, report =
-                update(machine.model, verbosity, machine.fitresult,
-                       machine.cache, args...)
-        else # retrain from scratch:
-            args = [arg(rows=rows) for arg in machine.args]
-            machine.fitresult, machine.cache, report =
-                fit(machine.model, verbosity, args...)
-            machine.rows = deepcopy(rows)
-        end
-    end
-
-    machine.previous_model = deepcopy(machine.model)
-    
-    if report != nothing
-        merge!(machine.report, report)
-    end
-
-    return machine
-
-end
-
-# fit method, supervised case (input data coerced):
-function fit!(machine::NodalMachine{M}; rows=nothing, verbosity=1) where M<:Supervised
-
-    if machine.frozen 
-#        verbosity < 0 || @warn "$machine with model $(machine.model) "*
-        verbosity < 0 || @warn "$machine "*
-        "not trained as it is frozen."
-        return machine
-    end
-        
-#    verbosity < 1 || @info "Training $machine whose model is $(machine.model)."
-    verbosity < 1 || @info "Training $machine."
-
-    args = machine.args
-    if !isdefined(machine, :fitresult)
-        if rows == nothing
-            rows=(:) # error("An untrained NodalMachine requires rows to fit.")
-        end
-        X = coerce(machine.model, args[1](rows=rows))
-        ys = [arg(rows=rows) for arg in args[2:end]]
-        machine.fitresult, machine.cache, report =
-            fit(machine.model, verbosity, X, ys...)
-        machine.rows = deepcopy(rows)
-    else
-        if rows == nothing # (ie rows not specified) update:
-            X = coerce(machine.model, args[1](rows=machine.rows))
-            ys = [arg(rows=machine.rows) for arg in args[2:end]]
-            machine.fitresult, machine.cache, report =
-                update(machine.model, verbosity, machine.fitresult,
-                       machine.cache, X, ys...)
-        else # retrain from scratch:
-            X = coerce(machine.model, args[1](rows=rows))
-            ys = [arg(rows=rows) for arg in args[2:end]]
-            machine.fitresult, machine.cache, report =
-                fit(machine.model, verbosity, X, ys...)
-            machine.rows = deepcopy(rows)
-        end
-    end
-
-    machine.previous_model = deepcopy(machine.model)
-    
-    if report != nothing
-        merge!(machine.report, report)
-    end
-
-    return machine
-
 end
 
 
@@ -275,21 +177,21 @@ function (y::Node)(Xnew)
     return (y.operation)(y.machine, [arg(Xnew) for arg in y.args]...)
 end
 
+# Allow nodes to share the `X[Rows, r]` syntax of concrete tabular data
+# (needed for `fit(::AbstractMachine, ...)` in machines.jl):
+Base.getindex(X::AbstractNode, ::Type{Rows}, r) = X(rows=r)
+
 # and for the special case of static operations:
 (y::Node{Nothing})(; rows=:) = (y.operation)([arg(rows=rows) for arg in y.args]...)
 (y::Node{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
-# if no `rows` specified, only retrain stale dependent
-# NodalMachines (using whatever rows each one was last trained
-# on):
-function fit!(y::Node; rows=nothing, verbosity=1)
+function fit!(y::Node; rows=nothing, verbosity=1, force=false)
     if rows == nothing
-        machines = filter(is_stale, y.tape)
-    else
-        machines = y.tape
+        rows = (:)
     end
-    for machine in machines
-        fit!(machine; rows=rows, verbosity=verbosity-1)
+    
+    for machine in y.tape
+        fit!(machine; rows=rows, verbosity=verbosity-1, force=force)
     end
     return y
 end
@@ -364,22 +266,14 @@ machine(model::Model, args::AbstractNode...) = NodalMachine(model, args...)
 machine(model::Model, X, y::AbstractNode) = NodalMachine(model, source(X), y)
 machine(model::Model, X::AbstractNode, y) = NodalMachine(model, X, source(y))
 
-# aliases
-
-# TODO: use macro to autogenerate these during model decleration/package glue-code:
-# remove need for `Node` syntax in case of operations of main interest:
-# predict(machine::NodalMachine, X::AbstractNode) = node(predict, machine, X)
-# transform(machine::NodalMachine, X::AbstractNode) = node(transform, machine, X)
-# inverse_transform(machine::NodalMachine, X::AbstractNode) = node(inverse_transform, machine, X)
-
-matrix(X::AbstractNode) = node(matrix, X)
+MLJBase.matrix(X::AbstractNode) = node(matrix, X)
 
 Base.log(v::Vector{<:Number}) = log.(v)
 Base.exp(v::Vector{<:Number}) = exp.(v)
 Base.log(X::AbstractNode) = node(log, X)
 Base.exp(X::AbstractNode) = node(exp, X)
 
-
+# maybe don't really need:
 rms(y::AbstractNode, yhat::AbstractNode) = node(rms, y, yhat)
 rms(y, yhat::AbstractNode) = node(rms, y, yhat)
 rms(y::AbstractNode, yhat) = node(rms, y, yhat)

@@ -140,16 +140,18 @@ predict(ensemble_model, fitresult, X[test,:])
 ## MAHCINE TEST
 
 X, y = datanow() # boston
-atom = KNNRegressor()
+atom = KNNRegressor(K=7)
 ensemble_model = EnsembleModel(atom=atom)
 ensemble = machine(ensemble_model, X, y)
-test, train = partition(eachindex(y), 0.7)
+train, test = partition(eachindex(y), 0.7)
 fit!(ensemble, rows=train); length(ensemble.fitresult.ensemble)
-ensemble_model.n = 115
-fit!(ensemble); length(ensemble.fitresult.ensemble)
+ensemble_model.n = 15
+fit!(ensemble);
+@test length(ensemble.fitresult.ensemble) == 15
+ensemble_model.n = 10
+fit!(ensemble);
+@test length(ensemble.fitresult.ensemble) == 10
 @test !isnan(predict(ensemble, X[test,:])[1])
-
-
 
 
 # old Koala tests

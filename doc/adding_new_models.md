@@ -6,6 +6,9 @@ in any package that imports the module
 [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl)
 and implements the API defined there as outlined below.
 
+To implement the API described here, some familiarity with the
+following packages is helpful: [Distributions.jl](https://github.com/JuliaStats/Distributions.jl) (for probabilistic predictions), [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl) (essential if you are implementing a classifier), [Query.jl](https://github.com/queryverse/Query.jl) (if you're algorithm needs input data in a novel format).
+
 For a quick and dirty implementation of user-defined models see [here]().
 
 <!-- As a temporary measure, -->
@@ -139,24 +142,37 @@ target. Differences in the multivariate case are described later.
 
 #### The form of data for fitting and prediction, and the coerce method
 
-The MLJ model specification has no explicit requirement for the
-type of `X`, the argument representing input features appearing in the
+The MLJ model specification has no explicit requirement for the type
+of `X`, the argument representing input features appearing in the
 compulsory `fit` and `predict` methods described below. However, the
-MLJ user is free to present input features in any format implementing
-the Queryverse [iterable tables
-interface](https://github.com/queryverse/IterableTables.jl). If the
+MLJ user is free to present input features in any of the
+[formats](https://github.com/queryverse/IterableTables.jl)
+implementing the Queryverse iterable tables interface (which can be
+queried using [Query](https://github.com/queryverse/Query.jl)). If the
 `fit` and `predict` methods require data in a different or more
 specific form, one must overload the following method (whose fallback
 just returns `Xtable`):
 
 ````julia
-MLJBase.coerce(model::Supervised{R}, Xtable) -> X
+MLJBase.coerce(model::Supervised{R}, Xtable) -> X  # for use in `fit`, `predict`, etc
 ````
 
 To this end, MLJ provides the convenience method `MLJBase.matrix`;
 `MLJBase.matrix(Xtable)` is a two-dimensional `Array{T}` where `T` is the
 tightest common type of elements of `Xtable`, and `Xtable` is any
 iterable table.
+
+In those special cases where the return type `Special` of `coerce` is not a [Queryverse iterable
+table](https://github.com/queryverse/IterableTables.jl) or a `Matrix` (with rows corresponding to patterns and
+columns corresponding to features) one must tell MLJ how to access its pattern rows, by defining a method:
+
+````julia
+getrows(model::SomeSupervisedModel, X::Special, r) -> X_restricted
+````
+
+Here `r` is any integer, unitrange or colon `:`, and `X_restricted` is
+the restriction of `X` to the patterns with index or indices `r`.
+
 
 In contrast, the target data `y` passed to training will always be an
 `Vector{F}` for some `F<:AbstractFloat` - in the case of regressors -

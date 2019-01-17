@@ -37,11 +37,12 @@ predict(composite, fitresult, Xin[test,:]);
 XXX = source(Xin[train,:])
 yyy = source(yin[train])
 
-composite_model = machine(composite, XXX, yyy)
-yhat = predict(composite_model, XXX)
+mach = machine(composite, XXX, yyy)
+yhat = predict(mach, XXX)
 fit!(yhat, verbosity=3)
 composite.transformer.features = [:NOx, :Zn]
 fit!(yhat, verbosity=3)
+fit!(yhat, rows=1:20, verbosity=3)
 yhat(Xin[test,:])
 
 
