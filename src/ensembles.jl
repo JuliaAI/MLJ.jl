@@ -1,6 +1,6 @@
 ## WEIGHTED ENSEMBLES OF FITRESULTS
 
-# R is atom fitresult type
+# R is atomic fitresult type
 # Atom is atomic model type, eg, DecisionTree
 mutable struct WrappedEnsemble{R,Atom <: Supervised{R}} <: MLJType
     atom::Atom
@@ -109,15 +109,15 @@ end
 
 ## CORE ENSEMBLE-BUILDING FUNCTION
 
-function get_ensemble(atom::Supervised{R}, verbosity, X, ys, n, n_patterns, n_train, rng) where R
-    
+function get_ensemble(atom::Supervised{R}, verbosity, X, ys, n, n_patterns,
+                      n_train, rng, progress_meter) where R
+
     ensemble = Vector{R}(undef, n)
-    
     for i in 1:n
-        verbosity < 1 || print("\rComputing regressor number: $i          ")
+        verbosity < 1 || next!(progress_meter)
         train_rows = StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
         atom_fitresult, atom_cache, atom_report =
-            fit(atom, verbosity - 1, X[Rows, train_rows], [y[train_rows] for y in ys]...)
+            fit(atom, verbosity - 1, MLJBase.getrows(atom, X, train_rows), [y[train_rows] for y in ys]...)
         ensemble[i] = atom_fitresult
     end
     verbosity < 1 || println()
@@ -294,29 +294,60 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) wher
     n = model.n
     n_patterns = length(ys[1])
     n_train = round(Int, floor(model.bagging_fraction*n_patterns))
-
+    
+    progress_meter = Progress(n, dt=0.5, desc="Training ensemble: ",
+                              barglyphs=BarGlyphs("[=> ]"), barlen=50, color=:yellow)
+    
     if !parallel || nworkers() == 1 # build in serial
-        ensemble = get_ensemble(atom, verbosity, X, ys, n, n_patterns, n_train, rng)
+        ensemble = get_ensemble(atom, verbosity, X, ys,
+                                n, n_patterns, n_train, rng, progress_meter)
     else # build in parallel
-        if verbosity >= 1
+        if verbosity > 0
             println("Ensemble-building in parallel on $(nworkers()) processors.")
         end
         chunk_size = div(n, nworkers())
         left_over = mod(n, nworkers())
         ensemble =  @distributed (vcat) for i = 1:nworkers()
             if i != nworkers()
-                get_ensemble(atom, verbosity - 1, X, ys, chunk_size, n_patterns, n_train, rng) # 0 means silent
+                get_ensemble(atom, 0, X, ys, chunk_size, n_patterns, n_train, rng, progress_meter)
             else
-                get_ensemble(atom, verbosity - 1, X, ys, chunk_size + left_over, n_patterns, n_train, rng)
+                get_ensemble(atom, 0, X, ys, chunk_size + left_over, n_patterns, n_train, rng, progress_meter)
             end
         end
     end
 
     fitresult = WrappedEnsemble(model.atom, ensemble)
     report = nothing
+    cache = deepcopy(model)
 
-    return fitresult, deepcopy(model), report
+    return fitresult, cache, report
     
+end
+
+# if n is only parameter that changes, we just append to the existing
+# ensemble, or truncate it:
+function update(model::EitherEnsembleModel, verbosity::Int, fitresult, old_model, X, y)
+
+    n = model.n
+
+    if model.atom == old_model.atom &&
+        model.bagging_fraction == old_model.bagging_fraction
+        if n > old_model.n
+            model.n = n - old_model.n # temporarily mutate the model
+            wens, model_copy, report = fit(model, verbosity, X, y)
+            append!(fitresult.ensemble, wens.ensemble)
+            model.n = n         # restore model
+            model_copy.n = n    # new copy of the model
+        else
+            fitresult.ensemble = fitresult.ensemble[1:n]
+            model_copy = deepcopy(model)
+        end
+        cache, report = model_copy, nothing
+        return fitresult, cache, report
+    else
+        return fit(model, verbosity, X, y)
+    end
+
 end
 
 function predict(model::EitherEnsembleModel, fitresult, Xnew)

@@ -48,6 +48,7 @@ export predict, predict_mean, predict_median, predict_mode
 export best, transform, inverse_transform, se, evaluate
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 
+import MLJBase: Rows, Cols, Names, Eltypes, getrows, nrows
 import MLJBase: fit, update, clean!, info, coerce
 import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: best, transform, inverse_transform, se, evaluate
@@ -63,6 +64,7 @@ import DataFrames: DataFrame, AbstractDataFrame, SubDataFrame, eltypes, names
 import Distributions: pdf, mode
 import Distributions
 import StatsBase
+using ProgressMeter
 using Query
 import TableTraits
 
@@ -80,7 +82,7 @@ const srcdir = dirname(@__FILE__) # the directory containing this file:
 
 include("utilities.jl")     # general purpose utilities
 include("metrics.jl")       # loss functions
-include("data.jl")          # internal agnostic data interface
+#include("data.jl")          # internal agnostic data interface
 include("tasks.jl")         
 include("datasets.jl")      # locally archived tasks for testing and demos
 include("machines.jl")      # machine API

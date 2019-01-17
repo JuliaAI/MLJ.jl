@@ -50,6 +50,10 @@ end
 RidgeRegressor(; lambda=0.0) = RidgeRegressor(lambda)
 
 MLJBase.coerce(model::RidgeRegressor, Xtable) = (MLJBase.matrix(Xtable), Xtable[MLJ.Names])
+function MLJBase.getrows(model::RidgeRegressor, X, r)
+    matrix, col_names = X
+    return (matrix[r,:], col_names)
+end
 
 function MLJBase.fit(model::RidgeRegressor, verbosity::Int, Xplus, y::Vector{<:Real})
 

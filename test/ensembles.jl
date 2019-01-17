@@ -8,7 +8,7 @@ using CategoricalArrays
 using Distributions
 
 
-## WEIGHTED ENSEMBLE PREDICTORS
+## WRAPPED ENSEMBLES OF FITRESULTS
 
 # target is :deterministic :nominal :univariate:
 atom = DeterministicConstantClassifier(target_type=Char)
@@ -52,8 +52,7 @@ X = DataFrame(rand(2,5))
 d = predict(wens, weights, X)[1]
 
 
-
-## DETERMINISTIC ENSEMBLE MODEL
+## ENSEMBLE MODEL
 
 # target is :deterministic :nominal :univariate:
 atom=DeterministicConstantClassifier(target_type=Char)
@@ -137,14 +136,23 @@ predict(ensemble_model, fitresult, X[test,:])
 @test EnsembleModel(atom=ConstantRegressor()) isa Probabilistic
 @test EnsembleModel(atom=DeterministicConstantRegressor()) isa Deterministic
 
-# test machine:
+
+## MAHCINE TEST
+
 X, y = datanow() # boston
-atom = KNNRegressor(K=7)
+atom = KNNRegressor()
 ensemble_model = EnsembleModel(atom=atom)
-ensemble = machine(atom, X, y)
-fit!(ensemble, rows=train)
+ensemble = machine(ensemble_model, X, y)
+test, train = partition(eachindex(y), 0.7)
+fit!(ensemble, rows=train); length(ensemble.fitresult.ensemble)
+ensemble_model.n = 115
+fit!(ensemble); length(ensemble.fitresult.ensemble)
 @test !isnan(predict(ensemble, X[test,:])[1])
 
+
+
+
+# old Koala tests
 # # check that providing fixed seed gives identical predictions each
 # # time if trees are deterministic:
 # tree.max_features = 0
