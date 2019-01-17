@@ -147,7 +147,9 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MLJBase]]
 deps = ["CategoricalArrays", "DataFrames", "Distributions", "Query", "Statistics", "TableTraits"]
-path = "../MLJBase"
+git-tree-sha1 = "fe10b2ec269be59682bd6619975a8feed3114697"
+repo-rev = "master"
+repo-url = "https://github.com/alan-turing-institute/MLJBase.jl"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 version = "0.1.0"
 
@@ -246,9 +248,9 @@ version = "0.5.2"
 
 [[Revise]]
 deps = ["Distributed", "FileWatching", "InteractiveUtils", "LibGit2", "OrderedCollections", "Pkg", "REPL", "Random", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "aced27858d5b4e89134004420a2c5f72b2a6e1e4"
+git-tree-sha1 = "341be2df64de382559e2cc307e02ed4192f8a8b7"
 uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
-version = "0.7.15"
+version = "1.0.2"
 
 [[Rmath]]
 deps = ["BinaryProvider", "Libdl", "Random", "Statistics", "Test"]
