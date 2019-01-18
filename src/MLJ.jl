@@ -46,13 +46,13 @@ export pdf, mode, median, mean, info
 
 # reexport from MLJBase:
 export predict, predict_mean, predict_median, predict_mode
-export best, transform, inverse_transform, se, evaluate
+export transform, inverse_transform, se, evaluate
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 
 import MLJBase: Rows, Cols, Names, Eltypes, getrows, nrows
 import MLJBase: fit, update, clean!, info, coerce
 import MLJBase: predict, predict_mean, predict_median, predict_mode
-import MLJBase: best, transform, inverse_transform, se, evaluate
+import MLJBase: transform, inverse_transform, se, evaluate
 import MLJBase: @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 import MLJBase: average
     

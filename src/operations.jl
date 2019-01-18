@@ -65,7 +65,7 @@ end
 @extend_to_machines inverse_transform
 @extend_to_machines se
 @extend_to_machines evaluate
-@extend_to_machines best
+# @extend_to_machines best
 
 @sugar predict
 @sugar predict_mode

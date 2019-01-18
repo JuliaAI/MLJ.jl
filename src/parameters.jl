@@ -271,9 +271,6 @@ end
     
 ## GRID GENERATION
 
-# credit: the idea to use `repeat` to generate the grid comes from an earlier
-# tuning algorithm of Diego Arenas
-
 """
     unwind(iterators...)
 
@@ -356,5 +353,4 @@ function iterator(model::M, param_iterators::Params) where M<:Model
     return it
 
 end
-
 

@@ -368,13 +368,16 @@ end
 
 An `update` method may be overloaded to enable a call by MLJ to
 retrain a model (on the same training data) to avoid repeating
-computations unnecessarily.
+computations unnecessarily. 
 
 ````julia
 MLJBase.update(model::SomeSupervisedModelType, verbosity, old_fitresult, old_cache, X, y) -> fitresult, cache, report
 ````
 
-A fallback just calls `fit`.  For context, see ["MLJ
+If an MLJ `Machine` is being `fit!` and it is not the first time, then
+`update` is called instead of `fit` unless `fit!` has been called with
+new rows. However, `MLJBase` defines a fallback for `update` which
+just calls `fit`. For context, see ["MLJ
 Internals"](internals.md). Learning networks wrapped as models
 constitute one use-case: One would like each component model to be
 retrained only when hyper-parameter changes "upstream" make this
