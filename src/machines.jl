@@ -51,8 +51,6 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
     warning = clean!(mach.model)
     isempty(warning) || verbosity < 0 || @warn warning 
     
-    verbosity < 1 || @info "Training $mach."
-
     if rows == nothing
         rows = (:) 
     end
@@ -63,6 +61,8 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
         return mach
     end
     
+    verbosity < 1 || @info "Training $mach."
+
     if mach.model isa Supervised
             X = coerce(mach.model, mach.args[1][Rows, rows])
             ys = [arg[Rows, rows] for arg in mach.args[2:end]]

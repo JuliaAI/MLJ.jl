@@ -25,7 +25,7 @@ lambda_ = strange(ridge, :lambda,
 param_ranges = Params(:transformer => Params(features_), :model => Params(lambda_)) 
 
 holdout = Holdout(fraction_train=0.8)
-grid = Grid(resolution=3)
+grid = Grid(resolution=10)
 
 tuned_model = TunedModel(model=composite, tuning=grid, resampling=holdout,
                          param_ranges=param_ranges)

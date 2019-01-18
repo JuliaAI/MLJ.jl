@@ -189,9 +189,8 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
     if rows == nothing
         rows = (:)
     end
-    
     for machine in y.tape
-        fit!(machine; rows=rows, verbosity=verbosity-1, force=force)
+        fit!(machine; rows=rows, verbosity=verbosity, force=force)
     end
     return y
 end

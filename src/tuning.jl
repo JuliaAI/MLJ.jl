@@ -2,9 +2,10 @@ abstract type TuningStrategy <: MLJ.MLJType end
 
 mutable struct Grid <: TuningStrategy
     resolution::Int
+    parallel::Bool
 end
 
-Grid(;resolution=10) = Grid(resolution)
+Grid(;resolution=10, parallel=true) = Grid(resolution, parallel)
 
 # TODO: make fitresult type `Machine` more concrete.
 
@@ -70,16 +71,20 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
 
     # evaluate all the models using specified resampling:
 
-    verbosity < 1 || println("Searching for best model:")
+    N = length(model_iterator)
+
+    # TODO: parallelize!
+
+    meter = Progress(N, dt=0.5, desc="Searching a $N-point grid for best model: ",
+                     barglyphs=BarGlyphs("[=> ]"), barlen=50, color=:yellow)
+
     for model in model_iterator
-        if verbosity > 0
-            print("model number: $m")
-        end
+
+        verbosity < 1 || next!(meter)
         
         resampling_machine.model.model = model
         fit!(resampling_machine, verbosity=verbosity-1)
         e = evaluate(resampling_machine)
-        verbosity < 1 || println("\t measurement: $e    ")
         measurements[m] = e
         if e < best_measurement
             best_model = model
@@ -87,8 +92,8 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
         end
         m += 1
     end
-    verbosity < 1 || println()
-    verbosity < 1 || println("Training best model on all supplied data.")
+
+    verbosity < 1 || @info "Training best model on all supplied data."
 
     # tune best model on all the data:
     fitresult = machine(best_model, X, y)
