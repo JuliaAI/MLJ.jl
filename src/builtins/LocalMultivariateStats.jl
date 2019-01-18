@@ -1,6 +1,6 @@
 # this file defines *and* loads one module
 
-module MultivariateStats_
+module LocalMultivariateStats
 
 export RidgeRegressor 
 
@@ -111,6 +111,8 @@ end # of module
 
 ## EXPOSE THE INTERFACE
 
-using .MultivariateStats_
-export RidgeRegressor
+using .LocalMultivariateStats
+
+#using .MultivariateStats_
+#export RidgeRegressor
 

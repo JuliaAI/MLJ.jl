@@ -6,7 +6,7 @@ end
 
 # fall-back for predicting on learning networks exported as models
 MLJBase.predict(composite::Supervised{Node}, fitresult, Xnew) =
-    fitresult(Xnew, verbosity=2)
+    fitresult(Xnew)
 
 
 """

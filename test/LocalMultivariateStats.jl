@@ -4,7 +4,7 @@ module TestMultivariateStats
 using Test
 using MLJ
 using LinearAlgebra
-import MultivariateStats
+# import MultivariateStats
 
 using DataFrames
 

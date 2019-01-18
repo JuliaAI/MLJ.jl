@@ -172,6 +172,12 @@ version = "0.3.1"
 [[Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 
+[[MultivariateStats]]
+deps = ["Arpack", "LinearAlgebra", "Printf", "Random", "SparseArrays", "Statistics", "StatsBase", "Test"]
+git-tree-sha1 = "cf1c990020bc4a52ff34ba2ee058b7cb677141f2"
+uuid = "6f286f6a-111f-5878-ab1e-185364afe411"
+version = "0.6.0"
+
 [[OrderedCollections]]
 deps = ["Random", "Serialization", "Test"]
 git-tree-sha1 = "85619a3f3e17bb4761fe1b1fd47f0e979f964d5b"

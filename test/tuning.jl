@@ -4,7 +4,6 @@ module TestTuning
 using Test
 using MLJ
 using DataFrames
-import MultivariateStats
 
 x1 = rand(100);
 x2 = rand(100);

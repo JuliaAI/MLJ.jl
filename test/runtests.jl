@@ -66,5 +66,5 @@ end
 end
 
 @testset "MultivariateStats" begin
-  @test include("MultivariateStats.jl")
+  @test include("LocalMultivariateStats.jl")
 end
