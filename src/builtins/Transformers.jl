@@ -252,7 +252,7 @@ function transform(transformer::Standardizer, fitresult, X)
     collect(propertynames(first(Tables.rows(X)))) == fitresult.features ||
         error("Attempting to transform data frame with incompatible feature labels.")
 
-    Xnew = copy(X) # make a copy of X, working even for `SubDataFrames`
+    Xnew = deepcopy(X) # make a copy of X, working even for `SubDataFrames`
     univ_transformer = UnivariateStandardizer()
     for j in 1:length(propertynames(first(Tables.rows(X))))
         if fitresult.is_transformed[j]
