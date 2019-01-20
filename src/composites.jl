@@ -39,10 +39,13 @@ end
 function MLJBase.fit(composite::SimpleCompositeModel, verbosity::Int, Xtrain, ytrain)
     X = source(Xtrain) # instantiates a source node
     y = source(ytrain)
+
     t = machine(composite.transformer, X)
     Xt = transform(t, X)
+
     l = machine(composite.model, Xt, y)
     yhat = predict(l, Xt)
+
     fit!(yhat, verbosity=verbosity)
     fitresult = yhat
     report = l.report

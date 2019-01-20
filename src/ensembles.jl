@@ -333,12 +333,14 @@ function update(model::EitherEnsembleModel, verbosity::Int, fitresult, old_model
     if model.atom == old_model.atom &&
         model.bagging_fraction == old_model.bagging_fraction
         if n > old_model.n
+            verbosity < 1 || @info "Building on existing ensemble of length $(old_model.n)"
             model.n = n - old_model.n # temporarily mutate the model
             wens, model_copy, report = fit(model, verbosity, X, y)
             append!(fitresult.ensemble, wens.ensemble)
             model.n = n         # restore model
             model_copy.n = n    # new copy of the model
         else
+            verbosity < 1 || @info "Truncating existing ensemble."
             fitresult.ensemble = fitresult.ensemble[1:n]
             model_copy = deepcopy(model)
         end

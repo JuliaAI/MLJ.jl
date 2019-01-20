@@ -10,27 +10,37 @@ train, test = partition(eachindex(yin), 0.7);
 Xtrain = Xin[train,:];
 ytrain = yin[train];
 
-knn_model = KNNRegressor(K=4)
+ridge_model = RidgeRegressor(lambda=0.1)
 selector_model = FeatureSelector()
 
-composite = SimpleCompositeModel(model=knn_model, transformer=selector_model)
+composite = SimpleCompositeModel(model=ridge_model, transformer=selector_model)
 
 fitresult, cache, report = MLJ.fit(composite, 3, Xtrain, ytrain)
 
 # to check internals:
-knn = fitresult.args[1].machine
-selector = fitresult.args[1].machine
+ridge = fitresult.tape[2]
+selector = fitresult.tape[1]
+ridge_old = deepcopy(ridge)
+selector_old = deepcopy(selector)
 
 # this should trigger no retraining:
 fitresult, cache, report = MLJ.update(composite, 3, fitresult, cache, Xtrain, ytrain);
+@test ridge.fitresult.coefficients == ridge_old.fitresult.coefficients
+@test selector.fitresult == selector_old.fitresult
 
-# this should trigger retraining of selector and knn:
+# this should trigger retraining of selector and ridge:
 selector_model.features = [:Crim, :Rm] 
 fitresult, cache, report = MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain)
+@test ridge.fitresult.bias != ridge_old.fitresult.bias
+@test selector.fitresult != selector_old.fitresult
+ridge_old = deepcopy(ridge)
+selector_old = deepcopy(selector)
 
-# this should trigger retraining of knn only:
-knn_model.K = 3
+# this should trigger retraining of ridge only:
+ridge_model.lambda = 1.0
 fitresult, cache, report = MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain)
+@test ridge.fitresult.bias != ridge_old.fitresult.bias
+@test selector.fitresult == selector_old.fitresult
 
 predict(composite, fitresult, Xin[test,:]);
 
@@ -48,11 +58,11 @@ yhat(Xin[test,:])
 
 ## EXPORTING LEARNING NETWORKS AS RE-USABLE STAND-ALONE MODELS
 
-mutable struct WrappedKNN <: Deterministic{Node}
-    K::Int
+mutable struct WrappedRidge <: Deterministic{Node}
+    ridge
 end
 
-function MLJ.fit(model::WrappedKNN, X, y)
+function MLJ.fit(model::WrappedRidge, X, y)
     Xs = source(X)
     ys = source(y)
 
@@ -64,8 +74,7 @@ function MLJ.fit(model::WrappedKNN, X, y)
     boxcoxM = machine(boxcox, ys)
     z = transform(boxcoxM, ys)
         
-    ridge = KNNRegressor(K=model.K)
-    ridgeM = machine(ridge, W, z)
+    ridgeM = machine(model.ridge, W, z)
     zhat = predict(ridgeM, W)
     yhat = inverse_transform(boxcoxM, zhat)
 
@@ -75,13 +84,14 @@ end
 
 X, y = datanow()
 
-model = WrappedKNN(2)
+ridge = RidgeRegressor(lambda=0.1)
+model = WrappedRidge(ridge)
 mach = machine(model, X, y)
 fit!(mach)
-yhat = predict(mach, X)
-model.K = 7
+yhat=predict(mach, X)
+ridge.lambda = 1.0
+fit!(mach)
 @test predict(mach, X) != yhat
-
 
 end
 true

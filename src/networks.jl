@@ -189,8 +189,22 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
     if rows == nothing
         rows = (:)
     end
-    for machine in y.tape
-        fit!(machine; rows=rows, verbosity=verbosity, force=force)
+
+    if force
+        need_training = y.tape
+    else
+        need_training = get_tape(nothing) # empty tape
+        for mach in y.tape
+            if is_stale(mach)
+                push!(need_training, mach)
+            else
+                verbosity < 1 || @info "$mach up-to-date and not retrained."
+            end
+        end
+    end
+    
+    for mach in need_training
+        fit!(mach; rows=rows, verbosity=verbosity, force=force)
     end
     return y
 end

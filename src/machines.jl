@@ -57,24 +57,20 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
     rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
 
-    if mach isa NodalMachine && !is_stale(mach) && !rows_have_changed && !force
-        return mach
-    end
-    
-    verbosity < 1 || @info "Training $mach."
-
     if mach.model isa Supervised
-            X = coerce(mach.model, mach.args[1][Rows, rows])
-            ys = [arg[Rows, rows] for arg in mach.args[2:end]]
+        X = coerce(mach.model, mach.args[1][Rows, rows])
+        ys = [arg[Rows, rows] for arg in mach.args[2:end]]
         args = (X, ys...)
     else
         args = [arg[Rows, rows] for arg in mach.args]
     end
 
     if !isdefined(mach, :fitresult) || rows_have_changed || force 
+        verbosity < 1 || @info "Training $mach."
         mach.fitresult, mach.cache, report =
             fit(mach.model, verbosity, args...)
     else # call `update`:
+        verbosity < 1 || @info "Updating $mach."
         mach.fitresult, mach.cache, report =
             update(mach.model, verbosity, mach.fitresult, mach.cache, args...)
     end

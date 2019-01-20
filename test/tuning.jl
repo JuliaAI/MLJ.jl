@@ -27,15 +27,12 @@ holdout = Holdout(fraction_train=0.8)
 grid = Grid(resolution=10)
 
 tuned_model = TunedModel(model=composite, tuning=grid, resampling=holdout,
-                         param_ranges=param_ranges)
-
-# tuned_model = TunedModel(model=ridge, tuning=grid, resampling=holdout,
-#                          param_ranges=Params(:lambda=>strange(ridge,:lambda,lower=0.05,upper=0.1)))
+                         param_ranges=param_ranges, report_measurements=true)
 
 tuned = machine(tuned_model, X, y)
 
 fit!(tuned)
-b = best(tuned)
+b = tuned.report[:best_model]
 
 measurements = tuned.report[:measurements]
 # should be all different:

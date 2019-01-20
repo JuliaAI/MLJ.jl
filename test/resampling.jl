@@ -12,16 +12,21 @@ y = [1.0, 1.0, 2.0, 2.0]
 
 holdout = Holdout(fraction_train=0.75)
 model = ConstantRegressor()
-resampler = Resampler(tuning=holdout, model=model)
+resampler = Resampler(resampling=holdout, model=model)
 fitresult, cache, report = MLJ.fit(resampler, 1, X, y)
 @test fitresult ≈ 2/3
 
 # resampler as machine:
-resampler = Resampler(tuning=holdout, model=model)
+X, y = datanow()
+ridge_model = RidgeRegressor(lambda=20.0)
+resampler = Resampler(resampling=holdout, model=ridge_model)
 resampling_machine = machine(resampler, X, y)
 fit!(resampling_machine, verbosity=2)
-@test evaluate(resampling_machine) ≈ 2/3
-
+e1=evaluate(resampling_machine)
+ridge_model.lambda=1.0
+fit!(resampling_machine, verbosity=2)
+e2=evaluate(resampling_machine)
+@test e1 != e2
 
 end
 true

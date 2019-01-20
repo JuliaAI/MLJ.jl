@@ -33,8 +33,11 @@ end
 
 function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) where M
 
-    resampler = Resampler(model=tuned_model.model,
-                          tuning=tuned_model.resampling,
+    # the mutating model:
+    clone = deepcopy(tuned_model.model)
+    
+    resampler = Resampler(model=clone,
+                          resampling=tuned_model.resampling,
                           measure=tuned_model.measure,
                           operation=tuned_model.operation)
 
@@ -57,12 +60,14 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
     # nested sequence of `:hyperparameter => iterator` pairs:
     param_iterators = copy(tuned_model.param_ranges, iterators)
 
-    # iterator over models:
-    model_iterator = MLJ.iterator(tuned_model.model, param_iterators)
+    iterators = flat_values(param_iterators)
+    A = unwind(iterators...)
+    N = size(A, 1)
 
-    L = length(model_iterator)
-    measurements = Vector{Float64}(undef, L)
-
+    if tuned_model.report_measurements
+        models = Vector{M}(undef, N)
+        measurements = Vector{Float64}(undef, N)
+    end
 
     # initialize search for best model:
     m = 1 # model counter
@@ -70,38 +75,44 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
     best_measurement = Inf
 
     # evaluate all the models using specified resampling:
-
-    N = length(model_iterator)
-
     # TODO: parallelize!
 
     meter = Progress(N, dt=0.5, desc="Searching a $N-point grid for best model: ",
                      barglyphs=BarGlyphs("[=> ]"), barlen=50, color=:yellow)
 
-    for model in model_iterator
+    for i in 1:N
 
         verbosity < 1 || next!(meter)
-        
-        resampling_machine.model.model = model
+
+        new_params = copy(param_iterators, Tuple(A[i,:]))   
+
+        # mutate `clone` (the model to which `resampler` points):
+        set_params!(clone, new_params)
+
         fit!(resampling_machine, verbosity=verbosity-1)
         e = evaluate(resampling_machine)
-        measurements[m] = e
         if e < best_measurement
-            best_model = model
+            best_model = deepcopy(clone)
             best_measurement = e
         end
-        m += 1
+
+        if tuned_model.report_measurements
+            models[i] = deepcopy(clone)
+            measurements[i] = e
+        end
+        
     end
 
     verbosity < 1 || @info "Training best model on all supplied data."
 
-    # tune best model on all the data:
+    # train best model on all the data:
+    # TODO: maybe avoid using machines here and use model fit/predict?
     fitresult = machine(best_model, X, y)
     fit!(fitresult, verbosity=verbosity-1)
 
     if tuned_model.report_measurements
         report = Dict{Symbol, Any}()
-        report[:models] = collect(model_iterator)
+        report[:models] = models
         report[:measurements] = measurements
         report[:best_model] = best_model
         report[:best_measurement] = best_measurement
