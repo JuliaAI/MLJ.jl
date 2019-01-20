@@ -198,7 +198,7 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
             if is_stale(mach)
                 push!(need_training, mach)
             else
-                verbosity < 1 || @info "$mach up-to-date and not retrained."
+                verbosity < 1 || @info "Not retraining $mach. It is up-to-date."
             end
         end
     end
