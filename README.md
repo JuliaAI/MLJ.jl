@@ -125,7 +125,7 @@ param_ranges = Params(:K => K_range)
 tuning = Grid(resolution=8)
 resampling = Holdout(fraction_train=0.8)
 tuned_knn_model = TunedModel(model=knn_model, 
-    tuning=tuning, resampling=resampling, param_ranges=param_ranges);
+    tuning_stragegy=tuning, resampling_stragegy=resampling, param_ranges=param_ranges);
 ```
 Fitting the corresponding machine tunes the underlying model and retrains on all supplied data:
 
