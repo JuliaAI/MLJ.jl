@@ -11,8 +11,8 @@ Grid(;resolution=10, parallel=true) = Grid(resolution, parallel)
 
 mutable struct TunedModel{T,M<:MLJ.Model} <: MLJ.Supervised{MLJ.Machine}
     model::M
-    tuning::T
-    resampling
+    tuning_strategy::T
+    resampling_strategy
     measure
     operation
     param_ranges::Params
@@ -20,14 +20,14 @@ mutable struct TunedModel{T,M<:MLJ.Model} <: MLJ.Supervised{MLJ.Machine}
 end
 
 function TunedModel(;model=ConstantRegressor(),
-                    tuning=Grid(),
-                    resampling=Holdout(),
+                    tuning_strategy=Grid(),
+                    resampling_strategy=Holdout(),
                     measure=rms,
                     operation=predict,
                     param_ranges=Params(),
                     report_measurements=true)
     !isempty(param_ranges) || error("No param_ranges specified.")
-    return TunedModel(model, tuning, resampling,
+    return TunedModel(model, tuning_strategy, resampling_strategy,
                       measure, operation, param_ranges, report_measurements)
 end
 
@@ -37,7 +37,7 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
     clone = deepcopy(tuned_model.model)
     
     resampler = Resampler(model=clone,
-                          resampling=tuned_model.resampling,
+                          resampling_strategy=tuned_model.resampling_strategy,
                           measure=tuned_model.measure,
                           operation=tuned_model.operation)
 
@@ -51,7 +51,7 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
         if range isa MLJ.NominalRange
             MLJ.iterator(range)
         elseif range isa MLJ.NumericRange
-            MLJ.iterator(range, tuned_model.tuning.resolution)
+            MLJ.iterator(range, tuned_model.tuning_strategy.resolution)
         else
             throw(TypeError(:iterator, "", MLJ.ParamRange, rrange))            
         end

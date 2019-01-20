@@ -28,18 +28,18 @@ CV(; n_folds=6) = CV(n_folds)
 
 mutable struct Resampler{S,M<:Supervised} <: Model
     model::M
-    resampling::S
+    resampling_strategy::S
     measure
     operation
 end
-Resampler(;model=RidgeRegressor(), resampling=Holdout(), measure=rms, operation=predict) =
-    Resampler(model, resampling, measure, operation) 
+Resampler(;model=RidgeRegressor(), resampling_strategy=Holdout(), measure=rms, operation=predict) =
+    Resampler(model, resampling_strategy, measure, operation) 
 
 function MLJBase.fit(resampler::Resampler{Holdout}, verbosity::Int, X, y)
 
     mach = machine(resampler.model, X, y)
 
-    train, test = partition(eachindex(y), resampler.resampling.fraction_train)
+    train, test = partition(eachindex(y), resampler.resampling_strategy.fraction_train)
     fit!(mach, rows=train, verbosity=verbosity-1)
     yhat = resampler.operation(mach, X[Rows, test])    
     fitresult = resampler.measure(y[test], yhat)
@@ -55,7 +55,7 @@ function MLJBase.update(resampler::Resampler{Holdout}, verbosity::Int, fitresult
 
     mach = cache
 
-    train, test = partition(eachindex(y), resampler.resampling.fraction_train)
+    train, test = partition(eachindex(y), resampler.resampling_strategy.fraction_train)
     fit!(mach, rows=train, verbosity=verbosity-1)
     yhat = resampler.operation(mach, X[Rows, test])    
     fitresult = resampler.measure(y[test], yhat)
@@ -72,12 +72,12 @@ MLJBase.evaluate(model::Resampler{Holdout}, fitresult) = fitresult
 ## DIRECT EVALUTATING OF TRAINABLE MODELS
 
 # # holdout evaluation:
-# function evaluate(mach, resampling::Holdout, measure, rows)
+# function evaluate(mach, resampling_strategy::Holdout, measure, rows)
 #     X, y = mach.args
 #     if rows == nothing
 #         rows = eachindex(y)
 #     end
-#     train, test = partition(rows, resampling.fraction_train)
+#     train, test = partition(rows, resampling_strategy.fraction_train)
 #     fit!(mach, rows=train)
 #     yhat = predict(mach, X[Rows, test])
 #     return measure(y[test], yhat)
@@ -85,10 +85,10 @@ MLJBase.evaluate(model::Resampler{Holdout}, fitresult) = fitresult
 
 # # universal keyword version:
 # evaluate(mach::Machine{<:Supervised};
-#          resampling=Holdout,
+#          resampling_strategy=Holdout,
 #          measure=rms,
 #          rows=nothing) =
-#              evaluate(mach, resampling, measure, rows)
+#              evaluate(mach, resampling_strategy, measure, rows)
 
 
     
