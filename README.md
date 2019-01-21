@@ -10,16 +10,16 @@ learning models, written in the high performance, rapid
 development, scientific programming language, Julia. This is a work in
 progress and new [collaborators](#collaborators) are being sought.
 
+![](doc/two_model_stack.png)
+
 
 In large measure the MLJ project is inspired by [mlR](https://pat-s.github.io/mlr/index.html) ([recent
-slides 7/18](https://github.com/mlr-org/mlr-outreach).)
-
-For an earlier proof-of-concept, see
+slides 7/18](https://github.com/mlr-org/mlr-outreach).) For an earlier proof-of-concept, see
 [this branch](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
 and [this poster summary](material/MLJ-JuliaCon2018-poster.pdf).
 
 Packages wishing to implement the MLJ API for their algorithms should
-import `MLJBase`, which has its own
+import MLJBase, which has its own
 [repository](https://github.com/alan-turing-institute/MLJBase.jl).
 
 ### Features to include:
@@ -183,11 +183,12 @@ We are looking for new collaborators @ the Alan Turing Institute!
 ### History
 
 Predecessors of the current package are
-[AnalyticalEngine.jl](https://github.com/tlienart/AnalyticalEngine.jl)
-and [Orchestra.jl](https://github.com/svs14/Orchestra.jl). Work
-continued as a research study group at the Univeristy of Warwick,
-beginning with a review of existing ML Modules that are available in
-Julia ([in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational),
+[AnalyticalEngine.jl](https://github.com/tlienart/AnalyticalEngine.jl),
+[Orchestra.jl](https://github.com/svs14/Orchestra.jl), and
+[Koala.jl](https://github.com/ablaom/Koala.jl). Work continued as a
+research study group at the Univeristy of Warwick, beginning with a
+review of existing ML Modules that are available in Julia
+([in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational),
 [overview](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Package%20Review)).
 
 ![alt text](material/packages.jpg)
