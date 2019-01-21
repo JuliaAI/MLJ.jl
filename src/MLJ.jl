@@ -55,11 +55,11 @@ import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: transform, inverse_transform, se, evaluate
 import MLJBase: @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 import MLJBase: average
-    
+
 using MLJBase
 
 import Requires.@require  # lazy code loading package
-using  CategoricalArrays  
+using  CategoricalArrays
 import CSV
 import DataFrames: DataFrame, AbstractDataFrame, SubDataFrame, eltypes, names
 import Distributions: pdf, mode
@@ -83,7 +83,7 @@ const srcdir = dirname(@__FILE__) # the directory containing this file:
 
 include("utilities.jl")     # general purpose utilities
 include("metrics.jl")       # loss functions
-include("tasks.jl")         
+include("tasks.jl")
 include("datasets.jl")      # locally archived tasks for testing and demos
 include("machines.jl")      # machine API
 include("networks.jl")      # for building learning networks
@@ -91,7 +91,7 @@ include("composites.jl")    # composite models, incl. learning networks exported
 include("operations.jl")    # syntactic sugar for operations (predict, transform, predict_mean, etc.)
 include("resampling.jl")    # evaluating models by assorted resampling strategies
 include("parameters.jl")    # hyper-parameter range constructors and nested hyper-parameter API
-include("tuning.jl")        
+include("tuning.jl")
 include("ensembles.jl")     # homogeneous ensembles
 
 ## LOAD BUILT-IN MODELS
@@ -100,7 +100,6 @@ include("builtins/Transformers.jl")
 include("builtins/Constant.jl")
 include("builtins/KNN.jl")
 include("builtins/LocalMultivariateStats.jl")
-
 
 ## SETUP LAZY PKG INTERFACE LOADING (a temporary hack)
 
@@ -129,6 +128,7 @@ end
 
 function __init__()
     @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=true
+    @load_interface GaussianProcesses "891a1506-143c-57d2-908e-e1f8e92e6de9" lazy=true
 #    @load_interface  MultivariateStats "6f286f6a-111f-5878-ab1e-185364afe411" lazy=true
 end
 
