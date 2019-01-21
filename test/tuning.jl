@@ -21,13 +21,13 @@ features_ = strange(sel, :features,
 lambda_ = strange(ridge, :lambda,
                            lower=1e-6, upper=1e-1, scale=:log10)
 
-param_ranges = Params(:transformer => Params(features_), :model => Params(lambda_)) 
+nested_ranges = Params(:transformer => Params(features_), :model => Params(lambda_)) 
 
 holdout = Holdout(fraction_train=0.8)
 grid = Grid(resolution=10)
 
 tuned_model = TunedModel(model=composite, tuning_strategy=grid, resampling_strategy=holdout,
-                         param_ranges=param_ranges, report_measurements=true)
+                         nested_ranges=nested_ranges, report_measurements=true)
 
 tuned = machine(tuned_model, X, y)
 
@@ -47,6 +47,21 @@ e = rms(y, predict(tuned, X))
 # check this error has same order of magnitude as best measurement during tuning:
 r = e/tuned.report[:best_measurement]
 @test r < 10 && r > 0.1
+
+ridge = RidgeRegressor()
+tuned_model = TunedModel(model=ridge,
+                          nested_ranges=Params(strange(ridge, :lambda, lower=0.01, upper=1.0)))
+tuned = machine(tuned_model, X, y)
+fit!(tuned)
+tuned.report[:curve]
+
+## LEARNING CURVE
+
+atom = RidgeRegressor()
+model = EnsembleModel(atom=atom)
+r = range(atom, :lambda, lower=0.001, upper=1.0, scale=:log10)
+nested_range = Params(:atom => Params(:lambda => r))
+u, v = MLJ.learning_curve(model, X, y; nested_range = nested_range) 
 
 end
 true
