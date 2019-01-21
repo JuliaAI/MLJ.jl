@@ -61,7 +61,7 @@ atom = RidgeRegressor()
 model = EnsembleModel(atom=atom)
 r = range(atom, :lambda, lower=0.001, upper=1.0, scale=:log10)
 nested_range = Params(:atom => Params(:lambda => r))
-u, v = MLJ.learning_curve(model, X, y; nested_range = nested_range) 
+u, v = learning_curve(model, X, y; nested_range = nested_range) 
 
 end
 true
