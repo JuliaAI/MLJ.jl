@@ -53,7 +53,7 @@ interface](https://github.com/queryverse/IterableTables.jl). &#10004;
 
 ### Requirements
 
-Julia 0.7
+* Julia 0.7 or higher
 
 
 ### Installation
@@ -239,12 +239,12 @@ We are looking for new collaborators @ the Alan Turing Institute!
 ### History
 
 Predecessors of the current package are
-[AnalyticalEngine.jl](https://github.com/tlienart/AnalyticalEngine.jl),
-[Orchestra.jl](https://github.com/svs14/Orchestra.jl), and
-[Koala.jl](https://github.com/ablaom/Koala.jl). Work continued as a
-research study group at the Univeristy of Warwick, beginning with a
-review of existing ML Modules that are available in Julia
-([in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational),
+[AnalyticalEngine.jl](https://github.com/tlienart/AnalyticalEngine.jl)
+and [Orchestra.jl](https://github.com/svs14/Orchestra.jl), and
+[Koala.jl](https://github.com/ablaom/Koala.jl). Work
+continued as a research study group at the University of Warwick,
+beginning with a review of existing ML Modules that were available in
+Julia at the time ([in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational),
 [overview](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Package%20Review)).
 
 ![alt text](material/packages.jpg)
