@@ -56,12 +56,12 @@ function MLJBase.fit(model::GPClassifier{T2,M,K}
     y_plain = MLJBase.transform(decoder, y)
 
     gp = GP.GPE(X'
-                , y
+                , y_plain
                 , model.mean
                 , model.kernel
                 , model.logNoise)
 
-    fit!(gp, X', y)
+    fit!(gp, X', y_plain)
 
     fitresult = (gp, decoder)
 
