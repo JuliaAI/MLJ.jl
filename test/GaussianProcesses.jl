@@ -2,11 +2,14 @@ module TestGaussianProcesses
 
 using MLJ
 using Test
+using Random:seed!
 
-task = load_iris()
+seed!(113355)
+
+task = load_crabs()
 
 X, y = X_and_y(task)
-X_array = convert(Array{Float64}, X)
+X_array = convert(Matrix{Float64}, X)
 
 import GaussianProcesses
 import CategoricalArrays
@@ -18,15 +21,17 @@ allrows = eachindex(y)
 train, test = partition(allrows, 0.7)
 @test vcat(train, test) == allrows
 
-fitresult, cache, report = MLJ.fit(baregp, 1, X_array, y)
+fitresult, cache, report = MLJ.fit(baregp, 1, X_array[train,:], y[train])
 
-yhat = predict(baregp, fitresult, X_array)
+yhat = predict(baregp, fitresult, X_array[test, :])
 
-@show sum(yhat .== y) / length(y)
+@test sum(yhat .== y[test]) / length(y[test]) > 0.7 # around 0.7
 
 gp = machine(baregp, X, y)
 fit!(gp)
-predict(gp, X[1:3, :])
+yhat2 = predict(gp, X[test,:])
+
+@test sum(yhat2 .== y[test]) / length(y[test]) > 0.7
 
 end # module
 true

@@ -14,27 +14,21 @@ GPClassifierFitResultType{T} =
     Tuple{GP.GPE,
     MLJBase.CategoricalDecoder{UInt32,T,1,UInt32}}
 
-# XXX it should probably be a probabilistic classifier instead of deterministic
-# but the GaussianProcesses.predict_y is deterministic (returns mean/var)
-
 mutable struct GPClassifier{T, M<:GP.Mean, K<:GP.Kernel} <: MLJBase.Probabilistic{GPClassifierFitResultType{T}}
     target_type::Type{T} # target is CategoricalArray{target_type}
     mean::M
     kernel::K
-    logNoise::Float64
 end
 
 function GPClassifier(
     ; target_type=Int
     , mean=GP.MeanZero()
-    , kernel=GP.SE(0.0, 1.0)
-    , logNoise=-2.0)
+    , kernel=GP.SE(0.0,1.0)) # binary
 
     model = GPClassifier(
         target_type
         , mean
-        , kernel
-        , logNoise)
+        , kernel)
 
     message = MLJBase.clean!(model)
     isempty(message) || @warn message
@@ -52,16 +46,15 @@ function MLJBase.fit(model::GPClassifier{T2,M,K}
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
 
-    decoder = MLJBase.CategoricalDecoder(y)
+    decoder = MLJBase.CategoricalDecoder(y, eltype=Int)
     y_plain = MLJBase.transform(decoder, y)
 
     gp = GP.GPE(X'
                 , y_plain
                 , model.mean
-                , model.kernel
-                , model.logNoise)
+                , model.kernel)
 
-    fit!(gp, X', y_plain)
+     GP.fit!(gp, X', y_plain)
 
     fitresult = (gp, decoder)
 
@@ -74,10 +67,17 @@ end
 MLJBase.coerce(model::GPClassifier, Xtable) = MLJBase.matrix(Xtable)
 
 function MLJBase.predict(model::GPClassifier{T}
-                    , fitresult
-                    , Xnew) where T
+                       , fitresult
+                       , Xnew) where T
+
     gp, decoder = fitresult
-    return MLJBase.inverse_transform(decoder, GP.predict_y(gp, Xnew'))
+
+    nlevels = length(decoder.pool.levels)
+    pred = GP.predict_y(gp, Xnew')[1] # Float
+    # rounding with clamping between 1 and nlevels
+    pred_rc = clamp.(round.(Int, pred), 1, nlevels)
+
+    return MLJBase.inverse_transform(decoder, pred_rc)
 end
 
 # metadata:

@@ -4,7 +4,7 @@ datadir = joinpath(srcdir, "../data/") # TODO: make OS agnostic
 function load_boston()
     df = CSV.read(joinpath(datadir, "Boston.csv"),
                   categorical=false, allowmissing=:none)
-    return SupervisedTask(data=df, target=:MedV, ignore=[:Chas], properties=()) 
+    return SupervisedTask(data=df, target=:MedV, ignore=[:Chas], properties=())
 end
 
 """Load a reduced version of the well-known Ames Housing task,
@@ -25,10 +25,16 @@ function load_iris()
     return SupervisedTask(data=df, target=:target, properties=())
 end
 
+"""Load a well-known crab classification dataset with nominal features."""
+function load_crabs(seed=113355)
+    df = CSV.read(joinpath(datadir, "crabs.csv"),
+                  categorical=true, allowmissing=:none)
+    df = df[shuffle(1:size(df)[1]), :]
+    return SupervisedTask(data=df, target=:sp, ignore=[:sex, :index], properties=())
+end
+
 """Get some supervised data now!!"""
 function datanow()
     X, y = X_and_y(load_boston())
     return X[1:75,:], y[1:75]
 end
-
-
