@@ -333,7 +333,7 @@ should be the name of a (possibly nested) field of `model`; and each
 element of `flat_values(param_iterators)` (the corresponding final
 values) is an iterator over values of one of those fields.
 
-See also `iterator` and `param_range`.
+See also `iterator` and `params`.
 
 """
 function iterator(model::M, param_iterators::Params) where M<:Model

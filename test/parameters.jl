@@ -81,11 +81,11 @@ iterators = ([1, 2], ["a","b"], ["x", "y", "z"])
  1  "b"  "z";
  2  "b"  "z"]
 
-# test iterator of a param_space_its (parameter space iterators):
-param_space_its = Params(:lambda => MLJ.iterator(p3, 2),
+# test iterator of a nested_iterators (parameter space iterators):
+nested_iterators = Params(:lambda => MLJ.iterator(p3, 2),
                         :model1 => Params(:K => MLJ.iterator(p1, 2),
                                          :kernel => MLJ.iterator(p2)))
-models = MLJ.iterator(super_model, param_space_its)
+models = MLJ.iterator(super_model, nested_iterators)
 @test map(MLJ.params, models) ==
     [Params(:lambda => 0.1, :model1 => Params(:K => 1, :metric => 9.5, :kernel => 'c'),
             :model2 => Params(:K => 3, :metric => 9.5, :kernel => 'k')), 
