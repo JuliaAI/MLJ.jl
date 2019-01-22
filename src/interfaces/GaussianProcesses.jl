@@ -14,7 +14,7 @@ GPClassifierFitResultType{T} =
     Tuple{GP.GPE,
     MLJBase.CategoricalDecoder{UInt32,T,1,UInt32}}
 
-mutable struct GPClassifier{T, M<:GP.Mean, K<:GP.Kernel} <: MLJBase.Probabilistic{GPClassifierFitResultType{T}}
+mutable struct GPClassifier{T, M<:GP.Mean, K<:GP.Kernel} <: MLJBase.Deterministic{GPClassifierFitResultType{T}}
     target_type::Type{T} # target is CategoricalArray{target_type}
     mean::M
     kernel::K
@@ -82,7 +82,7 @@ end
 
 # metadata:
 MLJBase.package_name(::Type{<:GPClassifier}) = "GaussianProcesses"
-MLJBase.package_uuid(::Type{<:GPClassifier}) = "unknown"
+MLJBase.package_uuid(::Type{<:GPClassifier}) = "891a1506-143c-57d2-908e-e1f8e92e6de9"
 MLJBase.is_pure_julia(::Type{<:GPClassifier}) = :yes
 MLJBase.inputs_can_be(::Type{<:GPClassifier}) = [:numeric, ]
 MLJBase.target_kind(::Type{<:GPClassifier}) = :multiclass
