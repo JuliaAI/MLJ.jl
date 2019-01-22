@@ -15,7 +15,7 @@ mutable struct TunedModel{T,M<:MLJ.Model} <: MLJ.Supervised{MLJ.Machine}
     resampling_strategy
     measure
     operation
-    param_ranges::Params
+    nested_ranges::Params
     report_measurements::Bool
 end
 
@@ -24,11 +24,11 @@ function TunedModel(;model=ConstantRegressor(),
                     resampling_strategy=Holdout(),
                     measure=rms,
                     operation=predict,
-                    param_ranges=Params(),
+                    nested_ranges=Params(),
                     report_measurements=true)
-    !isempty(param_ranges) || error("No param_ranges specified.")
+    !isempty(nested_ranges) || error("No nested_ranges specified.")
     return TunedModel(model, tuning_strategy, resampling_strategy,
-                      measure, operation, param_ranges, report_measurements)
+                      measure, operation, nested_ranges, report_measurements)
 end
 
 function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) where M
@@ -44,7 +44,7 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
     resampling_machine = machine(resampler, X, y)
 
     # tuple of `ParamRange` objects:
-    ranges = MLJ.flat_values(tuned_model.param_ranges)
+    ranges = MLJ.flat_values(tuned_model.nested_ranges)
 
     # tuple of iterators over hyper-parameter values:
     iterators = map(ranges) do range
@@ -58,9 +58,10 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
     end
 
     # nested sequence of `:hyperparameter => iterator` pairs:
-    param_iterators = copy(tuned_model.param_ranges, iterators)
+    param_iterators = copy(tuned_model.nested_ranges, iterators)
 
     iterators = flat_values(param_iterators)
+    n_iterators = length(iterators)
     A = unwind(iterators...)
     N = size(A, 1)
 
@@ -116,6 +117,9 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
         report[:measurements] = measurements
         report[:best_model] = best_model
         report[:best_measurement] = best_measurement
+        if n_iterators == 1
+            report[:curve] = ([A[:,1]...], measurements)
+        end
     else
         report = nothing
     end
@@ -128,4 +132,38 @@ end
 
 MLJBase.predict(tuned_model::TunedModel, fitresult, Xnew) = predict(fitresult, Xnew)
 MLJBase.best(model::TunedModel, fitresult) = fitresult.model
-    
+
+"""
+    learning_curve(model, X, ys...; resolution=30, resampling_strategy=Holdout(), measure=rms, operation=pr, param_range=nothing)
+
+Returns `(u, v)` where `u` is a vector of hyperparameter values, and
+`v` the corresponding performance estimates. 
+
+````julia
+X, y = datanow()
+atom = RidgeRegressor()
+model = EnsembleModel(atom=atom)
+r = range(atom, :lambda, lower=0.1, upper=100, scale=:log10)
+param_range = Params(:atom => Params(:lambda => r))
+u, v = MLJ.learning_curve(model, X, y; param_range = param_range) 
+````
+
+"""
+function learning_curve(model::Supervised, X, ys...;
+                        resolution=30,
+                        resampling_strategy=Holdout(),
+                        measure=rms, operation=predict, nested_range=nothing)
+
+    model != nothing || error("No model specified. Use learning_curve(model=..., param_range=...,)")
+    nested_range != nothing || error("No param range specified. Use learning_curve(model=..., param_range=...,)")
+
+    tuned_model = TunedModel(model=model, nested_ranges=nested_range,
+                             tuning_strategy=Grid(resolution=resolution),
+                             resampling_strategy=resampling_strategy, measure=measure, report_measurements=true)
+    tuned = machine(tuned_model, X, ys...)
+    fit!(tuned, verbosity=0)
+    return tuned.report[:curve]
+end
+
+
+ 

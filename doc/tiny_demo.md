@@ -1,70 +1,3 @@
-## MLJ
-
-A pure Julia machine learning framework.
-
-[![Build Status](https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master)](https://travis-ci.com/alan-turing-institute/MLJ.jl)
-[![Slack Channel mlj](https://img.shields.io/badge/chat-on%20slack-yellow.svg)](https://slackinvite.julialang.org/)
-
-MLJ aims to be a flexible framework for combining and tuning machine
-learning models, written in the high performance, rapid
-development, scientific programming language, Julia. This is a work in
-progress and new [collaborators](#collaborators) are being sought.
-
-![](doc/two_model_stack.png)
-
-
-In large measure the MLJ project is inspired by [mlR](https://pat-s.github.io/mlr/index.html) ([recent
-slides 7/18](https://github.com/mlr-org/mlr-outreach).) For an earlier proof-of-concept, see
-[this branch](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
-and [this poster summary](material/MLJ-JuliaCon2018-poster.pdf).
-
-Packages wishing to implement the MLJ interface for their algorithms should
-import MLJBase, which has its own
-[repository](https://github.com/alan-turing-institute/MLJBase.jl).
-
-### Features to include:
-
-- Automated tuning of hyperparameters, including
-  composite models with nested parameters. Tuning implemented as a
-  wrapper, allowing composition with other meta-algorithms. &#10004;
-
-- Option to tune hyperparameters using gradient descent and automatic
-  differentiation (for learning algorithms written in Julia).
-
-- Data agnostic: Train models on any data supported by the Queryverse
-[iterable tables
-interface](https://github.com/queryverse/IterableTables.jl). &#10004;
-
-- Intuitive syntax for building arbitrarily complicated
-  learning networks. &#10004;
-  
-- Learning networks can be exported as self-contained composite models &#10004;, but
-  common networks (e.g., linear pipelines, stacks) come ready to plug-and-play.
-
-- Performant parallel implementation of large homogeneous ensembles
-  of arbitrary models (e.g., random forests).
-
-- "Task" interface matches machine learning problem to available models.
-
-- Benchmarking a battery of assorted models for a given task.
-
-- Automated estimates of cpu and memory requirements for given task/model.
-
-
-### Requirements
-
-* Julia 0.7 or higher
-
-
-### Installation
-
-In the Julia REPL run `]add https://github.com/alan-turing-institute/MLJBase.jl` first and `]add https://github.com/alan-turing-institute/MLJ.jl.git` afterwards.
-
-
-### Basic train and test
-
-See also the MLJ [tour](doc/tour.ipynb).
-
 ### Basic training and testing
 
 Let's load data and define train and test rows:
@@ -219,38 +152,6 @@ best_model = tuned_ensemble.report[:best_model]
 
     best_model.bagging_fraction = 0.6363636363636364
     (best_model.atom).K = 43
-
-
-### Collaborators
-
-Diego Arenas, Edoardo Barp, Anthony Blaom, Gergö Bohner, Valentin
-Churvay, Harvey Devereux, Thibaut Lienart, Franz J Király, Mohammed
-Nook, Annika Stechemesser, Yiannis Simillides, Sebastian Vollmer; Mike
-Innes in partnership with Julia Computing
-
-We are looking for new collaborators @ the Alan Turing Institute! 
-  * Implementation of unsupported learners
-  * Backend improvement! (Scheduling, Dagger, JuliaDB, Queryverse)
-  * Store learner meta info in METADATA.JL fashion (ideally open.ml compatible)
-  * Feature Improvement 
-  * Bootstrapping from Sklearn and mlr by wrapping with task info
-  
-
-### History
-
-Predecessors of the current package are
-[AnalyticalEngine.jl](https://github.com/tlienart/AnalyticalEngine.jl)
-and [Orchestra.jl](https://github.com/svs14/Orchestra.jl), and
-[Koala.jl](https://github.com/ablaom/Koala.jl). Work
-continued as a research study group at the University of Warwick,
-beginning with a review of existing ML Modules that were available in
-Julia at the time ([in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational),
-[overview](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Package%20Review)).
-
-![alt text](material/packages.jpg)
-
-Further work culminated in the first MLJ
-[proof-of-concept](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
 
 
 
