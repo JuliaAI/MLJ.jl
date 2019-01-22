@@ -68,3 +68,7 @@ end
 @testset "MultivariateStats" begin
   @test include("LocalMultivariateStats.jl")
 end
+
+@testset "GaussianProcesses" begin
+  @test include("GaussianProcesses.jl")
+end
