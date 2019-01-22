@@ -49,12 +49,23 @@ function MLJBase.fit(model::GPClassifier{T2,M,K}
     decoder = MLJBase.CategoricalDecoder(y, eltype=Int)
     y_plain = MLJBase.transform(decoder, y)
 
-    gp = GP.GPE(X'
-                , y_plain
-                , model.mean
-                , model.kernel)
 
-     GP.fit!(gp, X', y_plain)
+    if VERSION < v"1.0"
+        XT = collect(X')
+        yP = convert(Vector{Float64}, y_plain)
+        gp = GP.GPE(XT
+                  , yP
+                  , model.mean
+                  , model.kernel)
+
+        GP.fit!(gp, XT, yP)
+    else
+        gp = GP.GPE(X'
+                  , y_plain
+                  , model.mean
+                  , model.kernel)
+        GP.fit!(gp, X', y_plain)
+    end
 
     fitresult = (gp, decoder)
 
