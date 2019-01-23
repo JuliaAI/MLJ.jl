@@ -1,7 +1,4 @@
-# NOTE: in Sklearn they also implement a `transform` for kmeans whereby
-# the data is transformed to a bunch of euclidean distance from cluster centers
-# not sure whether it's useful at this point but maybe in the future
-# NOTE 2: there's a `kmeans!` function that updates centers, maybe a candidate
+# NOTE: there's a `kmeans!` function that updates centers, maybe a candidate
 # for the `update` machinery.
 
 module Clustering_
