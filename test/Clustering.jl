@@ -29,10 +29,9 @@ p = MLJ.predict(barekm, fitresult, X_array)
 @test argmin(r[1, :]) == p[1]
 @test argmin(r[10, :]) == p[10]
 
-km = machine(barekm, X)
+km = machine(barekm, X_array)
 
-# NOTE: this fails, no method matching fit(::KMeans, ::DataFrames.DataFrame)
-# fit!(km)
+fit!(km)
 
 end # module
 true
