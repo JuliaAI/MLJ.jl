@@ -25,8 +25,8 @@ TableTraits = "3783bdb8-4a98-5b6b-af9a-565f29a5fe9c"
 
 [extras]
 DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 GaussianProcesses = "891a1506-143c-57d2-908e-e1f8e92e6de9"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["DecisionTree", "GaussianProcesses"]
