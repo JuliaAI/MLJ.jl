@@ -20,7 +20,7 @@ import MLJBase
 using CategoricalArrays
 
 #> import package:
-import DecisionTree                
+import DecisionTree
 
 DecisionTreeClassifierFitResultType{T} =
     Tuple{Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}}, MLJBase.CategoricalDecoder{UInt32,T,1,UInt32}}
@@ -33,7 +33,7 @@ DecisionTreeClassifierFitResultType{T} =
 """
 mutable struct DecisionTreeClassifier{T} <: MLJBase.Deterministic{DecisionTreeClassifierFitResultType{T}}
     target_type::Type{T}  # target is CategoricalArray{target_type}
-    pruning_purity::Float64 
+    pruning_purity::Float64
     max_depth::Int
     min_samples_leaf::Int
     min_samples_split::Int
@@ -70,7 +70,7 @@ function DecisionTreeClassifier(
         , post_prune
         , merge_purity_threshold)
 
-    message = MLJBase.clean!(model)       #> future proof by including these 
+    message = MLJBase.clean!(model)       #> future proof by including these
     isempty(message) || @warn message #> two lines even if no clean! defined below
 
     return model
@@ -104,7 +104,7 @@ function MLJBase.fit(model::DecisionTreeClassifier{T2}
 
     decoder = MLJBase.CategoricalDecoder(y)
     y_plain = MLJBase.transform(decoder, y)
-    
+
     tree = DecisionTree.build_tree(y_plain
                                    , X
                                    , model.n_subfeatures
@@ -112,10 +112,10 @@ function MLJBase.fit(model::DecisionTreeClassifier{T2}
                                    , model.min_samples_leaf
                                    , model.min_samples_split
                                    , model.min_purity_increase)
-    if model.post_prune 
+    if model.post_prune
         tree = DecisionTree.prune_tree(tree, model.merge_purity_threshold)
     end
-    
+
     verbosity < 3 || DecisionTree.print_tree(tree, model.display_depth)
 
     fitresult = (tree, decoder)
@@ -123,18 +123,18 @@ function MLJBase.fit(model::DecisionTreeClassifier{T2}
     #> return package-specific statistics (eg, feature rankings,
     #> internal estimates of generalization error) in `report`, which
     #> should be `nothing` or a dictionary keyed on symbols.
-        
+
     cache = nothing
     report = nothing
-    
-    return fitresult, cache, report 
+
+    return fitresult, cache, report
 
 end
 
 #> method to coerce generic data into form required by fit:
 MLJBase.coerce(model::DecisionTreeClassifier, Xtable) = MLJBase.matrix(Xtable)
 
-function MLJBase.predict(model::DecisionTreeClassifier{T} 
+function MLJBase.predict(model::DecisionTreeClassifier{T}
                      , fitresult
                      , Xnew) where T
     tree, decoder = fitresult
@@ -155,5 +155,4 @@ end # module
 ## EXPOSE THE INTERFACE
 
 using .DecisionTree_
-export DecisionTreeClassifier         
-
+export DecisionTreeClassifier
