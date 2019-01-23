@@ -8,7 +8,7 @@ task = load_iris();
 
 # get some binary classification data for testing
 X, y = X_and_y(task)
-X_array = convert(Array{Float64}, X);
+X_array = convert(Matrix{Float64}, X);
  
 import DecisionTree
 import CategoricalArrays

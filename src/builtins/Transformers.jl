@@ -13,7 +13,7 @@ import Distributions
 using Statistics
 # using Tables
 
-import MLJBase: Names, Rows, Cols, Eltypes
+import MLJBase: Rows, Cols, Schema, retrieve
 
 # to be extended:
 import MLJBase: fit, transform, inverse_transform
@@ -239,16 +239,17 @@ function fit(transformer::Standardizer, verbosity::Int, X::Any)
     # all_features = df |> @take(1) |> @map(fieldnames(typeof(_))) |> @mapmany(_, __)
     # Since this is a really dirty way of proceeding, I've used
     # Tables.jl for now.
-    all_features = X[Names]
+    schema =  retrieve(X, Schema)
+    all_features = schema.names
     
     # determine indices of all_features to be transformed
     if isempty(transformer.features)
         cols_to_fit = filter!(eachindex(all_features)|>collect) do j
-            X[Eltypes,j] <: AbstractFloat
+            schema.eltypes[j] <: AbstractFloat
         end
     else
         cols_to_fit = filter!(eachindex(all_features)|>collect) do j
-            all_features[j] in transformer.features && X[Eltypes,j] <: Real
+            all_features[j] in transformer.features && schema.eltypes[j] <: Real
         end
     end
     
@@ -258,7 +259,7 @@ function fit(transformer::Standardizer, verbosity::Int, X::Any)
     verbosity < 2 || @info "Features standarized: "
     for j in cols_to_fit
         col_fitresult, cache, report =
-            fit(UnivariateStandardizer(), verbosity - 1, X[Cols, j])
+            fit(UnivariateStandardizer(), verbosity - 1, retrieve(X, Cols, j))
         fitresult_given_feature[all_features[j]] = col_fitresult
         verbosity < 2 ||
             @info "  :$(all_features[j])    mu=$(col_fitresult[1])  sigma=$(col_fitresult[2])"
@@ -279,7 +280,7 @@ function transform(transformer::Standardizer, fitresult, X)
 
     features_to_be_transformed = keys(fitresult)
 
-    all_features = X[Names]
+    all_features = retrieve(X, Schema).names
     
     issubset(Set(features_to_be_transformed), Set(all_features)) ||
         error("Attempting to transform data with incompatible feature labels.")
@@ -288,9 +289,9 @@ function transform(transformer::Standardizer, fitresult, X)
 
     cols = map(all_features) do ftr
         if ftr in features_to_be_transformed
-            transform(col_transformer, fitresult[ftr], X[Cols,ftr])
+            transform(col_transformer, fitresult[ftr], retrieve(X, Cols, ftr))
         else
-            X[Cols,ftr]
+            retrieve(X, Cols, ftr)
         end
     end
         
