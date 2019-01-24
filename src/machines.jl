@@ -13,12 +13,17 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
 
         # check number of arguments for model subtypes:
         !(M <: Supervised) || length(args) > 1 ||
-            throw(error("Wrong number of arguments. "*
-                        "You must provide target(s) for supervised models."))
+            error("Wrong number of arguments. "*
+                  "You must provide target(s) for supervised models.")
         !(M <: Unsupervised) || length(args) == 1 ||
-            throw(error("Wrong number of arguments. "*
-                        "Use NodalMachine(model, X) for an unsupervised  model."))
+            error("Wrong number of arguments. "*
+                  "Use NodalMachine(model, X) for an unsupervised  model.")
         
+        if M <: Supervised
+            TableTraits.isiterabletable(args[1]) ||
+                error("The `X` in `machine(model, X, ...) needs to be an Queryverse iterable table.")
+        end
+
         machine = new{M}(model)
 
         machine.args = args
