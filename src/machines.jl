@@ -11,18 +11,21 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
     
     function Machine{M}(model::M, args...) where M<:Model
 
-        # check number of arguments for model subtypes:
-        !(M <: Supervised) || length(args) > 1 ||
-            error("Wrong number of arguments. "*
-                  "You must provide target(s) for supervised models.")
+        if M <: Supervised
+            length(args) > 1 ||
+                error("Wrong number of arguments. "*
+                      "You must provide target(s) for supervised models.")
+            nrows = retrieve(args[1], Schema).nrows
+            good = reduce(*, [length(y) == nrows for y in args[2:end]])
+            good || error("Machine data arguments of incompatible sizes.")
+        end
         !(M <: Unsupervised) || length(args) == 1 ||
             error("Wrong number of arguments. "*
                   "Use NodalMachine(model, X) for an unsupervised  model.")
         
-        if M <: Supervised
-            TableTraits.isiterabletable(args[1]) ||
-                error("The `X` in `machine(model, X, ...) needs to be an Queryverse iterable table.")
-        end
+        TableTraits.isiterabletable(args[1]) ||
+            error("First data argument of machine must be an iterable table. "*
+                  "Use DataFrame(X) to wrap an abstract matrix X as a DataFrame.")
 
         machine = new{M}(model)
 
@@ -42,9 +45,8 @@ Machine(model::M, args...) where M<:Model = Machine{M}(model, args...)
 # Machine(model::Model, task::SupervisedTask) = Machine(model, X_and_y(task)...)
 # Machine(model::Model, task::UnsupervisedTask) = Machine(model, task.data)
 
-# TODO: The fit code below is almost identical to NodalMachine
-# fit code in networks.jl and we ought to combine the two by, say,
-# making generic data and vectors callable on rows.
+# Note: The following method is written to fit! `NodalMachine`s
+# defined in networks.jl, in addition to `Machine`s defined above.
 
 function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
