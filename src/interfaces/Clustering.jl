@@ -35,26 +35,28 @@ function MLJBase.clean!(model::KMeans)
     return warning
 end
 
-MLJBase.coerce(model::KMeans, Xtable) = MLJBase.matrix(Xtable)
-
 function MLJBase.fit(model::KMeans
                    , verbosity::Int
-                   , X::Matrix{Float64})
+                   , X)
+
+    Xarray = MLJBase.matrix(X)
 
     # NOTE see https://github.com/JuliaStats/Clustering.jl/issues/136
     # there shouldn't be a need for collect here...
-    fitresult = C.kmeans(collect(X')
-                       , model.k)
+    fitresult = C.kmeans(collect(transpose(Xarray)), model.k)
 
     cache = nothing
-    report = nothing
+    report = Dict{Symbol, Any}()
+    report[:centers] = transpose(fitresult.centers)
 
     return fitresult, cache, report
 end
 
 function MLJBase.transform(model::KMeans
                          , fitresult::KMeansFitResultType
-                         , X::Matrix{Float64})
+                         , X)
+
+    Xarray = MLJBase.matrix(X)
     # X is n × d
     # centers is d × k
     # results is n × k
@@ -74,15 +76,16 @@ _norm2(x) = sum(e->e^2, x)
 
 function MLJBase.predict(model::KMeans
                        , fitresult::KMeansFitResultType
-                       , Xnew::Matrix{Float64})
+                       , Xnew)
 
+    Xarray = MLJBase.matrix(Xnew)
     # similar to transform except we only care about the min distance
-    (n, d), k = size(Xnew), model.k
+    (n, d), k = size(Xarray), model.k
     pred = zeros(Int, n)
     @inbounds for i ∈ 1:n
         minv = Inf
         @inbounds for j ∈ 1:k
-            curv = _norm2(view(Xnew, i, :) .- view(fitresult.centers, :, j))
+            curv = _norm2(view(Xarray, i, :) .- view(fitresult.centers, :, j))
             # avoid branching (this is twice as fast as argmin because
             # the context is simpler and we have to do fewer checks)
             P       = curv < minv
