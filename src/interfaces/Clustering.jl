@@ -61,14 +61,14 @@ function MLJBase.transform(model::KMeans
     # centers is d × k
     # results is n × k
     (n, d), k = size(X), model.k
-    result = zeros(size(X, 1), k)
+    X̃ = zeros(size(X, 1), k)
 
     @inbounds for i ∈ 1:n
         @inbounds for j ∈ 1:k
-            result[i, j] = norm(view(X, i, :) .- view(fitresult.centers, :, j))
+            X̃[i, j] = norm(view(Xarray, i, :) .- view(fitresult.centers, :, j))
         end
     end
-    return result
+    return X̃
 end
 
 # For finding the minimum the squared norm is enough (and faster)
