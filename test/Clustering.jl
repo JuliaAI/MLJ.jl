@@ -32,8 +32,8 @@ X_array = convert(Matrix{Float64}, X)
 
 p = MLJ.predict(barekm, fitresult, X)
 
-@test argmin(r[1, :]) == p[1]
-@test argmin(r[10, :]) == p[10]
+@test argmin(R[1, :]) == p[1]
+@test argmin(R[10, :]) == p[10]
 
 km = machine(barekm, X)
 
@@ -49,8 +49,8 @@ fitresult, cache, report = MLJ.fit(barekm, 1, X)
 
 R = MLJ.transform(barekm, fitresult, X)
 
-@test R[1, 2] == evaluate(model.metric, view(X_array, 1, :), view(fitresult[2], 2, :))
-@test R[10, 3] == evaluate(model.metric, view(X_array, 10, :), view(fitresult[2], 3, :))
+@test R[1, 2] == Distances.evaluate(barekm.metric, view(X_array, 1, :), view(fitresult[2], 2, :))
+@test R[10, 3] == Distances.evaluate(barekm.metric, view(X_array, 10, :), view(fitresult[2], 3, :))
 
 p = MLJ.predict(barekm, fitresult, X)
 
