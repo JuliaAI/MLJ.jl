@@ -205,6 +205,13 @@ MLJBase.inputs_can_be(::Type{KMeans}) = [:numeric,]
 MLJBase.target_kind(::Type{KMeans}) = :multiclass
 MLJBase.target_quantity(::Type{KMeans}) = :univariate
 
+MLJBase.package_name(::Type{KMedoids}) = "Clustering"
+MLJBase.package_uuid(::Type{KMedoids}) = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
+MLJBase.is_pure_julia(::Type{KMedoids}) = :yes
+MLJBase.inputs_can_be(::Type{KMedoids}) = [:numeric,]
+MLJBase.target_kind(::Type{KMedoids}) = :multiclass
+MLJBase.target_quantity(::Type{KMedoids}) = :univariate
+
 end # module
 
 using .Clustering_
