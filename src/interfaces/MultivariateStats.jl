@@ -12,17 +12,17 @@ PCAFitResultType = MS.PCA
 
 mutable struct PCA <: MLJBase.Unsupervised
     ncomp::Union{Nothing, Int}
-    solver::Symbol
+    method::Symbol
     pratio::Float64 # ratio of variances preserved in the principal subspace
-    mean::Union{Nothing, Int, Vector{Float64}}
+    mean::Union{Nothing, Real, Vector{Float64}}
 end
 
 function PCA(;
              ncomp=nothing
-           , solver=:auto
+           , method=:auto
            , pratio=0.99
            , mean=nothing)
-    model = PCA(ncomp, solver)
+    model = PCA(ncomp, method)
     message = MLJBase.clean!(model)
     isempty(message) || @warn message
     return model
@@ -34,9 +34,9 @@ function MLJBase.clean!(model::PCA)
         warning *= "Need ncomp > 1. Resetting ncomp=p.\n"
         model.ncomp = nothing
     end
-    if model.solver ∉ [:auto, :cov, :svd]
-        warning *= "Unknown solver specification. Resetting to solver=:auto.\n"
-        model.solver = :auto
+    if model.method ∉ [:auto, :cov, :svd]
+        warning *= "Unknown method specification. Resetting to method=:auto.\n"
+        model.method = :auto
     end
     if !(0.0 < model.pratio < 1.0)
         warning *= "Need 0 < pratio < 1. Resetting to pratio=0.99.\n"
@@ -57,14 +57,36 @@ function MLJBase.fit(model::PCA
     Xarray = MLJBase.matrix(X)
 
     fitresult = MS.fit(model, transpose(Xarray)
-                     ; method=model.solver
+                     ; method=model.method
                      , pratio=model.pratio
                      , maxoutdim=model.ncomp)
+
+
     cache = nothing
     report = nothing
 
     return fitresult, cache, report
 end
+
+function MLJBase.transform(model::PCA
+                         , fitresult::PCAFitResultType
+                         , X)
+
+    Xarray = MLJBase.matrix(X)
+    # X is n x d, need to transpose twice...
+    return transpose(MS.transform(model, transpose(Xarray)))
+end
+
+####
+#### METADATA
+####
+
+# exported types
+
+MLJBase.package_name(::Type{PCA})    = "MultivariateStats"
+MLJBase.package_uuid(::Type{PCA})    = "6f286f6a-111f-5878-ab1e-185364afe411"
+MLJBase.is_pure_julia(::Type{PCA})   = :yes
+MLJBase.inputs_can_be(::Type{PCA})   = [:numeric,]
 
 end # module
 
