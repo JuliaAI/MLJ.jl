@@ -11,7 +11,6 @@ task = load_crabs()
 
 X, y = X_and_y(task)
 
-
 import Clustering
 
 barekm = KMeans()
@@ -31,7 +30,7 @@ p = MLJ.predict(barekm, fitresult, X)
 @test argmin(r[1, :]) == p[1]
 @test argmin(r[10, :]) == p[10]
 
-km = machine(barekm, X_array)
+km = machine(barekm, X)
 
 fit!(km)
 
