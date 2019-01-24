@@ -148,6 +148,27 @@ function MLJBase.fit(model::KMedoids
     return fitresult, cache, report
 end
 
+function MLJBase.transform(model::KMedoids
+                         , fitresult::KMedoidsFitResultType
+                         , X)
+
+    Xarray = MLJBase.matrix(X)
+    medoids = fitresult[2]
+    metric = model.metric
+    # X is n × d
+    # centers is d × k
+    # results is n × k
+    (n, d), k = size(X), model.k
+    X̃ = zeros(size(X, 1), k)
+
+    @inbounds for i ∈ 1:n
+        @inbounds for j ∈ 1:k
+            X̃[i, j] = evaluate(metric, view(Xarray, i, :), view(medoids, j, :))
+        end
+    end
+    return X̃
+end
+
 function MLJBase.predict(model::KMedoids
                        , fitresult::KMedoidsFitResultType
                        , Xnew)
