@@ -26,10 +26,9 @@ function load_iris()
 end
 
 """Load a well-known crab classification dataset with nominal features."""
-function load_crabs(seed=113355)
+function load_crabs()
     df = CSV.read(joinpath(datadir, "crabs.csv"),
                   categorical=true, allowmissing=:none)
-    df = df[shuffle(1:size(df)[1]), :]
     return SupervisedTask(data=df, target=:sp, ignore=[:sex, :index], properties=())
 end
 
