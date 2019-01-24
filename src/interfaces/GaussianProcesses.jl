@@ -37,6 +37,7 @@ function GPClassifier(
 end
 
 # function MLJBase.clean!
+MLJBase.coerce(model::GPClassifier, Xtable) = MLJBase.matrix(Xtable)
 
 function MLJBase.fit(model::GPClassifier{T2,M,K}
             , verbosity::Int
@@ -74,8 +75,6 @@ function MLJBase.fit(model::GPClassifier{T2,M,K}
 
     return fitresult, cache, report
 end
-
-MLJBase.coerce(model::GPClassifier, Xtable) = MLJBase.matrix(Xtable)
 
 function MLJBase.predict(model::GPClassifier{T}
                        , fitresult
