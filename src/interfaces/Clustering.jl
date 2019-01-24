@@ -1,5 +1,7 @@
 # NOTE: there's a `kmeans!` function that updates centers, maybe a candidate
-# for the `update` machinery.
+# for the `update` machinery. Same for `kmedoids!`
+# NOTE: if the prediction is done on the original array, just the assignment
+# should be returned, unclear what's the best way of doing this.
 
 module Clustering_
 
@@ -8,31 +10,44 @@ export KMeans
 import MLJBase
 
 import Clustering
+using Distances
 using LinearAlgebra: norm
 
 const C = Clustering
 
+# ----------------------------------
+
 KMeansFitResultType = C.KmeansResult
+KMedoidsFitResultType = Tuple{C.KmedoidsResult, Matrix{Float64}}
 
 mutable struct KMeans <: MLJBase.Unsupervised
     k::Int
 end
 
-function KMeans(;k=3)
-    model = KMeans(k)
-    message = MLJBase.clean!(model)
-    isempty(message) || @warn message
-
-    return model
+mutable struct KMedoids <: MLJBase.Unsupervised
+    k::Int
+    metric::PreMetric
 end
 
-function MLJBase.clean!(model::KMeans)
+function MLJBase.clean!(model::Union{KMeans, KMedoids})
     warning = ""
     if model.k < 1
         warning *= "Need k > 1. Resetting k=1.\n"
         model.k = 1
     end
     return warning
+end
+
+####
+#### KMEANS: constructor, fit, transform and predict
+####
+
+function KMeans(; k=3)
+    model = KMeans(k)
+    message = MLJBase.clean!(model)
+    isempty(message) || @warn message
+
+    return model
 end
 
 function MLJBase.fit(model::KMeans
@@ -46,8 +61,9 @@ function MLJBase.fit(model::KMeans
     fitresult = C.kmeans(collect(transpose(Xarray)), model.k)
 
     cache = nothing
-    report = Dict{Symbol, Any}()
-    report[:centers] = transpose(fitresult.centers)
+    report = Dict(:centers => transpose(fitresult.centers) # size k x p
+                , :assignments => fitresult.assignments # size n
+                  )
 
     return fitresult, cache, report
 end
@@ -84,7 +100,7 @@ function MLJBase.predict(model::KMeans
     pred = zeros(Int, n)
     @inbounds for i ∈ 1:n
         minv = Inf
-        @inbounds for j ∈ 1:k
+        for j ∈ 1:k
             curv = _norm2(view(Xarray, i, :) .- view(fitresult.centers, :, j))
             # avoid branching (this is twice as fast as argmin because
             # the context is simpler and we have to do fewer checks)
@@ -96,7 +112,64 @@ function MLJBase.predict(model::KMeans
     return pred
 end
 
-# metadata:
+####
+#### KMEDOIDS: constructor, fit and predict
+#### NOTE there is no transform in the sense of kmeans
+####
+
+function KMedoids(; k=3)
+    model = KMedoids(k)
+    message = MLJBase.clean!(model)
+    isempty(message) || @warn message
+
+    return model
+end
+
+function MLJBase.fit(model::KMedoids
+                   , verbosity::Int
+                   , X)
+
+    Xarray = MLJBase.matrix(X)
+    Carray = pairwise(model.metric(), transpose(Xarray)) # n x n
+
+    fitresult = C.kmedoids(Carray, model.k)
+
+    medoids = Xarray[fitresult.medoids, :] # size k x p
+
+    cache = nothing
+    report = Dict(:medoids => medoids # size k x p
+                , :assignments => fitresult.assignments # size n
+                  )
+
+    # keep track of the actual medoids ("center") in order to predict
+    fitresult = (fitresult, medoids)
+
+    return fitresult, cache, report
+end
+
+function MLJBase.predict(model::KMedoids
+                       , fitresult::KMedoidsFitResultType
+                       , Xnew)
+
+    Xarray = MLJBase.matrix(Xnew)
+    medoids = fitresult[2]
+
+    # similar to kmeans except instead of centers we use medoids
+    # kth medoid corresponds to Xarray[medoids[k], :]
+    metric = model.metric()
+
+    @inbounds for i ∈ 1:n
+        minv = Inf
+        for j ∈ 1:k
+            curv = evaluate(metric, view(Xarray, i, :), view())
+        end
+    end
+end
+
+####
+#### METADATA
+####
+
 MLJBase.package_name(::Type{KMeans}) = "Clustering"
 MLJBase.package_uuid(::Type{KMeans}) = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
 MLJBase.is_pure_julia(::Type{KMeans}) = :yes
