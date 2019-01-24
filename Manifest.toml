@@ -53,9 +53,9 @@ version = "1.4.0"
 
 [[DataFrames]]
 deps = ["CategoricalArrays", "CodecZlib", "Compat", "DataStreams", "Dates", "InteractiveUtils", "IteratorInterfaceExtensions", "LinearAlgebra", "Missings", "Printf", "Random", "Reexport", "SortingAlgorithms", "Statistics", "StatsBase", "TableTraits", "Tables", "Test", "TranscodingStreams", "Unicode", "WeakRefStrings"]
-git-tree-sha1 = "7e032a76f3455e38660ac456791951ac2d0b1e70"
+git-tree-sha1 = "af5c8a233b838076947ef0c8f882f732ad578112"
 uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-version = "0.16.0"
+version = "0.17.0"
 
 [[DataStreams]]
 deps = ["Dates", "Missings", "Test", "WeakRefStrings"]

@@ -6,6 +6,7 @@
 module Clustering_
 
 export KMeans
+export KMedoids
 
 import MLJBase
 
@@ -24,9 +25,9 @@ mutable struct KMeans <: MLJBase.Unsupervised
     k::Int
 end
 
-mutable struct KMedoids <: MLJBase.Unsupervised
+mutable struct KMedoids{M<:PreMetric} <: MLJBase.Unsupervised
     k::Int
-    metric::PreMetric
+    metric::M
 end
 
 function MLJBase.clean!(model::Union{KMeans, KMedoids})
@@ -117,8 +118,8 @@ end
 #### NOTE there is no transform in the sense of kmeans
 ####
 
-function KMedoids(; k=3)
-    model = KMedoids(k)
+function KMedoids(; k=3, metric=SqEuclidean())
+    model = KMedoids(k, metric)
     message = MLJBase.clean!(model)
     isempty(message) || @warn message
 
@@ -130,7 +131,7 @@ function MLJBase.fit(model::KMedoids
                    , X)
 
     Xarray = MLJBase.matrix(X)
-    Carray = pairwise(model.metric(), transpose(Xarray)) # n x n
+    Carray = pairwise(model.metric, transpose(Xarray)) # n x n
 
     fitresult = C.kmedoids(Carray, model.k)
 
@@ -156,14 +157,20 @@ function MLJBase.predict(model::KMedoids
 
     # similar to kmeans except instead of centers we use medoids
     # kth medoid corresponds to Xarray[medoids[k], :]
-    metric = model.metric()
+    metric = model.metric
+    (n, d), k = size(Xarray), model.k
+    pred = zeros(Int, n)
 
     @inbounds for i ∈ 1:n
         minv = Inf
         for j ∈ 1:k
-            curv = evaluate(metric, view(Xarray, i, :), view())
+            curv = evaluate(metric, view(Xarray, i, :), view(medoids, j, :))
+            P       = curv < minv
+            pred[i] =    j * P + pred[i] * !P # if P is true --> j
+            minv    = curv * P +    minv * !P # if P is true --> curvalue
         end
     end
+    return pred
 end
 
 ####
@@ -181,3 +188,4 @@ end # module
 
 using .Clustering_
 export KMeans
+export KMedoids
