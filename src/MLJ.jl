@@ -50,7 +50,7 @@ export predict, predict_mean, predict_median, predict_mode
 export transform, inverse_transform, se, evaluate
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 
-import MLJBase: Rows, Cols, Names, Eltypes, getrows, nrows
+import MLJBase: Rows, Cols, Schema, retrieve, getrows
 import MLJBase: fit, update, clean!, info, coerce
 import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: transform, inverse_transform, se, evaluate

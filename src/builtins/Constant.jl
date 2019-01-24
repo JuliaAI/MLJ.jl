@@ -6,7 +6,6 @@ export ConstantRegressor, ConstantClassifier
 export DeterministicConstantRegressor, DeterministicConstantClassifier
 
 import MLJBase
-import MLJ # needed for `nrows` 
 import Distributions
 using StatsBase
 using Statistics
@@ -50,8 +49,10 @@ function MLJBase.fit(model::ConstantRegressor{F,D}, verbosity::Int, X, y::Vector
     return fitresult, cache, report
 end
 
-MLJBase.predict(model::ConstantRegressor, fitresult, Xnew) = fill(fitresult, MLJ.nrows(Xnew))
-MLJBase.predict_mean(model::ConstantRegressor, fitresult, Xnew) = fill(Distributions.mean(fitresult), MLJ.nrows(Xnew))
+nrows(X) = MLJBase.retrieve(X, MLJBase.Schema).nrows
+
+MLJBase.predict(model::ConstantRegressor, fitresult, Xnew) = fill(fitresult, nrows(Xnew))
+MLJBase.predict_mean(model::ConstantRegressor, fitresult, Xnew) = fill(Distributions.mean(fitresult), nrows(Xnew))
 
 # metadata:
 MLJBase.package_name(::Type{<:ConstantRegressor}) = "MLJ"
@@ -78,7 +79,7 @@ function MLJBase.fit(model::DeterministicConstantRegressor{F}, verbosity::Int, X
     return fitresult, cache, report
 end
 
-MLJBase.predict(model::DeterministicConstantRegressor, fitresult, Xnew) = fill(fitresult, MLJ.nrows(Xnew))
+MLJBase.predict(model::DeterministicConstantRegressor, fitresult, Xnew) = fill(fitresult, nrows(Xnew))
 
 # metadata:
 MLJBase.package_name(::Type{<:DeterministicConstantRegressor}) = "MLJ"
@@ -127,13 +128,13 @@ function MLJBase.fit(model::ConstantClassifier{L},
 end
 
 function MLJBase.predict(model::ConstantClassifier{L}, fitresult, Xnew) where L
-    return fill(fitresult, MLJ.nrows(Xnew))
+    return fill(fitresult, nrows(Xnew))
 end
 
 function MLJBase.predict_mode(model::ConstantClassifier{L}, fitresult, Xnew) where L
     m = mode(fitresult)
     labels = fitresult.prob_given_label |> keys |> collect
-    N = MLJ.nrows(Xnew)    
+    N = nrows(Xnew)    
     
     # to get a categorical array with all the original levels we append the 
     # distribution labels to the prediction vector and truncate afterwards:
@@ -180,9 +181,9 @@ end
 
 function MLJBase.predict(model::DeterministicConstantClassifier{L}, fitresult, Xnew) where L
     _mode, _levels = fitresult
-    nrows = MLJ.nrows(Xnew)
-    raw_predictions = fill(_mode, nrows)
-    return categorical(vcat(raw_predictions, _levels))[1:nrows]
+    _nrows = nrows(Xnew)
+    raw_predictions = fill(_mode, _nrows)
+    return categorical(vcat(raw_predictions, _levels))[1:_nrows]
 end
 
 # metadata:

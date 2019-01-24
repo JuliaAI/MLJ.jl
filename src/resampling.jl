@@ -41,7 +41,7 @@ function MLJBase.fit(resampler::Resampler{Holdout}, verbosity::Int, X, y)
 
     train, test = partition(eachindex(y), resampler.resampling_strategy.fraction_train)
     fit!(mach, rows=train, verbosity=verbosity-1)
-    yhat = resampler.operation(mach, X[Rows, test])    
+    yhat = resampler.operation(mach, retrieve(X, Rows, test))    
     fitresult = resampler.measure(y[test], yhat)
 
     cache = mach
@@ -57,7 +57,7 @@ function MLJBase.update(resampler::Resampler{Holdout}, verbosity::Int, fitresult
 
     train, test = partition(eachindex(y), resampler.resampling_strategy.fraction_train)
     fit!(mach, rows=train, verbosity=verbosity-1)
-    yhat = resampler.operation(mach, X[Rows, test])    
+    yhat = resampler.operation(mach, retrieve(X, Rows, test))    
     fitresult = resampler.measure(y[test], yhat)
 
     report = nothing
@@ -69,26 +69,6 @@ end
 MLJBase.evaluate(model::Resampler{Holdout}, fitresult) = fitresult
 
 
-## DIRECT EVALUTATING OF TRAINABLE MODELS
-
-# # holdout evaluation:
-# function evaluate(mach, resampling_strategy::Holdout, measure, rows)
-#     X, y = mach.args
-#     if rows == nothing
-#         rows = eachindex(y)
-#     end
-#     train, test = partition(rows, resampling_strategy.fraction_train)
-#     fit!(mach, rows=train)
-#     yhat = predict(mach, X[Rows, test])
-#     return measure(y[test], yhat)
-# end
-
-# # universal keyword version:
-# evaluate(mach::Machine{<:Supervised};
-#          resampling_strategy=Holdout,
-#          measure=rms,
-#          rows=nothing) =
-#              evaluate(mach, resampling_strategy, measure, rows)
 
 
     

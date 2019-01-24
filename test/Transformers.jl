@@ -3,6 +3,7 @@ module TestTransformer
 # using Revise
 using MLJ
 using Test
+using Statistics
 
 # selecting features
 X, y = datanow()
@@ -42,19 +43,34 @@ fitresult, cache, report = MLJ.fit(stand, 1, [0, 2, 4])
 
 # `Standardizer`:
 X, y = X_and_y(load_ames());
+X = X[1:4,1:4]
 train, test = partition(eachindex(y), 0.9);
 
 # introduce a field of type `Char`:
 X[:OverallQual] = map(Char, X[:OverallQual]);
 
+# introduce field of Int type:
+X[:x1stFlrSF] = [round(Int, x) for x in X[:x1stFlrSF]]
+
 stand = Standardizer()
 fitresult, cache, report = MLJ.fit(stand, 1, X)
-transform(stand, fitresult, X)
+Xnew = transform(stand, fitresult, X)
+@test std(Xnew[2]) ≈ 1.0
+@test Xnew[1] == X[1]
+@test Xnew[3] == X[3]
+@test Xnew[4] == X[4]
 
-stand = Standardizer(features=[:GrLivArea])
+stand.features = names(X)
 fitresult, cache, report = MLJ.fit(stand, 1, X)
-@test fitresult.features[fitresult.is_transformed] == [:GrLivArea]
+Xnew = transform(stand, fitresult, X)
+
+fitresult, cache, report = MLJ.fit(stand, 1, X)
+@test issubset(Set(keys(fitresult)), Set(names(X)[[2,4]]))
 transform(stand, fitresult, X)
+@test Xnew[1] == X[1]
+@test Xnew[3] == X[3]
+@test std(Xnew[2]) ≈ 1.0
+@test std(Xnew[4]) ≈ 1.0
 
 # `UnivariateBoxCoxTransformer`
 

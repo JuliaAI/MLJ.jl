@@ -11,7 +11,9 @@ import MLJBase: MLJType, Unsupervised
 import DataFrames: names, AbstractDataFrame, DataFrame, eltypes
 import Distributions
 using Statistics
-using Tables
+# using Tables
+
+import MLJBase: Rows, Cols, Schema, retrieve
 
 # to be extended:
 import MLJBase: fit, transform, inverse_transform
@@ -182,13 +184,46 @@ inverse_transform(transformer::UnivariateStandardizer, fitresult, w) =
     [inverse_transform(transformer, fitresult, y) for y in w]
 
 
-## STANDARDIZATION OF ORDINAL FEATURES OF A DATAFRAME
+## STANDARDIZATION OF ORDINAL FEATURES OF TABULAR DATA
 
 # TODO: reimplement in simpler, safer way: fitresult is two vectors:
 # one of features that are transformed, one of corresponding
 # univariate machines. Make data container agnostic.
 
-""" Standardizes the columns of eltype <: AbstractFloat unless non-empty `features` specfied."""
+"""
+    Standardizer(; features=Symbol[])
+
+Unsupervised model for standardizing (whitening) the columns of
+tabular data. If `features` is empty then all columns of eltype
+`AbstractFloat` will be standardized. For different behaviour, specify
+the names of features to be standardized. Presently returns a
+`DataFrame`.
+
+    using DataFrames
+    X = DataFrame(x1=[0.2, 0.3, 1.0], x2=[4, 2, 3])
+    stand_model = Standardizer()
+    transform(fit!(machine(stand_model, X)), X)
+
+    3×2 DataFrame
+    │ Row │ x1        │ x2    │
+    │     │ Float64   │ Int64 │
+    ├─────┼───────────┼───────┤
+    │ 1   │ -0.688247 │ 4     │
+    │ 2   │ -0.458831 │ 2     │
+    │ 3   │ 1.14708   │ 3     │
+
+    stand_model.features=[:x1, :x2]
+    transform(fit!(machine(stand_model, X)), X)
+
+    3×2 DataFrame
+    │ Row │ x1        │ x2      │
+    │     │ Float64   │ Float64 │
+    ├─────┼───────────┼─────────┤
+    │ 1   │ -0.688247 │ 1.0     │
+    │ 2   │ -0.458831 │ -1.0    │
+    │ 3   │ 1.14708   │ 0.0     │
+
+"""
 mutable struct Standardizer <: Unsupervised
     features::Vector{Symbol} # features to be standardized; empty means all of
 end
@@ -196,52 +231,44 @@ end
 # lazy keyword constructor:
 Standardizer(; features=Symbol[]) = Standardizer(features)
 
-struct StandardizerFitResult <: MLJType
-    fitresults::Matrix{Float64}
-    features::Vector{Symbol} # all the feature labels of the data frame fitted
-    is_transformed::Vector{Bool}
-end
-
 # null fitresult:
 StandardizerFitResult() = StandardizerFitResult(zeros(0,0), Symbol[], Bool[])
 
 function fit(transformer::Standardizer, verbosity::Int, X::Any)
     # if using Query.jl, replace below code with
-    # features = df |> @take(1) |> @map(fieldnames(typeof(_))) |> @mapmany(_, __)
+    # all_features = df |> @take(1) |> @map(fieldnames(typeof(_))) |> @mapmany(_, __)
     # Since this is a really dirty way of proceeding, I've used
     # Tables.jl for now.
-    features = collect(propertynames(first(Tables.rows(X))))
+    schema =  retrieve(X, Schema)
+    all_features = schema.names
     
-    # determine indices of features to be transformed
-    features_to_try = (isempty(transformer.features) ? features : transformer.features)
-    is_transformed = Array{Bool}(undef, length(features))
-    for j in 1:length(features)
-        if features[j] in features_to_try && Tables.schema(X).types[j] <: AbstractFloat
-            is_transformed[j] = true
-        else
-            is_transformed[j] = false
+    # determine indices of all_features to be transformed
+    if isempty(transformer.features)
+        cols_to_fit = filter!(eachindex(all_features)|>collect) do j
+            schema.eltypes[j] <: AbstractFloat
+        end
+    else
+        cols_to_fit = filter!(eachindex(all_features)|>collect) do j
+            all_features[j] in transformer.features && schema.eltypes[j] <: Real
         end
     end
+    
+    fitresult_given_feature = Dict{Symbol,Tuple{Float64,Float64}}()
 
-    # fit each of those features
-    fitresults = Array{Float64}(undef, 2, length(features))
+    # fit each feature
     verbosity < 2 || @info "Features standarized: "
-    for j in 1:length(features)
-        if is_transformed[j]
-            fitresult, cache, report =
-                fit(UnivariateStandardizer(), verbosity-1, getproperty(X, propertynames(first(Tables.rows(X)))[j]))
-            fitresults[:,j] = [fitresult...]
-            verbosity < 2 ||
-                @info "  :$(features[j])    mu=$(fitresults[1,j])  sigma=$(fitresults[2,j])"
-        else
-            fitresults[:,j] = Float64[0.0, 1.0]
-        end
+    for j in cols_to_fit
+        col_fitresult, cache, report =
+            fit(UnivariateStandardizer(), verbosity - 1, retrieve(X, Cols, j))
+        fitresult_given_feature[all_features[j]] = col_fitresult
+        verbosity < 2 ||
+            @info "  :$(all_features[j])    mu=$(col_fitresult[1])  sigma=$(col_fitresult[2])"
     end
     
-    fitresult = StandardizerFitResult(fitresults, features, is_transformed)
+    fitresult = fitresult_given_feature
     cache = nothing
     report = Dict{Symbol,Any}()
-    report[:features_transformed]=[features[is_transformed]]
+    report[:features_fit]=keys(fitresult_given_feature)
     
     return fitresult, cache, report
     
@@ -249,20 +276,26 @@ end
 
 function transform(transformer::Standardizer, fitresult, X)
 
-    collect(propertynames(first(Tables.rows(X)))) == fitresult.features ||
-        error("Attempting to transform data frame with incompatible feature labels.")
+    # `fitresult` is dict of column fitresults, keyed on feature names
 
-    Xnew = deepcopy(X) # make a copy of X, working even for `SubDataFrames`
-    univ_transformer = UnivariateStandardizer()
-    for j in 1:length(propertynames(first(Tables.rows(X))))
-        if fitresult.is_transformed[j]
-            # extract the (mu, sigma) pair:
-            univ_fitresult = (fitresult.fitresults[1,j], fitresult.fitresults[2,j])  
-            getproperty(Xnew, propertynames(first(Tables.rows(Xnew)))[j]) .= 
-                transform(univ_transformer, univ_fitresult, getproperty(X, propertynames(first(Tables.rows(X)))[j]))
+    features_to_be_transformed = keys(fitresult)
+
+    all_features = retrieve(X, Schema).names
+    
+    issubset(Set(features_to_be_transformed), Set(all_features)) ||
+        error("Attempting to transform data with incompatible feature labels.")
+
+    col_transformer = UnivariateStandardizer()
+
+    cols = map(all_features) do ftr
+        if ftr in features_to_be_transformed
+            transform(col_transformer, fitresult[ftr], retrieve(X, Cols, ftr))
+        else
+            retrieve(X, Cols, ftr)
         end
     end
-    return Xnew
+        
+    return DataFrame(cols, all_features)
 
 end    
 

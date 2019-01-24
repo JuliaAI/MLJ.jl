@@ -77,5 +77,5 @@ end
 
 # experimental:
 predict(machine::Machine{<:Supervised}; rows=rows) =
-    predict(machine, machine.args[1][Rows, rows])
+    predict(machine, retrieve(machine.args[1], Rows, rows))
 
