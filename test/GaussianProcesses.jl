@@ -2,7 +2,7 @@ module TestGaussianProcesses
 
 using MLJ
 using Test
-using Random:seed!, shuffle!
+using Random:seed!
 
 seed!(113355)
 
