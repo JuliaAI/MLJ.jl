@@ -46,18 +46,11 @@ barekm = KMedoids()
 
 fitresult, cache, report = MLJ.fit(barekm, 1, X)
 
-r = MLJ.transform(barekm, fitresult, X)
-
 X_array = convert(Matrix{Float64}, X)
-
-# distance from first point to second center
-@test r[1, 2] == norm(view(X_array, 1, :) .- view(fitresult.centers, :, 2))
-@test r[10, 3] == norm(view(X_array, 10, :) .- view(fitresult.centers, :, 3))
 
 p = MLJ.predict(barekm, fitresult, X)
 
-@test argmin(r[1, :]) == p[1]
-@test argmin(r[10, :]) == p[10]
+@test all(fitresult[1].assignments .== p)
 
 km = machine(barekm, X)
 
