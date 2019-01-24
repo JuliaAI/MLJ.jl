@@ -4,10 +4,14 @@
 # eg, `module TestDatasets` for code testing `datasets.jl`.
 
 using MLJ
+import MLJBase
+
 # using Revise
 using Test
 
 @constant junk=KNNRegressor()
+a = rand(3,4)'
+@test MLJBase.matrix(dataframe(a)) == collect(a)
 
 @testset "metrics" begin
   @test include("metrics.jl")

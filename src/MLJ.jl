@@ -8,8 +8,8 @@ export Supervised, Unsupervised, Deterministic, Probabilistic
 export partition, @curve, @pcurve, readlibsvm        # "utilities.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export misclassification_rate, cross_entropy         # "metrics.jl"
-export load_boston, load_ames, load_iris, load_crabs,
-       datanow                                       # "datasets.jl"
+export load_boston, load_ames, load_iris             # "datasets.jl"
+export load_crabs, datanow                           # "datasets.jl"
 export SimpleCompositeModel                          # "composites.jl"
 export Holdout, CV, Resampler                        # "resampling.jl"
 export Params, params, set_params!                   # "parameters.jl"
@@ -41,9 +41,10 @@ export UnivariateBoxCoxTransformer
 # export IntegerToInt64Transformer
 # export UnivariateDiscretizer, Discretizer
 
-
-# rexport from other Statistics, Distributions:
+# rexport from Statistics, Distributions:
 export pdf, mode, median, mean, info
+
+export dataframe # utilities.jl
 
 # reexport from MLJBase:
 export predict, predict_mean, predict_median, predict_mode

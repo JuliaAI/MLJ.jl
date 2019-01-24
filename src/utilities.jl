@@ -157,3 +157,4 @@ function keys_ordered_by_values(d::Dict{T,S}) where {T, S<:Real}
 
 end
 
+dataframe(X::AbstractMatrix) = DataFrame(X)
