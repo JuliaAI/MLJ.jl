@@ -18,7 +18,7 @@ baregp = GPClassifier(target_type=String)
 
 # split the rows:
 allrows = eachindex(y)
-train, test = partition(allrows, 0.7)
+train, test = partition(allrows, 0.7, shuffle=true)
 @test vcat(train, test) == allrows
 
 fitresult, cache, report = MLJ.fit(baregp, 1, X_array[train,:], y[train])
