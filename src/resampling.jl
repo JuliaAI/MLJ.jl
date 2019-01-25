@@ -23,31 +23,21 @@ end
 Holdout(; fraction_train=0.7) = Holdout(fraction_train)
 
 mutable struct CV <: ResamplingStrategy
-    n_folds::Int
-    is_parallel::Bool
+    nfolds::Int
+    parallel::Bool
+    shuffle::Bool ## TODO: add seed/rng 
 end
-CV(; n_folds=6) = CV(n_folds)
-
-
-## RESAMPLER - MODEL WITH `evaluate` OPERATION
-
-mutable struct Resampler{S,M<:Supervised} <: Model
-    model::M
-    resampling_strategy::S
-    measure
-    operation
-end
-Resampler(;model=RidgeRegressor(), resampling_strategy=Holdout(), measure=rms, operation=predict) =
-    Resampler(model, resampling_strategy, measure, operation) 
+CV(; nfolds=6, parallel=true, shuffle=false) = CV(nfolds, parallel, shuffle)
 
 
 ## DIRECT EVALUATION METHODS 
 
 # We first define an `evaluate` to directly generate estimates of
 # performance according to some strategy `s::S<:ResamplingStrategy`,
-# *without* first building and fitting a `Resampler{S}` object. We
-# need one for each strategy.
+# without first building and fitting a `Resampler{S}` object defined
+# later. We need an `evaluate` for each strategy.
 
+# holdout:
 function MLJBase.evaluate(mach::Machine, strategy::Holdout;
                           measure=rms, operation=predict, verbosity=1)
 
@@ -62,7 +52,68 @@ function MLJBase.evaluate(mach::Machine, strategy::Holdout;
 
 end
 
-function MLJBase.fit(resampler::Resampler{Holdout}, verbosity::Int, X, y)
+# cv:
+function MLJBase.evaluate(mach::Machine, strategy::CV;
+                          measure=rms, operation=predict, verbosity=1)
+
+    X = mach.args[1]
+    y = mach.args[2]
+    length(mach.args) == 2 || error("Multivariate targets not yet supported.")
+
+    n_samples = length(y)
+    nfolds = strategy.nfolds
+    
+    if strategy.shuffle
+         rows = shuffle(eachindex(y))
+    end
+    k = floor(Int,n_samples/nfolds)
+
+    # function to return the measure for the fold `rows[f:s]`:
+    function get_measure(f, s)
+        test = rows[f:s] # TODO: replace with views?
+        train = vcat(rows[1:(f - 1)], rows[(s + 1):end])
+        fit!(mach, rows=train; verbosity=verbosity-1)
+        yhat = operation(mach, retrieve(X, Rows, test))    
+        return measure(y[test], yhat)
+    end
+
+    firsts = 1:k:((nfolds - 1)*k + 1) # itr of first `test` rows index
+    seconds = k:k:(nfolds*k)          # itr of last `test` rows  index
+
+    if strategy.parallel && nworkers() > 1
+        ## TODO: progress meter for distributed case
+        if verbosity > 0
+            @info "Distributing cross-validation computation "*
+            "among $(nworkers()) workers."
+        end
+        fitresult = @distributed vcat for n in 1:nfolds
+            [get_measure(firsts[n], seconds[n])]
+        end
+    else
+        p = Progress(nfolds, dt=0.5, desc="Cross-validating: ",
+                     barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
+
+        measures = [(next!(p); get_measure(firsts[n], seconds[n])) for n in 1:nfolds]
+    end
+
+    return measures
+
+end
+
+
+## RESAMPLER - A MODEL WRAPPER WITH `evaluate` OPERATION
+
+mutable struct Resampler{S,M<:Supervised} <: Model
+    model::M
+    resampling_strategy::S
+    measure
+    operation
+end
+Resampler(;model=RidgeRegressor(), resampling_strategy=Holdout(),
+          measure=rms, operation=predict) =
+              Resampler(model, resampling_strategy, measure, operation) 
+
+function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
 
     mach = machine(resampler.model, X, y)
 
@@ -78,7 +129,7 @@ function MLJBase.fit(resampler::Resampler{Holdout}, verbosity::Int, X, y)
     
 end
 
-function MLJBase.update(resampler::Resampler{Holdout}, verbosity::Int, fitresult, cache, X, y)
+function MLJBase.update(resampler::Resampler, verbosity::Int, fitresult, cache, X, y)
 
     mach = cache
 
