@@ -63,7 +63,7 @@ In the Julia REPL run `]add https://github.com/alan-turing-institute/MLJBase.jl`
 
 ### Basic training and testing
 
-See also the MLJ [tour](doc/tour.ipynb).
+For more detail and features, see the MLJ [tour](doc/tour.ipynb).
 
 Let's load data and define train and test rows:
 
