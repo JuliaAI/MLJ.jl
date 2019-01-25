@@ -58,8 +58,8 @@ function MLJBase.fit(model::PCA
 
     ncomp = (model.ncomp === nothing) ? mindim : model.ncomp
 
-    # NOTE: again a collect(transpose) this is really dumb and wasteful
-    fitresult = MS.fit(MS.PCA, collect(transpose(Xarray))
+    # NOTE: copy/transpose
+    fitresult = MS.fit(MS.PCA, copy(transpose(Xarray))
                      ; method=model.method
                      , pratio=model.pratio
                      , maxoutdim=ncomp
@@ -76,10 +76,8 @@ function MLJBase.transform(model::PCA
                          , X)
 
     Xarray = MLJBase.matrix(X)
-    # X is n x d, need to transpose and collect twice...
-    # NOTE: again.. collect and transpose...
-    return collect(transpose(
-               MS.transform(fitresult, collect(transpose(Xarray)))))
+    # X is n x d, need to transpose and copy twice...
+    return copy(transpose(MS.transform(fitresult, copy(transpose(Xarray)))))
 end
 
 ####
