@@ -58,8 +58,8 @@ function MLJBase.fit(model::KMeans
     Xarray = MLJBase.matrix(X)
 
     # NOTE see https://github.com/JuliaStats/Clustering.jl/issues/136
-    # there shouldn't be a need for collect here...
-    fitresult = C.kmeans(collect(transpose(Xarray)), model.k)
+    # with respect to the copy/transpose
+    fitresult = C.kmeans(copy(transpose(Xarray)), model.k)
 
     cache = nothing
     report = Dict(:centers => transpose(fitresult.centers) # size k x p
