@@ -7,7 +7,7 @@ export OLSRegressor, OLS, LinearRegression
 
 import GLM
 
-const OLSFitresult = GLM.LinearModel
+const OLSFitResult = GLM.LinearModel
 
 OLSFitResult(coefs::Vector, b=nothing) = OLSFitResult(coefs, b)
 
@@ -15,7 +15,7 @@ OLSFitResult(coefs::Vector, b=nothing) = OLSFitResult(coefs, b)
 #### OLSRegressor
 ####
 
-mutable struct OLSRegressor <: MLJBase.Deterministic{OLSFitresult}
+mutable struct OLSRegressor <: MLJBase.Deterministic{OLSFitResult}
     fit_intercept::Bool
 #    allowrankdeficient::Bool
 end
@@ -65,7 +65,7 @@ function MLJBase.fit(model::OLSRegressor, verbosity::Int, Xplus, y::Vector)
     return fitresult, cache, report
 end
 
-function MLJBase.predict(model::OLSRegressor, fitresult::OLSFitresult, Xnew)
+function MLJBase.predict(model::OLSRegressor, fitresult::OLSFitResult, Xnew)
     X, features = Xnew
     model.fit_intercept && (X = hcat(X, ones(eltype(X), size(X, 1), 1)))
     return GLM.predict(fitresult, X)
