@@ -4,16 +4,17 @@
 #> may serve as a template for other interfaces introducing new
 #> Supervised subtypes. The annotations, which begin with "#>", should
 #> be removed (but copy this file first!). See also the model
-#> interface specification at "doc/adding_new_models.md".
+#> interface specification at "doc/adding_new_models.md". The
+#> assumption is that this interface is to be lazy loaded and live in
+#> "src/interfaces/".
 
-#> Glue code goes in a module, whose name is the package name with
-#> trailing underscore "_":
+#> model API implementation code goes in a module, whose name is the
+#> package name with trailing underscore "_":
 module DecisionTree_
 
 #> export the new models you're going to define (and nothing else):
-export DecisionTreeClassifier
+export DecisionTreeClassifier, DecisionTreeRegressor
 
-#> for all Supervised models:
 import MLJBase
 
 #> for all classifiers:
@@ -95,8 +96,8 @@ end
 #> A required `fit` method returns `fitresult, cache, report`. (Return
 #> `cache=nothing` unless you are overloading `update`)
 function MLJBase.fit(model::DecisionTreeClassifier{T2}
-             , verbosity::Int   #> must be here (and typed) even if not used (as here)
-             , X::Matrix{Float64}
+             , verbosity::Int   #> must be here (and typed!!) even if not used (as here)
+             , X
              , y::CategoricalVector{T}) where {T,T2}
 
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
