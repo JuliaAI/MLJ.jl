@@ -61,11 +61,9 @@ interface](https://github.com/queryverse/IterableTables.jl). &#10004;
 In the Julia REPL run `]add https://github.com/alan-turing-institute/MLJBase.jl` first and `]add https://github.com/alan-turing-institute/MLJ.jl.git` afterwards.
 
 
-### Basic train and test
-
-See also the MLJ [tour](doc/tour.ipynb).
-
 ### Basic training and testing
+
+For more detail and features, see the MLJ [tour](doc/tour.ipynb).
 
 Let's load data and define train and test rows:
 

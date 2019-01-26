@@ -69,7 +69,7 @@ Here the parameter `R` refers to a fit-result type. By declaring a
 model to be a subtype of `MLJBase.Supervised{R}` you guarantee
 the fit-result to be of type `R` and, if `R` is concrete, one may
 improve the performance of homogeneous ensembles of the model (as
-defined by the built-in MLJ module `Ensembles`). There is no abstract
+defined by the built-in MLJ `EnsembleModel` wrapper). There is no abstract
 type for fit-results because these types are generally declared
 outside of MLJBase.
 
