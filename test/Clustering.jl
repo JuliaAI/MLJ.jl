@@ -49,12 +49,12 @@ fitresult, cache, report = MLJ.fit(barekm, 1, X)
 
 R = MLJ.transform(barekm, fitresult, X)
 
-@test R[1, 2] == Distances.evaluate(barekm.metric, view(X_array, 1, :), view(fitresult[2], 2, :))
-@test R[10, 3] == Distances.evaluate(barekm.metric, view(X_array, 10, :), view(fitresult[2], 3, :))
+@test R[1, 2] == Distances.evaluate(barekm.metric, view(X_array, 1, :), view(fitresult, 2, :))
+@test R[10, 3] == Distances.evaluate(barekm.metric, view(X_array, 10, :), view(fitresult, 3, :))
 
 p = MLJ.predict(barekm, fitresult, X)
 
-@test all(fitresult[1].assignments .== p)
+@test all(report[:assignments] .== p)
 
 km = machine(barekm, X)
 

@@ -11,6 +11,7 @@ export KMedoids
 import MLJBase
 
 import Clustering
+
 using Distances
 using LinearAlgebra: norm
 
@@ -18,14 +19,14 @@ const C = Clustering
 
 # ----------------------------------
 
-KMeansFitResultType = C.KmeansResult
-KMedoidsFitResultType = Tuple{C.KmedoidsResult, Matrix{Float64}}
+const KMeansFitResultType = C.KmeansResult
+const KMedoidsFitResultType = Matrix
 
 mutable struct KMeans <: MLJBase.Unsupervised
     k::Int
 end
 
-mutable struct KMedoids{M<:PreMetric} <: MLJBase.Unsupervised
+mutable struct KMedoids{M<:SemiMetric} <: MLJBase.Unsupervised
     k::Int
     metric::M
 end
@@ -133,17 +134,18 @@ function MLJBase.fit(model::KMedoids
     Xarray = MLJBase.matrix(X)
     Carray = pairwise(model.metric, transpose(Xarray)) # n x n
 
-    fitresult = C.kmedoids(Carray, model.k)
+    result = C.kmedoids(Carray, model.k)
 
-    medoids = Xarray[fitresult.medoids, :] # size k x p
+    medoids = Xarray[result.medoids, :] # size k x p
 
     cache = nothing
-    report = Dict(:medoids => medoids # size k x p
-                , :assignments => fitresult.assignments # size n
+    report = Dict(:fit_result => result
+                , :medoids => medoids # size k x p
+                , :assignments => result.assignments # size n
                   )
 
     # keep track of the actual medoids ("center") in order to predict
-    fitresult = (fitresult, medoids)
+    fitresult = medoids
 
     return fitresult, cache, report
 end
@@ -153,7 +155,7 @@ function MLJBase.transform(model::KMedoids
                          , X)
 
     Xarray = MLJBase.matrix(X)
-    medoids = fitresult[2]
+    medoids = fitresult
     metric = model.metric
     # X is n × d
     # centers is d × k
@@ -174,7 +176,7 @@ function MLJBase.predict(model::KMedoids
                        , Xnew)
 
     Xarray = MLJBase.matrix(Xnew)
-    medoids = fitresult[2]
+    medoids = fitresult
 
     # similar to kmeans except instead of centers we use medoids
     # kth medoid corresponds to Xarray[medoids[k], :]
