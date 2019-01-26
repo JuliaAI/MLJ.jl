@@ -2,7 +2,7 @@ module TestGaussianProcesses
 
 using MLJ
 using Test
-using Random:seed!, shuffle!
+using Random:seed!
 
 seed!(113355)
 
@@ -17,9 +17,9 @@ import CategoricalArrays
 baregp = GPClassifier(target_type=String)
 
 # split the rows:
-allrows = shuffle!(collect(eachindex(y)))
-train, test = partition(allrows, 0.7)
-@test vcat(train, test) == allrows
+allrows = eachindex(y)
+train, test = partition(allrows, 0.7, shuffle=true)
+@test sort(vcat(train, test)) == allrows
 
 fitresult, cache, report = MLJ.fit(baregp, 1, X_array[train,:], y[train])
 
