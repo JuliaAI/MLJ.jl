@@ -49,7 +49,7 @@ function MLJBase.fit(model::ConstantRegressor{F,D}, verbosity::Int, X, y::Vector
     return fitresult, cache, report
 end
 
-nrows(X) = MLJBase.retrieve(X, MLJBase.Schema).nrows
+nrows(X) = MLJBase.select(X, MLJBase.Schema).nrows
 
 MLJBase.predict(model::ConstantRegressor, fitresult, Xnew) = fill(fitresult, nrows(Xnew))
 MLJBase.predict_mean(model::ConstantRegressor, fitresult, Xnew) = fill(Distributions.mean(fitresult), nrows(Xnew))

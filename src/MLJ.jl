@@ -51,7 +51,7 @@ export predict, predict_mean, predict_median, predict_mode
 export transform, inverse_transform, se, evaluate
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 
-import MLJBase: Rows, Cols, Schema, retrieve, getrows
+import MLJBase: Rows, Cols, Schema, select, getrows
 import MLJBase: fit, update, clean!, info, coerce
 import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: transform, inverse_transform, se, evaluate
@@ -68,8 +68,7 @@ import Distributions: pdf, mode
 import Distributions
 import StatsBase
 using ProgressMeter
-using Query
-import TableTraits
+import Tables
 
 # to be extended:
 import Base.==
@@ -95,6 +94,7 @@ include("resampling.jl")    # evaluating models by assorted resampling strategie
 include("parameters.jl")    # hyper-parameter range constructors and nested hyper-parameter API
 include("tuning.jl")
 include("ensembles.jl")     # homogeneous ensembles
+
 
 ## LOAD BUILT-IN MODELS
 

@@ -15,7 +15,7 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
             length(args) > 1 ||
                 error("Wrong number of arguments. "*
                       "You must provide target(s) for supervised models.")
-            nrows = retrieve(args[1], Schema).nrows
+            nrows = select(args[1], Schema).nrows
             good = reduce(*, [length(y) == nrows for y in args[2:end]])
             good || error("Machine data arguments of incompatible sizes.")
         end
@@ -23,7 +23,7 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
             error("Wrong number of arguments. "*
                   "Use NodalMachine(model, X) for an unsupervised  model.")
         
-        TableTraits.isiterabletable(args[1]) ||
+        Tables.istable(args[1]) ||
             error("First data argument of machine must be an iterable table. "*
                   "Use DataFrame(X) to wrap an abstract matrix X as a DataFrame.")
 
@@ -65,11 +65,11 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
     rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
 
     if mach.model isa Supervised
-        X = coerce(mach.model, retrieve(mach.args[1], Rows, rows))
-        ys = [retrieve(arg, Rows, rows) for arg in mach.args[2:end]]
+        X = coerce(mach.model, select(mach.args[1], Rows, rows))
+        ys = [select(arg, Rows, rows) for arg in mach.args[2:end]]
         args = (X, ys...)
     else
-        args = [retrieve(arg, Rows, rows) for arg in mach.args]
+        args = [select(arg, Rows, rows) for arg in mach.args]
     end
 
     if !isdefined(mach, :fitresult) || rows_have_changed || force 

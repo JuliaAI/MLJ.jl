@@ -49,7 +49,7 @@ end
 # lazy keywork constructor
 RidgeRegressor(; lambda=0.0) = RidgeRegressor(lambda)
 
-MLJBase.coerce(model::RidgeRegressor, Xtable) = (MLJBase.matrix(Xtable), MLJ.retrieve(Xtable, MLJ.Schema).names)
+MLJBase.coerce(model::RidgeRegressor, Xtable) = (MLJBase.matrix(Xtable), MLJ.select(Xtable, MLJ.Schema).names)
 function MLJBase.getrows(model::RidgeRegressor, X, r)
     matrix, col_names = X
     return (matrix[r,:], col_names)
