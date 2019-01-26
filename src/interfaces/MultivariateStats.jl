@@ -7,7 +7,7 @@ import MultivariateStats
 
 const MS = MultivariateStats
 
-PCAFitResultType = MS.PCA
+const PCAFitResultType = MS.PCA
 
 mutable struct PCA <: MLJBase.Unsupervised
     ncomp::Union{Nothing, Int} # number of PCA components, all if nothing
