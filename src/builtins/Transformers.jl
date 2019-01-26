@@ -13,7 +13,7 @@ import Distributions
 using Statistics
 # using Tables
 
-import MLJBase: Rows, Cols, Schema, retrieve
+import MLJBase: Rows, Cols, Schema, retrieve, table
 
 # to be extended:
 import MLJBase: fit, transform, inverse_transform
@@ -294,8 +294,10 @@ function transform(transformer::Standardizer, fitresult, X)
             retrieve(X, Cols, ftr)
         end
     end
+
+    named_cols = NamedTuple{all_features}(tuple(cols...))
         
-    return DataFrame(cols, all_features)
+    return table(named_cols, prototype=X)
 
 end    
 

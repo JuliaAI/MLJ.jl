@@ -4,9 +4,11 @@ module TestTransformer
 using MLJ
 using Test
 using Statistics
+using DataFrames
 
 # selecting features
-X, y = datanow()
+Xtable, y = datanow()
+X = DataFrame(Xtable) # will become redunant in DataFrames 0.17.0
 namesX = names(X)
 selector = FeatureSelector()
 fitresult, cache, report = MLJ.fit(selector, 1, X)
@@ -42,7 +44,8 @@ fitresult, cache, report = MLJ.fit(stand, 1, [0, 2, 4])
 @test round.(Int, inverse_transform(stand, fitresult, [-1, 1, 3])) == [0, 4, 8] 
 
 # `Standardizer`:
-X, y = X_and_y(load_ames());
+X, y = X_and_y(load_ames())
+X = DataFrame(X) # will be redundant in DataFrames 0.17.0
 X = X[1:4,1:4]
 train, test = partition(eachindex(y), 0.9);
 

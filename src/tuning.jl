@@ -79,7 +79,7 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
     # TODO: parallelize!
 
     meter = Progress(N, dt=0.5, desc="Searching a $N-point grid for best model: ",
-                     barglyphs=BarGlyphs("[=> ]"), barlen=50, color=:yellow)
+                     barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
 
     for i in 1:N
 

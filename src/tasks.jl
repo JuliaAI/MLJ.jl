@@ -50,11 +50,11 @@ end
 nrows(task::Task) = retrieve(task.data, Schema).nrows
 Base.eachindex(task::Task) = Base.OneTo(nrows(task))
 
-features(task::Task) = filter!(retrieve(task.data, Schema).names) do ftr
+features(task::Task) = filter!(retrieve(task.data, Schema).names |> collect) do ftr
     !(ftr in task.ignore)
 end
 
-features(task::SupervisedTask) = filter(retrieve(task.data, Schema).names) do ftr
+features(task::SupervisedTask) = filter(retrieve(task.data, Schema).names |> collect) do ftr
     ftr != task.target && !(ftr in task.ignore)
 end
 

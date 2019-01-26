@@ -45,9 +45,9 @@ version = "1.4.0"
 
 [[DataFrames]]
 deps = ["CategoricalArrays", "CodecZlib", "Compat", "DataStreams", "Dates", "InteractiveUtils", "IteratorInterfaceExtensions", "LinearAlgebra", "Missings", "Printf", "Random", "Reexport", "SortingAlgorithms", "Statistics", "StatsBase", "TableTraits", "Tables", "Test", "TranscodingStreams", "Unicode", "WeakRefStrings"]
-git-tree-sha1 = "7e032a76f3455e38660ac456791951ac2d0b1e70"
+git-tree-sha1 = "af5c8a233b838076947ef0c8f882f732ad578112"
 uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-version = "0.16.0"
+version = "0.17.0"
 
 [[DataStreams]]
 deps = ["Dates", "Missings", "Test", "WeakRefStrings"]
@@ -146,10 +146,8 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MLJBase]]
-deps = ["CategoricalArrays", "DataFrames", "Distributions", "Query", "Statistics", "TableTraits"]
-git-tree-sha1 = "7c6ed4a297160456e0a74f4bc9f1a3558a027150"
-repo-rev = "master"
-repo-url = "https://github.com/alan-turing-institute/MLJBase.jl"
+deps = ["CategoricalArrays", "DataFrames", "Distributions", "Statistics", "Tables"]
+path = "../MLJBase"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 version = "0.1.0"
 
