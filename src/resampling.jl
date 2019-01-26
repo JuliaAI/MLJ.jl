@@ -37,6 +37,9 @@ CV(; nfolds=6, parallel=true, shuffle=false) = CV(nfolds, parallel, shuffle)
 # without first building and fitting a `Resampler{S}` object defined
 # later. We need an `evaluate` for each strategy.
 
+# MLJBase.evaluate(mach::Machine; resampling_strategy=Holdout()) =
+#     evaluate(mach, resampling_strategy)
+
 # holdout:
 function MLJBase.evaluate(mach::Machine, strategy::Holdout;
                           measure=rms, operation=predict, verbosity=1)
@@ -64,8 +67,11 @@ function MLJBase.evaluate(mach::Machine, strategy::CV;
     nfolds = strategy.nfolds
     
     if strategy.shuffle
-         rows = shuffle(eachindex(y))
+        rows = shuffle(eachindex(y))
+    else
+        rows = eachindex(y)
     end
+    
     k = floor(Int,n_samples/nfolds)
 
     # function to return the measure for the fold `rows[f:s]`:

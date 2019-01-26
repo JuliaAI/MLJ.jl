@@ -91,7 +91,7 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
         set_params!(clone, new_params)
 
         fit!(resampling_machine, verbosity=verbosity-1)
-        e = evaluate(resampling_machine)
+        e = mean(evaluate(resampling_machine))
         if e < best_measurement
             best_model = deepcopy(clone)
             best_measurement = e
