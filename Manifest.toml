@@ -1,3 +1,5 @@
+# This file is machine-generated - editing it directly is not advised
+
 [[Arpack]]
 deps = ["BinaryProvider", "Libdl", "LinearAlgebra", "Random", "SparseArrays", "Test"]
 git-tree-sha1 = "1ce1ce9984683f0b6a587d5bdbc688ecb480096f"
@@ -81,8 +83,14 @@ version = "0.8.1"
 deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
+[[Distances]]
+deps = ["LinearAlgebra", "Printf", "Random", "Statistics", "Test"]
+git-tree-sha1 = "0e37d8a95bafbeb9c800ef27ab6f443d29e17610"
+uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
+version = "0.7.4"
+
 [[Distributed]]
-deps = ["LinearAlgebra", "Random", "Serialization", "Sockets"]
+deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[Distributions]]
@@ -117,7 +125,7 @@ uuid = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
 version = "1.0.2"
 
 [[InteractiveUtils]]
-deps = ["LinearAlgebra", "Markdown"]
+deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[IterableTables]]
@@ -153,9 +161,7 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MLJBase]]
 deps = ["CategoricalArrays", "DataFrames", "Distributions", "Query", "Statistics", "TableTraits"]
-git-tree-sha1 = "7c6ed4a297160456e0a74f4bc9f1a3558a027150"
-repo-rev = "master"
-repo-url = "https://github.com/alan-turing-institute/MLJBase.jl"
+path = "/Users/tlienart/.julia/dev/MLJBase"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 version = "0.1.0"
 
@@ -323,12 +329,12 @@ version = "0.7.0"
 
 [[StatsModels]]
 deps = ["Compat", "DataFrames", "StatsBase", "Test"]
-git-tree-sha1 = "27144bb39ce2a1b3da7f21f8a4dd90fa3983b489"
+git-tree-sha1 = "b5a735dcd2be05f0af86709750d4d5f62ca4a25d"
 uuid = "3eaba693-59b7-5ba5-a881-562e759f1c8d"
-version = "0.4.0"
+version = "0.5.0"
 
 [[SuiteSparse]]
-deps = ["Libdl", "LinearAlgebra", "SparseArrays"]
+deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
 uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 
 [[TableShowUtils]]
@@ -372,7 +378,7 @@ uuid = "30578b45-9adc-5946-b283-645ec420af67"
 version = "0.4.0"
 
 [[UUIDs]]
-deps = ["Random"]
+deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [[Unicode]]
