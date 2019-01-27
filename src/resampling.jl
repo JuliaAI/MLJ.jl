@@ -96,10 +96,10 @@ function MLJBase.evaluate(mach::Machine, strategy::CV;
             [get_measure(firsts[n], seconds[n])]
         end
     else
-        p = Progress(nfolds, dt=0.5, desc="Cross-validating: ",
+        p = Progress(nfolds + 1, dt=0, desc="Cross-validating: ",
                      barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
-
-        measures = [(next!(p); get_measure(firsts[n], seconds[n])) for n in 1:nfolds]
+        next!(p)
+        measures = [first((get_measure(firsts[n], seconds[n]), next!(p))) for n in 1:nfolds]
     end
 
     return measures
@@ -128,16 +128,25 @@ function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
                          operation=resampler.operation,
                          verbosity=verbosity-1)
     
-    cache = mach
+    cache = (mach, deepcopy(resampler.resampling_strategy))
     report = nothing
 
     return fitresult, cache, report
     
 end
 
-function MLJBase.update(resampler::Resampler, verbosity::Int, fitresult, cache, X, y)
+# in special case of holdout, we can reuse the underlying model's
+# machine, provided the training_fraction has not changed:
+function MLJBase.update(resampler::Resampler{Holdout}, verbosity::Int, fitresult, cache, X, y)
 
-    mach = cache
+    old_mach, old_resampling_strategy = cache
+
+    if old_resampling_strategy.fraction_train == resampler.resampling_strategy.fraction_train
+        mach = old_mach
+    else
+        mach = machine(resampler.model, X, y)
+        cache = (mach, deepcopy(resampler.resampling_strategy))
+    end
 
     fitresult = evaluate(mach, resampler.resampling_strategy;
                          measure=resampler.measure,
@@ -150,9 +159,8 @@ function MLJBase.update(resampler::Resampler, verbosity::Int, fitresult, cache, 
     
 end
 
-MLJBase.evaluate(model::Resampler{Holdout}, fitresult) = fitresult
+MLJBase.evaluate(model::Resampler, fitresult) = fitresult
 
-#####
 
 
 
