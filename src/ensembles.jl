@@ -179,7 +179,7 @@ function DeterministicEnsembleModel(;atom=DeterministicConstantClassifier(), wei
     return model
 end
 
-coerce(model::DeterministicEnsembleModel, Xtable) where R = coerce(model.atom, Xtable) 
+coerce(model::DeterministicEnsembleModel, Xtable) = coerce(model.atom, Xtable) 
 
 
 ## ENSEMBLE MODEL FOR PROBABILISTIC MODELS 
