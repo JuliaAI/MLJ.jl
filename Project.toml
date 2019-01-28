@@ -12,7 +12,6 @@ DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
-GLM = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
@@ -28,7 +27,8 @@ Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 Clustering = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
 DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 GaussianProcesses = "891a1506-143c-57d2-908e-e1f8e92e6de9"
+GLM = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Clustering", "DecisionTree", "GaussianProcesses", "Test"]
+test = ["Clustering", "DecisionTree", "GaussianProcesses", "GLM", "Test"]

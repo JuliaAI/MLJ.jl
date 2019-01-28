@@ -80,3 +80,8 @@ end
 @testset "Clustering" begin
   @test include("Clustering.jl")
 end
+
+@testset "GLM" begin
+    @test_broken include("GLM.jl")
+end
+

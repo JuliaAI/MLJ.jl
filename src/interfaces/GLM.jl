@@ -32,7 +32,7 @@ const LinearRegression = OLSRegressor
 #### Data preparation
 ####
 
-MLJBase.coerce(model::OLSRegressor, Xtable) = (MLJBase.matrix(Xtable), MLJ.retrieve(Xtable, MLJ.Schema).names)
+MLJBase.coerce(model::OLSRegressor, Xtable) = (MLJBase.matrix(Xtable), MLJBase.schema(Xtable).names)
 
 function MLJBase.getrows(model::OLSRegressor, X, r)
     matrix, col_names = X

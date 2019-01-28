@@ -1,10 +1,13 @@
 module TestGLM
 
+# using Revise
 using MLJ
 using Test
+using DataFrames
 
 task = load_boston()
 X, y = X_and_y(task)
+X = DataFrame(X) # needed for DataFrames < v0.17.0
 
 import GLM
 
