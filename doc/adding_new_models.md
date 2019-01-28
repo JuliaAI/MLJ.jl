@@ -162,6 +162,12 @@ To this end, MLJ provides the convenience method `MLJBase.matrix`;
 the tightest common type of elements of `Xtable`, and `Xtable` is any
 table supported by Tables.jl.
 
+Other convenience methods provided by MLJBase for handling tabular
+data are: `selectrows`, `selectcols`, `schema` (for extracting the
+size, names and eltypes of a table) and `table` (for materializing an
+abstract matrix, or named tuple of vectors, as a table matching a
+given prototype). Query the doc-strings for details.
+
 In those special cases where the return type `Special` of `coerce` is
 not an an an `AbstractMatrix` (with rows corresponding to patterns and
 columns corresponding to features) or a table supported by Tables.jl,
