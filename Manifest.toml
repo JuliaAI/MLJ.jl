@@ -1,3 +1,5 @@
+# This file is machine-generated - editing it directly is not advised
+
 [[Arpack]]
 deps = ["BinaryProvider", "Libdl", "LinearAlgebra", "Random", "SparseArrays", "Test"]
 git-tree-sha1 = "1ce1ce9984683f0b6a587d5bdbc688ecb480096f"
@@ -45,9 +47,9 @@ version = "1.4.0"
 
 [[DataFrames]]
 deps = ["CategoricalArrays", "CodecZlib", "Compat", "DataStreams", "Dates", "InteractiveUtils", "IteratorInterfaceExtensions", "LinearAlgebra", "Missings", "Printf", "Random", "Reexport", "SortingAlgorithms", "Statistics", "StatsBase", "TableTraits", "Tables", "Test", "TranscodingStreams", "Unicode", "WeakRefStrings"]
-git-tree-sha1 = "7e032a76f3455e38660ac456791951ac2d0b1e70"
+git-tree-sha1 = "af5c8a233b838076947ef0c8f882f732ad578112"
 uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-version = "0.16.0"
+version = "0.17.0"
 
 [[DataStreams]]
 deps = ["Dates", "Missings", "Test", "WeakRefStrings"]
@@ -81,8 +83,14 @@ version = "0.8.1"
 deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
+[[Distances]]
+deps = ["LinearAlgebra", "Printf", "Random", "Statistics", "Test"]
+git-tree-sha1 = "0e37d8a95bafbeb9c800ef27ab6f443d29e17610"
+uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
+version = "0.7.4"
+
 [[Distributed]]
-deps = ["LinearAlgebra", "Random", "Serialization", "Sockets"]
+deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[Distributions]]
@@ -112,12 +120,12 @@ uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 
 [[GLM]]
 deps = ["Distributions", "LinearAlgebra", "Printf", "Random", "Reexport", "SparseArrays", "SpecialFunctions", "Statistics", "StatsBase", "StatsFuns", "StatsModels"]
-git-tree-sha1 = "7b92209d7700137d4c1b9bd2a60f7f354b1341d7"
+git-tree-sha1 = "7c3f988031022a26b84c1a5106a5161c7a573960"
 uuid = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
-version = "1.0.2"
+version = "1.1.0"
 
 [[InteractiveUtils]]
-deps = ["LinearAlgebra", "Markdown"]
+deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
 [[IterableTables]]
@@ -323,12 +331,12 @@ version = "0.7.0"
 
 [[StatsModels]]
 deps = ["Compat", "DataFrames", "StatsBase", "Test"]
-git-tree-sha1 = "27144bb39ce2a1b3da7f21f8a4dd90fa3983b489"
+git-tree-sha1 = "b5a735dcd2be05f0af86709750d4d5f62ca4a25d"
 uuid = "3eaba693-59b7-5ba5-a881-562e759f1c8d"
-version = "0.4.0"
+version = "0.5.0"
 
 [[SuiteSparse]]
-deps = ["Libdl", "LinearAlgebra", "SparseArrays"]
+deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
 uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 
 [[TableShowUtils]]
@@ -372,7 +380,7 @@ uuid = "30578b45-9adc-5946-b283-645ec420af67"
 version = "0.4.0"
 
 [[UUIDs]]
-deps = ["Random"]
+deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [[Unicode]]
