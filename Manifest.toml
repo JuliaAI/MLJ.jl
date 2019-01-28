@@ -329,9 +329,15 @@ version = "0.7.0"
 
 [[StatsModels]]
 deps = ["Compat", "DataFrames", "StatsBase", "Test"]
+<<<<<<< HEAD
 git-tree-sha1 = "b5a735dcd2be05f0af86709750d4d5f62ca4a25d"
 uuid = "3eaba693-59b7-5ba5-a881-562e759f1c8d"
 version = "0.5.0"
+=======
+git-tree-sha1 = "27144bb39ce2a1b3da7f21f8a4dd90fa3983b489"
+uuid = "3eaba693-59b7-5ba5-a881-562e759f1c8d"
+version = "0.4.0"
+>>>>>>> upstream/master
 
 [[SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
