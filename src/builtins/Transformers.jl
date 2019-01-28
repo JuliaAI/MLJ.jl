@@ -8,12 +8,12 @@ export UnivariateStandardizer, Standardizer
 export UnivariateBoxCoxTransformer
 
 import MLJBase: MLJType, Unsupervised
+import MLJBase: schema, selectcols, table
 import DataFrames: names, AbstractDataFrame, DataFrame, eltypes
 import Distributions
 using Statistics
 # using Tables
 
-import MLJBase: Rows, Cols, Schema, select, table
 
 # to be extended:
 import MLJBase: fit, transform, inverse_transform
@@ -239,17 +239,17 @@ function fit(transformer::Standardizer, verbosity::Int, X::Any)
     # all_features = df |> @take(1) |> @map(fieldnames(typeof(_))) |> @mapmany(_, __)
     # Since this is a really dirty way of proceeding, I've used
     # Tables.jl for now.
-    schema =  select(X, Schema)
-    all_features = schema.names
+    _schema =  schema(X)
+    all_features = _schema.names
     
     # determine indices of all_features to be transformed
     if isempty(transformer.features)
         cols_to_fit = filter!(eachindex(all_features)|>collect) do j
-            schema.eltypes[j] <: AbstractFloat
+            _schema.eltypes[j] <: AbstractFloat
         end
     else
         cols_to_fit = filter!(eachindex(all_features)|>collect) do j
-            all_features[j] in transformer.features && schema.eltypes[j] <: Real
+            all_features[j] in transformer.features && _schema.eltypes[j] <: Real
         end
     end
     
@@ -259,7 +259,7 @@ function fit(transformer::Standardizer, verbosity::Int, X::Any)
     verbosity < 2 || @info "Features standarized: "
     for j in cols_to_fit
         col_fitresult, cache, report =
-            fit(UnivariateStandardizer(), verbosity - 1, select(X, Cols, j))
+            fit(UnivariateStandardizer(), verbosity - 1, selectcols(X, j))
         fitresult_given_feature[all_features[j]] = col_fitresult
         verbosity < 2 ||
             @info "  :$(all_features[j])    mu=$(col_fitresult[1])  sigma=$(col_fitresult[2])"
@@ -280,7 +280,7 @@ function transform(transformer::Standardizer, fitresult, X)
 
     features_to_be_transformed = keys(fitresult)
 
-    all_features = select(X, Schema).names
+    all_features = schema(X).names
     
     issubset(Set(features_to_be_transformed), Set(all_features)) ||
         error("Attempting to transform data with incompatible feature labels.")
@@ -289,9 +289,9 @@ function transform(transformer::Standardizer, fitresult, X)
 
     cols = map(all_features) do ftr
         if ftr in features_to_be_transformed
-            transform(col_transformer, fitresult[ftr], select(X, Cols, ftr))
+            transform(col_transformer, fitresult[ftr], selectcols(X, ftr))
         else
-            select(X, Cols, ftr)
+            selectcols(X, ftr)
         end
     end
 

@@ -47,16 +47,16 @@ end
 
 ## RUDIMENTARY TASK OPERATIONS
 
-nrows(task::Task) = select(task.data, Schema).nrows
+nrows(task::Task) = schema(task.data).nrows
 Base.eachindex(task::Task) = Base.OneTo(nrows(task))
 
-features(task::Task) = filter!(select(task.data, Schema).names |> collect) do ftr
+features(task::Task) = filter!(schema(task.data).names |> collect) do ftr
     !(ftr in task.ignore)
 end
 
-features(task::SupervisedTask) = filter(select(task.data, Schema).names |> collect) do ftr
+features(task::SupervisedTask) = filter(schema(task.data).names |> collect) do ftr
     ftr != task.target && !(ftr in task.ignore)
 end
 
-X_and_y(task::SupervisedTask) = (select(task.data, Cols, features(task)),
-                                 select(task.data, Cols, task.target))
+X_and_y(task::SupervisedTask) = (selectcols(task.data, features(task)),
+                                 selectcols(task.data, task.target))

@@ -15,7 +15,7 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
             length(args) > 1 ||
                 error("Wrong number of arguments. "*
                       "You must provide target(s) for supervised models.")
-            nrows = select(args[1], Schema).nrows
+            nrows = schema(args[1]).nrows
             good = reduce(*, [length(y) == nrows for y in args[2:end]])
             good || error("Machine data arguments of incompatible sizes.")
         end
@@ -65,11 +65,11 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
     rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
 
     if mach.model isa Supervised
-        X = coerce(mach.model, select(mach.args[1], Rows, rows))
-        ys = [select(arg, Rows, rows) for arg in mach.args[2:end]]
+        X = coerce(mach.model, selectrows(mach.args[1], rows))
+        ys = [selectrows(arg, rows) for arg in mach.args[2:end]]
         args = (X, ys...)
     else
-        args = [select(arg, Rows, rows) for arg in mach.args]
+        args = [selectrows(arg, rows) for arg in mach.args]
     end
 
     if !isdefined(mach, :fitresult) || rows_have_changed || force 

@@ -50,7 +50,7 @@ function MLJBase.evaluate(mach::Machine, strategy::Holdout;
     
     train, test = partition(eachindex(y), strategy.fraction_train)
     fit!(mach, rows=train, verbosity=verbosity-1)
-    yhat = operation(mach, select(X, Rows, test))    
+    yhat = operation(mach, selectrows(X, test))    
     fitresult = measure(y[test], yhat)
 
 end
@@ -79,7 +79,7 @@ function MLJBase.evaluate(mach::Machine, strategy::CV;
         test = rows[f:s] # TODO: replace with views?
         train = vcat(rows[1:(f - 1)], rows[(s + 1):end])
         fit!(mach, rows=train; verbosity=verbosity-1)
-        yhat = operation(mach, select(X, Rows, test))    
+        yhat = operation(mach, selectrows(X, test))    
         return measure(y[test], yhat)
     end
 

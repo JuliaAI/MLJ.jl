@@ -13,7 +13,7 @@ function (s::Source)(; rows=:)
     if rows == (:)
         return s.data
     else
-        return select(s.data, Rows, rows)
+        return selectrows(s.data, rows)
     end
 end
 
@@ -177,9 +177,9 @@ function (y::Node)(Xnew)
     return (y.operation)(y.machine, [arg(Xnew) for arg in y.args]...)
 end
 
-# Allow nodes to share the `select(X, Rows, r)` syntax of concrete tabular data
+# Allow nodes to share the `selectrows(X, r)` syntax of concrete tabular data
 # (needed for `fit(::AbstractMachine, ...)` in machines.jl):
-MLJBase.select(X::AbstractNode, ::Type{Rows}, r) = X(rows=r)
+MLJBase.selectrows(X::AbstractNode, r) = X(rows=r)
 
 # and for the special case of static operations:
 (y::Node{Nothing})(; rows=:) = (y.operation)([arg(rows=rows) for arg in y.args]...)
