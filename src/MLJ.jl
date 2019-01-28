@@ -22,7 +22,7 @@ export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
 export DeterministicConstantRegressor                # "builtins/Constant.jl
 export DeterministicConstantClassifier               # "builtins/Constant.jl
 export KNNRegressor                                  # "builtins/KNN.jl"
-export RidgeRegressor                                # "builtins/LocalMulitivariateStats.jl
+export RidgeRegressor, PCA                           # "builtins/LocalMulitivariateStats.jl
 
 # defined in include files "machines.jl" and "networks.jl":
 export Machine, NodalMachine, machine
