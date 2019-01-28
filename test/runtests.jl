@@ -82,6 +82,6 @@ end
 end
 
 @testset "GLM" begin
-    @test_broken include("GLM.jl")
+    @test include("GLM.jl")
 end
 
