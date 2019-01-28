@@ -10,8 +10,9 @@ ones. So, for example,
     (1:200, 201:900, 901:1000)
 
 """
-function partition(rows::AbstractVector{Int}, fractions...)
+function partition(rows::AbstractVector{Int}, fractions...; shuffle::Bool=false)
     rows = collect(rows)
+    shuffle && shuffle!(rows)
     rowss = []
     if sum(fractions) >= 1
         throw(DomainError)

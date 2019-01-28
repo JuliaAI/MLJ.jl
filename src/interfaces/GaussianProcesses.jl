@@ -52,7 +52,7 @@ function MLJBase.fit(model::GPClassifier{T2,M,K}
 
 
     if VERSION < v"1.0"
-        XT = collect(X')
+        XT = collect(transpose(X))
         yP = convert(Vector{Float64}, y_plain)
         gp = GP.GPE(XT
                   , yP
@@ -61,11 +61,11 @@ function MLJBase.fit(model::GPClassifier{T2,M,K}
 
         GP.fit!(gp, XT, yP)
     else
-        gp = GP.GPE(X'
+        gp = GP.GPE(transpose(X)
                   , y_plain
                   , model.mean
                   , model.kernel)
-        GP.fit!(gp, X', y_plain)
+        GP.fit!(gp, transpose(X), y_plain)
     end
 
     fitresult = (gp, decoder)
@@ -83,7 +83,7 @@ function MLJBase.predict(model::GPClassifier{T}
     gp, decoder = fitresult
 
     nlevels = length(decoder.pool.levels)
-    pred = GP.predict_y(gp, Xnew')[1] # Float
+    pred = GP.predict_y(gp, transpose(Xnew))[1] # Float
     # rounding with clamping between 1 and nlevels
     pred_rc = clamp.(round.(Int, pred), 1, nlevels)
 
