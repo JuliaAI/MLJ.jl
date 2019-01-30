@@ -33,9 +33,9 @@ end
 
 function MLJBase.clean!(model::Union{KMeans, KMedoids})
     warning = ""
-    if model.k < 1
-        warning *= "Need k > 1. Resetting k=1.\n"
-        model.k = 1
+    if model.k < 2
+        warning *= "Need k >= 2. Resetting k=2.\n"
+        model.k = 2
     end
     return warning
 end
