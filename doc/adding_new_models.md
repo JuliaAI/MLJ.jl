@@ -196,11 +196,14 @@ getrows(model::SomeSupervisedModel, X::Special, r) -> X_restricted
 Here `r` is any integer, unitrange or colon `:`, and `X_restricted` is
 the restriction of `X` to the patterns with index or indices `r`.
 
-In contrast, the target data `y` passed to training will always be an
+In contrast, the target data `y` passed to `fit` will always be an
 `Vector{F}` for some `F<:AbstractFloat` - in the case of regressors -
-or a `CategoricalVector` - in the case of classifiers. (At present only
-target `CategoricalVector`s of the default reference type `UInt32` are
-supported.)
+or a `CategoricalVector` - in the case of classifiers. (At present
+only target `CategoricalVector`s of the default reference type
+`UInt32` are supported.) If the target to be predicted is an *ordered*
+factor, then an ordered `CategoricalVector` is to be expected; if the
+ordered factor is infinite (unbounded), then a `Vector{<:Integer}` is
+to be expected.
 
 
 #### The fit method
@@ -250,11 +253,14 @@ method (MLJ will call `coerce` on the data provided by the user to obtain `Xnew`
 
 **Prediction types for deterministic responses.** In the case of
 `Deterministic` models, `yhat` must have the same type as the target
-`y` passed to the `fit` method. Note, in particular, that for
-point-value predicting classifiers, the categorical vector returned by
-`predict` *must have the same levels of the target data presented in
-training*, even if not all levels appear in the prediction
-itself. That is, we require `levels(yhat) == levels(y)`.
+`y` passed to the `fit` method (see above discussion on the form of
+data for fitting), with one exception: If predicting an infinite
+ordered factor (where `fit` receives a `Vector{<:Integer}` object) the
+prediction may be continuous, i.e., of type
+`Vector{<:AbstractFloat}`. For all other classifiers, the categorical
+vector returned by `predict` **must have the same levels of the target
+data presented in training**, even if not all levels appear in the
+prediction itself. That is, we require `levels(yhat) == levels(y)`.
 
 For code not written with the preservation of categorical
 levels in mind, MLJ provides a utility `CategoricalDecoder` which can
@@ -321,28 +327,37 @@ declarations. A full set of declarations are shown below for the
 `RidgeRegressor` type:
 
 ````julia
-MLJBase.target_kind(::Type{RidgeRegressor}) = :numeric
-MLJBase.target_quantity(::Type{RidgeRegressor}) = :univariate
-MLJBase.inputs_can_be(::Type{RidgeRegressor}) = [:numeric, ]
-MLJBase.is_pure_julia(::Type{RidgeRegressor}) = :yes
-MLJBase.package_name(::Type{RidgeRegressor}) = "MultivariateStats"
-MLJBase.package_uuid(::Type{RidgeRegressor}) = "6f286f6a-111f-5878-ab1e-185364afe411"
+MLJBase.output_kind(::Type{<:RidgeRegressor}) = :continuous
+MLJBase.output_quantity(::Type{<:RidgeRegressor}) = :univariate
+MLJBase.input_kinds(::Type{<:RidgeRegressor}) = [:continuous, ]
+MLJBase.input_quantity(::Type{<:RidgeRegressor}) = :multivariate
+MLJBase.is_pure_julia(::Type{<:RidgeRegressor}) = :yes
+MLJBase.load_path(::Type{<:RidgeRegressor}) = "MLJ.RidgeRegressor"
+MLJBase.package_name(::Type{<:RidgeRegressor}) = "MultivariateStats"
+MLJBase.package_uuid(::Type{<:RidgeRegressor}) = "6f286f6a-111f-5878-ab1e-185364afe411"
+MLJBase.package_url((::Type{<:RidgeRegressor}) = "https://github.com/JuliaStats/MultivariateStats.jl"
 ````
 
-method                   | return type       | declarable  return values | default value
--------------------------|-------------------|---------------------------|------------------------
-`target_kind`            | `Symbol`          |`:numeric`, `:binary`, `:multiclass` | `:unknown`
-`target_quantity`        | `Symbol`          |`:univariate`, `:multivariate`| `:univariate`
-`inputs_can_be`          | `Vector{Symbol}`  | one or more of: `:numeric`, `:nominal`, `:missing` | `Symbol[]`
+method                   | return type       | declarable return values | default value
+-------------------------|-------------------|---------------------------|-------------------
+`output_kind`            | `Symbol`          |`:continuous`, `:binary`, `:multiclass`, `:ordered_factor_finite`, `:ordered_factor_infinite`, `:same_as_inputs` | `:unknown`
+`output_quantity`        | `Symbol`          |`:univariate`, `:multivariate`| `:univariate`
+`input_kinds`          | `Vector{Symbol}`  | one or more of: `:continuous`, `:multiclass`, `:ordered_factor_finite`, `:ordered_factor_infinite`, `:missing` | `Symbol[]`
+`input_quantity`        | `Symbol`          | `:univariate`, `:multivariate` | `:multivariate`
 `is_pure_julia`          | `Symbol`          | `:yes`, `:no`             | `:unknown`
+`load_path`              | `String`          | unrestricted              | "unknown"
 `package_name`           | `String`          | unrestricted              | "unknown"
-`package_uuid`           | `String`          | unrestricted              | "unknown"         |
+`package_uuid`           | `String`          | unrestricted              | "unknown"
+`package_url`            | `String`          | unrestricted              | "unknown"
 
 Note that `:binary` does not mean *boolean*. Rather, it
 means the model is a classifier but is unable to classify targets with more than two
 classes. As explained above, all classifiers are passed training targets
 as `CategoricalVector`s, whose element types are
 arbitrary.
+
+The option `:same_as_inputs` for `output_kind` is intended primarily
+for transformers, such as MLJ's built-in `FeatureSelector`.
 
 You can test declarations of traits by calling `info(SomeModelType)`.
 

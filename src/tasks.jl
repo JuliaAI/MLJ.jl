@@ -1,5 +1,5 @@
 # TODO: add evaluation metric:
-# TODO: add `inputs_can_be` and `outputs_are`
+# TODO: add `input_kinds` and `outputs_are`
 # TODO: add multiple targets
 
 abstract type Task <: MLJType end

@@ -43,7 +43,7 @@ fit!(tree)
 predict(tree, X[1:3,:])
 
 @show baretree
-display(info(baretree))
+info(baretree)
 
 end
 true

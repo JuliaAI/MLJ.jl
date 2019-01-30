@@ -91,12 +91,14 @@ function MLJBase.predict(model::GPClassifier{T}
 end
 
 # metadata:
+MLJBase.load_path(::Type{<:GPClassifier}) = "MLJ.GPClassifier" # lazy-loaded from MLJ
 MLJBase.package_name(::Type{<:GPClassifier}) = "GaussianProcesses"
 MLJBase.package_uuid(::Type{<:GPClassifier}) = "891a1506-143c-57d2-908e-e1f8e92e6de9"
+MLJBase.package_url(::Type{<:GPClassifier}) = "https://github.com/STOR-i/GaussianProcesses.jl"
 MLJBase.is_pure_julia(::Type{<:GPClassifier}) = :yes
-MLJBase.inputs_can_be(::Type{<:GPClassifier}) = [:numeric, ]
-MLJBase.target_kind(::Type{<:GPClassifier}) = :multiclass
-MLJBase.target_quantity(::Type{<:GPClassifier}) = :univariate
+MLJBase.input_kinds(::Type{<:GPClassifier}) = [:continuous, ]
+MLJBase.output_kind(::Type{<:GPClassifier}) = :ordered_factor_finite
+MLJBase.output_quantity(::Type{<:GPClassifier}) = :univariate
 
 end # module
 

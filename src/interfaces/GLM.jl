@@ -72,12 +72,14 @@ function MLJBase.predict(model::OLSRegressor, fitresult::OLSFitResult, Xnew)
 end
 
 # metadata:
+MLJBase.load_path(::Type{OLS}) = "MLJ.OLS"
 MLJBase.package_name(::Type{OLS}) = "GLM"
 MLJBase.package_uuid(::Type{OLS}) = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
+MLJBase.package_url(::Type{OLS}) = "https://github.com/JuliaStats/GLM.jl"
 MLJBase.is_pure_julia(::Type{OLS}) = :yes
-MLJBase.inputs_can_be(::Type{OLS}) = [:numeric, ]
-MLJBase.target_kind(::Type{OLS}) = :numeric
-MLJBase.target_quantity(::Type{OLS}) = :univariate
+MLJBase.input_kinds(::Type{OLS}) = [:continuous, ]
+MLJBase.output_kind(::Type{OLS}) = :continuous
+MLJBase.output_quantity(::Type{OLS}) = :univariate
 
 end # module
 

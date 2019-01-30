@@ -39,6 +39,8 @@ km = machine(barekm, X)
 
 fit!(km)
 
+info(barekm)
+
 ####
 #### KMEDOIDS
 ####
@@ -59,6 +61,8 @@ p = MLJ.predict(barekm, fitresult, X)
 km = machine(barekm, X)
 
 fit!(km)
+
+info(barekm)
 
 end # module
 true

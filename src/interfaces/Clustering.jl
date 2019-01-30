@@ -200,19 +200,23 @@ end
 #### METADATA
 ####
 
+MLJBase.load_path(::Type{KMeans}) = "MLJ.KMeans" # lazy-loaded from MLJ
+MLJBase.package_url(::Type{KMeans}) = "https://github.com/JuliaStats/Clustering.jl"
 MLJBase.package_name(::Type{KMeans}) = "Clustering"
 MLJBase.package_uuid(::Type{KMeans}) = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
 MLJBase.is_pure_julia(::Type{KMeans}) = :yes
-MLJBase.inputs_can_be(::Type{KMeans}) = [:numeric,]
-MLJBase.target_kind(::Type{KMeans}) = :multiclass
-MLJBase.target_quantity(::Type{KMeans}) = :univariate
+MLJBase.input_kinds(::Type{KMeans}) = [:continuous,]
+MLJBase.output_kind(::Type{KMeans}) = :continuous
+MLJBase.output_quantity(::Type{KMeans}) = :multivariate
 
-MLJBase.package_name(::Type{KMedoids}) = "Clustering"
-MLJBase.package_uuid(::Type{KMedoids}) = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
+MLJBase.load_path(::Type{KMedoids}) = "MLJ.KMedoids" # lazy-loaded from MLJ
+MLJBase.package_url(::Type{KMedoids}) = MLJBase.package_name_url(KMeans)
+MLJBase.package_name(::Type{KMedoids}) = MLJBase.package_name_name(KMeans)
+MLJBase.package_uuid(::Type{KMedoids}) = MLJBase.package_name_uuid(KMeans)
 MLJBase.is_pure_julia(::Type{KMedoids}) = :yes
-MLJBase.inputs_can_be(::Type{KMedoids}) = [:numeric,]
-MLJBase.target_kind(::Type{KMedoids}) = :multiclass
-MLJBase.target_quantity(::Type{KMedoids}) = :univariate
+MLJBase.input_kinds(::Type{KMedoids}) = [:continuous,]
+MLJBase.output_kind(::Type{KMedoids}) = :continuous
+MLJBase.output_quantity(::Type{KMedoids}) = :multivariate
 
 end # module
 

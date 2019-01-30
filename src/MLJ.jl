@@ -69,6 +69,7 @@ import Distributions
 import StatsBase
 using ProgressMeter
 import Tables
+# import TOML
 
 # to be extended:
 import Base.==
@@ -94,7 +95,7 @@ include("resampling.jl")    # evaluating models by assorted resampling strategie
 include("parameters.jl")    # hyper-parameter range constructors and nested hyper-parameter API
 include("tuning.jl")
 include("ensembles.jl")     # homogeneous ensembles
-
+include("introspection.jl") # reflection on the state of MLJ package
 
 ## LOAD BUILT-IN MODELS
 

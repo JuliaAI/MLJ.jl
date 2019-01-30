@@ -30,5 +30,7 @@ p2 = Xa1[test, :] * coefs
 
 @test p ≈ p2
 
+info(atom_ols)
+
 end # module
 true

@@ -9,6 +9,7 @@ export UnivariateBoxCoxTransformer
 
 import MLJBase: MLJType, Unsupervised
 import MLJBase: schema, selectcols, table
+import MLJBase
 import DataFrames: names, AbstractDataFrame, DataFrame, eltypes
 import Distributions
 using Statistics
@@ -26,6 +27,7 @@ const N_VALUES_THRESH = 16 # for BoxCoxTransformation
 
 ## FOR FEATURE (COLUMN) SELECTION
 
+# TODO - make input data agnositic!!
 """
     FeatureSelector(features=Symbol[])
 
@@ -61,12 +63,29 @@ function transform(transformer::FeatureSelector, features, X)
     issubset(Set(features), Set(names(X))) ||
         throw(error("Supplied frame does not admit previously selected features."))
     return X[features]
-end 
+end
+
+# metadata:
+MLJBase.load_path(::Type{<:FeatureSelector}) = "MLJ.FeatureSelector" 
+MLJBase.package_url(::Type{<:FeatureSelector}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.package_name(::Type{<:FeatureSelector}) = "MLJ"
+MLJBase.package_uuid(::Type{<:FeatureSelector}) = ""
+MLJBase.is_pure_julia(::Type{<:FeatureSelector}) = :yes
+MLJBase.input_kinds(::Type{<:FeatureSelector}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
+MLJBase.output_kind(::Type{<:FeatureSelector}) = :same_as_inputs
+MLJBase.output_quantity(::Type{<:FeatureSelector}) = :multivariate
 
 
 ## FOR RELABELLING BY CONSECUTIVE INTEGERS
+
+# TODO: Fix so categorical levels are maintained, even "invisible" ones.
 """
-    Relabel with consecutive integers
+    ToIntTransformer
+
+Univariate transformer for relabelling with consecutive integers. Does
+not keep all levels of a `CategoricalVector` - only those manifest in
+the fitting input.
+
 """
 mutable struct ToIntTransformer <: Unsupervised
     sorted::Bool
@@ -147,6 +166,16 @@ end
 inverse_transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T},
                   w::AbstractVector{Int}) where T = T[fitresult.T_given_int[y] for y in w]
 
+MLJBase.load_path(::Type{<:ToIntTransformer}) = "MLJ.ToIntTransformer" 
+MLJBase.package_url(::Type{<:ToIntTransformer}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.package_name(::Type{<:ToIntTransformer}) = "MLJ"
+MLJBase.package_uuid(::Type{<:ToIntTransformer}) = ""
+MLJBase.is_pure_julia(::Type{<:ToIntTransformer}) = :yes
+MLJBase.input_kinds(::Type{<:ToIntTransformer}) = [:multiclass, :ordered_factor_finite]
+MLJBase.input_quantity(::Type{<:ToIntTransformer}) = :univariate
+MLJBase.output_kind(::Type{<:ToIntTransformer}) = :multiclass
+MLJBase.output_quantity(::Type{<:ToIntTransformer}) = :univariate
+
 
 ## UNIVARIATE STANDARDIZATION
 
@@ -183,12 +212,19 @@ end
 inverse_transform(transformer::UnivariateStandardizer, fitresult, w) =
     [inverse_transform(transformer, fitresult, y) for y in w]
 
+# metadata:
+MLJBase.load_path(::Type{<:UnivariateStandardizer}) = "MLJ.UnivariateStandardizer" 
+MLJBase.package_url(::Type{<:UnivariateStandardizer}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.package_name(::Type{<:UnivariateStandardizer}) = "MLJ"
+MLJBase.package_uuid(::Type{<:UnivariateStandardizer}) = ""
+MLJBase.is_pure_julia(::Type{<:UnivariateStandardizer}) = :yes
+MLJBase.input_kinds(::Type{<:UnivariateStandardizer}) = [:multiclass, :ordered_factor_finite]
+MLJBase.input_quantity(::Type{<:UnivariateStandardizer}) = :univariate
+MLJBase.output_kind(::Type{<:UnivariateStandardizer}) = :multiclass
+MLJBase.output_quantity(::Type{<:UnivariateStandardizer}) = :univariate
+
 
 ## STANDARDIZATION OF ORDINAL FEATURES OF TABULAR DATA
-
-# TODO: reimplement in simpler, safer way: fitresult is two vectors:
-# one of features that are transformed, one of corresponding
-# univariate machines. Make data container agnostic.
 
 """
     Standardizer(; features=Symbol[])
@@ -300,6 +336,18 @@ function transform(transformer::Standardizer, fitresult, X)
     return table(named_cols, prototype=X)
 
 end    
+
+# metadata:
+MLJBase.load_path(::Type{<:Standardizer}) = "MLJ.Standardizer" 
+MLJBase.package_url(::Type{<:Standardizer}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.package_name(::Type{<:Standardizer}) = "MLJ"
+MLJBase.package_uuid(::Type{<:Standardizer}) = ""
+MLJBase.is_pure_julia(::Type{<:Standardizer}) = :yes
+MLJBase.input_kinds(::Type{<:Standardizer}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
+MLJBase.input_quantity(::Type{<:Standardizer}) = :multivariate
+MLJBase.output_kind(::Type{<:Standardizer}) = :same_as_inputs
+MLJBase.output_quantity(::Type{<:Standardizer}) = :multivariate
+
 
 ## UNIVARIATE BOX-COX TRANSFORMATIONS
 
@@ -417,6 +465,18 @@ function inverse_transform(transformer::UnivariateBoxCoxTransformer,
                            fitresult, w::AbstractVector{T}) where T <: Real
     return [inverse_transform(transformer, fitresult, y) for y in w]
 end
+
+# metadata:
+MLJBase.load_path(::Type{<:UnivariateBoxCoxTransformer}) = "MLJ.UnivariateBoxCoxTransformer" 
+MLJBase.package_url(::Type{<:UnivariateBoxCoxTransformer}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.package_name(::Type{<:UnivariateBoxCoxTransformer}) = "MLJ"
+MLJBase.package_uuid(::Type{<:UnivariateBoxCoxTransformer}) = ""
+MLJBase.is_pure_julia(::Type{<:UnivariateBoxCoxTransformer}) = :yes
+MLJBase.input_kinds(::Type{<:UnivariateBoxCoxTransformer}) = [:continuous,]
+MLJBase.input_quantity(::Type{<:UnivariateBoxCoxTransformer}) = :univariate
+MLJBase.output_kind(::Type{<:UnivariateBoxCoxTransformer}) = :continuous
+MLJBase.output_quantity(::Type{<:UnivariateBoxCoxTransformer}) = :univariate
+
 
 end # end module
 

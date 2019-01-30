@@ -43,7 +43,8 @@ using DataFrames
 
     # Instantiate a model:
     ridge = RidgeRegressor(lambda=0.1)
-
+    info(ridge)
+    
     # Build a machine:
     ridgeM = machine(ridge, Xtable, y)
 
@@ -70,6 +71,7 @@ end
     X, y = X_and_y(task)
 
     barepca = PCA(pratio=0.9999)
+    info(barepca)
 
     fitresult, cache, report = MLJ.fit(barepca, 1, X)
 

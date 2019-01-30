@@ -143,12 +143,14 @@ function MLJBase.predict(model::DecisionTreeClassifier{T}
 end
 
 # metadata:
+MLJBase.load_path(::Type{<:DecisionTreeClassifier}) = "MLJ.DecisionTreeClassifier" # lazy-loaded from MLJ
 MLJBase.package_name(::Type{<:DecisionTreeClassifier}) = "DecisionTree"
 MLJBase.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+MLJBase.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bensadeghi/DecisionTree.jl"
 MLJBase.is_pure_julia(::Type{<:DecisionTreeClassifier}) = :yes
-MLJBase.inputs_can_be(::Type{<:DecisionTreeClassifier}) = [:numeric, ]
-MLJBase.target_kind(::Type{<:DecisionTreeClassifier}) = :multiclass
-MLJBase.target_quantity(::Type{<:DecisionTreeClassifier}) = :univariate
+MLJBase.input_kinds(::Type{<:DecisionTreeClassifier}) = [:continuous, ]
+MLJBase.output_kind(::Type{<:DecisionTreeClassifier}) = :multiclass
+MLJBase.output_quantity(::Type{<:DecisionTreeClassifier}) = :univariate
 
 end # module
 

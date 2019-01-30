@@ -11,6 +11,7 @@ Xtable, y = datanow()
 X = DataFrame(Xtable) # will become redunant in DataFrames 0.17.0
 namesX = names(X)
 selector = FeatureSelector()
+info(selector)
 fitresult, cache, report = MLJ.fit(selector, 1, X)
 @test fitresult == namesX
 transform(selector, fitresult, X[1:2,:])
@@ -23,6 +24,7 @@ y = rand(Char, 50)
 allrows = eachindex(y)
 test = 3:37
 to_int_hypers = ToIntTransformer()
+info(to_int_hypers)
 fitresult, cache, report = MLJ.fit(to_int_hypers, 1, y)
 # to_int = Trainable(to_int_hypers, y)
 # fit!(to_int, allrows)
@@ -38,6 +40,7 @@ fitresult, cache, report = MLJ.fit(to_int_hypers, 1, [1, 2, 3, 4, 3])
 
 # `UnivariateStandardizer`:
 stand = UnivariateStandardizer()
+info(stand)
 #fit!(stand, 1:3)
 fitresult, cache, report = MLJ.fit(stand, 1, [0, 2, 4])
 @test round.(Int, transform(stand, fitresult, [0,4,8])) == [-1.0,1.0,3.0]
@@ -56,6 +59,7 @@ X[:OverallQual] = map(Char, X[:OverallQual]);
 X[:x1stFlrSF] = [round(Int, x) for x in X[:x1stFlrSF]]
 
 stand = Standardizer()
+info(stand)
 fitresult, cache, report = MLJ.fit(stand, 1, X)
 Xnew = transform(stand, fitresult, X)
 @test std(Xnew[2]) ≈ 1.0
@@ -83,6 +87,7 @@ v = v .- minimum(v)
 MLJ.Transformers.normality(v)
 
 t = UnivariateBoxCoxTransformer(shift=true)
+info(t)
 fitresult, cache, report = MLJ.fit(t, 2, v)
 @test sum(abs.(v - MLJ.inverse_transform(t, fitresult, MLJ.transform(t, fitresult, v)))) <= 5000*eps()
 

@@ -33,5 +33,7 @@ yhat2 = predict(gp, X[test,:])
 
 @test sum(yhat2 .== y[test]) / length(y[test]) >= 0.7
 
+info(baregp)
+
 end # module
 true

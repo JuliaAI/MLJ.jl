@@ -56,15 +56,17 @@ MLJBase.predict(model::ConstantRegressor, fitresult, Xnew) = fill(fitresult, nro
 MLJBase.predict_mean(model::ConstantRegressor, fitresult, Xnew) = fill(Distributions.mean(fitresult), nrows(Xnew))
 
 # metadata:
+MLJBase.load_path(::Type{<:ConstantRegressor}) = "MLJ.ConstantRegressor"
 MLJBase.package_name(::Type{<:ConstantRegressor}) = "MLJ"
 MLJBase.package_uuid(::Type{<:ConstantRegressor}) = ""
+MLJBase.package_url(::Type{<:ConstantRegressor}) = "https://github.com/alan-turing-institute/MLJ.jl"
 MLJBase.is_pure_julia(::Type{<:ConstantRegressor}) = :yes
-MLJBase.inputs_can_be(::Type{<:ConstantRegressor}) = [:numeric, :nominal, :missing]
-MLJBase.target_kind(::Type{<:ConstantRegressor}) = :numeric
-MLJBase.target_quantity(::Type{<:ConstantRegressor}) = :univariate
+MLJBase.input_kinds(::Type{<:ConstantRegressor}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
+MLJBase.output_kind(::Type{<:ConstantRegressor}) = :continuous
+MLJBase.output_quantity(::Type{<:ConstantRegressor}) = :univariate
 
 
-## THE CONSTANT DETERMINISTIC REGRESSOR
+## THE CONSTANT DETERMINISTIC REGRESSOR (FOR TESTING)
 
 struct DeterministicConstantRegressor{F} <: MLJBase.Deterministic{F}
     target_type::Type{F}
@@ -83,12 +85,14 @@ end
 MLJBase.predict(model::DeterministicConstantRegressor, fitresult, Xnew) = fill(fitresult, nrows(Xnew))
 
 # metadata:
-MLJBase.package_name(::Type{<:DeterministicConstantRegressor}) = "MLJ"
-MLJBase.package_uuid(::Type{<:DeterministicConstantRegressor}) = ""
+MLJBase.load_path(::Type{<:DeterministicConstantRegressor}) = load_path(ConstantRegressor)
+MLJBase.package_name(::Type{<:DeterministicConstantRegressor}) = MLJBase.package_name_name(ConstantRegressor)
+MLJBase.package_uuid(::Type{<:DeterministicConstantRegressor}) = MLJBase.package_name_url(ConstantRegressor)
+MLJBase.package_url(::Type{<:DeterministicConstantRegressor}) = MLJBase.package_name_url(ConstantRegressor)
 MLJBase.is_pure_julia(::Type{<:DeterministicConstantRegressor}) = :yes
-MLJBase.inputs_can_be(::Type{<:DeterministicConstantRegressor}) = [:numeric, :nominal, :missing]
-MLJBase.target_kind(::Type{<:DeterministicConstantRegressor}) = :numeric
-MLJBase.target_quantity(::Type{<:DeterministicConstantRegressor}) = :univariate
+MLJBase.input_kinds(::Type{<:DeterministicConstantRegressor}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
+MLJBase.output_kind(::Type{<:DeterministicConstantRegressor}) = :continuous
+MLJBase.output_quantity(::Type{<:DeterministicConstantRegressor}) = :univariate
 
 
 ## THE CONSTANT CLASSIFIER
@@ -143,17 +147,18 @@ function MLJBase.predict_mode(model::ConstantClassifier{L}, fitresult, Xnew) whe
     return yhat[1:N]
 end
 
-
 # metadata:
-MLJBase.package_name(::Type{<:ConstantClassifier}) = "MLJ"
-MLJBase.package_uuid(::Type{<:ConstantClassifier}) = ""
+MLJBase.load_path(::Type{<:ConstantClassifier}) = "MLJ.ConstantClassifier"
+MLJBase.package_name(::Type{<:ConstantClassifier}) = MLJBase.package_name(ConstantRegressor)
+MLJBase.package_uuid(::Type{<:ConstantClassifier}) = MLJBase.package_uuid(ConstantRegressor)
+MLJBase.package_url(::Type{<:ConstantClassifier}) = MLJBase.package_url(ConstantRegressor)
 MLJBase.is_pure_julia(::Type{<:ConstantClassifier}) = :yes
-MLJBase.inputs_can_be(::Type{<:ConstantClassifier}) = [:numeric, :nominal, :missing]
-MLJBase.target_kind(::Type{<:ConstantClassifier}) = :multiclass
-MLJBase.target_quantity(::Type{<:ConstantClassifier}) = :univariate
+MLJBase.input_kinds(::Type{<:ConstantClassifier}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
+MLJBase.output_kind(::Type{<:ConstantClassifier}) = :multiclass
+MLJBase.output_quantity(::Type{<:ConstantClassifier}) = :univariate
 
 
-## DETERMINISTIC CONSTANT CLASSIFIER
+## DETERMINISTIC CONSTANT CLASSIFIER (FOR TESTING)
 
 struct DeterministicConstantClassifier{L} <: MLJBase.Deterministic{Tuple{L,Vector{L}}}
     target_type::Type{L}
@@ -188,12 +193,14 @@ function MLJBase.predict(model::DeterministicConstantClassifier{L}, fitresult, X
 end
 
 # metadata:
-MLJBase.package_name(::Type{<:DeterministicConstantClassifier}) = "MLJ"
-MLJBase.package_uuid(::Type{<:DeterministicConstantClassifier}) = ""
+MLJBase.load_path(::Type{<:DeterministicConstantClassifier}) = "MLJ.DeterministicConstantClassifier"
+MLJBase.package_name(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_name_name(ConstantRegressor)
+MLJBase.package_uuid(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_name_uuid(ConstantRegressor)
+MLJBase.package_url(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_name_url(ConstantRegressor)
 MLJBase.is_pure_julia(::Type{<:DeterministicConstantClassifier}) = :yes
-MLJBase.inputs_can_be(::Type{<:DeterministicConstantClassifier}) = [:numeric, :nominal, :missing]
-MLJBase.target_kind(::Type{<:DeterministicConstantClassifier}) = :multiclass
-MLJBase.target_quantity(::Type{<:DeterministicConstantClassifier}) = :univariate
+MLJBase.input_kinds(::Type{<:DeterministicConstantClassifier}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
+MLJBase.output_kind(::Type{<:DeterministicConstantClassifier}) = :multiclass
+MLJBase.output_quantity(::Type{<:DeterministicConstantClassifier}) = :univariate
 
 
 end # module

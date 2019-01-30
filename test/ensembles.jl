@@ -10,7 +10,7 @@ using Distributions
 
 ## WRAPPED ENSEMBLES OF FITRESULTS
 
-# target is :deterministic :nominal :univariate:
+# target is :deterministic :multiclass :univariate:
 atom = DeterministicConstantClassifier(target_type=Char)
 L = ['a', 'b', 'j']
 ensemble = [('a', L), ('j', L), ('j', L), ('b', L)]
@@ -20,14 +20,14 @@ wens = MLJ.WrappedEnsemble(atom, ensemble)
 X = DataFrame(rand(3,5))
 @test predict(wens, weights, X) == categorical(['j','j','j'])
 
-# target is :deterministic :numeric :univariate:
+# target is :deterministic :continuous :univariate:
 atom = DeterministicConstantRegressor()
 ensemble = Float64[4, 7, 4, 4]
 weights = [0.1, 0.5, 0.2, 0.2]
 wens = MLJ.WrappedEnsemble(atom, ensemble)
 @test predict(wens, weights, X) ≈ [5.5, 5.5, 5.5]
 
-# target is :probabilistic :nominal :univariate:
+# target is :probabilistic :multiclass :univariate:
 atom = ConstantClassifier(target_type=Char)
 L = ['a', 'b', 'j']
 d1 = UnivariateNominal(L, [0.1, 0.2, 0.7])
@@ -41,7 +41,7 @@ d = predict(wens, weights, X)[1]
 @test pdf(d, 'b') ≈ 0.25
 @test pdf(d, 'j') ≈ 0.6
 
-# target is :probabilistic :numeric :univariate:
+# target is :probabilistic :continuous :univariate:
 atom = ConstantRegressor(target_type=Float64)
 d1 = Distributions.Normal(1, 2)
 d2 = Distributions.Normal(3, 4)
@@ -54,7 +54,7 @@ d = predict(wens, weights, X)[1]
 
 ## ENSEMBLE MODEL
 
-# target is :deterministic :nominal :univariate:
+# target is :deterministic :multiclass :univariate:
 atom=DeterministicConstantClassifier(target_type=Char)
 X = DataFrame(ones(5,3))
 y = categorical(collect("asdfa"))
@@ -67,7 +67,7 @@ weights = rand(10)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, X[test,:])
 
-# target is :deterministic :numeric :univariate:
+# target is :deterministic :continuous :univariate:
 atom = DeterministicConstantRegressor(target_type=Float64)
 X = DataFrame(ones(5,3))
 y = Float64[1.0, 2.0, 1.0, 1.0, 1.0]
@@ -85,7 +85,7 @@ weights = rand(10)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, X[test,:])
 
-# target is :probabilistic :nominal :univariate:
+# target is :probabilistic :multiclass :univariate:
 atom = ConstantClassifier(target_type=Char)
 X = DataFrame(ones(5,3))
 y = categorical(collect("asdfa"))
@@ -107,7 +107,7 @@ weights = rand(10)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, X[test,:])
 
-# target is :probabilistic :numeric :univariate:
+# target is :probabilistic :continuous :univariate:
 atom = ConstantRegressor(target_type=Float64)
 X = DataFrame(ones(5,3))
 y = Float64[1.0, 2.0, 2.0, 1.0, 1.0]
