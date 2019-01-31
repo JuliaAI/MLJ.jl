@@ -32,4 +32,4 @@ GaussianProcesses = "891a1506-143c-57d2-908e-e1f8e92e6de9"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Clustering", "DecisionTree", "GLM", "GaussianProcesses", "Test"]
+test = ["DecisionTree", "GLM", "Clustering", "GLM", "GaussianProcesses"]
