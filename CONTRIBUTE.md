@@ -5,10 +5,10 @@ issues or the Julia [slack
 channel](https://slackinvite.julialang.org), #MLJ.
 
 
-There is a [list]() of presently implemented models/packages. Please
-add to the new [model wish list](), preferably including a brief plug
-for the model. Even better, write a pull-request for an implementation
-yourself!
+- [List of presently implemented models](https://github.com/ablaom/MLJRegistry.jl/blob/master/Models.toml) 
+
+- [Wish list for new models]()
+
 
 While new model implementations are a priority, help adding core
 functionality to MLJ is also welcome. If you are interested in
