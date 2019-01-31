@@ -223,7 +223,7 @@ best_model = tuned_ensemble.report[:best_model]
 
 Diego Arenas, Edoardo Barp, Anthony Blaom, Gergö Bohner, Valentin
 Churvay, Harvey Devereux, Thibaut Lienart, Franz J Király, Mohammed
-Nook, Annika Stechemesser, Yiannis Simillides, Sebastian Vollmer; Mike
+Nook, Ayush Shridhar, Yiannis Simillides, Annika Stechemesser, Sebastian Vollmer; Mike
 Innes in partnership with Julia Computing
 
 We are looking for new collaborators @ the Alan Turing Institute! 
