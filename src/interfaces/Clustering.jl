@@ -210,9 +210,9 @@ MLJBase.output_kind(::Type{KMeans}) = :continuous
 MLJBase.output_quantity(::Type{KMeans}) = :multivariate
 
 MLJBase.load_path(::Type{KMedoids}) = "MLJ.KMedoids" # lazy-loaded from MLJ
-MLJBase.package_url(::Type{KMedoids}) = MLJBase.package_name_url(KMeans)
-MLJBase.package_name(::Type{KMedoids}) = MLJBase.package_name_name(KMeans)
-MLJBase.package_uuid(::Type{KMedoids}) = MLJBase.package_name_uuid(KMeans)
+MLJBase.package_url(::Type{KMedoids}) = MLJBase.package_url(KMeans)
+MLJBase.package_name(::Type{KMedoids}) = MLJBase.package_name(KMeans)
+MLJBase.package_uuid(::Type{KMedoids}) = MLJBase.package_uuid(KMeans)
 MLJBase.is_pure_julia(::Type{KMedoids}) = :yes
 MLJBase.input_kinds(::Type{KMedoids}) = [:continuous,]
 MLJBase.output_kind(::Type{KMedoids}) = :continuous
