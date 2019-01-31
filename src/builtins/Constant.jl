@@ -85,10 +85,10 @@ end
 MLJBase.predict(model::DeterministicConstantRegressor, fitresult, Xnew) = fill(fitresult, nrows(Xnew))
 
 # metadata:
-MLJBase.load_path(::Type{<:DeterministicConstantRegressor}) = load_path(ConstantRegressor)
-MLJBase.package_name(::Type{<:DeterministicConstantRegressor}) = MLJBase.package_name_name(ConstantRegressor)
-MLJBase.package_uuid(::Type{<:DeterministicConstantRegressor}) = MLJBase.package_name_url(ConstantRegressor)
-MLJBase.package_url(::Type{<:DeterministicConstantRegressor}) = MLJBase.package_name_url(ConstantRegressor)
+MLJBase.load_path(::Type{<:DeterministicConstantRegressor}) = MLJBase.load_path(ConstantRegressor)
+MLJBase.package_name(::Type{<:DeterministicConstantRegressor}) = MLJBase.package_name(ConstantRegressor)
+MLJBase.package_uuid(::Type{<:DeterministicConstantRegressor}) = MLJBase.package_url(ConstantRegressor)
+MLJBase.package_url(::Type{<:DeterministicConstantRegressor}) = MLJBase.package_url(ConstantRegressor)
 MLJBase.is_pure_julia(::Type{<:DeterministicConstantRegressor}) = :yes
 MLJBase.input_kinds(::Type{<:DeterministicConstantRegressor}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
 MLJBase.output_kind(::Type{<:DeterministicConstantRegressor}) = :continuous
@@ -194,9 +194,9 @@ end
 
 # metadata:
 MLJBase.load_path(::Type{<:DeterministicConstantClassifier}) = "MLJ.DeterministicConstantClassifier"
-MLJBase.package_name(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_name_name(ConstantRegressor)
-MLJBase.package_uuid(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_name_uuid(ConstantRegressor)
-MLJBase.package_url(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_name_url(ConstantRegressor)
+MLJBase.package_name(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_name(ConstantRegressor)
+MLJBase.package_uuid(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_uuid(ConstantRegressor)
+MLJBase.package_url(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_url(ConstantRegressor)
 MLJBase.is_pure_julia(::Type{<:DeterministicConstantClassifier}) = :yes
 MLJBase.input_kinds(::Type{<:DeterministicConstantClassifier}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
 MLJBase.output_kind(::Type{<:DeterministicConstantClassifier}) = :multiclass

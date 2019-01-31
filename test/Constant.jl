@@ -22,7 +22,8 @@ d=Distributions.Normal(1.5, 0.5)
 @test predict_mean(model, fitresult, ones(10,2)) == fill(1.5, 10)
 
 @show model
-display(info(model))
+info(model)
+info(DeterministicConstantRegressor)
 
 
 ## CLASSIFIER
@@ -44,7 +45,8 @@ yhat = predict(model, fitresult, ones(10, 2))
 @test yhat == fill(d, 10)
 
 @show model
-display(info(model))
+info(model)
+info(DeterministicConstantClassifier)
 
 end # module
 true
