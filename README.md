@@ -31,18 +31,17 @@ import MLJBase, which has its own
 - Option to tune hyperparameters using gradient descent and automatic
   differentiation (for learning algorithms written in Julia).
 
-- Data agnostic: Train models on any data supported by the Queryverse
-[iterable tables
-interface](https://github.com/queryverse/IterableTables.jl). &#10004;
+- Data agnostic: Train models on any data supported by the Tables.jl 
+[interface](https://github.com/JuliaData/Tables.jl). &#10004;
 
 - Intuitive syntax for building arbitrarily complicated
-  learning networks. &#10004;
+  learning networks .&#10004;
   
 - Learning networks can be exported as self-contained composite models &#10004;, but
   common networks (e.g., linear pipelines, stacks) come ready to plug-and-play.
 
 - Performant parallel implementation of large homogeneous ensembles
-  of arbitrary models (e.g., random forests).
+  of arbitrary models (e.g., random forests). &#10004;
 
 - "Task" interface matches machine learning problem to available models.
 

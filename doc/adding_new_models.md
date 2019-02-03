@@ -11,7 +11,8 @@ following packages is helpful:
 [Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
 (for probabilistic predictions),
 [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl)
-(essential if you are implementing a classifier),
+(essential if you are implementing a classifier, or a learner that
+handles categorical inputs),
 [Tables.jl](https://github.com/JuliaData/Tables.jl) (if you're
 algorithm needs input data in a novel format).
 

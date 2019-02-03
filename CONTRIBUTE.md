@@ -82,7 +82,7 @@ implementing new models.
 
 - Sebastian Vollmer (director, consultant)
 - Franz Kiraly (director, consultant)
-- Anthony Blaom (coordinating contributor)
+- Anthony Blaom (lead contributor, coordinator)
 - Yiannis Simillides (contributor)
 
 #### At Julia Computing
