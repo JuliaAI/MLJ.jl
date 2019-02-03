@@ -10,8 +10,7 @@ x2 = ones(4)
 X = DataFrame(x1=x1, x2=x2)
 y = [1.0, 1.0, 2.0, 2.0]
 
-## HOLDOUT
-
+# holdout:
 holdout = Holdout(fraction_train=0.75)
 model = ConstantRegressor()
 resampler = Resampler(resampling_strategy=holdout, model=model)
@@ -19,20 +18,18 @@ fitresult, cache, report = MLJ.fit(resampler, 1, X, y)
 @test fitresult ≈ 2/3
 
 mach = machine(model, X, y)
-@test evaluate(mach, holdout) ≈ 2/3
+@test evaluate!(mach, resampling_strategy=holdout) ≈ 2/3
 
 x1 = ones(10)
 x2 = ones(10)
 X = DataFrame(x1=x1, x2=x2)
 y = [1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0]
 
-
-## CV
-
+# cv:
 cv=CV(nfolds=5)
 model = ConstantRegressor()
 mach = machine(model, X, y)
-errs = evaluate(mach, cv)
+errs = evaluate!(mach, resampling_strategy=cv)
 for e in errs
     @test e ≈ 1/2 || e ≈ 3/4
 end
@@ -47,7 +44,7 @@ resampling_machine = machine(resampler, X, y)
 fit!(resampling_machine)
 e1=evaluate(resampling_machine)
 mach = machine(ridge_model, X, y)
-e1 ≈ evaluate(mach, holdout)
+e1 ≈ evaluate!(mach, holdout)
 ridge_model.lambda=1.0
 fit!(resampling_machine, verbosity=2)
 e2=evaluate(resampling_machine)
@@ -59,12 +56,11 @@ resampling_machine = machine(resampler, X, y)
 fit!(resampling_machine)
 e1=evaluate(resampling_machine)
 mach = machine(ridge_model, X, y)
-e1 ≈ evaluate(mach, cv)
+e1 ≈ evaluate!(mach, cv)
 ridge_model.lambda=10.0
 fit!(resampling_machine, verbosity=2)
 e2=evaluate(resampling_machine)
 @test mean(e1) != mean(e2)
-
 
 end
 true
