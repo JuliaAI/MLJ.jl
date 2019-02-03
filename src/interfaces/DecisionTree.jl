@@ -103,11 +103,13 @@ function MLJBase.fit(model::DecisionTreeClassifier{T2}
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
 
+    Xmatrix = MLJBase.matrix(X)
+    
     decoder = MLJBase.CategoricalDecoder(y)
     y_plain = MLJBase.transform(decoder, y)
 
     tree = DecisionTree.build_tree(y_plain
-                                   , X
+                                   , Xmatrix
                                    , model.n_subfeatures
                                    , model.max_depth
                                    , model.min_samples_leaf
@@ -133,13 +135,13 @@ function MLJBase.fit(model::DecisionTreeClassifier{T2}
 end
 
 #> method to coerce generic data into form required by fit:
-MLJBase.coerce(model::DecisionTreeClassifier, Xtable) = MLJBase.matrix(Xtable)
 
 function MLJBase.predict(model::DecisionTreeClassifier{T}
                      , fitresult
                      , Xnew) where T
+    Xmatrix = MLJBase.matrix(Xnew)
     tree, decoder = fitresult
-    return MLJBase.inverse_transform(decoder, DecisionTree.apply_tree(tree, Xnew))
+    return MLJBase.inverse_transform(decoder, DecisionTree.apply_tree(tree, Xmatrix))
 end
 
 # metadata:

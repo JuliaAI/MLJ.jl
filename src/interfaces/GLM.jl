@@ -29,31 +29,23 @@ const OLS = OLSRegressor
 const LinearRegression = OLSRegressor
 
 ####
-#### Data preparation
-####
-
-MLJBase.coerce(model::OLSRegressor, Xtable) = (MLJBase.matrix(Xtable), MLJBase.schema(Xtable).names)
-
-function MLJBase.getrows(model::OLSRegressor, X, r)
-    matrix, col_names = X
-    return (matrix[r,:], col_names)
-end
-
-####
 #### fit/predict OLSRegressor
 ####
 
-function MLJBase.fit(model::OLSRegressor, verbosity::Int, Xplus, y::Vector)
-    X, features = Xplus
+function MLJBase.fit(model::OLSRegressor, verbosity::Int, X, y::Vector)
 
+    Xmatrix = MLJBase.matrix(X)
+    features = MLJBase.schema(X).names
+    
     if model.fit_intercept
-        fitresult = GLM.lm(hcat(X, ones(eltype(X), size(X, 1), 1)), y)
+        fitresult = GLM.lm(hcat(Xmatrix, ones(eltype(Xmatrix), size(Xmatrix, 1), 1)), y)
     else
-        fitresult = GLM.lm(X, y)
+        fitresult = GLM.lm(Xmatrix, y)
     end
 
     coefs = GLM.coef(fitresult)
 
+    ## TODO: add feature importance curve to report using `features`
     report = Dict(:coef => coefs[1:end-Int(model.fit_intercept)]
                 , :intercept => ifelse(model.fit_intercept, coefs[end], nothing)
                 , :deviance => GLM.deviance(fitresult)
@@ -66,9 +58,9 @@ function MLJBase.fit(model::OLSRegressor, verbosity::Int, Xplus, y::Vector)
 end
 
 function MLJBase.predict(model::OLSRegressor, fitresult::OLSFitResult, Xnew)
-    X, features = Xnew
-    model.fit_intercept && (X = hcat(X, ones(eltype(X), size(X, 1), 1)))
-    return GLM.predict(fitresult, X)
+    Xmatrix = MLJBase.matrix(Xnew)
+    model.fit_intercept && (Xmatrix = hcat(Xmatrix, ones(eltype(Xmatrix), size(Xmatrix, 1), 1)))
+    return GLM.predict(fitresult, Xmatrix)
 end
 
 # metadata:
