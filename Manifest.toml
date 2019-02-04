@@ -128,8 +128,8 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MLJBase]]
-deps = ["CategoricalArrays", "DataFrames", "Distributions", "Statistics", "Tables"]
-git-tree-sha1 = "5aa3f45ceaf474662142e61e89a4cbeb6f538c2a"
+deps = ["CategoricalArrays", "Distributions", "Statistics", "Tables"]
+git-tree-sha1 = "36101410be08c98c99dd5a5f301fb79f0f1866a8"
 repo-rev = "master"
 repo-url = "https://github.com/alan-turing-institute/MLJBase.jl"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
@@ -326,6 +326,6 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[WeakRefStrings]]
 deps = ["Missings", "Random", "Test"]
-git-tree-sha1 = "1a9511b00152bbecaf3cd59d1fadd5d23e7bb1f9"
+git-tree-sha1 = "7f8ba9345c80121e49944a9c7d9c2bc76da5f623"
 uuid = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
-version = "0.5.4"
+version = "0.5.5"
