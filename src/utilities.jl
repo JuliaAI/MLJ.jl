@@ -1,5 +1,5 @@
 """
-    partition(rows::AbstractVector{Int}, fractions...)
+    partition(rows::AbstractVector{Int}, fractions...; shuffle=false)
 
 Splits the vector `rows` into a tuple of vectors whose lengths are
 given by the corresponding `fractions` of `length(rows)`. The last

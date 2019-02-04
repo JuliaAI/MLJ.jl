@@ -90,7 +90,7 @@ function evaluate!(mach::Machine, resampling_strategy::CV;
     function get_measure(f, s)
         test = rows[f:s] # TODO: replace with views?
         train = vcat(rows[1:(f - 1)], rows[(s + 1):end])
-        fit!(mach, rows=train; verbosity=verbosity-1)
+        fit!(mach; rows=train, verbosity=verbosity-1)
         yhat = operation(mach, selectrows(X, test))    
         return measure(y[test], yhat)
     end
