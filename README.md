@@ -31,18 +31,17 @@ import MLJBase, which has its own
 - Option to tune hyperparameters using gradient descent and automatic
   differentiation (for learning algorithms written in Julia).
 
-- Data agnostic: Train models on any data supported by the Queryverse
-[iterable tables
-interface](https://github.com/queryverse/IterableTables.jl). &#10004;
+- Data agnostic: Train models on any data supported by the Tables.jl 
+[interface](https://github.com/JuliaData/Tables.jl). &#10004;
 
 - Intuitive syntax for building arbitrarily complicated
-  learning networks. &#10004;
+  learning networks .&#10004;
   
 - Learning networks can be exported as self-contained composite models &#10004;, but
   common networks (e.g., linear pipelines, stacks) come ready to plug-and-play.
 
 - Performant parallel implementation of large homogeneous ensembles
-  of arbitrary models (e.g., random forests).
+  of arbitrary models (e.g., random forests). &#10004;
 
 - "Task" interface matches machine learning problem to available models.
 
@@ -53,7 +52,7 @@ interface](https://github.com/queryverse/IterableTables.jl). &#10004;
 
 ### Requirements
 
-Julia 0.7
+* Julia 1.0 or higher
 
 
 ### Installation
@@ -61,11 +60,9 @@ Julia 0.7
 In the Julia REPL run `]add https://github.com/alan-turing-institute/MLJBase.jl` first and `]add https://github.com/alan-turing-institute/MLJ.jl.git` afterwards.
 
 
-### Basic train and test
-
-See also the MLJ [tour](doc/tour.ipynb).
-
 ### Basic training and testing
+
+For more detail and features, see the MLJ [tour](doc/tour.ipynb).
 
 Let's load data and define train and test rows:
 
@@ -225,7 +222,7 @@ best_model = tuned_ensemble.report[:best_model]
 
 Diego Arenas, Edoardo Barp, Anthony Blaom, Gergö Bohner, Valentin
 Churvay, Harvey Devereux, Thibaut Lienart, Franz J Király, Mohammed
-Nook, Annika Stechemesser, Yiannis Simillides, Sebastian Vollmer; Mike
+Nook, Ayush Shridhar, Yiannis Simillides, Annika Stechemesser, Sebastian Vollmer; Mike
 Innes in partnership with Julia Computing
 
 We are looking for new collaborators @ the Alan Turing Institute! 
@@ -239,12 +236,12 @@ We are looking for new collaborators @ the Alan Turing Institute!
 ### History
 
 Predecessors of the current package are
-[AnalyticalEngine.jl](https://github.com/tlienart/AnalyticalEngine.jl),
-[Orchestra.jl](https://github.com/svs14/Orchestra.jl), and
-[Koala.jl](https://github.com/ablaom/Koala.jl). Work continued as a
-research study group at the Univeristy of Warwick, beginning with a
-review of existing ML Modules that are available in Julia
-([in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational),
+[AnalyticalEngine.jl](https://github.com/tlienart/AnalyticalEngine.jl)
+and [Orchestra.jl](https://github.com/svs14/Orchestra.jl), and
+[Koala.jl](https://github.com/ablaom/Koala.jl). Work
+continued as a research study group at the University of Warwick,
+beginning with a review of existing ML Modules that were available in
+Julia at the time ([in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational),
 [overview](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Package%20Review)).
 
 ![alt text](material/packages.jpg)

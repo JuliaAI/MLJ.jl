@@ -1,5 +1,5 @@
 # TODO: add evaluation metric:
-# TODO: add `inputs_can_be` and `outputs_are`
+# TODO: add `input_kinds` and `outputs_are`
 # TODO: add multiple targets
 
 abstract type Task <: MLJType end
@@ -47,16 +47,16 @@ end
 
 ## RUDIMENTARY TASK OPERATIONS
 
-nrows(task::Task) = nrows(task.data)
+nrows(task::Task) = schema(task.data).nrows
 Base.eachindex(task::Task) = Base.OneTo(nrows(task))
 
-features(task::Task) = filter!(task.data[Names]) do ftr
+features(task::Task) = filter!(schema(task.data).names |> collect) do ftr
     !(ftr in task.ignore)
 end
 
-features(task::SupervisedTask) = filter(task.data[Names]) do ftr
+features(task::SupervisedTask) = filter(schema(task.data).names |> collect) do ftr
     ftr != task.target && !(ftr in task.ignore)
 end
 
-X_and_y(task::SupervisedTask) = (task.data[Cols, features(task)],
-                                 task.data[Cols, task.target])
+X_and_y(task::SupervisedTask) = (selectcols(task.data, features(task)),
+                                 selectcols(task.data, task.target))

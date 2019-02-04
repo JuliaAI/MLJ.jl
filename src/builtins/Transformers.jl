@@ -8,10 +8,13 @@ export UnivariateStandardizer, Standardizer
 export UnivariateBoxCoxTransformer
 
 import MLJBase: MLJType, Unsupervised
+import MLJBase: schema, selectcols, table
+import MLJBase
 import DataFrames: names, AbstractDataFrame, DataFrame, eltypes
 import Distributions
 using Statistics
-using Tables
+# using Tables
+
 
 # to be extended:
 import MLJBase: fit, transform, inverse_transform
@@ -24,6 +27,7 @@ const N_VALUES_THRESH = 16 # for BoxCoxTransformation
 
 ## FOR FEATURE (COLUMN) SELECTION
 
+# TODO - make input data agnositic!!
 """
     FeatureSelector(features=Symbol[])
 
@@ -59,12 +63,29 @@ function transform(transformer::FeatureSelector, features, X)
     issubset(Set(features), Set(names(X))) ||
         throw(error("Supplied frame does not admit previously selected features."))
     return X[features]
-end 
+end
+
+# metadata:
+MLJBase.load_path(::Type{<:FeatureSelector}) = "MLJ.FeatureSelector" 
+MLJBase.package_url(::Type{<:FeatureSelector}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.package_name(::Type{<:FeatureSelector}) = "MLJ"
+MLJBase.package_uuid(::Type{<:FeatureSelector}) = ""
+MLJBase.is_pure_julia(::Type{<:FeatureSelector}) = :yes
+MLJBase.input_kinds(::Type{<:FeatureSelector}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
+MLJBase.output_kind(::Type{<:FeatureSelector}) = :same_as_inputs
+MLJBase.output_quantity(::Type{<:FeatureSelector}) = :multivariate
 
 
 ## FOR RELABELLING BY CONSECUTIVE INTEGERS
+
+# TODO: Fix so categorical levels are maintained, even "invisible" ones.
 """
-    Relabel with consecutive integers
+    ToIntTransformer
+
+Univariate transformer for relabelling with consecutive integers. Does
+not keep all levels of a `CategoricalVector` - only those manifest in
+the fitting input.
+
 """
 mutable struct ToIntTransformer <: Unsupervised
     sorted::Bool
@@ -145,6 +166,16 @@ end
 inverse_transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T},
                   w::AbstractVector{Int}) where T = T[fitresult.T_given_int[y] for y in w]
 
+MLJBase.load_path(::Type{<:ToIntTransformer}) = "MLJ.ToIntTransformer" 
+MLJBase.package_url(::Type{<:ToIntTransformer}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.package_name(::Type{<:ToIntTransformer}) = "MLJ"
+MLJBase.package_uuid(::Type{<:ToIntTransformer}) = ""
+MLJBase.is_pure_julia(::Type{<:ToIntTransformer}) = :yes
+MLJBase.input_kinds(::Type{<:ToIntTransformer}) = [:multiclass, :ordered_factor_finite]
+MLJBase.input_quantity(::Type{<:ToIntTransformer}) = :univariate
+MLJBase.output_kind(::Type{<:ToIntTransformer}) = :multiclass
+MLJBase.output_quantity(::Type{<:ToIntTransformer}) = :univariate
+
 
 ## UNIVARIATE STANDARDIZATION
 
@@ -181,14 +212,54 @@ end
 inverse_transform(transformer::UnivariateStandardizer, fitresult, w) =
     [inverse_transform(transformer, fitresult, y) for y in w]
 
+# metadata:
+MLJBase.load_path(::Type{<:UnivariateStandardizer}) = "MLJ.UnivariateStandardizer" 
+MLJBase.package_url(::Type{<:UnivariateStandardizer}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.package_name(::Type{<:UnivariateStandardizer}) = "MLJ"
+MLJBase.package_uuid(::Type{<:UnivariateStandardizer}) = ""
+MLJBase.is_pure_julia(::Type{<:UnivariateStandardizer}) = :yes
+MLJBase.input_kinds(::Type{<:UnivariateStandardizer}) = [:multiclass, :ordered_factor_finite]
+MLJBase.input_quantity(::Type{<:UnivariateStandardizer}) = :univariate
+MLJBase.output_kind(::Type{<:UnivariateStandardizer}) = :multiclass
+MLJBase.output_quantity(::Type{<:UnivariateStandardizer}) = :univariate
 
-## STANDARDIZATION OF ORDINAL FEATURES OF A DATAFRAME
 
-# TODO: reimplement in simpler, safer way: fitresult is two vectors:
-# one of features that are transformed, one of corresponding
-# univariate machines. Make data container agnostic.
+## STANDARDIZATION OF ORDINAL FEATURES OF TABULAR DATA
 
-""" Standardizes the columns of eltype <: AbstractFloat unless non-empty `features` specfied."""
+"""
+    Standardizer(; features=Symbol[])
+
+Unsupervised model for standardizing (whitening) the columns of
+tabular data. If `features` is empty then all columns of eltype
+`AbstractFloat` will be standardized. For different behaviour, specify
+the names of features to be standardized. Presently returns a
+`DataFrame`.
+
+    using DataFrames
+    X = DataFrame(x1=[0.2, 0.3, 1.0], x2=[4, 2, 3])
+    stand_model = Standardizer()
+    transform(fit!(machine(stand_model, X)), X)
+
+    3×2 DataFrame
+    │ Row │ x1        │ x2    │
+    │     │ Float64   │ Int64 │
+    ├─────┼───────────┼───────┤
+    │ 1   │ -0.688247 │ 4     │
+    │ 2   │ -0.458831 │ 2     │
+    │ 3   │ 1.14708   │ 3     │
+
+    stand_model.features=[:x1, :x2]
+    transform(fit!(machine(stand_model, X)), X)
+
+    3×2 DataFrame
+    │ Row │ x1        │ x2      │
+    │     │ Float64   │ Float64 │
+    ├─────┼───────────┼─────────┤
+    │ 1   │ -0.688247 │ 1.0     │
+    │ 2   │ -0.458831 │ -1.0    │
+    │ 3   │ 1.14708   │ 0.0     │
+
+"""
 mutable struct Standardizer <: Unsupervised
     features::Vector{Symbol} # features to be standardized; empty means all of
 end
@@ -196,52 +267,44 @@ end
 # lazy keyword constructor:
 Standardizer(; features=Symbol[]) = Standardizer(features)
 
-struct StandardizerFitResult <: MLJType
-    fitresults::Matrix{Float64}
-    features::Vector{Symbol} # all the feature labels of the data frame fitted
-    is_transformed::Vector{Bool}
-end
-
 # null fitresult:
 StandardizerFitResult() = StandardizerFitResult(zeros(0,0), Symbol[], Bool[])
 
 function fit(transformer::Standardizer, verbosity::Int, X::Any)
     # if using Query.jl, replace below code with
-    # features = df |> @take(1) |> @map(fieldnames(typeof(_))) |> @mapmany(_, __)
+    # all_features = df |> @take(1) |> @map(fieldnames(typeof(_))) |> @mapmany(_, __)
     # Since this is a really dirty way of proceeding, I've used
     # Tables.jl for now.
-    features = collect(propertynames(first(Tables.rows(X))))
+    _schema =  schema(X)
+    all_features = _schema.names
     
-    # determine indices of features to be transformed
-    features_to_try = (isempty(transformer.features) ? features : transformer.features)
-    is_transformed = Array{Bool}(undef, length(features))
-    for j in 1:length(features)
-        if features[j] in features_to_try && Tables.schema(X).types[j] <: AbstractFloat
-            is_transformed[j] = true
-        else
-            is_transformed[j] = false
+    # determine indices of all_features to be transformed
+    if isempty(transformer.features)
+        cols_to_fit = filter!(eachindex(all_features)|>collect) do j
+            _schema.eltypes[j] <: AbstractFloat
+        end
+    else
+        cols_to_fit = filter!(eachindex(all_features)|>collect) do j
+            all_features[j] in transformer.features && _schema.eltypes[j] <: Real
         end
     end
+    
+    fitresult_given_feature = Dict{Symbol,Tuple{Float64,Float64}}()
 
-    # fit each of those features
-    fitresults = Array{Float64}(undef, 2, length(features))
+    # fit each feature
     verbosity < 2 || @info "Features standarized: "
-    for j in 1:length(features)
-        if is_transformed[j]
-            fitresult, cache, report =
-                fit(UnivariateStandardizer(), verbosity-1, getproperty(X, propertynames(first(Tables.rows(X)))[j]))
-            fitresults[:,j] = [fitresult...]
-            verbosity < 2 ||
-                @info "  :$(features[j])    mu=$(fitresults[1,j])  sigma=$(fitresults[2,j])"
-        else
-            fitresults[:,j] = Float64[0.0, 1.0]
-        end
+    for j in cols_to_fit
+        col_fitresult, cache, report =
+            fit(UnivariateStandardizer(), verbosity - 1, selectcols(X, j))
+        fitresult_given_feature[all_features[j]] = col_fitresult
+        verbosity < 2 ||
+            @info "  :$(all_features[j])    mu=$(col_fitresult[1])  sigma=$(col_fitresult[2])"
     end
     
-    fitresult = StandardizerFitResult(fitresults, features, is_transformed)
+    fitresult = fitresult_given_feature
     cache = nothing
     report = Dict{Symbol,Any}()
-    report[:features_transformed]=[features[is_transformed]]
+    report[:features_fit]=keys(fitresult_given_feature)
     
     return fitresult, cache, report
     
@@ -249,22 +312,42 @@ end
 
 function transform(transformer::Standardizer, fitresult, X)
 
-    collect(propertynames(first(Tables.rows(X)))) == fitresult.features ||
-        error("Attempting to transform data frame with incompatible feature labels.")
+    # `fitresult` is dict of column fitresults, keyed on feature names
 
-    Xnew = deepcopy(X) # make a copy of X, working even for `SubDataFrames`
-    univ_transformer = UnivariateStandardizer()
-    for j in 1:length(propertynames(first(Tables.rows(X))))
-        if fitresult.is_transformed[j]
-            # extract the (mu, sigma) pair:
-            univ_fitresult = (fitresult.fitresults[1,j], fitresult.fitresults[2,j])  
-            getproperty(Xnew, propertynames(first(Tables.rows(Xnew)))[j]) .= 
-                transform(univ_transformer, univ_fitresult, getproperty(X, propertynames(first(Tables.rows(X)))[j]))
+    features_to_be_transformed = keys(fitresult)
+
+    all_features = schema(X).names
+    
+    issubset(Set(features_to_be_transformed), Set(all_features)) ||
+        error("Attempting to transform data with incompatible feature labels.")
+
+    col_transformer = UnivariateStandardizer()
+
+    cols = map(all_features) do ftr
+        if ftr in features_to_be_transformed
+            transform(col_transformer, fitresult[ftr], selectcols(X, ftr))
+        else
+            selectcols(X, ftr)
         end
     end
-    return Xnew
+
+    named_cols = NamedTuple{all_features}(tuple(cols...))
+        
+    return table(named_cols, prototype=X)
 
 end    
+
+# metadata:
+MLJBase.load_path(::Type{<:Standardizer}) = "MLJ.Standardizer" 
+MLJBase.package_url(::Type{<:Standardizer}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.package_name(::Type{<:Standardizer}) = "MLJ"
+MLJBase.package_uuid(::Type{<:Standardizer}) = ""
+MLJBase.is_pure_julia(::Type{<:Standardizer}) = :yes
+MLJBase.input_kinds(::Type{<:Standardizer}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
+MLJBase.input_quantity(::Type{<:Standardizer}) = :multivariate
+MLJBase.output_kind(::Type{<:Standardizer}) = :same_as_inputs
+MLJBase.output_quantity(::Type{<:Standardizer}) = :multivariate
+
 
 ## UNIVARIATE BOX-COX TRANSFORMATIONS
 
@@ -382,6 +465,18 @@ function inverse_transform(transformer::UnivariateBoxCoxTransformer,
                            fitresult, w::AbstractVector{T}) where T <: Real
     return [inverse_transform(transformer, fitresult, y) for y in w]
 end
+
+# metadata:
+MLJBase.load_path(::Type{<:UnivariateBoxCoxTransformer}) = "MLJ.UnivariateBoxCoxTransformer" 
+MLJBase.package_url(::Type{<:UnivariateBoxCoxTransformer}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.package_name(::Type{<:UnivariateBoxCoxTransformer}) = "MLJ"
+MLJBase.package_uuid(::Type{<:UnivariateBoxCoxTransformer}) = ""
+MLJBase.is_pure_julia(::Type{<:UnivariateBoxCoxTransformer}) = :yes
+MLJBase.input_kinds(::Type{<:UnivariateBoxCoxTransformer}) = [:continuous,]
+MLJBase.input_quantity(::Type{<:UnivariateBoxCoxTransformer}) = :univariate
+MLJBase.output_kind(::Type{<:UnivariateBoxCoxTransformer}) = :continuous
+MLJBase.output_quantity(::Type{<:UnivariateBoxCoxTransformer}) = :univariate
+
 
 end # end module
 

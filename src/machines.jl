@@ -11,14 +11,22 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
     
     function Machine{M}(model::M, args...) where M<:Model
 
-        # check number of arguments for model subtypes:
-        !(M <: Supervised) || length(args) > 1 ||
-            throw(error("Wrong number of arguments. "*
-                        "You must provide target(s) for supervised models."))
+        if M <: Supervised
+            length(args) > 1 ||
+                error("Wrong number of arguments. "*
+                      "You must provide target(s) for supervised models.")
+            nrows = schema(args[1]).nrows
+            good = reduce(*, [length(y) == nrows for y in args[2:end]])
+            good || error("Machine data arguments of incompatible sizes.")
+        end
         !(M <: Unsupervised) || length(args) == 1 ||
-            throw(error("Wrong number of arguments. "*
-                        "Use NodalMachine(model, X) for an unsupervised  model."))
+            error("Wrong number of arguments. "*
+                  "Use NodalMachine(model, X) for an unsupervised  model.")
         
+        Tables.istable(args[1]) ||
+            error("First data argument of machine must be an iterable table. "*
+                  "Use DataFrame(X) to wrap an abstract matrix X as a DataFrame.")
+
         machine = new{M}(model)
 
         machine.args = args
@@ -37,9 +45,8 @@ Machine(model::M, args...) where M<:Model = Machine{M}(model, args...)
 # Machine(model::Model, task::SupervisedTask) = Machine(model, X_and_y(task)...)
 # Machine(model::Model, task::UnsupervisedTask) = Machine(model, task.data)
 
-# TODO: The fit code below is almost identical to NodalMachine
-# fit code in networks.jl and we ought to combine the two by, say,
-# making generic data and vectors callable on rows.
+# Note: The following method is written to fit! `NodalMachine`s
+# defined in networks.jl, in addition to `Machine`s defined above.
 
 function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
@@ -57,14 +64,8 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
     rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
 
-    if mach.model isa Supervised
-        X = coerce(mach.model, mach.args[1][Rows, rows])
-        ys = [arg[Rows, rows] for arg in mach.args[2:end]]
-        args = (X, ys...)
-    else
-        args = [arg[Rows, rows] for arg in mach.args]
-    end
-
+    args = [selectrows(arg, rows) for arg in mach.args]
+    
     if !isdefined(mach, :fitresult) || rows_have_changed || force 
         verbosity < 1 || @info "Training $mach."
         mach.fitresult, mach.cache, report =

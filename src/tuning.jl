@@ -58,9 +58,9 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
     end
 
     # nested sequence of `:hyperparameter => iterator` pairs:
-    param_iterators = copy(tuned_model.nested_ranges, iterators)
+    nested_iterators = copy(tuned_model.nested_ranges, iterators)
 
-    iterators = flat_values(param_iterators)
+    iterators = flat_values(nested_iterators)
     n_iterators = length(iterators)
     A = unwind(iterators...)
     N = size(A, 1)
@@ -72,26 +72,26 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
 
     # initialize search for best model:
     m = 1 # model counter
-    best_model = tuned_model.model
+    best_model = deepcopy(tuned_model.model)
     best_measurement = Inf
 
     # evaluate all the models using specified resampling:
     # TODO: parallelize!
 
-    meter = Progress(N, dt=0.5, desc="Searching a $N-point grid for best model: ",
-                     barglyphs=BarGlyphs("[=> ]"), barlen=50, color=:yellow)
-
+    meter = Progress(N+1, dt=0, desc="Searching a $N-point grid for best model: ",
+                     barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
+    next!(meter)
     for i in 1:N
 
         verbosity < 1 || next!(meter)
 
-        new_params = copy(param_iterators, Tuple(A[i,:]))   
+        new_params = copy(nested_iterators, Tuple(A[i,:]))   
 
         # mutate `clone` (the model to which `resampler` points):
         set_params!(clone, new_params)
 
         fit!(resampling_machine, verbosity=verbosity-1)
-        e = evaluate(resampling_machine)
+        e = mean(evaluate(resampling_machine))
         if e < best_measurement
             best_model = deepcopy(clone)
             best_measurement = e

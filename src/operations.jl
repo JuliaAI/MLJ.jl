@@ -31,19 +31,6 @@ macro extend_to_machines(operation)
                                          machine.fitresult,
                                          args...)
             else
-#                throw(error("$machine with model $(machine.model) is not trained and so cannot predict."))
-                throw(error("$machine is not trained and so cannot predict."))
-            end
-        end
-
-        # for supervised models (data must be coerced):
-        function $(esc(operation))(machine::AbstractMachine{M}, Xtable) where M<:Supervised
-            if isdefined(machine, :fitresult)
-                return $(esc(operation))(machine.model,
-                                         machine.fitresult,
-                                         coerce(machine.model, Xtable))
-            else
-#                throw(error("$machine with model $(machine.model) is not trained and so cannot predict."))
                 throw(error("$machine is not trained and so cannot predict."))
             end
         end
@@ -77,5 +64,5 @@ end
 
 # experimental:
 predict(machine::Machine{<:Supervised}; rows=rows) =
-    predict(machine, machine.args[1][Rows, rows])
+    predict(machine, selectrows(machine.args[1], rows))
 

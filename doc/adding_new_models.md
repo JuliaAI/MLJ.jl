@@ -1,4 +1,4 @@
-# Implementing the MLJ interface for a learning algorithm 
+# Implementing the MLJ interface for a learning algorithm
 
 This guide outlines the specification of the MLJ model interface. The
 machine learning tools provided by MLJ can be applied to the models
@@ -7,7 +7,14 @@ in any package that imports the module
 and implements the API defined there as outlined below.
 
 To implement the API described here, some familiarity with the
-following packages is helpful: [Distributions.jl](https://github.com/JuliaStats/Distributions.jl) (for probabilistic predictions), [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl) (essential if you are implementing a classifier), [Query.jl](https://github.com/queryverse/Query.jl) (if you're algorithm needs input data in a novel format).
+following packages is helpful:
+[Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
+(for probabilistic predictions),
+[CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl)
+(essential if you are implementing a classifier, or a learner that
+handles categorical inputs),
+[Tables.jl](https://github.com/JuliaData/Tables.jl) (if you're
+algorithm needs input data in a novel format).
 
 For a quick and dirty implementation of user-defined models see [here]().
 
@@ -69,7 +76,7 @@ Here the parameter `R` refers to a fit-result type. By declaring a
 model to be a subtype of `MLJBase.Supervised{R}` you guarantee
 the fit-result to be of type `R` and, if `R` is concrete, one may
 improve the performance of homogeneous ensembles of the model (as
-defined by the built-in MLJ module `Ensembles`). There is no abstract
+defined by the built-in MLJ `EnsembleModel` wrapper). There is no abstract
 type for fit-results because these types are generally declared
 outside of MLJBase.
 
@@ -109,12 +116,14 @@ regressors) overriding obvious fallbacks provided by
 
 ### New model type declarations
 
-Here is an example of a concrete model type declaration:
+Here is an example of a concrete supervised model type declaration:
 
 ````julia
 import MLJ
 
-R{S,T} = Tuple{Matrix{S},Vector{T}} where {S<:AbstractFloat,T<:AbstractFloat}
+# R{S, T} is the parametric type of the `fitresult` object
+# that will be generated when `fit(KNNRegressor...)` is called
+const R{S,T} = Tuple{Matrix{S},Vector{T}} where {S<:AbstractFloat,T<:AbstractFloat}
 
 mutable struct KNNRegressor{S,T,M,K} <: MLJBase.Deterministic{R{S,T}}
     source_type::S
@@ -129,7 +138,14 @@ Models (which are mutable) should not be given internal
 constructors. It is recommended that they be given an external lazy
 keyword constructor of the same name that defines default values (for
 every field) and checks their validity, by calling a `clean!` method
-(see below).
+(see further below).
+
+```julia
+# another, simple example, demonstrating with keyword with default value
+# assuming the only hyperparameter in KMeans is "k" the number of clusters.
+# the clean! method here should check that a given `k` is valid (>0).
+KMeans(; k=3)
+```
 
 
 ### Supervised models
@@ -140,70 +156,65 @@ restrict attention to algorithms handling a *single* (univariate)
 target. Differences in the multivariate case are described later.
 
 
-#### The form of data for fitting and prediction, and the coerce method
+#### The form of data for fitting and prediction
 
-The MLJ model specification has no explicit requirement for the type
-of `X`, the argument representing input features appearing in the
-compulsory `fit` and `predict` methods described below. However, the
-MLJ user is free to present input features in any of the
-[formats](https://github.com/queryverse/IterableTables.jl)
-implementing the Queryverse iterable tables interface (which can be
-queried using [Query](https://github.com/queryverse/Query.jl)). If the
-`fit` and `predict` methods require data in a different or more
-specific form, one must overload the following method (whose fallback
-just returns `Xtable`):
+The argument `X` passed to the `fit` method described below, and the
+argument `Xnew` of the `predict` (or `transform`) method, are
+arbitrary tables. Here *table* means an object supporting
+the[Tables.jl](https://github.com/JuliaData/Tables.jl) interface. If
+the core algorithm requires data in a different or more specific form,
+then `fit` will need to coerce the table into the form desired. To
+this end, MLJ provides the convenience method `MLJBase.matrix`;
+`MLJBase.matrix(Xtable)` is a two-dimensional `Array{T}` where `T` is
+the tightest common type of elements of `Xtable`, and `Xtable` is any
+table. 
 
-````julia
-MLJBase.coerce(model::Supervised{R}, Xtable) -> X  # for use in `fit`, `predict`, etc
-````
+Other convenience methods provided by MLJBase for handling tabular
+data are: `selectrows`, `selectcols`, `schema` (for extracting the
+size, names and eltypes of a table) and `table` (for materializing an
+abstract matrix, or named tuple of vectors, as a table matching a
+given prototype). Query the doc-strings for details.
 
-To this end, MLJ provides the convenience method `MLJBase.matrix`;
-`MLJBase.matrix(Xtable)` is a two-dimensional `Array{T}` where `T` is the
-tightest common type of elements of `Xtable`, and `Xtable` is any
-iterable table.
-
-In those special cases where the return type `Special` of `coerce` is not a [Queryverse iterable
-table](https://github.com/queryverse/IterableTables.jl) or a `Matrix` (with rows corresponding to patterns and
-columns corresponding to features) one must tell MLJ how to access its pattern rows, by defining a method:
-
-````julia
-getrows(model::SomeSupervisedModel, X::Special, r) -> X_restricted
-````
-
-Here `r` is any integer, unitrange or colon `:`, and `X_restricted` is
-the restriction of `X` to the patterns with index or indices `r`.
+Note that generally the same type coercions applied to `X` by `fit` will need to
+be applied by `predict` to `Xnew`. 
 
 
-In contrast, the target data `y` passed to training will always be an
+**Important convention** It is to be understood that the columns of the
+table `X` correspond to features and the rows to patterns.
+
+The target data `y` passed to `fit` will always be an
 `Vector{F}` for some `F<:AbstractFloat` - in the case of regressors -
-or a `CategoricalVector` - in the case of classifiers. (At present only
-target `CategoricalVector`s of the default reference type `UInt32` are
-supported.) 
+or a `CategoricalVector` - in the case of classifiers. (At present
+only target `CategoricalVector`s of the default reference type
+`UInt32` are supported.) If the target to be predicted is an *ordered*
+factor, then an ordered `CategoricalVector` is to be expected; if the
+ordered factor is infinite (unbounded), then a `Vector{<:Integer}` is
+to be expected.
 
 
 #### The fit method
 
 A compulsory `fit` method returns three objects:
 
-````julia 
-MLJBase.fit(model::SomeSupervisedModelType, verbosity::Int, X, y) -> fitresult, cache, report 
+````julia
+MLJBase.fit(model::SomeSupervisedModelType, verbosity::Int, X, y) -> fitresult, cache, report
 ````
 
-Note: The `Int` typing of `verbosity` cannot be omitted. 
+Note: The `Int` typing of `verbosity` cannot be omitted.
 
-Here `fitresult::R` is the fit-result in the sense above (which
-becomes an argument for `predict` discussed below). Any
-training-related statistics, such as internal estimates of the
-generalization error, feature rankings, and coefficients in linear
-models, should be returned in the `report` object. How, or if, these
-are generated should be controlled by hyper-parameters (the fields of
-`model`). The `report` object returned is either a `Dict{Symbol,Any}`
-object, or `nothing` if there is nothing to report. So for example,
-`fit` might declare `report[:feature_importances] = ...`.  Reports get
-merged with those generated by previous calls to `fit` by MLJ. The
-value of `cache` can be `nothing` unless one is also defining an
-`update` method (see below). The Julia type of `cache` is not
-presently restricted.
+1. `fitresult::R` is the fit-result in the sense above (which becomes an
+    argument for `predict` discussed below). Any training-related statistics,
+    such as internal estimates of the generalization error, feature rankings,
+    and coefficients in linear models, should be returned in the `report`
+    object. How, or if, these are generated should be controlled by hyper-
+    parameters (the fields of `model`).
+2.  `report` is either a `Dict{Symbol,Any}` object, or `nothing` if there is
+    nothing to report. So for example, `fit` might declare
+    `report[:feature_importances] = ...`.  Reports get merged with those
+    generated by previous calls to `fit` by MLJ. The value of `cache` can be
+    `nothing` unless one is also defining an `update` method (see below). The Julia type of `cache` is not presently restricted.
+3. `cache` is either `nothing` or an object allowing to update a `fitresult`
+    more efficiently in the case where a model can be updated.
 
 It is not necessary for `fit` to provide dimension checks or to call
 `clean!` on the model; MLJ will carry out such checks.
@@ -223,16 +234,18 @@ The compulsory predict method has the form
 MLJBase.predict(model::SomeSupervisedModelType, fitresult, Xnew) -> yhat
 ````
 
-Here `Xnew` is understood to be of the same type as `X` in the `fit`
-method (MLJ will call `coerce` on the data provided by the user to obtain `Xnew`). 
+Here `Xnew` is an arbitrary table (see above).
 
 **Prediction types for deterministic responses.** In the case of
 `Deterministic` models, `yhat` must have the same type as the target
-`y` passed to the `fit` method. Note, in particular, that for
-point-value predicting classifiers, the categorical vector returned by
-`predict` *must have the same levels of the target data presented in
-training*, even if not all levels appear in the prediction
-itself. That is, we require `levels(yhat) == levels(y)`.
+`y` passed to the `fit` method (see above discussion on the form of
+data for fitting), with one exception: If predicting an infinite
+ordered factor (where `fit` receives a `Vector{<:Integer}` object) the
+prediction may be continuous, i.e., of type
+`Vector{<:AbstractFloat}`. For all other classifiers, the categorical
+vector returned by `predict` **must have the same levels of the target
+data presented in training**, even if not all levels appear in the
+prediction itself. That is, we require `levels(yhat) == levels(y)`.
 
 For code not written with the preservation of categorical
 levels in mind, MLJ provides a utility `CategoricalDecoder` which can
@@ -299,31 +312,39 @@ declarations. A full set of declarations are shown below for the
 `RidgeRegressor` type:
 
 ````julia
-MLJBase.target_kind(::Type{RidgeRegressor}) = :numeric
-MLJBase.target_quantity(::Type{RidgeRegressor}) = :univariate
-MLJBase.inputs_can_be(::Type{RidgeRegressor}) = [:numeric, ]
-MLJBase.is_pure_julia(::Type{RidgeRegressor}) = :yes
-MLJBase.package_name(::Type{RidgeRegressor}) = "MultivariateStats"
-MLJBase.package_uuid(::Type{RidgeRegressor}) = "6f286f6a-111f-5878-ab1e-185364afe411"
+MLJBase.output_kind(::Type{<:RidgeRegressor}) = :continuous
+MLJBase.output_quantity(::Type{<:RidgeRegressor}) = :univariate
+MLJBase.input_kinds(::Type{<:RidgeRegressor}) = [:continuous, ]
+MLJBase.input_quantity(::Type{<:RidgeRegressor}) = :multivariate
+MLJBase.is_pure_julia(::Type{<:RidgeRegressor}) = :yes
+MLJBase.load_path(::Type{<:RidgeRegressor}) = "MLJ.RidgeRegressor"
+MLJBase.package_name(::Type{<:RidgeRegressor}) = "MultivariateStats"
+MLJBase.package_uuid(::Type{<:RidgeRegressor}) = "6f286f6a-111f-5878-ab1e-185364afe411"
+MLJBase.package_url((::Type{<:RidgeRegressor}) = "https://github.com/JuliaStats/MultivariateStats.jl"
 ````
 
-method                   | return type       | declarable  return values | default value
--------------------------|-------------------|---------------------------|------------------------
-`target_kind`            | `Symbol`          |`:numeric`, `:binary`, `:multiclass` | `:unknown`
-`target_quantity`        | `Symbol`          |`:univariate`, `:multivariate`| `:univariate`
-`inputs_can_be`          | `Vector{Symbol}`  | one or more of: `:numeric`, `:nominal`, `:missing` | `Symbol[]`
+method                   | return type       | declarable return values | default value
+-------------------------|-------------------|---------------------------|-------------------
+`output_kind`            | `Symbol`          |`:continuous`, `:binary`, `:multiclass`, `:ordered_factor_finite`, `:ordered_factor_infinite`, `:same_as_inputs` | `:unknown`
+`output_quantity`        | `Symbol`          |`:univariate`, `:multivariate`| `:univariate`
+`input_kinds`          | `Vector{Symbol}`  | one or more of: `:continuous`, `:multiclass`, `:ordered_factor_finite`, `:ordered_factor_infinite`, `:missing` | `Symbol[]`
+`input_quantity`        | `Symbol`          | `:univariate`, `:multivariate` | `:multivariate`
 `is_pure_julia`          | `Symbol`          | `:yes`, `:no`             | `:unknown`
+`load_path`              | `String`          | unrestricted              | "unknown"
 `package_name`           | `String`          | unrestricted              | "unknown"
-`package_uuid`           | `String`          | unrestricted              | "unknown"         | 
+`package_uuid`           | `String`          | unrestricted              | "unknown"
+`package_url`            | `String`          | unrestricted              | "unknown"
 
 Note that `:binary` does not mean *boolean*. Rather, it
 means the model is a classifier but is unable to classify targets with more than two
 classes. As explained above, all classifiers are passed training targets
 as `CategoricalVector`s, whose element types are
-arbitrary. 
+arbitrary.
 
-You can test declarations of traits by calling `info(SomeModelType)`. 
+The option `:same_as_inputs` for `output_kind` is intended primarily
+for transformers, such as MLJ's built-in `FeatureSelector`.
 
+You can test declarations of traits by calling `info(SomeModelType)`.
 
 
 #### The clean! method
@@ -356,7 +377,7 @@ function MLJBase.clean!(model::RidgeRegressor)
     return warning
 end
 
-function RidgeRegressor(; lambda=0.0) 
+function RidgeRegressor(; lambda=0.0)
     model =  RidgeRegressor(lambda)
     message = MLJBase.clean!(model)     
     isempty(message) || @warn message
@@ -368,7 +389,7 @@ end
 
 An `update` method may be overloaded to enable a call by MLJ to
 retrain a model (on the same training data) to avoid repeating
-computations unnecessarily. 
+computations unnecessarily.
 
 ````julia
 MLJBase.update(model::SomeSupervisedModelType, verbosity, old_fitresult, old_cache, X, y) -> fitresult, cache, report
@@ -446,3 +467,9 @@ TODO
 <!-- will need to `Pkg.dev` your local MLJ fork first. To test your code in -->
 <!-- isolation, locally edit "test/runtest.jl" appropriately. -->
 
+### Unsupervised models
+
+<!--
+TODO:
+* specify that the output of `predict`/`transform` should be a table
+-->

@@ -8,9 +8,10 @@ export Supervised, Unsupervised, Deterministic, Probabilistic
 export partition, @curve, @pcurve, readlibsvm        # "utilities.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export misclassification_rate, cross_entropy         # "metrics.jl"
-export load_boston, load_ames, load_iris, datanow    # "datasets.jl"
+export load_boston, load_ames, load_iris             # "datasets.jl"
+export load_crabs, datanow                           # "datasets.jl"
 export SimpleCompositeModel                          # "composites.jl"
-export Holdout, CV, Resampler                        # "resampling.jl"
+export Holdout, CV, evaluate!, Resampler             # "resampling.jl"
 export Params, params, set_params!                   # "parameters.jl"
 export strange, iterator                             # "parameters.jl"
 export Grid, TunedModel, learning_curve              # "tuning.jl"
@@ -21,7 +22,7 @@ export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
 export DeterministicConstantRegressor                # "builtins/Constant.jl
 export DeterministicConstantClassifier               # "builtins/Constant.jl
 export KNNRegressor                                  # "builtins/KNN.jl"
-export RidgeRegressor                                # "builtins/LocalMulitivariateStats.jl
+export RidgeRegressor, PCA                           # "builtins/LocalMulitivariateStats.jl
 
 # defined in include files "machines.jl" and "networks.jl":
 export Machine, NodalMachine, machine
@@ -40,34 +41,35 @@ export UnivariateBoxCoxTransformer
 # export IntegerToInt64Transformer
 # export UnivariateDiscretizer, Discretizer
 
-
-# rexport from other Statistics, Distributions:
+# rexport from Statistics, Distributions:
 export pdf, mode, median, mean, info
+
+export dataframe # utilities.jl
 
 # reexport from MLJBase:
 export predict, predict_mean, predict_median, predict_mode
 export transform, inverse_transform, se, evaluate
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 
-import MLJBase: Rows, Cols, Names, Eltypes, getrows, nrows
-import MLJBase: fit, update, clean!, info, coerce
+import MLJBase: schema, selectrows, selectcols, matrix
+import MLJBase: fit, update, clean!, info
 import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: transform, inverse_transform, se, evaluate
 import MLJBase: @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 import MLJBase: average
-    
+
 using MLJBase
 
 import Requires.@require  # lazy code loading package
-using  CategoricalArrays  
+using  CategoricalArrays
 import CSV
 import DataFrames: DataFrame, AbstractDataFrame, SubDataFrame, eltypes, names
 import Distributions: pdf, mode
 import Distributions
 import StatsBase
 using ProgressMeter
-using Query
-import TableTraits
+import Tables
+# import TOML
 
 # to be extended:
 import Base.==
@@ -83,7 +85,7 @@ const srcdir = dirname(@__FILE__) # the directory containing this file:
 
 include("utilities.jl")     # general purpose utilities
 include("metrics.jl")       # loss functions
-include("tasks.jl")         
+include("tasks.jl")
 include("datasets.jl")      # locally archived tasks for testing and demos
 include("machines.jl")      # machine API
 include("networks.jl")      # for building learning networks
@@ -91,8 +93,9 @@ include("composites.jl")    # composite models, incl. learning networks exported
 include("operations.jl")    # syntactic sugar for operations (predict, transform, predict_mean, etc.)
 include("resampling.jl")    # evaluating models by assorted resampling strategies
 include("parameters.jl")    # hyper-parameter range constructors and nested hyper-parameter API
-include("tuning.jl")        
+include("tuning.jl")
 include("ensembles.jl")     # homogeneous ensembles
+include("introspection.jl") # reflection on the state of MLJ package
 
 ## LOAD BUILT-IN MODELS
 
@@ -100,7 +103,6 @@ include("builtins/Transformers.jl")
 include("builtins/Constant.jl")
 include("builtins/KNN.jl")
 include("builtins/LocalMultivariateStats.jl")
-
 
 ## SETUP LAZY PKG INTERFACE LOADING (a temporary hack)
 
@@ -129,8 +131,12 @@ end
 
 function __init__()
     @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=true
+    @load_interface Clustering "aaaa29a8-35af-508c-8bc3-b662a17a0fe5" lazy=true
+    @load_interface GLM "38e38edf-8417-5370-95a0-9cbb8c7f171a" lazy=true
 #    @load_interface  MultivariateStats "6f286f6a-111f-5878-ab1e-185364afe411" lazy=true
 end
+
+@load_interface GaussianProcesses "891a1506-143c-57d2-908e-e1f8e92e6de9" lazy=false
 
 #@load_interface XGBoost "009559a3-9522-5dbb-924b-0b6ed2b22bb9" lazy=false
 

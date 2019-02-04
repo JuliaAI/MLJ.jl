@@ -4,23 +4,24 @@
 #> may serve as a template for other interfaces introducing new
 #> Supervised subtypes. The annotations, which begin with "#>", should
 #> be removed (but copy this file first!). See also the model
-#> interface specification at "doc/adding_new_models.md".
+#> interface specification at "doc/adding_new_models.md". The
+#> assumption is that this interface is to be lazy loaded and live in
+#> "src/interfaces/".
 
-#> Glue code goes in a module, whose name is the package name with
-#> trailing underscore "_":
+#> model API implementation code goes in a module, whose name is the
+#> package name with trailing underscore "_":
 module DecisionTree_
 
 #> export the new models you're going to define (and nothing else):
-export DecisionTreeClassifier
+export DecisionTreeClassifier, DecisionTreeRegressor
 
-#> for all Supervised models:
 import MLJBase
 
 #> for all classifiers:
 using CategoricalArrays
 
 #> import package:
-import DecisionTree                
+import DecisionTree
 
 DecisionTreeClassifierFitResultType{T} =
     Tuple{Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}}, MLJBase.CategoricalDecoder{UInt32,T,1,UInt32}}
@@ -33,7 +34,7 @@ DecisionTreeClassifierFitResultType{T} =
 """
 mutable struct DecisionTreeClassifier{T} <: MLJBase.Deterministic{DecisionTreeClassifierFitResultType{T}}
     target_type::Type{T}  # target is CategoricalArray{target_type}
-    pruning_purity::Float64 
+    pruning_purity::Float64
     max_depth::Int
     min_samples_leaf::Int
     min_samples_split::Int
@@ -70,7 +71,7 @@ function DecisionTreeClassifier(
         , post_prune
         , merge_purity_threshold)
 
-    message = MLJBase.clean!(model)       #> future proof by including these 
+    message = MLJBase.clean!(model)       #> future proof by including these
     isempty(message) || @warn message #> two lines even if no clean! defined below
 
     return model
@@ -95,27 +96,29 @@ end
 #> A required `fit` method returns `fitresult, cache, report`. (Return
 #> `cache=nothing` unless you are overloading `update`)
 function MLJBase.fit(model::DecisionTreeClassifier{T2}
-             , verbosity::Int   #> must be here (and typed) even if not used (as here)
-             , X::Matrix{Float64}
+             , verbosity::Int   #> must be here (and typed!!) even if not used (as here)
+             , X
              , y::CategoricalVector{T}) where {T,T2}
 
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
 
+    Xmatrix = MLJBase.matrix(X)
+    
     decoder = MLJBase.CategoricalDecoder(y)
     y_plain = MLJBase.transform(decoder, y)
-    
+
     tree = DecisionTree.build_tree(y_plain
-                                   , X
+                                   , Xmatrix
                                    , model.n_subfeatures
                                    , model.max_depth
                                    , model.min_samples_leaf
                                    , model.min_samples_split
                                    , model.min_purity_increase)
-    if model.post_prune 
+    if model.post_prune
         tree = DecisionTree.prune_tree(tree, model.merge_purity_threshold)
     end
-    
+
     verbosity < 3 || DecisionTree.print_tree(tree, model.display_depth)
 
     fitresult = (tree, decoder)
@@ -123,31 +126,31 @@ function MLJBase.fit(model::DecisionTreeClassifier{T2}
     #> return package-specific statistics (eg, feature rankings,
     #> internal estimates of generalization error) in `report`, which
     #> should be `nothing` or a dictionary keyed on symbols.
-        
+
     cache = nothing
     report = nothing
-    
-    return fitresult, cache, report 
+
+    return fitresult, cache, report
 
 end
 
-#> method to coerce generic data into form required by fit:
-MLJBase.coerce(model::DecisionTreeClassifier, Xtable) = MLJBase.matrix(Xtable)
-
-function MLJBase.predict(model::DecisionTreeClassifier{T} 
+function MLJBase.predict(model::DecisionTreeClassifier{T}
                      , fitresult
                      , Xnew) where T
+    Xmatrix = MLJBase.matrix(Xnew)
     tree, decoder = fitresult
-    return MLJBase.inverse_transform(decoder, DecisionTree.apply_tree(tree, Xnew))
+    return MLJBase.inverse_transform(decoder, DecisionTree.apply_tree(tree, Xmatrix))
 end
 
 # metadata:
+MLJBase.load_path(::Type{<:DecisionTreeClassifier}) = "MLJ.DecisionTreeClassifier" # lazy-loaded from MLJ
 MLJBase.package_name(::Type{<:DecisionTreeClassifier}) = "DecisionTree"
 MLJBase.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+MLJBase.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bensadeghi/DecisionTree.jl"
 MLJBase.is_pure_julia(::Type{<:DecisionTreeClassifier}) = :yes
-MLJBase.inputs_can_be(::Type{<:DecisionTreeClassifier}) = [:numeric, ]
-MLJBase.target_kind(::Type{<:DecisionTreeClassifier}) = :multiclass
-MLJBase.target_quantity(::Type{<:DecisionTreeClassifier}) = :univariate
+MLJBase.input_kinds(::Type{<:DecisionTreeClassifier}) = [:continuous, ]
+MLJBase.output_kind(::Type{<:DecisionTreeClassifier}) = :multiclass
+MLJBase.output_quantity(::Type{<:DecisionTreeClassifier}) = :univariate
 
 end # module
 
@@ -155,5 +158,4 @@ end # module
 ## EXPOSE THE INTERFACE
 
 using .DecisionTree_
-export DecisionTreeClassifier         
-
+export DecisionTreeClassifier

@@ -7,15 +7,16 @@ mutable struct WrappedEnsemble{R,Atom <: Supervised{R}} <: MLJType
     ensemble::Vector{R}
 end
 
-_target_kind(Atom::Type{<:Model}) = target_kind(Atom) in [:binary, :multiclass] ? :nominal : target_kind(Atom)
-_target_kind(atom::Model) = _target_kind(typeof(atom))
+_output_kind(Atom::Type{<:Model}) =
+    output_kind(Atom) in [:binary, :multiclass, :ordered_factor_finite] ? :nominal : output_kind(Atom)
+_output_kind(atom::Model) = _output_kind(typeof(atom))
 
 # trait functions to dispatch predict method:
-_target_is(Atom::Type{<:Deterministic}) = Val((:deterministic, _target_kind(Atom), target_quantity(Atom)))
-_target_is(Atom::Type{<:Probabilistic}) =  Val((:probabilistic, _target_kind(Atom), target_quantity(Atom)))
+_output_is(Atom::Type{<:Deterministic}) = Val((:deterministic, _output_kind(Atom), output_quantity(Atom)))
+_output_is(Atom::Type{<:Probabilistic}) =  Val((:probabilistic, _output_kind(Atom), output_quantity(Atom)))
 
 predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom} = 
-    predict(wens, weights, Xnew, _target_is(Atom))
+    predict(wens, weights, Xnew, _output_is(Atom))
 
 function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:deterministic, :nominal, :univariate)})
 
@@ -37,7 +38,7 @@ function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:deterministic, :n
     return prediction
 end
 
-function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:deterministic, :numeric, :univariate)})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:deterministic, :continuous, :univariate)})
     ensemble = wens.ensemble
     
     atom = wens.atom
@@ -76,7 +77,7 @@ function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:probabilistic, :n
     return predictions
 end
 
-function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:probabilistic, :numeric, :univariate)})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:probabilistic, :continuous, :univariate)})
 
     ensemble = wens.ensemble
     
@@ -117,7 +118,8 @@ function get_ensemble(atom::Supervised{R}, verbosity, X, ys, n, n_patterns,
         verbosity < 1 || next!(progress_meter)
         train_rows = StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
         atom_fitresult, atom_cache, atom_report =
-            fit(atom, verbosity - 1, MLJBase.getrows(atom, X, train_rows), [y[train_rows] for y in ys]...)
+            fit(atom, verbosity - 1, MLJBase.selectrows(X, train_rows),
+                [y[train_rows] for y in ys]...)
         ensemble[i] = atom_fitresult
     end
     verbosity < 1 || println()
@@ -147,7 +149,7 @@ function clean!(model::DeterministicEnsembleModel{R}) where R
         "in the range (0,1]. Reset to 1. "
         model.bagging_fraction = 1.0
     end
-    if _target_kind(model.atom) == :nominal && !isempty(model.weights)
+    if _output_kind(model.atom) == :nominal && !isempty(model.weights)
         message = message*"weights will be ignored to form predictions. "
     elseif !isempty(model.weights)
         total = sum(model.weights)
@@ -178,8 +180,6 @@ function DeterministicEnsembleModel(;atom=DeterministicConstantClassifier(), wei
     
     return model
 end
-
-coerce(model::DeterministicEnsembleModel, Xtable) where R = coerce(model.atom, Xtable) 
 
 
 ## ENSEMBLE MODEL FOR PROBABILISTIC MODELS 
@@ -230,8 +230,6 @@ function ProbabilisticEnsembleModel(;atom=ConstantProbabilisticClassifier(), wei
     
     return model
 end
-
-coerce(model::ProbabilisticEnsembleModel, Xtable) where R = coerce(model.atom, Xtable) 
 
 
 ## COMMON CONSTRUCTOR
