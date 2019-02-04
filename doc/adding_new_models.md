@@ -156,27 +156,18 @@ restrict attention to algorithms handling a *single* (univariate)
 target. Differences in the multivariate case are described later.
 
 
-#### The form of data for fitting and prediction, and the coerce method
+#### The form of data for fitting and prediction
 
-The MLJ model specification has no explicit requirement for the type
-of `X`, the argument representing input features appearing in the
-compulsory `fit` and `predict` methods described below. However, the
-MLJ user is free to present input features as [any
-table](https://github.com/JuliaData/Tables.jl/blob/master/INTEGRATIONS.md)
-supported by by the
-[Tables.jl](https://github.com/JuliaData/Tables.jl) package. If the
-`fit` and `predict` methods require data in a different or more
-specific form, one must overload the following method (whose fallback
-just returns `Xtable`):
-
-````julia
-MLJBase.coerce(model::Supervised{R}, Xtable) -> X  # for use in `fit`, `predict`, etc
-````
-
-To this end, MLJ provides the convenience method `MLJBase.matrix`;
+The argument `X` passed to the `fit` method described below, and the
+argument `Xnew` of the `predict` (or `transform`) method, are
+arbitrary tables. Here *table* means an object supporting
+the[Tables.jl](https://github.com/JuliaData/Tables.jl) interface. If
+the core algorithm requires data in a different or more specific form,
+then `fit` will need to coerce the table into the form desired. To
+this end, MLJ provides the convenience method `MLJBase.matrix`;
 `MLJBase.matrix(Xtable)` is a two-dimensional `Array{T}` where `T` is
 the tightest common type of elements of `Xtable`, and `Xtable` is any
-table supported by Tables.jl.
+table. 
 
 Other convenience methods provided by MLJBase for handling tabular
 data are: `selectrows`, `selectcols`, `schema` (for extracting the
@@ -184,20 +175,14 @@ size, names and eltypes of a table) and `table` (for materializing an
 abstract matrix, or named tuple of vectors, as a table matching a
 given prototype). Query the doc-strings for details.
 
-In those special cases where the return type `Special` of `coerce` is
-not an an an `AbstractMatrix` (with rows corresponding to patterns and
-columns corresponding to features) or a table supported by Tables.jl,
-one must tell MLJ how to access its pattern rows, by defining a
-method:
+Note that generally the same type coercions applied to `X` by `fit` will need to
+be applied by `predict` to `Xnew`. 
 
-````julia
-getrows(model::SomeSupervisedModel, X::Special, r) -> X_restricted
-````
 
-Here `r` is any integer, unitrange or colon `:`, and `X_restricted` is
-the restriction of `X` to the patterns with index or indices `r`.
+**Important convention** It is to be understood that the columns of the
+table `X` correspond to features and the rows to patterns.
 
-In contrast, the target data `y` passed to `fit` will always be an
+The target data `y` passed to `fit` will always be an
 `Vector{F}` for some `F<:AbstractFloat` - in the case of regressors -
 or a `CategoricalVector` - in the case of classifiers. (At present
 only target `CategoricalVector`s of the default reference type
@@ -249,8 +234,7 @@ The compulsory predict method has the form
 MLJBase.predict(model::SomeSupervisedModelType, fitresult, Xnew) -> yhat
 ````
 
-Here `Xnew` is understood to be of the same type as `X` in the `fit`
-method (MLJ will call `coerce` on the data provided by the user to obtain `Xnew`).
+Here `Xnew` is an arbitrary table (see above).
 
 **Prediction types for deterministic responses.** In the case of
 `Deterministic` models, `yhat` must have the same type as the target
