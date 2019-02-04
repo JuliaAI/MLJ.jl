@@ -89,7 +89,7 @@ A container for training data and point of entry for new data in a
 learning network (see below).
 
 
-### nodal machine (object of type 'Node')
+### nodal machine (object of type 'NodalMachine')
 
 Like a machine with the following exceptions:
 

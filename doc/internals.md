@@ -2,7 +2,8 @@
 
 ## The machine interface, simplified
 
-The following is simplified description of the `Machine` interface.
+The following is simplified description of the `Machine`
+interface. See also the [glossary](glossary.md)
 
 ### The Machine type
 
