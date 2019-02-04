@@ -32,23 +32,35 @@ CV(; nfolds=6, parallel=true, shuffle=false) = CV(nfolds, parallel, shuffle)
 
 ## DIRECT EVALUATION METHODS 
 
-# We first define an `evaluate` to directly generate estimates of
-# performance according to some strategy `s::S<:ResamplingStrategy`,
-# without first building and fitting a `Resampler{S}` object defined
-# later. We need an `evaluate` for each strategy.
+# We first define an `evaluate!` to directly generate estimates of
+# performance according to some strategy
+# `s::S<:ResamplingStrategy`. (For tuning we later define a
+# `Resampler{S}` object that wraps a model in a resampling strategy
+# and a measure.)  We need an `evaluate!` for each strategy.
 
-# MLJBase.evaluate(mach::Machine; resampling_strategy=Holdout()) =
-#     evaluate(mach, resampling_strategy)
+"""
+    evaluate!(mach, resampling_strategy=CV(), measure=rms, operation=predict, verbosity=1)
+
+Estimate the performance of a machine `mach` using the specified
+`resampling_strategy` (defaulting to 6-fold cross-validation) and
+`measure`. In general this mutating operation preserves only
+`mach.args` (the data stored in the machine).
+
+"""
+evaluate!(mach::Machine;
+          resampling_strategy=CV(), kwargs...) =
+              evaluate!(mach, resampling_strategy; kwargs... )
+
 
 # holdout:
-function MLJBase.evaluate(mach::Machine, strategy::Holdout;
-                          measure=rms, operation=predict, verbosity=1)
+function evaluate!(mach::Machine, resampling_strategy::Holdout;
+                   measure=rms, operation=predict, verbosity=1)
 
     X = mach.args[1]
     y = mach.args[2]
     length(mach.args) == 2 || error("Multivariate targets not yet supported.")
     
-    train, test = partition(eachindex(y), strategy.fraction_train)
+    train, test = partition(eachindex(y), resampling_strategy.fraction_train)
     fit!(mach, rows=train, verbosity=verbosity-1)
     yhat = operation(mach, selectrows(X, test))    
     fitresult = measure(y[test], yhat)
@@ -56,17 +68,17 @@ function MLJBase.evaluate(mach::Machine, strategy::Holdout;
 end
 
 # cv:
-function MLJBase.evaluate(mach::Machine, strategy::CV;
-                          measure=rms, operation=predict, verbosity=1)
+function evaluate!(mach::Machine, resampling_strategy::CV;
+                   measure=rms, operation=predict, verbosity=1)
 
     X = mach.args[1]
     y = mach.args[2]
     length(mach.args) == 2 || error("Multivariate targets not yet supported.")
 
     n_samples = length(y)
-    nfolds = strategy.nfolds
+    nfolds = resampling_strategy.nfolds
     
-    if strategy.shuffle
+    if resampling_strategy.shuffle
         rows = shuffle(eachindex(y))
     else
         rows = eachindex(y)
@@ -86,7 +98,7 @@ function MLJBase.evaluate(mach::Machine, strategy::CV;
     firsts = 1:k:((nfolds - 1)*k + 1) # itr of first `test` rows index
     seconds = k:k:(nfolds*k)          # itr of last `test` rows  index
 
-    if strategy.parallel && nworkers() > 1
+    if resampling_strategy.parallel && nworkers() > 1
         ## TODO: progress meter for distributed case
         if verbosity > 0
             @info "Distributing cross-validation computation "*
@@ -109,6 +121,8 @@ end
 
 ## RESAMPLER - A MODEL WRAPPER WITH `evaluate` OPERATION
 
+# this is needed for the `TunedModel` `fit` defined in tuning.jl
+
 mutable struct Resampler{S,M<:Supervised} <: Model
     model::M
     resampling_strategy::S
@@ -123,7 +137,7 @@ function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
 
     mach = machine(resampler.model, X, y)
 
-    fitresult = evaluate(mach, resampler.resampling_strategy;
+    fitresult = evaluate!(mach, resampler.resampling_strategy;
                          measure=resampler.measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)
@@ -148,7 +162,7 @@ function MLJBase.update(resampler::Resampler{Holdout}, verbosity::Int, fitresult
         cache = (mach, deepcopy(resampler.resampling_strategy))
     end
 
-    fitresult = evaluate(mach, resampler.resampling_strategy;
+    fitresult = evaluate!(mach, resampler.resampling_strategy;
                          measure=resampler.measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)

@@ -52,7 +52,7 @@ import MLJBase, which has its own
 
 ### Requirements
 
-* Julia 0.7 or higher
+* Julia 1.0 or higher
 
 
 ### Installation
