@@ -22,21 +22,13 @@ train, test = partition(allrows, 0.7, shuffle=true)
 @test sort(vcat(train, test)) == allrows
 
 fitresult, cache, report = MLJ.fit(baregp, 1, MLJ.selectrows(X, train), y[train])
-
-
-
-
-
-
-
-
-yhat = predict(baregp, fitresult, selectrows(X, test))
+yhat = predict(baregp, fitresult, MLJ.selectrows(X, test))
 
 @test sum(yhat .== y[test]) / length(y[test]) >= 0.7 # around 0.7
 
 gp = machine(baregp, X, y)
 fit!(gp)
-yhat2 = predict(gp, X[test,:])
+yhat2 = predict(gp, MLJ.selectrows(X, test))
 
 @test sum(yhat2 .== y[test]) / length(y[test]) >= 0.7
 

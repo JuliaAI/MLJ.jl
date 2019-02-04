@@ -40,10 +40,10 @@ end
 
 function MLJBase.fit(model::GPClassifier{T2,M,K}
             , verbosity::Int
-            , X::Matrix{Float64}
+            , X
             , y::CategoricalVector{T}) where {T,T2,M,K}
 
-    Xmatrix = MLJBase.matrix(Xtable)
+    Xmatrix = MLJBase.matrix(X)
     
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
