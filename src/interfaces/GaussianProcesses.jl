@@ -37,13 +37,14 @@ function GPClassifier(
 end
 
 # function MLJBase.clean!
-MLJBase.coerce(model::GPClassifier, Xtable) = MLJBase.matrix(Xtable)
 
 function MLJBase.fit(model::GPClassifier{T2,M,K}
             , verbosity::Int
             , X::Matrix{Float64}
             , y::CategoricalVector{T}) where {T,T2,M,K}
 
+    Xmatrix = MLJBase.matrix(Xtable)
+    
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
 
@@ -52,7 +53,7 @@ function MLJBase.fit(model::GPClassifier{T2,M,K}
 
 
     if VERSION < v"1.0"
-        XT = collect(transpose(X))
+        XT = collect(transpose(Xmatrix))
         yP = convert(Vector{Float64}, y_plain)
         gp = GP.GPE(XT
                   , yP
@@ -61,11 +62,11 @@ function MLJBase.fit(model::GPClassifier{T2,M,K}
 
         GP.fit!(gp, XT, yP)
     else
-        gp = GP.GPE(transpose(X)
+        gp = GP.GPE(transpose(Xmatrix)
                   , y_plain
                   , model.mean
                   , model.kernel)
-        GP.fit!(gp, transpose(X), y_plain)
+        GP.fit!(gp, transpose(Xmatrix), y_plain)
     end
 
     fitresult = (gp, decoder)
@@ -80,10 +81,12 @@ function MLJBase.predict(model::GPClassifier{T}
                        , fitresult
                        , Xnew) where T
 
+    Xmatrix = MLJBase.matrix(Xnew)
+    
     gp, decoder = fitresult
 
     nlevels = length(decoder.pool.levels)
-    pred = GP.predict_y(gp, transpose(Xnew))[1] # Float
+    pred = GP.predict_y(gp, transpose(Xmatrix))[1] # Float
     # rounding with clamping between 1 and nlevels
     pred_rc = clamp.(round.(Int, pred), 1, nlevels)
 
