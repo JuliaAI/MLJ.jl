@@ -9,7 +9,7 @@ using DataFrames
 
 X, y = X_and_y(load_boston())
 
-train, test = partition(eachindex(y), 0.70); # 70:10:10 split
+train, test = partition(eachindex(y), 0.70); # 70:30 split
 ```
 
 A *model* is a container for hyperparameters:
