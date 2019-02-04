@@ -118,7 +118,8 @@ function get_ensemble(atom::Supervised{R}, verbosity, X, ys, n, n_patterns,
         verbosity < 1 || next!(progress_meter)
         train_rows = StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
         atom_fitresult, atom_cache, atom_report =
-            fit(atom, verbosity - 1, MLJBase.getrows(atom, X, train_rows), [y[train_rows] for y in ys]...)
+            fit(atom, verbosity - 1, MLJBase.selectrows(X, train_rows),
+                [y[train_rows] for y in ys]...)
         ensemble[i] = atom_fitresult
     end
     verbosity < 1 || println()
@@ -180,8 +181,6 @@ function DeterministicEnsembleModel(;atom=DeterministicConstantClassifier(), wei
     return model
 end
 
-coerce(model::DeterministicEnsembleModel, Xtable) = coerce(model.atom, Xtable) 
-
 
 ## ENSEMBLE MODEL FOR PROBABILISTIC MODELS 
 
@@ -231,8 +230,6 @@ function ProbabilisticEnsembleModel(;atom=ConstantProbabilisticClassifier(), wei
     
     return model
 end
-
-coerce(model::ProbabilisticEnsembleModel, Xtable) where R = coerce(model.atom, Xtable) 
 
 
 ## COMMON CONSTRUCTOR

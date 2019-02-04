@@ -134,8 +134,6 @@ function MLJBase.fit(model::DecisionTreeClassifier{T2}
 
 end
 
-#> method to coerce generic data into form required by fit:
-
 function MLJBase.predict(model::DecisionTreeClassifier{T}
                      , fitresult
                      , Xnew) where T

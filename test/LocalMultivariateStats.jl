@@ -5,8 +5,6 @@ using Test
 using MLJ
 using LinearAlgebra
 
-using DataFrames
-
 @testset "Ridge" begin
     ## SYNTHETIC DATA TEST
 
@@ -14,7 +12,7 @@ using DataFrames
     bias = -42.0
     coefficients = Float64[1, 3, 7]
     A = randn(1000, 3)
-    Xtable = DataFrame(A)
+    Xtable = MLJ.table(A)
     y = A*coefficients
 
     # Train model on all data with no regularization and no
@@ -31,8 +29,8 @@ using DataFrames
     @test abs(ridgeM.fitresult.bias) < 1e-10
     @test norm(ridgeM.fitresult.coefficients - coefficients) < 1e-10
 
-    @show ridge
-    display(info(ridge))
+    info(ridge)
+
 
     ## TEST OF OTHER METHODS ON REAL DATA
 
@@ -43,7 +41,6 @@ using DataFrames
 
     # Instantiate a model:
     ridge = RidgeRegressor(lambda=0.1)
-    info(ridge)
     
     # Build a machine:
     ridgeM = machine(ridge, Xtable, y)
@@ -77,7 +74,7 @@ end
 
     Xtr = MLJ.transform(barepca, fitresult, X)
 
-    X_array = convert(Matrix{Float64}, X)
+    X_array = MLJ.matrix(X)
 
     # home made PCA (the sign flip is irrelevant)
     Xac = X_array .- mean(X_array, dims=1)

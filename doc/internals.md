@@ -2,29 +2,27 @@
 
 ## The machine interface, simplified
 
-The following is simplified description of the `Machine` interface, as
-it applies to `Supervised` models.
+The following is simplified description of the `Machine` interface.
 
-### The types
+### The Machine type
 
 ````julia 
-abstract type AbstractMachine{M}
+mutable struct Machine{M<Model}
 
-mutable struct Machine{M<Supervised} 
-
-    model::M
+	model::M
     fitresult
     cache
-    args::Tuple    # (Xtable, y) 
+    args::Tuple    # e.g., (X, y) for supervised models
     report
     rows # remember last rows used 
     
-    function Machine{M}(model::M, Xtable, y) where M<:Supervised
+    function Machine{M}(model::M, args...) where M<:Model
         machine = new{M}(model)
-        machine.args = (Xtable, y)
+        machine.args = args
         machine.report = Dict{Symbol,Any}()
         return machine
     end
+
 end
 ````
     
@@ -34,10 +32,10 @@ end
 machine(model::M, Xtable, y) = Machine{M}(model, Xtable, y)
 ````
 
-### fit! and predict
+### fit! and predict/transform
 
 ````julia
-function fit!(machine::Machine{<:Supervised}; rows=nothing, verbosity=1) 
+function fit!(machine::Machine; rows=nothing, verbosity=1) 
 
     warning = clean!(mach.model)
     isempty(warning) || verbosity < 0 || @warn warning 
@@ -48,15 +46,14 @@ function fit!(machine::Machine{<:Supervised}; rows=nothing, verbosity=1)
 
     rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
 
-    X = coerce(mach.model, mach.args[1][Rows, rows])
-    ys = [arg[Rows, rows] for arg in mach.args[2:end]]
-
+    args = [MLJ.selectrows(arg, rows) for arg in mach.args]
+	
     if !isdefined(mach, :fitresult) || rows_have_changed || force 
         mach.fitresult, mach.cache, report =
-            fit(mach.model, verbosity, X, ys...)
+            fit(mach.model, verbosity, args...)
     else # call `update`:
         mach.fitresult, mach.cache, report =
-            update(mach.model, verbosity, mach.fitresult, mach.cache, X, ys...)
+            update(mach.model, verbosity, mach.fitresult, mach.cache, args...)
     end
 
     if rows_have_changed
@@ -73,11 +70,17 @@ end
 
 function predict(machine::Machine{<:Supervised}, Xnew)
     if isdefined(machine, :fitresult)
-        return predict(machine.model,
-                       machine.fitresult,
-                       coerce(machine.model, Xnew))
+        return predict(machine.model, machine.fitresult, Xnew))
     else
         throw(error("$machine is not trained and so cannot predict."))
+    end
+end
+
+function transform(machine::Machine{<:Unsupervised}, Xnew)
+    if isdefined(machine, :fitresult)
+        return transform(machine.model, machine.fitresult, Xnew))
+    else
+        throw(error("$machine is not trained and so cannot transform."))
     end
 end
 ````

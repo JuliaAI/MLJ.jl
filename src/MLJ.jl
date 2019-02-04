@@ -51,8 +51,8 @@ export predict, predict_mean, predict_median, predict_mode
 export transform, inverse_transform, se, evaluate
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 
-import MLJBase: schema, selectrows, selectcols, getrows, matrix
-import MLJBase: fit, update, clean!, info, coerce
+import MLJBase: schema, selectrows, selectcols, matrix
+import MLJBase: fit, update, clean!, info
 import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: transform, inverse_transform, se, evaluate
 import MLJBase: @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal

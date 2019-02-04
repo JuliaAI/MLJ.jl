@@ -61,7 +61,7 @@ y = categorical(collect("asdfa"))
 train, test = partition(1:length(y), 0.8);
 ensemble_model = DeterministicEnsembleModel(atom=atom)
 ensemble_model.n = 10
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 predict(ensemble_model, fitresult, X[test,:])
 weights = rand(10)
 ensemble_model.weights = weights
@@ -74,11 +74,11 @@ y = Float64[1.0, 2.0, 1.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
 ensemble_model = DeterministicEnsembleModel(atom=atom)
 ensemble_model.n = 10
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 @test reduce(* , [x ≈ 1.0 || x ≈ 1.25 for x in fitresult.ensemble])
 predict(ensemble_model, fitresult, X[test,:])
 ensemble_model.bagging_fraction = 1.0
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 @test unique(fitresult.ensemble) ≈ [1.2]
 predict(ensemble_model, fitresult, X[test,:])
 weights = rand(10)
@@ -92,11 +92,11 @@ y = categorical(collect("asdfa"))
 train, test = partition(1:length(y), 0.8);
 ensemble_model = ProbabilisticEnsembleModel(atom=atom)
 ensemble_model.n = 10
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 fitresult.ensemble
 predict(ensemble_model, fitresult, X[test,:])
 ensemble_model.bagging_fraction = 1.0
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 fitresult.ensemble
 d = predict(ensemble_model, fitresult, X[test,:])[1]
 @test pdf(d, 'a') ≈ 2/5
@@ -114,7 +114,7 @@ y = Float64[1.0, 2.0, 2.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
 ensemble_model = ProbabilisticEnsembleModel(atom=atom)
 ensemble_model.n = 10
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 d1 = fit(Distributions.Normal, [1,1,2,2])
 d2 = fit(Distributions.Normal, [1,1,1,2])
 # @test reduce(* , [d.μ ≈ d1.μ || d.μ ≈ d2.μ for d in fitresult.ensemble])
@@ -124,7 +124,7 @@ for dc in d.components
     @test pdf(dc, 1.52) ≈ pdf(d1, 1.52) || pdf(dc, 1.52) ≈ pdf(d2, 1.52)
 end
 ensemble_model.bagging_fraction = 1.0
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, MLJ.coerce(ensemble_model, X), y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 d = predict(ensemble_model, fitresult, X[test,:])[1]
 d3 = fit(Distributions.Normal, y)
 @test pdf(d, 1.52) ≈ pdf(d3, 1.52)
@@ -137,7 +137,7 @@ predict(ensemble_model, fitresult, X[test,:])
 @test EnsembleModel(atom=DeterministicConstantRegressor()) isa Deterministic
 
 
-## MAHCINE TEST
+## MACHINE TEST
 
 X, y = datanow() # boston
 atom = KNNRegressor(K=7)
@@ -153,6 +153,8 @@ fit!(ensemble);
 @test length(ensemble.fitresult.ensemble) == 10
 @test !isnan(predict(ensemble, X[test,:])[1])
 
+nested_range=Params(strange(ensemble_model, :n, lower=1, upper=50, scale=:log10))
+learning_curve(ensemble_model, X, y; resolution=10, nested_range=nested_range)
 
 # old Koala tests
 # # check that providing fixed seed gives identical predictions each

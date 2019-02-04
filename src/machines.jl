@@ -64,14 +64,8 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
     rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
 
-    if mach.model isa Supervised
-        X = coerce(mach.model, selectrows(mach.args[1], rows))
-        ys = [selectrows(arg, rows) for arg in mach.args[2:end]]
-        args = (X, ys...)
-    else
-        args = [selectrows(arg, rows) for arg in mach.args]
-    end
-
+    args = [selectrows(arg, rows) for arg in mach.args]
+    
     if !isdefined(mach, :fitresult) || rows_have_changed || force 
         verbosity < 1 || @info "Training $mach."
         mach.fitresult, mach.cache, report =
