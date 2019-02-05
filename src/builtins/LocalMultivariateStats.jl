@@ -163,7 +163,7 @@ function MLJBase.fit(model::PCA
     ncomp = (model.ncomp === nothing) ? mindim : model.ncomp
 
     # NOTE: copy/transpose
-    fitresult = MS.fit(MS.PCA, copy(transpose(Xarray))
+    fitresult = MS.fit(MS.PCA, permutedims(Xarray)
                      ; method=model.method
                      , pratio=model.pratio
                      , maxoutdim=ncomp
@@ -181,7 +181,9 @@ function MLJBase.transform(model::PCA
 
     Xarray = MLJBase.matrix(X)
     # X is n x d, need to transpose and copy twice...
-    return copy(transpose(MS.transform(fitresult, copy(transpose(Xarray)))))
+    return MLJBase.table(
+                permutedims(MS.transform(fitresult, permutedims(Xarray))),
+                prototype=X)
 end
 
 ####
