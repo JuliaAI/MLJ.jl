@@ -186,7 +186,7 @@ function MLJBase.predict(model::Union{SVMClassifier{Any},SVMRegressor{Any}}
 end
 
 # metadata:
-#MLJBase.package_name(::Type{<:SVMClassifier}) = "ScitkitLearn"
+#MLJBase.package_name(::Type{<:SVMClassifier}) = "ScikitLearn"
 #MLJBase.package_uuid(::Type{<:SVMClassifier}) = "7"
 #MLJBase.is_pure_julia(::Type{<:SVMClassifier}) = :no
 #MLJBase.inputs_can_be(::Type{<:SVMClassifier}) = [:numeric, ]
