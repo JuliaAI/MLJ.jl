@@ -2,7 +2,7 @@ module TestMultivariateStats
 
 # using Revise
 using Test
-using MLJ
+using MLJ, MLJBase
 using LinearAlgebra
 
 @testset "Ridge" begin
@@ -41,7 +41,7 @@ using LinearAlgebra
 
     # Instantiate a model:
     ridge = RidgeRegressor(lambda=0.1)
-    
+
     # Build a machine:
     ridgeM = machine(ridge, Xtable, y)
 
@@ -72,7 +72,7 @@ end
 
     fitresult, cache, report = MLJ.fit(barepca, 1, X)
 
-    Xtr = MLJ.transform(barepca, fitresult, X)
+    Xtr = MLJBase.matrix(MLJ.transform(barepca, fitresult, X))
 
     X_array = MLJ.matrix(X)
 
@@ -86,9 +86,8 @@ end
     pca = machine(barepca, X)
     fit!(pca)
 
-    Xtr2 = transform(barepca, fitresult, X)
+    Xtr2 = MLJBase.matrix(transform(barepca, fitresult, X))
     @test abs.(Xtr2) ≈ Xtr_ref
-
 end
 
 end

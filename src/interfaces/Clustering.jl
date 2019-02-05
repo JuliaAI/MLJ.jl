@@ -19,11 +19,11 @@ const C = Clustering
 
 # ----------------------------------
 
-const KMeansFitResultType = C.KmeansResult
-const KMedoidsFitResultType = Matrix
+const KMitResultType = AbstractMatrix{<:Real} # the medoids
 
-mutable struct KMeans <: MLJBase.Unsupervised
+mutable struct KMeans{M<:SemiMetric} <: MLJBase.Unsupervised
     k::Int
+    metric::M
 end
 
 mutable struct KMedoids{M<:SemiMetric} <: MLJBase.Unsupervised
@@ -44,11 +44,10 @@ end
 #### KMEANS: constructor, fit, transform and predict
 ####
 
-function KMeans(; k=3)
-    model = KMeans(k)
+function KMeans(; k=3, metric=SqEuclidean())
+    model = KMeans(k, metric)
     message = MLJBase.clean!(model)
     isempty(message) || @warn message
-
     return model
 end
 
@@ -59,59 +58,25 @@ function MLJBase.fit(model::KMeans
     Xarray = MLJBase.matrix(X)
 
     # NOTE see https://github.com/JuliaStats/Clustering.jl/issues/136
-    # with respect to the copy/transpose
-    fitresult = C.kmeans(copy(transpose(Xarray)), model.k)
-
-    cache = nothing
-    report = Dict(:centers => transpose(fitresult.centers) # size k x p
-                , :assignments => fitresult.assignments # size n
-                  )
+    # this has been updated but only on #master, in the future replace permutedims
+    # with transpose (lazy)
+    result    = C.kmeans(permutedims(Xarray), model.k; distance=model.metric)
+    fitresult = result.centers # centers (p x k)
+    cache     = nothing
+    report    = Dict(:assignments => result.assignments) # size n
 
     return fitresult, cache, report
 end
 
 function MLJBase.transform(model::KMeans
-                         , fitresult::KMeansFitResultType
+                         , fitresult::KMitResultType
                          , X)
 
     Xarray = MLJBase.matrix(X)
-    # X is n × d
-    # centers is d × k
-    # results is n × k
-    (n, d), k = size(X), model.k
-    X̃ = zeros(size(X, 1), k)
-
-    @inbounds for i ∈ 1:n
-        @inbounds for j ∈ 1:k
-            X̃[i, j] = norm(view(Xarray, i, :) .- view(fitresult.centers, :, j))
-        end
-    end
-    return X̃
-end
-
-# For finding the minimum the squared norm is enough (and faster)
-_norm2(x) = sum(e->e^2, x)
-
-function MLJBase.predict(model::KMeans
-                       , fitresult::KMeansFitResultType
-                       , Xnew)
-
-    Xarray = MLJBase.matrix(Xnew)
-    # similar to transform except we only care about the min distance
-    (n, d), k = size(Xarray), model.k
-    pred = zeros(Int, n)
-    @inbounds for i ∈ 1:n
-        minv = Inf
-        for j ∈ 1:k
-            curv = _norm2(view(Xarray, i, :) .- view(fitresult.centers, :, j))
-            # avoid branching (this is twice as fast as argmin because
-            # the context is simpler and we have to do fewer checks)
-            P       = curv < minv
-            pred[i] =    j * P + pred[i] * !P # if P is true --> j
-            minv    = curv * P +    minv * !P # if P is true --> curvalue
-        end
-    end
-    return pred
+    (n, p), k = size(X), model.k
+    # pairwise distance from samples to centers
+    X̃ = pairwise(model.metric, transpose(Xarray), fitresult)
+    return MLJBase.table(X̃, prototype=X)
 end
 
 ####
@@ -123,7 +88,6 @@ function KMedoids(; k=3, metric=SqEuclidean())
     model = KMedoids(k, metric)
     message = MLJBase.clean!(model)
     isempty(message) || @warn message
-
     return model
 end
 
@@ -132,62 +96,43 @@ function MLJBase.fit(model::KMedoids
                    , X)
 
     Xarray = MLJBase.matrix(X)
+    # cost matrix: all the pairwise distances
     Carray = pairwise(model.metric, transpose(Xarray)) # n x n
 
-    result = C.kmedoids(Carray, model.k)
-
-    medoids = Xarray[result.medoids, :] # size k x p
-
-    cache = nothing
-    report = Dict(:fit_result => result
-                , :medoids => medoids # size k x p
-                , :assignments => result.assignments # size n
-                  )
-
-    # keep track of the actual medoids ("center") in order to predict
-    fitresult = medoids
+    result    = C.kmedoids(Carray, model.k)
+    fitresult = permutedims(view(Xarray, result.medoids, :)) # medoids (p x k)
+    cache     = nothing
+    report    = Dict(:assignments => result.assignments) # size n
 
     return fitresult, cache, report
 end
 
 function MLJBase.transform(model::KMedoids
-                         , fitresult::KMedoidsFitResultType
+                         , fitresult::KMitResultType
                          , X)
 
     Xarray = MLJBase.matrix(X)
-    medoids = fitresult
-    metric = model.metric
-    # X is n × d
-    # centers is d × k
-    # results is n × k
-    (n, d), k = size(X), model.k
-    X̃ = zeros(size(X, 1), k)
-
-    @inbounds for i ∈ 1:n
-        @inbounds for j ∈ 1:k
-            X̃[i, j] = evaluate(metric, view(Xarray, i, :), view(medoids, j, :))
-        end
-    end
-    return X̃
+    (n, p), k = size(X), model.k
+    # pairwise distance from samples to medoids
+    X̃ = pairwise(model.metric, transpose(Xarray), fitresult)
+    return MLJBase.table(X̃, prototype=X)
 end
 
-function MLJBase.predict(model::KMedoids
-                       , fitresult::KMedoidsFitResultType
-                       , Xnew)
+####
+#### Predict methods
+####
+
+function MLJBase.predict(model::Union{KMeans,KMedoids}, fitresult::KMitResultType, Xnew)
 
     Xarray = MLJBase.matrix(Xnew)
-    medoids = fitresult
+    (n, p), k = size(Xarray), model.k
 
-    # similar to kmeans except instead of centers we use medoids
-    # kth medoid corresponds to Xarray[medoids[k], :]
-    metric = model.metric
-    (n, d), k = size(Xarray), model.k
     pred = zeros(Int, n)
-
     @inbounds for i ∈ 1:n
         minv = Inf
         for j ∈ 1:k
-            curv = evaluate(metric, view(Xarray, i, :), view(medoids, j, :))
+            curv    = evaluate(model.metric,
+                                  view(Xarray, i, :), view(fitresult, :, j))
             P       = curv < minv
             pred[i] =    j * P + pred[i] * !P # if P is true --> j
             minv    = curv * P +    minv * !P # if P is true --> curvalue
