@@ -7,44 +7,12 @@ channel](https://slackinvite.julialang.org), #MLJ.
 
 - [List of presently implemented models](https://github.com/ablaom/MLJRegistry.jl/blob/master/Models.toml) 
 
-- [Wish list for new models]()
+- [Enhancement requests](https://github.com/alan-turing-institute/MLJ.jl/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3A%22enhancement%22)
 
 
-While new model implementations are a priority, help adding core
+While new model implementations are a priority at present, help adding core
 functionality to MLJ is also welcome. If you are interested in
-contributing, please read the "Design Overview" below.
-
-
-### Feature wish list (in no particular order)
-
-- Add visualisation tools
-
-- Add random search tuning strategy
-
-- Add genetic algorithm tuning strategy 
-
-- Explore possibilities for architecture search
-
-- Integrate with Flux (both "high" level for the Flux expert and
-  plug-and-play "low" level options). Recurrent networks, adversarial networks, etc
-
-- Add model selection tools, benchmarking
-
-- Add DAG scheduling, eg Dagger.jl, for training learning networks.
-
-- Add tools to estimate resource requirements (like MLR "learning curves")
-
-- Integrate interpretable machine learning tools, such as Shapley values
-
-- Implement the task interface for matching models to tasks
-
-- Implement a gradient descent tuning strategy using automatic
-  differentiation (for cure Julie algorithms).
-
-- Bootstrapping from Sklearn and mlr by wrapping with task info
-
-Development of MLJ is currently sponsored through the Alan Turing
-Institute “Machine Learning in Julia" project, in cooperation with Julia Computing.
+contributing, please read the this rest of this document.
 
 
 ### Brief design overview
@@ -77,6 +45,12 @@ The project is presently in the transition stage: The model API is
 mostly fixed, but small changes are still being driven by experiences
 implementing new models.
 
+#### Funding
+
+Development of MLJ is currently sponsored through the Alan Turing
+Institute “Machine Learning in Julia" project, in cooperation with
+Julia Computing. 
+
 
 #### The team at Turing
 
@@ -84,6 +58,7 @@ implementing new models.
 - Franz Kiraly (director, consultant)
 - Anthony Blaom (lead contributor, coordinator)
 - Yiannis Simillides (contributor)
+
 
 #### At Julia Computing
 

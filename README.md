@@ -5,22 +5,22 @@ A pure Julia machine learning framework.
 [![Build Status](https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master)](https://travis-ci.com/alan-turing-institute/MLJ.jl)
 [![Slack Channel mlj](https://img.shields.io/badge/chat-on%20slack-yellow.svg)](https://slackinvite.julialang.org/)
 
-MLJ aims to be a flexible framework for combining and tuning machine
-learning models, written in the high performance, rapid
-development, scientific programming language, Julia. This is a work in
-progress and new [collaborators](#collaborators) are being sought.
-
 ![](doc/two_model_stack.png)
 
+MLJ aims to be a flexible framework for combining and tuning machine
+learning models, written in the high performance, rapid development,
+scientific programming language, [Julia](https://julialang.org). MLJ
+is a work in progress and new collaborators are being sought. 
 
-In large measure the MLJ project is inspired by [mlR](https://pat-s.github.io/mlr/index.html) ([recent
+Click [here](CONTRIBUTE.md) if your are interested in contributing.
+
+The MLJ project is partly inspired by [MLR](https://pat-s.github.io/mlr/index.html) ([recent
 slides 7/18](https://github.com/mlr-org/mlr-outreach).) For an earlier proof-of-concept, see
 [this branch](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
 and [this poster summary](material/MLJ-JuliaCon2018-poster.pdf).
 
 Packages wishing to implement the MLJ interface for their algorithms should
-import MLJBase, which has its own
-[repository](https://github.com/alan-turing-institute/MLJBase.jl).
+import [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl).
 
 ### Features to include:
 
@@ -57,12 +57,16 @@ import MLJBase, which has its own
 
 ### Installation
 
-In the Julia REPL run `]add https://github.com/alan-turing-institute/MLJBase.jl` first and `]add https://github.com/alan-turing-institute/MLJ.jl.git` afterwards.
+In the Julia REPL:
 
+````julia
+]add https://github.com/alan-turing-institute/MLJBase.jl
+add https://github.com/alan-turing-institute/MLJ.jl
+````
 
 ### Basic training and testing
 
-For more detail and features, see the MLJ [tour](doc/tour.ipynb).
+For more detail and features, see the evolving MLJ [tour](doc/tour.ipynb).
 
 Let's load data and define train and test rows:
 
@@ -217,21 +221,6 @@ best_model = tuned_ensemble.report[:best_model]
     best_model.bagging_fraction = 0.6363636363636364
     (best_model.atom).K = 43
 
-
-### Collaborators
-
-Diego Arenas, Edoardo Barp, Anthony Blaom, Gergö Bohner, Valentin
-Churvay, Harvey Devereux, Thibaut Lienart, Franz J Király, Mohammed
-Nook, Ayush Shridhar, Yiannis Simillides, Annika Stechemesser, Sebastian Vollmer; Mike
-Innes in partnership with Julia Computing
-
-We are looking for new collaborators @ the Alan Turing Institute! 
-  * Implementation of unsupported learners
-  * Backend improvement! (Scheduling, Dagger, JuliaDB, Queryverse)
-  * Store learner meta info in METADATA.JL fashion (ideally open.ml compatible)
-  * Feature Improvement 
-  * Bootstrapping from Sklearn and mlr by wrapping with task info
-  
 
 ### History
 
