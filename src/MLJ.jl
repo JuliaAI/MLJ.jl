@@ -138,6 +138,5 @@ end
 
 @load_interface GaussianProcesses "891a1506-143c-57d2-908e-e1f8e92e6de9" lazy=false
 
-#@load_interface XGBoost "009559a3-9522-5dbb-924b-0b6ed2b22bb9" lazy=false
 
 end # module
