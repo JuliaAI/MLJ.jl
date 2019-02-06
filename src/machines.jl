@@ -13,8 +13,7 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
 
         if M <: Supervised
             length(args) > 1 ||
-                error("Wrong number of arguments. "*
-                      "You must provide target(s) for supervised models.")
+            Tables.istable(args[1]) || error("Tabular data expected.")
             nrows = schema(args[1]).nrows
             good = reduce(*, [length(y) == nrows for y in args[2:end]])
             good || error("Machine data arguments of incompatible sizes.")
@@ -24,8 +23,8 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
                   "Use NodalMachine(model, X) for an unsupervised  model.")
         
         Tables.istable(args[1]) ||
-            error("First data argument of machine must be an iterable table. "*
-                  "Use DataFrame(X) to wrap an abstract matrix X as a DataFrame.")
+            error("First data argument of machine must be a task or table. "*
+                  "Use MLJ.table(X) to wrap an abstract matrix X as a columns table.")
 
         machine = new{M}(model)
 

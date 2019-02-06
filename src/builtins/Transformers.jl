@@ -10,6 +10,7 @@ export UnivariateBoxCoxTransformer
 import MLJBase: MLJType, Unsupervised
 import MLJBase: schema, selectcols, table
 import MLJBase
+import Tables
 import DataFrames: names, AbstractDataFrame, DataFrame, eltypes
 import Distributions
 using Statistics
@@ -31,12 +32,12 @@ const N_VALUES_THRESH = 16 # for BoxCoxTransformation
 """
     FeatureSelector(features=Symbol[])
 
-A transformer model for `DataFrame`s that returns a new `DataFrame`
-with only the those features (columns) encountered during fitting the
-transformer, and in the order encountered then.  Alternatively, if a
-non-empty `features` is specified, then only the specified features
-are used. Throws an error if a recorded or specified feature is not
-present in the transformation input.
+A transformer for reducing filtering out the features (columns) of a
+table.  Only those features encountered during fitting will appear in
+transformed tables, these features appearing encountered.
+Alternatively, if a non-empty `features` is specified, then only the
+specified features are used. Throws an error if a recorded or
+specified feature is not present in the transformation input.
 
 """
 mutable struct FeatureSelector <: Unsupervised
@@ -45,12 +46,12 @@ end
 
 FeatureSelector(;features=Symbol[]) = FeatureSelector(features)
 
-function fit(transformer::FeatureSelector, verbosity::Int, X::AbstractDataFrame)
-    namesX = names(X)
+function fit(transformer::FeatureSelector, verbosity::Int, X)
+    namesX = Tables.schema(X).names
     issubset(Set(transformer.features), Set(namesX)) ||
         throw(error("Attempting to select non-existent feature(s)."))
     if isempty(transformer.features)
-        fitresult = namesX
+        fitresult = collect(namesX)
     else
         fitresult = transformer.features
     end
@@ -60,9 +61,9 @@ function fit(transformer::FeatureSelector, verbosity::Int, X::AbstractDataFrame)
 end
 
 function transform(transformer::FeatureSelector, features, X)
-    issubset(Set(features), Set(names(X))) ||
+    issubset(Set(features), Set(Tables.schema(X).names)) ||
         throw(error("Supplied frame does not admit previously selected features."))
-    return X[features]
+    return MLJBase.selectcols(X, features)
 end
 
 # metadata:

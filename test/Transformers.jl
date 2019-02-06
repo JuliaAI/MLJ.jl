@@ -17,7 +17,8 @@ fitresult, cache, report = MLJ.fit(selector, 1, X)
 transform(selector, fitresult, X[1:2,:])
 selector = FeatureSelector([:Zn, :Crim])
 fitresult, cache, report = MLJ.fit(selector, 1, X)
-@test names(transform(selector, fitresult, X[1:2,:])) == [:Zn, :Crim]
+@test transform(selector, fitresult, X[1:2,:]) ==
+    MLJ.selectcols(MLJ.selectrows(X, 1:2), [:Zn, :Crim])
 
 # relabelling with integer transformer:
 y = rand(Char, 50)

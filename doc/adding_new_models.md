@@ -90,6 +90,8 @@ abstract type Probabilistic{R} <: Supervised{R} end
 abstract type Deterministic{R} <: Supervised{R} end
 ````
 
+Further division of model types is realized through "trait" declarations (see below). 
+
 Associated with every concrete subtype of `Model` there must be a
 `fit` method, which implements the associated algorithm to produce the
 fit-result. Additionally, every `Supervised` model has a `predict`
