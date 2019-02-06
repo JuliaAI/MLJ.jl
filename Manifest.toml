@@ -339,6 +339,7 @@ version = "0.5.0"
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
+
 [[ScikitLearnBase]]
 deps = ["Compat", "LinearAlgebra", "Random", "Statistics", "Test"]
 git-tree-sha1 = "0e27caac9a456b531193117c538d739d2d6e91c2"
