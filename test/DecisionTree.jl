@@ -2,6 +2,7 @@ module TestDecisionTree
 
 # using Revise
 using MLJ
+import MLJBase
 using Test
 
 task = load_iris();
@@ -23,7 +24,7 @@ baretree.max_depth = 1
 fitresult, cache, report = MLJ.fit(baretree, 1, X, y);
 baretree.max_depth = -1 # no max depth
 fitresult, cache, report = MLJ.update(baretree, 1, fitresult, cache, X, y);
-
+@test fitresult isa MLJBase.fitresult_type(baretree)
 # in this case decision tree is a perfect predictor:
 yhat = predict(baretree, fitresult, X);
 @test yhat == y
@@ -37,8 +38,9 @@ yhat = predict(baretree, fitresult, X);
 
 tree = machine(baretree, X, y)
 fit!(tree)
-predict(tree, MLJ.selectrows(X, 1:3))
+yyhat = predict(tree, MLJ.selectrows(X, 1:3))
 
+@test CategoricalArrays.levels(yyhat) == CategoricalArrays.levels(y)
 @show baretree
 info(baretree)
 

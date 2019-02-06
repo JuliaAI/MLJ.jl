@@ -2,6 +2,7 @@ module TestGaussianProcesses
 
 # using Revise
 using MLJ
+using MLJBase
 using Test
 using Random:seed!
 
@@ -22,7 +23,8 @@ train, test = partition(allrows, 0.7, shuffle=true)
 @test sort(vcat(train, test)) == allrows
 
 fitresult, cache, report = MLJ.fit(baregp, 1, MLJ.selectrows(X, train), y[train])
-yhat = predict(baregp, fitresult, MLJ.selectrows(X, test))
+@test fitresult isa MLJBase.fitresult_type(baregp)
+yhat = predict(baregp, fitresult, MLJ.selectrows(X, test));
 
 @test sum(yhat .== y[test]) / length(y[test]) >= 0.7 # around 0.7
 

@@ -10,9 +10,12 @@ import GaussianProcesses
 
 const GP = GaussianProcesses
 
-GPClassifierFitResultType{T} =
-    Tuple{GP.GPE,
-    MLJBase.CategoricalDecoder{UInt32,T,1,UInt32}}
+# here T is target type:
+const CD{T,C} = MLJBase.CategoricalDecoder{Int,false,T,1,UInt32,C}
+const GPClassifierFitResultType{T} =
+    Tuple{GP.GPE,     # TODO: make this a concrete type for ensembling efficiency
+          Union{CD{T,CategoricalValue{T,UInt32}},
+                CD{T,CategoricalString{UInt32}}}}
 
 mutable struct GPClassifier{T, M<:GP.Mean, K<:GP.Kernel} <: MLJBase.Deterministic{GPClassifierFitResultType{T}}
     target_type::Type{T} # target is CategoricalArray{target_type}
@@ -48,7 +51,7 @@ function MLJBase.fit(model::GPClassifier{T2,M,K}
     T == T2 || throw(ErrorException("Type, $T, of target incompatible "*
                                     "with type, $T2, of $model."))
 
-    decoder = MLJBase.CategoricalDecoder(y, eltype=Int)
+    decoder = MLJBase.CategoricalDecoder(y, Int)
     y_plain = MLJBase.transform(decoder, y)
 
 

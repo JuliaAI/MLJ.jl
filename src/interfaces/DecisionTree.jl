@@ -23,8 +23,12 @@ using CategoricalArrays
 #> import package:
 import DecisionTree
 
-DecisionTreeClassifierFitResultType{T} =
-    Tuple{Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}}, MLJBase.CategoricalDecoder{UInt32,T,1,UInt32}}
+# here T is target type:
+const CD{T,C} = MLJBase.CategoricalDecoder{UInt32,true,T,1,UInt32,C}
+const DecisionTreeClassifierFitResultType{T} =
+    Tuple{Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}},
+          Union{CD{T,CategoricalValue{T,UInt32}},
+                CD{T,CategoricalString{UInt32}}}}
 
 """
     DecisionTreeClassifer(; kwargs...)

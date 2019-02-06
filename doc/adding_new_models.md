@@ -223,6 +223,11 @@ The method `fit` should never alter hyper-parameter values. If the
 package is able to suggest better hyper-parameters, as a byproduct of
 training, return these in the report field.
 
+One should test that actual fit-results have the type declared in the model
+`mutable struct` declaration. To help with this,
+`MLJBase.fitresult_type(m)` returns the declared type, for any
+supervised model (or model type) `m`.
+
 The `verbosity` level (0 for silent) is for passing to learning
 algorithm itself. A `fit` method wrapping such an algorithm should
 generally avoid doing any of its own logging.
@@ -260,7 +265,7 @@ may look something like this:
 
 ````julia
 function MLJBase.fit(model::SomeSupervisedModelType, verbosity, X, y)
-    decoder = MLJBase.CategoricalDecoder(y, eltype=Int64)
+    decoder = MLJBase.CategoricalDecoder(y, Int64)
 	yint = transform(decoder, y)
 	core_fitresult = SomePackage.fit(X, yint, verbosity=verbosity)
 	fitresult = (decoder, core_fitresult)
