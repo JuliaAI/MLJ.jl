@@ -13,7 +13,7 @@ ytrain = yin[train];
 ridge_model = RidgeRegressor(lambda=0.1)
 selector_model = FeatureSelector()
 
-composite = SimpleCompositeModel(model=ridge_model, transformer=selector_model)
+composite = MLJ.SimpleDeterministicCompositeModel(model=ridge_model, transformer=selector_model)
 
 fitresult, cache, report = MLJ.fit(composite, 3, Xtrain, ytrain)
 

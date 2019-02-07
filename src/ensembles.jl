@@ -272,10 +272,9 @@ function EnsembleModel(; args...)
 end
 
 
-
 ## THE COMMON FIT AND PREDICT METHODS
 
-EitherEnsembleModel{R,Atom} = Union{DeterministicEnsembleModel{R,Atom}, ProbabilisticEnsembleModel{R,Atom}}
+const EitherEnsembleModel{R,Atom} = Union{DeterministicEnsembleModel{R,Atom}, ProbabilisticEnsembleModel{R,Atom}}
 
 function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) where {R,Atom<:Supervised{R}}
 
@@ -365,6 +364,28 @@ function predict(model::EitherEnsembleModel, fitresult, Xnew)
     end
     predict(fitresult, weights, Xnew)
 end
+
+## METADATA
+
+# Note: input and output traits are inherited from atom
+
+MLJBase.load_path(::Type{<:DeterministicEnsembleModel}) = "MLJ.DeterministicEnsembleModel"
+MLJBase.package_name(::Type{<:DeterministicEnsembleModel}) = "MLJ"
+MLJBase.package_uuid(::Type{<:DeterministicEnsembleModel}) = ""
+MLJBase.package_url(::Type{<:DeterministicEnsembleModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.is_pure_julia(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.is_pure_julia(Atom)
+MLJBase.input_kinds(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.input_kinds(Atom)
+MLJBase.output_kind(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.output_kind(Atom)
+MLJBase.output_quantity(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.output_quantity(Atom)
+
+MLJBase.load_path(::Type{<:ProbabilisticEnsembleModel}) = "MLJ.ProbabilisticEnsembleModel"
+MLJBase.package_name(::Type{<:ProbabilisticEnsembleModel}) = "MLJ"
+MLJBase.package_uuid(::Type{<:ProbabilisticEnsembleModel}) = ""
+MLJBase.package_url(::Type{<:ProbabilisticEnsembleModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.is_pure_julia(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.is_pure_julia(Atom)
+MLJBase.input_kinds(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.input_kinds(Atom)
+MLJBase.output_kind(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.output_kind(Atom)
+MLJBase.output_quantity(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.output_quantity(Atom)
 
 ### old KoalaEnsembles code for optimizing the weights in the deterministic regressor case:
 

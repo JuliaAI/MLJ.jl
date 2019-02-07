@@ -3,6 +3,7 @@ module TestEnsembles
 # using Revise
 using Test
 using MLJ
+import MLJBase
 using CategoricalArrays
 using Distributions
 
@@ -65,6 +66,8 @@ predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 weights = rand(10)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
+info(ensemble_model)
+# @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # target is :deterministic :continuous :univariate:
 atom = DeterministicConstantRegressor(target_type=Float64)
@@ -83,6 +86,8 @@ predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 weights = rand(10)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
+info(ensemble_model)
+# @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # target is :probabilistic :multiclass :univariate:
 atom = ConstantClassifier(target_type=Char)
@@ -105,6 +110,8 @@ d = predict(ensemble_model, fitresult, MLJ.selectrows(X, test))[1]
 weights = rand(10)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
+info(ensemble_model)
+# @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # target is :probabilistic :continuous :univariate:
 atom = ConstantRegressor(target_type=Float64)
@@ -130,6 +137,8 @@ d3 = fit(Distributions.Normal, y)
 weights = rand(10)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
+info(ensemble_model)
+# @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # test generic constructor:
 @test EnsembleModel(atom=ConstantRegressor()) isa Probabilistic

@@ -3,6 +3,7 @@ module TestTuning
 # using Revise
 using Test
 using MLJ
+import MLJBase
 using DataFrames
 
 x1 = rand(100);
@@ -14,7 +15,7 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
 sel = FeatureSelector()
 stand = UnivariateStandardizer()
 ridge = RidgeRegressor()
-composite = SimpleCompositeModel(transformer=sel, model=ridge)
+composite = MLJ.SimpleDeterministicCompositeModel(transformer=sel, model=ridge)
 
 features_ = strange(sel, :features,
                              values=[[:x1], [:x1, :x2], [:x2, :x3], [:x1, :x2, :x3]])
@@ -26,8 +27,10 @@ nested_ranges = Params(:transformer => Params(features_), :model => Params(lambd
 holdout = Holdout(fraction_train=0.8)
 grid = Grid(resolution=10)
 
-tuned_model = TunedModel(model=composite, tuning_strategy=grid, resampling_strategy=holdout,
+tuned_model = TunedModel(model=composite, tuning=grid, resampling=holdout, measure=rms,
                          nested_ranges=nested_ranges, report_measurements=true)
+@test MLJBase.output_is(tuned_model) == MLJBase.output_is(composite)
+info(tuned_model)
 
 tuned = machine(tuned_model, X, y)
 

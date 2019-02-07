@@ -9,36 +9,59 @@ Grid(;resolution=10, parallel=true) = Grid(resolution, parallel)
 
 # TODO: make fitresult type `Machine` more concrete.
 
-mutable struct TunedModel{T,M<:MLJ.Model} <: MLJ.Supervised{MLJ.Machine}
+mutable struct DeterministicTunedModel{T,M<:Deterministic} <: MLJ.Deterministic{MLJ.Machine}
     model::M
-    tuning_strategy::T
-    resampling_strategy
+    tuning::T  # tuning strategy 
+    resampling # resampling strategy
     measure
     operation
     nested_ranges::Params
     report_measurements::Bool
 end
 
-function TunedModel(;model=ConstantRegressor(),
-                    tuning_strategy=Grid(),
-                    resampling_strategy=Holdout(),
-                    measure=rms,
+mutable struct ProbabilisticTunedModel{T,M<:Probabilistic} <: MLJ.Probabilistic{MLJ.Machine}
+    model::M
+    tuning::T  # tuning strategy 
+    resampling # resampling strategy
+    measure
+    operation
+    nested_ranges::Params
+    report_measurements::Bool
+end
+
+const EitherTunedModel{T,M} = Union{DeterministicTunedModel{T,M},ProbabilisticTunedModel{T,M}}
+
+function TunedModel(;model=nothing,
+                    tuning=Grid(),
+                    resampling=Holdout(),
+                    measure=nothing,
                     operation=predict,
                     nested_ranges=Params(),
                     report_measurements=true)
+    
     !isempty(nested_ranges) || error("No nested_ranges specified.")
-    return TunedModel(model, tuning_strategy, resampling_strategy,
+    model != nothing || error("No model specified. Use TunedModel(model=...) ")
+    if model isa Deterministic
+        return DeterministicTunedModel(model, tuning, resampling,
                       measure, operation, nested_ranges, report_measurements)
+    elseif model isa Probabilistic
+        return ProbabilisticTunedModel(model, tuning, resampling,
+                      measure, operation, nested_ranges, report_measurements)
+    end
+    error("$model does not appear to be a Supervised model.")
 end
 
-function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) where M
+function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y) where M
 
     # the mutating model:
     clone = deepcopy(tuned_model.model)
+
+    measure =
+        tuned_model.measure == nothing ? default_measure(tuned_model.model) : tuned_model.measure
     
     resampler = Resampler(model=clone,
-                          resampling_strategy=tuned_model.resampling_strategy,
-                          measure=tuned_model.measure,
+                          resampling=tuned_model.resampling,
+                          measure=measure,
                           operation=tuned_model.operation)
 
     resampling_machine = machine(resampler, X, y)
@@ -51,7 +74,7 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
         if range isa MLJ.NominalRange
             MLJ.iterator(range)
         elseif range isa MLJ.NumericRange
-            MLJ.iterator(range, tuned_model.tuning_strategy.resolution)
+            MLJ.iterator(range, tuned_model.tuning.resolution)
         else
             throw(TypeError(:iterator, "", MLJ.ParamRange, rrange))            
         end
@@ -130,11 +153,35 @@ function MLJBase.fit(tuned_model::TunedModel{Grid,M}, verbosity::Int, X, y) wher
     
 end
 
-MLJBase.predict(tuned_model::TunedModel, fitresult, Xnew) = predict(fitresult, Xnew)
-MLJBase.best(model::TunedModel, fitresult) = fitresult.model
+MLJBase.predict(tuned_model::EitherTunedModel, fitresult, Xnew) = predict(fitresult, Xnew)
+MLJBase.best(model::EitherTunedModel, fitresult) = fitresult.model
+
+
+## METADATA
+
+MLJBase.load_path(::Type{<:DeterministicTunedModel}) = "MLJ.DeterministicTunedModel"
+MLJBase.package_name(::Type{<:DeterministicTunedModel}) = "MLJ"
+MLJBase.package_uuid(::Type{<:DeterministicTunedModel}) = ""
+MLJBase.package_url(::Type{<:DeterministicTunedModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.is_pure_julia(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.is_pure_julia(M)
+MLJBase.input_kinds(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.input_kinds(M)
+MLJBase.output_kind(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.output_kind(M)
+MLJBase.output_quantity(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.output_quantity(M)
+
+MLJBase.load_path(::Type{<:ProbabilisticTunedModel}) = "MLJ.ProbabilisticTunedModel"
+MLJBase.package_name(::Type{<:ProbabilisticTunedModel}) = "MLJ"
+MLJBase.package_uuid(::Type{<:ProbabilisticTunedModel}) = ""
+MLJBase.package_url(::Type{<:ProbabilisticTunedModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.is_pure_julia(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.is_pure_julia(M)
+MLJBase.input_kinds(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.input_kinds(M)
+MLJBase.output_kind(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.output_kind(M)
+MLJBase.output_quantity(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.output_quantity(M)
+
+
+## LEARNING CURVES (1D TUNING)
 
 """
-    learning_curve(model, X, ys...; resolution=30, resampling_strategy=Holdout(), measure=rms, operation=pr, param_range=nothing)
+    learning_curve(model, X, ys...; resolution=30, resampling=Holdout(), measure=rms, operation=pr, param_range=nothing)
 
 Returns `(u, v)` where `u` is a vector of hyperparameter values, and
 `v` the corresponding performance estimates. 
@@ -151,15 +198,15 @@ u, v = MLJ.learning_curve(model, X, y; param_range = param_range)
 """
 function learning_curve(model::Supervised, X, ys...;
                         resolution=30,
-                        resampling_strategy=Holdout(),
+                        resampling=Holdout(),
                         measure=rms, operation=predict, nested_range=nothing)
 
     model != nothing || error("No model specified. Use learning_curve(model=..., param_range=...,)")
     nested_range != nothing || error("No param range specified. Use learning_curve(model=..., param_range=...,)")
 
     tuned_model = TunedModel(model=model, nested_ranges=nested_range,
-                             tuning_strategy=Grid(resolution=resolution),
-                             resampling_strategy=resampling_strategy, measure=measure, report_measurements=true)
+                             tuning=Grid(resolution=resolution),
+                             resampling=resampling, measure=measure, report_measurements=true)
     tuned = machine(tuned_model, X, ys...)
     fit!(tuned, verbosity=0)
     return tuned.report[:curve]

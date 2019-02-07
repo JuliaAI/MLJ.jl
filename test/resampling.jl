@@ -13,12 +13,12 @@ y = [1.0, 1.0, 2.0, 2.0]
 # holdout:
 holdout = Holdout(fraction_train=0.75)
 model = ConstantRegressor()
-resampler = Resampler(resampling_strategy=holdout, model=model, measure=rms)
+resampler = Resampler(resampling=holdout, model=model, measure=rms)
 fitresult, cache, report = MLJ.fit(resampler, 1, X, y)
 @test fitresult ≈ 2/3
 
 mach = machine(model, X, y)
-@test evaluate!(mach, resampling_strategy=holdout) ≈ 2/3
+@test evaluate!(mach, resampling=holdout) ≈ 2/3
 
 x1 = ones(10)
 x2 = ones(10)
@@ -29,7 +29,7 @@ y = [1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0]
 cv=CV(nfolds=5)
 model = ConstantRegressor()
 mach = machine(model, X, y)
-errs = evaluate!(mach, resampling_strategy=cv)
+errs = evaluate!(mach, resampling=cv)
 for e in errs
     @test e ≈ 1/2 || e ≈ 3/4
 end
@@ -39,7 +39,7 @@ end
 # holdout:
 X, y = datanow()
 ridge_model = RidgeRegressor(lambda=20.0)
-resampler = Resampler(resampling_strategy=holdout, model=ridge_model)
+resampler = Resampler(resampling=holdout, model=ridge_model)
 resampling_machine = machine(resampler, X, y)
 fit!(resampling_machine)
 e1=evaluate(resampling_machine)
@@ -51,7 +51,7 @@ e2=evaluate(resampling_machine)
 @test e1 != e2
 
 # cv:
-resampler = Resampler(resampling_strategy=cv, model=ridge_model)
+resampler = Resampler(resampling=cv, model=ridge_model)
 resampling_machine = machine(resampler, X, y)
 fit!(resampling_machine)
 e1=evaluate(resampling_machine)

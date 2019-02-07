@@ -39,10 +39,10 @@ CV(; nfolds=6, parallel=true, shuffle=false) = CV(nfolds, parallel, shuffle)
 # and a measure.)  We need an `evaluate!` for each strategy.
 
 """
-    evaluate!(mach, resampling_strategy=CV(), measure=nothing, operation=predict, verbosity=1)
+    evaluate!(mach, resampling=CV(), measure=nothing, operation=predict, verbosity=1)
 
 Estimate the performance of a machine `mach` using the specified
-`resampling_strategy` (defaulting to 6-fold cross-validation) and
+`resampling` (defaulting to 6-fold cross-validation) and
 `measure`. In general this mutating operation preserves only
 `mach.args` (the data stored in the machine).
 
@@ -50,11 +50,11 @@ If no measure is specified, then `default_measure(mach.model)` is used.
 
 """
 evaluate!(mach::Machine;
-          resampling_strategy=CV(), kwargs...) =
-              evaluate!(mach, resampling_strategy; kwargs... )
+          resampling=CV(), kwargs...) =
+              evaluate!(mach, resampling; kwargs... )
 
 # holdout:
-function evaluate!(mach::Machine, resampling_strategy::Holdout;
+function evaluate!(mach::Machine, resampling::Holdout;
                    measure=nothing, operation=predict, verbosity=1)
 
     _measure =
@@ -64,7 +64,7 @@ function evaluate!(mach::Machine, resampling_strategy::Holdout;
     y = mach.args[2]
     length(mach.args) == 2 || error("Multivariate targets not yet supported.")
     
-    train, test = partition(eachindex(y), resampling_strategy.fraction_train)
+    train, test = partition(eachindex(y), resampling.fraction_train)
     fit!(mach, rows=train, verbosity=verbosity-1)
     yhat = operation(mach, selectrows(X, test))    
     fitresult = _measure(y[test], yhat)
@@ -72,7 +72,7 @@ function evaluate!(mach::Machine, resampling_strategy::Holdout;
 end
 
 # cv:
-function evaluate!(mach::Machine, resampling_strategy::CV;
+function evaluate!(mach::Machine, resampling::CV;
                    measure=nothing, operation=predict, verbosity=1)
 
     _measure =
@@ -83,9 +83,9 @@ function evaluate!(mach::Machine, resampling_strategy::CV;
     length(mach.args) == 2 || error("Multivariate targets not yet supported.")
 
     n_samples = length(y)
-    nfolds = resampling_strategy.nfolds
+    nfolds = resampling.nfolds
     
-    if resampling_strategy.shuffle
+    if resampling.shuffle
         rows = shuffle(eachindex(y))
     else
         rows = eachindex(y)
@@ -105,7 +105,7 @@ function evaluate!(mach::Machine, resampling_strategy::CV;
     firsts = 1:k:((nfolds - 1)*k + 1) # itr of first `test` rows index
     seconds = k:k:(nfolds*k)          # itr of last `test` rows  index
 
-    if resampling_strategy.parallel && nworkers() > 1
+    if resampling.parallel && nworkers() > 1
         ## TODO: progress meter for distributed case
         if verbosity > 0
             @info "Distributing cross-validation computation "*
@@ -115,10 +115,14 @@ function evaluate!(mach::Machine, resampling_strategy::CV;
             [get_measure(firsts[n], seconds[n])]
         end
     else
-        p = Progress(nfolds + 1, dt=0, desc="Cross-validating: ",
-                     barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
-        next!(p)
-        measures = [first((get_measure(firsts[n], seconds[n]), next!(p))) for n in 1:nfolds]
+        if verbosity > 0
+            p = Progress(nfolds + 1, dt=0, desc="Cross-validating: ",
+                         barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
+            next!(p)
+            measures = [first((get_measure(firsts[n], seconds[n]), next!(p))) for n in 1:nfolds]
+        else
+            measures = [get_measure(firsts[n], seconds[n]) for n in 1:nfolds]
+        end            
     end
 
     return measures
@@ -132,13 +136,13 @@ end
 
 mutable struct Resampler{S,M<:Supervised} <: Model
     model::M
-    resampling_strategy::S
+    resampling::S # resampling strategy
     measure
     operation
 end
-Resampler(; model=ConstantRegressor(), resampling_strategy=Holdout(),
+Resampler(; model=ConstantRegressor(), resampling=Holdout(),
           measure=nothing, operation=predict) =
-              Resampler(model, resampling_strategy, measure, operation) 
+              Resampler(model, resampling, measure, operation) 
 
 function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
 
@@ -147,12 +151,12 @@ function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
 
     mach = machine(resampler.model, X, y)
 
-    fitresult = evaluate!(mach, resampler.resampling_strategy;
+    fitresult = evaluate!(mach, resampler.resampling;
                          measure=measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)
     
-    cache = (mach, deepcopy(resampler.resampling_strategy))
+    cache = (mach, deepcopy(resampler.resampling))
     report = nothing
 
     return fitresult, cache, report
@@ -163,19 +167,19 @@ end
 # machine, provided the training_fraction has not changed:
 function MLJBase.update(resampler::Resampler{Holdout}, verbosity::Int, fitresult, cache, X, y)
 
-    old_mach, old_resampling_strategy = cache
+    old_mach, old_resampling = cache
 
     measure =
         resampler.measure == nothing ? default_measure(resampler.model) : resampler.measure
 
-    if old_resampling_strategy.fraction_train == resampler.resampling_strategy.fraction_train
+    if old_resampling.fraction_train == resampler.resampling.fraction_train
         mach = old_mach
     else
         mach = machine(resampler.model, X, y)
-        cache = (mach, deepcopy(resampler.resampling_strategy))
+        cache = (mach, deepcopy(resampler.resampling))
     end
 
-    fitresult = evaluate!(mach, resampler.resampling_strategy;
+    fitresult = evaluate!(mach, resampler.resampling;
                          measure=resampler.measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)

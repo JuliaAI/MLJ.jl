@@ -10,24 +10,25 @@ MLJBase.predict(composite::Supervised{Node}, fitresult, Xnew) =
 
 
 """
-    SimpleCompositeModel(;regressor=ConstantRegressor(), 
+    SimpleDeterministicCompositeModel(;regressor=ConstantRegressor(), 
                               transformer=FeatureSelector())
 
 Construct a composite model consisting of a transformer
-(`Unsupervised` model) followed by a `Supervised` model.
+(`Unsupervised` model) followed by a `Deterministic` model. Mainly
+intended for internal testing .
 
 """
-mutable struct SimpleCompositeModel{L<:Supervised,
-                             T<:Unsupervised} <: Supervised{Node}
+mutable struct SimpleDeterministicCompositeModel{L<:Deterministic,
+                             T<:Unsupervised} <: Deterministic{Node}
     model::L
     transformer::T
     
 end
 
-function SimpleCompositeModel(; model=ConstantRegressor(), 
+function SimpleDeterministicCompositeModel(; model=DeterministicConstantRegressor(), 
                           transformer=FeatureSelector())
 
-    composite =  SimpleCompositeModel(model, transformer)
+    composite =  SimpleDeterministicCompositeModel(model, transformer)
 
     message = MLJ.clean!(composite)
     isempty(message) || @warn message
@@ -36,7 +37,7 @@ function SimpleCompositeModel(; model=ConstantRegressor(),
 
 end
 
-function MLJBase.fit(composite::SimpleCompositeModel, verbosity::Int, Xtrain, ytrain)
+function MLJBase.fit(composite::SimpleDeterministicCompositeModel, verbosity::Int, Xtrain, ytrain)
     X = source(Xtrain) # instantiates a source node
     y = source(ytrain)
 
@@ -53,5 +54,5 @@ function MLJBase.fit(composite::SimpleCompositeModel, verbosity::Int, Xtrain, yt
     return fitresult, cache, report
 end
 
-MLJBase.predict(composite::SimpleCompositeModel, fitresult, Xnew) = fitresult(Xnew)
+MLJBase.predict(composite::SimpleDeterministicCompositeModel, fitresult, Xnew) = fitresult(Xnew)
 

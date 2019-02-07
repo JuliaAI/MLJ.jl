@@ -332,7 +332,7 @@ MLJBase.package_url((::Type{<:RidgeRegressor}) = "https://github.com/JuliaStats/
 
 method                   | return type       | declarable return values | default value
 -------------------------|-------------------|---------------------------|-------------------
-`output_kind`            | `Symbol`          |`:continuous`, `:binary`, `:multiclass`, `:ordered_factor_finite`, `:ordered_factor_infinite`, `:same_as_inputs` | `:unknown`
+`output_kind`            | `Symbol`          |`:continuous`, `:binary`, `:multiclass`, `:ordered_factor_finite`, `:ordered_factor_infinite`, `:mixed` | `:unknown`
 `output_quantity`        | `Symbol`          |`:univariate`, `:multivariate`| `:univariate`
 `input_kinds`          | `Vector{Symbol}`  | one or more of: `:continuous`, `:multiclass`, `:ordered_factor_finite`, `:ordered_factor_infinite`, `:missing` | `Symbol[]`
 `input_quantity`        | `Symbol`          | `:univariate`, `:multivariate` | `:multivariate`
