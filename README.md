@@ -14,7 +14,7 @@ is a work in progress and new collaborators are being sought.
 
 Click [here](CONTRIBUTE.md) if your are interested in contributing.
 
-The MLJ project is partly inspired by [MLR](https://pat-s.github.io/mlr/index.html) ([recent
+The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html) ([recent
 slides 7/18](https://github.com/mlr-org/mlr-outreach).) For an earlier proof-of-concept, see
 [this branch](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
 and [this poster summary](material/MLJ-JuliaCon2018-poster.pdf).
