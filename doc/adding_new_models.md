@@ -348,7 +348,7 @@ classes. As explained above, all classifiers are passed training targets
 as `CategoricalVector`s, whose element types are
 arbitrary.
 
-The option `:same_as_inputs` for `output_kind` is intended primarily
+The option `:mixed` for `output_kind` is intended primarily
 for transformers, such as MLJ's built-in `FeatureSelector`.
 
 You can test declarations of traits by calling `info(SomeModelType)`.

@@ -5,6 +5,8 @@ using MLJ
 using Test
 using Statistics
 using DataFrames
+using CategoricalArrays
+using Tables
 
 # selecting features
 Xtable, y = datanow()
@@ -91,6 +93,39 @@ t = UnivariateBoxCoxTransformer(shift=true)
 info(t)
 fitresult, cache, report = MLJ.fit(t, 2, v)
 @test sum(abs.(v - MLJ.inverse_transform(t, fitresult, MLJ.transform(t, fitresult, v)))) <= 5000*eps()
+
+
+# `OneHotEncoder`
+
+X = DataFrame(name=categorical(["Ben", "John", "Mary", "John"]),
+              height=[1.85, 1.67, 1.5, 1.67],
+              favourite_number=categorical([7, 5, 10, 5]),
+              age=[23, 23, 14, 23])
+
+t = OneHotEncoder()
+info(t)
+fitresult, cache, nothing = MLJ.fit(t, 1, X)
+Xt = transform(t, fitresult, X)
+@test Xt.name__John == [false, true, false, true]
+@test Xt.height == X.height
+@test Xt.favourite_number__10 == [false, false, true, false]
+@test Xt.age == X.age
+@test Tables.schema(Xt).names == (:name__Ben, :name__John, :name__Mary,
+                                  :height, :favourite_number__5,
+                                  :favourite_number__7, :favourite_number__10, :age) 
+
+# test that *entire* pool of categoricals is used in fit, including unseen levels:
+fitresult_small, cache, nothing = MLJ.fit(t, 1, MLJ.selectrows(X,1:2))
+Xtsmall = transform(t, fitresult_small, X)
+@test Xt == Xtsmall
+
+# test that transform can be applied to subset of the data:
+@test transform(t, fitresult, MLJ.selectcols(X, [:name, :age])) ==
+    MLJ.selectcols(transform(t, fitresult, X), [:name__Ben, :name__John, :name__Mary, :age])
+
+# test that one may not add new columns:
+X.gender = categorical(['M', 'M', 'F', 'M'])
+@test_throws Exception transform(t, fitresult, X)
 
 end
 true

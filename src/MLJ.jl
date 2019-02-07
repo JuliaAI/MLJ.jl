@@ -33,11 +33,7 @@ export FeatureSelector
 export ToIntTransformer
 export UnivariateStandardizer, Standardizer
 export UnivariateBoxCoxTransformer
-# export OneHotEncoder
-# export UnivariateBoxCoxTransformer, BoxCoxTransformer
-# export DataFrameToArrayTransformer, RegressionTargetTransformer
-# export MakeCategoricalsIntTransformer
-# export DataFrameToStandardizedArrayTransformer
+export OneHotEncoder
 # export IntegerToInt64Transformer
 # export UnivariateDiscretizer, Discretizer
 
