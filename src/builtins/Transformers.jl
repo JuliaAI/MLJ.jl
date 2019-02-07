@@ -75,7 +75,7 @@ MLJBase.package_name(::Type{<:FeatureSelector}) = "MLJ"
 MLJBase.package_uuid(::Type{<:FeatureSelector}) = ""
 MLJBase.is_pure_julia(::Type{<:FeatureSelector}) = :yes
 MLJBase.input_kinds(::Type{<:FeatureSelector}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
-MLJBase.output_kind(::Type{<:FeatureSelector}) = :same_as_inputs
+MLJBase.output_kind(::Type{<:FeatureSelector}) = :mixed
 MLJBase.output_quantity(::Type{<:FeatureSelector}) = :multivariate
 
 
@@ -350,7 +350,7 @@ MLJBase.package_uuid(::Type{<:Standardizer}) = ""
 MLJBase.is_pure_julia(::Type{<:Standardizer}) = :yes
 MLJBase.input_kinds(::Type{<:Standardizer}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
 MLJBase.input_quantity(::Type{<:Standardizer}) = :multivariate
-MLJBase.output_kind(::Type{<:Standardizer}) = :same_as_inputs
+MLJBase.output_kind(::Type{<:Standardizer}) = :mixed
 MLJBase.output_quantity(::Type{<:Standardizer}) = :multivariate
 
 
