@@ -10,7 +10,7 @@ A pure Julia machine learning framework.
 MLJ aims to be a flexible framework for combining and tuning machine
 learning models, written in the high performance, rapid development,
 scientific programming language, [Julia](https://julialang.org). MLJ
-is a work in progress and new collaborators are being sought. 
+is work in progress and new collaborators are being sought. 
 
 Click [here](CONTRIBUTE.md) if your are interested in contributing.
 
@@ -24,28 +24,28 @@ import [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl).
 
 ### Features to include:
 
-- Automated tuning of hyperparameters, including
-  composite models with nested parameters. Tuning implemented as a
+- **Automated tuning** of hyperparameters, including
+  composite models with *nested parameters*. Tuning implemented as a
   wrapper, allowing composition with other meta-algorithms. &#10004;
 
-- Option to tune hyperparameters using gradient descent and automatic
-  differentiation (for learning algorithms written in Julia).
+- Option to tune hyperparameters using gradient descent and **automatic
+	differentiation** (for learning algorithms written in Julia).
 
-- Data agnostic: Train models on any data supported by the Tables.jl 
+- **Data agnostic**: Train models on any data supported by the Tables.jl 
 [interface](https://github.com/JuliaData/Tables.jl). &#10004;
 
 - Intuitive syntax for building arbitrarily complicated
-  learning networks .&#10004;
+  **learning networks** .&#10004;
   
-- Learning networks can be exported as self-contained composite models &#10004;, but
+- Learning networks can be exported as self-contained **composite models** &#10004;, but
   common networks (e.g., linear pipelines, stacks) come ready to plug-and-play.
 
-- Performant parallel implementation of large homogeneous ensembles
+- Performant parallel implementation of large homogeneous **ensembles**
   of arbitrary models (e.g., random forests). &#10004;
 
-- "Task" interface matches machine learning problem to available models.
+- **Task** interface matches machine learning problem to available models.
 
-- Benchmarking a battery of assorted models for a given task.
+- **Benchmarking** a battery of assorted models for a given task.
 
 - Automated estimates of cpu and memory requirements for given task/model.
 
@@ -68,45 +68,44 @@ add https://github.com/alan-turing-institute/MLJ.jl
 
 For more detail and features, see the evolving MLJ [tour](doc/tour.ipynb).
 
-Let's load data and define train and test rows:
-
-
 ```julia
 using MLJ
 using DataFrames
 
-X, y = X_and_y(load_boston())
+task = load_boston()
+X, y = X_and_y(task);
 
-train, test = partition(eachindex(y), 0.70); # 70:10:10 split
+X = DataFrame(X) # or any other tabular format supported by Tables.jl 
+
+train, test = partition(eachindex(y), 0.7); # 70:30 split
 ```
 
 A *model* is a container for hyperparameters:
-
 
 ```julia
 knn_model=KNNRegressor(K=10)
 ```
 
-    # KNNRegressor @ 6…89: 
+    # KNNRegressor{Float64} @ 1…90: 
+    target_type             =>   Float64
     K                       =>   10
     metric                  =>   euclidean (generic function with 1 method)
     kernel                  =>   reciprocal (generic function with 1 method)
-    
-Wrapping the model in data creates a *machine* which will store training outcomes (called *fit-results*):
 
+Wrapping the model in data creates a *machine* which will store training outcomes (called *fit-results*):
 
 ```julia
 knn = machine(knn_model, X, y)
 ```
 
-    # Machine{KNNRegressor} @ 1…96: 
-    model                   =>   KNNRegressor @ 6…89
+    # Machine{KNNRegressor{Float64}} @ 9…72: 
+    model                   =>   KNNRegressor{Float64} @ 1…90
     fitresult               =>   (undefined)
     cache                   =>   (undefined)
     args                    =>   (omitted Tuple{DataFrame,Array{Float64,1}} of length 2)
     report                  =>   empty Dict{Symbol,Any}
     rows                    =>   (undefined)
-    
+
 Training on the training rows and evaluating on the test rows:
 
 ```julia
@@ -115,26 +114,26 @@ yhat = predict(knn, X[test,:])
 rms(y[test], yhat)
 ```
 
-    ┌ Info: Training Machine{KNNRegressor} @ 1…96.
+    ┌ Info: Training Machine{KNNRegressor{Float64}} @ 9…72.
     └ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:69
-
     8.090639098853249
 
+Or, in one line:
+
+```julia
+evaluate!(knn, resampling=Holdout(fraction_train=0.7))
+```
+
+    8.090639098853249
 
 Changing a hyperparameter and re-evaluating:
 
 ```julia
 knn_model.K = 20
-fit!(knn)
-yhat = predict(knn, X[test,:])
-rms(y[test], yhat)
+evaluate!(knn, resampling=Holdout(fraction_train=0.7))
 ```
 
-    ┌ Info: Training Machine{KNNRegressor} @ 1…96.
-    └ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:69
-
-    6.253838532302258
-
+    8.41003854724935
 
 ### Systematic tuning as a model wrapper
 
@@ -144,8 +143,8 @@ A simple example of a composite model is a homogeneous ensemble. Here's a bagged
 ensemble_model = EnsembleModel(atom=knn_model, n=20) 
 ```
 
-    # DeterministicEnsembleModel @ 1…59: 
-    atom                    =>   KNNRegressor @ 6…89
+    # DeterministicEnsembleModel @ 5…24: 
+    atom                    =>   KNNRegressor{Float64} @ 1…90
     weights                 =>   0-element Array{Float64,1}
     bagging_fraction        =>   0.8
     rng_seed                =>   0
@@ -158,7 +157,7 @@ Let's simultaneously tune the ensemble's `bagging_fraction` and the K-nearest ne
 params(ensemble_model)
 ```
 
-    Params(:atom => Params(:K => 20, :metric => MLJ.KNN.euclidean, :kernel => MLJ.KNN.reciprocal), :weights => Float64[], :bagging_fraction => 0.8, :rng_seed => 0, :n => 20, :parallel => true)
+    Params(:atom => Params(:target_type => Float64, :K => 20, :metric => MLJ.KNN.euclidean, :kernel => MLJ.KNN.reciprocal), :weights => Float64[], :bagging_fraction => 0.8, :rng_seed => 0, :n => 20, :parallel => true)
 
 To define a tuning grid, we construct ranges for the two parameters and collate these ranges following the same pattern above (omitting parameters that don't change):
 
@@ -168,27 +167,27 @@ K_range = range(knn_model, :K, lower=1, upper=100, scale=:log10)
 nested_ranges = Params(:atom => Params(:K => K_range), :bagging_fraction => B_range)
 ```
 
-    Params(:atom => Params(:K => NumericRange @ 1…22), :bagging_fraction => NumericRange @ 1…24)
+    Params(:atom => Params(:K => NumericRange @ 1…75), :bagging_fraction => NumericRange @ 1…56)
 
 Now we choose a tuning strategy, and a resampling strategy (for estimating performance), and wrap these strategies around our ensemble model to obtain a new model:
 
 ```julia
 tuning = Grid(resolution=12)
-resampling = Holdout(fraction_train=0.8)
+resampling = CV(nfolds=6)
 
 tuned_ensemble_model = TunedModel(model=ensemble_model, 
-    tuning_strategy=tuning, resampling_strategy=resampling, nested_ranges=nested_ranges)
+    tuning=tuning, resampling=resampling, nested_ranges=nested_ranges)
 ```
 
-    # TunedModel @ 6…74: 
-    model                   =>   DeterministicEnsembleModel @ 1…59
-    tuning_strategy         =>   Grid @ 1…83
-    resampling_strategy     =>   Holdout @ 1…58
-    measure                 =>   rms (generic function with 5 methods)
+    # DeterministicTunedModel @ 1…93: 
+    model                   =>   DeterministicEnsembleModel @ 5…24
+    tuning                  =>   Grid @ 1…37
+    resampling              =>   CV @ 6…31
+    measure                 =>   nothing
     operation               =>   predict (generic function with 19 methods)
-    nested_ranges           =>   Params(:atom => Params(:K => NumericRange @ 1…22), :bagging_fraction => NumericRange @ 1…24)
+    nested_ranges           =>   Params(:atom => Params(:K => NumericRange @ 1…75), :bagging_fraction => NumericRange @ 1…56)
     report_measurements     =>   true
-
+    
 Fitting the corresponding machine tunes the underlying model (in this case an ensemble) and retrains on all supplied data:
 
 ```julia
@@ -196,11 +195,11 @@ tuned_ensemble = machine(tuned_ensemble_model, X[train,:], y[train])
 fit!(tuned_ensemble);
 ```
 
-    ┌ Info: Training Machine{TunedModel{Grid,Determin…} @ 1…91.
+    ┌ Info: Training Machine{MLJ.DeterministicTunedMo…} @ 1…05.
     └ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:69
-    Searching a 132-point grid for best model: 100%[==================================================] Time: 0:00:16
+    Searching a 132-point grid for best model: 100%[=========================] Time: 0:01:20
     ┌ Info: Training best model on all supplied data.
-    └ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/tuning.jl:107
+    └ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/tuning.jl:130
 
 ```julia
 tuned_ensemble.report
@@ -218,8 +217,8 @@ best_model = tuned_ensemble.report[:best_model]
 @show best_model.atom.K
 ```
 
-    best_model.bagging_fraction = 0.6363636363636364
-    (best_model.atom).K = 43
+    best_model.bagging_fraction = 0.7272727272727273
+    (best_model.atom).K = 100
 
 
 ### History
