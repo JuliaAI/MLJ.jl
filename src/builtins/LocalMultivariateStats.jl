@@ -42,14 +42,31 @@ end
 #### RIDGE
 ####
 
-mutable struct RidgeRegressor{F} <: MLJBase.Deterministic{LinearFitresult{F}}
+mutable struct RidgeRegressor{F<:AbstractFloat} <: MLJBase.Deterministic{LinearFitresult{F}}
     target_type::Type{F}
     lambda::Float64
 end
 
-# lazy keywork constructor
-RidgeRegressor(; target_type=Float64, lambda=0.0) =
-    RidgeRegressor(target_type, lambda)
+function MLJ.clean!(model::RidgeRegressor)
+    warning = ""
+    if model.lambda < 0
+        warning *= "Need lambda ≥ 0. Resetting lambda=0. "
+        model.lambda = 0
+    end
+    return warning
+end
+
+# keyword constructor
+function RidgeRegressor(; target_type=Float64, lambda=0.0)
+
+    model = RidgeRegressor(target_type, lambda)
+
+    message = MLJBase.clean!(model)
+    isempty(message) || @warn message
+
+    return model
+    
+end
 
 function MLJBase.fit(model::RidgeRegressor{F},
                      verbosity::Int,
