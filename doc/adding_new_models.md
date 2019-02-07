@@ -118,21 +118,19 @@ regressors) overriding obvious fallbacks provided by
 
 ### New model type declarations
 
-Here is an example of a concrete supervised model type declaration:
+Here is an example of a concrete supervised model type declaration, made after defining an appropriate fitresult type (an optional step):
 
 ````julia
 import MLJ
 
-# R{S, T} is the parametric type of the `fitresult` object
-# that will be generated when `fit(KNNRegressor...)` is called
-const R{S,T} = Tuple{Matrix{S},Vector{T}} where {S<:AbstractFloat,T<:AbstractFloat}
+struct LinearFitresult{F<:AbstractFloat} <: MLJBase.MLJType
+    coefficients::Vector{F}
+    bias::F
+end
 
-mutable struct KNNRegressor{S,T,M,K} <: MLJBase.Deterministic{R{S,T}}
-    source_type::S
-    target_type::T
-    K::Int          
-    metric::M
-    kernel::K
+mutable struct RidgeRegressor{F} <: MLJBase.Deterministic{LinearFitresult{F}}
+    target_type::Type{F}
+    lambda::Float64
 end
 ````
 
@@ -140,13 +138,29 @@ Models (which are mutable) should not be given internal
 constructors. It is recommended that they be given an external lazy
 keyword constructor of the same name that defines default values (for
 every field) and checks their validity, by calling a `clean!` method
-(see further below).
+(discussed further below).
 
 ```julia
-# another, simple example, demonstrating with keyword with default value
-# assuming the only hyperparameter in KMeans is "k" the number of clusters.
-# the clean! method here should check that a given `k` is valid (>0).
-KMeans(; k=3)
+function MLJ.clean!(model::RidgeRegressor)
+    warning = ""
+    if model.lambda < 0
+        warning *= "Need lambda ≥ 0. Resetting lambda=0. "
+        model.lambda = 0
+    end
+    return warning
+end
+
+# keyword constructor
+function RidgeRegressor(; target_type=Float64, lambda=0.0)
+
+    model = RidgeRegressor(target_type, lambda)
+
+    message = MLJBase.clean!(model)
+    isempty(message) || @warn message
+
+    return model
+    
+end
 ```
 
 
