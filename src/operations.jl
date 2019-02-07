@@ -31,7 +31,7 @@ macro extend_to_machines(operation)
                                          machine.fitresult,
                                          args...)
             else
-                throw(error("$machine is not trained and so cannot predict."))
+                throw(error("$machine has not trained."))
             end
         end
     end

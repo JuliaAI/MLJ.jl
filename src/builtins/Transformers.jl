@@ -10,11 +10,13 @@ export UnivariateBoxCoxTransformer
 import MLJBase: MLJType, Unsupervised
 import MLJBase: schema, selectcols, table
 import MLJBase
-import Tables
 import DataFrames: names, AbstractDataFrame, DataFrame, eltypes
 import Distributions
+import CategoricalArrays
 using Statistics
-# using Tables
+using Tables
+
+const CA = CategoricalArrays
 
 
 # to be extended:
@@ -32,8 +34,8 @@ const N_VALUES_THRESH = 16 # for BoxCoxTransformation
 """
     FeatureSelector(features=Symbol[])
 
-A transformer for reducing filtering out the features (columns) of a
-table.  Only those features encountered during fitting will appear in
+An usupervised model for filtering features (columns) of a table.
+Only those features encountered during fitting will appear in
 transformed tables, these features appearing encountered.
 Alternatively, if a non-empty `features` is specified, then only the
 specified features are used. Throws an error if a recorded or
@@ -79,7 +81,9 @@ MLJBase.output_quantity(::Type{<:FeatureSelector}) = :multivariate
 
 ## FOR RELABELLING BY CONSECUTIVE INTEGERS
 
-# TODO: Fix so categorical levels are maintained, even "invisible" ones.
+# TODO: Fix so categorical levels are maintained, even "invisible"
+# ones. Or depreciate in favour of (wrapped version of)
+# MLJBase.CategoricalDecoder (but which does not respect order)?
 """
     ToIntTransformer
 
@@ -87,6 +91,7 @@ Univariate transformer for relabelling with consecutive integers. Does
 not keep all levels of a `CategoricalVector` - only those manifest in
 the fitting input.
 
+See also: MLJBase.CategoricalDecoder
 """
 mutable struct ToIntTransformer <: Unsupervised
     sorted::Bool
@@ -233,8 +238,7 @@ MLJBase.output_quantity(::Type{<:UnivariateStandardizer}) = :univariate
 Unsupervised model for standardizing (whitening) the columns of
 tabular data. If `features` is empty then all columns of eltype
 `AbstractFloat` will be standardized. For different behaviour, specify
-the names of features to be standardized. Presently returns a
-`DataFrame`.
+the names of features to be standardized. 
 
     using DataFrames
     X = DataFrame(x1=[0.2, 0.3, 1.0], x2=[4, 2, 3])
@@ -397,7 +401,7 @@ boxcox(lambda, c, v::AbstractVector{T}) where T <: Real =
 """
     UnivariateBoxCoxTransformer(; n=171, shift=false)
 
-Construct a `Unsupervised` model specifying a univariate Box-Cox
+Unsupervised model specifying a univariate Box-Cox
 transformation of a single variable taking non-negative values, with a
 possible preliminary shift. Such a transformation is of the form
 
@@ -477,6 +481,12 @@ MLJBase.input_kinds(::Type{<:UnivariateBoxCoxTransformer}) = [:continuous,]
 MLJBase.input_quantity(::Type{<:UnivariateBoxCoxTransformer}) = :univariate
 MLJBase.output_kind(::Type{<:UnivariateBoxCoxTransformer}) = :continuous
 MLJBase.output_quantity(::Type{<:UnivariateBoxCoxTransformer}) = :univariate
+
+
+
+
+
+
 
 
 end # end module

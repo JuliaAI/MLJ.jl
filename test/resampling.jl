@@ -13,7 +13,7 @@ y = [1.0, 1.0, 2.0, 2.0]
 # holdout:
 holdout = Holdout(fraction_train=0.75)
 model = ConstantRegressor()
-resampler = Resampler(resampling_strategy=holdout, model=model)
+resampler = Resampler(resampling_strategy=holdout, model=model, measure=rms)
 fitresult, cache, report = MLJ.fit(resampler, 1, X, y)
 @test fitresult ≈ 2/3
 

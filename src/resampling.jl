@@ -39,23 +39,27 @@ CV(; nfolds=6, parallel=true, shuffle=false) = CV(nfolds, parallel, shuffle)
 # and a measure.)  We need an `evaluate!` for each strategy.
 
 """
-    evaluate!(mach, resampling_strategy=CV(), measure=rms, operation=predict, verbosity=1)
+    evaluate!(mach, resampling_strategy=CV(), measure=nothing, operation=predict, verbosity=1)
 
 Estimate the performance of a machine `mach` using the specified
 `resampling_strategy` (defaulting to 6-fold cross-validation) and
 `measure`. In general this mutating operation preserves only
 `mach.args` (the data stored in the machine).
 
+If no measure is specified, then `default_measure(mach.model)` is used.
+
 """
 evaluate!(mach::Machine;
           resampling_strategy=CV(), kwargs...) =
               evaluate!(mach, resampling_strategy; kwargs... )
 
-
 # holdout:
 function evaluate!(mach::Machine, resampling_strategy::Holdout;
-                   measure=rms, operation=predict, verbosity=1)
+                   measure=nothing, operation=predict, verbosity=1)
 
+    _measure =
+        measure == nothing ? default_measure(mach.model) : measure
+    
     X = mach.args[1]
     y = mach.args[2]
     length(mach.args) == 2 || error("Multivariate targets not yet supported.")
@@ -63,13 +67,16 @@ function evaluate!(mach::Machine, resampling_strategy::Holdout;
     train, test = partition(eachindex(y), resampling_strategy.fraction_train)
     fit!(mach, rows=train, verbosity=verbosity-1)
     yhat = operation(mach, selectrows(X, test))    
-    fitresult = measure(y[test], yhat)
+    fitresult = _measure(y[test], yhat)
 
 end
 
 # cv:
 function evaluate!(mach::Machine, resampling_strategy::CV;
-                   measure=rms, operation=predict, verbosity=1)
+                   measure=nothing, operation=predict, verbosity=1)
+
+    _measure =
+        measure == nothing ? default_measure(mach.model) : measure
 
     X = mach.args[1]
     y = mach.args[2]
@@ -92,7 +99,7 @@ function evaluate!(mach::Machine, resampling_strategy::CV;
         train = vcat(rows[1:(f - 1)], rows[(s + 1):end])
         fit!(mach; rows=train, verbosity=verbosity-1)
         yhat = operation(mach, selectrows(X, test))    
-        return measure(y[test], yhat)
+        return _measure(y[test], yhat)
     end
 
     firsts = 1:k:((nfolds - 1)*k + 1) # itr of first `test` rows index
@@ -129,16 +136,19 @@ mutable struct Resampler{S,M<:Supervised} <: Model
     measure
     operation
 end
-Resampler(;model=RidgeRegressor(), resampling_strategy=Holdout(),
-          measure=rms, operation=predict) =
+Resampler(; model=ConstantRegressor(), resampling_strategy=Holdout(),
+          measure=nothing, operation=predict) =
               Resampler(model, resampling_strategy, measure, operation) 
 
 function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
 
+    measure =
+        resampler.measure == nothing ? default_measure(resampler.model) : resampler.measure
+
     mach = machine(resampler.model, X, y)
 
     fitresult = evaluate!(mach, resampler.resampling_strategy;
-                         measure=resampler.measure,
+                         measure=measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)
     
@@ -154,6 +164,9 @@ end
 function MLJBase.update(resampler::Resampler{Holdout}, verbosity::Int, fitresult, cache, X, y)
 
     old_mach, old_resampling_strategy = cache
+
+    measure =
+        resampler.measure == nothing ? default_measure(resampler.model) : resampler.measure
 
     if old_resampling_strategy.fraction_train == resampler.resampling_strategy.fraction_train
         mach = old_mach
