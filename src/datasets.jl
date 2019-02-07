@@ -3,15 +3,15 @@ datadir = joinpath(srcdir, "../data/") # TODO: make OS agnostic
 """Load a well-known public regression dataset with nominal features."""
 function load_boston()
     df = CSV.read(joinpath(datadir, "Boston.csv"),
-                  categorical=false, allowmissing=:none)
+                  categorical=true, allowmissing=:none)
     return SupervisedTask(data=df, target=:MedV, ignore=[:Chas], properties=())
 end
 
 """Load a reduced version of the well-known Ames Housing task,
 having six numerical and six categorical features."""
 function load_ames()
-    df = CSV.read(joinpath(datadir, "reduced_ames.csv"),
-                  categorical=false, allowmissing=:none)
+    df = CSV.read(joinpath(datadir, "reduced_ames.csv"), categorical=true,
+                  allowmissing=:none)
     df[:target] = exp.(df[:target])
     return SupervisedTask(data=df, target=:target, properties=())
 end
