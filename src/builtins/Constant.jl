@@ -105,8 +105,8 @@ R{L} = MLJBase.UnivariateNominal{L,Float64}
 
 A classifier that, for any new input pattern, `predict`s the
 `UnivariateNominal` probability distribution `d` best fitting the
-training target data. So, `pdf(d, label)` is the proportion of labels
-in the training data coinciding with `label`. Use `predict_mode` to
+training target data. So, `pdf(d, level)` is the proportion of levels
+in the training data coinciding with `level`. Use `predict_mode` to
 obtain the training target mode instead.
 
 """
@@ -124,7 +124,7 @@ function MLJBase.fit(model::ConstantClassifier{L},
 
     fitresult = Distributions.fit(MLJBase.UnivariateNominal, y)
 
-    verbosity < 1 || @info "probabilities: \n$(fitresult.prob_given_label)"
+    verbosity < 1 || @info "probabilities: \n$(fitresult.prob_given_level)"
     cache = nothing
     report = nothing
 
@@ -138,12 +138,12 @@ end
 
 function MLJBase.predict_mode(model::ConstantClassifier{L}, fitresult, Xnew) where L
     m = mode(fitresult)
-    labels = fitresult.prob_given_label |> keys |> collect
+    levels = fitresult.prob_given_level |> keys |> collect
     N = nrows(Xnew)    
     
     # to get a categorical array with all the original levels we append the 
-    # distribution labels to the prediction vector and truncate afterwards:
-    yhat = vcat(fill(m, N), labels) |> categorical
+    # distribution levels to the prediction vector and truncate afterwards:
+    yhat = vcat(fill(m, N), levels) |> categorical
     return yhat[1:N]
 end
 

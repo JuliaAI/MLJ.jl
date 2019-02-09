@@ -45,7 +45,7 @@ For post-fit pruning, set `post-prune=true` and set
 package documentation cited above.
 
 """
-mutable struct DecisionTreeClassifier{T} <: MLJBase.Deterministic{DecisionTreeClassifierFitResultType{T}}
+mutable struct DecisionTreeClassifier{T} <: MLJBase.Probabilistic{DecisionTreeClassifierFitResultType{T}}
     target_type::Type{T}  # target is CategoricalArray{target_type}
     pruning_purity::Float64
     max_depth::Int
