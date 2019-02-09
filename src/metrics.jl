@@ -89,7 +89,7 @@ misclassification_rate(y::CategoricalArray, yhat) =
 ## CLASSIFICATION METRICS (FOR PROBABILISTIC PREDICTIONS)
 
 # for single pattern:
-cross_entropy(y, d::UnivariateNominal) = -log(d.prob_given_label[y])
+cross_entropy(y, d::UnivariateNominal) = -log(d.prob_given_level[y])
 
 cross_entropy(y::CategoricalVector{L}, yhat::Vector{<:UnivariateNominal{L}}) where L =
     broadcast(cross_entropy, y, yhat) |> mean

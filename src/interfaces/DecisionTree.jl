@@ -8,8 +8,12 @@
 #> assumption is that this interface is to be lazy loaded and live in
 #> "src/interfaces/".
 
-#> model API implementation code goes in a module, whose name is the
-#> package name with trailing underscore "_":
+#> Lazily-loaded package interfaces go in a module whose name is the
+#> package name with trailing underscore, "_". Packages providing
+#> native implementations can put their code anywhere. All models
+#> "register" their location by setting `load_path(<:ModelType)`
+#> appropriately (packages natively implementing MLJ for their models
+#> should also register the package with MLJRegistry).
 module DecisionTree_
 
 #> export the new models you're going to define (and nothing else):
@@ -17,23 +21,28 @@ export DecisionTreeClassifier, DecisionTreeRegressor
 
 import MLJBase
 
-#> for all classifiers:
+#> needed for all classifiers:
 using CategoricalArrays
 
 #> import package:
 import DecisionTree
 
 # here T is target type:
-const CD{T,C} = MLJBase.CategoricalDecoder{UInt32,true,T,1,UInt32,C}
+# const D{T,C} = MLJBase.CategoricalDecoder{UInt32,true,T,1,UInt32,C}
+# const DecoderType{T} =  Union{D{T,CategoricalValue{T,UInt32}}, D{T,CategoricalString{UInt32}}}
 const DecisionTreeClassifierFitResultType{T} =
-    Tuple{Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}},
-          Union{CD{T,CategoricalValue{T,UInt32}},
-                CD{T,CategoricalString{UInt32}}}}
+    Tuple{Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}}, Vector{T}}
 
 """
     DecisionTreeClassifer(; kwargs...)
 
-[https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md](https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md)
+CART decision tree classifier from
+[https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md](https://github.com/bensadeghi/DecisionTree.jl/blob/master/README.md). Predictions
+are probabilistic. 
+
+For post-fit pruning, set `post-prune=true` and set
+`min_purity_threshold` appropriately. Other hyperparameters as per
+package documentation cited above.
 
 """
 mutable struct DecisionTreeClassifier{T} <: MLJBase.Deterministic{DecisionTreeClassifierFitResultType{T}}
@@ -108,7 +117,8 @@ function MLJBase.fit(model::DecisionTreeClassifier{T2}
                                     "with type, $T2, of $model."))
 
     Xmatrix = MLJBase.matrix(X)
-    
+
+    classes = levels(y) # *all* levels in pool of y, not just observed ones
     decoder = MLJBase.CategoricalDecoder(y)
     y_plain = MLJBase.transform(decoder, y)
 
@@ -125,7 +135,7 @@ function MLJBase.fit(model::DecisionTreeClassifier{T2}
 
     verbosity < 3 || DecisionTree.print_tree(tree, model.display_depth)
 
-    fitresult = (tree, decoder)
+    fitresult = (tree, classes)
 
     #> return package-specific statistics (eg, feature rankings,
     #> internal estimates of generalization error) in `report`, which
@@ -142,8 +152,14 @@ function MLJBase.predict(model::DecisionTreeClassifier{T}
                      , fitresult
                      , Xnew) where T
     Xmatrix = MLJBase.matrix(Xnew)
-    tree, decoder = fitresult
-    return MLJBase.inverse_transform(decoder, DecisionTree.apply_tree(tree, Xmatrix))
+    tree, classes = fitresult
+
+    # apply_tree_proba returns zero probabilities on levels unseen in
+    # train, so we can give it all the levels in the pool of the
+    # training vector:
+    y_probabilities = DecisionTree.apply_tree_proba(tree, Xmatrix, classes)
+    return [MLJBase.UnivariateNominal(classes, y_probabilities[i,:])
+            for i in 1:size(y_probabilities, 1)]
 end
 
 # metadata:

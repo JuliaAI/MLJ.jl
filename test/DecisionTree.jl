@@ -26,23 +26,26 @@ baretree.max_depth = -1 # no max depth
 fitresult, cache, report = MLJ.update(baretree, 1, fitresult, cache, X, y);
 @test fitresult isa MLJBase.fitresult_type(baretree)
 # in this case decision tree is a perfect predictor:
-yhat = predict(baretree, fitresult, X);
+yhat = predict_mode(baretree, fitresult, X);
 @test yhat == y
 
 # but pruning upsets this:
 baretree.post_prune = true
 baretree.merge_purity_threshold=0.1
 fitresult, cache, report = MLJ.update(baretree, 2, fitresult, cache, X, y)
-yhat = predict(baretree, fitresult, X);
+yhat = predict_mode(baretree, fitresult, X);
 @test yhat != y
+yhat = predict(baretree, fitresult, X);
+cross_entropy(y, yhat)
 
 tree = machine(baretree, X, y)
 fit!(tree)
-yyhat = predict(tree, MLJ.selectrows(X, 1:3))
+yyhat = predict_mode(tree, MLJ.selectrows(X, 1:3))
 
 @test CategoricalArrays.levels(yyhat) == CategoricalArrays.levels(y)
 @show baretree
 info(baretree)
+
 
 end
 true
