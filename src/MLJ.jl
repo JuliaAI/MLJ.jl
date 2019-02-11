@@ -47,14 +47,21 @@ export predict, predict_mean, predict_median, predict_mode
 export transform, inverse_transform, se, evaluate
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 
-import MLJBase: schema, selectrows, selectcols, matrix
+# reexport from MLJRegistry:
+export models
+
+# to be extended:
 import MLJBase: fit, update, clean!, info
 import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: transform, inverse_transform, se, evaluate
+
+import MLJBase: schema, selectrows, selectcols, matrix
 import MLJBase: @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 import MLJBase: average
 
 using MLJBase
+
+import MLJRegistry: models, metadata
 
 import Requires.@require  # lazy code loading package
 using  CategoricalArrays

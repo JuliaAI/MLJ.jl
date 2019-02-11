@@ -201,6 +201,14 @@ repo-url = "https://github.com/alan-turing-institute/MLJBase.jl"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 version = "0.1.0"
 
+[[MLJRegistry]]
+deps = ["TOML"]
+git-tree-sha1 = "be0bb871a5038385b8ad4c9e1dbc349ac0d38c6e"
+repo-rev = "master"
+repo-url = "https://github.com/alan-turing-institute/MLJRegistry.jl"
+uuid = "a41df0fa-2d8a-11e9-1bfb-8110be68cd3e"
+version = "0.1.0"
+
 [[MacroTools]]
 deps = ["Compat"]
 git-tree-sha1 = "c443e1c8d58a4e9f61b708ad0a88286c7042145b"
@@ -402,6 +410,14 @@ version = "0.5.0"
 [[SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "SparseArrays"]
 uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
+
+[[TOML]]
+deps = ["Dates"]
+git-tree-sha1 = "70c12a7129b147aa9e43325c86f32f7fbb88245a"
+repo-rev = "master"
+repo-url = "https://github.com/wildart/TOML.jl"
+uuid = "191fdcea-f9f2-43e0-b922-d33f71e2abc3"
+version = "0.4.0"
 
 [[TableTraits]]
 deps = ["IteratorInterfaceExtensions", "Test"]
