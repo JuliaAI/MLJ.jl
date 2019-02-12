@@ -65,23 +65,8 @@ end
     @test include("loading.jl")
 end
 
-@testset "XGBoost" begin
-  @test_broken include("XGBoost.jl")
-end
-
 @testset "MultivariateStats" begin
   @test include("LocalMultivariateStats.jl")
 end
 
-@testset "GaussianProcesses" begin
-  @test include("GaussianProcesses.jl")
-end
-
-@testset "Clustering" begin
-  @test include("Clustering.jl")
-end
-
-@testset "GLM" begin
-    @test include("GLM.jl")
-end
 

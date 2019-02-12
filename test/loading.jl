@@ -25,8 +25,10 @@ dinv = Dict(
 
 @test MLJ.inverse(d) == dinv
 
-@load DecisionTreeClassifier
-@test @isdefined DecisionTreeClassifier
+## if you put these back, need to add DecisionTree and MLJModels to
+## [extras] and [targets]:
+# @load DecisionTreeClassifier
+# @test @isdefined DecisionTreeClassifier
 
 end # module
 true

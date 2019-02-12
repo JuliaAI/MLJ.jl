@@ -53,14 +53,16 @@ import MLJBase: fit, update, clean!, info
 import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: transform, inverse_transform, se, evaluate
 
+# to be used
 import MLJBase: schema, selectrows, selectcols, matrix
 import MLJBase: @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 import MLJBase: average
+import MLJBase: fitresult_type
 
 using MLJBase
 
 import MLJRegistry
-import MLJModels
+# import MLJModels
 
 import Requires.@require  # lazy code loading package
 using  CategoricalArrays

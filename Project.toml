@@ -11,11 +11,8 @@ Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
-GLM = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
-GaussianProcesses = "891a1506-143c-57d2-908e-e1f8e92e6de9"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
-MLJModels = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
 MLJRegistry = "a41df0fa-2d8a-11e9-1bfb-8110be68cd3e"
 MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
@@ -28,8 +25,8 @@ TOML = "191fdcea-f9f2-43e0-b922-d33f71e2abc3"
 Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 
 [extras]
-DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+MLJModels = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "DecisionTree"]
+test = ["Test"]
