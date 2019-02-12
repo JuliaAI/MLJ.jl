@@ -1,19 +1,13 @@
-# this file defines *and* loads one module
+#> This code implements the MLJ model interface for models in the
+#> DecisionTree.jl package. It is annotated so that it may serve as a
+#> template for other supervised models of type `Probabilistic`. The
+#> annotations, which begin with "#>", should be removed (but copy
+#> this file first!). See also the model interface specification at
+#> "doc/adding_new_models.md".
 
-#> This interface for the DecisionTree package is annotated so that it
-#> may serve as a template for other interfaces introducing new
-#> Supervised subtypes. The annotations, which begin with "#>", should
-#> be removed (but copy this file first!). See also the model
-#> interface specification at "doc/adding_new_models.md". The
-#> assumption is that this interface is to be lazy loaded and live in
-#> "src/interfaces/".
+#> Note that all models need to "register" their location by setting
+#> `load_path(<:ModelType)` appropriately.
 
-#> Lazily-loaded package interfaces go in a module whose name is the
-#> package name with trailing underscore, "_". Packages providing
-#> native implementations can put their code anywhere. All models
-#> "register" their location by setting `load_path(<:ModelType)`
-#> appropriately (packages natively implementing MLJ for their models
-#> should also register the package with MLJRegistry).
 module DecisionTree_
 
 #> export the new models you're going to define (and nothing else):
@@ -25,11 +19,9 @@ import MLJBase
 using CategoricalArrays
 
 #> import package:
-import DecisionTree
+import ..DecisionTree # strange syntax b/s we are lazy-loading
 
-# here T is target type:
-# const D{T,C} = MLJBase.CategoricalDecoder{UInt32,true,T,1,UInt32,C}
-# const DecoderType{T} =  Union{D{T,CategoricalValue{T,UInt32}}, D{T,CategoricalString{UInt32}}}
+# here T is target type, and the `Vector{T}` is for storing target levels:  
 const DecisionTreeClassifierFitResultType{T} =
     Tuple{Union{DecisionTree.Node{Float64,T}, DecisionTree.Leaf{T}}, Vector{T}}
 
@@ -163,7 +155,7 @@ function MLJBase.predict(model::DecisionTreeClassifier{T}
 end
 
 # metadata:
-MLJBase.load_path(::Type{<:DecisionTreeClassifier}) = "MLJ.DecisionTreeClassifier" # lazy-loaded from MLJ
+MLJBase.load_path(::Type{<:DecisionTreeClassifier}) = "MLJModels.DecisionTree_.DecisionTreeClassifier" 
 MLJBase.package_name(::Type{<:DecisionTreeClassifier}) = "DecisionTree"
 MLJBase.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 MLJBase.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bensadeghi/DecisionTree.jl"
@@ -174,8 +166,3 @@ MLJBase.output_quantity(::Type{<:DecisionTreeClassifier}) = :univariate
 
 end # module
 
-
-## EXPOSE THE INTERFACE
-
-using .DecisionTree_
-export DecisionTreeClassifier
