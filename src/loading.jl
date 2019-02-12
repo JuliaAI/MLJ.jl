@@ -60,7 +60,6 @@ macro load(model_ex)
     # is already loaded into MLJ's namespace):
     if path_components[1] == "MLJModels"
         print("import MLJModels ")
-        @show __module__ 
         __module__.eval(:(import MLJModels))
         println('\u2714')
     end
