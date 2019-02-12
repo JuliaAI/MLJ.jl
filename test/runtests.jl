@@ -37,10 +37,6 @@ end
   @test include("Transformers.jl")
 end
 
-@testset "DecisionTree" begin
-  @test include("DecisionTree.jl")
-end
-
 @testset "Machines" begin
   @test include("machines.jl")
 end
@@ -63,6 +59,10 @@ end
 
 @testset "ensembles" begin
     @test include("ensembles.jl")
+end
+
+@testset "loading" begin
+    @test include("loading.jl")
 end
 
 @testset "XGBoost" begin

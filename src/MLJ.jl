@@ -21,6 +21,7 @@ export EnsembleModel                                 # "ensembles.jl"
 export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
 export DeterministicConstantRegressor                # "builtins/Constant.jl
 export DeterministicConstantClassifier               # "builtins/Constant.jl
+export models, @load                                  # "loading.jl"
 export KNNRegressor                                  # "builtins/KNN.jl"
 export RidgeRegressor, PCA                           # "builtins/LocalMulitivariateStats.jl
 
@@ -47,9 +48,6 @@ export predict, predict_mean, predict_median, predict_mode
 export transform, inverse_transform, se, evaluate
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 
-# reexport from MLJRegistry:
-export models
-
 # to be extended:
 import MLJBase: fit, update, clean!, info
 import MLJBase: predict, predict_mean, predict_median, predict_mode
@@ -61,7 +59,8 @@ import MLJBase: average
 
 using MLJBase
 
-import MLJRegistry: models, metadata
+import MLJRegistry
+import MLJModels
 
 import Requires.@require  # lazy code loading package
 using  CategoricalArrays
@@ -98,7 +97,7 @@ include("resampling.jl")    # evaluating models by assorted resampling strategie
 include("parameters.jl")    # hyper-parameter range constructors and nested hyper-parameter API
 include("tuning.jl")
 include("ensembles.jl")     # homogeneous ensembles
-include("introspection.jl") # reflection on the state of MLJ package
+include("loading.jl")      # model metadata processing
 
 ## LOAD BUILT-IN MODELS
 
@@ -133,12 +132,11 @@ macro load_interface(pkgname, uuid::String, load_instr)
 end
 
 function __init__()
-    @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=true
-    @load_interface Clustering "aaaa29a8-35af-508c-8bc3-b662a17a0fe5" lazy=true
-    @load_interface GLM "38e38edf-8417-5370-95a0-9cbb8c7f171a" lazy=true
-#    @load_interface  MultivariateStats "6f286f6a-111f-5878-ab1e-185364afe411" lazy=true
+#    @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=true
+#    @load_interface Clustering "aaaa29a8-35af-508c-8bc3-b662a17a0fe5" lazy=true
+#    @load_interface GLM "38e38edf-8417-5370-95a0-9cbb8c7f171a" lazy=true
+#    @load_interface GaussianProcesses "891a1506-143c-57d2-908e-e1f8e92e6de9" lazy=true
 end
 
-@load_interface GaussianProcesses "891a1506-143c-57d2-908e-e1f8e92e6de9" lazy=false
 
 end # module

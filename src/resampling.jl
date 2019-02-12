@@ -140,6 +140,9 @@ mutable struct Resampler{S,M<:Supervised} <: Model
     measure
     operation
 end
+
+MLJBase.package_name(::Type{<:Resampler}) = "MLJ"
+    
 Resampler(; model=ConstantRegressor(), resampling=Holdout(),
           measure=nothing, operation=predict) =
               Resampler(model, resampling, measure, operation) 

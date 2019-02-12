@@ -77,12 +77,6 @@ version = "0.15.0"
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 
-[[DecisionTree]]
-deps = ["DelimitedFiles", "Distributed", "LinearAlgebra", "Random", "ScikitLearnBase", "Statistics", "Test"]
-git-tree-sha1 = "a0a1b9f70f9c57819aed52b2ce570de77bf0a6cf"
-uuid = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
-version = "0.8.1"
-
 [[DelimitedFiles]]
 deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
@@ -201,9 +195,17 @@ repo-url = "https://github.com/alan-turing-institute/MLJBase.jl"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 version = "0.1.0"
 
+[[MLJModels]]
+deps = ["CategoricalArrays", "MLJBase", "Requires"]
+git-tree-sha1 = "f4e1b41e6ed0a6c314c17969f5ebde8f9f36ffd3"
+repo-rev = "master"
+repo-url = "https://github.com/alan-turing-institute/MLJModels.jl"
+uuid = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
+version = "0.1.0"
+
 [[MLJRegistry]]
 deps = ["TOML"]
-git-tree-sha1 = "be0bb871a5038385b8ad4c9e1dbc349ac0d38c6e"
+git-tree-sha1 = "3b322bb4fd2918efcd3a26c170e7f77d198fd8c3"
 repo-rev = "master"
 repo-url = "https://github.com/alan-turing-institute/MLJRegistry.jl"
 uuid = "a41df0fa-2d8a-11e9-1bfb-8110be68cd3e"

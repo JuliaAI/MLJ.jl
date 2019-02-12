@@ -25,6 +25,8 @@ mutable struct SimpleDeterministicCompositeModel{L<:Deterministic,
     
 end
 
+MLJBase.package_name(::Type{<:SimpleDeterministicCompositeModel}) = "MLJ"
+
 function SimpleDeterministicCompositeModel(; model=DeterministicConstantRegressor(), 
                           transformer=FeatureSelector())
 
