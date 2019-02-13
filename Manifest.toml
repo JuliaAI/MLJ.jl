@@ -123,6 +123,14 @@ repo-url = "https://github.com/alan-turing-institute/MLJBase.jl"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 version = "0.1.0"
 
+[[MLJModels]]
+deps = ["CategoricalArrays", "Distances", "LinearAlgebra", "MLJBase", "MLJRegistry", "Pkg", "Random", "Requires", "TOML"]
+git-tree-sha1 = "64e38198514a3a82832adec6af42201036493120"
+repo-rev = "master"
+repo-url = "https://github.com/alan-turing-institute/MLJModels.jl"
+uuid = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
+version = "0.1.0"
+
 [[MLJRegistry]]
 deps = ["TOML"]
 git-tree-sha1 = "3b322bb4fd2918efcd3a26c170e7f77d198fd8c3"
@@ -318,6 +326,6 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[WeakRefStrings]]
 deps = ["Missings", "Random", "Test"]
-git-tree-sha1 = "bccf012a0e8815410ad8b6846944a33903992fc3"
+git-tree-sha1 = "cf70c71939e621a3fac4156a8bfb3c80d745794a"
 uuid = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
-version = "0.5.6"
+version = "0.5.7"
