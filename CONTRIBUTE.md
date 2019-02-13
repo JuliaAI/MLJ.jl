@@ -21,15 +21,34 @@ MLJ has a basement level *model* interface, which must be implemented
 for each new learning algorithm. Formally, each model is a `mutable
 struct` storing hyperparameters and the implementer defines
 model-dispatched `fit` and `predict` methods; for details, see
-[here](doc/adding_new_models.md). The user interacts through a
-*machine* interface using `fit!` and `predict` methods, dispatched on
-machines. A machine wraps a model in data and the results of training. The
-model interface has a functional style, the machine interface is more
-object-oriented.
+[here](doc/adding_new_models.md). The user interacts through a *task*
+interface (work-in-progress) and a *machine* interface using `fit!`
+and `predict` methods, dispatched on machines. A machine wraps a model
+in data and the results of training. The model interface has a
+functional style, the machine interface is more object-oriented.
 
 A generalization of machine, called a *nodal* machine, is the key
 element of *learning networks* which combine several models
 together. See the [tour](doc/tour.ipynb) for more on these.
+
+The MLJ ecosystem is currently spread across four repostitories:
+
+- [MLJ](https://github.com/alan-turing-institute/MLJ.jl) is the
+  ordinary user's point-of-entry. It implements the meta-algorithms
+  (resampling, tuning, learing networks, etc).
+  
+- [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl)
+  defines the model interface which new algorithims must implement to
+  participate in MLJ.
+  
+- [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl)
+  stores metadata on all models "registered" with MLJ, which become
+  available to the MLJ user through the task inteface, before external
+  packages implementing the models need be loaded.
+  
+- [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
+  contains the implementation code for models in external packages
+  that do not natively support the MLJ interface.
 
 
 ### Current state of the project and directions (early Feb 2019)
@@ -37,9 +56,8 @@ together. See the [tour](doc/tour.ipynb) for more on these.
 The long-term goal is for external packages to natively implement the
 MLJ interface for their models (and in principle they can already do
 so). Currently, model interface implementations are either built in
-(see [src/builtin](src/builtin)) or lazy-loaded using Requires.jl (see
-[src/interfaces](src/interfaces)). The lazy-loaded implementations
-will soon move to a new repository, MLJModels.
+(see [src/builtin](src/builtin)) or lazy-loaded from MLJModels using
+Requires.jl.
 
 The project is presently in the transition stage: The model API is
 mostly fixed, but small changes are still being driven by experiences
