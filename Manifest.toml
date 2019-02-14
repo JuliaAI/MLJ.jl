@@ -117,7 +117,7 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MLJBase]]
 deps = ["CategoricalArrays", "Distributions", "Statistics", "Tables"]
-git-tree-sha1 = "f635f213adcb55f25c93b38298df94df4eff6db0"
+git-tree-sha1 = "1f61fc85d52b507063b316f90de9e2ee8579d781"
 repo-rev = "master"
 repo-url = "https://github.com/alan-turing-institute/MLJBase.jl"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
