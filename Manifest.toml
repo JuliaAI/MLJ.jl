@@ -133,7 +133,7 @@ version = "0.1.0"
 
 [[MLJRegistry]]
 deps = ["TOML"]
-git-tree-sha1 = "3b322bb4fd2918efcd3a26c170e7f77d198fd8c3"
+git-tree-sha1 = "e1caa8bc8510bfb781a91b24e98b3f90531b088e"
 repo-rev = "master"
 repo-url = "https://github.com/alan-turing-institute/MLJRegistry.jl"
 uuid = "a41df0fa-2d8a-11e9-1bfb-8110be68cd3e"
