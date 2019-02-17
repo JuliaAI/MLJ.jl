@@ -1,26 +1,27 @@
-## LOADING AND PROCESSING MODEL METADATA
+## LOADING METADATA FOR EXTERNAL PACKAGE MODELS
 
-const _models_given_pkg = MLJRegistry.models()
-const metadata = MLJRegistry.metadata()
+# Get latest version of metadata, we programatically load the registry
+# (which will never be a julia registered package):
+Pkg.add(PackageSpec(url="https://github.com/alan-turing-institute/MLJRegistry.jl", rev="master")) 
+const METADATA = MLJRegistry.metadata()
 
-# the inverse of a multivalued dictionary is a mulitvalued
-# dictionary:
-function inverse(d::Dict{S,Set{T}}) where {S,T}
-    dinv = Dict{T,Set{S}}()
-    for key in keys(d)
-        for val in d[key]
-            if val in keys(dinv)
-                push!(dinv[val], key)
-            else
-                dinv[val] = Set([key,])
-            end
-        end
-    end
-    return dinv
+# merge with the metadata for models defined in MLJ.jl:
+modeltypes = MLJRegistry.finaltypes(MLJBase.Model)
+for M in modeltypes
+    _info = MLJBase.info(M)
+    modelname = _info[:name]
+    meta_given_package["MLJ"][modelname] = _info
 end
 
 
-# set-valued version:
+## GET LIST OF MODELS IN EACH PACKAGE (INCL MLJ):
+
+_models_given_pkg = Dict()
+for pkg in packages
+    _models_given_pkg[pkg] = collect(keys(METADATA[pkg]))
+end
+
+# set-valued version (needed to compute inverse dictionary):
 const models_given_pkg = Dict{String, Set{String}}()
 for pkg in keys(_models_given_pkg)
     models_given_pkg[pkg] = Set(_models_given_pkg[pkg])
@@ -52,7 +53,7 @@ macro load(model_ex)
     end
 
     # get load path:
-    info = metadata[pkg][model]
+    info = METADATA[pkg][model]
     path = info[:load_path]
     path_components = split(path, '.')
 
@@ -92,7 +93,7 @@ function MLJBase.info(model::String)
     if !success
         error(pkg*"Use info($model, pkg=...)")
     end
-    return metadata[pkg][model]
+    return METADATA[pkg][model]
 end
 
     

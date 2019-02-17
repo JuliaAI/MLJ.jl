@@ -73,6 +73,7 @@ import Distributions
 import StatsBase
 using ProgressMeter
 import Tables
+import Pkg
 # import TOML
 
 # to be extended:
