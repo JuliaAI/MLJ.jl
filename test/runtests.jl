@@ -13,6 +13,10 @@ using Test
 a = rand(3,4)'
 @test MLJBase.matrix(dataframe(a)) == collect(a)
 
+@testset "utilities" begin
+  @test include("utilities.jl")
+end
+
 @testset "metrics" begin
   @test include("metrics.jl")
 end

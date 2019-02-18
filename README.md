@@ -61,9 +61,9 @@ In the Julia REPL:
 
 ````julia
 ]add "https://github.com/wildart/TOML.jl"
-add "https://github.com/alan-turing-institute/MLJRegistry.jl"
 add "https://github.com/alan-turing-institute/MLJBase.jl"
 add "https://github.com/alan-turing-institute/MLJModels.jl"
+add "https://github.com/alan-turing-institute/MLJRegistry.jl"
 add "https://github.com/alan-turing-institute/MLJ.jl"
 ````
 

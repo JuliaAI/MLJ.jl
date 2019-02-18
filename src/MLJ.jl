@@ -73,7 +73,6 @@ import Distributions
 import StatsBase
 using ProgressMeter
 import Tables
-import Pkg
 # import TOML
 
 # to be extended:
@@ -100,7 +99,6 @@ include("resampling.jl")    # evaluating models by assorted resampling strategie
 include("parameters.jl")    # hyper-parameter range constructors and nested hyper-parameter API
 include("tuning.jl")
 include("ensembles.jl")     # homogeneous ensembles
-include("loading.jl")      # model metadata processing
 
 ## LOAD BUILT-IN MODELS
 
@@ -109,37 +107,11 @@ include("builtins/Constant.jl")
 include("builtins/KNN.jl")
 include("builtins/LocalMultivariateStats.jl")
 
-## SETUP LAZY PKG INTERFACE LOADING (a temporary hack)
 
-# Note: Presently an MLJ interface to a package, eg `DecisionTree`,
-# is not loaded by `using MLJ` alone; one must additionally call
-# `import DecisionTree`.
+## GET THE EXTERNAL MODEL METADATA AND MERGE WITH MLJ MODEL METADATA
 
-# files containing a pkg interface must have same name as pkg plus ".jl"
+include("loading.jl")      # model metadata processing
 
-macro load_interface(pkgname, uuid::String, load_instr)
-    (load_instr.head == :(=) && load_instr.args[1] == :lazy) ||
-        throw(error("Invalid load instruction"))
-    lazy = load_instr.args[2]
-    filename = joinpath("interfaces", string(pkgname, ".jl"))
-
-    if lazy
-        quote
-            @require $pkgname=$uuid include($filename)
-        end
-    else
-        quote
-            @eval include(joinpath($srcdir, $filename))
-        end
-    end
-end
-
-function __init__()
-#    @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=true
-#    @load_interface Clustering "aaaa29a8-35af-508c-8bc3-b662a17a0fe5" lazy=true
-#    @load_interface GLM "38e38edf-8417-5370-95a0-9cbb8c7f171a" lazy=true
-#    @load_interface GaussianProcesses "891a1506-143c-57d2-908e-e1f8e92e6de9" lazy=true
-end
 
 
 end # module

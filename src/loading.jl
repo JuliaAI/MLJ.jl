@@ -4,6 +4,7 @@ const METADATA = MLJRegistry.metadata()
 
 # merge with the metadata for models defined in MLJ.jl:
 modeltypes = MLJRegistry.finaltypes(MLJBase.Model)
+METADATA["MLJ"] = Dict()
 for M in modeltypes
     _info = MLJBase.info(M)
     modelname = _info[:name]
@@ -14,6 +15,7 @@ end
 ## GET LIST OF MODELS IN EACH PACKAGE (INCL MLJ):
 
 _models_given_pkg = Dict()
+packages = keys(METADATA) |> collect
 for pkg in packages
     _models_given_pkg[pkg] = collect(keys(METADATA[pkg]))
 end

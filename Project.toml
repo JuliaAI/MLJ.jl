@@ -16,7 +16,6 @@ MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 MLJModels = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
 MLJRegistry = "a41df0fa-2d8a-11e9-1bfb-8110be68cd3e"
 MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
-Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Requires = "ae029012-a4dd-5104-9daa-d747884805df"
@@ -28,6 +27,3 @@ Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
-[targets]
-target = ["Test"]
