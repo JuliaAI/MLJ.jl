@@ -209,7 +209,7 @@ version = "0.1.0"
 
 [[MLJModels]]
 deps = ["CategoricalArrays", "Distances", "LinearAlgebra", "MLJBase", "Random", "Requires", "TOML"]
-git-tree-sha1 = "78713d753f3ebb370a22e6783dc1bf43f8c952de"
+git-tree-sha1 = "67470fcef0bfd3dee7d04a45a0563f19a6cc58f4"
 repo-rev = "master"
 repo-url = "https://github.com/alan-turing-institute/MLJModels.jl"
 uuid = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
@@ -217,7 +217,7 @@ version = "0.1.0"
 
 [[MLJRegistry]]
 deps = ["Clustering", "DecisionTree", "GLM", "GaussianProcesses", "InteractiveUtils", "MLJBase", "MLJModels", "TOML"]
-git-tree-sha1 = "b1972536d7460519be54bc10cfba16c56d8446e6"
+git-tree-sha1 = "a3e2c922a9595477669f77422903d653c05d4ea9"
 repo-rev = "master"
 repo-url = "https://github.com/alan-turing-institute/MLJRegistry.jl"
 uuid = "a41df0fa-2d8a-11e9-1bfb-8110be68cd3e"
