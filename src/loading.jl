@@ -3,7 +3,7 @@
 const METADATA = MLJRegistry.metadata()
 
 # merge with the metadata for models defined in MLJ.jl:
-modeltypes = MLJRegistry.finaltypes(MLJBase.Model)
+modeltypes = MLJBase.finaltypes(MLJBase.Model)
 METADATA["MLJ"] = Dict()
 for M in modeltypes
     _info = MLJBase.info(M)

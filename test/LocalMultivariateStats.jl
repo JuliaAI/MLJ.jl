@@ -12,7 +12,7 @@ using LinearAlgebra
     bias = -42.0
     coefficients = Float64[1, 3, 7]
     A = randn(1000, 3)
-    Xtable = MLJ.table(A)
+    Xtable = MLJBase.table(A)
     y = A*coefficients
 
     # Train model on all data with no regularization and no
@@ -70,11 +70,11 @@ end
     barepca = PCA(pratio=0.9999)
     info(barepca)
 
-    fitresult, cache, report = MLJ.fit(barepca, 1, X)
+    fitresult, cache, report = MLJBase.fit(barepca, 1, X)
 
-    Xtr = MLJBase.matrix(MLJ.transform(barepca, fitresult, X))
+    Xtr = MLJBase.matrix(MLJBase.transform(barepca, fitresult, X))
 
-    X_array = MLJ.matrix(X)
+    X_array = MLJBase.matrix(X)
 
     # home made PCA (the sign flip is irrelevant)
     Xac = X_array .- mean(X_array, dims=1)

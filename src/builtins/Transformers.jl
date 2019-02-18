@@ -11,7 +11,6 @@ export OneHotEncoder
 import MLJBase: MLJType, Unsupervised
 import MLJBase: schema, selectcols, table
 import MLJBase
-import DataFrames: names, AbstractDataFrame, DataFrame, eltypes
 import Distributions
 using CategoricalArrays
 using Statistics
