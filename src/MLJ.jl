@@ -53,8 +53,8 @@ import MLJBase: fit, update, clean!, info
 import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: transform, inverse_transform, se, evaluate
 
-import MLJRegistry
-
+using RemoteFiles
+import TOML
 import Requires.@require  # lazy code loading package
 using  CategoricalArrays
 import Distributions: pdf, mode

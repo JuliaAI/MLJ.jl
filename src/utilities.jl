@@ -1,3 +1,29 @@
+
+# for changing symbols to strings in dictionaries:
+encode_dic(s) =
+    s isa Symbol ? string(":", s) : s
+encode_dic(v::Vector) = encode_dic.(v)
+function encode_dic(d::Dict)
+    ret = Dict{}()
+    for (k, v) in d
+        ret[encode_dic(k)] = encode_dic(v)
+    end
+    return ret
+end
+
+# for changing strings to symbols in dictionaries:
+decode_dic(s) =
+    s isa String && !isempty(s) && s[1] == ':' ? Symbol(s[2:end]) : s
+decode_dic(v::Vector) = decode_dic.(v)
+
+function decode_dic(d::Dict)
+    ret = Dict()
+    for (k, v) in d
+        ret[decode_dic(k)] = decode_dic(v)
+    end
+    return ret
+end
+
 # the inverse of a multivalued dictionary is a mulitvalued
 # dictionary:
 function inverse(d::Dict{S,Set{T}}) where {S,T}
