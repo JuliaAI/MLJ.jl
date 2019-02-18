@@ -1,8 +1,5 @@
 ## LOADING METADATA FOR EXTERNAL PACKAGE MODELS
 
-# Get latest version of metadata, we programatically load the registry
-# (which will never be a julia registered package):
-Pkg.add(PackageSpec(url="https://github.com/alan-turing-institute/MLJRegistry.jl", rev="master")) 
 const METADATA = MLJRegistry.metadata()
 
 # merge with the metadata for models defined in MLJ.jl:
