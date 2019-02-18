@@ -22,6 +22,7 @@ and [this poster summary](material/MLJ-JuliaCon2018-poster.pdf).
 Packages wishing to implement the MLJ interface for their algorithms should
 import [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl).
 
+
 ### Features to include:
 
 - **Automated tuning** of hyperparameters, including
@@ -63,7 +64,6 @@ In the Julia REPL:
 ]add "https://github.com/wildart/TOML.jl"
 add "https://github.com/alan-turing-institute/MLJBase.jl"
 add "https://github.com/alan-turing-institute/MLJModels.jl"
-add "https://github.com/alan-turing-institute/MLJRegistry.jl"
 add "https://github.com/alan-turing-institute/MLJ.jl"
 ````
 
