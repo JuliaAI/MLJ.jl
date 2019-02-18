@@ -7,7 +7,7 @@ modeltypes = MLJRegistry.finaltypes(MLJBase.Model)
 for M in modeltypes
     _info = MLJBase.info(M)
     modelname = _info[:name]
-    meta_given_package["MLJ"][modelname] = _info
+    METADATA["MLJ"][modelname] = _info
 end
 
 
