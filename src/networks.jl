@@ -296,4 +296,6 @@ import Base.+
 +(y1, y2::AbstractNode) = node(+, y1, y2)
 +(y1::AbstractNode, y2) = node(+, y1, y2)
 
+import Base.*
+*(lambda::Real, y::AbstactNode) = node(y->lambda*y, y)
 
