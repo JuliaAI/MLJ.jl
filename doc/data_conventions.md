@@ -45,21 +45,21 @@ As an aside, note that these types are used in MLJ purely for
 dispatch; they are never instantiated. 
 
 A given scientific type may have multiple machine type representations
-(eg, `Float64` and `Float32` both represent "continuous"). However, MLJ adopts
-the simplifying (but not universally adopted) convention that *the same
-machine data type cannote be used to represent multiple scientific
-types*. We may accordingly express MLJ scientific type representation
-using a function, `kind`, which associates to every Julia object a
-corresponding subtype of `Kind`:
+(eg, `Float64` and `Float32` both represent "continuous"). However,
+MLJ adopts the simplifying (but not universally adopted) convention
+that *the same machine data type cannot be used to represent multiple
+scientific types*. We may accordingly express MLJ's convention on
+scientific type representations using a function, `kind`, which
+associates to every Julia object a corresponding subtype of `Kind`:
 
 **Definitive type convention** Scalar data with intended
 scientific type `K` can be represented in MLJ by a Julia object `x` if `kind(x) = K`.
 
 So, for example, you may check that `kind(4.56) = Continuous` and
 `kind(4) = OrderedFactorInfinite`. In particular, you cannot use
-integers to represent (nominal) multiclass data!! You should use a
-`CategoralString` or `CategoricalValue` type (automatic if your data
-appears in a `CategoricaVector`).
+integers (which include booleans) to represent (nominal) multiclass
+data!! You should use a `CategoralString` or `CategoricalValue` type
+(automatic if your data appears in a `CategoricaVector`).
 
 In fact, if `kind(x) = K` then `kind(y) = K` for *all* `y` with
 `typeof(y)=typeof(x)` *unless*, `x` and `y` are instances of
