@@ -33,6 +33,8 @@ set_params!(super_model, changes)
       :model1 => Params(:K => 1, :metric => 9.5, :kernel => 'k'),
       :model2 => Params(:K => 3, :metric => 9.5, :kernel => 'k'))
 
+@test MLJ.flat_keys(params(super_model)) == ["lambda", "model1.K", "model1.metric", "model1.kernel",
+                                "model2.K", "model2.metric", "model2.kernel"]
 
 @test length(changes) == 2 
 @test length(params(super_model)) == 7

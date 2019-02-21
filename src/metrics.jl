@@ -4,8 +4,7 @@ default_measure(model::M) where M<:Supervised =
     default_measure(model,
                     Val((MLJBase.output_kind(M),
                          MLJBase.output_quantity(M))))
-default_measure(model, ::Any) =
-    error("A measure must be explicitly specified using measure=...") # eventually drop
+default_measure(model, ::Any) = nothing
 default_measure(model::Deterministic, ::Val{(:continuous, :univariate)}) = rms
 default_measure(model::Probabilistic, ::Val{(:continuous, :univariate)}) = rms
 default_measure(model::Deterministic, ::Val{(:binary, :univariate)}) = misclassification_rate

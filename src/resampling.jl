@@ -46,7 +46,8 @@ Estimate the performance of a machine `mach` using the specified
 `measure`. In general this mutating operation preserves only
 `mach.args` (the data stored in the machine).
 
-If no measure is specified, then `default_measure(mach.model)` is used.
+If no measure is specified, then `default_measure(mach.model)` is used, unless
+this default is `nothing` and an error is thrown.
 
 """
 evaluate!(mach::Machine;
@@ -57,8 +58,14 @@ evaluate!(mach::Machine;
 function evaluate!(mach::Machine, resampling::Holdout;
                    measure=nothing, operation=predict, verbosity=1)
 
-    _measure =
-        measure == nothing ? default_measure(mach.model) : measure
+    if measure == nothing
+        _measure = default_measure(mach.model)
+        if _measure == nothing
+            error("You need to specify measure=... ")
+        end
+    else
+        _measure = measure
+    end
     
     X = mach.args[1]
     y = mach.args[2]
@@ -75,8 +82,14 @@ end
 function evaluate!(mach::Machine, resampling::CV;
                    measure=nothing, operation=predict, verbosity=1)
 
-    _measure =
-        measure == nothing ? default_measure(mach.model) : measure
+    if measure == nothing
+        _measure = default_measure(mach.model)
+        if _measure == nothing
+            error("You need to specify measure=... ")
+        end
+    else
+        _measure = measure
+    end
 
     X = mach.args[1]
     y = mach.args[2]
@@ -149,8 +162,14 @@ Resampler(; model=ConstantRegressor(), resampling=Holdout(),
 
 function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
 
-    measure =
-        resampler.measure == nothing ? default_measure(resampler.model) : resampler.measure
+    if resampler.measure == nothing
+        measure = default_measure(resampler.model)
+        if measure == nothing
+            error("You need to specify measure=... ")
+        end
+    else
+        measure = resampler.measure
+    end
 
     mach = machine(resampler.model, X, y)
 
@@ -172,8 +191,14 @@ function MLJBase.update(resampler::Resampler{Holdout}, verbosity::Int, fitresult
 
     old_mach, old_resampling = cache
 
-    measure =
-        resampler.measure == nothing ? default_measure(resampler.model) : resampler.measure
+    if resampler.measure == nothing
+        measure = default_measure(resampler.model)
+        if measure == nothing
+            error("You need to specify measure=... ")
+        end
+    else
+        measure = resampler.measure
+    end
 
     if old_resampling.fraction_train == resampler.resampling.fraction_train
         mach = old_mach

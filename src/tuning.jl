@@ -39,8 +39,12 @@ function TunedModel(;model=nothing,
                     nested_ranges=Params(),
                     report_measurements=true)
     
-    !isempty(nested_ranges) || error("No nested_ranges specified.")
-    model != nothing || error("No model specified. Use TunedModel(model=...) ")
+    !isempty(nested_ranges) || error("You need to specify nested_ranges=... ")
+    model != nothing || error("You need to specify model=... ")
+
+    message = clean!(model)
+    isempty(message) || @info message
+    
     if model isa Deterministic
         return DeterministicTunedModel(model, tuning, resampling,
                       measure, operation, nested_ranges, report_measurements)
@@ -51,14 +55,22 @@ function TunedModel(;model=nothing,
     error("$model does not appear to be a Supervised model.")
 end
 
+function MLJBase.clean!(model::EitherTunedModel)
+    message = ""
+    if model.measure == nothing
+        model.measure = default_measure(model)
+        message *= "No measure specified. Using measure=$(model.measure). "
+    end
+    return message
+end
+
 function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y) where M
 
     # the mutating model:
     clone = deepcopy(tuned_model.model)
 
-    measure =
-        tuned_model.measure == nothing ? default_measure(tuned_model.model) : tuned_model.measure
-    
+    measure = tuned_model.measure
+
     resampler = Resampler(model=clone,
                           resampling=tuned_model.resampling,
                           measure=measure,
@@ -83,9 +95,10 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     # nested sequence of `:hyperparameter => iterator` pairs:
     nested_iterators = copy(tuned_model.nested_ranges, iterators)
 
-    iterators = flat_values(nested_iterators)
+    # iterators = MLJ.flat_values(nested_iterators)
+    
     n_iterators = length(iterators)
-    A = unwind(iterators...)
+    A = MLJ.unwind(iterators...)
     N = size(A, 1)
 
     if tuned_model.report_measurements
@@ -94,7 +107,6 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     end
 
     # initialize search for best model:
-    m = 1 # model counter
     best_model = deepcopy(tuned_model.model)
     best_measurement = Inf
 
@@ -143,6 +155,9 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
         if n_iterators == 1
             report[:curve] = ([A[:,1]...], measurements)
         end
+        # return parameter names as row vector to correspond to layout of values:
+        report[:parameter_names] = reshape(flat_keys(tuned_model.nested_ranges), 1, :)
+        report[:parameter_values] = A
     else
         report = nothing
     end

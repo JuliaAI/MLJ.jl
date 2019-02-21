@@ -65,7 +65,7 @@ macro load(model_ex)
     model = string(model_ex)
 
     pkg, success = try_to_get_package(model)
-    if !success
+    if !success # pkg is then a message
         error(pkg*"Use @load $model pkg=...")
     end
 

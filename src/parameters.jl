@@ -93,6 +93,28 @@ function flat_values(params::Params)
 end
 
 """
+     flat_keys(params::Params)
+
+Use dot-concatentation to express each key in key-value pair of
+`params` in string form.
+
+### Example
+
+````
+julia> flat_keys(Params(:A => Params(:x => 2, :y => 3), :B)))
+["A.x", "A.y", "B"]
+````
+
+"""
+flat_keys(pair::Pair{Symbol}) = flat_keys(pair, last(pair))
+flat_keys(pair, ::Any) = [string(first(pair)), ]
+flat_keys(pair, ::Params) =
+    [string(first(pair), ".", str) for str in flat_keys(last(pair))]
+flat_keys(nested::Params) =
+    reduce(vcat, [flat_keys(pair) for pair in nested.pairs])
+
+
+"""
     copy(params::Params, values=nothing)
 
 Return a copy of `params` with new `values`. That is,

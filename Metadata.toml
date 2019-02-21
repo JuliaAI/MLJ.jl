@@ -62,9 +62,23 @@
 ":is_pure_julia" = ":yes"
 ":package_url" = "https://github.com/JuliaStats/GLM.jl"
 ":package_name" = "GLM"
-":output_is_probabilistic" = ":no"
+":output_is_probabilistic" = ":yes"
 ":name" = "OLSRegressor"
 ":output_kind" = ":continuous"
+":output_quantity" = ":univariate"
+":input_kinds" = [":continuous"]
+":learning_type" = ":supervised"
+
+[GLM.GLMCountRegressor]
+":package_uuid" = "38e38edf-8417-5370-95a0-9cbb8c7f171a"
+":load_path" = "MLJModels.GLM_.GLMCountRegressor"
+":input_quantity" = ":multivariate"
+":is_pure_julia" = ":yes"
+":package_url" = "https://github.com/JuliaStats/GLM.jl"
+":package_name" = "GLM"
+":output_is_probabilistic" = ":yes"
+":name" = "GLMCountRegressor"
+":output_kind" = ":ordered_factor_infinite"
 ":output_quantity" = ":univariate"
 ":input_kinds" = [":continuous"]
 ":learning_type" = ":supervised"
