@@ -45,8 +45,8 @@ Discrete <: Found
 Other <: Found
 ````
 
-Note that `Multiclass` is parameterized by the number of classes, and
-`Binary = Multiclass{2}`. 
+Note that `Multiclass` and `OrderedFactorFinite` are parameterized by
+the number of classes, and `Binary = Multiclass{2}`.
 
 As an aside, note that these types are used in MLJ purely for
 dispatch; they are never instantiated. 
@@ -83,9 +83,9 @@ scitype(::Missing) = Missing
 scitype(::Real) = Continuous
 scitype(::Integer) = OrderedFactorInfinite
 scitype(c::CategoricalValue) =
-    c.ordered ? OrderedFactorFinite : Multiclass{length(levels(c))}
+    c.ordered ? OrderedFactorFinite{length(levels(c))} : Multiclass{length(levels(c))}
 scitype(c::CategoricalString) =
-    c.ordered ? OrderedFactorFinite : Multiclass{length(levels(c))}
+    c.ordered ? OrderedFactorFinite{length(levels(c))} : Multiclass{length(levels(c))}
 
 ````
 
