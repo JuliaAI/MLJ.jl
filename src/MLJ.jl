@@ -42,7 +42,7 @@ export predict, predict_mean, predict_median, predict_mode
 export transform, inverse_transform, se, evaluate
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 export partition, X_and_y
-export load_boston, load_ames, load_iris  
+export load_boston, load_ames, load_iris, load_reduced_ames
 export load_crabs, datanow                
 export features, X_and_y
 
