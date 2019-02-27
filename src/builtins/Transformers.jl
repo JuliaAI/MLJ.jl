@@ -17,8 +17,9 @@ using Statistics
 using Tables
 
 # to be extended:
-import MLJBase: fit, transform, inverse_transform
-import MLJBase: Found, Continuous, Discrete, Multiclass, Other, OrderedFactor, Count
+import MLJBase: fit, transform, inverse_transform, scitype
+import MLJBase: Found, Continuous, Discrete, Multiclass
+import MLJBase: FiniteOrderedFactor, Other, OrderedFactor, Count
 
 
 ## CONSTANTS
@@ -32,9 +33,9 @@ const N_VALUES_THRESH = 16 # for BoxCoxTransformation
 """
     FeatureSelector(features=Symbol[])
 
-An usupervised model for filtering features (columns) of a table.
+An unsupervised model for filtering features (columns) of a table.
 Only those features encountered during fitting will appear in
-transformed tables, these features appearing encountered.
+transformed tables if `features` is empty (the default).
 Alternatively, if a non-empty `features` is specified, then only the
 specified features are used. Throws an error if a recorded or
 specified feature is not present in the transformation input.
@@ -254,17 +255,6 @@ specify the names of features to be standardized.
     │ 2   │ -0.458831 │ 2     │
     │ 3   │ 1.14708   │ 3     │
 
-    stand_model.features=[:x1, :x2]
-    transform(fit!(machine(stand_model, X)), X)
-
-    3×2 DataFrame
-    │ Row │ x1        │ x2      │
-    │     │ Float64   │ Float64 │
-    ├─────┼───────────┼─────────┤
-    │ 1   │ -0.688247 │ 1.0     │
-    │ 2   │ -0.458831 │ -1.0    │
-    │ 3   │ 1.14708   │ 0.0     │
-
 """
 mutable struct Standardizer <: Unsupervised
     features::Vector{Symbol} # features to be standardized; empty means all of
@@ -277,21 +267,18 @@ Standardizer(; features=Symbol[]) = Standardizer(features)
 StandardizerFitResult() = StandardizerFitResult(zeros(0,0), Symbol[], Bool[])
 
 function fit(transformer::Standardizer, verbosity::Int, X::Any)
-    # if using Query.jl, replace below code with
-    # all_features = df |> @take(1) |> @map(fieldnames(typeof(_))) |> @mapmany(_, __)
-    # Since this is a really dirty way of proceeding, I've used
-    # Tables.jl for now.
+
     _schema =  schema(X)
     all_features = _schema.names
     
     # determine indices of all_features to be transformed
     if isempty(transformer.features)
         cols_to_fit = filter!(eachindex(all_features)|>collect) do j
-            _schema.eltypes[j] <: AbstractFloat
+            scitype(MLJBase.selectcols(X, j)) <: Continuous
         end
     else
         cols_to_fit = filter!(eachindex(all_features)|>collect) do j
-            all_features[j] in transformer.features && _schema.eltypes[j] <: Real
+            all_features[j] in transformer.features && scitype(MLJBase.selectcols(X, j)) <: Continuous
         end
     end
     
@@ -542,16 +529,15 @@ function fit(transformer::OneHotEncoder{R}, verbosity::Int, X) where R
     all_features = Tables.schema(X).names # a tuple not vector
     specified_features =
         isempty(transformer.features) ? collect(all_features) : transformer.features
-    all_eltypes = Tables.schema(X).types  # a tuple not vector
 
     ref_name_pairs_given_feature = Dict{Symbol,Vector{Pair{R,Symbol}}}()
 
     for j in eachindex(all_features)
         ftr = all_features[j]
-        T = all_eltypes[j]
-        if T <: Union{CategoricalValue,CategoricalString} && ftr in specified_features
+        col = MLJBase.selectcols(X,j)
+        T = scitype(col)
+        if T <: Union{Multiclass,FiniteOrderedFactor} && ftr in specified_features
             ref_name_pairs_given_feature[ftr] = Pair{R,Symbol}[]
-            col = MLJBase.selectcols(X,j)
             shift = transformer.drop_last ? 1 : 0
             if verbosity > 0
                 @info "Spawned $(length(col)-shift) sub-features to one-hot encode feature :$ftr."
@@ -619,9 +605,9 @@ MLJBase.package_url(::Type{<:OneHotEncoder}) = "https://github.com/alan-turing-i
 MLJBase.package_name(::Type{<:OneHotEncoder}) = "MLJ"
 MLJBase.package_uuid(::Type{<:OneHotEncoder}) = ""
 MLJBase.is_pure_julia(::Type{<:OneHotEncoder}) = true
-MLJBase.input_scitypes(::Type{<:OneHotEncoder}) = MLJBase.Found
+MLJBase.input_scitypes(::Type{<:OneHotEncoder}) = Union{Missing,Found}
 MLJBase.input_is_multivariate(::Type{<:OneHotEncoder}) = true
-MLJBase.output_scitypes(::Type{<:OneHotEncoder}) = Union{MLJBase.Count,MLJBase.Continuous}
+MLJBase.output_scitypes(::Type{<:OneHotEncoder}) = Union{Missing,Found}
 MLJBase.output_is_multivariate(::Type{<:OneHotEncoder}) = true
 
 

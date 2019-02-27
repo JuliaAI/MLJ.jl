@@ -39,7 +39,7 @@ export pdf, mode, median, mean, info
 export SupervisedTask, UnsupervisedTask
 export Deterministic, Probabilistic, Unsupervised, Supervised
 export Found, Continuous, Discrete, OrderedFactor    
-export FiniteOrderedFactor                           
+export FiniteOrderedFactor, Other
 export Count, Multiclass, Binary
 export scitype
 export predict, predict_mean, predict_median, predict_mode
