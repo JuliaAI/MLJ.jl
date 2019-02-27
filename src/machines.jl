@@ -41,8 +41,7 @@ end
 Machine(model::M, args...) where M<:Model = Machine{M}(model, args...)
 
 # constructor for tasks instead of bare data:
-# Machine(model::Model, task::SupervisedTask) = Machine(model, X_and_y(task)...)
-# Machine(model::Model, task::UnsupervisedTask) = Machine(model, task.data)
+Machine(model::Model, task::Task) = Machine(model, task())
 
 # Note: The following method is written to fit! `NodalMachine`s
 # defined in networks.jl, in addition to `Machine`s defined above.
