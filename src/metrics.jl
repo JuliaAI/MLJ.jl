@@ -21,7 +21,7 @@ default_measure(model::Probabilistic, ::Type{<:Union{Multiclass,FiniteOrderedFac
 ## REGRESSOR METRICS (FOR DETERMINISTIC PREDICTIONS)
 
 
-function rms(y, yhat::AbstractVector{<:Real})
+function rms(yhat::AbstractVector{<:Real}, y)
     length(y) == length(yhat) || throw(DimensionMismatch())
     ret = 0.0
     for i in eachindex(y)
@@ -30,9 +30,9 @@ function rms(y, yhat::AbstractVector{<:Real})
     end
     return sqrt(ret/length(y))
 end
-rms(y, yhat) = rms(y, mean.(yhat)) 
+rms(yhat, y) = rms(mean.(yhat), y) 
 
-function rmsl(y, yhat::AbstractVector{<:Real})
+function rmsl(yhat::AbstractVector{<:Real}, y)
     length(y) == length(yhat) || throw(DimensionMismatch())
     ret = 0.0
     for i in eachindex(y)
@@ -41,9 +41,9 @@ function rmsl(y, yhat::AbstractVector{<:Real})
     end
     return sqrt(ret/length(y))
 end
-rmsl(y, yhat) = rmsl(y, mean.(yhat)) 
+rmsl(yhat, y) = rmsl(mean.(yhat), y) 
 
-function rmslp1(y, yhat::AbstractVector{<:Real})
+function rmslp1(yhat::AbstractVector{<:Real}, y)
     length(y) == length(yhat) || throw(DimensionMismatch())
     ret = 0.0
     for i in eachindex(y)
@@ -52,11 +52,11 @@ function rmslp1(y, yhat::AbstractVector{<:Real})
     end
     return sqrt(ret/length(y))
 end
-rmslp1(y, yhat) = rmslp1(y, mean.(yhat)) 
+rmslp1(yhat, y) = rmslp1(y, mean.(yhat))
 
 
 """ Root mean squared percentage loss """
-function rmsp(y, yhat::AbstractVector{<:Real})
+function rmsp(yhat::AbstractVector{<:Real}, y)
     length(y) == length(yhat) || throw(DimensionMismatch())
     ret = 0.0
     count = 0
@@ -69,15 +69,15 @@ function rmsp(y, yhat::AbstractVector{<:Real})
     end
     return sqrt(ret/count)
 end
-rmsp(y, yhat) = rmsp(y, mean.(yhat)) 
+rmsp(yhat, y) = rmsp(mean.(yhat), y) 
 
 
 ## CLASSIFICATION METRICS (FOR DETERMINISTIC PREDICTIONS)
 
-misclassification_rate(y::CategoricalVector{L}, yhat::CategoricalVector{L}) where L =
+misclassification_rate(yhat::CategoricalVector{L}, y::CategoricalVector{L}) where L =
     mean(y .!= yhat)
-misclassification_rate(y::CategoricalArray, yhat) =
-    misclassification_rate(y, mode.(yhat))
+misclassification_rate(yhat, y::CategoricalArray) =
+    misclassification_rate(mode.(yhat), y)
 
 # TODO: multivariate case 
 
@@ -85,10 +85,10 @@ misclassification_rate(y::CategoricalArray, yhat) =
 ## CLASSIFICATION METRICS (FOR PROBABILISTIC PREDICTIONS)
 
 # for single pattern:
-cross_entropy(y, d::UnivariateNominal) = -log(d.prob_given_level[y])
+cross_entropy(d::UnivariateNominal, y) = -log(d.prob_given_level[y])
 
-cross_entropy(y::CategoricalVector{L}, yhat::Vector{<:UnivariateNominal{L}}) where L =
-    broadcast(cross_entropy, y, yhat) |> mean
+cross_entropy(yhat::Vector{<:UnivariateNominal{L}}, y::CategoricalVector{L}) where L =
+    broadcast(cross_entropy, yhat, y) |> mean
 
 
 # function auc(truelabel::L) where L

@@ -74,7 +74,7 @@ function evaluate!(mach::Machine, resampling::Holdout;
     train, test = partition(eachindex(y), resampling.fraction_train)
     fit!(mach, rows=train, verbosity=verbosity-1)
     yhat = operation(mach, selectrows(X, test))    
-    fitresult = _measure(y[test], yhat)
+    fitresult = _measure(yhat, y[test])
 
 end
 
@@ -112,7 +112,7 @@ function evaluate!(mach::Machine, resampling::CV;
         train = vcat(rows[1:(f - 1)], rows[(s + 1):end])
         fit!(mach; rows=train, verbosity=verbosity-1)
         yhat = operation(mach, selectrows(X, test))    
-        return _measure(y[test], yhat)
+        return _measure(yhat, y[test])
     end
 
     firsts = 1:k:((nfolds - 1)*k + 1) # itr of first `test` rows index
