@@ -10,7 +10,7 @@ using Distributions
 
 ## WRAPPED ENSEMBLES OF FITRESULTS
 
-# target is :deterministic :multiclass :univariate:
+# target is :deterministic :multiclass false:
 atom = DeterministicConstantClassifier(target_type=Char)
 L = ['a', 'b', 'j']
 ensemble = [('a', L), ('j', L), ('j', L), ('b', L)]
@@ -20,14 +20,14 @@ wens = MLJ.WrappedEnsemble(atom, ensemble)
 X = MLJ.table(rand(3,5))
 @test predict(wens, weights, X) == categorical(['j','j','j'])
 
-# target is :deterministic :continuous :univariate:
+# target is :deterministic :continuous false:
 atom = DeterministicConstantRegressor()
 ensemble = Float64[4, 7, 4, 4]
 weights = [0.1, 0.5, 0.2, 0.2]
 wens = MLJ.WrappedEnsemble(atom, ensemble)
 @test predict(wens, weights, X) ≈ [5.5, 5.5, 5.5]
 
-# target is :probabilistic :multiclass :univariate:
+# target is :probabilistic :multiclass false:
 atom = ConstantClassifier(target_type=Char)
 L = ['a', 'b', 'j']
 d1 = UnivariateNominal(L, [0.1, 0.2, 0.7])
@@ -41,7 +41,7 @@ d = predict(wens, weights, X)[1]
 @test pdf(d, 'b') ≈ 0.25
 @test pdf(d, 'j') ≈ 0.6
 
-# target is :probabilistic :continuous :univariate:
+# target is :probabilistic :continuous false:
 atom = ConstantRegressor(target_type=Float64)
 d1 = Distributions.Normal(1, 2)
 d2 = Distributions.Normal(3, 4)
@@ -54,7 +54,7 @@ d = predict(wens, weights, X)[1]
 
 ## ENSEMBLE MODEL
 
-# target is :deterministic :multiclass :univariate:
+# target is :deterministic :multiclass false:
 atom=DeterministicConstantClassifier(target_type=Char)
 X = MLJ.table(ones(5,3))
 y = categorical(collect("asdfa"))
@@ -69,7 +69,7 @@ predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
-# target is :deterministic :continuous :univariate:
+# target is :deterministic :continuous false:
 atom = DeterministicConstantRegressor(target_type=Float64)
 X = MLJ.table(ones(5,3))
 y = Float64[1.0, 2.0, 1.0, 1.0, 1.0]
@@ -89,7 +89,7 @@ predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
-# target is :probabilistic :multiclass :univariate:
+# target is :probabilistic :multiclass false:
 atom = ConstantClassifier(target_type=Char)
 X = MLJ.table(ones(5,3))
 y = categorical(collect("asdfa"))
@@ -113,7 +113,7 @@ predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
-# target is :probabilistic :continuous :univariate:
+# target is :probabilistic :continuous false:
 atom = ConstantRegressor(target_type=Float64)
 X = MLJ.table(ones(5,3))
 y = Float64[1.0, 2.0, 2.0, 1.0, 1.0]
@@ -179,7 +179,7 @@ learning_curve(ensemble_model, X, y; resolution=10, nested_range=nested_range)
 # fit!(ensemble);
 # ensemble_model.weight_regularization = 0.5
 # fit_weights!(ensemble);
-# display(ensemble.report[:normalized_weights])
+# display(ensemble.report[falsermalized_weights])
 # err(ensemble, test)
 # fit!(ensemble, train, add=true);
 # err(ensemble, test)

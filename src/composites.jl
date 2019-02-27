@@ -25,8 +25,6 @@ mutable struct SimpleDeterministicCompositeModel{L<:Deterministic,
     
 end
 
-MLJBase.package_name(::Type{<:SimpleDeterministicCompositeModel}) = "MLJ"
-
 function SimpleDeterministicCompositeModel(; model=DeterministicConstantRegressor(), 
                           transformer=FeatureSelector())
 
@@ -57,4 +55,12 @@ function MLJBase.fit(composite::SimpleDeterministicCompositeModel, verbosity::In
 end
 
 MLJBase.predict(composite::SimpleDeterministicCompositeModel, fitresult, Xnew) = fitresult(Xnew)
+
+MLJBase.load_path(::Type{<:SimpleDeterministicCompositeModel}) = "MLJ.SimpleDeterministicCompositeModel"
+MLJBase.package_name(::Type{<:SimpleDeterministicCompositeModel}) = "MLJ"
+MLJBase.package_uuid(::Type{<:SimpleDeterministicCompositeModel}) = ""
+MLJBase.package_url(::Type{<:SimpleDeterministicCompositeModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.is_pure_julia(::Type{<:SimpleDeterministicCompositeModel}) = true
+# MLJBase.input_scitypes(::Type{<:SimpleDeterministicCompositeModel}) = 
+# MLJBase.target_scitype(::Type{<:SimpleDeterministicCompositeModel}) = 
 

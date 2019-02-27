@@ -7,18 +7,15 @@ mutable struct WrappedEnsemble{R,Atom <: Supervised{R}} <: MLJType
     ensemble::Vector{R}
 end
 
-_output_kind(Atom::Type{<:Model}) =
-    output_kind(Atom) in [:binary, :multiclass, :ordered_factor_finite] ? :nominal : output_kind(Atom)
-_output_kind(atom::Model) = _output_kind(typeof(atom))
+Nominal = Union{Multiclass,FiniteOrderedFactor}
 
-# trait functions to dispatch predict method:
-_output_is(Atom::Type{<:Deterministic}) = Val((:deterministic, _output_kind(Atom), output_quantity(Atom)))
-_output_is(Atom::Type{<:Probabilistic}) =  Val((:probabilistic, _output_kind(Atom), output_quantity(Atom)))
+# to enable trait-based dispatch of predict:
+predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom<:Deterministic} = 
+    predict(wens, weights, Xnew, Deterministic, target_scitype(Atom))
+predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom<:Probabilistic} = 
+    predict(wens, weights, Xnew, Probabilistic, target_scitype(Atom))
 
-predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom} = 
-    predict(wens, weights, Xnew, _output_is(Atom))
-
-function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:deterministic, :nominal, :univariate)})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Deterministic}, ::Type{<:Nominal})
 
     # weights ignored in this case
     
@@ -38,7 +35,7 @@ function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:deterministic, :n
     return prediction
 end
 
-function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:deterministic, :continuous, :univariate)})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Deterministic}, ::Type{<:Continuous})
     ensemble = wens.ensemble
     
     atom = wens.atom
@@ -54,7 +51,7 @@ function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:deterministic, :c
     return prediction
 end
 
-function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:probabilistic, :nominal, :univariate)})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Probabilistic}, ::Type{<:Nominal})
 
     ensemble = wens.ensemble
     
@@ -77,7 +74,7 @@ function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:probabilistic, :n
     return predictions
 end
 
-function predict(wens::WrappedEnsemble, weights, Xnew, ::Val{(:probabilistic, :continuous, :univariate)})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Probabilistic}, ::Type{<:Continuous})
 
     ensemble = wens.ensemble
     
@@ -149,12 +146,12 @@ function clean!(model::DeterministicEnsembleModel{R}) where R
         "in the range (0,1]. Reset to 1. "
         model.bagging_fraction = 1.0
     end
-    if _output_kind(model.atom) == :nominal && !isempty(model.weights)
+    if target_scitype(model.atom)<:Nominal && !isempty(model.weights)
         message = message*"weights will be ignored to form predictions. "
     elseif !isempty(model.weights)
         total = sum(model.weights)
         if !(total ≈ 1.0)
-            message = message*"Weights should sum to one and are being automatically normalized. "
+            message = message*"weights should sum to one and are being automatically normalized. "
             model.weights = model.weights/total
         end
     end
@@ -238,7 +235,7 @@ end
     EnsembleModel(atom=nothing, weights=Float64[], bagging_fraction=0.8, rng_seed=0, n=100, parallel=true)
 
 Create a model for training an ensemble of `n` learners, with optional
-bagging, each with associated model `atom`. Useful if
+bagging, each with associated model `atom`. Ensembling is useful if
 `fit!(machine(atom, data...))` does not create identical models on
 repeated calls (ie, is a stochastic model, such as a decision tree
 with randomized node selection criteria), or if `bagging_fraction` is
@@ -251,11 +248,13 @@ for external optimization) except in the case that `atom` is a
 zero length.
 
 The ensemble model is `Deterministic` or `Probabilistic`, according to
-the corresponding supertype of `atom`. In the case of classifiers, the
-predictions are majority votes, and for regressors they are ordinary
-averages.  Probabilistic predictions are obtained by averaging the
-atomic probability distribution functions; in particular, for
-regressors, the ensemble prediction on each input pattern has the type
+the corresponding supertype of `atom`. In the case of classifiers
+(target_scitype(atom) <: Union{Multiclass,FiniteOrderedFactor}), the
+predictions are majority votes, and for regressors
+(target_scitype(atom)<: Continuous) they are ordinary averages.
+Probabilistic predictions are obtained by averaging the atomic
+probability distribution functions; in particular, for regressors, the
+ensemble prediction on each input pattern has the type
 `MixtureModel{VF,VS,D}` from the Distributions.jl package, where `D`
 is the type of predicted distribution for `atom`.
 
@@ -367,25 +366,25 @@ end
 
 ## METADATA
 
-# Note: input and output traits are inherited from atom
+# Note: input and target traits are inherited from atom
 
 MLJBase.load_path(::Type{<:DeterministicEnsembleModel}) = "MLJ.DeterministicEnsembleModel"
 MLJBase.package_name(::Type{<:DeterministicEnsembleModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:DeterministicEnsembleModel}) = ""
 MLJBase.package_url(::Type{<:DeterministicEnsembleModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
 MLJBase.is_pure_julia(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.is_pure_julia(Atom)
-MLJBase.input_kinds(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.input_kinds(Atom)
-MLJBase.output_kind(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.output_kind(Atom)
-MLJBase.output_quantity(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.output_quantity(Atom)
+MLJBase.input_scitypes(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.input_scitypes(Atom)
+MLJBase.target_scitype(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.target_scitype(Atom)
+MLJBase.input_is_multivariate(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.input_is_multivariate(Atom)
 
 MLJBase.load_path(::Type{<:ProbabilisticEnsembleModel}) = "MLJ.ProbabilisticEnsembleModel"
 MLJBase.package_name(::Type{<:ProbabilisticEnsembleModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:ProbabilisticEnsembleModel}) = ""
 MLJBase.package_url(::Type{<:ProbabilisticEnsembleModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
 MLJBase.is_pure_julia(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.is_pure_julia(Atom)
-MLJBase.input_kinds(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.input_kinds(Atom)
-MLJBase.output_kind(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.output_kind(Atom)
-MLJBase.output_quantity(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.output_quantity(Atom)
+MLJBase.input_scitypes(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.input_scitypes(Atom)
+MLJBase.target_scitype(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.target_scitype(Atom)
+MLJBase.input_is_multivariate(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.input_is_multivariate(Atom)
 
 ### old KoalaEnsembles code for optimizing the weights in the deterministic regressor case:
 
@@ -444,7 +443,7 @@ MLJBase.output_quantity(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,A
                 
 #     fitresult = WrappedEnsemble(model.atom, ensemble, weights)
 #     report = Dict{Symbol, Any}()
-#     report[:normalized_weights] = weights*length(weights)
+#     report[falsermalized_weights] = weights*length(weights)
 
 #     cache = (X, y, scheme_X, ensemble)
         

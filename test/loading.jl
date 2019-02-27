@@ -4,7 +4,7 @@ module TestLoading
 using Test
 using MLJ
 
-pkgs = keys(MLJ.METADATA)
+pkgs = keys(MLJ.metadata())
 @test "MLJ" in pkgs
 @test "DecisionTree" in pkgs
 

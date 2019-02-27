@@ -156,7 +156,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
             report[:curve] = ([A[:,1]...], measurements)
         end
         # return parameter names as row vector to correspond to layout of values:
-        report[:parameter_names] = reshape(flat_keys(tuned_model.nested_ranges), 1, :)
+        report[:parameter_names] =  permutedims(flat_keys(tuned_model.nested_ranges)) #reshape(flat_keys(tuned_model.nested_ranges), 1, :)
         report[:parameter_values] = A
     else
         report = nothing
@@ -179,18 +179,18 @@ MLJBase.package_name(::Type{<:DeterministicTunedModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:DeterministicTunedModel}) = ""
 MLJBase.package_url(::Type{<:DeterministicTunedModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
 MLJBase.is_pure_julia(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.is_pure_julia(M)
-MLJBase.input_kinds(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.input_kinds(M)
-MLJBase.output_kind(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.output_kind(M)
-MLJBase.output_quantity(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.output_quantity(M)
+MLJBase.input_scitypes(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.input_scitypes(M)
+MLJBase.input_is_multivariate(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.input_is_multivariate(M)
+MLJBase.target_scitype(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.target_scitype(M)
 
 MLJBase.load_path(::Type{<:ProbabilisticTunedModel}) = "MLJ.ProbabilisticTunedModel"
 MLJBase.package_name(::Type{<:ProbabilisticTunedModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:ProbabilisticTunedModel}) = ""
 MLJBase.package_url(::Type{<:ProbabilisticTunedModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
 MLJBase.is_pure_julia(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.is_pure_julia(M)
-MLJBase.input_kinds(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.input_kinds(M)
-MLJBase.output_kind(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.output_kind(M)
-MLJBase.output_quantity(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.output_quantity(M)
+MLJBase.input_scitypes(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.input_scitypes(M)
+MLJBase.target_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.target_scitype(M)
+MLJBase.input_is_multivariate(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.input_is_multivariate(M)
 
 
 ## LEARNING CURVES (1D TUNING)

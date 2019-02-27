@@ -101,10 +101,9 @@ end
 MLJBase.load_path(::Type{<:KNNRegressor}) = "MLJ.KNNRegressor"
 MLJBase.package_name(::Type{<:KNNRegressor}) = "MLJ"
 MLJBase.package_uuid(::Type{<:KNNRegressor}) = ""
-MLJBase.is_pure_julia(::Type{<:KNNRegressor}) = :yes
-MLJBase.input_kinds(::Type{<:KNNRegressor}) = [:continuous, ]
-MLJBase.output_kind(::Type{<:KNNRegressor}) = :continuous
-MLJBase.output_quantity(::Type{<:KNNRegressor}) = :univariate
+MLJBase.is_pure_julia(::Type{<:KNNRegressor}) = true
+MLJBase.input_scitypes(::Type{<:KNNRegressor}) = MLJBase.Continuous
+MLJBase.target_scitype(::Type{<:KNNRegressor}) = MLJBase.Continuous
 
 
 end # module

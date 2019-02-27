@@ -60,10 +60,9 @@ MLJBase.load_path(::Type{<:ConstantRegressor}) = "MLJ.ConstantRegressor"
 MLJBase.package_name(::Type{<:ConstantRegressor}) = "MLJ"
 MLJBase.package_uuid(::Type{<:ConstantRegressor}) = ""
 MLJBase.package_url(::Type{<:ConstantRegressor}) = "https://github.com/alan-turing-institute/MLJ.jl"
-MLJBase.is_pure_julia(::Type{<:ConstantRegressor}) = :yes
-MLJBase.input_kinds(::Type{<:ConstantRegressor}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
-MLJBase.output_kind(::Type{<:ConstantRegressor}) = :continuous
-MLJBase.output_quantity(::Type{<:ConstantRegressor}) = :univariate
+MLJBase.is_pure_julia(::Type{<:ConstantRegressor}) = true
+MLJBase.input_scitypes(::Type{<:ConstantRegressor}) = Union{MLJBase.Missing,MLJBase.Found}
+MLJBase.target_scitype(::Type{<:ConstantRegressor}) = MLJBase.Continuous
 
 
 ## THE CONSTANT DETERMINISTIC REGRESSOR (FOR TESTING)
@@ -89,10 +88,9 @@ MLJBase.load_path(::Type{<:DeterministicConstantRegressor}) = MLJBase.load_path(
 MLJBase.package_name(::Type{<:DeterministicConstantRegressor}) = MLJBase.package_name(ConstantRegressor)
 MLJBase.package_uuid(::Type{<:DeterministicConstantRegressor}) = MLJBase.package_url(ConstantRegressor)
 MLJBase.package_url(::Type{<:DeterministicConstantRegressor}) = MLJBase.package_url(ConstantRegressor)
-MLJBase.is_pure_julia(::Type{<:DeterministicConstantRegressor}) = :yes
-MLJBase.input_kinds(::Type{<:DeterministicConstantRegressor}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
-MLJBase.output_kind(::Type{<:DeterministicConstantRegressor}) = :continuous
-MLJBase.output_quantity(::Type{<:DeterministicConstantRegressor}) = :univariate
+MLJBase.is_pure_julia(::Type{<:DeterministicConstantRegressor}) = true
+MLJBase.input_scitypes(::Type{<:DeterministicConstantRegressor}) = Union{MLJBase.Missing,MLJBase.Found}
+MLJBase.target_scitype(::Type{<:DeterministicConstantRegressor}) = MLJBase.Continuous
 
 
 ## THE CONSTANT CLASSIFIER
@@ -152,10 +150,9 @@ MLJBase.load_path(::Type{<:ConstantClassifier}) = "MLJ.ConstantClassifier"
 MLJBase.package_name(::Type{<:ConstantClassifier}) = MLJBase.package_name(ConstantRegressor)
 MLJBase.package_uuid(::Type{<:ConstantClassifier}) = MLJBase.package_uuid(ConstantRegressor)
 MLJBase.package_url(::Type{<:ConstantClassifier}) = MLJBase.package_url(ConstantRegressor)
-MLJBase.is_pure_julia(::Type{<:ConstantClassifier}) = :yes
-MLJBase.input_kinds(::Type{<:ConstantClassifier}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
-MLJBase.output_kind(::Type{<:ConstantClassifier}) = :multiclass
-MLJBase.output_quantity(::Type{<:ConstantClassifier}) = :univariate
+MLJBase.is_pure_julia(::Type{<:ConstantClassifier}) = true
+MLJBase.input_scitypes(::Type{<:ConstantClassifier}) = Union{MLJBase.Missing,MLJBase.Found}
+MLJBase.target_scitype(::Type{<:ConstantClassifier}) = Union{MLJBase.Multiclass,MLJBase.FiniteOrderedFactor}
 
 
 ## DETERMINISTIC CONSTANT CLASSIFIER (FOR TESTING)
@@ -197,10 +194,9 @@ MLJBase.load_path(::Type{<:DeterministicConstantClassifier}) = "MLJ.Deterministi
 MLJBase.package_name(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_name(ConstantRegressor)
 MLJBase.package_uuid(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_uuid(ConstantRegressor)
 MLJBase.package_url(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_url(ConstantRegressor)
-MLJBase.is_pure_julia(::Type{<:DeterministicConstantClassifier}) = :yes
-MLJBase.input_kinds(::Type{<:DeterministicConstantClassifier}) = [:continuous, :multiclass, :ordered_factor_finite, :ordered_factor_infinite, :missing]
-MLJBase.output_kind(::Type{<:DeterministicConstantClassifier}) = :multiclass
-MLJBase.output_quantity(::Type{<:DeterministicConstantClassifier}) = :univariate
+MLJBase.is_pure_julia(::Type{<:DeterministicConstantClassifier}) = true
+MLJBase.input_scitypes(::Type{<:DeterministicConstantClassifier}) = Union{MLJBase.Missing,MLJBase.Found}
+MLJBase.target_scitype(::Type{<:DeterministicConstantClassifier}) = Union{MLJBase.Multiclass,MLJBase.FiniteOrderedFactor}
 
 
 end # module

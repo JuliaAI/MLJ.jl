@@ -29,7 +29,7 @@ grid = Grid(resolution=10)
 
 tuned_model = TunedModel(model=composite, tuning=grid, resampling=holdout, measure=rms,
                          nested_ranges=nested_ranges, report_measurements=true)
-@test MLJBase.output_is(tuned_model) == MLJBase.output_is(composite)
+
 info(tuned_model)
 
 tuned = machine(tuned_model, X, y)

@@ -1,21 +1,23 @@
 
-# for changing symbols to strings in dictionaries:
-encode_dic(s) =
-    s isa Symbol ? string(":", s) : s
-encode_dic(v::Vector) = encode_dic.(v)
-function encode_dic(d::Dict)
-    ret = Dict{}()
-    for (k, v) in d
-        ret[encode_dic(k)] = encode_dic(v)
+# NOTE: The next three functions should be identical to those defined
+# in MLJRegistry/src/MLJRegistry.jl (not explicitly shared for
+# dependency reasons).
+
+# for decoding metadata:
+function decode_dic(s::String)
+    if !isempty(s)
+        if  s[1] == ':'
+            return Symbol(s[2:end])
+        elseif s[1] == '`'
+            return eval(Meta.parse(s[2:end-1]))
+        else
+            return s
+        end
+    else
+        return ""
     end
-    return ret
 end
-
-# for changing strings to symbols in dictionaries:
-decode_dic(s) =
-    s isa String && !isempty(s) && s[1] == ':' ? Symbol(s[2:end]) : s
 decode_dic(v::Vector) = decode_dic.(v)
-
 function decode_dic(d::Dict)
     ret = Dict()
     for (k, v) in d

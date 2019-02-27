@@ -1,19 +1,16 @@
 ## DEFAULT MEASURES
 
 default_measure(model::M) where M<:Supervised =
-    default_measure(model,
-                    Val((MLJBase.output_kind(M),
-                         MLJBase.output_quantity(M))))
+    default_measure(model, target_scitype(M))
 default_measure(model, ::Any) = nothing
-default_measure(model::Deterministic, ::Val{(:continuous, :univariate)}) = rms
-default_measure(model::Probabilistic, ::Val{(:continuous, :univariate)}) = rms
-default_measure(model::Deterministic, ::Val{(:binary, :univariate)}) = misclassification_rate
-default_measure(model::Deterministic, ::Val{(:multiclass, :univariate)}) = misclassification_rate
-default_measure(model::Probabilistic, ::Val{(:binary, :univariate)}) = cross_entropy
-default_measure(model::Probabilistic, ::Val{(:multiclass, :univariate)}) = cross_entropy
+default_measure(model::Deterministic, ::Type{<:Continuous}) = rms
+default_measure(model::Probabilistic, ::Type{<:Continuous}) = rms
+default_measure(model::Deterministic, ::Type{<:Union{Multiclass,FiniteOrderedFactor}}) =
+    misclassification_rate
+default_measure(model::Probabilistic, ::Type{<:Union{Multiclass,FiniteOrderedFactor}}) =
+                                cross_entropy
 
-
-# TODO the names to match MLR or MLMetrics?
+# TODO: the names to match MLR or MLMetrics?
 
 # Note: If the `yhat` argument of a deterministic metric does not have
 # the expected type, the metric assumes it is a distribution and

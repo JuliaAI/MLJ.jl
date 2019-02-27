@@ -15,7 +15,7 @@ export EnsembleModel                                 # "ensembles.jl"
 export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
 export DeterministicConstantRegressor                # "builtins/Constant.jl
 export DeterministicConstantClassifier               # "builtins/Constant.jl
-export models, @load                                  # "loading.jl"
+export models, @load                                 # "loading.jl"
 export KNNRegressor                                  # "builtins/KNN.jl"
 export RidgeRegressor, PCA                           # "builtins/LocalMulitivariateStats.jl
 
@@ -38,6 +38,10 @@ export pdf, mode, median, mean, info
 # reexport from MLJBase:
 export SupervisedTask, UnsupervisedTask
 export Deterministic, Probabilistic, Unsupervised, Supervised
+export Found, Continuous, Discrete, OrderedFactor    
+export FiniteOrderedFactor                           
+export Count, Multiclass, Binary
+export scitype
 export predict, predict_mean, predict_median, predict_mode
 export transform, inverse_transform, se, evaluate
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
