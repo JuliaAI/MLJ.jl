@@ -77,7 +77,7 @@ rmsp(yhat, y) = rmsp(mean.(yhat), y)
 misclassification_rate(yhat::CategoricalVector{L}, y::CategoricalVector{L}) where L =
     mean(y .!= yhat)
 misclassification_rate(yhat, y::CategoricalArray) =
-    misclassification_rate(mode.(yhat), y)
+    misclassification_rate(categorical(mode.(yhat)), y)
 
 # TODO: multivariate case 
 

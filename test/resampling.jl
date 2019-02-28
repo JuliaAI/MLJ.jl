@@ -17,6 +17,8 @@ resampler = Resampler(resampling=holdout, model=model, measure=rms)
 fitresult, cache, report = MLJ.fit(resampler, 1, X, y)
 @test fitresult ≈ 2/3
 
+holdout = Holdout(shuffle=true)
+
 mach = machine(model, X, y)
 @test evaluate!(mach, resampling=holdout) ≈ 2/3
 

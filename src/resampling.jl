@@ -14,13 +14,14 @@ end
 
 mutable struct Holdout <: ResamplingStrategy
     fraction_train::Float64
-    function Holdout(fraction_train)
+    shuffle::Bool
+    function Holdout(fraction_train, shuffle)
         0 < fraction_train && fraction_train < 1 ||
             error("fraction_train must be between 0 and 1.")
-        return new(fraction_train)
+        return new(fraction_train, shuffle)
     end
 end
-Holdout(; fraction_train=0.7) = Holdout(fraction_train)
+Holdout(; fraction_train=0.7, shuffle=false) = Holdout(fraction_train, shuffle)
 
 mutable struct CV <: ResamplingStrategy
     nfolds::Int
@@ -71,7 +72,8 @@ function evaluate!(mach::Machine, resampling::Holdout;
     y = mach.args[2]
     length(mach.args) == 2 || error("Multivariate targets not yet supported.")
     
-    train, test = partition(eachindex(y), resampling.fraction_train)
+    train, test = partition(eachindex(y), resampling.fraction_train,
+                            shuffle=resampling.shuffle)
     fit!(mach, rows=train, verbosity=verbosity-1)
     yhat = operation(mach, selectrows(X, test))    
     fitresult = _measure(yhat, y[test])
@@ -187,7 +189,8 @@ end
 
 # in special case of holdout, we can reuse the underlying model's
 # machine, provided the training_fraction has not changed:
-function MLJBase.update(resampler::Resampler{Holdout}, verbosity::Int, fitresult, cache, X, y)
+function MLJBase.update(resampler::Resampler{Holdout},
+                        verbosity::Int, fitresult, cache, X, y)
 
     old_mach, old_resampling = cache
 
