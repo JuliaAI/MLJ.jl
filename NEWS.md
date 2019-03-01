@@ -42,6 +42,8 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   returns `(X, y)` for supervised models, and `X` for unsuperivsed
   models.  Progress on:  [\#86](https://github.com/alan-turing-institute/MLJ.jl/issues/68)
 
+- the data in the `load_ames()` test task has been replaced by the
+  full data set, and `load_reduced_ames()` now loads a reduced set.
 
 
 
