@@ -36,7 +36,7 @@ export OneHotEncoder
 export pdf, mode, median, mean, info
 
 # reexport from MLJBase:
-export SupervisedTask, UnsupervisedTask
+export SupervisedTask, UnsupervisedTask, MLJTask
 export Deterministic, Probabilistic, Unsupervised, Supervised
 export Found, Continuous, Discrete, OrderedFactor    
 export FiniteOrderedFactor, Other

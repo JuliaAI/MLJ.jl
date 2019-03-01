@@ -384,8 +384,8 @@ Types](scientific_data_types.md).
 
 method                   | return type       | declarable return values           | default value
 -------------------------|-------------------|------------------------------------|---------------
-`target_scitype`         | `DataType`        | subtype of `Found` or tuple of such types | `Other`
-`input_scitypes`         | `DataType`        | subtype of `Union{Missing,Found}`  |  `Other`
+`target_scitype`         | `DataType`        | subtype of `Found` or tuple of such types | `Union{Found,NTuple{<:Found}}`
+`input_scitypes`         | `DataType`        | subtype of `Union{Missing,Found}`  |  `Union{Missing,Found}`
 `input_is_multivariate`  | `Bool`            | `true` or `false`                  | `true`
 `is_pure_julia`          | `Bool`            | `true` or `false`                  | `false`
 `load_path`              | `String`          | unrestricted                       | "unknown"

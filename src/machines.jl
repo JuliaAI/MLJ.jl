@@ -11,24 +11,54 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
     
     function Machine{M}(model::M, args...) where M<:Model
 
+        # checks on args:
         if M <: Supervised
-            length(args) > 1 ||
-            Tables.istable(args[1]) || error("Tabular data expected.")
-            nrows = schema(args[1]).nrows
-            good = reduce(*, [length(y) == nrows for y in args[2:end]])
-            good || error("Machine data arguments of incompatible sizes.")
+            if  (length(args) == 1 && !(args[1] isa SupervisedTask)) ||
+                (length(args) == 2 && !Tables.istable(args[1])) ||
+                length(args) > 2
+                error("Use machine(model, task) or machine(model, X, y) "*
+                      "for a supervised model.")
+            end
+            if length(args) == 2
+                X, y = args
+                scitype(X) <: input_scitypes(model) ||
+                        error("The scitype of X in machine(model, X, y) should be a subtype of $(input_scitypes(model)). ")
+                scitype(y) <: target_scitype(model) ||
+                    error("The scitype of y in machine(model, X, y) should be a subtype of $(target_scitype(model)). ")
+                T =  target_scitype(model)
+                if T <: Tuple
+                    Tables.istable(y) ||
+                        error("y in machine(model, X, y) should be a table. ")
+                else
+                    if scitype(y)  <: Union{Continuous,Count}
+                        y isa Vector ||
+                            error("y in machine(model, X, y) should be a Vector. ")
+                    elseif scitype(y) <: Union{Multiclass,FiniteOrderedFactor}
+                        y isa CategoricalArray ||
+                            error("y in machine(model, X, y) should be a CategoricalVector. ")
+                    end
+                end
+            end
         end
-        !(M <: Unsupervised) || length(args) == 1 ||
-            error("Wrong number of arguments. "*
-                  "Use NodalMachine(model, X) for an unsupervised  model.")
-        
-        Tables.istable(args[1]) ||
-            error("First data argument of machine must be a task or table. "*
-                  "Use MLJ.table(X) to wrap an abstract matrix X as a columns table.")
+        if M <: Unsupervised
+            length(args) == 1 ||
+                error("Wrong number of arguments. "*
+                      "Use machine(model, X) or machine(model, task) for an unsupervised model.")
+            Tables.istable(args[1]) || args[1] isa UnsupervisedTask ||
+                error("X in machine(model, X) should be a table or  UnsupervisedTask. "*
+                      "Use MLJ.table(X) to wrap an abstract matrix X as a table. ")
+            if Tables.istable(args[1]) && !(scitype(args[1]) <: input_scitypes(model))
+                error("The scitype of X in machine(model, X) should be a subtype of $(input_scitypes(model)). ")
+            end
+        end
 
         machine = new{M}(model)
 
-        machine.args = args
+        if args[1] isa MLJTask
+            machine.args = args[1]()
+        else
+            machine.args = args
+        end
         
         machine.report = Dict{Symbol,Any}()
 
@@ -39,9 +69,6 @@ end
 
 # automatically detect type parameter:
 Machine(model::M, args...) where M<:Model = Machine{M}(model, args...)
-
-# constructor for tasks instead of bare data:
-Machine(model::Model, task::Task) = Machine(model, task())
 
 # Note: The following method is written to fit! `NodalMachine`s
 # defined in networks.jl, in addition to `Machine`s defined above.
