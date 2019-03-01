@@ -1,14 +1,18 @@
 # Glossary
 
-## Basics
+Note that this glossary refers to some objects not accessed by the
+general user and is intended mainly for MLJ developers.
 
-### task (object of type `Task`)
+### Basics
 
-Data plus a clearly specified learning objective. In addition, a
-description of how the completed task is to be evaluated.
+#### task (object of type `Task`)
+
+Data plus a learning objective (e.g., "probabilistic prediction of
+Sales"). In MLJ a task does not include a description of how the
+completed task is to be evaluated.
 
 
-### hyperparameters
+#### hyperparameters
 
 Parameters on which some learning algorithm depends, specified before
 the algorithm is applied, and where learning is interpreted in the
@@ -19,34 +23,34 @@ sense may specify configuration (eg, number of parallel processes)
 even when this does not effect the end-product of learning. (But we
 exlcude verbosity level.)
 
-### model (object of abstract type `Model`)
+#### model (object of abstract type `Model`)
 
 Object collecting together hyperameters of a single algorithm. Most
 models are classified either as *supervised* or *unsupervised* models
 (generally, "transformers").
 
 
-### fit-result (type generally defined outside of MLJ)
+#### fit-result (type generally defined outside of MLJ)
 
-The "weights" or "paramaters" learned by an algorithm, after adopting
-prescribed hyperparameters. For example, decision trees of a random
-forest, the coefficients and intercept of a linear model, or the
-rotation and projection matrices of PCA reduction scheme.
+Also known as "learned" or "fitted" parameters, these are "weights",
+"coefficients", or similar paramaters learned by an algorithm, after
+adopting the prescribed hyperparameters. For example, decision trees
+of a random forest, the coefficients and intercept of a linear model,
+or the rotation and projection matrices of PCA reduction scheme.
 
-### method
+<!-- #### method -->
 
-What Julia calls a function. (In Julia, a "function" is a collection
-of methods sharing the same name but different type signatures.)
+<!-- What Julia calls a function. (In Julia, a "function" is a collection -->
+<!-- of methods sharing the same name but different type signatures.) -->
 
-Associated with every model is a `fit` method for computing assoicated
-fit-results, and an `update` method for retraining with
-new hyperaparameters (but unchanged data).
+<!-- For example, associated with every machine (see below) is a `fit!` method for computing assoicated -->
+<!-- fit-results. -->
 
 
-### operation
+#### operation
 
 Data-manipulating operations (methods) parameterized by some
-fit-result. For supervised learners, the `predict` or `predict_proba` methods, for
+fit-result. For supervised learners, the `predict` or `predict_mode` methods, for
 transformers, the `transform` or `inverse_transform` method. In some
 contexts, such an operation might be replaced by an ordinary operation
 (method) that does *not* depend on an fit-result, which are then then
@@ -54,7 +58,7 @@ called *static* operations for clarity. An operation that is not static
 is *dynamic*.
 
 
-### machine (object of type `Machine`)
+#### machine (object of type `Machine`)
 
 An object consisting of:
 
@@ -67,7 +71,7 @@ associated `fit` method). A training argument is data used for
 training. Generally, there are two training arguments for supervised
 models, and just one for unsuperivsed models.
 
-In additioin machines store "report" metadata, for recording
+In addition machines store "report" metadata, for recording
 algorithm-specific statistics of training (eg, internal estimate of
 generalization error, feature importances); and they cache information
 allowing the fit-result to be updated without repeating unnecessary
@@ -78,18 +82,18 @@ passed an optional argument specifying the rows of data to be used in
 training.
 
 
-## Learning Networks and Composite Models
+### Learning Networks and Composite Models
 
 *Note:* Multiple nodal machines may share the same model, and
 multiple learning nodes may share the same nodal machine.
 
-### source node (object of type 'SourceNode')
+#### source node (object of type 'Source')
 
 A container for training data and point of entry for new data in a
 learning network (see below).
 
 
-### nodal machine (object of type 'NodalMachine')
+#### nodal machine (object of type 'NodalMachine')
 
 Like a machine with the following exceptions:
 
@@ -100,7 +104,7 @@ learning network, instead of data.
 machines, as implied by the training arguments, and so on. 
 
 
-###  node (object of type 'Node')
+####  node (object of type 'Node')
 
 Essentially a nodal machine wrapped in an assoicated operation
 (e.g., `predict` or `inverse_transform`. It detail, it consists of:
@@ -117,12 +121,14 @@ the dependecies on other nodal machines implied by its
 arguments.
 
 
-### learning network (implicity defined by dynamic data)
+#### learning network 
 
-A directed graph implicit in the specification of a learning node. 
+An acyclic directed graph implicit in the connections of a collection
+of source(s) and nodes. Each connected component is ordinarily
+restricted to have a unique source.
 
 
-### composite model
+#### composite model
 
-Any model with one or more other models as hyper-parameters. 
+Any model with one or more other models as hyperparameters. 
 

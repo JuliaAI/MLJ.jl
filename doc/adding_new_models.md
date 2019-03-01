@@ -1,22 +1,32 @@
-# Implementing the MLJ interface for a learning algorithm
+# Adding New Models
 
-This guide outlines the specification of the MLJ model interface. The
-machine learning tools provided by MLJ can be applied to the models
-in any package that imports the module
-[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl)
-and implements the API defined there as outlined below.
+This guide outlines the specification of the MLJ model interface and
+provides guidelines for implementing the interface for models defined
+in external packages. For sample implementations, see
+[MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src).
 
+The machine learning tools provided by MLJ can be applied to the
+models in any package that imports the module
+[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) and
+implements the API defined there, as outlined below. For a quick and
+dirty implementation of user-defined models see [here]().  To make new
+models available to all MLJ users, see [Where to place code
+implementing new models](#Where-to-place-code-implementing-new-models)
+below.
+
+It is assumed the reader has read [Getting Started](getting_started.md).
 To implement the API described here, some familiarity with the
-following packages is helpful:
-[Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
-(for probabilistic predictions),
-[CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl)
-(essential if you are implementing a classifier, or a learner that
-handles categorical inputs),
-[Tables.jl](https://github.com/JuliaData/Tables.jl) (if you're
-algorithm needs input data in a novel format).
+following packages is also helpful:
 
-For a quick and dirty implementation of user-defined models see [here]().
+- [Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
+(for probabilistic predictions)
+
+- [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl)
+(essential if you are implementing a model handling data of
+`Multiclass` or `FiniteOrderedFactor` scitype)
+
+- [Tables.jl](https://github.com/JuliaData/Tables.jl) (if you're
+algorithm needs input data in a novel format).
 
 <!-- As a temporary measure, -->
 <!-- the MLJ package also implements the MLJ interface for some -->
@@ -29,24 +39,11 @@ For a quick and dirty implementation of user-defined models see [here]().
 
 In MLJ, the basic interface exposed to the user, built atop the model
 interface described here, is the *machine interface*. After a first
-reading of this document, the reader may wish to refer to the
-simplified description of the machine interface appearing under ["MLJ
-Internals"](internals.md).
-
-<!-- ### MLJ types -->
-
-<!-- Every type introduced the core MLJ package should be a subtype of: -->
-
-<!-- ``` -->
-<!-- abstract type MLJType end -->
-<!-- ``` -->
-
-<!-- The Julia `show` method is informatively overloaded for this -->
-<!-- type. Variable bindings declared with `@constant` "register" the -->
-<!-- binding, which is reflected in the output of `show`. -->
+reading of this document, the reader may wish to refer to [MLJ
+Internals](internals.md) for context.
 
 
-## Overview
+### Overview
 
 A *model* is an object storing hyperparameters associated with some
 machine learning algorithm, where "learning algorithm" is broadly
@@ -64,10 +61,9 @@ coefficients and intercept. For a general supervised model, it is the
 (generally minimal) information needed to make new predictions.
 
 The ultimate supertype of all models is `MLJBase.Model`, which
-has two abstract subtypes; quoting MLJBase.jl:
+has two abstract subtypes:
 
 ````julia
-abstract type MLJType end
 abstract type Supervised{R} <: Model end
 abstract type Unsupervised <: Model end
 ````
@@ -80,6 +76,8 @@ defined by the built-in MLJ `EnsembleModel` wrapper). There is no abstract
 type for fit-results because these types are generally declared
 outside of MLJBase.
 
+> The necessity to declare the fitresult type `R` may disappear in the future (issue #93).
+
 `Supervised` models are further divided according to whether they are
 able to furnish probabilistic predictions of the target(s) (which they
 will do so by default) or directly predict "point" estimates, for each
@@ -90,7 +88,7 @@ abstract type Probabilistic{R} <: Supervised{R} end
 abstract type Deterministic{R} <: Supervised{R} end
 ````
 
-Further division of model types is realized through "trait" declarations (see below). 
+Further division of model types is realized through [trait declarations](#Trait-Declarations).
 
 Associated with every concrete subtype of `Model` there must be a
 `fit` method, which implements the associated algorithm to produce the
@@ -105,16 +103,6 @@ regressors) overriding obvious fallbacks provided by
 `MLJBase`. `Unsupervised` models may implement an
 `inverse_transform` operation.
 
-
-## The Model API
-
-<!-- Every package interface should live inside a submodule for namespace -->
-<!-- hygiene (see the template at -->
-<!-- "src/interfaces/DecisionTree.jl"). Ideally, package interfaces should -->
-<!-- export no `struct` outside of the new model types they define, and -->
-<!-- import only abstract types. All "structural" design should be -->
-<!-- restricted to the MLJ core to prevent rewriting glue code when there -->
-<!-- are design changes. -->
 
 ### New model type declarations and optional clean! method
 
@@ -165,26 +153,29 @@ end
 ```
 
 
-### Supervised models
+### The model API for supervised models
 
 Below we describe the compulsory and optional methods to be specified
-for each concrete type `SomeSupervisedModel{R} <: MLJBase.Supervised{R}`. We
-restrict attention to algorithms handling a *single* (univariate)
-target. Differences in the multivariate case are described later.
+for each concrete type `SomeSupervisedModel{R} <: MLJBase.Supervised{R}`. 
 
 
-#### The form of data for fitting and prediction, and the ouput_kind trait
+#### The form of data for fitting and predicting
 
-The argument `X` passed to the `fit` method described below, and the
-argument `Xnew` of the `predict` (or `transform`) method, are
-arbitrary tables. Here *table* means an object supporting
-the[Tables.jl](https://github.com/JuliaData/Tables.jl) interface. If
-the core algorithm requires data in a different or more specific form,
-then `fit` will need to coerce the table into the form desired. To
-this end, MLJ provides the convenience method `MLJBase.matrix`;
+In every circumstance, the argument `X` passed to the `fit` method
+described below, and the argument `Xnew` of the `predict` method, will
+be some table supporting the
+[Tables.jl](https://github.com/JuliaData/Tables.jl) API. The interface
+implementer can control the scientific type of data appearing in `X`
+with an appropriate `input_scitype` declaration (see [Trait
+Declarations](#Trait-Declarations) below). If the core algorithm
+requires data in a different or more specific form, then `fit` will
+need to coerce the table into the form desired. To this end, MLJ
+provides the convenience method `MLJBase.matrix`;
 `MLJBase.matrix(Xtable)` is a two-dimensional `Array{T}` where `T` is
 the tightest common type of elements of `Xtable`, and `Xtable` is any
-table. 
+table.
+
+> Tables.jl has recently added a `matrix` method as well.
 
 Other convenience methods provided by MLJBase for handling tabular
 data are: `selectrows`, `selectcols`, `schema` (for extracting the
@@ -198,19 +189,38 @@ be applied by `predict` to `Xnew`.
 **Important convention** It is to be understood that the columns of the
 table `X` correspond to features and the rows to patterns.
 
-The form of the target data `y` passed to `fit` depends on the kind of
-supervised model. For "regressors", `y` is a vector, for "classifiers"
-it must be a categorical vector. More precisely, the form is
-determined by value returned by the trait `output_kind` that each model
-type should define (see below):
+The form of the target data `y` passed to `fit` is constrained by the
+`target_scitype` trait declaration. All elements of `y` will satisfy
+`scitype(y) <: target_scitype(SomeSupervisedModelType)`. Furthermore,
+for univariate targets, `y` is always a `Vector` or
+`CategoricalVector`, according to the value of the trait:
 
-`output_kind` return value | type of `y`
----------------------------|------------------------
-`:continuous`              | `Vector{<:AbstractFloat}`
-`:binary`                  | `CategoricalVector`
-`:multiclass`              | `CategoricalVector`
-`:ordered_factor_finite`   | `CategoricalVector`
-`:ordered_factor_infinite` | `Vector{<:Integer}`
+`target_scitype(SomeSupervisedModelType)`  | type of `y`  | tightest known supertype of `eltype(y)`
+------------------------------|---------------------------|--------------------------------------------
+`Continuous`                  | `Vector`                  | `Real`
+`<: Multiclass`               | `CategoricalVector`       | `Union{CategoricalString, CategoricalValue}`
+`<: FiniteOrderedFactor`      | `CategoricalVector`       | `Union{CategoricalString, CategoricalValue}`
+`Count`                       | `Vector`                  | `Integer`
+
+So, for example, if your model is a binary classifier, you declare
+
+````julia
+target_scitype(SomeSupervisedModelType)=Multiclass{2}
+````
+
+If it can predict any number of classes, you might instead declare
+
+````julia
+target_scitype(SomeSupervisedModelType)=Union{Multiclass, FiniteOrderedFactor}
+````
+
+See also the table in [Getting Started](getting_started.md).
+
+For multivariate targets, `y` will be a table whose columns have the
+scitypes indicated in the `Tuple` type returned by `target_scitype`;
+for example, if you declare `target_scitype(SomeSupervisedModelType) = Tuple{Continuous,Count}`,
+then `y` will have two columns, the first with `Real` elements, the
+second with `Integer` elements.
 
 
 #### The fit method
@@ -265,16 +275,15 @@ MLJBase.predict(model::SomeSupervisedModelType, fitresult, Xnew) -> yhat
 Here `Xnew` is an arbitrary table (see above).
 
 **Prediction types for deterministic responses.** In the case of
-`Deterministic` models, `yhat` must have the same type as the target
+`Deterministic` models, `yhat` must have the same form as the target
 `y` passed to the `fit` method (see above discussion on the form of
-data for fitting), with one exception: If predicting an infinite
-ordered factor (where `fit` receives a `Vector{<:Integer}` object) the
-prediction may be continuous, i.e., of type
-`Vector{<:AbstractFloat}`. For all other classifiers, the categorical
-vector returned by `predict` **must have the levels in the categorical
-pool of the target data presented in training**, even if not all
-levels appear in the training data or prediction itself. That is, we
-must have `levels(yhat) == levels(y)`.
+data for fitting), with one exception: If predicting a `Count`, the
+prediction may be `Continuous`. For all models predicting a
+`Multiclass` or `FiniteOrderedFactor`, the categorical vectors
+returned by `predict` **must have the levels in the categorical pool
+of the target data presented in training**, even if not all levels
+appear in the training data or prediction itself. That is, we must
+have `levels(yhat) == levels(y)`.
 
 Unfortunately, code not written with the preservation
 of categorical levels in mind poses special problems. To help with
@@ -282,10 +291,15 @@ this, MLJ provides a utility `CategoricalDecoder` which can decode a
 `CategoricalArray` into a plain array, and re-encode a prediction with
 the original levels intact. The `CategoricalDecoder` object created
 during `fit` will need to be bundled with `fitresult` to make it
-available to `predict` during re-encoding.
+available to `predict` during re-encoding. (If you are coding a learning algorithm 
+from scratch, rather than 
+wrapping an existing one, conversions may be unnecessary. It may suffice 
+to record the pool of `y` and bundle that with the fitresult for `predict` to append 
+to the levels of its categorical output, or to add to the support of the predicted 
+probability distributions.)
 
 So, for example, if the core algorithm being wrapped by `fit` expects
-a nominal target `yint` of type `Vector{Int64}` then the `fit` method
+a nominal target `yint` of type `Vector{Int64}` then a `fit` method
 may look something like this:
 
 ````julia
@@ -299,7 +313,7 @@ function MLJBase.fit(model::SomeSupervisedModelType, verbosity, X, y)
     return fitresult, cache, report
 end
 ````
-while the corresponding `predict` operation might look like this:
+while a corresponding deterministic `predict` operation might look like this:
 
 ````julia
 function MLJBase.predict(model::SomeSupervisedModelType, fitresult, Xnew)
@@ -311,88 +325,76 @@ end
 Query `?MLJBase.DecodeCategorical` for more information.
 
 **Prediction types for probabilistic responses.** In the case of
-`Probabilistic` models, `yhat` must be a `Vector` whose elements are
-distributions (one distribution per row of `Xnew`).
+`Probabilistic` models with univariate targets, `yhat` must be a
+`Vector` whose elements are distributions (one distribution per row of
+`Xnew`).
 
 A *distribution* is any instance of a subtype of
 `Distributions.Distribution` from the package Distributions.jl, or any
 instance of the additional types `UnivariateNominal` and
 `MultivariateNominal` defined in MLJBase.jl (or any other type
-`D` for which `MLJBase.isdistribution(::D) = true`, meaning `Base.rand`
+`D` you define for which `MLJBase.isdistribution(::D) = true`, meaning `Base.rand`
 and `Distributions.pdf` are implemented, as well
 `Distributions.mean`/`Distribution.median` or `Distributions.mode`).
 
-Use `UnivariateNominal` for `Probabilistic` classifiers with a single
-nominal target, whether binary or multiclass. For example, suppose
+Use `UnivariateNominal` for `Probabilistic` models predicting
+`Multiclass` or `FiniteOrderedFactor` targets. For example, suppose
 `levels(y)=["yes", "no", "maybe"]` and set `L=levels(y)`. Then, if the
 predicted probabilities for some input pattern are `[0.1, 0.7, 0.2]`,
 respectively, then the prediction returned for that pattern will be
 `UnivariateNominal(L, [0.1, 0.7, 0.2])`. Query `?UnivariateNominal`
-for more information. 
+for more information.
 
-The `predict` method will need access to all levels of the target
+The `predict` method will need access to all levels in the pool of the target
 variable presented `y` presented for training, which consequently need
 to be encoded in the `fitresult` returned by `fit`. If a
 `CategoricalDecoder` object, `decoder`, has been bundled in
 `fitresult`, as in the deterministic example above, then the levels
-are given by `levels(decoder)`.
-````
+are given by `levels(decoder)`. Levels not observed in the training data 
+(i.e., only in its pool) should be assigned probability zero.
 
 
 #### Trait declarations
 
-There are a number of recommended trait declarations for each concrete
-subtype `SomeSupervisedModel <: Supervised`. Basic fitting, resampling
-and tuning in MLJ does not require these traits but some advanced MLJ
-meta-algorithms may require them now, or in the future. In particular,
-MLJ's `models(::Task)` method (matching models to user-specified
-tasks) can only identify models having a complete set of trait
-declarations. A full set of declarations are shown below for the
-`RidgeRegressor` type:
+There are a number of recommended trait declarations for each model
+mutable structure `SomeSupervisedModel <: Supervised` you define. Basic
+fitting, resampling and tuning in MLJ does not require these traits
+but some advanced MLJ meta-algorithms may require them now, or in the
+future. In particular, MLJ's `models(::Task)` method (matching models
+to user-specified tasks) can only identify models having a complete
+set of trait declarations. A full set of declarations is shown below
+for the `DecisionTreeClassifier` type (defined in the submodule DecisionTree_ of MLJModels):
 
 ````julia
-MLJBase.output_kind(::Type{<:RidgeRegressor}) = :continuous
-MLJBase.output_quantity(::Type{<:RidgeRegressor}) = :univariate
-MLJBase.input_kinds(::Type{<:RidgeRegressor}) = [:continuous, ]
-MLJBase.input_quantity(::Type{<:RidgeRegressor}) = :multivariate
-MLJBase.is_pure_julia(::Type{<:RidgeRegressor}) = :yes
-MLJBase.load_path(::Type{<:RidgeRegressor}) = "MLJ.RidgeRegressor"
-MLJBase.package_name(::Type{<:RidgeRegressor}) = "MultivariateStats"
-MLJBase.package_uuid(::Type{<:RidgeRegressor}) = "6f286f6a-111f-5878-ab1e-185364afe411"
-MLJBase.package_url((::Type{<:RidgeRegressor}) = "https://github.com/JuliaStats/MultivariateStats.jl"
+MLJBase.load_path(::Type{<:DecisionTreeClassifier}) = "MLJModels.DecisionTree_.DecisionTreeClassifier" 
+MLJBase.package_name(::Type{<:DecisionTreeClassifier}) = "DecisionTree"
+MLJBase.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+MLJBase.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bensadeghi/DecisionTree.jl"
+MLJBase.is_pure_julia(::Type{<:DecisionTreeClassifier}) = true
+MLJBase.input_is_multivariate(::Type{<:DecisionTreeClassifier}) = true
+MLJBase.input_scitypes(::Type{<:DecisionTreeClassifier}) = MLJBase.Continuous
+MLJBase.target_scitype(::Type{<:DecisionTreeClassifier}) = MLJBase.Multiclass
 ````
 
-method                   | return type       | declarable return values | default value
--------------------------|-------------------|---------------------------|-------------------
-`output_kind`            | `Symbol`          |`:continuous`, `:binary`, `:multiclass`, `:ordered_factor_finite`, `:ordered_factor_infinite`, `:mixed` | `:unknown`
-`output_quantity`        | `Symbol`          |`:univariate`, `:multivariate`| `:univariate`
-`input_kinds`          | `Vector{Symbol}`  | one or more of: `:continuous`, `:multiclass`, `:ordered_factor_finite`, `:ordered_factor_infinite`, `:missing` | `Symbol[]`
-`input_quantity`        | `Symbol`          | `:univariate`, `:multivariate` | `:multivariate`
-`is_pure_julia`          | `Symbol`          | `:yes`, `:no`             | `:unknown`
-`load_path`              | `String`          | unrestricted              | "unknown"
-`package_name`           | `String`          | unrestricted              | "unknown"
-`package_uuid`           | `String`          | unrestricted              | "unknown"
-`package_url`            | `String`          | unrestricted              | "unknown"
+Note that models predicting multivariate targets will need to need to have
+`target_scitype` return an appropriate `Tuple` type. 
 
-Note that `:binary` does not mean *boolean*. Rather, it
-means the model is a classifier but is unable to classify targets with more than two
-classes. As explained above, all classifiers are passed training targets
-as `CategoricalVector`s, whose element types are
-arbitrary.
+For an explanation of `Found` and `Other` in the table below, see [Scientific
+Types](scientific_data_types.md).
 
-The option `:mixed` for `output_kind` is intended primarily
-for transformers, such as MLJ's built-in `FeatureSelector`.
+method                   | return type       | declarable return values           | default value
+-------------------------|-------------------|------------------------------------|---------------
+`target_scitype`         | `DataType`        | subtype of `Found` or tuple of such types | `Other`
+`input_scitypes`         | `DataType`        | subtype of `Union{Missing,Found}`  |  `Other`
+`input_is_multivariate`  | `Bool`            | `true` or `false`                  | `true`
+`is_pure_julia`          | `Bool`            | `true` or `false`                  | `false`
+`load_path`              | `String`          | unrestricted                       | "unknown"
+`package_name`           | `String`          | unrestricted                       | "unknown"
+`package_uuid`           | `String`          | unrestricted                       | "unknown"
+`package_url`            | `String`          | unrestricted                       | "unknown"
+
 
 You can test declarations of traits by calling `info(SomeModelType)`.
-
-A `clean!` method may optionally be overloaded (the default returns an
-empty message without changing model fields):
-This method is for checking and correcting invalid fields
-(hyperparameters) of the model, returning a warning `message`
-explaining what has been changed. It should only throw an exception as
-a last resort. This method should be called by the model keyword
-constructor, as shown in the example below, and is called by MLJ
-before each call to `fit`.
 
 
 #### The update! method
@@ -408,15 +410,15 @@ MLJBase.update(model::SomeSupervisedModelType, verbosity, old_fitresult, old_cac
 If an MLJ `Machine` is being `fit!` and it is not the first time, then
 `update` is called instead of `fit` unless `fit!` has been called with
 new rows. However, `MLJBase` defines a fallback for `update` which
-just calls `fit`. For context, see ["MLJ
-Internals"](internals.md). Learning networks wrapped as models
+just calls `fit`. For context, see [MLJ
+Internals](internals.md). Learning networks wrapped as models
 constitute one use-case: One would like each component model to be
 retrained only when hyperparameter changes "upstream" make this
 necessary. In this case MLJ provides a fallback (specifically, the
 fallback is for any subtype of `Supervised{Node}`). A second important
 use-case is iterative models, where calls to increase the number of
 iterations only restarts the iterative procedure if other
-hyperparameters have also changed. For an example see
+hyperparameters have also changed. For an example, see
 `builtins/Ensembles.jl`.
 
 In the event that the argument `fitresult` (returned by a preceding
@@ -430,56 +432,54 @@ to the `update` method.
 
 TODO
 
-<!-- ##  Checklist for new adding models  -->
-
-<!-- At present the following checklist is just for supervised models in -->
-<!-- lazily loaded interface implementations. -->
-
-<!-- - Copy and edit file -->
-<!-- ["src/interfaces/DecisionTree.jl"](../src/interfaces/DecisionTree.jl) -->
-<!-- which is annotated for use as a template. Give your new file a name -->
-<!-- identical to the package name, including ".jl" extension, such as -->
-<!-- "DecisionTree.jl". Put this file in "src/interfaces/". -->
-
-<!-- - Register your package for lazy loading with MLJ by finding out the -->
-<!-- UUID of the package and adding an appropriate line to the `__init__` -->
-<!-- method at the end of "src/MLJ.jl". It will look something like this: -->
-
-<!-- ````julia -->
-<!-- function __init__() -->
-<!--    @load_interface DecisionTree "7806a523-6efd-50cb-b5f6-3fa6f1930dbb" lazy=true -->
-<!--    @load_interface NewExternalPackage "893749-98374-9234-91324-1324-9134-98" lazy=true -->
-<!-- end -->
-<!-- ```` -->
-
-<!-- With `lazy=true`, your glue code only gets loaded by the MLJ user -->
-<!-- after they run `import NewExternalPackage`. For testing in your local -->
-<!-- MLJ fork, you may want to set `lazy=false` but to use `Revise` you -->
-<!-- will also need to move the `@load_interface` line out outside of the -->
-<!-- `__init__` function.  -->
-
-<!-- - Write self-contained test-code for the methods defined in your glue -->
-<!-- code, in a file with name like "TestExternalPackage.jl", but -->
-<!-- placed in "test/". This code should be wrapped in a module to prevent -->
-<!-- namespace conflicts with other test code. For a module name, just -->
-<!-- prepend "Test", as in "TestDecisionTree". See "test/TestDecisionTree.jl" -->
-<!-- for an example. -->
-
-<!-- - Do not add the external package to the `Project.toml` file in the -->
-<!--   usual way. Rather, add its UUID to the `[extras]` section of -->
-<!--   `Project.toml` and add the package name to `test = [Test", "DecisionTree", -->
-<!--   ...]`. -->
-
-<!-- - Add suitable lines to ["test/runtests.jl"](../test/runtests.jl) to -->
-<!-- `include` your test file, for the purpose of testing MLJ core and all -->
-<!-- currently supported packages, including yours. You can Test your code -->
-<!-- by running `test MLJ` from the Julia interactive package manager. You -->
-<!-- will need to `Pkg.dev` your local MLJ fork first. To test your code in -->
-<!-- isolation, locally edit "test/runtest.jl" appropriately. -->
 
 ### Unsupervised models
 
-<!--
-TODO:
-* specify that the output of `predict`/`transform` should be a table
--->
+TODO
+
+
+### Where to place code implementing new models
+
+Note that different packages can implement models having the same name
+without causing conflicts, although an MLJ user cannot simultaneously
+*load* two such models.
+
+There are two options for making a new model available to all MLJ
+users:
+
+1. **Native implementations** (preferred option). The implementation
+   code lives in the same package that contains the learning
+   algorithms implementing the interface. In this case, it is
+   sufficient to open an issue at
+   [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl)
+   requesting the package to be registered with MLJ. Registering a package allows
+   the MLJ user to access its models' metadata and to selectively load them.
+
+2. **External implementations** (short-term alternative). The model
+   implementation code is necessarily separate from the package
+   `SomePkg` defining the learning algorithm being wrapped. In this
+   case, the recommended procedure is to include the implementation
+   code at
+   [MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src)
+   via a pull-request, and test code at
+   [MLJModels/test](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/test).
+   Assuming `SomePkg` is the only package imported by the
+   implementation code, one needs to: (i) register `SomePkg` at
+   MLJRegistry as explained above; and (ii) add a corresponding
+   `@require` line in the PR to
+   [MLJModels/src/MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src/MLJModels.jl)
+   to enable lazy-loading of that package by MLJ (following the
+   pattern of existing additions). If other packages must be imported,
+   add them to the MLJModels project file after checking they are not
+   already there. If it is really necessary, packages can be also
+   added to Project.toml for testing purposes.
+   
+Additionally, one needs to ensure that the implementation code defines
+the `package_name` and `load_path` model traits appropriately, so that
+`MLJ`'s `@load` macro can find the necessary code (see
+[MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src)
+for examples). The `@load` command can only be tested after
+registration. If changes are made, lodge an issue at
+[MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl)
+to make the changes available to MLJ.  
+

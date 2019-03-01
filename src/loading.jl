@@ -2,9 +2,9 @@
 
 const path_to_metadata_dot_toml = joinpath(srcdir, "../") # todo: make os independent
 const remote_file =
-    @RemoteFile "https://raw.githubusercontent.com/alan-turing-institute/MLJRegistry.jl/master/Metadata2.toml" dir=path_to_metadata_dot_toml
+    @RemoteFile "https://raw.githubusercontent.com/alan-turing-institute/MLJRegistry.jl/master/Metadata.toml" dir=path_to_metadata_dot_toml
 
-const local_metadata_file = joinpath(path_to_metadata_dot_toml, "Metadata2.toml")
+const local_metadata_file = joinpath(path_to_metadata_dot_toml, "Metadata.toml")
 
 # update locally archived Metadata.toml:
 try 
@@ -59,9 +59,13 @@ to be specified.
 """
 function MLJBase.info(model::String, pkg=nothing)
     if pkg == nothing
-        pkg, success = try_to_get_package(model)
-        if !success
-            error(pkg*"Use info($model, pkg=...)")
+        if model in string.(MLJBase.finaltypes(Model))
+            pkg = "MLJ"
+        else
+            pkg, success = try_to_get_package(model)
+            if !success 
+                error(pkg*"Use info($model, pkg=...)")
+            end
         end
     end
     return metadata()[pkg][model]

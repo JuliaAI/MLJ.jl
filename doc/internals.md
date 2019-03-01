@@ -1,11 +1,11 @@
-# MLJ Internals
+# Internals
 
-## The machine interface, simplified
+### The machine interface, simplified
 
 The following is simplified description of the `Machine`
 interface. See also the [glossary](glossary.md)
 
-### The Machine type
+#### The Machine type
 
 ````julia 
 mutable struct Machine{M<Model}
@@ -27,13 +27,13 @@ mutable struct Machine{M<Model}
 end
 ````
     
-### Constructor
+#### Constructor
 
 ````julia
 machine(model::M, Xtable, y) = Machine{M}(model, Xtable, y)
 ````
 
-### fit! and predict/transform
+#### fit! and predict/transform
 
 ````julia
 function fit!(machine::Machine; rows=nothing, verbosity=1) 
