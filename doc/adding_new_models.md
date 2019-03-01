@@ -6,7 +6,7 @@ in external packages. For sample implementations, see
 [MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src).
 
 The machine learning tools provided by MLJ can be applied to the
-models in any package that imports the module
+models in any package that imports the package
 [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) and
 implements the API defined there, as outlined below. For a quick and
 dirty implementation of user-defined models see [here]().  To make new
