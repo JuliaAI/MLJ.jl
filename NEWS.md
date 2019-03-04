@@ -7,7 +7,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 ### unversioned commits 1 March 2019 (some time after 03:50 GMT)
 
-- Addition of "scientific type" heirarchy, including `Continuous`,
+- Addition of "scientific type" hierarchy, including `Continuous`,
   `Discrete`, `Multiclass`, and `Other` subtypes of `Found` (to
   complement `Missing`). See
   new documents [Getting Started](doc/gettting_started.md) and
@@ -39,7 +39,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   task-model matching. Query the doc-strings for `SupervisedTask` and
   `UnsupervisedTask` for details.  Machines can now dispatch on tasks
   instead of `X` and `y`. A task, `task`, is now callable: `task()`
-  returns `(X, y)` for supervised models, and `X` for unsuperivsed
+  returns `(X, y)` for supervised models, and `X` for unsupervised
   models.  Progress on:  [\#86](https://github.com/alan-turing-institute/MLJ.jl/issues/68)
 
 - the data in the `load_ames()` test task has been replaced by the
