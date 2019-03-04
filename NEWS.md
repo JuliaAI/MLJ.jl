@@ -45,5 +45,11 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 - the data in the `load_ames()` test task has been replaced by the
   full data set, and `load_reduced_ames()` now loads a reduced set.
 
+### unversioned commit to MLJModels 5 March 2019 (around 03:00 GMT)
+
+-  GaussianNBClassifier and MultinomialNBClassifier, from
+   NaiveBayes.jl, now implemented. Resolves:
+   (#66)[https://github.com/alan-turing-institute/MLJ.jl/issues/66#issue-406598708].
+   
 
 

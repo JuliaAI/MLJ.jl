@@ -51,6 +51,11 @@ import [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl).
 - Automated estimates of cpu and memory requirements for given task/model.
 
 
+### Frequently Asked Questions
+
+See [here](doc/frequently_asked_questions.md).
+
+
 ### Requirements
 
 * Julia 1.0 or higher
