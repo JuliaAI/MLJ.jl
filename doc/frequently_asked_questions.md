@@ -3,11 +3,12 @@
 ### Julia already has a great machine learning toolbox, ScitkitLearn.jl. Why MLJ?
 
 An alternative machine learning toolbox for Julia users is
-[ScikitLearn.jl](). Initially intended as a Julia wrapper for the
-popular python library [scikit-learn](), ML algorithms written in
-Julia can also implement the ScikitLearn.jl API. Meta-algorithms
-(systematic tuning, pipelining, etc) remain python wrapped
-code, however.
+[ScikitLearn.jl](https://github.com/cstjean/ScikitLearn.jl). Initially
+intended as a Julia wrapper for the popular python library
+[scikit-learn](https://scikit-learn.org/stable/), ML algorithms
+written in Julia can also implement the ScikitLearn.jl
+API. Meta-algorithms (systematic tuning, pipelining, etc) remain
+python wrapped code, however.
 
 While ScitkiLearn.jl provides the Julia user with access to a mature
 and large library of machine learning models, the scikit-learn API on
