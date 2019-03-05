@@ -313,7 +313,7 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) wher
     end
 
     fitresult = WrappedEnsemble(model.atom, ensemble)
-    report = nothing
+    report = NamedTuple()
     cache = deepcopy(model)
 
     return fitresult, cache, report
@@ -340,7 +340,7 @@ function update(model::EitherEnsembleModel, verbosity::Int, fitresult, old_model
             fitresult.ensemble = fitresult.ensemble[1:n]
             model_copy = deepcopy(model)
         end
-        cache, report = model_copy, nothing
+        cache, report = model_copy, NamedTuple()
         return fitresult, cache, report
     else
         return fit(model, verbosity, X, y)

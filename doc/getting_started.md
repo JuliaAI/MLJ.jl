@@ -90,8 +90,7 @@ julia> evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true), mea
 ### Next steps
 
 To learn a little more about what MLJ can do, take the MLJ
-[tour](tour.ipynb). However, before considering serious data science
-applications, please acquaint yourselves with the remaining sections below.
+[tour](tour.ipynb). Read the remainder of this document before considering more serious use of MLJ.
 
 
 ### Prerequisites
@@ -107,16 +106,21 @@ also assumed.
 ### Data
 
 While MLJ is data *container* agnostic it is very fussy about
-*element* types. Every serious user needs to understand the basic
-assumptions about the form of data expected by MLJ, as outlined below.
+*element* types. The MLJ user should acquaint themselves with some
+basic assumptions about the form of data expected by MLJ, as outlined
+below. 
 
-On the one hand, MLJ is quite flexible about how tabular data is
-presented: Anywhere a table is expected (eg, `X` above) any tabular
-format supporting the [Tables.jl](Tables.jl) API is allowed. For
-example, `DataFrame` objects are supported. A single feature (such as
-the target `y` above) is expected to be a `Vector` or
-`CategoricalVector`, according to the *scientific type* of the data (see
-below). A multivariate target can be any table.
+> Eventually task constructors will make the coercion of data into the
+> requisite form more automated. The following remarks will be less
+> critical to the casual user. At present, however, task constructors
+> assume data is in the requisite form.
+
+Anywhere a table is expected in MLJ (eg, `X` above) any tabular format
+supporting the [Tables.jl](Tables.jl) API is allowed. For example,
+`DataFrame` and `TypedTables.Table` objects are supported. A single feature (such as the
+target `y` above) is expected to be a `Vector` or `CategoricalVector`,
+according to the *scientific type* of the data (see below). A
+multivariate target can be any table.
 
 On the other hand, the *element types* you use to represent your data
 has implicit consequences about how MLJ will interpret that data.
@@ -136,7 +140,7 @@ Scientific types appear when querying model metadata, as in this example:
 julia> info("DecisionTreeClassifier")[:target_scitype]
 ```
 
-    Multiclass
+    Union{Multiclass,FiniteOrderedFactor}
 
 **Basic data convention** The scientific type of data that a Julia
 object `x` can represent is defined by `scitype(x)`. If `scitype(x) ==

@@ -181,7 +181,7 @@ function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
                          verbosity=verbosity-1)
     
     cache = (mach, deepcopy(resampler.resampling))
-    report = nothing
+    report = NamedTuple()
 
     return fitresult, cache, report
     
@@ -215,7 +215,7 @@ function MLJBase.update(resampler::Resampler{Holdout},
                          operation=resampler.operation,
                          verbosity=verbosity-1)
     
-    report = nothing
+    report = NamedTuple
 
     return fitresult, cache, report
     

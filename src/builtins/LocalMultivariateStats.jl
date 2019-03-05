@@ -86,8 +86,6 @@ function MLJBase.fit(model::RidgeRegressor{F},
     fitresult = LinearFitresult(coefficients, bias)
 
     # report on the relative strength of each feature in the fitresult:
-    report = Dict{Symbol, Any}()
-
     cinfo = coef_info(fitresult, features) # a named tuple of vectors
     u = String[]
     v = Float64[]
@@ -102,12 +100,15 @@ function MLJBase.fit(model::RidgeRegressor{F},
         push!(u, label)
         push!(v, abs(coef))
     end
-    report[:feature_importance_curve] = (u, v)
+    report= (feature_importance_curve=(u, v),)
     cache = nothing
 
     return fitresult, cache, report
 
 end
+
+MLJBase.fitted_params(::RidgeRegressor, fitresult) =
+    (coefs=fitresult.coefficients, bias=fitresult.bias)
 
 function MLJBase.predict(model::RidgeRegressor, fitresult::LinearFitresult, Xnew)
     Xmatrix = MLJBase.matrix(Xnew)
@@ -186,10 +187,19 @@ function MLJBase.fit(model::PCA
                      , mean=model.mean)
 
     cache = nothing
-    report = nothing
+    report = (indim=MS.indim(fitresult),
+              outdim=MS.outdim(fitresult),
+              mean=MS.mean(fitresult),
+              principalvars=MS.principalvars(fitresult),
+              tprincipalvar=MS.tprincipalvar(fitresult),
+              tresidualvar=MS.tresidualvar(fitresult),
+              tvar=MS.tvar(fitresult))
 
     return fitresult, cache, report
 end
+
+MLJBase.fitted_params(::PCA, fitresult) = (projection=fitresult,)
+
 
 function MLJBase.transform(model::PCA
                          , fitresult::PCAFitResultType

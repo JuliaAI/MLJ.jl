@@ -56,7 +56,7 @@ function MLJBase.fit(model::KNNRegressor{F}
     # computing norms of rows later on is faster if we use the transpose of Xmatrix:
     fitresult = (Xmatrix', y)
     cache = nothing
-    report = nothing
+    report = NamedTuple()
     
     return fitresult, cache, report 
 end

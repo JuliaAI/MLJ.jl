@@ -70,7 +70,7 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
         machine = new{M}(model)
         machine.frozen = false
         machine.args = args
-        machine.report = Dict{Symbol,Any}()
+#        machine.report = NamedTuple()
 
         # note: `get_tape(arg)` returns arg.tape where this makes
         # sense and an empty tape otherwise.  However, the complete

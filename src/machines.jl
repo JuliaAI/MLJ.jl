@@ -60,8 +60,6 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
             machine.args = args
         end
         
-        machine.report = Dict{Symbol,Any}()
-
         return machine
 
     end
@@ -70,7 +68,7 @@ end
 # automatically detect type parameter:
 Machine(model::M, args...) where M<:Model = Machine{M}(model, args...)
 
-# Note: The following method is written to fit! `NodalMachine`s
+# Note: The following method is written to fit `NodalMachine`s
 # defined in networks.jl, in addition to `Machine`s defined above.
 
 function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
@@ -93,11 +91,11 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
     
     if !isdefined(mach, :fitresult) || rows_have_changed || force 
         verbosity < 1 || @info "Training $mach."
-        mach.fitresult, mach.cache, report =
+        mach.fitresult, mach.cache, mach.report =
             fit(mach.model, verbosity, args...)
     else # call `update`:
         verbosity < 1 || @info "Updating $mach."
-        mach.fitresult, mach.cache, report =
+        mach.fitresult, mach.cache, mach.report =
             update(mach.model, verbosity, mach.fitresult, mach.cache, args...)
     end
 
@@ -109,10 +107,6 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
         mach.previous_model = deepcopy(mach.model)
     end
     
-    if report != nothing
-        merge!(mach.report, report)
-    end
-
     return mach
 
 end

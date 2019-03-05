@@ -56,10 +56,11 @@ function fit(transformer::FeatureSelector, verbosity::Int, X)
     else
         fitresult = transformer.features
     end
-    report = Dict{Symbol,Any}()
-    report[:features_to_keep] = fitresult
+    report = NamedTuple()
     return fitresult, nothing, report
 end
+
+MLJBase.fitted_params(::FeatureSelector, fitresult) = (features_to_keep=fitresult,)
 
 function transform(transformer::FeatureSelector, features, X)
     issubset(Set(features), Set(Tables.schema(X).names)) ||
@@ -140,8 +141,7 @@ function fit(transformer::ToIntTransformer
 
     fitresult = ToIntFitResult{T}(n_levels, int_given_T, T_given_int)
     cache = nothing
-    report = Dict{Symbol,Any}()
-    report[:values] = vals
+    report= (values=vals,)
 
     return fitresult, cache, report
 
@@ -195,7 +195,7 @@ function fit(transformer::UnivariateStandardizer, verbosity::Int, v::AbstractVec
         @warn "Extremely small standard deviation encountered in standardization."
     fitresult = (mean(v), std(v))
     cache = nothing
-    report = nothing
+    report = NamedTuple()
     return fitresult, cache, report
 end
 
@@ -263,9 +263,6 @@ end
 # lazy keyword constructor:
 Standardizer(; features=Symbol[]) = Standardizer(features)
 
-# null fitresult:
-StandardizerFitResult() = StandardizerFitResult(zeros(0,0), Symbol[], Bool[])
-
 function fit(transformer::Standardizer, verbosity::Int, X::Any)
 
     _schema =  schema(X)
@@ -296,12 +293,13 @@ function fit(transformer::Standardizer, verbosity::Int, X::Any)
     
     fitresult = fitresult_given_feature
     cache = nothing
-    report = Dict{Symbol,Any}()
-    report[:features_fit]=keys(fitresult_given_feature)
+    report = (features_fit=keys(fitresult_given_feature),)
     
     return fitresult, cache, report
     
 end
+
+MLJBase.fitted_params(::Standardizer, fitresult) = (mean_and_std_given_feature=fitresult,)
 
 function transform(transformer::Standardizer, fitresult, X)
 
@@ -400,7 +398,7 @@ On fitting to data `n` different values of the Box-Cox
 exponent λ (between `-0.4` and `3`) are searched to fix the value
 maximizing normality. If `shift=true` and zero values are encountered
 in the data then the transformation sought includes a preliminary
-positive shift by `0.2` times the data mean. If there are no zero
+positive shift `c` of `0.2` times the data mean. If there are no zero
 values, then no shift is applied.
 
 See also `BoxCoxEstimator` a transformer for selected ordinals in a
@@ -434,9 +432,12 @@ function fit(transformer::UnivariateBoxCoxTransformer, verbosity::Int, v::Abstra
     scores = Float64[normality(boxcox(l, c, v)) for l in lambdas]
     lambda = lambdas[argmax(scores)]
 
-    return  (lambda, c), nothing, nothing
+    return  (lambda, c), nothing, NamedTuple()
 
 end
+
+fitted_params(::UnivariateBoxCoxTransformer, fitresult) =
+    (λ=fitresult[1], c=fitresult[2])
 
 # for X scalar or vector:
 transform(transformer::UnivariateBoxCoxTransformer, fitresult, X) =
@@ -551,8 +552,7 @@ function fit(transformer::OneHotEncoder{R}, verbosity::Int, X) where R
     end
 
     fitresult = OneHotEncoderResult(collect(all_features), ref_name_pairs_given_feature)
-    report = Dict{Symbol,Any}()
-    report[:features_to_be_encoded] = collect(keys(ref_name_pairs_given_feature))
+    report = (features_to_be_encoded=collect(keys(ref_name_pairs_given_feature)),)
     cache = nothing
 
     return fitresult, cache, report

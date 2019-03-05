@@ -45,9 +45,11 @@ function MLJBase.fit(model::ConstantRegressor{F,D}, verbosity::Int, X, y::Vector
     fitresult = Distributions.fit(D, y)
     verbosity < 1 || @info "Fitted a constant probability distribution, $fitresult."
     cache = nothing
-    report = nothing
+    report = NamedTuple()
     return fitresult, cache, report
 end
+
+MLJBase.fitted_params(::ConstantRegressor, fitresult) = (target_distribution=fitresult,)
 
 nrows(X) = MLJBase.schema(X).nrows
 
@@ -77,7 +79,7 @@ function MLJBase.fit(model::DeterministicConstantRegressor{F}, verbosity::Int, X
     fitresult = mean(y)
     verbosity < 1 || @info "mean = $fitresult."
     cache = nothing
-    report = nothing
+    report = NamedTuple
     return fitresult, cache, report
 end
 
@@ -124,11 +126,13 @@ function MLJBase.fit(model::ConstantClassifier{L},
 
     verbosity < 1 || @info "probabilities: \n$(fitresult.prob_given_level)"
     cache = nothing
-    report = nothing
+    report = NamedTuple
 
     return fitresult, cache, report
 
 end
+
+MLJBase.fitted_params(::ConstantClassifier, fitresult) = (target_distribution=fitresult,)
 
 function MLJBase.predict(model::ConstantClassifier{L}, fitresult, Xnew) where L
     return fill(fitresult, nrows(Xnew))
@@ -176,7 +180,7 @@ function MLJBase.fit(model::DeterministicConstantClassifier{L},
 
     verbosity < 1 || @info "mode = $fitresult"
     cache = nothing
-    report = nothing
+    report = NamedTuple()
 
     return fitresult, cache, report
 

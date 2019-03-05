@@ -53,7 +53,9 @@ end
 @extend_to_machines se
 @extend_to_machines evaluate
 @extend_to_machines fitted_params
-# @extend_to_machines best
+
+params(mach::AbstractMachine) = params(mach.model)
+report(mach::AbstractMachine) = mach.report
 
 @sugar predict
 @sugar predict_mode
