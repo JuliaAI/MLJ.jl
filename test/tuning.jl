@@ -40,6 +40,7 @@ report(tuned)
 tuned_model.full_report=true
 fit!(tuned)
 report(tuned)
+fitted_params(tuned)
 
 b = tuned.report.best_model
 

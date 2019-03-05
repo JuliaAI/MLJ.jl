@@ -102,7 +102,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     N = size(A, 1)
 
     if tuned_model.full_report
-        models = Vector{M}(undef, N)
+#        models = Vector{M}(undef, N)
         measurements = Vector{Float64}(undef, N)
     end
 
@@ -133,7 +133,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
         end
 
         if tuned_model.full_report
-            models[i] = deepcopy(clone)
+ #           models[i] = deepcopy(clone)
             measurements[i] = e
         end
         
@@ -149,16 +149,16 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     scales=scale.(flat_values(tuned_model.nested_ranges)) |> collect
 
     if tuned_model.full_report
-        report = (models=models,
-                  best_model=best_model,
+        report = (# models=models,
+                  # best_model=best_model,
                   parameter_names= permutedims(flat_keys(tuned_model.nested_ranges)), # row vector
                   parameter_scales=permutedims(scales),  # row vector
                   parameter_values=A,
                   measurements=measurements,
                   best_measurement=best_measurement)
     else
-        report = (models=[deepcopy(clone),][1:0],         # empty vector
-                  best_model=best_model,
+        report = (# models=[deepcopy(clone),][1:0],         # empty vector
+                  # best_model=best_model,
                   parameter_names= permutedims(flat_keys(tuned_model.nested_ranges)), # row vector
                   parameter_scales=permutedims(scales),   # row vector
                   parameter_values=A[1:0,1:0],            # empty matrix
