@@ -54,9 +54,6 @@ end
 @extend_to_machines evaluate
 @extend_to_machines fitted_params
 
-params(mach::AbstractMachine) = params(mach.model)
-report(mach::AbstractMachine) = mach.report
-
 @sugar predict
 @sugar predict_mode
 @sugar predict_mean

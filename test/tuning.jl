@@ -3,6 +3,7 @@ module TestTuning
 # using Revise
 using Test
 using MLJ
+# using UnicodePlots
 import MLJBase
 
 
@@ -28,16 +29,21 @@ holdout = Holdout(fraction_train=0.8)
 grid = Grid(resolution=10)
 
 tuned_model = TunedModel(model=composite, tuning=grid, resampling=holdout, measure=rms,
-                         nested_ranges=nested_ranges, report_measurements=true)
+                         nested_ranges=nested_ranges, full_report=false)
 
 info(tuned_model)
 
 tuned = machine(tuned_model, X, y)
 
 fit!(tuned)
-b = tuned.report[:best_model]
+report(tuned)
+tuned_model.full_report=true
+fit!(tuned)
+report(tuned)
 
-measurements = tuned.report[:measurements]
+b = tuned.report.best_model
+
+measurements = tuned.report.measurements
 # should be all different:
 @test length(unique(measurements)) == length(measurements)
 
@@ -48,7 +54,7 @@ measurements = tuned.report[:measurements]
 e = rms(y, predict(tuned, X))
 
 # check this error has same order of magnitude as best measurement during tuning:
-r = e/tuned.report[:best_measurement]
+r = e/tuned.report.best_measurement
 @test r < 10 && r > 0.1
 
 ridge = RidgeRegressor()
@@ -56,7 +62,7 @@ tuned_model = TunedModel(model=ridge,
                           nested_ranges=Params(strange(ridge, :lambda, lower=0.01, upper=1.0)))
 tuned = machine(tuned_model, X, y)
 fit!(tuned)
-tuned.report[:curve]
+
 
 ## LEARNING CURVE
 
@@ -64,7 +70,8 @@ atom = RidgeRegressor()
 model = EnsembleModel(atom=atom)
 r = range(atom, :lambda, lower=0.001, upper=1.0, scale=:log10)
 nested_range = Params(:atom => Params(:lambda => r))
-u, v = learning_curve(model, X, y; nested_range = nested_range) 
+curve = learning_curve(model, X, y; nested_range = nested_range)
+# lineplot([curve.parameter_values...], curve.measurements)
 
 end
 true

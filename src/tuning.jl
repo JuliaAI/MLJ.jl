@@ -16,7 +16,7 @@ mutable struct DeterministicTunedModel{T,M<:Deterministic} <: MLJ.Deterministic{
     measure
     operation
     nested_ranges::Params
-    report_measurements::Bool
+    full_report::Bool
 end
 
 mutable struct ProbabilisticTunedModel{T,M<:Probabilistic} <: MLJ.Probabilistic{MLJ.Machine}
@@ -26,7 +26,7 @@ mutable struct ProbabilisticTunedModel{T,M<:Probabilistic} <: MLJ.Probabilistic{
     measure
     operation
     nested_ranges::Params
-    report_measurements::Bool
+    full_report::Bool
 end
 
 const EitherTunedModel{T,M} = Union{DeterministicTunedModel{T,M},ProbabilisticTunedModel{T,M}}
@@ -37,7 +37,7 @@ function TunedModel(;model=nothing,
                     measure=nothing,
                     operation=predict,
                     nested_ranges=Params(),
-                    report_measurements=true)
+                    full_report=true)
     
     !isempty(nested_ranges) || error("You need to specify nested_ranges=... ")
     model != nothing || error("You need to specify model=... ")
@@ -47,10 +47,10 @@ function TunedModel(;model=nothing,
     
     if model isa Deterministic
         return DeterministicTunedModel(model, tuning, resampling,
-                      measure, operation, nested_ranges, report_measurements)
+                      measure, operation, nested_ranges, full_report)
     elseif model isa Probabilistic
         return ProbabilisticTunedModel(model, tuning, resampling,
-                      measure, operation, nested_ranges, report_measurements)
+                      measure, operation, nested_ranges, full_report)
     end
     error("$model does not appear to be a Supervised model.")
 end
@@ -101,7 +101,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     A = MLJ.unwind(iterators...)
     N = size(A, 1)
 
-    if tuned_model.report_measurements
+    if tuned_model.full_report
         models = Vector{M}(undef, N)
         measurements = Vector{Float64}(undef, N)
     end
@@ -132,7 +132,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
             best_measurement = e
         end
 
-        if tuned_model.report_measurements
+        if tuned_model.full_report
             models[i] = deepcopy(clone)
             measurements[i] = e
         end
@@ -146,22 +146,24 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     fitresult = machine(best_model, X, y)
     fit!(fitresult, verbosity=verbosity-1)
 
-    if tuned_model.report_measurements
-        report = Dict{Symbol, Any}()
-        report[:models] = models
-        report[:measurements] = measurements
-        report[:best_model] = best_model
-        report[:best_measurement] = best_measurement
-        if n_iterators == 1
-            report[:curve] = ([A[:,1]...], measurements)
-        end
-        # return parameter names as row vector to correspond to layout of values:
-        report[:parameter_names] =  permutedims(flat_keys(tuned_model.nested_ranges))
-        scales = scale.(flat_values(tuned_model.nested_ranges)) |> collect
-        report[:parameter_scales] = permutedims(scales)
-        report[:parameter_values] = A
+    scales=scale.(flat_values(tuned_model.nested_ranges)) |> collect
+
+    if tuned_model.full_report
+        report = (models=models,
+                  best_model=best_model,
+                  parameter_names= permutedims(flat_keys(tuned_model.nested_ranges)), # row vector
+                  parameter_scales=permutedims(scales),  # row vector
+                  parameter_values=A,
+                  measurements=measurements,
+                  best_measurement=best_measurement)
     else
-        report = nothing
+        report = (models=[deepcopy(clone),][1:0],         # empty vector
+                  best_model=best_model,
+                  parameter_names= permutedims(flat_keys(tuned_model.nested_ranges)), # row vector
+                  parameter_scales=permutedims(scales),   # row vector
+                  parameter_values=A[1:0,1:0],            # empty matrix
+                  measurements=[best_measurement, ][1:0], # empty vector
+                  best_measurement=best_measurement)
     end
     
     cache = nothing
@@ -169,6 +171,8 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     return fitresult, cache, report
     
 end
+
+MLJBase.fitted_params(::EitherTunedModel, fitresult) = (best_model=fitresult.model,)
 
 MLJBase.predict(tuned_model::EitherTunedModel, fitresult, Xnew) = predict(fitresult, Xnew)
 MLJBase.best(model::EitherTunedModel, fitresult) = fitresult.model
@@ -223,10 +227,14 @@ function learning_curve(model::Supervised, X, ys...;
 
     tuned_model = TunedModel(model=model, nested_ranges=nested_range,
                              tuning=Grid(resolution=resolution),
-                             resampling=resampling, measure=measure, report_measurements=true)
+                             resampling=resampling, measure=measure, full_report=true)
     tuned = machine(tuned_model, X, ys...)
     fit!(tuned, verbosity=0)
-    return tuned.report[:curve]
+    report = tuned.report
+    return (parameter_name=report.parameter_names[1],
+            parameter_scale=report.parameter_scales[1],
+            parameter_values=report.parameter_values[:, 1],
+            measurements=report.measurements)
 end
 
 

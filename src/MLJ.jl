@@ -5,6 +5,7 @@ export @curve, @pcurve                               # "utilities.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export misclassification_rate, cross_entropy         # "metrics.jl"
 export default_measure                               # "metrics.jl"
+export report                                        # "machines.jl"
 export Holdout, CV, evaluate!, Resampler             # "resampling.jl"
 export Params, params, set_params!                   # "parameters.jl"
 export strange, iterator                             # "parameters.jl"
@@ -43,7 +44,7 @@ export FiniteOrderedFactor, Other
 export Count, Multiclass, Binary
 export scitype
 export predict, predict_mean, predict_median, predict_mode
-export transform, inverse_transform, se, evaluate
+export transform, inverse_transform, se, evaluate, fitted_params
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
 export partition, X_and_y
 export load_boston, load_ames, load_iris, load_reduced_ames
