@@ -61,6 +61,11 @@ p2 = range(dummy_model, :kernel, values=['c', 'd'])
 p3 = range(super_model, :lambda, lower=0.1, upper=1, scale=:log2) 
 p4 = strange(dummy_model, :K, lower=1, upper=3, scale=x->2x) |> last
 
+@test MLJ.scale(p1) == :log10
+@test MLJ.scale(p2) == :none
+@test MLJ.scale(p3) == :log2
+@test MLJ.scale(p4) == :custom
+
 @test MLJ.iterator(p1, 5)  == [1, 2, 3, 6, 10]
 @test MLJ.iterator(p2) == collect(p2.values)
 u = 2^(log2(0.1)/2)

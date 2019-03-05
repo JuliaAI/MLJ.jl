@@ -156,7 +156,9 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
             report[:curve] = ([A[:,1]...], measurements)
         end
         # return parameter names as row vector to correspond to layout of values:
-        report[:parameter_names] =  permutedims(flat_keys(tuned_model.nested_ranges)) #reshape(flat_keys(tuned_model.nested_ranges), 1, :)
+        report[:parameter_names] =  permutedims(flat_keys(tuned_model.nested_ranges))
+        scales = scale.(flat_values(tuned_model.nested_ranges)) |> collect
+        report[:parameter_scales] = permutedims(scales)
         report[:parameter_values] = A
     else
         report = nothing

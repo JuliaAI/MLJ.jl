@@ -154,24 +154,23 @@ end
 
 ## PARAMETER RANGES
 
-""" 
-    Scale = SCALE()
 
-Object for dispatching on scales and functions when generating
-parameter ranges. We require different behaviour for scales and
-functions:
+#     Scale = SCALE()
 
-     transform(Scale, scale(:log), 100) = 2
-     inverse_transform(Scale, scale(:log), 2) = 100
+# Object for dispatching on scales and functions when generating
+# parameter ranges. We require different behaviour for scales and
+# functions:
 
-but
-    transform(Scale, scale(log), 100) = 100       # identity
-    inverse_transform(Scale, scale(log), 100) = 2 
+#      transform(Scale, scale(:log), 100) = 2
+#      inverse_transform(Scale, scale(:log), 2) = 100
+
+# but
+#     transform(Scale, scale(log), 100) = 100       # identity
+#     inverse_transform(Scale, scale(log), 100) = 2 
 
 
-See also: strange
+# See also: strange
 
-"""
 struct SCALE end
 Scale = SCALE()
 scale(s::Symbol) = Val(s)
@@ -235,6 +234,7 @@ Alternatively, if a function `f` is provided as `scale`, then
 f(xn)]`, where `x1, x2, ..., xn` are linearly spaced between `lower`
 and `upper`.
 
+
 See also: strange, iterator
 
 """
@@ -261,6 +261,19 @@ See also: range
 
 """
 strange(model::Model, field::Symbol; kwargs...) = field => range(model, field; kwargs...)
+
+"""
+    MLJ.scale(r::ParamRange)
+
+Return the scale associated with the `ParamRange` object `r`. The
+possible return values are: `:none` (for a `NominalRange`), `:linear`,
+`:log`, `:log10`, `:log2`, or `:custom` (if `r.scale` is function).
+
+"""
+scale(r::NominalRange) = :none
+scale(r::NumericRange) = :custom
+scale(r::NumericRange{T,Symbol}) where T =
+    r.scale
 
 
 ## ITERATORS FROM A PARAMETER RANGE

@@ -4,12 +4,12 @@ module TestTuning
 using Test
 using MLJ
 import MLJBase
-using DataFrames
+
 
 x1 = rand(100);
 x2 = rand(100);
 x3 = rand(100);
-X = DataFrame(x1=x1, x2=x2, x3=x3);
+X = (x1=x1, x2=x2, x3=x3);
 y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
 
 sel = FeatureSelector()
