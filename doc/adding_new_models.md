@@ -272,7 +272,8 @@ The compulsory predict method has the form
 MLJBase.predict(model::SomeSupervisedModelType, fitresult, Xnew) -> yhat
 ````
 
-Here `Xnew` is an arbitrary table (see above).
+Here `Xnew` is an any table whose entries satisfy the same scitype
+constraints as discussed for `X` above.
 
 **Prediction types for deterministic responses.** In the case of
 `Deterministic` models, `yhat` must have the same form as the target
@@ -285,18 +286,13 @@ of the target data presented in training**, even if not all levels
 appear in the training data or prediction itself. That is, we must
 have `levels(yhat) == levels(y)`.
 
-Unfortunately, code not written with the preservation
-of categorical levels in mind poses special problems. To help with
-this, MLJ provides a utility `CategoricalDecoder` which can decode a
-`CategoricalArray` into a plain array, and re-encode a prediction with
-the original levels intact. The `CategoricalDecoder` object created
-during `fit` will need to be bundled with `fitresult` to make it
-available to `predict` during re-encoding. (If you are coding a learning algorithm 
-from scratch, rather than 
-wrapping an existing one, conversions may be unnecessary. It may suffice 
-to record the pool of `y` and bundle that with the fitresult for `predict` to append 
-to the levels of its categorical output, or to add to the support of the predicted 
-probability distributions.)
+Unfortunately, code not written with the preservation of categorical
+levels in mind poses special problems. To help with this, MLJ provides
+a utility `CategoricalDecoder` which can decode a `CategoricalArray`
+into a plain array, and re-encode a prediction with the original
+levels intact. The `CategoricalDecoder` object created during `fit`
+will need to be bundled with `fitresult` to make it available to
+`predict` during re-encoding. 
 
 So, for example, if the core algorithm being wrapped by `fit` expects
 a nominal target `yint` of type `Vector{Int64}` then a `fit` method
@@ -323,6 +319,11 @@ function MLJBase.predict(model::SomeSupervisedModelType, fitresult, Xnew)
 end
 ````
 Query `?MLJBase.DecodeCategorical` for more information.
+
+If you are coding a learning algorithm from scratch, rather than
+wrapping an existing one, conversions may be unnecessary. It may
+suffice to record the pool of `y` and bundle that with the fitresult
+for `predict` to append to the levels of its categorical output.
 
 **Prediction types for probabilistic responses.** In the case of
 `Probabilistic` models with univariate targets, `yhat` must be a
@@ -444,8 +445,8 @@ Note that different packages can implement models having the same name
 without causing conflicts, although an MLJ user cannot simultaneously
 *load* two such models.
 
-There are two options for making a new model available to all MLJ
-users:
+There are two options for making a new model implementation available
+to all MLJ users:
 
 1. **Native implementations** (preferred option). The implementation
    code lives in the same package that contains the learning

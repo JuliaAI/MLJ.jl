@@ -11,10 +11,6 @@ julia> using RDatasets
 julia> iris = dataset("datasets", "iris"); # a DataFrame
 ```
 
-    ┌ Info: Recompiling stale cache file /Users/anthony/.julia/compiled/v1.0/MLJ/rAU56.ji for MLJ [add582a8-e3ab-11e8-2d5e-e98b27df1bc7]
-    └ @ Base loading.jl:1190
-
-
 In MLJ one can either wrap data for supervised learning in a formal *task* (see [Working with Tasks](tasks.jl)), or work directly with the data, split into its input and target parts:
 
 
@@ -72,6 +68,8 @@ julia> misclassification_rate(yhat, y[test]);
     ┌ Info: Training Machine{DecisionTreeClassifier{S…} @ 1…36.
     └ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:68
 
+    0.08888888888888889
+
 Or, in one line:
 
 ```julia
@@ -126,11 +124,11 @@ has implicit consequences about how MLJ will interpret that data.
 To articulate MLJ's conventions about data representation, MLJ
 distinguishes between *machine* data types on the one hand (`Float64`,
 `Bool`, `String`, etc) and scientific data types on the other,
-represented by new Julia types: `Continuous`, `Discrete`,
-`Multiclass{N}`, `FiniteOrderedFactor{N}`, and `Count`, with obvious
-interpretations. These types, which are organized in a type hierarchy
-(see [Scientific Data Types](scientific_data_types.md)), are used by
-MLJ for dispatch (but have no corresponding instances).
+represented by new Julia types: `Continuous`, `Multiclass{N}`,
+`FiniteOrderedFactor{N}`, and `Count` (unbounded ordered factor), with
+obvious interpretations. These types, which are part of a type
+hierarchy (see [Scientific Data Types](scientific_data_types.md)), are
+used by MLJ for dispatch, but have no corresponding instances.
 
 Scientific types appear when querying model metadata, as in this example:
 
@@ -145,7 +143,7 @@ object `x` can represent is defined by `scitype(x)`. If `scitype(x) ==
 Other`, then `x` cannot represent scalar data in MLJ.
 
 ```julia
-julia> (scitype(42), scitype(π), scitype(String))
+julia> (scitype(42), scitype(π), scitype("Julia"))
 ```
 
     (Count, Continuous, MLJBase.Other)
