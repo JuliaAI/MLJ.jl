@@ -45,6 +45,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 - the data in the `load_ames()` test task has been replaced by the
   full data set, and `load_reduced_ames()` now loads a reduced set.
 
+
 ### unversioned commit to MLJModels 5 March 2019 (around 03:00 GMT)
 
 -  GaussianNBClassifier and MultinomialNBClassifier, from
@@ -52,4 +53,27 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
    (#66)[https://github.com/alan-turing-institute/MLJ.jl/issues/66#issue-406598708].
    
 
+### unversioned commits 6 March 2019 (around 05:00 GMT)
 
+- Added **new accessor function** `fitted_params` for accessing
+  user-friendly version of the learned parameters of a fitted machine
+  (with corresponding operation on models). Fallback returns
+  unadulterated `fitresult` returned by model `fit`. Implemented
+  `fitted_parmams` for all models in MLJ repos where
+  appropriate. Addresses parts of:
+  [\#51](https://github.com/alan-turing-institute/MLJ.jl/issues/51#issuecomment-469850582)
+
+- Made the `report` field of machines (and corresponding value in
+  return tuple of model `fit` methods) into a **named tuple**, instead
+  of dictionary, for type stability. All broken tests for models in
+  all repos repaired. Added `report` **accessor function** for
+  machines.  Resolves:
+  [\#94](https://github.com/alan-turing-institute/MLJ.jl/issues/94)
+  
+- **Abandoned custom `Param` type** for nested parameters (returned by
+  `params(::Model)` in favour of (possibly nested) **named
+  tuples**. So now `params`, `report` and `fitted_params` all return
+  (possible nested) named tuples for a uniform API. All broken code in
+  all repos repaired.
+  
+- Updated tour.ipynb and mini_demo.ipynb and docs to reflect changes.
