@@ -18,12 +18,10 @@ stand = UnivariateStandardizer()
 ridge = RidgeRegressor()
 composite = MLJ.SimpleDeterministicCompositeModel(transformer=sel, model=ridge)
 
-features_ = strange(sel, :features,
-                             values=[[:x1], [:x1, :x2], [:x2, :x3], [:x1, :x2, :x3]])
-lambda_ = strange(ridge, :lambda,
-                           lower=1e-6, upper=1e-1, scale=:log10)
+features_ = range(sel, :features, values=[[:x1], [:x1, :x2], [:x2, :x3], [:x1, :x2, :x3]])
+lambda_ = range(ridge, :lambda, lower=1e-6, upper=1e-1, scale=:log10)
 
-nested_ranges = Params(:transformer => Params(features_), :model => Params(lambda_)) 
+nested_ranges = (transformer = (features=features_,), model = (lambda=lambda_,))
 
 holdout = Holdout(fraction_train=0.8)
 grid = Grid(resolution=10)
@@ -59,7 +57,7 @@ r = e/tuned.report.best_measurement
 
 ridge = RidgeRegressor()
 tuned_model = TunedModel(model=ridge,
-                          nested_ranges=Params(strange(ridge, :lambda, lower=0.01, upper=1.0)))
+                          nested_ranges=(lambda = range(ridge, :lambda, lower=0.01, upper=1.0),))
 tuned = machine(tuned_model, X, y)
 fit!(tuned)
 
@@ -69,7 +67,7 @@ fit!(tuned)
 atom = RidgeRegressor()
 model = EnsembleModel(atom=atom)
 r = range(atom, :lambda, lower=0.001, upper=1.0, scale=:log10)
-nested_range = Params(:atom => Params(:lambda => r))
+nested_range = (atom = (lambda = r,),)
 curve = learning_curve(model, X, y; nested_range = nested_range)
 # lineplot([curve.parameter_values...], curve.measurements)
 

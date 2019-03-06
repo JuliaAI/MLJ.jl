@@ -15,7 +15,7 @@ mutable struct DeterministicTunedModel{T,M<:Deterministic} <: MLJ.Deterministic{
     resampling # resampling strategy
     measure
     operation
-    nested_ranges::Params
+    nested_ranges::NamedTuple
     full_report::Bool
 end
 
@@ -25,7 +25,7 @@ mutable struct ProbabilisticTunedModel{T,M<:Probabilistic} <: MLJ.Probabilistic{
     resampling # resampling strategy
     measure
     operation
-    nested_ranges::Params
+    nested_ranges::NamedTuple
     full_report::Bool
 end
 
@@ -36,7 +36,7 @@ function TunedModel(;model=nothing,
                     resampling=Holdout(),
                     measure=nothing,
                     operation=predict,
-                    nested_ranges=Params(),
+                    nested_ranges=NestedTuple(),
                     full_report=true)
     
     !isempty(nested_ranges) || error("You need to specify nested_ranges=... ")

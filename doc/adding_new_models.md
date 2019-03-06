@@ -122,6 +122,10 @@ mutable struct RidgeRegressor{F} <: MLJBase.Deterministic{LinearFitResult{F}}
 end
 ````
 
+**Note.** Model fields may be of any type except `NamedTuple`. 
+(This is because named tuples are used to represented the nested hyperparameters 
+of composite models (models that have other models as fields.)
+
 Models (which are mutable) should not be given internal
 constructors. It is recommended that they be given an external lazy
 keyword constructor of the same name. This constructor defines default values for

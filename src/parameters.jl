@@ -1,77 +1,49 @@
 ## NESTED PARAMATER INTERFACE
 
-# A `Params` object is a wrapped tuple of symbol-value pairs. In our
-# application, the symbol is always the name of the field of some
-# `Model` object. There are several possibilities for the values: (i)
-# They are normal hyperparameter values or, in the case the field
-# represents another `Model`, another `Params` object. So for us, a
-# `Params` object represents nested hyper-parameter values in this
-# case; (ii) The values are hyperparameter *ranges* (see below) or
-# another `Params` object representing ranges of some sub-`Model`.
-# object. So in this latter case we are representing nested
-# hyperparameter ranges; (iii) As in (ii) but iterators instead of
-# ranges.
-struct Params
-    pairs::Tuple{Vararg{Pair{Symbol}}}
-    Params(args::Pair...) = new(args)
-end
 
-MLJBase.istoobig(::Params) = false # for display functionality
+"""
+    params(m)
 
-# since a "value" may be another Params object, we can build nested
-# Param objects. The symbols are the names of paramet
+Returns the hyperparameters of a machine or model `m` as a named
+tuple. For a non-composite model, the keys are just the field names of
+`m` and the values the field values. If, however, `m` is a composite
+model, then a *nested* named tuple is returned:
 
-Base.isempty(p::Params) = isempty(p.pairs)
+    julia> params(EnsembleModel(atom=ConstantClassifier()))
+    (atom = (target_type = Bool,), weights = Float64[], bagging_fraction = 0.8, rng_seed = 0, n = 100, parallel = true)
 
-==(params1::Params, params2::Params) = params1.pairs == params2.pairs
-
-function Base.show(stream::IO, params::Params)
-    print(stream, "Params(")
-    count = 1 
-    for pair in params.pairs
-        show(stream, first(pair))
-        print(stream, " => ")
-        show(stream, last(pair))
-        count == length(params.pairs) || print(stream, ", ")
-        count += 1
-    end
-    print(stream, ")")
-end
-
+"""
 params(field) = field
+
 function params(model::M) where M<:Model
-    pairs = Pair{Symbol,Any}[]
-    for field in fieldnames(M)
-        value = getfield(model, field)
-        push!(pairs, field => params(value))
-    end
-    return Params(pairs...)
+    fields = fieldnames(M)
+    NamedTuple{fields}(Tuple([params(getfield(model, field)) for field in fields]))
 end
 
-function set_params!(model::M, pair::Pair) where M<:Model
-    setfield!(model, first(pair), last(pair))
+function set_params!(model::Model, key::Symbol, value)
+    setfield!(model, key, value)
     return model
 end
 
-function set_params!(model::M, pair::Pair{Symbol, Params}) where M<:Model
-    submodel = getfield(model, first(pair))
-    set_params!(submodel, last(pair))
+function set_params!(model::Model, key::Symbol, params::NamedTuple)
+    submodel = getfield(model, key)
+    set_params!(submodel, params)
     return model
 end
 
-function set_params!(model::M, params::Params) where M<:Model
-    for pair in params.pairs
-        set_params!(model, pair)
+function set_params!(model, params::NamedTuple)
+    for k in keys(params)
+        set_params!(model, k,  getproperty(params, k))
     end
     return model
 end
 
-function Base.length(params::Params)
+function flat_length(params::NamedTuple)
     count = 0
-    for pair in params.pairs
-        value = last(pair)
-        if value isa Params
-            count += length(value)
+    for k in keys(params)
+        value = getproperty(params, k)
+        if value isa NamedTuple
+            count += flat_length(value)
         else
             count += 1
         end
@@ -79,11 +51,11 @@ function Base.length(params::Params)
     return count
 end
 
-function flat_values(params::Params)
+function flat_values(params::NamedTuple)
     values = []
-    for pair in params.pairs
-        value = last(pair)
-        if value isa Params
+    for k in keys(params)
+        value = getproperty(params, k)
+        if value isa NamedTuple
             append!(values, flat_values(value))
         else
             push!(values, value)
@@ -93,61 +65,64 @@ function flat_values(params::Params)
 end
 
 """
-     flat_keys(params::Params)
+     flat_keys(params::NamedTuple)
 
-Use dot-concatentation to express each key in key-value pair of
-`params` in string form.
+Use dot-concatentation to express each possibly nested key of `params`
+in string form.
 
 ### Example
 
 ````
-julia> flat_keys(Params(:A => Params(:x => 2, :y => 3), :B)))
+julia> flat_keys((A=(x=2, y=3), B=9)))
 ["A.x", "A.y", "B"]
 ````
 
 """
 flat_keys(pair::Pair{Symbol}) = flat_keys(pair, last(pair))
 flat_keys(pair, ::Any) = [string(first(pair)), ]
-flat_keys(pair, ::Params) =
+flat_keys(pair, ::NamedTuple) =
     [string(first(pair), ".", str) for str in flat_keys(last(pair))]
-flat_keys(nested::Params) =
-    reduce(vcat, [flat_keys(pair) for pair in nested.pairs])
+flat_keys(nested::NamedTuple) =
+    reduce(vcat, [flat_keys(k => getproperty(nested, k)) for k in keys(nested)])
 
 
 """
-    copy(params::Params, values=nothing)
+    copy(params::NamedTuple, values=nothing)
 
 Return a copy of `params` with new `values`. That is,
-`flat_values(copy(params, values)) == values` is true, while
-the first element of each nested pair (parameter name) is unchanged.
+`flat_values(copy(params, values)) == values` is true, while the
+nested keys remain unchanged.
 
 If `values` is not specified a deep copy is returned. 
 
 """
-function Base.copy(params::Params, values=nothing)
+function Base.copy(params::NamedTuple, values=nothing)
 
     values != nothing || return deepcopy(params)
-    length(params) == length(values) ||
-        throw(DimensionMismatch("Length of Params object not matching number "*
+    flat_length(params) == length(values) ||
+        throw(DimensionMismatch("Length of NamedTuple object not matching number "*
                                 "of supplied values"))
 
-    pairs = []
+    kys = Symbol[]
+    vals = Any[]
     pos = 1
     
-    for oldpair in params.pairs
-        oldvalue = last(oldpair)
-        if oldvalue isa Params
-            L = length(oldvalue)
-            newvalue = copy(oldvalue, values[pos:(pos+L-1)])
-            push!(pairs, first(oldpair) => newvalue)
+    for oldky in keys(params)
+        oldval = getproperty(params, oldky)
+        if oldval isa NamedTuple
+            L = flat_length(oldval)
+            newval = copy(oldval, values[pos:(pos+L-1)])
+            push!(kys, oldky)
+            push!(vals, newval)
             pos += L
         else
-            push!(pairs, first(oldpair) => values[pos])
+            push!(kys, oldky)
+            push!(vals, values[pos])
             pos += 1
         end
     end
 
-    return Params(pairs...)
+    return NamedTuple{Tuple(kys)}(Tuple(vals))
 
 end
 
@@ -235,7 +210,7 @@ f(xn)]`, where `x1, x2, ..., xn` are linearly spaced between `lower`
 and `upper`.
 
 
-See also: strange, iterator
+See also: iterator
 
 """
 function Base.range(model::MLJType, field::Symbol; values=nothing,
@@ -250,17 +225,6 @@ function Base.range(model::MLJType, field::Symbol; values=nothing,
         return NominalRange{T}(Tuple(values))
     end
 end
-
-"""
-    strange(model, :hyper; kwargs...)
-
-Returns the pair `:hyper => range(model, :hyper; kwargs...)`;
-"strange" is short for "set to range".
-
-See also: range
-
-"""
-strange(model::Model, field::Symbol; kwargs...) = field => range(model, field; kwargs...)
 
 """
     MLJ.scale(r::ParamRange)
@@ -358,7 +322,7 @@ function unwind(iterators...)
 end
 
 """
-    iterator(model::Model, param_iterators::Params)
+    iterator(model::Model, param_iterators::NamedTuple)
 
 Iterator over all models of type `typeof(model)` defined by
 `param_iterators`.
@@ -371,7 +335,7 @@ values) is an iterator over values of one of those fields.
 See also `iterator` and `params`.
 
 """
-function iterator(model::M, param_iterators::Params) where M<:Model
+function iterator(model::M, param_iterators::NamedTuple) where M<:Model
     iterators = flat_values(param_iterators)
     A = unwind(iterators...)
 
