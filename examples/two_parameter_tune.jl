@@ -1,5 +1,5 @@
 # To show how to accesss the report of a TunedModel machine for
-# plotting purposed, in the case a of a two-parameter tune.
+# plotting purposes, in the case a of a two-parameter tune.
 
 using MLJ
 using DataFrames, Statistics
