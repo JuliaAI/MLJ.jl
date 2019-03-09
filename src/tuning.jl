@@ -36,7 +36,7 @@ function TunedModel(;model=nothing,
                     resampling=Holdout(),
                     measure=nothing,
                     operation=predict,
-                    nested_ranges=NestedTuple(),
+                    nested_ranges=NamedTuple(),
                     full_report=true)
     
     !isempty(nested_ranges) || error("You need to specify nested_ranges=... ")
