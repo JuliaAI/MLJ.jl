@@ -10,7 +10,7 @@ const local_metadata_file = joinpath(path_to_metadata_dot_toml, "Metadata.toml")
 try 
     download(remote_file, quiet=true, force=true)
 catch
-    @info "Unable to update model metadata from registry. "*
+    @info "Unable to update model metadata from github.alan-turing-institute/MLJRegistry. "*
     "Using locally archived metadata. "
 end
 
