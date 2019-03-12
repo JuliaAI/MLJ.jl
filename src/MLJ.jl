@@ -77,6 +77,9 @@ using LinearAlgebra
 using Random
 import Distributed: @distributed, nworkers, pmap
 
+# for plotting
+using RecipesBase
+
 const srcdir = dirname(@__FILE__) # the directory containing this file:
 
 include("utilities.jl")     # general purpose utilities
@@ -104,5 +107,8 @@ include("builtins/LocalMultivariateStats.jl")
 include("loading.jl")      # model metadata processing
 
 
+## SIMPLE PLOTTING RECIPE
+
+include("plotrecipes.jl")
 
 end # module
