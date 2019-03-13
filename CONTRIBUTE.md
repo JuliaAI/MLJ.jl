@@ -9,6 +9,7 @@ channel](https://slackinvite.julialang.org), #MLJ.
 
 - [Enhancement requests](https://github.com/alan-turing-institute/MLJ.jl/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3A%22enhancement%22)
 
+- [Nice overview of Julia ML packages](https://www.simonwenkel.com/2018/10/05/Julia-for-datascience-machine-learning-and-artificial-intelligence.html)
 
 While new model implementations are a priority at present, help adding core
 functionality to MLJ is also welcome. If you are interested in
