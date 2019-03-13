@@ -72,6 +72,11 @@ add "https://github.com/alan-turing-institute/MLJModels.jl"
 add "https://github.com/alan-turing-institute/MLJ.jl"
 ````
 
+### Known issues
+
+- The ScikitLearn SVM models will not work under Julia 1.0.3 but do work under Julia 1.1.
+
+
 ### Getting started
 
 [Get started](doc/getting_started.md) with MLJ, or [take a tour](doc/tour.ipynb) of some of the features implemented so far.
