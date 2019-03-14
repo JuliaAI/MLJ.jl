@@ -5,7 +5,6 @@
 
 
 ```julia
-julia> using Revise
 julia> using MLJ
 julia> using RDatasets
 julia> iris = dataset("datasets", "iris"); # a DataFrame
@@ -24,37 +23,37 @@ A *model* is a container for hyperparameters:
 ```julia
 julia> @load DecisionTreeClassifier
 julia> tree_model = DecisionTreeClassifier(target_type=String, max_depth=2)
+
+import MLJModels ✔
+import DecisionTree ✔
+import MLJModels.DecisionTree_.DecisionTreeClassifier ✔
+
+# DecisionTreeClassifier{String} @ 2…98: 
+target_type             =>   String
+pruning_purity          =>   1.0
+max_depth               =>   2
+min_samples_leaf        =>   1
+min_samples_split       =>   2
+min_purity_increase     =>   0.0
+n_subfeatures           =>   0.0
+display_depth           =>   5
+post_prune              =>   false
+merge_purity_threshold  =>   0.9
 ```
-
-    import MLJModels ✔
-    import DecisionTree ✔
-    import MLJModels.DecisionTree_.DecisionTreeClassifier ✔
-
-    # DecisionTreeClassifier{String} @ 2…98: 
-    target_type             =>   String
-    pruning_purity          =>   1.0
-    max_depth               =>   2
-    min_samples_leaf        =>   1
-    min_samples_split       =>   2
-    min_purity_increase     =>   0.0
-    n_subfeatures           =>   0.0
-    display_depth           =>   5
-    post_prune              =>   false
-    merge_purity_threshold  =>   0.9
 
 Wrapping the model in data creates a *machine* which will store training outcomes (called *fit-results*):
 
 ```julia
 julia> tree = machine(tree_model, X, y)
-```
 
-    # Machine{DecisionTreeClassifier{S…} @ 1…36: 
-    model                   =>   DecisionTreeClassifier{String} @ 2…98
-    fitresult               =>   (undefined)
-    cache                   =>   (undefined)
-    args                    =>   (omitted Tuple{DataFrame,CategoricalArray{String,1,UInt8,String,CategoricalString{UInt8},Union{}}} of length 2)
-    report                  =>   empty Dict{Symbol,Any}
-    rows                    =>   (undefined)
+# Machine{DecisionTreeClassifier{S…} @ 1…36: 
+model                   =>   DecisionTreeClassifier{String} @ 2…98
+fitresult               =>   (undefined)
+cache                   =>   (undefined)
+args                    =>   (omitted Tuple{DataFrame,CategoricalArray{String,1,UInt8,String,CategoricalString{UInt8},Union{}}} of length 2)
+report                  =>   empty Dict{Symbol,Any}
+rows                    =>   (undefined)
+```
 
 Training and testing on a hold-out set:
 
@@ -63,29 +62,28 @@ julia> train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
 julia> fit!(tree, rows=train)
 julia> yhat = predict(tree, X[test,:]);
 julia> misclassification_rate(yhat, y[test]);
+
+┌ Info: Training Machine{DecisionTreeClassifier{S…} @ 1…36.
+└ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:68
+0.08888888888888889
 ```
-
-    ┌ Info: Training Machine{DecisionTreeClassifier{S…} @ 1…36.
-    └ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:68
-
-    0.08888888888888889
 
 Or, in one line:
 
 ```julia
 julia> evaluate!(tree, resampling=Holdout(fraction_train=0.7, shuffle=true), measure=misclassification_rate)
-```
 
-    0.08888888888888889
+0.08888888888888889
+```
 
 Changing a hyperparameter and re-evaluating:
 
 ```julia
 julia> tree_model.max_depth = 3
 julia> evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true), measure=misclassification_rate)
-```
 
-    0.06666666666666667
+0.06666666666666667
+```
 
 ### Next steps
 
@@ -145,9 +143,9 @@ Scientific types appear when querying model metadata, as in this example:
 
 ```julia
 julia> info("DecisionTreeClassifier")[:target_scitype]
-```
 
-    Union{Multiclass,FiniteOrderedFactor}
+Union{Multiclass,FiniteOrderedFactor}
+```
 
 **Basic data convention** The scientific type of data that a Julia
 object `x` can represent is defined by `scitype(x)`. If `scitype(x) ==
@@ -155,9 +153,9 @@ Other`, then `x` cannot represent scalar data in MLJ.
 
 ```julia
 julia> (scitype(42), scitype(π), scitype("Julia"))
-```
 
-    (Count, Continuous, MLJBase.Other)
+(Count, Continuous, MLJBase.Other)
+```
 
 In particular, *integers cannot be used to represent `Multiclass` or
 `FiniteOrderedFactor` data*; these can represented by an unordered or
