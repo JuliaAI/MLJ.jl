@@ -115,12 +115,19 @@ below.
 > critical to the casual user. At present, however, task constructors
 > assume data is in the requisite form.
 
-Anywhere a table is expected in MLJ (eg, `X` above) any tabular format
-supporting the [Tables.jl](Tables.jl) API is allowed. For example,
-`DataFrame` and `TypedTables.Table` objects are supported. A single feature (such as the
-target `y` above) is expected to be a `Vector` or `CategoricalVector`,
-according to the *scientific type* of the data (see below). A
-multivariate target can be any table.
+In principle, anywhere a table is expected in MLJ (eg, `X` above) any
+tabular format supporting the [Tables.jl](Tables.jl) interface is
+allowed. (At present our API is more restrictive; see this
+[issue](https://github.com/JuliaData/Tables.jl/issues/74) with
+Tables.jl. If your Tables.jl compatible format is not working in MLJ,
+please post an issue.) In particular, `DataFrame`,
+`JuliaDB.IndexedTable` and `TypedTables.Table` objects are supported,
+as are named tuples of equi-length vectors ("column tables" in
+Tables.jl parlance).
+
+A single feature (such as the target `y` above) is expected to be a
+`Vector` or `CategoricalVector`, according to the *scientific type* of
+the data (see below). A multivariate target can be any table.
 
 On the other hand, the *element types* you use to represent your data
 has implicit consequences about how MLJ will interpret that data.
