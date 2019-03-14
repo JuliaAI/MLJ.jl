@@ -20,6 +20,9 @@
 #
 # The following macros are for this purpose.
 
+## TODO: need to add checks on the arguments of
+## predict(::AbstractMachine, ) and transform(::AbstractMachine, )
+
 macro extend_to_machines(operation)
     quote
 

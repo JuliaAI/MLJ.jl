@@ -6,6 +6,7 @@ export ConstantRegressor, ConstantClassifier
 export DeterministicConstantRegressor, DeterministicConstantClassifier
 
 import MLJBase
+import MLJBase.nrows
 import Distributions
 using StatsBase
 using Statistics
@@ -50,9 +51,6 @@ function MLJBase.fit(model::ConstantRegressor{F,D}, verbosity::Int, X, y::Vector
 end
 
 MLJBase.fitted_params(::ConstantRegressor, fitresult) = (target_distribution=fitresult,)
-
-nrows(X) = MLJBase.schema(X).nrows
-
 
 MLJBase.predict(model::ConstantRegressor, fitresult, Xnew) = fill(fitresult, nrows(Xnew))
 MLJBase.predict_mean(model::ConstantRegressor, fitresult, Xnew) = fill(Distributions.mean(fitresult), nrows(Xnew))

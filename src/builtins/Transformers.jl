@@ -9,7 +9,7 @@ export UnivariateBoxCoxTransformer
 export OneHotEncoder
 
 import MLJBase: MLJType, Unsupervised
-import MLJBase: schema, selectcols, table
+import MLJBase: schema, selectcols, table, union_scitypes
 import MLJBase
 import Distributions
 using CategoricalArrays
@@ -239,8 +239,8 @@ MLJBase.output_is_multivariate(::Type{<:UnivariateStandardizer}) = false
 
 Unsupervised model for standardizing (whitening) the columns of
 tabular data. If `features` is empty then all columns `v` for which
-`scitype(v) <: Continuous` are standardized. For different behaviour,
-specify the names of features to be standardized.
+all elements have `Continuous` scitypes are standardized. For
+different behaviour, specify the names of features to be standardized.
 
     using DataFrames
     X = DataFrame(x1=[0.2, 0.3, 1.0], x2=[4, 2, 3])
@@ -271,11 +271,11 @@ function fit(transformer::Standardizer, verbosity::Int, X::Any)
     # determine indices of all_features to be transformed
     if isempty(transformer.features)
         cols_to_fit = filter!(eachindex(all_features)|>collect) do j
-            scitype(MLJBase.selectcols(X, j)) <: Continuous
+            union_scitypes(MLJBase.selectcols(X, j)) <: Continuous
         end
     else
         cols_to_fit = filter!(eachindex(all_features)|>collect) do j
-            all_features[j] in transformer.features && scitype(MLJBase.selectcols(X, j)) <: Continuous
+            all_features[j] in transformer.features && union_scitypes(MLJBase.selectcols(X, j)) <: Continuous
         end
     end
     
@@ -536,7 +536,7 @@ function fit(transformer::OneHotEncoder{R}, verbosity::Int, X) where R
     for j in eachindex(all_features)
         ftr = all_features[j]
         col = MLJBase.selectcols(X,j)
-        T = scitype(col)
+        T = union_scitypes(col)
         if T <: Union{Multiclass,FiniteOrderedFactor} && ftr in specified_features
             ref_name_pairs_given_feature[ftr] = Pair{R,Symbol}[]
             shift = transformer.drop_last ? 1 : 0
