@@ -127,7 +127,7 @@ has implicit consequences about how MLJ will interpret that data.
 
 To articulate MLJ's conventions about data representation, MLJ
 distinguishes between *machine* data types on the one hand (`Float64`,
-`Bool`, `String`, etc) and scientific data types on the other,
+`Bool`, `String`, etc) and *scientific data types* on the other,
 represented by new Julia types: `Continuous`, `Multiclass{N}`,
 `FiniteOrderedFactor{N}`, and `Count` (unbounded ordered factor), with
 obvious interpretations. These types, which are part of a type
