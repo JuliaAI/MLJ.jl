@@ -72,9 +72,11 @@ add "https://github.com/alan-turing-institute/MLJModels.jl"
 add "https://github.com/alan-turing-institute/MLJ.jl"
 ````
 
+Alternatively we also provide a [docker image](https://github.com/ysimillides/mlj-docker) with instructions in how to set it up. 
+
 ### Known issues
 
-- The ScikitLearn SVM models will not work under Julia 1.0.3 but do work under Julia 1.1.
+- The ScikitLearn SVM models will not work under Julia 1.0.3 but do work under Julia 1.1 due to [Issue #29208](https://github.com/JuliaLang/julia/issues/29208)
 
 
 ### Getting started
