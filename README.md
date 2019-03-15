@@ -23,6 +23,33 @@ Packages wishing to implement the MLJ interface for their algorithms should
 import [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl).
 
 
+
+## Installation
+
+In the Julia REPL:
+
+````julia
+]add "https://github.com/wildart/TOML.jl"
+add "https://github.com/alan-turing-institute/MLJBase.jl"
+add "https://github.com/alan-turing-institute/MLJModels.jl"
+add "https://github.com/alan-turing-institute/MLJ.jl"
+````
+
+
+### Alternatively, try it out now using our docker image : 
+
+A [docker image](https://github.com/ysimillides/mlj-docker) is provided with instructions in how to set it up. 
+
+#### Running Docker
+
+To run the docker image you can simply call
+```sh
+docker run -p 8888:8888 ysimillides/mlj-docker 
+```
+and this will open a port on your localhost:8888 from where you can access the container/notebook.
+ames.ipynb has been provided as an example.
+
+
 ### Features to include:
 
 - **Automated tuning** of hyperparameters, including
@@ -55,26 +82,9 @@ import [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl).
 
 See [here](doc/frequently_asked_questions.md).
 
-
-### Requirements
-
-* Julia 1.0 or higher
-
-
-### Installation
-
-In the Julia REPL:
-
-````julia
-]add "https://github.com/wildart/TOML.jl"
-add "https://github.com/alan-turing-institute/MLJBase.jl"
-add "https://github.com/alan-turing-institute/MLJModels.jl"
-add "https://github.com/alan-turing-institute/MLJ.jl"
-````
-
 ### Known issues
 
-- The ScikitLearn SVM models will not work under Julia 1.0.3 but do work under Julia 1.1.
+- The ScikitLearn SVM models will not work under Julia 1.0.3 but do work under Julia 1.1 due to [Issue #29208](https://github.com/JuliaLang/julia/issues/29208)
 
 
 ### Getting started
