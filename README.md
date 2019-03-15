@@ -22,11 +22,11 @@ and [this poster summary](material/MLJ-JuliaCon2018-poster.pdf).
 Packages wishing to implement the MLJ interface for their algorithms should
 import [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl).
 
-### Try it out now using our docker image : 
+## Try it out now using our docker image : 
 
 A [docker image](https://github.com/ysimillides/mlj-docker)is provided with instructions in how to set it up. 
 
-## Running Docker
+### Running Docker
 
 To run the docker image you can simply call
 ```sh
