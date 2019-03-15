@@ -5,6 +5,16 @@ Development news for MLJ and its satellite packages,
 [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl)
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
+### unversioned commits 14 March 2019 (around 09:00 GMT)
+
+- Implemented DecisionTreeRegressor model from DecisionTree.jl
+  (classifier already implemented) and updated registry. Resolves:
+  [#88](https://github.com/alan-turing-institute/MLJ.jl/issues/88)
+  
+- Removed restriction on version of Tables.jl. Resolves:
+  [#100](https://github.com/alan-turing-institute/MLJ.jl/issues/100)
+
+
 ### unversioned commits 6 March 2019 (around 05:00 GMT)
 
 - Added **new accessor function** `fitted_params` for accessing
@@ -13,14 +23,14 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   unadulterated `fitresult` returned by model `fit`. Implemented
   `fitted_parmams` for all models in MLJ repos where
   appropriate. Addresses parts of:
-  [\#51](https://github.com/alan-turing-institute/MLJ.jl/issues/51#issuecomment-469850582)
+  [#51](https://github.com/alan-turing-institute/MLJ.jl/issues/51#issuecomment-469850582)
 
 - Made the `report` field of machines (and corresponding value in
   return tuple of model `fit` methods) into a **named tuple**, instead
   of dictionary, for type stability. All broken tests for models in
   all repos repaired. Added `report` **accessor function** for
   machines.  Resolves:
-  [\#94](https://github.com/alan-turing-institute/MLJ.jl/issues/94)
+  [#94](https://github.com/alan-turing-institute/MLJ.jl/issues/94)
   
 - **Abandoned custom `Param` type** for nested parameters (returned by
   `params(::Model)` in favour of (possibly nested) **named
