@@ -22,11 +22,25 @@ and [this poster summary](material/MLJ-JuliaCon2018-poster.pdf).
 Packages wishing to implement the MLJ interface for their algorithms should
 import [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl).
 
-## Try it out now using our docker image : 
 
-A [docker image](https://github.com/ysimillides/mlj-docker)is provided with instructions in how to set it up. 
 
-### Running Docker
+## Installation
+
+In the Julia REPL:
+
+````julia
+]add "https://github.com/wildart/TOML.jl"
+add "https://github.com/alan-turing-institute/MLJBase.jl"
+add "https://github.com/alan-turing-institute/MLJModels.jl"
+add "https://github.com/alan-turing-institute/MLJ.jl"
+````
+
+
+### Alternatively, try it out now using our docker image : 
+
+A [docker image](https://github.com/ysimillides/mlj-docker) is provided with instructions in how to set it up. 
+
+#### Running Docker
 
 To run the docker image you can simply call
 ```sh
@@ -67,24 +81,6 @@ ames.ipynb has been provided as an example.
 ### Frequently Asked Questions
 
 See [here](doc/frequently_asked_questions.md).
-
-
-### Requirements
-
-* Julia 1.0 or higher
-
-
-### Installation
-
-In the Julia REPL:
-
-````julia
-]add "https://github.com/wildart/TOML.jl"
-add "https://github.com/alan-turing-institute/MLJBase.jl"
-add "https://github.com/alan-turing-institute/MLJModels.jl"
-add "https://github.com/alan-turing-institute/MLJ.jl"
-````
-
 
 ### Known issues
 
