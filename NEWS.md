@@ -5,6 +5,12 @@ Development news for MLJ and its satellite packages,
 [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl)
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
+### unversioned commits 15 March 2019 (around 12:00 GMT)
+
+- Added docker image for quick demonstration. Resolves:
+  [#101](https://github.com/alan-turing-institute/MLJ.jl/issues/101)
+
+
 ### unversioned commits 14 March 2019 (around 09:00 GMT)
 
 - Implemented DecisionTreeRegressor model from DecisionTree.jl
