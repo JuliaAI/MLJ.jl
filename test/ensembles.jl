@@ -161,8 +161,6 @@ fit!(ensemble);
 @test length(ensemble.fitresult.ensemble) == 10
 @test !isnan(predict(ensemble, MLJ.selectrows(X, test))[1])
 
-nested_range=(n=range(ensemble_model, :n, lower=1, upper=50, scale=:log10),)
-learning_curve(ensemble_model, X, y; resolution=10, nested_range=nested_range)
 
 # old Koala tests
 # # check that providing fixed seed gives identical predictions each

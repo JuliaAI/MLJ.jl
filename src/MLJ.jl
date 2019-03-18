@@ -9,7 +9,7 @@ export report                                        # "machines.jl"
 export Holdout, CV, evaluate!, Resampler             # "resampling.jl"
 export Params, params, set_params!                   # "parameters.jl"
 export strange, iterator                             # "parameters.jl"
-export Grid, TunedModel, learning_curve              # "tuning.jl"
+export Grid, TunedModel, learning_curve!             # "tuning.jl"
 export DeterministicEnsembleModel                    # "ensembles.jl"
 export ProbabilisticEnsembleModel                    # "ensembles.jl"
 export EnsembleModel                                 # "ensembles.jl"
@@ -77,11 +77,13 @@ using Statistics
 using LinearAlgebra
 using Random
 import Distributed: @distributed, nworkers, pmap
-
-# for plotting
-using RecipesBase
+using RecipesBase # for plotting
 
 const srcdir = dirname(@__FILE__) # the directory containing this file:
+
+# fallback
+is_wrapper(::Type{Model}) = false
+is_wrapper(m::Model) = is_wrapper(typeof(m))
 
 include("utilities.jl")     # general purpose utilities
 include("metrics.jl")       # loss functions

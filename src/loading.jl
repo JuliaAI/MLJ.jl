@@ -18,6 +18,28 @@ end
 # symbols from string representations):
 const METADATA = decode_dic(TOML.parsefile(local_metadata_file))
 
+"""
+   info(model, pkg=nothing)
+
+Return the dictionary of metadata associated with `model::String`. If
+more than one package implements `model` then `pkg::String` will need
+to be specified.
+
+"""
+function MLJBase.info(model::String; pkg=nothing)
+    if pkg == nothing
+        if model in string.(MLJBase.finaltypes(Model))
+            pkg = "MLJ"
+        else
+            pkg, success = try_to_get_package(model)
+            if !success 
+                error(pkg*"Use info($model, pkg=...)")
+            end
+        end
+    end
+    return metadata()[pkg][model]
+end
+
 
 ## FUNCTIONS TO RETRIEVE MODELS AND METADATA
 
@@ -37,7 +59,12 @@ end
 """
     models()
 
-List the names of all MLJ models, loaded or registered, as a dictionary indexed on package name.
+List all models, loaded or registered, as a dictionary indexed on package name.
+
+    models(task)
+
+List, in the same format, all models matching the specified `task`.
+
 """
 function models()
     _models_given_pkg = Dict()
@@ -49,26 +76,21 @@ function models()
     return _models_given_pkg
 end
 
-"""
-   info(model, pkg=nothing)
-
-Return the dictionary of metadata associated with `model::String`. If
-more than one package implements `model` then `pkg::String` will need
-to be specified.
-
-"""
-function MLJBase.info(model::String, pkg=nothing)
-    if pkg == nothing
-        if model in string.(MLJBase.finaltypes(Model))
-            pkg = "MLJ"
-        else
-            pkg, success = try_to_get_package(model)
-            if !success 
-                error(pkg*"Use info($model, pkg=...)")
+function models(task::SupervisedTask)
+    ret = Dict{String, Any}()
+    allmodels = models()
+    for pkg in keys(allmodels)
+        models_in_pkg = 
+            filter(allmodels[pkg]) do model
+                info_ = info(model, pkg=pkg)
+                info_[:is_supervised] &&
+                    task.target_scitype <: info_[:target_scitype] &&
+                    task.input_scitypes <: info_[:input_scitypes] &&
+                    task.is_probabilistic == info_[:is_probabilistic]
             end
-        end
+        isempty(models_in_pkg) || (ret[pkg] = models_in_pkg)
     end
-    return metadata()[pkg][model]
+    return ret
 end
 
 

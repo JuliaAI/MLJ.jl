@@ -156,7 +156,7 @@ function evaluate!(mach::Machine, resampling::CV;
             @info "Distributing cross-validation computation "*
             "among $(nworkers()) workers."
         end
-        fitresult = @distributed vcat for n in 1:nfolds
+        measures = @distributed vcat for n in 1:nfolds
             [get_measure(firsts[n], seconds[n])]
         end
     else
@@ -187,6 +187,8 @@ mutable struct Resampler{S,M<:Supervised} <: Supervised{Any}
 end
 
 MLJBase.package_name(::Type{<:Resampler}) = "MLJ"
+is_wrapper(::Type{<:Resampler}) = true
+
     
 Resampler(; model=ConstantRegressor(), resampling=Holdout(),
           measure=nothing, operation=predict) =

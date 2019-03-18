@@ -275,6 +275,8 @@ end
 
 const EitherEnsembleModel{R,Atom} = Union{DeterministicEnsembleModel{R,Atom}, ProbabilisticEnsembleModel{R,Atom}}
 
+is_wrapper(::Type{<:EitherEnsembleModel}) = true
+
 function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) where {R,Atom<:Supervised{R}}
 
     parallel = model.parallel

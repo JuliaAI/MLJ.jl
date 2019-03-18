@@ -1,4 +1,4 @@
-# Scientific data types
+# Scientific Data Types
 
 "Scientific" data types are formalized in MLJ with the addition of new
 Julia type hierarchy, rooted in an abstract type called `Found`. A
