@@ -47,6 +47,9 @@ Estimate the performance of a machine `mach` using the specified
 `measure`. In general this mutating operation preserves only
 `mach.args` (the data stored in the machine).
 
+Resampling and testing is based exclusively on data in `rows`, when
+specified.
+
 If no measure is specified, then `default_measure(mach.model)` is used, unless
 this default is `nothing` and an error is thrown.
 
@@ -72,8 +75,23 @@ function evaluate!(mach::Machine, resampling::Holdout;
     y = mach.args[2]
     length(mach.args) == 2 || error("Multivariate targets not yet supported.")
     
-    train, test = partition(eachindex(y), resampling.fraction_train,
+    all =
+        rows == nothing ? eachindex(y) : rows
+    
+    train, test = partition(all, resampling.fraction_train,
                             shuffle=resampling.shuffle)
+    if verbosity > 0
+            all == eachindex(y) ? "Resampling from all rows. " : "Resampling from a subset of all rows. "
+        which_rows =
+            all == eachindex(y) ? "Resampling from all rows. " : "Resampling from a subset of all rows. "
+        @info "Evaluating using a holdout set. \n"*
+        "fraction_train=$(resampling.fraction_train) \n"*
+        "shuffle=$(resampling.shuffle) \n"*
+        "measure=$_measure \n"*
+        "operation=$operation \n"*
+        "$which_rows"
+    end
+
     fit!(mach, rows=train, verbosity=verbosity-1)
     yhat = operation(mach, selectrows(X, test))
 
@@ -92,7 +110,7 @@ end
 
 # cv:
 function evaluate!(mach::Machine, resampling::CV;
-                   measures=nothing, operation=predict, verbosity=1)
+                   measures=nothing, operation=predict, rows=nothing, verbosity=1)
 
     if measures == nothing
         _measures = default_measure(mach.model)
@@ -107,21 +125,33 @@ function evaluate!(mach::Machine, resampling::CV;
     y = mach.args[2]
     length(mach.args) == 2 || error("Multivariate targets not yet supported.")
 
-    n_samples = length(y)
+    all =
+        rows == nothing ? eachindex(y) : rows
+    
+    if verbosity > 0
+        which_rows =
+            all == eachindex(y) ? "Resampling from all rows. " : "Resampling from a subset of all rows. "
+        @info "Evaluating using cross-validation. \n"*
+        "nfolds=$(resampling.nfolds). \n"*
+        "shuffle=$(resampling.shuffle) \n"*
+        "measure=$_measure \n"*
+        "operation=$operation \n"*
+        "$which_rows"
+    end
+
+    n_samples = length(all)
     nfolds = resampling.nfolds
     
     if resampling.shuffle
-        rows = shuffle(eachindex(y))
-    else
-        rows = eachindex(y)
+        all = shuffle(all)
     end
     
     k = floor(Int,n_samples/nfolds)
 
-    # function to return the measure for the fold `rows[f:s]`:
+    # function to return the measure for the fold `all[f:s]`:
     function get_measure(f, s)
-        test = rows[f:s] # TODO: replace with views?
-        train = vcat(rows[1:(f - 1)], rows[(s + 1):end])
+        test = all[f:s] # TODO: replace with views?
+        train = vcat(all[1:(f - 1)], all[(s + 1):end])
         fit!(mach; rows=train, verbosity=verbosity-1)
         yhat = operation(mach, selectrows(X, test))
         if !(_measures isa AbstractVector) 

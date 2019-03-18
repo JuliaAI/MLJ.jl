@@ -21,22 +21,26 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
             end
             if length(args) == 2
                 X, y = args
-                scitype(X) <: input_scitypes(model) ||
-                        error("The scitype of X in machine(model, X, y) should be a subtype of $(input_scitypes(model)). ")
-                scitype(y) <: target_scitype(model) ||
-                    error("The scitype of y in machine(model, X, y) should be a subtype of $(target_scitype(model)). ")
+                union_scitypes(X) <: input_scitypes(model) ||
+                        error("The scitypes of elments of X, in machine(model, X, y), should be a subtype of $(input_scitypes(model)). ")
                 T =  target_scitype(model)
                 if T <: Tuple
-                    Tables.istable(y) ||
-                        error("y in machine(model, X, y) should be a table. ")
+                    container_type(y) in [:table, :sparse] ||
+                        error("The y, in machine(model, X, y), should be a table or sparse table.")
+                    column_scitypes_as_tuple(y) <: T ||
+                        error("The tuple scitype defined by columns of y, in machine(model, X, y), "*
+                              "should be a subtype of $T. ")
                 else
-                    if scitype(y)  <: Union{Continuous,Count}
+                    U = union_scitypes(y)
+                    if U  <: Union{Continuous,Count}
                         y isa Vector ||
                             error("y in machine(model, X, y) should be a Vector. ")
-                    elseif scitype(y) <: Union{Multiclass,FiniteOrderedFactor}
+                    elseif U <: Union{Multiclass,FiniteOrderedFactor}
                         y isa CategoricalArray ||
                             error("y in machine(model, X, y) should be a CategoricalVector. ")
                     end
+                    U <: T ||
+                        error("The scitype of elements of y, in machine(model, X, y), should be a subtype of $T. ")
                 end
             end
         end
@@ -44,11 +48,11 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
             length(args) == 1 ||
                 error("Wrong number of arguments. "*
                       "Use machine(model, X) or machine(model, task) for an unsupervised model.")
-            Tables.istable(args[1]) || args[1] isa UnsupervisedTask ||
-                error("X in machine(model, X) should be a table or  UnsupervisedTask. "*
+            container_type(args[1]) in [:table, :sparse] || args[1] isa UnsupervisedTask ||
+                error("The X, in machine(model, X), should be a table, sparse table, or  UnsupervisedTask. "*
                       "Use MLJ.table(X) to wrap an abstract matrix X as a table. ")
-            if Tables.istable(args[1]) && !(scitype(args[1]) <: input_scitypes(model))
-                error("The scitype of X in machine(model, X) should be a subtype of $(input_scitypes(model)). ")
+            if container_type(args[1]) in [:table, :sparse]  && !(union_scitypes(args[1]) <: input_scitypes(model))
+                error("The scitype of elements of X, in machine(model, X), should be a subtype of $(input_scitypes(model)). ")
             end
         end
 

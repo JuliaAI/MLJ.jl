@@ -10,7 +10,7 @@ using CategoricalArrays
 # TRAINABLE MODELS
 
 X_frame, y = datanow();  # boston data
-X = MLJBase.matrix(X_frame)
+# X = MLJBase.matrix(X_frame)
 
 knn_ = KNNRegressor(K=7)
 
@@ -19,7 +19,7 @@ allrows = eachindex(y);
 train, valid, test = partition(allrows, 0.7, 0.15);
 @test vcat(train, valid, test) == allrows
 
-Xtrain = X[train,:]
+Xtrain = X_frame[train,:]
 ytrain = y[train]
 
 Xs = source(Xtrain)
@@ -31,8 +31,8 @@ knn_.K = 5
 fit!(knn1, rows=train[1:end-10], verbosity=2)
 fit!(knn1, verbosity=2)
 yhat = predict(knn1, Xs)
-yhat(X[test,:])
-rms(yhat(X[test,:]), y[test])
+yhat(X_frame[test,:])
+rms(yhat(X_frame[test,:]), y[test])
 
 @test MLJ.is_stale(knn1) == false
 

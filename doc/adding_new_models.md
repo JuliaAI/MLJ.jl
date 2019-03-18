@@ -8,11 +8,12 @@ in external packages. For sample implementations, see
 The machine learning tools provided by MLJ can be applied to the
 models in any package that imports the package
 [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) and
-implements the API defined there, as outlined below. For a quick and
-dirty implementation of user-defined models see [here]().  To make new
+implements the API defined there, as outlined in detail below. For a
+quick-and-dirty implementation of user-defined models see [The
+Simplified Model API](the_simplified_model_API.md).  To make new
 models available to all MLJ users, see [Where to place code
-implementing new models](#Where-to-place-code-implementing-new-models)
-below.
+implementing new
+models](#Where-to-place-code-implementing-new-models).
 
 It is assumed the reader has read [Getting Started](getting_started.md).
 To implement the API described here, some familiarity with the

@@ -7,7 +7,7 @@ a *scientific type* is defined to be any subtype of `Union{Missing, Found}`:
 ````julia
 Continuous <: Found 
 Discrete <: Found
-	Multiclass{N}    <: Discrete
+	Multiclass{N} <: Discrete
     OrderedFactor <: Discrete
 	    FiniteOrderedFactor{N} <: OrderedFactor 
 	    Count <: OrderedFactor
@@ -61,8 +61,9 @@ scitype(c::CategoricalString) =
     c.pool.ordered ? FiniteOrderedFactor{nlevels(c)} : Multiclass{nlevels(c)}
 ````
 
-If the `scitype` method is applied to a table or `AbstractVector`,
-then a type *union* over all elements is returned.
+Additionally, we may compute the *union* of element scitypes for
+vectors, tables and sparse tables, using the methods `union_scitypes`
+and `column_scitypes_as_tuple`.
 
 
 

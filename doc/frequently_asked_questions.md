@@ -58,9 +58,10 @@ term:
 
 - **Clean probabilistic API.** The scikit-learn API does not specify a
   universal standard for the form of probabilistic predictions. By
-  fixing a probabilistic API along the lines of the [skpro]() project,
-  MLJ aims to improve support for Bayesian statistics and
-  probabilistic graphical models.
+  fixing a probabilistic API along the lines of the
+  [skpro](https://github.com/alan-turing-institute/skpro) project, MLJ
+  aims to improve support for Bayesian statistics and probabilistic
+  graphical models.
   
 - **Universal adoption of categorical data types.** Python's
   scientific array library NumPy has no dedicated data type for

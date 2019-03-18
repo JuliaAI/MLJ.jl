@@ -36,7 +36,7 @@ function TunedModel(;model=nothing,
                     resampling=Holdout(),
                     measure=nothing,
                     operation=predict,
-                    nested_ranges=NestedTuple(),
+                    nested_ranges=NamedTuple(),
                     full_report=true)
     
     !isempty(nested_ranges) || error("You need to specify nested_ranges=... ")
@@ -92,11 +92,8 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
         end
     end
 
-    # nested sequence of `:hyperparameter => iterator` pairs:
     nested_iterators = copy(tuned_model.nested_ranges, iterators)
 
-    # iterators = MLJ.flat_values(nested_iterators)
-    
     n_iterators = length(iterators)
     A = MLJ.unwind(iterators...)
     N = size(A, 1)

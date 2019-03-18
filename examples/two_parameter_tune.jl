@@ -1,8 +1,8 @@
-# To show how to accesss the report of a TunedModel machine for
-# plotting purposes, in the case a of a two-parameter tune.
+# two-parameter tuning plot (with nested parameters)
 
 using MLJ
 using DataFrames, Statistics
+using Plots
 
 Xraw = rand(300,3)
 y = exp(Xraw[:,1] - Xraw[:,2] - 2Xraw[:,3] + 0.1*rand(300))
@@ -29,18 +29,7 @@ tuned_ensemble_model = TunedModel(model=ensemble_model,
 tuned_ensemble = machine(tuned_ensemble_model, X[train,:], y[train])
 fit!(tuned_ensemble);
 
-r = report(tuned_ensemble)
-keys(r)
-xlab, ylab = r.parameter_names
-xscale, yscale = r.parameter_scales
-x = r.parameter_values[:,1]
-y = r.parameter_values[:,2]
-z = r.measurements
-
-@assert length(x) == length(y) && length(y) == length(z)
-
-# possible scale values:
-?MLJ.scale
+plot(tuned_ensemble)
 
 
 
