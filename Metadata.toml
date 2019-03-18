@@ -10,7 +10,20 @@
 ":package_name" = "GaussianProcesses"
 ":name" = "GPClassifier"
 ":is_probabilistic" = "`false`"
-":target_scitype" = "`MLJBase.FiniteOrderedFactor`"
+":target_scitype" = "`Union{FiniteOrderedFactor, Multiclass}`"
+
+[DecisionTree.DecisionTreeRegressor]
+":input_is_multivariate" = "`true`"
+":package_uuid" = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+":load_path" = "MLJModels.DecisionTree_.DecisionTreeRegressor"
+":input_scitypes" = "`MLJBase.Continuous`"
+":is_pure_julia" = "`true`"
+":is_supervised" = "`true`"
+":package_url" = "https://github.com/bensadeghi/DecisionTree.jl"
+":package_name" = "DecisionTree"
+":name" = "DecisionTreeRegressor"
+":is_probabilistic" = "`false`"
+":target_scitype" = "`MLJBase.Continuous`"
 
 [DecisionTree.DecisionTreeClassifier]
 ":input_is_multivariate" = "`true`"
@@ -23,7 +36,7 @@
 ":package_name" = "DecisionTree"
 ":name" = "DecisionTreeClassifier"
 ":is_probabilistic" = "`true`"
-":target_scitype" = "`MLJBase.Multiclass`"
+":target_scitype" = "`Union{FiniteOrderedFactor, Multiclass}`"
 
 [ScikitLearn.SVMLClassifier]
 ":input_is_multivariate" = "`true`"
@@ -36,7 +49,7 @@
 ":package_name" = "ScikitLearn"
 ":name" = "SVMLClassifier"
 ":is_probabilistic" = "`false`"
-":target_scitype" = "`MLJBase.Multiclass`"
+":target_scitype" = "`Union{FiniteOrderedFactor, Multiclass}`"
 
 [ScikitLearn.SVMNuClassifier]
 ":input_is_multivariate" = "`true`"
@@ -49,7 +62,7 @@
 ":package_name" = "ScikitLearn"
 ":name" = "SVMNuClassifier"
 ":is_probabilistic" = "`false`"
-":target_scitype" = "`MLJBase.Multiclass`"
+":target_scitype" = "`Union{FiniteOrderedFactor, Multiclass}`"
 
 [ScikitLearn.SVMRegressor]
 ":input_is_multivariate" = "`true`"
@@ -75,7 +88,7 @@
 ":package_name" = "ScikitLearn"
 ":name" = "SVMClassifier"
 ":is_probabilistic" = "`false`"
-":target_scitype" = "`MLJBase.Multiclass`"
+":target_scitype" = "`Union{FiniteOrderedFactor, Multiclass}`"
 
 [ScikitLearn.SVMLRegressor]
 ":input_is_multivariate" = "`true`"

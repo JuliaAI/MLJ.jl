@@ -40,7 +40,7 @@ CV(; nfolds=6, parallel=true, shuffle=false) = CV(nfolds, parallel, shuffle)
 # and a measure.)  We need an `evaluate!` for each strategy.
 
 """
-    evaluate!(mach, resampling=CV(), measure=nothing, operation=predict, verbosity=1)
+    evaluate!(mach, resampling=CV(), measures=nothing, operation=predict, verbosity=1)
 
 Estimate the performance of a machine `mach` using the specified
 `resampling` (defaulting to 6-fold cross-validation) and
@@ -57,15 +57,15 @@ evaluate!(mach::Machine;
 
 # holdout:
 function evaluate!(mach::Machine, resampling::Holdout;
-                   measure=nothing, operation=predict, verbosity=1)
+                   measures=nothing, operation=predict, verbosity=1)
 
-    if measure == nothing
-        _measure = default_measure(mach.model)
-        if _measure == nothing
-            error("You need to specify measure=... ")
+    if measures == nothing
+        _measures = default_measure(mach.model)
+        if _measures == nothing
+            error("You need to specify measures=... ")
         end
     else
-        _measure = measure
+        _measures = measures
     end
     
     X = mach.args[1]
@@ -75,22 +75,32 @@ function evaluate!(mach::Machine, resampling::Holdout;
     train, test = partition(eachindex(y), resampling.fraction_train,
                             shuffle=resampling.shuffle)
     fit!(mach, rows=train, verbosity=verbosity-1)
-    yhat = operation(mach, selectrows(X, test))    
-    fitresult = _measure(yhat, y[test])
+    yhat = operation(mach, selectrows(X, test))
+
+    if !(_measures isa AbstractVector)
+        return _measures(yhat, y[test])
+    end
+
+    res = Dict()
+    for measure in _measures
+        fitresult = measure(yhat, y[test])
+        res[string(measure)] = fitresult
+    end
+    NamedTuple{Tuple(Symbol.(keys(res)))}(values(res))
 
 end
 
 # cv:
 function evaluate!(mach::Machine, resampling::CV;
-                   measure=nothing, operation=predict, verbosity=1)
+                   measures=nothing, operation=predict, verbosity=1)
 
-    if measure == nothing
-        _measure = default_measure(mach.model)
-        if _measure == nothing
-            error("You need to specify measure=... ")
+    if measures == nothing
+        _measures = default_measure(mach.model)
+        if _measures == nothing
+            error("You need to specify measures=... ")
         end
     else
-        _measure = measure
+        _measures = measures
     end
 
     X = mach.args[1]
@@ -113,8 +123,17 @@ function evaluate!(mach::Machine, resampling::CV;
         test = rows[f:s] # TODO: replace with views?
         train = vcat(rows[1:(f - 1)], rows[(s + 1):end])
         fit!(mach; rows=train, verbosity=verbosity-1)
-        yhat = operation(mach, selectrows(X, test))    
-        return _measure(yhat, y[test])
+        yhat = operation(mach, selectrows(X, test))
+        if !(_measures isa AbstractVector) 
+            return _measures(yhat, y[test])
+        else
+            res = Dict()
+            for measure in _measures
+                fitresult = measure(yhat, y[test])
+                res[string(measure)] = fitresult
+            end
+            return NamedTuple{Tuple(Symbol.(keys(res)))}(values(res))
+        end
     end
 
     firsts = 1:k:((nfolds - 1)*k + 1) # itr of first `test` rows index
@@ -176,7 +195,7 @@ function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
     mach = machine(resampler.model, X, y)
 
     fitresult = evaluate!(mach, resampler.resampling;
-                         measure=measure,
+                         measures=measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)
     
@@ -197,7 +216,7 @@ function MLJBase.update(resampler::Resampler{Holdout},
     if resampler.measure == nothing
         measure = default_measure(resampler.model)
         if measure == nothing
-            error("You need to specify measure=... ")
+            error("You need to specify measures=... ")
         end
     else
         measure = resampler.measure
@@ -211,7 +230,7 @@ function MLJBase.update(resampler::Resampler{Holdout},
     end
 
     fitresult = evaluate!(mach, resampler.resampling;
-                         measure=resampler.measure,
+                         measures=resampler.measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)
     
