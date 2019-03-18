@@ -81,10 +81,6 @@ using RecipesBase # for plotting
 
 const srcdir = dirname(@__FILE__) # the directory containing this file:
 
-# fallback
-is_wrapper(::Type{Model}) = false
-is_wrapper(m::Model) = is_wrapper(typeof(m))
-
 include("utilities.jl")     # general purpose utilities
 include("metrics.jl")       # loss functions
 include("machines.jl")      # machine API

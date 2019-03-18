@@ -84,6 +84,7 @@ function models(task::SupervisedTask)
             filter(allmodels[pkg]) do model
                 info_ = info(model, pkg=pkg)
                 info_[:is_supervised] &&
+                    info_[:is_wrapper] == false && 
                     task.target_scitype <: info_[:target_scitype] &&
                     task.input_scitypes <: info_[:input_scitypes] &&
                     task.is_probabilistic == info_[:is_probabilistic]
