@@ -60,7 +60,7 @@ evaluate!(mach::Machine;
 
 # holdout:
 function evaluate!(mach::Machine, resampling::Holdout;
-                   measures=nothing, operation=predict, verbosity=1)
+                   measures=nothing, operation=predict, rows=nothing, verbosity=1)
 
     if measures == nothing
         _measures = default_measure(mach.model)
@@ -208,8 +208,8 @@ end
 MLJBase.package_name(::Type{<:Resampler}) = "MLJ"
     
 Resampler(; model=ConstantRegressor(), resampling=Holdout(),
-          measure=nothing, operation=predict) =
-              Resampler(model, resampling, measure, operation) 
+          measures=nothing, operation=predict) =
+              Resampler(model, resampling, measures, operation) 
 
 function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
 
