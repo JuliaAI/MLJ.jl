@@ -87,7 +87,7 @@ function evaluate!(mach::Machine, resampling::Holdout;
         @info "Evaluating using a holdout set. \n"*
         "fraction_train=$(resampling.fraction_train) \n"*
         "shuffle=$(resampling.shuffle) \n"*
-        "measure=$_measure \n"*
+        "measures=$_measures \n"*
         "operation=$operation \n"*
         "$which_rows"
     end
@@ -134,7 +134,7 @@ function evaluate!(mach::Machine, resampling::CV;
         @info "Evaluating using cross-validation. \n"*
         "nfolds=$(resampling.nfolds). \n"*
         "shuffle=$(resampling.shuffle) \n"*
-        "measure=$_measure \n"*
+        "measures=$_measures \n"*
         "operation=$operation \n"*
         "$which_rows"
     end
@@ -162,7 +162,7 @@ function evaluate!(mach::Machine, resampling::CV;
                 fitresult = measure(yhat, y[test])
                 res[string(measure)] = fitresult
             end
-            return NamedTuple{Tuple(Symbol.(keys(res)))}(values(res))
+            return res
         end
     end
 
@@ -189,7 +189,19 @@ function evaluate!(mach::Machine, resampling::CV;
         end            
     end
 
-    return measures
+    if eltype(measures) != Dict{Any, Any}
+        return measures
+    end
+    res = Dict()
+    for ind_dict in measures
+        for key in keys(ind_dict)
+            if !haskey(res, key)
+                res[key] = []
+            end
+            push!(res[key], ind_dict[key])
+        end
+    end
+    return NamedTuple{Tuple(Symbol.(keys(res)))}(values(res))
 
 end
 
