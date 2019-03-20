@@ -67,12 +67,6 @@ version = "0.15.0"
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 
-[[DecisionTree]]
-deps = ["DelimitedFiles", "Distributed", "LinearAlgebra", "Random", "ScikitLearnBase", "Statistics", "Test"]
-git-tree-sha1 = "a0a1b9f70f9c57819aed52b2ce570de77bf0a6cf"
-uuid = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
-version = "0.8.1"
-
 [[DelimitedFiles]]
 deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
@@ -137,7 +131,7 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MLJBase]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "Distributions", "InteractiveUtils", "Random", "SparseArrays", "Statistics", "StatsBase", "Tables"]
-git-tree-sha1 = "3cab057fc61367bc3d41d7f4852c0ab9c181a171"
+git-tree-sha1 = "62d2b0fd63638be802afac52ac33ede3978d3008"
 repo-rev = "master"
 repo-url = "https://github.com/alan-turing-institute/MLJBase.jl"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
@@ -145,7 +139,7 @@ version = "0.1.0"
 
 [[MLJModels]]
 deps = ["CategoricalArrays", "Distances", "Distributions", "LinearAlgebra", "MLJBase", "Random", "Requires", "TOML"]
-git-tree-sha1 = "d44e9bd98128759fed4365ebff6e2208cfd4f0bc"
+git-tree-sha1 = "fded459193d7916c844173fc8c128e97c85ba005"
 repo-rev = "master"
 repo-url = "https://github.com/alan-turing-institute/MLJModels.jl"
 uuid = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
@@ -264,12 +258,6 @@ version = "0.5.0"
 
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
-
-[[ScikitLearnBase]]
-deps = ["Compat", "LinearAlgebra", "Random", "Statistics", "Test"]
-git-tree-sha1 = "0e27caac9a456b531193117c538d739d2d6e91c2"
-uuid = "6e75b9c4-186b-50bd-896f-2d2496a4843e"
-version = "0.4.1"
 
 [[Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
