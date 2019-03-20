@@ -26,7 +26,10 @@ Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 
 [extras]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+RDatasets = "ce6b1742-4840-55fa-b093-852dadbb1d8b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [targets]
-test = ["DataFrames", "Test"]
+test = ["DataFrames", "DecisionTree", "RDatasets", "Test", "UnicodePlots"]

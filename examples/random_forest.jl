@@ -65,7 +65,7 @@ lineplot(curve.parameter_values, curve.measurements)
    #     └────────────────────────────────────────┘ 
    #     0                                      500
 
-ensemble.n = 300
+forest.n = 300
 
                      
 ## DEFINE A TUNING GRID
@@ -103,7 +103,7 @@ show(fitted_params(mach).best_model, 2)
 # uncomment 6 lines for plotting the tuning results:
 # using Plots
 # pyplot()
-# yplot(mach)
+# plot(mach)
 # savefig("random_forest_tuning.png")
 # heatmap(mach)
 # savefig("random_forest_heatmap.png")
@@ -113,6 +113,6 @@ show(fitted_params(mach).best_model, 2)
 
 yhat = predict(mach, X[test,:]);
 rms(yhat, y[test])
-# 4.00
+# 4.01
 
-
+true

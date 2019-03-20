@@ -112,7 +112,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     # evaluate all the models using specified resampling:
     # TODO: parallelize!
 
-    meter = Progress(N+1, dt=0, desc="Searching a $N-point grid for best model: ",
+    meter = Progress(N+1, dt=0, desc="Iterating over an $N-point grid: ",
                      barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
     next!(meter)
     for i in 1:N
