@@ -99,12 +99,9 @@ function evaluate!(mach::Machine, resampling::Holdout;
         return _measures(yhat, y[test])
     end
 
-    res = Dict()
-    for measure in _measures
-        fitresult = measure(yhat, y[test])
-        res[string(measure)] = fitresult
-    end
-    NamedTuple{Tuple(Symbol.(keys(res)))}(values(res))
+    measures = [m(yhat, y[test]) for m in _measures]
+    measure_names = Tuple(Symbol.(string.(_measures)))
+    return NamedTuple{measure_names}(measures)
 
 end
 
@@ -148,7 +145,7 @@ function evaluate!(mach::Machine, resampling::CV;
     
     k = floor(Int,n_samples/nfolds)
 
-    # function to return the measure for the fold `all[f:s]`:
+    # function to return the measures for the fold `all[f:s]`:
     function get_measure(f, s)
         test = all[f:s] # TODO: replace with views?
         train = vcat(all[1:(f - 1)], all[(s + 1):end])
@@ -157,12 +154,7 @@ function evaluate!(mach::Machine, resampling::CV;
         if !(_measures isa AbstractVector) 
             return _measures(yhat, y[test])
         else
-            res = Dict()
-            for measure in _measures
-                fitresult = measure(yhat, y[test])
-                res[string(measure)] = fitresult
-            end
-            return res
+            return [m(yhat, y[test]) for m in _measures]
         end
     end
 
@@ -189,19 +181,15 @@ function evaluate!(mach::Machine, resampling::CV;
         end            
     end
 
-    if eltype(measures) != Dict{Any, Any}
+    if !(_measures isa AbstractVector)
         return measures
     end
-    res = Dict()
-    for ind_dict in measures
-        for key in keys(ind_dict)
-            if !haskey(res, key)
-                res[key] = []
-            end
-            push!(res[key], ind_dict[key])
-        end
-    end
-    return NamedTuple{Tuple(Symbol.(keys(res)))}(values(res))
+
+    # repackage measures:
+    measures_reshaped = [[measures[i][j] for i in 1:nfolds] for j in 1:length(_measures)]
+    
+    measure_names = Tuple(Symbol.(string.(_measures)))
+    return NamedTuple{measure_names}(Tuple(measures_reshaped))
 
 end
 
