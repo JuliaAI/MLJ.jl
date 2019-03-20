@@ -48,7 +48,7 @@ function metadata()
     info_given_model = Dict()
     for M in modeltypes
         _info = MLJBase.info(M)
-        modelname = _info[:name]
+        modelname = string(M) #_info[:name]
         info_given_model[modelname] = _info
     end
     ret = deepcopy(METADATA)
@@ -57,28 +57,44 @@ function metadata()
 end
 
 """
-    models()
+    models(; show_dotted=false)
 
-List all models, loaded or registered, as a dictionary indexed on package name.
+List all models as a dictionary indexed on package name. Models
+available for immediate use (including external models loaded with
+@load and user-defined models) appear in
+`localmodels()=models()["MLJ"]`.
 
-    models(task)
+By declaring `show_dotted=true` models not in the top-level of the
+current namespace - which require dots to call, such as
+`MLJ.DeterministicConstantModel` - are also included.
 
-List, in the same format, all models matching the specified `task`.
+    models(task; show_dotted=false)
+
+List all models matching the specified `task`. 
+
+See also: localmodels
 
 """
-function models()
+function models(; show_dotted=false)
     _models_given_pkg = Dict()
     meta = metadata()
     packages = keys(meta) |> collect
     for pkg in packages
         _models_given_pkg[pkg] = collect(keys(meta[pkg]))
     end
+    # by default models not in the immediate (undotted) namespace are
+    # hidden:
+    if !show_dotted
+        _models_given_pkg["MLJ"] = filter(_models_given_pkg["MLJ"]) do model
+            !('.' in model)
+        end
+    end
     return _models_given_pkg
 end
 
-function models(task::SupervisedTask)
+function models(task::SupervisedTask; args...)
     ret = Dict{String, Any}()
-    allmodels = models()
+    allmodels = models(; args...)
     for pkg in keys(allmodels)
         models_in_pkg = 
             filter(allmodels[pkg]) do model
@@ -93,6 +109,21 @@ function models(task::SupervisedTask)
     end
     return ret
 end
+
+"""
+    localmodels()
+
+List all models available for immediate use. Equivalent to
+`models()["MLJ"]`
+
+    localmodels(task)
+
+List all such models additionally matching the specified
+`task`. Equivalent to `models(task)["MLJ"]`.
+
+"""
+localmodels(; args...) = models(; args...)["MLJ"]
+localmodels(task::SupervisedTask; args...) = models(task; args...)["MLJ"]
 
 
 ## MACROS TO LOAD MODELS
@@ -121,7 +152,10 @@ function try_to_get_package(model::String)
 end
 
 macro load(model_ex)
-    model = string(model_ex)
+    model_ = string(model_ex)
+
+    # get rid brackets, as in "(MLJModels.Clustering).KMedoids":
+    model = filter(model_) do c !(c in ['(',')']) end
 
     if model in string.(MLJBase.finaltypes(Model))
         @info "A model named \"$model\" is already loaded.\n"*
@@ -131,7 +165,7 @@ macro load(model_ex)
 
     pkg, success = try_to_get_package(model)
     if !success # pkg is then a message
-        error(pkg*"Use @load $model pkg=...")
+        error(pkg*"Use @load $model pkg=\"PackageName\". ")
     end
 
     # get load path:

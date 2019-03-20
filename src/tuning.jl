@@ -31,7 +31,7 @@ end
 
 const EitherTunedModel{T,M} = Union{DeterministicTunedModel{T,M},ProbabilisticTunedModel{T,M}}
 
-is_wrapper(::Type{<:EitherTunedModel}) = true
+MLJBase.is_wrapper(::Type{<:EitherTunedModel}) = true
 
 function TunedModel(;model=nothing,
                     tuning=Grid(),

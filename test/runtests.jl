@@ -67,4 +67,11 @@ end
   @test include("LocalMultivariateStats.jl")
 end
 
+## TEST THE EXAMPLES
 
+const exdir = joinpath(srcdir, "../examples") # TODO make this OS agnostic
+
+include(joinpath(exdir, "using_tasks.jl"))
+include(joinpath(exdir, "random_forest.jl"))
+include(joinpath(exdir, "two_parameter_tune.jl"))
+       

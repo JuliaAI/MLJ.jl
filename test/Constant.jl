@@ -22,7 +22,7 @@ d=Distributions.Normal(1.5, 0.5)
 
 @show model
 info(model)
-info(DeterministicConstantRegressor)
+info(MLJ.DeterministicConstantRegressor)
 
 
 ## CLASSIFIER
@@ -45,7 +45,7 @@ yhat = predict(model, fitresult, DataFrame(ones(10, 2)))
 
 @show model
 info(model)
-info(DeterministicConstantClassifier)
+info(MLJ.DeterministicConstantClassifier)
 
 end # module
 true

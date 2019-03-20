@@ -187,7 +187,7 @@ mutable struct Resampler{S,M<:Supervised} <: Supervised{Any}
 end
 
 MLJBase.package_name(::Type{<:Resampler}) = "MLJ"
-is_wrapper(::Type{<:Resampler}) = true
+MLJBase.is_wrapper(::Type{<:Resampler}) = true
 
     
 Resampler(; model=ConstantRegressor(), resampling=Holdout(),

@@ -11,6 +11,7 @@
 ":name" = "GPClassifier"
 ":is_probabilistic" = "`false`"
 ":target_scitype" = "`Union{FiniteOrderedFactor, Multiclass}`"
+":is_wrapper" = "`false`"
 
 [DecisionTree.DecisionTreeRegressor]
 ":input_is_multivariate" = "`true`"
@@ -24,6 +25,7 @@
 ":name" = "DecisionTreeRegressor"
 ":is_probabilistic" = "`false`"
 ":target_scitype" = "`MLJBase.Continuous`"
+":is_wrapper" = "`false`"
 
 [DecisionTree.DecisionTreeClassifier]
 ":input_is_multivariate" = "`true`"
@@ -37,6 +39,7 @@
 ":name" = "DecisionTreeClassifier"
 ":is_probabilistic" = "`true`"
 ":target_scitype" = "`Union{FiniteOrderedFactor, Multiclass}`"
+":is_wrapper" = "`false`"
 
 [ScikitLearn.SVMLClassifier]
 ":input_is_multivariate" = "`true`"
@@ -50,6 +53,7 @@
 ":name" = "SVMLClassifier"
 ":is_probabilistic" = "`false`"
 ":target_scitype" = "`Union{FiniteOrderedFactor, Multiclass}`"
+":is_wrapper" = "`false`"
 
 [ScikitLearn.SVMNuClassifier]
 ":input_is_multivariate" = "`true`"
@@ -63,6 +67,7 @@
 ":name" = "SVMNuClassifier"
 ":is_probabilistic" = "`false`"
 ":target_scitype" = "`Union{FiniteOrderedFactor, Multiclass}`"
+":is_wrapper" = "`false`"
 
 [ScikitLearn.SVMRegressor]
 ":input_is_multivariate" = "`true`"
@@ -76,6 +81,7 @@
 ":name" = "SVMRegressor"
 ":is_probabilistic" = "`false`"
 ":target_scitype" = "`MLJBase.Continuous`"
+":is_wrapper" = "`false`"
 
 [ScikitLearn.SVMClassifier]
 ":input_is_multivariate" = "`true`"
@@ -89,6 +95,7 @@
 ":name" = "SVMClassifier"
 ":is_probabilistic" = "`false`"
 ":target_scitype" = "`Union{FiniteOrderedFactor, Multiclass}`"
+":is_wrapper" = "`false`"
 
 [ScikitLearn.SVMLRegressor]
 ":input_is_multivariate" = "`true`"
@@ -102,6 +109,7 @@
 ":name" = "SVMLRegressor"
 ":is_probabilistic" = "`false`"
 ":target_scitype" = "`MLJBase.Continuous`"
+":is_wrapper" = "`false`"
 
 [ScikitLearn.SVMNuRegressor]
 ":input_is_multivariate" = "`true`"
@@ -115,6 +123,7 @@
 ":name" = "SVMNuRegressor"
 ":is_probabilistic" = "`false`"
 ":target_scitype" = "`MLJBase.Continuous`"
+":is_wrapper" = "`false`"
 
 [Clustering.KMeans]
 ":input_is_multivariate" = "`true`"
@@ -128,6 +137,7 @@
 ":name" = "KMeans"
 ":output_is_multivariate" = "`true`"
 ":output_scitypes" = "`MLJBase.Continuous`"
+":is_wrapper" = "`false`"
 
 [Clustering.KMedoids]
 ":input_is_multivariate" = "`true`"
@@ -141,6 +151,7 @@
 ":name" = "KMedoids"
 ":output_is_multivariate" = "`true`"
 ":output_scitypes" = "`MLJBase.Continuous`"
+":is_wrapper" = "`false`"
 
 [GLM.OLSRegressor]
 ":input_is_multivariate" = "`true`"
@@ -154,6 +165,7 @@
 ":name" = "OLSRegressor"
 ":is_probabilistic" = "`true`"
 ":target_scitype" = "`MLJBase.Continuous`"
+":is_wrapper" = "`false`"
 
 [GLM.GLMCountRegressor]
 ":input_is_multivariate" = "`true`"
@@ -167,6 +179,7 @@
 ":name" = "GLMCountRegressor"
 ":is_probabilistic" = "`true`"
 ":target_scitype" = "`MLJBase.Count`"
+":is_wrapper" = "`false`"
 
 [NaiveBayes.GaussianNBClassifier]
 ":input_is_multivariate" = "`true`"
@@ -180,6 +193,7 @@
 ":name" = "GaussianNBClassifier"
 ":is_probabilistic" = "`true`"
 ":target_scitype" = "`Union{FiniteOrderedFactor, Multiclass}`"
+":is_wrapper" = "`false`"
 
 [NaiveBayes.MultinomialNBClassifier]
 ":input_is_multivariate" = "`true`"
@@ -193,3 +207,4 @@
 ":name" = "MultinomialNBClassifier"
 ":is_probabilistic" = "`true`"
 ":target_scitype" = "`Union{FiniteOrderedFactor, Multiclass}`"
+":is_wrapper" = "`false`"

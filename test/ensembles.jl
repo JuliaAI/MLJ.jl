@@ -11,7 +11,7 @@ using Distributions
 ## WRAPPED ENSEMBLES OF FITRESULTS
 
 # target is :deterministic :multiclass false:
-atom = DeterministicConstantClassifier(target_type=Char)
+atom = MLJ.DeterministicConstantClassifier(target_type=Char)
 L = ['a', 'b', 'j']
 ensemble = [('a', L), ('j', L), ('j', L), ('b', L)]
 n=length(ensemble)
@@ -21,7 +21,7 @@ X = MLJ.table(rand(3,5))
 @test predict(wens, weights, X) == categorical(['j','j','j'])
 
 # target is :deterministic :continuous false:
-atom = DeterministicConstantRegressor()
+atom = MLJ.DeterministicConstantRegressor()
 ensemble = Float64[4, 7, 4, 4]
 weights = [0.1, 0.5, 0.2, 0.2]
 wens = MLJ.WrappedEnsemble(atom, ensemble)
@@ -55,11 +55,11 @@ d = predict(wens, weights, X)[1]
 ## ENSEMBLE MODEL
 
 # target is :deterministic :multiclass false:
-atom=DeterministicConstantClassifier(target_type=Char)
+atom=MLJ.DeterministicConstantClassifier(target_type=Char)
 X = MLJ.table(ones(5,3))
 y = categorical(collect("asdfa"))
 train, test = partition(1:length(y), 0.8);
-ensemble_model = DeterministicEnsembleModel(atom=atom)
+ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom)
 ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
@@ -70,11 +70,11 @@ info(ensemble_model)
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # target is :deterministic :continuous false:
-atom = DeterministicConstantRegressor(target_type=Float64)
+atom = MLJ.DeterministicConstantRegressor(target_type=Float64)
 X = MLJ.table(ones(5,3))
 y = Float64[1.0, 2.0, 1.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
-ensemble_model = DeterministicEnsembleModel(atom=atom)
+ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom)
 ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 @test reduce(* , [x ≈ 1.0 || x ≈ 1.25 for x in fitresult.ensemble])
@@ -94,7 +94,7 @@ atom = ConstantClassifier(target_type=Char)
 X = MLJ.table(ones(5,3))
 y = categorical(collect("asdfa"))
 train, test = partition(1:length(y), 0.8);
-ensemble_model = ProbabilisticEnsembleModel(atom=atom)
+ensemble_model = MLJ.ProbabilisticEnsembleModel(atom=atom)
 ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 fitresult.ensemble
@@ -118,7 +118,7 @@ atom = ConstantRegressor(target_type=Float64)
 X = MLJ.table(ones(5,3))
 y = Float64[1.0, 2.0, 2.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
-ensemble_model = ProbabilisticEnsembleModel(atom=atom)
+ensemble_model = MLJ.ProbabilisticEnsembleModel(atom=atom)
 ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 d1 = fit(Distributions.Normal, [1,1,2,2])
@@ -142,7 +142,7 @@ info(ensemble_model)
 
 # test generic constructor:
 @test EnsembleModel(atom=ConstantRegressor()) isa Probabilistic
-@test EnsembleModel(atom=DeterministicConstantRegressor()) isa Deterministic
+@test EnsembleModel(atom=MLJ.DeterministicConstantRegressor()) isa Deterministic
 
 
 ## MACHINE TEST

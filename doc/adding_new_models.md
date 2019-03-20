@@ -183,10 +183,10 @@ table.
 > Tables.jl has recently added a `matrix` method as well.
 
 Other convenience methods provided by MLJBase for handling tabular
-data are: `selectrows`, `selectcols`, `schema` (for extracting the
-size, names and eltypes of a table) and `table` (for materializing an
-abstract matrix, or named tuple of vectors, as a table matching a
-given prototype). Query the doc-strings for details.
+data are: `selectrows`, `selectcols`, `select`, `schema` (for
+extracting the size, names and eltypes of a table) and `table` (for
+materializing an abstract matrix, or named tuple of vectors, as a
+table matching a given prototype). Query the doc-strings for details.
 
 Note that generally the same type coercions applied to `X` by `fit` will need to
 be applied by `predict` to `Xnew`. 
