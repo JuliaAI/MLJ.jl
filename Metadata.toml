@@ -135,8 +135,8 @@
 ":package_url" = "https://github.com/JuliaStats/Clustering.jl"
 ":package_name" = "Clustering"
 ":name" = "KMeans"
-":output_is_multivariate" = "`true`"
 ":output_scitypes" = "`MLJBase.Continuous`"
+":output_is_multivariate" = "`true`"
 ":is_wrapper" = "`false`"
 
 [Clustering.KMedoids]
@@ -149,8 +149,8 @@
 ":package_url" = "https://github.com/JuliaStats/Clustering.jl"
 ":package_name" = "Clustering"
 ":name" = "KMedoids"
-":output_is_multivariate" = "`true`"
 ":output_scitypes" = "`MLJBase.Continuous`"
+":output_is_multivariate" = "`true`"
 ":is_wrapper" = "`false`"
 
 [GLM.OLSRegressor]

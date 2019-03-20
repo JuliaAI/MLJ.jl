@@ -114,7 +114,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
 
     meter = Progress(N+1, dt=0, desc="Iterating over an $N-point grid: ",
                      barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
-    next!(meter)
+    verbosity < 1 || next!(meter)
     for i in 1:N
 
         verbosity < 1 || next!(meter)
