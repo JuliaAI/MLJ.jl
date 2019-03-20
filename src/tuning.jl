@@ -75,7 +75,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
 
     resampler = Resampler(model=clone,
                           resampling=tuned_model.resampling,
-                          measure=measure,
+                          measures=measure,
                           operation=tuned_model.operation)
 
     resampling_machine = machine(resampler, X, y)

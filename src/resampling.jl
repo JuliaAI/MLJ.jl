@@ -40,7 +40,7 @@ CV(; nfolds=6, parallel=true, shuffle=false) = CV(nfolds, parallel, shuffle)
 # and a measure.)  We need an `evaluate!` for each strategy.
 
 """
-    evaluate!(mach, resampling=CV(), measure=nothing, operation=predict, rows=nothing, verbosity=1)
+    evaluate!(mach, resampling=CV(), measures=nothing, operation=predict, verbosity=1)
 
 Estimate the performance of a machine `mach` using the specified
 `resampling` (defaulting to 6-fold cross-validation) and
@@ -60,15 +60,15 @@ evaluate!(mach::Machine;
 
 # holdout:
 function evaluate!(mach::Machine, resampling::Holdout;
-                   measure=nothing, operation=predict, rows=nothing, verbosity=1)
+                   measures=nothing, operation=predict, rows=nothing, verbosity=1)
 
-    if measure == nothing
-        _measure = default_measure(mach.model)
-        if _measure == nothing
-            error("You need to specify measure=... ")
+    if measures == nothing
+        _measures = default_measure(mach.model)
+        if _measures == nothing
+            error("You need to specify measures=... ")
         end
     else
-        _measure = measure
+        _measures = measures
     end
     
     X = mach.args[1]
@@ -87,28 +87,38 @@ function evaluate!(mach::Machine, resampling::Holdout;
         @info "Evaluating using a holdout set. \n"*
         "fraction_train=$(resampling.fraction_train) \n"*
         "shuffle=$(resampling.shuffle) \n"*
-        "measure=$_measure \n"*
+        "measures=$_measures \n"*
         "operation=$operation \n"*
         "$which_rows"
     end
 
     fit!(mach, rows=train, verbosity=verbosity-1)
-    yhat = operation(mach, selectrows(X, test))    
-    fitresult = _measure(yhat, y[test])
+    yhat = operation(mach, selectrows(X, test))
+
+    if !(_measures isa AbstractVector)
+        return _measures(yhat, y[test])
+    end
+
+    res = Dict()
+    for measure in _measures
+        fitresult = measure(yhat, y[test])
+        res[string(measure)] = fitresult
+    end
+    NamedTuple{Tuple(Symbol.(keys(res)))}(values(res))
 
 end
 
 # cv:
 function evaluate!(mach::Machine, resampling::CV;
-                   measure=nothing, operation=predict, rows=nothing, verbosity=1)
+                   measures=nothing, operation=predict, rows=nothing, verbosity=1)
 
-    if measure == nothing
-        _measure = default_measure(mach.model)
-        if _measure == nothing
-            error("You need to specify measure=... ")
+    if measures == nothing
+        _measures = default_measure(mach.model)
+        if _measures == nothing
+            error("You need to specify measures=... ")
         end
     else
-        _measure = measure
+        _measures = measures
     end
 
     X = mach.args[1]
@@ -124,7 +134,7 @@ function evaluate!(mach::Machine, resampling::CV;
         @info "Evaluating using cross-validation. \n"*
         "nfolds=$(resampling.nfolds). \n"*
         "shuffle=$(resampling.shuffle) \n"*
-        "measure=$_measure \n"*
+        "measures=$_measures \n"*
         "operation=$operation \n"*
         "$which_rows"
     end
@@ -143,8 +153,17 @@ function evaluate!(mach::Machine, resampling::CV;
         test = all[f:s] # TODO: replace with views?
         train = vcat(all[1:(f - 1)], all[(s + 1):end])
         fit!(mach; rows=train, verbosity=verbosity-1)
-        yhat = operation(mach, selectrows(X, test))    
-        return _measure(yhat, y[test])
+        yhat = operation(mach, selectrows(X, test))
+        if !(_measures isa AbstractVector) 
+            return _measures(yhat, y[test])
+        else
+            res = Dict()
+            for measure in _measures
+                fitresult = measure(yhat, y[test])
+                res[string(measure)] = fitresult
+            end
+            return res
+        end
     end
 
     firsts = 1:k:((nfolds - 1)*k + 1) # itr of first `test` rows index
@@ -170,7 +189,19 @@ function evaluate!(mach::Machine, resampling::CV;
         end            
     end
 
-    return measures
+    if eltype(measures) != Dict{Any, Any}
+        return measures
+    end
+    res = Dict()
+    for ind_dict in measures
+        for key in keys(ind_dict)
+            if !haskey(res, key)
+                res[key] = []
+            end
+            push!(res[key], ind_dict[key])
+        end
+    end
+    return NamedTuple{Tuple(Symbol.(keys(res)))}(values(res))
 
 end
 
@@ -191,8 +222,8 @@ MLJBase.is_wrapper(::Type{<:Resampler}) = true
 
     
 Resampler(; model=ConstantRegressor(), resampling=Holdout(),
-          measure=nothing, operation=predict) =
-              Resampler(model, resampling, measure, operation) 
+          measures=nothing, operation=predict) =
+              Resampler(model, resampling, measures, operation) 
 
 function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
 
@@ -208,7 +239,7 @@ function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
     mach = machine(resampler.model, X, y)
 
     fitresult = evaluate!(mach, resampler.resampling;
-                         measure=measure,
+                         measures=measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)
     
@@ -229,7 +260,7 @@ function MLJBase.update(resampler::Resampler{Holdout},
     if resampler.measure == nothing
         measure = default_measure(resampler.model)
         if measure == nothing
-            error("You need to specify measure=... ")
+            error("You need to specify measures=... ")
         end
     else
         measure = resampler.measure
@@ -243,7 +274,7 @@ function MLJBase.update(resampler::Resampler{Holdout},
     end
 
     fitresult = evaluate!(mach, resampler.resampling;
-                         measure=resampler.measure,
+                         measures=resampler.measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)
     
