@@ -40,12 +40,13 @@ CV(; nfolds=6, parallel=true, shuffle=false) = CV(nfolds, parallel, shuffle)
 # and a measure.)  We need an `evaluate!` for each strategy.
 
 """
-    evaluate!(mach, resampling=CV(), measures=nothing, operation=predict, verbosity=1)
+    evaluate!(mach, resampling=CV(), measure=nothing, operation=predict, verbosity=1)
 
 Estimate the performance of a machine `mach` using the specified
-`resampling` (defaulting to 6-fold cross-validation) and
-`measure`. In general this mutating operation preserves only
-`mach.args` (the data stored in the machine).
+`resampling` (defaulting to 6-fold cross-validation) and `measure`,
+which can be a single measure or vector. In general operation is
+mutating (only `mach.args`, the data stored in the machine, is
+preserved).
 
 Resampling and testing is based exclusively on data in `rows`, when
 specified.
@@ -60,15 +61,15 @@ evaluate!(mach::Machine;
 
 # holdout:
 function evaluate!(mach::Machine, resampling::Holdout;
-                   measures=nothing, operation=predict, rows=nothing, verbosity=1)
+                   measure=nothing, operation=predict, rows=nothing, verbosity=1)
 
-    if measures == nothing
+    if measure == nothing
         _measures = default_measure(mach.model)
         if _measures == nothing
-            error("You need to specify measures=... ")
+            error("You need to specify measure=... ")
         end
     else
-        _measures = measures
+        _measures = measure
     end
     
     X = mach.args[1]
@@ -87,7 +88,7 @@ function evaluate!(mach::Machine, resampling::Holdout;
         @info "Evaluating using a holdout set. \n"*
         "fraction_train=$(resampling.fraction_train) \n"*
         "shuffle=$(resampling.shuffle) \n"*
-        "measures=$_measures \n"*
+        "measure=$_measures \n"*
         "operation=$operation \n"*
         "$which_rows"
     end
@@ -99,23 +100,23 @@ function evaluate!(mach::Machine, resampling::Holdout;
         return _measures(yhat, y[test])
     end
 
-    measures = [m(yhat, y[test]) for m in _measures]
+    measure_values = [m(yhat, y[test]) for m in _measures]
     measure_names = Tuple(Symbol.(string.(_measures)))
-    return NamedTuple{measure_names}(measures)
+    return NamedTuple{measure_names}(measure_values)
 
 end
 
 # cv:
 function evaluate!(mach::Machine, resampling::CV;
-                   measures=nothing, operation=predict, rows=nothing, verbosity=1)
+                   measure=nothing, operation=predict, rows=nothing, verbosity=1)
 
-    if measures == nothing
+    if measure == nothing
         _measures = default_measure(mach.model)
         if _measures == nothing
-            error("You need to specify measures=... ")
+            error("You need to specify measure=... ")
         end
     else
-        _measures = measures
+        _measures = measure
     end
 
     X = mach.args[1]
@@ -131,7 +132,7 @@ function evaluate!(mach::Machine, resampling::CV;
         @info "Evaluating using cross-validation. \n"*
         "nfolds=$(resampling.nfolds). \n"*
         "shuffle=$(resampling.shuffle) \n"*
-        "measures=$_measures \n"*
+        "measure=$_measures \n"*
         "operation=$operation \n"*
         "$which_rows"
     end
@@ -167,7 +168,7 @@ function evaluate!(mach::Machine, resampling::CV;
             @info "Distributing cross-validation computation "*
             "among $(nworkers()) workers."
         end
-        measures = @distributed vcat for n in 1:nfolds
+        measure_values = @distributed vcat for n in 1:nfolds
             [get_measure(firsts[n], seconds[n])]
         end
     else
@@ -175,18 +176,18 @@ function evaluate!(mach::Machine, resampling::CV;
             p = Progress(nfolds + 1, dt=0, desc="Cross-validating: ",
                          barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
             next!(p)
-            measures = [first((get_measure(firsts[n], seconds[n]), next!(p))) for n in 1:nfolds]
+            measure_values = [first((get_measure(firsts[n], seconds[n]), next!(p))) for n in 1:nfolds]
         else
-            measures = [get_measure(firsts[n], seconds[n]) for n in 1:nfolds]
+            measure_values = [get_measure(firsts[n], seconds[n]) for n in 1:nfolds]
         end            
     end
 
-    if !(_measures isa AbstractVector)
-        return measures
+    if !(measure isa AbstractVector)
+        return measure_values
     end
 
     # repackage measures:
-    measures_reshaped = [[measures[i][j] for i in 1:nfolds] for j in 1:length(_measures)]
+    measures_reshaped = [[measure_values[i][j] for i in 1:nfolds] for j in 1:length(_measures)]
     
     measure_names = Tuple(Symbol.(string.(_measures)))
     return NamedTuple{measure_names}(Tuple(measures_reshaped))
@@ -210,8 +211,8 @@ MLJBase.is_wrapper(::Type{<:Resampler}) = true
 
     
 Resampler(; model=ConstantRegressor(), resampling=Holdout(),
-          measures=nothing, operation=predict) =
-              Resampler(model, resampling, measures, operation) 
+          measure=nothing, operation=predict) =
+              Resampler(model, resampling, measure, operation) 
 
 function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
 
@@ -227,7 +228,7 @@ function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
     mach = machine(resampler.model, X, y)
 
     fitresult = evaluate!(mach, resampler.resampling;
-                         measures=measure,
+                         measure=measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)
     
@@ -248,7 +249,7 @@ function MLJBase.update(resampler::Resampler{Holdout},
     if resampler.measure == nothing
         measure = default_measure(resampler.model)
         if measure == nothing
-            error("You need to specify measures=... ")
+            error("You need to specify measure=... ")
         end
     else
         measure = resampler.measure
@@ -262,7 +263,7 @@ function MLJBase.update(resampler::Resampler{Holdout},
     end
 
     fitresult = evaluate!(mach, resampler.resampling;
-                         measures=resampler.measure,
+                         measure=resampler.measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)
     

@@ -13,14 +13,14 @@ y = [1.0, 1.0, 2.0, 2.0]
 # holdout:
 holdout = Holdout(fraction_train=0.75)
 model = ConstantRegressor()
-resampler = Resampler(resampling=holdout, model=model, measures=rms)
+resampler = Resampler(resampling=holdout, model=model, measure=rms)
 fitresult, cache, report = MLJ.fit(resampler, 1, X, y)
 @test fitresult ≈ 2/3
 
 holdout = Holdout(shuffle=true)
 
 mach = machine(model, X, y)
-result = evaluate!(mach, resampling=holdout, measures=[rms, rmslp1])
+result = evaluate!(mach, resampling=holdout, measure=[rms, rmslp1])
 @test result isa NamedTuple
 @test evaluate!(mach, resampling=holdout) ≈ 2/3
 
@@ -33,7 +33,7 @@ y = [1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0]
 cv=CV(nfolds=5)
 model = ConstantRegressor()
 mach = machine(model, X, y)
-result = evaluate!(mach, resampling=cv, measures=[rms, rmslp1])
+result = evaluate!(mach, resampling=cv, measure=[rms, rmslp1])
 @test result isa NamedTuple
 errs = evaluate!(mach, resampling=cv)
 for e in errs
