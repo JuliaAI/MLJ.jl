@@ -43,7 +43,7 @@ end
 ## RESAMPLER AS MACHINE
 
 # holdout:
-# X, y = datanow()
+X, y = datanow()
 ridge_model = RidgeRegressor(lambda=20.0)
 resampler = Resampler(resampling=holdout, model=ridge_model)
 resampling_machine = machine(resampler, X, y)
