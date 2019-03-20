@@ -5,6 +5,14 @@ Development news for MLJ and its satellite packages,
 [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl)
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
+
+### unversioned commits 20 March 2019 (around 16:00 GMT)
+
+- `evaluate!` may now specify a vector of measures (metric) to
+  use. Note one still uses the keyword "measure=" and not "measures=". Resolves:
+  [#98](https://github.com/alan-turing-institute/MLJ.jl/issues/98)
+
+
 ### unversioned commits 15 March 2019 (around 12:00 GMT)
 
 - Added docker image for quick demonstration. Resolves:
