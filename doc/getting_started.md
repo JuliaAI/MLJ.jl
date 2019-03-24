@@ -157,8 +157,8 @@ julia> (scitype(42), scitype(π), scitype("Julia"))
 (Count, Continuous, MLJBase.Other)
 ```
 
-In particular, *integers cannot be used to represent `Multiclass` or
-`FiniteOrderedFactor` data*; these can represented by an unordered or
+In particular, *integers cannot be used to represent* `Multiclass` *or*
+`FiniteOrderedFactor` *data*; these can be represented by an unordered or
 ordered `CategoricalValue` or `CategoricalString`:
 
 `T`                     |     `scitype(x)` for `x::T`

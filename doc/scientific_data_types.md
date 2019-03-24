@@ -7,7 +7,7 @@ a *scientific type* is defined to be any subtype of `Union{Missing, Found}`:
 ````julia
 Continuous <: Found 
 Discrete <: Found
-	Multiclass{N} <: Discrete
+    Multiclass{N} <: Discrete
     OrderedFactor <: Discrete
 	    FiniteOrderedFactor{N} <: OrderedFactor 
 	    Count <: OrderedFactor
@@ -41,7 +41,7 @@ In fact, if `scitype(x) = K` then `scitype(y) = K` for *all* `y` with
 `typeof(y)=typeof(x)` *unless*, `x` and `y` are instances of
 `CategoricalValue` or `CategoricalString`. In this latter case, the
 assertion continues to hold if and only if `x` and `y` have the same
-`ordered` flag and the same number of levels:
+`ordered` flag and the same number of levels.
 
 Here, approximately, is the definition of `scitype` on scalar types:
 
