@@ -239,7 +239,7 @@ bagging, each with associated model `atom`. Ensembling is useful if
 `fit!(machine(atom, data...))` does not create identical models on
 repeated calls (ie, is a stochastic model, such as a decision tree
 with randomized node selection criteria), or if `bagging_fraction` is
-set to a value not equal to 1.0 (or both). The constructor fails if no
+set to a value less than 1.0, or both. The constructor fails if no
 `atom` is specified.
 
 Predictions are weighted according to the vector `weights` (to allow
@@ -248,12 +248,12 @@ for external optimization) except in the case that `atom` is a
 zero length.
 
 The ensemble model is `Deterministic` or `Probabilistic`, according to
-the corresponding supertype of `atom`. In the case of classifiers
-(target_scitype(atom) <: Union{Multiclass,FiniteOrderedFactor}), the
+the corresponding supertype of `atom`. In the case of deterministic classifiers
+(`target_scitype(atom) <: Union{Multiclass,FiniteOrderedFactor}`), the
 predictions are majority votes, and for regressors
-(target_scitype(atom)<: Continuous) they are ordinary averages.
+(`target_scitype(atom)<: Continuous`) they are ordinary averages.
 Probabilistic predictions are obtained by averaging the atomic
-probability distribution functions; in particular, for regressors, the
+probability distribution/mass functions; in particular, for regressors, the
 ensemble prediction on each input pattern has the type
 `MixtureModel{VF,VS,D}` from the Distributions.jl package, where `D`
 is the type of predicted distribution for `atom`.

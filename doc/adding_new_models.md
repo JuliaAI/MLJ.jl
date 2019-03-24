@@ -10,7 +10,7 @@ models in any package that imports the package
 [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) and
 implements the API defined there, as outlined in detail below. For a
 quick-and-dirty implementation of user-defined models see [The
-Simplified Model API](the_simplified_model_API.md).  To make new
+Simplified Model API](the_simplified_model_api.md).  To make new
 models available to all MLJ users, see [Where to place code
 implementing new
 models](#Where-to-place-code-implementing-new-models).
