@@ -117,7 +117,6 @@ end
 
 machine(model::Model, args...) = Machine(model, args...)
 
-params(mach::AbstractMachine) = params(mach.model)
 report(mach::AbstractMachine) = mach.report
 
 
