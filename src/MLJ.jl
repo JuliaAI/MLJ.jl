@@ -54,6 +54,7 @@ using MLJBase
 import MLJBase: fit, update, clean!
 import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: transform, inverse_transform, se, evaluate, fitted_params
+import MLJBase: show_as_constructed
 
 using RemoteFiles
 import TOML

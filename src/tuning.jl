@@ -6,6 +6,7 @@ mutable struct Grid <: TuningStrategy
 end
 
 Grid(;resolution=10, parallel=true) = Grid(resolution, parallel)
+MLJBase.show_as_constructed(::Type{<:Grid}) = true
 
 # TODO: make fitresult type `Machine` more concrete.
 

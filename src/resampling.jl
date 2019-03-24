@@ -22,6 +22,7 @@ mutable struct Holdout <: ResamplingStrategy
     end
 end
 Holdout(; fraction_train=0.7, shuffle=false) = Holdout(fraction_train, shuffle)
+show_as_constructed(::Type{<:Holdout}) = true
 
 mutable struct CV <: ResamplingStrategy
     nfolds::Int
@@ -29,6 +30,7 @@ mutable struct CV <: ResamplingStrategy
     shuffle::Bool ## TODO: add seed/rng 
 end
 CV(; nfolds=6, parallel=true, shuffle=false) = CV(nfolds, parallel, shuffle)
+MLJBase.show_as_constructed(::Type{<:CV}) = true
 
 
 ## DIRECT EVALUATION METHODS 
