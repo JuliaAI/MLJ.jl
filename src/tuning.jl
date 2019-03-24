@@ -201,13 +201,18 @@ MLJBase.input_is_multivariate(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M
 ## LEARNING CURVES 
 
 """
-    curve = learning_curve!(mach; resolution=30, resampling=Holdout(), measure=rms, operation=predict, nested_range=nothing)
+    curve = learning_curve!(mach; resolution=30, resampling=Holdout(), measure=rms, operation=predict, nested_range=nothing, n=1)
 
 Given a supervised machine `mach`, returns a named tuple of objects
 needed to generate a plot of performance measurements, as a function
 of the single hyperparameter specified in `nested_range`. The tuple `curve`
 has the following keys: `:parameter_name`, `:parameter_scale`,
 `:parameter_values`, `:measurements`.
+
+For `n` not equal to 1, multiple curves are computed, and the value of
+`curve.measurements` is an array, one column for each run. This is
+useful in the case of models with indeterminate fit-results, such as a
+random forest.
 
 ````julia
 X, y = datanow()
@@ -217,7 +222,7 @@ mach = machine(ensemble, X, y)
 r_lambda = range(atom, :lambda, lower=0.1, upper=100, scale=:log10)
 curve = MLJ.learning_curve!(mach; nested_range=(atom=(lambda=r_lambda,),))
 using Plots
-plot(curve.parameter_values, curve.measurements, xscale=curve.parameter_scale)
+plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)
 ````
 
 Smart fitting applies. For example, if the model is an ensemble model,
@@ -227,16 +232,16 @@ each new value of `n`.
 
 ````julia
 atom.lambda=1.0
-r_n = range(ensemble, :n, lower=2, upper=100)
-curve2 = MLJ.learning_curve!(mach; nested_range=(n=r_n,), verbosity=3)
-plot(curve2.parameter_values, curve2.measurements)
+r_n = range(ensemble, :n, lower=2, upper=150)
+curves = MLJ.learning_curve!(mach; nested_range=(n=r_n,), verbosity=3, n=5)
+plot(curves.parameter_values, curves.measurements, xlab=curves.parameter_name)
 ````
 
 """
 function learning_curve!(mach::Machine{<:Supervised};
                         resolution=30,
                         resampling=Holdout(),
-                        measure=rms, operation=predict, nested_range=nothing, verbosity=0)
+                        measure=rms, operation=predict, nested_range=nothing, verbosity=0, n=1)
 
     nested_range != nothing || error("No param range specified. Use nested_range=... ")
 
@@ -244,12 +249,19 @@ function learning_curve!(mach::Machine{<:Supervised};
                              tuning=Grid(resolution=resolution),
                              resampling=resampling, measure=measure, full_report=true)
     tuned = machine(tuned_model, mach.args...)
-    fit!(tuned, verbosity=verbosity)
+
+    measurements = reduce(hcat, [(fit!(tuned, verbosity=verbosity); tuned.report.measurements) for i in 1:n])
     report = tuned.report
-    return (parameter_name=report.parameter_names[1],
-            parameter_scale=report.parameter_scales[1],
-            parameter_values=[report.parameter_values[:, 1]...],
-            measurements=report.measurements)
+    parameter_name=report.parameter_names[1]
+    parameter_scale=report.parameter_scales[1]
+    parameter_values=[report.parameter_values[:, 1]...]
+    measurements_ =
+        n == 1 ? [measurements...] : measurements
+    
+    return (parameter_name=parameter_name,
+            parameter_scale=parameter_scale,
+            parameter_values=parameter_values,
+            measurements = measurements_)
 end
 
 
