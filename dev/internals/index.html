@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Internals · MLJ</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>MLJ</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../getting_started/">Launch Pad</a></li><li><a class="toctext" href="../scientific_data_types/">Scientific<em>Data</em>types</a></li><li><a class="toctext" href="../adding_new_models/">Adding new Models</a></li><li class="current"><a class="toctext" href>Internals</a><ul class="internal"></ul></li><li><a class="toctext" href="../glossary/">Glossary</a></li><li><a class="toctext" href="../NEWS/">News</a></li><li><a class="toctext" href="../">MLJ.jl</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Internals</a></li></ul><a class="edit-page" href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/internals.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Internals</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Internals-1" href="#Internals-1">Internals</a></h1><h3><a class="nav-anchor" id="The-machine-interface,-simplified-1" href="#The-machine-interface,-simplified-1">The machine interface, simplified</a></h3><p>The following is simplified description of the <code>Machine</code> interface. See also the <a href="../glossary/">glossary</a></p><h4><a class="nav-anchor" id="The-Machine-type-1" href="#The-Machine-type-1">The Machine type</a></h4><pre><code class="language-julia">mutable struct Machine{M&lt;Model}
+
+	model::M
+    fitresult
+    cache
+    args::Tuple    # e.g., (X, y) for supervised models
+    report
+    rows # remember last rows used 
+    
+    function Machine{M}(model::M, args...) where M&lt;:Model
+        machine = new{M}(model)
+        machine.args = args
+        machine.report = Dict{Symbol,Any}()
+        return machine
+    end
+
+end</code></pre><h4><a class="nav-anchor" id="Constructor-1" href="#Constructor-1">Constructor</a></h4><pre><code class="language-julia">machine(model::M, Xtable, y) = Machine{M}(model, Xtable, y)</code></pre><h4><a class="nav-anchor" id="fit!-and-predict/transform-1" href="#fit!-and-predict/transform-1">fit! and predict/transform</a></h4><pre><code class="language-julia">function fit!(machine::Machine; rows=nothing, verbosity=1) 
+
+    warning = clean!(mach.model)
+    isempty(warning) || verbosity &lt; 0 || @warn warning 
+
+    if rows == nothing
+        rows = (:) 
+    end
+
+    rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
+
+    args = [MLJ.selectrows(arg, rows) for arg in mach.args]
+	
+    if !isdefined(mach, :fitresult) || rows_have_changed || force 
+        mach.fitresult, mach.cache, report =
+            fit(mach.model, verbosity, args...)
+    else # call `update`:
+        mach.fitresult, mach.cache, report =
+            update(mach.model, verbosity, mach.fitresult, mach.cache, args...)
+    end
+
+    if rows_have_changed
+        mach.rows = deepcopy(rows)
+    end
+
+    if report != nothing
+        merge!(mach.report, report)
+    end
+
+    return mach
+
+end
+
+function predict(machine::Machine{&lt;:Supervised}, Xnew)
+    if isdefined(machine, :fitresult)
+        return predict(machine.model, machine.fitresult, Xnew))
+    else
+        throw(error(&quot;$machine is not trained and so cannot predict.&quot;))
+    end
+end
+
+function transform(machine::Machine{&lt;:Unsupervised}, Xnew)
+    if isdefined(machine, :fitresult)
+        return transform(machine.model, machine.fitresult, Xnew))
+    else
+        throw(error(&quot;$machine is not trained and so cannot transform.&quot;))
+    end
+end</code></pre><footer><hr/><a class="previous" href="../adding_new_models/"><span class="direction">Previous</span><span class="title">Adding new Models</span></a><a class="next" href="../glossary/"><span class="direction">Next</span><span class="title">Glossary</span></a></footer></article></body></html>
