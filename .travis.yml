@@ -6,7 +6,8 @@ os:
   - osx
 julia:
   - 1.0
-#  - nightly
+  - 1.1
+  - nightly
 notifications:
   email: false
 git:
