@@ -1,25 +1,5 @@
 ## NESTED PARAMATER INTERFACE
 
-
-"""
-    params(m)
-
-Returns the hyperparameters of a machine or model `m` as a named
-tuple. For a non-composite model, the keys are just the field names of
-`m` and the values the field values. If, however, `m` is a composite
-model, then a *nested* named tuple is returned:
-
-    julia> params(EnsembleModel(atom=ConstantClassifier()))
-    (atom = (target_type = Bool,), weights = Float64[], bagging_fraction = 0.8, rng_seed = 0, n = 100, parallel = true)
-
-"""
-params(field) = field
-
-function params(model::M) where M<:Model
-    fields = fieldnames(M)
-    NamedTuple{fields}(Tuple([params(getfield(model, field)) for field in fields]))
-end
-
 function set_params!(model::Model, key::Symbol, value)
     setfield!(model, key, value)
     return model

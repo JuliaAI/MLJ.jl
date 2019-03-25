@@ -4,9 +4,6 @@
 # eg, `module TestDatasets` for code testing `datasets.jl`.
 
 using MLJ
-import MLJBase
-
-# using Revise
 using Test
 
 @constant junk=KNNRegressor()
@@ -67,4 +64,15 @@ end
   @test include("LocalMultivariateStats.jl")
 end
 
+## TEST THE EXAMPLES
 
+const exdir = joinpath(MLJ.srcdir, "..", "examples")
+
+# uncomment remaining code to test examples:
+# @testset "/examples" begin
+#     @test include(joinpath(exdir, "using_tasks.jl"))
+#     @test include(joinpath(exdir, "random_forest.jl"))
+#     @test include(joinpath(exdir, "two_parameter_tune.jl"))
+# end
+
+       

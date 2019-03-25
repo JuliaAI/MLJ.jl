@@ -280,13 +280,9 @@ end
 
 const EitherEnsembleModel{R,Atom} = Union{DeterministicEnsembleModel{R,Atom}, ProbabilisticEnsembleModel{R,Atom}}
 
-<<<<<<< HEAD
-function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int,  X, ys...) where {R,Atom<:Supervised{R}}
-=======
 MLJBase.is_wrapper(::Type{<:EitherEnsembleModel}) = true
 
 function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) where {R,Atom<:Supervised{R}}
->>>>>>> d57002c3f5b94d912a41f217aa1527f0841ba741
 
     parallel = model.parallel
     out_of_bag_measures= model.out_of_bag_measures

@@ -37,6 +37,8 @@ function SimpleDeterministicCompositeModel(; model=DeterministicConstantRegresso
 
 end
 
+MLJBase.is_wrapper(::Type{<:SimpleDeterministicCompositeModel}) = true
+
 function MLJBase.fit(composite::SimpleDeterministicCompositeModel, verbosity::Int, Xtrain, ytrain)
     X = source(Xtrain) # instantiates a source node
     y = source(ytrain)

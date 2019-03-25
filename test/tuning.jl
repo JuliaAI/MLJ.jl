@@ -64,12 +64,16 @@ fit!(tuned)
 
 ## LEARNING CURVE
 
+X, y = datanow()
 atom = RidgeRegressor()
-model = EnsembleModel(atom=atom)
-r = range(atom, :lambda, lower=0.001, upper=1.0, scale=:log10)
-nested_range = (atom = (lambda = r,),)
-curve = learning_curve(model, X, y; nested_range = nested_range)
-# lineplot([curve.parameter_values...], curve.measurements)
+ensemble = EnsembleModel(atom=atom)
+mach = machine(ensemble, X, y)
+r_lambda = range(atom, :lambda, lower=0.1, upper=100, scale=:log10)
+curve = MLJ.learning_curve!(mach; nested_range=(atom=(lambda=r_lambda,),))
+
+atom.lambda=1.0
+r_n = range(ensemble, :n, lower=2, upper=100)
+curve2 = MLJ.learning_curve!(mach; nested_range=(n=r_n,))
 
 end
 true

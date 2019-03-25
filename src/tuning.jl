@@ -6,6 +6,7 @@ mutable struct Grid <: TuningStrategy
 end
 
 Grid(;resolution=10, parallel=true) = Grid(resolution, parallel)
+MLJBase.show_as_constructed(::Type{<:Grid}) = true
 
 # TODO: make fitresult type `Machine` more concrete.
 
@@ -30,6 +31,8 @@ mutable struct ProbabilisticTunedModel{T,M<:Probabilistic} <: MLJ.Probabilistic{
 end
 
 const EitherTunedModel{T,M} = Union{DeterministicTunedModel{T,M},ProbabilisticTunedModel{T,M}}
+
+MLJBase.is_wrapper(::Type{<:EitherTunedModel}) = true
 
 function TunedModel(;model=nothing,
                     tuning=Grid(),
@@ -110,9 +113,9 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     # evaluate all the models using specified resampling:
     # TODO: parallelize!
 
-    meter = Progress(N+1, dt=0, desc="Searching a $N-point grid for best model: ",
+    meter = Progress(N+1, dt=0, desc="Iterating over an $N-point grid: ",
                      barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
-    next!(meter)
+    verbosity < 1 || next!(meter)
     for i in 1:N
 
         verbosity < 1 || next!(meter)
@@ -196,42 +199,70 @@ MLJBase.target_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJ
 MLJBase.input_is_multivariate(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.input_is_multivariate(M)
 
 
-## LEARNING CURVES (1D TUNING)
+## LEARNING CURVES 
 
 """
-    learning_curve(model, X, ys...; resolution=30, resampling=Holdout(), measure=rms, operation=pr, param_range=nothing)
+    curve = learning_curve!(mach; resolution=30, resampling=Holdout(), measure=rms, operation=predict, nested_range=nothing, n=1)
 
-Returns `(u, v)` where `u` is a vector of hyperparameter values, and
-`v` the corresponding performance estimates. 
+Given a supervised machine `mach`, returns a named tuple of objects
+needed to generate a plot of performance measurements, as a function
+of the single hyperparameter specified in `nested_range`. The tuple `curve`
+has the following keys: `:parameter_name`, `:parameter_scale`,
+`:parameter_values`, `:measurements`.
+
+For `n` not equal to 1, multiple curves are computed, and the value of
+`curve.measurements` is an array, one column for each run. This is
+useful in the case of models with indeterminate fit-results, such as a
+random forest.
 
 ````julia
 X, y = datanow()
 atom = RidgeRegressor()
-model = EnsembleModel(atom=atom)
-r = range(atom, :lambda, lower=0.1, upper=100, scale=:log10)
-param_range = Params(:atom => Params(:lambda => r))
-u, v = MLJ.learning_curve(model, X, y; param_range = param_range) 
+ensemble = EnsembleModel(atom=atom)
+mach = machine(ensemble, X, y)
+r_lambda = range(atom, :lambda, lower=0.1, upper=100, scale=:log10)
+curve = MLJ.learning_curve!(mach; nested_range=(atom=(lambda=r_lambda,),))
+using Plots
+plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)
+````
+
+Smart fitting applies. For example, if the model is an ensemble model,
+and the hyperparemeter parameter is `n`, then atomic models are
+progressively added to the ensemble, not recomputed from scratch for
+each new value of `n`.
+
+````julia
+atom.lambda=1.0
+r_n = range(ensemble, :n, lower=2, upper=150)
+curves = MLJ.learning_curve!(mach; nested_range=(n=r_n,), verbosity=3, n=5)
+plot(curves.parameter_values, curves.measurements, xlab=curves.parameter_name)
 ````
 
 """
-function learning_curve(model::Supervised, X, ys...;
+function learning_curve!(mach::Machine{<:Supervised};
                         resolution=30,
                         resampling=Holdout(),
-                        measure=rms, operation=predict, nested_range=nothing)
+                        measure=rms, operation=predict, nested_range=nothing, verbosity=0, n=1)
 
-    model != nothing || error("No model specified. Use learning_curve(model=..., param_range=...,)")
-    nested_range != nothing || error("No param range specified. Use learning_curve(model=..., param_range=...,)")
+    nested_range != nothing || error("No param range specified. Use nested_range=... ")
 
-    tuned_model = TunedModel(model=model, nested_ranges=nested_range,
+    tuned_model = TunedModel(model=mach.model, nested_ranges=nested_range,
                              tuning=Grid(resolution=resolution),
                              resampling=resampling, measure=measure, full_report=true)
-    tuned = machine(tuned_model, X, ys...)
-    fit!(tuned, verbosity=0)
+    tuned = machine(tuned_model, mach.args...)
+
+    measurements = reduce(hcat, [(fit!(tuned, verbosity=verbosity); tuned.report.measurements) for i in 1:n])
     report = tuned.report
-    return (parameter_name=report.parameter_names[1],
-            parameter_scale=report.parameter_scales[1],
-            parameter_values=report.parameter_values[:, 1],
-            measurements=report.measurements)
+    parameter_name=report.parameter_names[1]
+    parameter_scale=report.parameter_scales[1]
+    parameter_values=[report.parameter_values[:, 1]...]
+    measurements_ =
+        n == 1 ? [measurements...] : measurements
+    
+    return (parameter_name=parameter_name,
+            parameter_scale=parameter_scale,
+            parameter_values=parameter_values,
+            measurements = measurements_)
 end
 
 

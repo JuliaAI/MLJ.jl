@@ -22,6 +22,7 @@ mutable struct Holdout <: ResamplingStrategy
     end
 end
 Holdout(; fraction_train=0.7, shuffle=false) = Holdout(fraction_train, shuffle)
+show_as_constructed(::Type{<:Holdout}) = true
 
 mutable struct CV <: ResamplingStrategy
     nfolds::Int
@@ -29,6 +30,7 @@ mutable struct CV <: ResamplingStrategy
     shuffle::Bool ## TODO: add seed/rng 
 end
 CV(; nfolds=6, parallel=true, shuffle=false) = CV(nfolds, parallel, shuffle)
+MLJBase.show_as_constructed(::Type{<:CV}) = true
 
 
 ## DIRECT EVALUATION METHODS 
@@ -40,12 +42,13 @@ CV(; nfolds=6, parallel=true, shuffle=false) = CV(nfolds, parallel, shuffle)
 # and a measure.)  We need an `evaluate!` for each strategy.
 
 """
-    evaluate!(mach, resampling=CV(), measure=nothing, operation=predict, rows=nothing, verbosity=1)
+    evaluate!(mach, resampling=CV(), measure=nothing, operation=predict, verbosity=1)
 
 Estimate the performance of a machine `mach` using the specified
-`resampling` (defaulting to 6-fold cross-validation) and
-`measure`. In general this mutating operation preserves only
-`mach.args` (the data stored in the machine).
+`resampling` (defaulting to 6-fold cross-validation) and `measure`,
+which can be a single measure or vector. In general operation is
+mutating (only `mach.args`, the data stored in the machine, is
+preserved).
 
 Resampling and testing is based exclusively on data in `rows`, when
 specified.
@@ -63,12 +66,12 @@ function evaluate!(mach::Machine, resampling::Holdout;
                    measure=nothing, operation=predict, rows=nothing, verbosity=1)
 
     if measure == nothing
-        _measure = default_measure(mach.model)
-        if _measure == nothing
+        _measures = default_measure(mach.model)
+        if _measures == nothing
             error("You need to specify measure=... ")
         end
     else
-        _measure = measure
+        _measures = measure
     end
     
     X = mach.args[1]
@@ -87,14 +90,21 @@ function evaluate!(mach::Machine, resampling::Holdout;
         @info "Evaluating using a holdout set. \n"*
         "fraction_train=$(resampling.fraction_train) \n"*
         "shuffle=$(resampling.shuffle) \n"*
-        "measure=$_measure \n"*
+        "measure=$_measures \n"*
         "operation=$operation \n"*
         "$which_rows"
     end
 
     fit!(mach, rows=train, verbosity=verbosity-1)
-    yhat = operation(mach, selectrows(X, test))    
-    fitresult = _measure(yhat, y[test])
+    yhat = operation(mach, selectrows(X, test))
+
+    if !(_measures isa AbstractVector)
+        return _measures(yhat, y[test])
+    end
+
+    measure_values = [m(yhat, y[test]) for m in _measures]
+    measure_names = Tuple(Symbol.(string.(_measures)))
+    return NamedTuple{measure_names}(measure_values)
 
 end
 
@@ -103,12 +113,12 @@ function evaluate!(mach::Machine, resampling::CV;
                    measure=nothing, operation=predict, rows=nothing, verbosity=1)
 
     if measure == nothing
-        _measure = default_measure(mach.model)
-        if _measure == nothing
+        _measures = default_measure(mach.model)
+        if _measures == nothing
             error("You need to specify measure=... ")
         end
     else
-        _measure = measure
+        _measures = measure
     end
 
     X = mach.args[1]
@@ -124,7 +134,7 @@ function evaluate!(mach::Machine, resampling::CV;
         @info "Evaluating using cross-validation. \n"*
         "nfolds=$(resampling.nfolds). \n"*
         "shuffle=$(resampling.shuffle) \n"*
-        "measure=$_measure \n"*
+        "measure=$_measures \n"*
         "operation=$operation \n"*
         "$which_rows"
     end
@@ -138,13 +148,17 @@ function evaluate!(mach::Machine, resampling::CV;
     
     k = floor(Int,n_samples/nfolds)
 
-    # function to return the measure for the fold `all[f:s]`:
+    # function to return the measures for the fold `all[f:s]`:
     function get_measure(f, s)
         test = all[f:s] # TODO: replace with views?
         train = vcat(all[1:(f - 1)], all[(s + 1):end])
         fit!(mach; rows=train, verbosity=verbosity-1)
-        yhat = operation(mach, selectrows(X, test))    
-        return _measure(yhat, y[test])
+        yhat = operation(mach, selectrows(X, test))
+        if !(_measures isa AbstractVector) 
+            return _measures(yhat, y[test])
+        else
+            return [m(yhat, y[test]) for m in _measures]
+        end
     end
 
     firsts = 1:k:((nfolds - 1)*k + 1) # itr of first `test` rows index
@@ -156,7 +170,7 @@ function evaluate!(mach::Machine, resampling::CV;
             @info "Distributing cross-validation computation "*
             "among $(nworkers()) workers."
         end
-        fitresult = @distributed vcat for n in 1:nfolds
+        measure_values = @distributed vcat for n in 1:nfolds
             [get_measure(firsts[n], seconds[n])]
         end
     else
@@ -164,13 +178,21 @@ function evaluate!(mach::Machine, resampling::CV;
             p = Progress(nfolds + 1, dt=0, desc="Cross-validating: ",
                          barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
             next!(p)
-            measures = [first((get_measure(firsts[n], seconds[n]), next!(p))) for n in 1:nfolds]
+            measure_values = [first((get_measure(firsts[n], seconds[n]), next!(p))) for n in 1:nfolds]
         else
-            measures = [get_measure(firsts[n], seconds[n]) for n in 1:nfolds]
+            measure_values = [get_measure(firsts[n], seconds[n]) for n in 1:nfolds]
         end            
     end
 
-    return measures
+    if !(measure isa AbstractVector)
+        return measure_values
+    end
+
+    # repackage measures:
+    measures_reshaped = [[measure_values[i][j] for i in 1:nfolds] for j in 1:length(_measures)]
+    
+    measure_names = Tuple(Symbol.(string.(_measures)))
+    return NamedTuple{measure_names}(Tuple(measures_reshaped))
 
 end
 
@@ -187,6 +209,8 @@ mutable struct Resampler{S,M<:Supervised} <: Supervised{Any}
 end
 
 MLJBase.package_name(::Type{<:Resampler}) = "MLJ"
+MLJBase.is_wrapper(::Type{<:Resampler}) = true
+
     
 Resampler(; model=ConstantRegressor(), resampling=Holdout(),
           measure=nothing, operation=predict) =

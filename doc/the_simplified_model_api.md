@@ -1,6 +1,6 @@
 # The Simplified Model API
 
-To quickly implement a new model in MLJ, it suffices to:
+To quickly implement a new supervised model in MLJ, it suffices to:
 
 - Define a `mutable struct` to store hyperparameters. This is either a subtype
   of `Probabilistic{Any}` or `Deterministic{Any}`, depending on
@@ -26,8 +26,8 @@ MLJ logging protocol, or report training statistics or other
 model-specific functionality, a `fit` method with a slightly different
 signature and output is required. To enable checks of the scientific
 type of data passed to your model by MLJ's meta-algorithms, one needs
-to implement additional traits and a `clean` method can be defined to
-check hyperparameter values are within normal ranges. For details, see
+to implement additional traits. A `clean!` method can be defined to
+check that hyperparameter values are within normal ranges. For details, see
 [Adding New Models](adding_new_models.md).
 
 

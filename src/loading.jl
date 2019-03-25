@@ -18,37 +18,6 @@ end
 # symbols from string representations):
 const METADATA = decode_dic(TOML.parsefile(local_metadata_file))
 
-
-## FUNCTIONS TO RETRIEVE MODELS AND METADATA
-
-function metadata()
-    modeltypes = MLJBase.finaltypes(Model)
-    info_given_model = Dict()
-    for M in modeltypes
-        _info = MLJBase.info(M)
-        modelname = _info[:name]
-        info_given_model[modelname] = _info
-    end
-    ret = deepcopy(METADATA)
-    ret["MLJ"] = info_given_model
-    return ret
-end
-
-"""
-    models()
-
-List the names of all MLJ models, loaded or registered, as a dictionary indexed on package name.
-"""
-function models()
-    _models_given_pkg = Dict()
-    meta = metadata()
-    packages = keys(meta) |> collect
-    for pkg in packages
-        _models_given_pkg[pkg] = collect(keys(meta[pkg]))
-    end
-    return _models_given_pkg
-end
-
 """
    info(model, pkg=nothing)
 
@@ -57,7 +26,7 @@ more than one package implements `model` then `pkg::String` will need
 to be specified.
 
 """
-function MLJBase.info(model::String, pkg=nothing)
+function MLJBase.info(model::String; pkg=nothing)
     if pkg == nothing
         if model in string.(MLJBase.finaltypes(Model))
             pkg = "MLJ"
@@ -70,6 +39,91 @@ function MLJBase.info(model::String, pkg=nothing)
     end
     return metadata()[pkg][model]
 end
+
+
+## FUNCTIONS TO RETRIEVE MODELS AND METADATA
+
+function metadata()
+    modeltypes = MLJBase.finaltypes(Model)
+    info_given_model = Dict()
+    for M in modeltypes
+        _info = MLJBase.info(M)
+        modelname = string(M) #_info[:name]
+        info_given_model[modelname] = _info
+    end
+    ret = deepcopy(METADATA)
+    ret["MLJ"] = info_given_model
+    return ret
+end
+
+"""
+    models(; show_dotted=false)
+
+List all models as a dictionary indexed on package name. Models
+available for immediate use (including external models loaded with
+@load and user-defined models) appear in
+`localmodels()=models()["MLJ"]`.
+
+By declaring `show_dotted=true` models not in the top-level of the
+current namespace - which require dots to call, such as
+`MLJ.DeterministicConstantModel` - are also included.
+
+    models(task; show_dotted=false)
+
+List all models matching the specified `task`. 
+
+See also: localmodels
+
+"""
+function models(; show_dotted=false)
+    _models_given_pkg = Dict()
+    meta = metadata()
+    packages = keys(meta) |> collect
+    for pkg in packages
+        _models_given_pkg[pkg] = collect(keys(meta[pkg]))
+    end
+    # by default models not in the immediate (undotted) namespace are
+    # hidden:
+    if !show_dotted
+        _models_given_pkg["MLJ"] = filter(_models_given_pkg["MLJ"]) do model
+            !('.' in model)
+        end
+    end
+    return _models_given_pkg
+end
+
+function models(task::SupervisedTask; args...)
+    ret = Dict{String, Any}()
+    allmodels = models(; args...)
+    for pkg in keys(allmodels)
+        models_in_pkg = 
+            filter(allmodels[pkg]) do model
+                info_ = info(model, pkg=pkg)
+                info_[:is_supervised] &&
+                    info_[:is_wrapper] == false && 
+                    task.target_scitype <: info_[:target_scitype] &&
+                    task.input_scitypes <: info_[:input_scitypes] &&
+                    task.is_probabilistic == info_[:is_probabilistic]
+            end
+        isempty(models_in_pkg) || (ret[pkg] = models_in_pkg)
+    end
+    return ret
+end
+
+"""
+    localmodels()
+
+List all models available for immediate use. Equivalent to
+`models()["MLJ"]`
+
+    localmodels(task)
+
+List all such models additionally matching the specified
+`task`. Equivalent to `models(task)["MLJ"]`.
+
+"""
+localmodels(; args...) = models(; args...)["MLJ"]
+localmodels(task::SupervisedTask; args...) = models(task; args...)["MLJ"]
 
 
 ## MACROS TO LOAD MODELS
@@ -98,7 +152,10 @@ function try_to_get_package(model::String)
 end
 
 macro load(model_ex)
-    model = string(model_ex)
+    model_ = string(model_ex)
+
+    # get rid brackets, as in "(MLJModels.Clustering).KMedoids":
+    model = filter(model_) do c !(c in ['(',')']) end
 
     if model in string.(MLJBase.finaltypes(Model))
         @info "A model named \"$model\" is already loaded.\n"*
@@ -108,7 +165,7 @@ macro load(model_ex)
 
     pkg, success = try_to_get_package(model)
     if !success # pkg is then a message
-        error(pkg*"Use @load $model pkg=...")
+        error(pkg*"Use @load $model pkg=\"PackageName\". ")
     end
 
     # get load path:

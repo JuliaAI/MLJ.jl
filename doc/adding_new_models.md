@@ -10,7 +10,7 @@ models in any package that imports the package
 [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) and
 implements the API defined there, as outlined in detail below. For a
 quick-and-dirty implementation of user-defined models see [The
-Simplified Model API](the_simplified_model_API.md).  To make new
+Simplified Model API](the_simplified_model_api.md).  To make new
 models available to all MLJ users, see [Where to place code
 implementing new
 models](#Where-to-place-code-implementing-new-models).
@@ -183,10 +183,10 @@ table.
 > Tables.jl has recently added a `matrix` method as well.
 
 Other convenience methods provided by MLJBase for handling tabular
-data are: `selectrows`, `selectcols`, `schema` (for extracting the
-size, names and eltypes of a table) and `table` (for materializing an
-abstract matrix, or named tuple of vectors, as a table matching a
-given prototype). Query the doc-strings for details.
+data are: `selectrows`, `selectcols`, `select`, `schema` (for
+extracting the size, names and eltypes of a table) and `table` (for
+materializing an abstract matrix, or named tuple of vectors, as a
+table matching a given prototype). Query the doc-strings for details.
 
 Note that generally the same type coercions applied to `X` by `fit` will need to
 be applied by `predict` to `Xnew`. 

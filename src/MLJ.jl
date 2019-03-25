@@ -9,14 +9,10 @@ export report                                        # "machines.jl"
 export Holdout, CV, evaluate!, Resampler             # "resampling.jl"
 export Params, params, set_params!                   # "parameters.jl"
 export strange, iterator                             # "parameters.jl"
-export Grid, TunedModel, learning_curve              # "tuning.jl"
-export DeterministicEnsembleModel                    # "ensembles.jl"
-export ProbabilisticEnsembleModel                    # "ensembles.jl"
+export Grid, TunedModel, learning_curve!             # "tuning.jl"
 export EnsembleModel                                 # "ensembles.jl"
 export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
-export DeterministicConstantRegressor                # "builtins/Constant.jl
-export DeterministicConstantClassifier               # "builtins/Constant.jl
-export models, @load                                 # "loading.jl"
+export models, localmodels, @load                    # "loading.jl"
 export KNNRegressor                                  # "builtins/KNN.jl"
 export RidgeRegressor, PCA                           # "builtins/LocalMulitivariateStats.jl
 
@@ -55,9 +51,10 @@ export features, X_and_y
 using MLJBase
 
 # to be extended:
-import MLJBase: fit, update, clean!, info
+import MLJBase: fit, update, clean!
 import MLJBase: predict, predict_mean, predict_median, predict_mode
 import MLJBase: transform, inverse_transform, se, evaluate, fitted_params
+import MLJBase: show_as_constructed, params
 
 using RemoteFiles
 import TOML
@@ -77,9 +74,7 @@ using Statistics
 using LinearAlgebra
 using Random
 import Distributed: @distributed, nworkers, pmap
-
-# for plotting
-using RecipesBase
+using RecipesBase # for plotting
 
 const srcdir = dirname(@__FILE__) # the directory containing this file:
 

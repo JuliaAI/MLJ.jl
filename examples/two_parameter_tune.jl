@@ -2,7 +2,6 @@
 
 using MLJ
 using DataFrames, Statistics
-using Plots
 
 Xraw = rand(300,3)
 y = exp(Xraw[:,1] - Xraw[:,2] - 2Xraw[:,3] + 0.1*rand(300))
@@ -29,7 +28,13 @@ tuned_ensemble_model = TunedModel(model=ensemble_model,
 tuned_ensemble = machine(tuned_ensemble_model, X[train,:], y[train])
 fit!(tuned_ensemble);
 
-plot(tuned_ensemble)
+# data needed for plotting is here:
+tuned_ensemble.report
 
+# uncomment 3 lines to see plots
+# using Plots
+# plot(tuned_ensemble)
+# heatmap(tuned_ensemble)
 
+true
 
