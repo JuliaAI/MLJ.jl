@@ -2,6 +2,7 @@ module TestEnsembles
 
 # using Revise
 using Test
+using Random
 using MLJ
 import MLJBase
 using CategoricalArrays
@@ -11,7 +12,7 @@ using Distributions
 ## WRAPPED ENSEMBLES OF FITRESULTS
 
 # target is :deterministic :multiclass false:
-atom = DeterministicConstantClassifier(target_type=Char)
+atom = MLJ.DeterministicConstantClassifier(target_type=Char)
 L = ['a', 'b', 'j']
 ensemble = [('a', L), ('j', L), ('j', L), ('b', L)]
 n=length(ensemble)
@@ -21,7 +22,7 @@ X = MLJ.table(rand(3,5))
 @test predict(wens, weights, X) == categorical(['j','j','j'])
 
 # target is :deterministic :continuous false:
-atom = DeterministicConstantRegressor()
+atom = MLJ.DeterministicConstantRegressor()
 ensemble = Float64[4, 7, 4, 4]
 weights = [0.1, 0.5, 0.2, 0.2]
 wens = MLJ.WrappedEnsemble(atom, ensemble)
@@ -55,11 +56,11 @@ d = predict(wens, weights, X)[1]
 ## ENSEMBLE MODEL
 
 # target is :deterministic :multiclass false:
-atom=DeterministicConstantClassifier(target_type=Char)
+atom=MLJ.DeterministicConstantClassifier(target_type=Char)
 X = MLJ.table(ones(5,3))
 y = categorical(collect("asdfa"))
 train, test = partition(1:length(y), 0.8);
-ensemble_model = DeterministicEnsembleModel(atom=atom)
+ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom)
 ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
@@ -70,11 +71,11 @@ info(ensemble_model)
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # target is :deterministic :continuous false:
-atom = DeterministicConstantRegressor(target_type=Float64)
+atom = MLJ.DeterministicConstantRegressor(target_type=Float64)
 X = MLJ.table(ones(5,3))
 y = Float64[1.0, 2.0, 1.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
-ensemble_model = DeterministicEnsembleModel(atom=atom)
+ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom)
 ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 @test reduce(* , [x ≈ 1.0 || x ≈ 1.25 for x in fitresult.ensemble])
@@ -87,6 +88,20 @@ weights = rand(10)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
+
+# target is :deterministic :continuous false:
+atom = MLJ.DeterministicConstantRegressor(target_type=Float64)
+rng_seed=1
+Random.seed!(1234)
+
+X = MLJ.table(randn(10,3))
+y = randn(10)
+train, test = partition(1:length(y), 0.8);
+ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom,rng_seed=rng_seed )
+ensemble_model.out_of_bag_measures = [MLJ.rms,MLJ.rmsp]
+ensemble_model.n = 2
+fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+@test report[:oob_estimates][1] ≈ 1.083490899041915
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # target is :probabilistic :multiclass false:
@@ -94,7 +109,7 @@ atom = ConstantClassifier(target_type=Char)
 X = MLJ.table(ones(5,3))
 y = categorical(collect("asdfa"))
 train, test = partition(1:length(y), 0.8);
-ensemble_model = ProbabilisticEnsembleModel(atom=atom)
+ensemble_model = MLJ.ProbabilisticEnsembleModel(atom=atom)
 ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 fitresult.ensemble
@@ -118,7 +133,7 @@ atom = ConstantRegressor(target_type=Float64)
 X = MLJ.table(ones(5,3))
 y = Float64[1.0, 2.0, 2.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
-ensemble_model = ProbabilisticEnsembleModel(atom=atom)
+ensemble_model = MLJ.ProbabilisticEnsembleModel(atom=atom)
 ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 d1 = fit(Distributions.Normal, [1,1,2,2])
@@ -142,7 +157,7 @@ info(ensemble_model)
 
 # test generic constructor:
 @test EnsembleModel(atom=ConstantRegressor()) isa Probabilistic
-@test EnsembleModel(atom=DeterministicConstantRegressor()) isa Deterministic
+@test EnsembleModel(atom=MLJ.DeterministicConstantRegressor()) isa Deterministic
 
 
 ## MACHINE TEST
@@ -161,8 +176,6 @@ fit!(ensemble);
 @test length(ensemble.fitresult.ensemble) == 10
 @test !isnan(predict(ensemble, MLJ.selectrows(X, test))[1])
 
-nested_range=(n=range(ensemble_model, :n, lower=1, upper=50, scale=:log10),)
-learning_curve(ensemble_model, X, y; resolution=10, nested_range=nested_range)
 
 # old Koala tests
 # # check that providing fixed seed gives identical predictions each
