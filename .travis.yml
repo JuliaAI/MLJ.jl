@@ -5,10 +5,8 @@ os:
   - linux
   - osx
 julia:
-#  - 0.7
   - 1.0
-  - 1.1
-  - nightly
+#  - nightly
 notifications:
   email: false
 git:
@@ -21,15 +19,20 @@ matrix:
   - julia: nightly
 
 ## uncomment following lines to deploy documentation
-#jobs:
-#  include:
-#    - stage: Documentation
-#      julia: 1.0
-#      os: linux
-#      script:
-#        - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
-#        - julia --project=docs --color=yes docs/make.jl
-#      after_success: skip
-after_success:
-  - julia --project=test/coverage -e 'using Pkg; Pkg.instantiate()'
-  - julia --project=test/coverage test/coverage/coverage.jl
+jobs:
+  include:
+    - stage: "Documentation"
+      julia: 1.0
+      os: linux
+      # disable global before_script in order not to install Compose twice
+      before_script:
+      script:
+        - |
+          julia --color=yes --project=docs/ -e'
+            using Pkg
+            Pkg.add(PackageSpec(name="Documenter", rev="master"));Pkg.clone("https://github.com/wildart/TOML.jl");Pkg.clone("https://github.com/alan-turing-institute/MLJBase.jl");Pkg.clone("https://github.com/alan-turing-institute/MLJModels.jl")
+            Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.instantiate()
+            include("docs/make.jl")
+          '
+after_success: skip

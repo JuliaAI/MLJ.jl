@@ -128,13 +128,7 @@ of source(s) and nodes. Each connected component is ordinarily
 restricted to have a unique source.
 
 
-#### wrapper
-
-Any model with one or more other models as hyperparameters.
-
-
 #### composite model
 
-Any wrapper, or any learning network "exported" as a model (see
-[Learning Networks](learning_networks.md)).
+Any model with one or more other models as hyperparameters. 
 
