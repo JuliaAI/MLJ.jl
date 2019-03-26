@@ -47,17 +47,17 @@ using LinearAlgebra
 
     fit!(ridgeM, rows=train)
 
-    # tune lambda:
-    lambdas, rmserrors = @curve λ map(x->10^x, (range(-6, stop=-2, length=100))) begin
-        ridge.lambda = λ
-        fit!(ridgeM, verbosity=0)
-        rms(predict(ridgeM, Xtable[test,:]), y[test])
-    end
+    # # tune lambda:
+    # lambdas, rmserrors = @curve λ map(x->10^x, (range(-6, stop=-2, length=100))) begin
+    #     ridge.lambda = λ
+    #     fit!(ridgeM, verbosity=0)
+    #     rms(predict(ridgeM, Xtable[test,:]), y[test])
+    # end
 
-    # set lambda to the optimal value and do final train:
-    ridge.lambda = lambdas[argmin(rmserrors)]
-    fit!(ridgeM, rows=train)
-    rms(predict(ridgeM, Xtable[test,:]), y[test])
+    # # set lambda to the optimal value and do final train:
+    # ridge.lambda = lambdas[argmin(rmserrors)]
+    # fit!(ridgeM, rows=train)
+    # rms(predict(ridgeM, Xtable[test,:]), y[test])
 
     # TODO: check this score is reasonable
 end
