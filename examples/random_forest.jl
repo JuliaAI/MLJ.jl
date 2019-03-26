@@ -5,8 +5,9 @@
 # using Distributed
 # addprocs()
 
-# using Revise
 using MLJ
+using Plots
+plotly()
 
 # load a task (data plus learning objective):
 task = load_boston()
@@ -39,31 +40,10 @@ mach = machine(forest, task)
 r = range(forest, :n, lower=10, upper=500)
 
 # generate learning curve, rms loss vs n:
-curve = learning_curve!(mach, nested_range=(n=r,), measure=rms)
+curves = learning_curve!(mach, nested_range=(n=r,), measure=rms, n=4)
+plot(curves.parameter_values, curves.measurements)
 
-using UnicodePlots
-lineplot(curve.parameter_values, curve.measurements)
-
-   #     ┌────────────────────────────────────────┐ 
-   # 7.8 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   #     │⢰⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   #     │⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   #     │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   #     │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   #     │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   #     │⠀⡇⠀⠀⠀⢀⠔⢲⠀⠀⡠⠃⠱⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   #     │⠀⢱⠀⠀⠀⡜⠀⠀⢣⠜⠀⠀⠀⠘⠔⠊⠑⠒⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   #     │⠀⢸⠀⠀⢰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   #     │⠀⢸⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢢⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   #     │⠀⢸⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠱⡀⡠⡀⠀⡠⠊⠑⠢⢄⠔⠉⠉⠉⠉⠢⢄⣀⠀│ 
-   #     │⠀⠈⣦⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠋⠀⠘⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉│ 
-   #     │⠀⠀⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   #     │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   # 7.3 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
-   #     └────────────────────────────────────────┘ 
-   #     0                                      500
-
-forest.n = 300
+forest.n = 200
 
                      
 ## DEFINE A TUNING GRID
@@ -101,6 +81,11 @@ evaluate!(mach, resampling=Holdout(fraction_train=0.8), measure=[rms, rmslp1], v
 
 # We can view the optimal `forest` parameters:
 fitted_params(mach)
-# (best_model = DeterministicEnsembleModel @ 1…66,)
-show(fitted_params(mach).best_model, 2)
+fitted_params(mach).best_model
+@more
+
+# And plot the performance estimates for the grid search:
+heatmap(mach)
+
+
 true
