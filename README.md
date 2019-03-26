@@ -77,7 +77,9 @@ See [here](docs/src/frequently_asked_questions.md).
 
 ### Getting started
 
-Get started [here](docs/src/getting_started.md), or take the MLJ [tour](docs/src/tour.ipynb).
+Get started
+[here](https://alan-turing-institute.github.io/MLJ.jl/dev/getting_started/),
+or take the MLJ [tour](docs/src/tour.ipynb).
 
 
 ### History
