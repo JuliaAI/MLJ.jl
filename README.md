@@ -80,7 +80,7 @@ ames.ipynb has been provided as an example.
 
 ### Frequently Asked Questions
 
-See [here](docs/frequently_asked_questions.md).
+See [here](docs/src/frequently_asked_questions.md).
 
 ### Known issues
 
@@ -89,7 +89,7 @@ See [here](docs/frequently_asked_questions.md).
 
 ### Getting started
 
-[Get started](docs/getting_started.md) with MLJ, or [take a tour](docs/tour.ipynb) of some of the features implemented so far.
+[Get started](docs/src/getting_started.md) with MLJ, or [take a tour](docs/src/tour.ipynb) of some of the features implemented so far.
 
 
 ### History
