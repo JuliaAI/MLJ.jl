@@ -4,3 +4,4 @@
 *.bu
 .DS_Store
 sandbox/
+docs/build
