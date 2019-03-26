@@ -1,7 +1,6 @@
 # Glossary
 
-Note that this glossary refers to some objects not accessed by the
-general user and is intended mainly for MLJ developers.
+Note: This glossary includes some detail intended mainly for MLJ developers.
 
 ### Basics
 
@@ -37,14 +36,6 @@ Also known as "learned" or "fitted" parameters, these are "weights",
 adopting the prescribed hyperparameters. For example, decision trees
 of a random forest, the coefficients and intercept of a linear model,
 or the rotation and projection matrices of PCA reduction scheme.
-
-<!-- #### method -->
-
-<!-- What Julia calls a function. (In Julia, a "function" is a collection -->
-<!-- of methods sharing the same name but different type signatures.) -->
-
-<!-- For example, associated with every machine (see below) is a `fit!` method for computing assoicated -->
-<!-- fit-results. -->
 
 
 #### operation
@@ -87,27 +78,27 @@ training.
 *Note:* Multiple nodal machines may share the same model, and
 multiple learning nodes may share the same nodal machine.
 
-#### source node (object of type 'Source')
+#### source node (object of type `Source`)
 
 A container for training data and point of entry for new data in a
 learning network (see below).
 
 
-#### nodal machine (object of type 'NodalMachine')
+#### nodal machine (object of type `NodalMachine`)
 
 Like a machine with the following exceptions:
 
-(1) Training arguments are source nodes or regular *nodes* in the
-learning network, instead of data.
+(1) Training arguments are source nodes or regular nodes (see below)
+in the learning network, instead of data.
 
 (2) The object internally records dependencies on other other nodal
 machines, as implied by the training arguments, and so on. 
 
 
-####  node (object of type 'Node')
+####  node (object of type `Node`)
 
 Essentially a nodal machine wrapped in an assoicated operation
-(e.g., `predict` or `inverse_transform`. It detail, it consists of:
+(e.g., `predict` or `inverse_transform`). It detail, it consists of:
 
 (1) An operation, static or dynamic.
 

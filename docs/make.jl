@@ -16,9 +16,16 @@ using MLJModels
 makedocs(
     sitename = "MLJ",
     format = Documenter.HTML(),
-    modules = [MLJ,MLJBase,MLJModels],
-    pages = Any["Launch Pad"=>"getting_started.md","Scientific_Data_types"=>"scientific_data_types.md","Adding new Models"=>
-"adding_new_models.md","Internals"=>"internals.md","Glossary"=>"glossary.md","News"=>"NEWS.md","MLJ.jl"=>"index.md"]
+    modules = [MLJ, MLJBase, MLJModels, MLJ.Transformers],
+    pages = Any["Getting Started"=>"getting_started.md",
+                "Scientific Data Types"=>"scientific_data_types.md",
+                "Adding New Models"=> ["Adding New Models"=>"adding_new_models.md",
+                                       "The Simplified Model API"=>"the_simplified_model_api.md"],
+                "Internals"=>"internals.md",
+                "Glossary"=>"glossary.md",
+                "API"=>"index.md",
+                "FAQ" => "frequently_asked_questions.md",
+                "MLJ News"=>"NEWS.md"]
 )
 
 deploydocs(

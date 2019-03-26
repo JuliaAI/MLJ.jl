@@ -3,14 +3,14 @@
 ### The machine interface, simplified
 
 The following is simplified description of the `Machine`
-interface. See also the [glossary](glossary.md)
+interface. See also the [Glossary](glossary.md)
 
 #### The Machine type
 
 ````julia 
 mutable struct Machine{M<Model}
 
-	model::M
+    model::M
     fitresult
     cache
     args::Tuple    # e.g., (X, y) for supervised models

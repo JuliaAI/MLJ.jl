@@ -1,4 +1,3 @@
-
 # Getting Started
 
 ### Basic supervised training and testing
@@ -88,7 +87,9 @@ julia> evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true), mea
 ### Next steps
 
 To learn a little more about what MLJ can do, take the MLJ
-[tour](tour.ipynb). Read the remainder of this document before considering more serious use of MLJ.
+[tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/tour.ipynb). Read
+the remainder of this document before considering more serious use of
+MLJ.
 
 
 ### Prerequisites
@@ -114,7 +115,8 @@ below.
 > assume data is in the requisite form.
 
 In principle, anywhere a table is expected in MLJ (eg, `X` above) any
-tabular format supporting the [Tables.jl](Tables.jl) interface is
+tabular format supporting the
+[Tables.jl](https://github.com/JuliaData/Tables.jl) interface is
 allowed. (At present our API is more restrictive; see this
 [issue](https://github.com/JuliaData/Tables.jl/issues/74) with
 Tables.jl. If your Tables.jl compatible format is not working in MLJ,
@@ -147,7 +149,7 @@ julia> info("DecisionTreeClassifier")[:target_scitype]
 Union{Multiclass,FiniteOrderedFactor}
 ```
 
-**Basic data convention** The scientific type of data that a Julia
+**Basic data convention.** The scientific type of data that a Julia
 object `x` can represent is defined by `scitype(x)`. If `scitype(x) ==
 Other`, then `x` cannot represent scalar data in MLJ.
 

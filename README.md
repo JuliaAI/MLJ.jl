@@ -4,27 +4,26 @@ A pure Julia machine learning framework.
 
 [![Build Status](https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master)](https://travis-ci.com/alan-turing-institute/MLJ.jl)
 [![Slack Channel mlj](https://img.shields.io/badge/chat-on%20slack-yellow.svg)](https://slackinvite.julialang.org/)
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://alan-turing-institute.github.io/MLJ.jl/dev)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://alan-turing-institute.github.io/MLJ.jl/dev/getting_started/)
+
 ![](docs/src/two_model_stack.png)
 
 MLJ aims to be a flexible framework for combining and tuning machine
 learning models, written in the high performance, rapid development,
-scientific programming language, [Julia](https://julialang.org). MLJ
-is work in progress and new collaborators are being sought. 
+scientific programming language, [Julia](https://julialang.org). 
 
-Click [here](CONTRIBUTE.md) if your are interested in contributing.
+MLJ is in a relatively early stage of development and welcomes new
+collaborators. Click [here](CONTRIBUTE.md) if you are interested in
+contributing, or if you are interested in implementing the MLJ
+interface for an existing Julia machine learning algorithm.
 
-The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html) ([recent
-slides 7/18](https://github.com/mlr-org/mlr-outreach).) For an earlier proof-of-concept, see
-[this branch](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
-and [this poster summary](material/MLJ-JuliaCon2018-poster.pdf).
+The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html).
 
-Packages wishing to implement the MLJ interface for their algorithms should
-import [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl).
-
+A list of models implementing the MLJ interface:
+[MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl/blob/master/Models.toml)
 
 
-## Installation
+### Installation
 
 In the Julia REPL:
 
@@ -35,19 +34,7 @@ add "https://github.com/alan-turing-institute/MLJModels.jl"
 add "https://github.com/alan-turing-institute/MLJ.jl"
 ````
 
-
-### Alternatively, try it out now using our docker image : 
-
-A [docker image](https://github.com/ysimillides/mlj-docker) is provided with instructions in how to set it up. 
-
-#### Running Docker
-
-To run the docker image you can simply call
-```sh
-docker run -p 8888:8888 ysimillides/mlj-docker 
-```
-and this will open a port on your localhost:8888 from where you can access the container/notebook.
-ames.ipynb has been provided as an example.
+A docker image with installation [instructions](https://github.com/ysimillides/mlj-docker) is also available.
 
 
 ### Features to include:
@@ -71,7 +58,7 @@ ames.ipynb has been provided as an example.
 - Performant parallel implementation of large homogeneous **ensembles**
   of arbitrary models (e.g., random forests). &#10004;
 
-- **Task** interface matches machine learning problem to available models.
+- **Task** interface matches machine learning problem to available models. &#10004; (mostly)
 
 - **Benchmarking** a battery of assorted models for a given task.
 
@@ -82,6 +69,7 @@ ames.ipynb has been provided as an example.
 
 See [here](docs/src/frequently_asked_questions.md).
 
+
 ### Known issues
 
 - The ScikitLearn SVM models will not work under Julia 1.0.3 but do work under Julia 1.1 due to [Issue #29208](https://github.com/JuliaLang/julia/issues/29208)
@@ -89,7 +77,7 @@ See [here](docs/src/frequently_asked_questions.md).
 
 ### Getting started
 
-[Get started](docs/src/getting_started.md) with MLJ, or [take a tour](docs/src/tour.ipynb) of some of the features implemented so far.
+Get started [here](docs/src/getting_started.md), or take the MLJ [tour](docs/src/tour.ipynb).
 
 
 ### History

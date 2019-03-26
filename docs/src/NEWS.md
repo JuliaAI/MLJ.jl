@@ -10,8 +10,8 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 - Addition of "scientific type" hierarchy, including `Continuous`,
   `Discrete`, `Multiclass`, and `Other` subtypes of `Found` (to
   complement `Missing`). See
-  new documents [Getting Started](doc/gettting_started.md) and
-  [Scientific Data Types](doc/scientific_data_types.md) for more one
+  new documents [Getting Started](getting_started.md) and
+  [Scientific Data Types](scientific_data_types.md) for more one
   this.  Resolves: [#86](https://github.com/alan-turing-institute/MLJ.jl/issues/86)
 
 - Revamp of model traits to take advantage of scientific types, with
@@ -24,7 +24,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   [#81](https://github.com/alan-turing-institute/MLJ.jl/issues/81)
   
 - Substantial update of the core guide [Adding New
-  Models](doc/adding_new_models.md) to reflect above changes and in
+  Models](adding_new_models.md) to reflect above changes and in
   response to new model implementer queries. Some design "decisions"
   regarding multivariate targets now explict there.
 

@@ -11,9 +11,11 @@ channel](https://slackinvite.julialang.org), #MLJ.
 
 - [Nice overview of Julia ML packages](https://www.simonwenkel.com/2018/10/05/Julia-for-datascience-machine-learning-and-artificial-intelligence.html)
 
-While new model implementations are a priority at present, help adding core
-functionality to MLJ is also welcome. If you are interested in
-contributing, please read the this rest of this document.
+While new model implementations are a priority at present, help adding
+core functionality to MLJ is also welcome. If you are interested in
+contributing, please read the this rest of this document. A guide to
+implementing the MLJ inteface for new models is
+[here](docs/src/adding_new_models.md).
 
 
 ### Brief design overview
