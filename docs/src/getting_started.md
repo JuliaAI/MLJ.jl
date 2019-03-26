@@ -27,17 +27,16 @@ import MLJModels ✔
 import DecisionTree ✔
 import MLJModels.DecisionTree_.DecisionTreeClassifier ✔
 
-# DecisionTreeClassifier{String} @ 2…98: 
-target_type             =>   String
-pruning_purity          =>   1.0
-max_depth               =>   2
-min_samples_leaf        =>   1
-min_samples_split       =>   2
-min_purity_increase     =>   0.0
-n_subfeatures           =>   0.0
-display_depth           =>   5
-post_prune              =>   false
-merge_purity_threshold  =>   0.9
+DecisionTreeClassifier(target_type = String,
+                       pruning_purity = 1.0,
+                       max_depth = 2,
+                       min_samples_leaf = 1,
+                       min_samples_split = 2,
+                       min_purity_increase = 0.0,
+                       n_subfeatures = 0.0,
+                       display_depth = 5,
+                       post_prune = false,
+                       merge_purity_threshold = 0.9,) @ 1…72
 ```
 
 Wrapping the model in data creates a *machine* which will store training outcomes (called *fit-results*):
@@ -45,13 +44,7 @@ Wrapping the model in data creates a *machine* which will store training outcome
 ```julia
 julia> tree = machine(tree_model, X, y)
 
-# Machine{DecisionTreeClassifier{S…} @ 1…36: 
-model                   =>   DecisionTreeClassifier{String} @ 2…98
-fitresult               =>   (undefined)
-cache                   =>   (undefined)
-args                    =>   (omitted Tuple{DataFrame,CategoricalArray{String,1,UInt8,String,CategoricalString{UInt8},Union{}}} of length 2)
-report                  =>   empty Dict{Symbol,Any}
-rows                    =>   (undefined)
+Machine @ 5…78
 ```
 
 Training and testing on a hold-out set:
