@@ -1,7 +1,6 @@
 module MLJ
 
 # defined in include files:
-export @curve, @pcurve                               # "utilities.jl"
 export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
 export misclassification_rate, cross_entropy         # "metrics.jl"
 export default_measure                               # "metrics.jl"
