@@ -21,12 +21,11 @@ A *model* is a container for hyperparameters:
 
 ```julia
 julia> @load DecisionTreeClassifier
-julia> tree_model = DecisionTreeClassifier(target_type=String, max_depth=2)
-
 import MLJModels ✔
 import DecisionTree ✔
 import MLJModels.DecisionTree_.DecisionTreeClassifier ✔
 
+julia> tree_model = DecisionTreeClassifier(target_type=String, max_depth=2)
 DecisionTreeClassifier(target_type = String,
                        pruning_purity = 1.0,
                        max_depth = 2,
@@ -43,7 +42,6 @@ Wrapping the model in data creates a *machine* which will store training outcome
 
 ```julia
 julia> tree = machine(tree_model, X, y)
-
 Machine @ 5…78
 ```
 
@@ -64,7 +62,6 @@ Or, in one line:
 
 ```julia
 julia> evaluate!(tree, resampling=Holdout(fraction_train=0.7, shuffle=true), measure=misclassification_rate)
-
 0.08888888888888889
 ```
 
@@ -73,7 +70,6 @@ Changing a hyperparameter and re-evaluating:
 ```julia
 julia> tree_model.max_depth = 3
 julia> evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true), measure=misclassification_rate)
-
 0.06666666666666667
 ```
 
