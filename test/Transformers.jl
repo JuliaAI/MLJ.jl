@@ -110,9 +110,9 @@ t = OneHotEncoder()
 info(t)
 fitresult, cache, nothing = MLJBase.fit(t, 1, X)
 Xt = transform(t, fitresult, X)
-@test Xt.name__John == [false, true, false, true]
+@test Xt.name__John == float.([false, true, false, true])
 @test Xt.height == X.height
-@test Xt.favourite_number__10 == [false, false, true, false]
+@test Xt.favourite_number__10 == float.([false, false, true, false])
 @test Xt.age == X.age
 @test Tables.schema(Xt).names == (:name__Ben, :name__John, :name__Mary,
                                   :height, :favourite_number__5,

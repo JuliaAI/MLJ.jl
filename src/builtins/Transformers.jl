@@ -584,7 +584,7 @@ function transform(transformer::OneHotEncoder, fitresult, X)
             refs = first.(pairs)
             names = last.(pairs)
             cols_to_add = map(refs) do ref
-                hot(col, ref)
+                float.(hot(col, ref))
             end
             append!(new_cols, cols_to_add)
         else
