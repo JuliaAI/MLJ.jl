@@ -19,7 +19,15 @@ end
 
 (s::Source)(Xnew) = Xnew
 
-get_sources(s::Source) = Set([s])
+sources(s::Source) = Set([s])
+"""
+   sources(N)
+
+Return a list of the sources of the learning network with node `N`. 
+
+See also: node, source
+
+"""
 
 
 ## DEPENDENCY TAPES
@@ -125,8 +133,8 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
             length(args) > 0 || throw(error("`args` in `Node(::Function, args...)` must be non-empty. "))
         end
 
-        sources = union([get_sources(arg) for arg in args]...)
-        length(sources) == 1 || @warn "Node with multiple sources defined."
+        sources_ = union([sources(arg) for arg in args]...)
+        length(sources_) == 1 || @warn "Node with multiple sources defined."
 
         # get the machine's dependencies:
         tape = copy(get_tape(machine))
@@ -141,7 +149,7 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
             merge!(tape, get_tape(arg))
         end
 
-        return new{T}(operation, machine, args, sources, tape)
+        return new{T}(operation, machine, args, sources_, tape)
 
     end
 end
@@ -149,7 +157,7 @@ end
 # ... where
 #get_depth(::Source) = 0
 #get_depth(X::Node) = X.depth
-get_sources(X::Node) = X.sources
+sources(X::Node) = X.sources
 
 function is_stale(X::Node)
     (X.machine != nothing && is_stale(X.machine)) ||
@@ -269,9 +277,55 @@ end
 ## SYNTACTIC SUGAR FOR LEARNING NETWORKS
 
 source(X) = Source(X) # here `X` is data
-# Node(X) = Source(X)   # here `X` is data
-# Node(X::AbstractNode) = X 
+"""
+    Xs = source(X)
+
+Defines a `Source` object out of data `X`. The data can be a vector,
+categorical vector, or table. The calling behaviour of a source node is this:
+
+    Xs() = X
+    Xs(rows=r) = selectrows(X, r)  # eg, X[r,:] for a DataFrame
+    Xs(Xnew) = Xnew
+
+See also: sources, node
+
+"""
+
 node = Node
+"""
+    N = node(f::Function, args...)
+ 
+Defines a `Node` object `N` wrapping a static operation `f` and arguments
+`args`. Each of the `n` element of `args` must be a `Node` or `Source`
+object. The node `N` has the following calling behaviour:
+
+    N() = f(args[1](), args[2](), ..., args[n]())
+    N(rows=r) = f(args[1](rows=r), args[2](rows=r), ..., args[n](rows=r))
+    N(X) = f(args[1](X), args[2](X), ..., args[n](X))
+
+    J = node(f, mach::NodalMachine, args...)
+
+Defines a dynamic `Node` object `J` wrapping a dynamic operation `f`
+(`predict`, `predict_mean`, `transform`, etc), a nodal machine `mach` and
+arguments `args`. Its calling behaviour, which depends on the outcome of
+training `mach` (and, implicitly, on training outcomes affecting its
+arguments) is this:
+
+    J() = f(mach, args[1](), args[2](), ..., args[n]())
+    J(rows=r) = f(mach, args[1](rows=r), args[2](rows=r), ..., args[n](rows=r))
+    J(X) = f(mach, args[1](X), args[2](X), ..., args[n](X))
+
+Generally `n=1` or `n=2` in this latter case. 
+
+Calling a node is a recursive operation which terminates in the call
+to a source node (or nodes). Calling nodes on new data `X` fails unless the
+number of source nodes is unique.  
+
+
+See also: source, sources
+
+"""
+
 
 # unless no arguments are `AbstractNode`s, `machine` creates a
 # NodalTrainablaeModel, rather than a `Machine`:
@@ -299,3 +353,4 @@ import Base.+
 import Base.*
 *(lambda::Real, y::AbstractNode) = node(y->lambda*y, y)
 
+Base.hcat

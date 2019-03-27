@@ -17,7 +17,7 @@ export RidgeRegressor, PCA                           # "builtins/LocalMulitivari
 
 # defined in include files "machines.jl" and "networks.jl":
 export Machine, NodalMachine, machine
-export source, node, fit!, freeze!, thaw!, Node
+export source, node, fit!, freeze!, thaw!, Node, sources
 
 # defined in include file "builtins/Transformers.jl":
 export FeatureSelector
