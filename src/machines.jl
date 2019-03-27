@@ -14,10 +14,11 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
         # checks on args:
         if M <: Supervised
             if  (length(args) == 1 && !(args[1] isa SupervisedTask)) ||
-                (length(args) == 2 && !Tables.istable(args[1])) ||
                 length(args) > 2
                 error("Use machine(model, task) or machine(model, X, y) "*
                       "for a supervised model.")
+            elseif length(args) == 2 && !Tables.istable(args[1])
+                error("The X in machine(model, X, y) should be a table.")
             end
             if length(args) == 2
                 X, y = args

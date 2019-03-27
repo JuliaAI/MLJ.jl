@@ -19,6 +19,7 @@ makedocs(
     modules = [MLJ, MLJBase, MLJModels, MLJ.Transformers],
     pages = Any["Getting Started"=>"getting_started.md",
                 "Scientific Data Types"=>"scientific_data_types.md",
+                "Learning Networks" => "learning_networks.md",
                 "Adding New Models"=> ["Adding New Models"=>"adding_new_models.md",
                                        "The Simplified Model API"=>"the_simplified_model_api.md"],
                 "Internals"=>"internals.md",
