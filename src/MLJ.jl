@@ -1,21 +1,22 @@
 module MLJ
 
 # defined in include files:
-export mav, rms, rmsl, rmslp1, rmsp                  # "metrics.jl"
-export misclassification_rate, cross_entropy         # "metrics.jl"
-export default_measure                               # "metrics.jl"
-export report                                        # "machines.jl"
-export Holdout, CV, evaluate!, Resampler             # "resampling.jl"
-export Params, params, set_params!                   # "parameters.jl"
-export strange, iterator                             # "parameters.jl"
-export Grid, TunedModel, learning_curve!             # "tuning.jl"
-export EnsembleModel                                 # "ensembles.jl"
-export ConstantRegressor, ConstantClassifier         # "builtins/Constant.jl
-export models, localmodels, @load                    # "loading.jl"
-export KNNRegressor                                  # "builtins/KNN.jl"
-export RidgeRegressor, PCA                           # "builtins/LocalMulitivariateStats.jl
+export @curve, @pcurve                               # utilities.jl
+export mav, rms, rmsl, rmslp1, rmsp                  # metrics.jl
+export misclassification_rate, cross_entropy         # metrics.jl
+export default_measure                               # metrics.jl
+export report                                        # machines.jl
+export Holdout, CV, evaluate!, Resampler             # resampling.jl
+export Params, params, set_params!                   # parameters.jl
+export strange, iterator                             # parameters.jl
+export Grid, TunedModel, learning_curve!             # tuning.jl
+export EnsembleModel                                 # ensembles.jl
+export ConstantRegressor, ConstantClassifier         # builtins/Constant.jl
+export models, localmodels, @load                    # loading.jl
+export KNNRegressor                                  # builtins/KNN.jl
+export RidgeRegressor, PCA                           # builtins/LocalMulitivariateStats.jl
 
-# defined in include files "machines.jl" and "networks.jl":
+# defined in include files "machines.jl and "networks.jl":
 export Machine, NodalMachine, machine, AbstractNode
 export source, node, fit!, freeze!, thaw!, Node, sources
 
