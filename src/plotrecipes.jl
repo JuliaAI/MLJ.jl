@@ -21,8 +21,16 @@
         label --> ""
         seriestype := st
         ms = get(plotattributes, :markersize, 4)
-        markersize := 3ms * sqrt.(z)
+        markersize := _getmarkersize(ms, z)
         marker_z --> z
         x, y
     end
+end
+
+function _getmarkersize(ms, z)
+    ret = sqrt.(z)
+    minz, maxz = extrema(x for x in ret if isfinite(x))
+    ret .-= minz
+    ret ./= maxz - minz
+    4ms .* ret .+ 1
 end
