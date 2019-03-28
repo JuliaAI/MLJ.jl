@@ -31,8 +31,9 @@ fit!(tuned_ensemble);
 # data needed for plotting is here:
 tuned_ensemble.report
 
-# uncomment 3 lines to see plots
+# uncomment 4 lines to see plots
 # using Plots
+# pyplot()
 # plot(tuned_ensemble)
 # heatmap(tuned_ensemble)
 

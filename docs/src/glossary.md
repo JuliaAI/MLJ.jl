@@ -97,7 +97,7 @@ machines, as implied by the training arguments, and so on.
 
 ####  node (object of type `Node`)
 
-Essentially a nodal machine wrapped in an assoicated operation
+Essentially a nodal machine wrapped in an associated operation
 (e.g., `predict` or `inverse_transform`). It detail, it consists of:
 
 (1) An operation, static or dynamic.

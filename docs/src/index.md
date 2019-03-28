@@ -1,23 +1,12 @@
-# MLJ.jl
+# API
 
-Documentation for MLJ.jl
-
-```@contents
-```
-
-
-## Functions
-
-```@docs
-@curve(var1, range, code)
-```
+### Functions
 
 ```@autodocs
 Modules = [MLJ,MLJBase,MLJModels]
 ```
 
-
-## Index
+### Index
 
 ```@index
 ```

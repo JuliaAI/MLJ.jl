@@ -19,15 +19,15 @@ end
 
 (s::Source)(Xnew) = Xnew
 
-sources(s::Source) = Set([s])
 """
-   sources(N)
+    sources(N)
 
-Return a list of the sources of the learning network with node `N`. 
+Return a list of all ultimate sources of  a node `N`. 
 
 See also: node, source
 
 """
+sources(s::Source) = Set([s])
 
 
 ## DEPENDENCY TAPES
@@ -276,7 +276,6 @@ end
 
 ## SYNTACTIC SUGAR FOR LEARNING NETWORKS
 
-source(X) = Source(X) # here `X` is data
 """
     Xs = source(X)
 
@@ -290,8 +289,8 @@ categorical vector, or table. The calling behaviour of a source node is this:
 See also: sources, node
 
 """
+source(X) = Source(X) # here `X` is data
 
-node = Node
 """
     N = node(f::Function, args...)
  
@@ -321,11 +320,11 @@ Calling a node is a recursive operation which terminates in the call
 to a source node (or nodes). Calling nodes on new data `X` fails unless the
 number of source nodes is unique.  
 
-
 See also: source, sources
 
 """
-
+#node(args...; kwargs...) = Node(args...; kwargs...)
+node = Node
 
 # unless no arguments are `AbstractNode`s, `machine` creates a
 # NodalTrainablaeModel, rather than a `Machine`:
@@ -340,11 +339,6 @@ Base.exp(v::Vector{<:Number}) = exp.(v)
 Base.log(X::AbstractNode) = node(log, X)
 Base.exp(X::AbstractNode) = node(exp, X)
 
-# maybe don't really need:
-rms(y::AbstractNode, yhat::AbstractNode) = node(rms, y, yhat)
-rms(y, yhat::AbstractNode) = node(rms, y, yhat)
-rms(y::AbstractNode, yhat) = node(rms, y, yhat)
-
 import Base.+
 +(y1::AbstractNode, y2::AbstractNode) = node(+, y1, y2)
 +(y1, y2::AbstractNode) = node(+, y1, y2)
@@ -353,4 +347,3 @@ import Base.+
 import Base.*
 *(lambda::Real, y::AbstractNode) = node(y->lambda*y, y)
 
-Base.hcat

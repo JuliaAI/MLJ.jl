@@ -1,7 +1,7 @@
 module MLJ
 
 # defined in include files:
-export rms, rmsl, rmslp1, rmsp                       # "metrics.jl"
+export mav, rms, rmsl, rmslp1, rmsp                  # "metrics.jl"
 export misclassification_rate, cross_entropy         # "metrics.jl"
 export default_measure                               # "metrics.jl"
 export report                                        # "machines.jl"
@@ -16,7 +16,7 @@ export KNNRegressor                                  # "builtins/KNN.jl"
 export RidgeRegressor, PCA                           # "builtins/LocalMulitivariateStats.jl
 
 # defined in include files "machines.jl" and "networks.jl":
-export Machine, NodalMachine, machine
+export Machine, NodalMachine, machine, AbstractNode
 export source, node, fit!, freeze!, thaw!, Node, sources
 
 # defined in include file "builtins/Transformers.jl":

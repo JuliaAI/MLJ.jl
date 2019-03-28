@@ -21,6 +21,17 @@ default_measure(model::Probabilistic, ::Type{<:Union{Multiclass,FiniteOrderedFac
 ## REGRESSOR METRICS (FOR DETERMINISTIC PREDICTIONS)
 
 
+function mav(yhat::AbstractVector{<:Real}, y)
+    length(y) == length(yhat) || throw(DimensionMismatch())
+    ret = 0.0
+    for i in eachindex(y)
+        dev = y[i] - yhat[i]
+        ret += abs(dev)
+    end
+    return ret/length(y)
+end
+mav(yhat, y) = mav(mean.(yhat), y) 
+
 function rms(yhat::AbstractVector{<:Real}, y)
     length(y) == length(yhat) || throw(DimensionMismatch())
     ret = 0.0
@@ -30,7 +41,7 @@ function rms(yhat::AbstractVector{<:Real}, y)
     end
     return sqrt(ret/length(y))
 end
-rms(yhat, y) = rms(mean.(yhat), y) 
+rms(yhat, y) = rms(mean.(yhat), y)
 
 function rmsl(yhat::AbstractVector{<:Real}, y)
     length(y) == length(yhat) || throw(DimensionMismatch())

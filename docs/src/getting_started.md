@@ -93,7 +93,7 @@ also assumed.
 
 ### Data
 
-While MLJ is data *container* agnostic it is very fussy about
+While MLJ is data *container* agnostic it is ussy about
 *element* types. The MLJ user should acquaint themselves with some
 basic assumptions about the form of data expected by MLJ, as outlined
 below. 

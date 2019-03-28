@@ -11,7 +11,7 @@ plotly()
 
 # load a task (data plus learning objective):
 task = load_boston()
-
+models(task)
 
 ## EVALUATE A SINGLE TREE MODEL
 
@@ -43,7 +43,7 @@ r = range(forest, :n, lower=10, upper=500)
 curves = learning_curve!(mach, nested_range=(n=r,), measure=rms, n=4)
 plot(curves.parameter_values, curves.measurements)
 
-forest.n = 200
+forest.n = 10
 
                      
 ## DEFINE A TUNING GRID
@@ -85,6 +85,7 @@ fitted_params(mach).best_model
 @more
 
 # And plot the performance estimates for the grid search:
+plot(mach)
 heatmap(mach)
 
 
