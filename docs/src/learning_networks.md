@@ -11,7 +11,7 @@ In the future the casual MLJ user will be able to build common
 pipeline architetures, such as linear compositites and stacks, with
 simple macro invocations. Handcrafting a learning network, as outlined
 below, is an advanced MLJ feature, assuming familiarity with the
-basics outlined in [Getting Started](getting_started.md). The syntax
+basics outlined in [Getting Started](index.md). The syntax
 for building a learning network is essentially an extension of the
 basic syntax in which data objects are replaced by nodes ("dynamic
 data").

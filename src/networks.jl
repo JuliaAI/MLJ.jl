@@ -323,7 +323,6 @@ number of source nodes is unique.
 See also: source, sources
 
 """
-#node(args...; kwargs...) = Node(args...; kwargs...)
 node = Node
 
 # unless no arguments are `AbstractNode`s, `machine` creates a

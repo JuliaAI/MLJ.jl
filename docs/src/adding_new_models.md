@@ -15,7 +15,7 @@ models available to all MLJ users, see [Where to place code
 implementing new
 models](#Where-to-place-code-implementing-new-models).
 
-It is assumed the reader has read [Getting Started](getting_started.md).
+It is assumed the reader has read [Getting Started](index.md).
 To implement the API described here, some familiarity with the
 following packages is also helpful:
 
@@ -219,7 +219,7 @@ If it can predict any number of classes, you might instead declare
 target_scitype(SomeSupervisedModelType)=Union{Multiclass, FiniteOrderedFactor}
 ````
 
-See also the table in [Getting Started](getting_started.md).
+See also the table in [Getting Started](index.md).
 
 For multivariate targets, `y` will be a table whose columns have the
 scitypes indicated in the `Tuple` type returned by `target_scitype`;

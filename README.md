@@ -4,7 +4,7 @@ A pure Julia machine learning framework.
 
 [![Build Status](https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master)](https://travis-ci.com/alan-turing-institute/MLJ.jl)
 [![Slack Channel mlj](https://img.shields.io/badge/chat-on%20slack-yellow.svg)](https://slackinvite.julialang.org/)
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://alan-turing-institute.github.io/MLJ.jl/dev/getting_started/)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://alan-turing-institute.github.io/MLJ.jl/dev/)
 
 ![](docs/src/two_model_stack.png)
 
@@ -78,7 +78,7 @@ See [here](docs/src/frequently_asked_questions.md).
 ### Getting started
 
 Get started
-[here](https://alan-turing-institute.github.io/MLJ.jl/dev/getting_started/),
+[here](https://alan-turing-institute.github.io/MLJ.jl/dev/),
 or take the MLJ [tour](docs/src/tour.ipynb).
 
 
