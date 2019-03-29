@@ -24,7 +24,7 @@ MLJ has a basement level *model* interface, which must be implemented
 for each new learning algorithm. Formally, each model is a `mutable
 struct` storing hyperparameters and the implementer defines
 model-dispatched `fit` and `predict` methods; for details, see
-[here](doc/adding_new_models.md). The user interacts through a *task*
+[here](docs/src/adding_new_models.md). The user interacts through a *task*
 interface (work-in-progress) and a *machine* interface using `fit!`
 and `predict` methods, dispatched on machines. A machine wraps a model
 in data and the results of training. The model interface has a
@@ -32,7 +32,7 @@ functional style, the machine interface is more object-oriented.
 
 A generalization of machine, called a *nodal* machine, is the key
 element of *learning networks* which combine several models
-together. See the [tour](doc/tour.ipynb) for more on these.
+together. See the [tour](docs/src/tour.ipynb) for more on these.
 
 The MLJ ecosystem is currently spread across four repostitories:
 

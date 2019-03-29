@@ -337,7 +337,7 @@ The key components of a `NodalMachine` object are:
 
 - A *fit-result*, for storing the outcomes of calls to `fit!`.
 
-- A dependency *tape* (a vector or DAG) containing elements type
+- A dependency *tape* (a vector or DAG) containing elements of type
   `NodalMachine`, obtained by merging the tapes of all training
   arguments.
 
