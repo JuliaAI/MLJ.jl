@@ -13,7 +13,7 @@ simple macro invocations. Handcrafting a learning network, as outlined
 below, is an advanced MLJ feature, assuming familiarity with the
 basics outlined in [Getting Started](index.md). The syntax
 for building a learning network is essentially an extension of the
-basic syntax in which data objects are replaced by nodes ("dynamic
+basic syntax but with data objects replaced with nodes ("dynamic
 data").
 
 In MLJ, a *learning network* is a graph whose nodes apply an
@@ -289,7 +289,6 @@ As a final example, here's how to extend row shuffling to nodes:
 ```julia
 using Random
 Random.shuffle(X::AbstractNode) = node(Y -> MLJ.selectrows(Y, Random.shuffle(1:nrows(Y))), X)
-
 ```
 
 ```@example 1
