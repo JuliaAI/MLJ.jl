@@ -1,42 +1,32 @@
 # Adding New Models
 
-This guide outlines the specification of the MLJ model interface and
-provides guidelines for implementing the interface for models defined
-in external packages. For sample implementations, see
+This guide outlines in detail the specification of the MLJ model interface and
+provides guidelines for implementing the interface for models intended
+for general use. For sample implementations, see
 [MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src).
 
 The machine learning tools provided by MLJ can be applied to the
 models in any package that imports the package
 [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) and
-implements the API defined there, as outlined in detail below. For a
-quick-and-dirty implementation of user-defined models see [The
-Simplified Model API](the_simplified_model_api.md).  To make new
-models available to all MLJ users, see [Where to place code
-implementing new
-models](#Where-to-place-code-implementing-new-models).
+implements the API defined there, as outlined below. For a
+quick-and-dirty implementation of user-defined models see [Simple User
+Defined Models](simple_user_defined_models.md).  To make new models
+available to all MLJ users, see [Where to place code implementing new
+models](@ref).
 
 It is assumed the reader has read [Getting Started](index.md).
 To implement the API described here, some familiarity with the
 following packages is also helpful:
 
 - [Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
-(for probabilistic predictions)
+  (for probabilistic predictions)
 
 - [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl)
-(essential if you are implementing a model handling data of
-`Multiclass` or `FiniteOrderedFactor` scitype)
+  (essential if you are implementing a model handling data of
+  `Multiclass` or `FiniteOrderedFactor` scitype)
 
 - [Tables.jl](https://github.com/JuliaData/Tables.jl) (if you're
-algorithm needs input data in a novel format).
-
-<!-- As a temporary measure, -->
-<!-- the MLJ package also implements the MLJ interface for some -->
-<!-- non-compliant packages, using lazily loaded modules ("glue code") -->
-<!-- residing in -->
-<!-- [src/interfaces](https://github.com/alan-turing-institute/MLJ.jl/tree/master/src/interfaces) -->
-<!-- of the MLJ.jl repository. A checklist for adding models in this latter -->
-<!-- way is given at the end; a template is given here: -->
-<!-- ["src/interfaces/DecisionTree.jl"](https://github.com/alan-turing-institute/MLJ.jl/tree/master/src/interfaces/DecisionTree.jl). -->
+  algorithm needs input data in a novel format).
 
 In MLJ, the basic interface exposed to the user, built atop the model
 interface described here, is the *machine interface*. After a first
@@ -47,8 +37,7 @@ Internals](internals.md) for context.
 ### Overview
 
 A *model* is an object storing hyperparameters associated with some
-machine learning algorithm, where "learning algorithm" is broadly
-interpreted.  In MLJ, hyperparameters include configuration
+machine learning algorithm.  In MLJ, hyperparameters include configuration
 parameters, like the number of threads, and special instructions, such
 as "compute feature rankings", which may or may not affect the final
 learning outcome.  However, the logging level (`verbosity` below) is
@@ -56,7 +45,7 @@ excluded.
 
 The name of the Julia type associated with a model indicates the
 associated algorithm (e.g., `DecisionTreeClassifier`). The outcome of
-training a learning algorithm is here called a *fit-result*. For
+training a learning algorithm is called a *fit-result*. For
 ordinary multilinear regression, for example, this would be the
 coefficients and intercept. For a general supervised model, it is the
 (generally minimal) information needed to make new predictions.
@@ -77,7 +66,7 @@ defined by the built-in MLJ `EnsembleModel` wrapper). There is no abstract
 type for fit-results because these types are generally declared
 outside of MLJBase.
 
-> The necessity to declare the fitresult type `R` may disappear in the future (issue #93).
+> WIP: The necessity to declare the fitresult type `R` may disappear in the future (issue #93).
 
 `Supervised` models are further divided according to whether they are
 able to furnish probabilistic predictions of the target(s) (which they
@@ -89,7 +78,7 @@ abstract type Probabilistic{R} <: Supervised{R} end
 abstract type Deterministic{R} <: Supervised{R} end
 ````
 
-Further division of model types is realized through [trait declarations](#Trait-Declarations).
+Further division of model types is realized through [Trait declarations](@ref).
 
 Associated with every concrete subtype of `Model` there must be a
 `fit` method, which implements the associated algorithm to produce the
@@ -158,7 +147,7 @@ end
 ```
 
 
-### The model API for supervised models
+### Supervised models
 
 Below we describe the compulsory and optional methods to be specified
 for each concrete type `SomeSupervisedModelType{R} <: MLJBase.Supervised{R}`. 
@@ -171,14 +160,12 @@ described below, and the argument `Xnew` of the `predict` method, will
 be some table supporting the
 [Tables.jl](https://github.com/JuliaData/Tables.jl) API. The interface
 implementer can control the scientific type of data appearing in `X`
-with an appropriate `input_scitype` declaration (see [Trait
-Declarations](#Trait-Declarations) below). If the core algorithm
-requires data in a different or more specific form, then `fit` will
-need to coerce the table into the form desired. To this end, MLJ
-provides the convenience method `MLJBase.matrix`;
-`MLJBase.matrix(Xtable)` is a two-dimensional `Array{T}` where `T` is
-the tightest common type of elements of `Xtable`, and `Xtable` is any
-table.
+with an appropriate `input_scitype` declaration (see [Trait declarations](@ref). If the core algorithm requires data in a
+different or more specific form, then `fit` will need to coerce the
+table into the form desired. To this end, MLJ provides the convenience
+method `MLJBase.matrix`; `MLJBase.matrix(Xtable)` has type `Matrix{T}`
+where `T` is the tightest common type of elements of `Xtable`, and
+`Xtable` is any table.
 
 > Tables.jl has recently added a `matrix` method as well.
 
@@ -200,7 +187,7 @@ The form of the target data `y` passed to `fit` is constrained by the
 for univariate targets, `y` is always a `Vector` or
 `CategoricalVector`, according to the value of the trait:
 
-`target_scitype(SomeSupervisedModelType)`  | type of `y`  | tightest known supertype of `eltype(y)`
+`target_scitype(SomeSupervisedModelType)`  | type of `y`  | a supertype of `eltype(y)`
 ------------------------------|---------------------------|--------------------------------------------
 `Continuous`                  | `Vector`                  | `Real`
 `<: Multiclass`               | `CategoricalVector`       | `Union{CategoricalString, CategoricalValue}`
@@ -252,8 +239,8 @@ Note: The `Int` typing of `verbosity` cannot be omitted.
     accessible to MLJ through the `fitted_params` method, see below).
 
 3.	The value of `cache` can be `nothing`, unless one is also defining
-   an `update` method (see below). The Julia type of `cache` is not
-   presently restricted.
+      an `update` method (see below). The Julia type of `cache` is not
+      presently restricted.
 
 It is not necessary for `fit` to provide dimension checks or to call
 `clean!` on the model; MLJ will carry out such checks.

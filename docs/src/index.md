@@ -1,3 +1,6 @@
+[MLJ homepage](https://github.com/alan-turing-institute/MLJ.jl)
+
+
 # Getting Started
 
 ### Basic supervised training and testing
@@ -9,7 +12,9 @@ julia> using RDatasets
 julia> iris = dataset("datasets", "iris"); # a DataFrame
 ```
 
-In MLJ one can either wrap data for supervised learning in a formal *task* (see [Working with Tasks](tasks.jl)), or work directly with the data, split into its input and target parts:
+In MLJ one can either wrap data for supervised learning in a formal
+*task* (see [Working with Tasks](working_with_tasks.md)), or work directly with the
+data, split into its input and target parts:
 
 
 ```julia

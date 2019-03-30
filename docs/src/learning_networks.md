@@ -184,7 +184,7 @@ end
 
 The line marked `###`, where the new exported model's hyperparameter `ridge_model` is spliced into the network, is the only modification.
 
-> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](adding_new_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding machine `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the node returned by `fit` on the data supplied: `MLJ.predict(model::Supervised{Node}, Xnew) = yhat(Xnew)`.
+> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](adding_models_for_general_use.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding machine `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the node returned by `fit` on the data supplied: `MLJ.predict(model::Supervised{Node}, Xnew) = yhat(Xnew)`.
 
 The export process is complete and we can wrap our exported model
 around any data or task we like, and evaluate like any other model:
@@ -341,7 +341,13 @@ The key components of a `NodalMachine` object are:
   `NodalMachine`, obtained by merging the tapes of all training
   arguments.
 
-    
+A nodal machine is trained in the same way as a regular machine with
+one difference: Instead of training the model on the wrapped data
+*indexed* on `rows`, it is trained on the wrapped nodes *called* on
+`rows`, with calling being a recursive operation on nodes within a
+learning network (see below).
+
+
 ### Nodes
 
 The key components of a `Node` are:
@@ -363,4 +369,11 @@ The key components of a `Node` are:
 ```@docs
 node
 ```
+
+```@docs
+fit!(N::Node; rows=nothing, verbosity=1, force=false)
+```
+
+
+
 

@@ -76,7 +76,24 @@ Machine(model::M, args...) where M<:Model = Machine{M}(model, args...)
 # Note: The following method is written to fit `NodalMachine`s
 # defined in networks.jl, in addition to `Machine`s defined above.
 
-function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
+"""
+    fit!(mach::Machine; rows=nothing, verbosity=1)
+
+Train the machine `mach` using the algorithm and hyperparameters
+specified by `mach.model`, using those rows of the wrapped data having
+indices in `rows`.
+
+    fit!(mach::NodalMachine; rows=nothing, verbosity=1)
+
+A nodal machine is trained in the same way as a regular machine with
+one difference: Instead of training the model on the wrapped data
+*indexed* on `rows`, it is trained on the wrapped nodes *called* on
+`rows`, with calling being a recursive operation on nodes within a
+learning network.
+
+"""
+function fit!(mach::AbstractMachine; rows=nothing, verbosity=1,
+force=false)
 
     if mach isa NodalMachine && mach.frozen 
         verbosity < 0 || @warn "$mach not trained as it is frozen."

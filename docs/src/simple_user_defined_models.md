@@ -1,4 +1,4 @@
-# The Simplified Model API
+# Simple User Defined Models
 
 To quickly implement a new supervised model in MLJ, it suffices to:
 
@@ -14,21 +14,24 @@ To quickly implement a new supervised model in MLJ, it suffices to:
   fit-result, to return predictions on new patterns.
   
 In the examples below, the training input `X` of `fit`, and the new
-input `Xnew` passed to `predict`, are tables implementing the
-[Tables.jl](https://github.com/JuliaData/Tables.jl) interface. Each
-training target `y` is a `Vector` for regressors, and a 
-`CategoricalVector` for classifiers. The predicitions returned by
-`predict` have the same form as `y` for deterministic models, but are
-`Vector`s of distibutions for probabilistic models.
+input `Xnew` passed to `predict`, are tables. Each training target `y`
+is a `Vector` or `CategoricalVector`, according to its [scientific
+type](scientific_data_types.md), or a table in the multivariate case. 
 
-For your models to implement an optional `update` method, buy into the
+The predicitions returned by `predict` have the same form as `y` for
+deterministic models, but are `Vector`s of distibutions for
+probabilistic models.
+
+For your models to implement an optional `update` method, to buy into the
 MLJ logging protocol, or report training statistics or other
 model-specific functionality, a `fit` method with a slightly different
 signature and output is required. To enable checks of the scientific
 type of data passed to your model by MLJ's meta-algorithms, one needs
 to implement additional traits. A `clean!` method can be defined to
 check that hyperparameter values are within normal ranges. For details, see
-[Adding New Models](adding_new_models.md).
+[Adding Models for General Use](adding_models_for_general_use.md).
+
+For an unsupervised model, implement `transform` and, optionally, `inverse_transform` using the same signature at `predict below.
 
 
 ### A simple deterministic regressor
@@ -69,8 +72,8 @@ julia> evaluate!(regressor, resampling=CV(), measure=rms) |> mean
 ### A simple probabilistic classifier
 
 The following probabilistic model simply fits a probability
-distribution to a `MultiClass`training target and returns this pdf for
-any new pattern:
+distribution to the `MultiClass` training target (i.e., ignores `X`)
+and returns this pdf for any new pattern:
 
 ````julia
 import MLJBase
@@ -94,4 +97,5 @@ function MLJBase.predict(model::MyClassifier, fitresult, Xnew)
 end
 ````
 
-For more details on `UnivariateNominal`, query `MLJBase.UnivariateNominal`. 
+For more details on the `UnivariateNominal` distribution, query
+`MLJBase.UnivariateNominal`.

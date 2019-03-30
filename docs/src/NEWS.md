@@ -24,7 +24,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   [#81](https://github.com/alan-turing-institute/MLJ.jl/issues/81)
   
 - Substantial update of the core guide [Adding New
-  Models](adding_new_models.md) to reflect above changes and in
+  Models](adding_models_for_general_use.md) to reflect above changes and in
   response to new model implementer queries. Some design "decisions"
   regarding multivariate targets now explict there.
 

@@ -60,9 +60,7 @@ end
     models(; show_dotted=false)
 
 List all models as a dictionary indexed on package name. Models
-available for immediate use (including external models loaded with
-@load and user-defined models) appear in
-`localmodels()=models()["MLJ"]`.
+available for immediate use appear under the key "MLJ". 
 
 By declaring `show_dotted=true` models not in the top-level of the
 current namespace - which require dots to call, such as

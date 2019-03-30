@@ -15,7 +15,7 @@ While new model implementations are a priority at present, help adding
 core functionality to MLJ is also welcome. If you are interested in
 contributing, please read the this rest of this document. A guide to
 implementing the MLJ inteface for new models is
-[here](docs/src/adding_new_models.md).
+[here](docs/src/adding_models_for_general_use.md).
 
 
 ### Brief design overview
@@ -24,7 +24,7 @@ MLJ has a basement level *model* interface, which must be implemented
 for each new learning algorithm. Formally, each model is a `mutable
 struct` storing hyperparameters and the implementer defines
 model-dispatched `fit` and `predict` methods; for details, see
-[here](docs/src/adding_new_models.md). The user interacts through a *task*
+[here](docs/src/adding_models_for_general_use.md). The user interacts through a *task*
 interface (work-in-progress) and a *machine* interface using `fit!`
 and `predict` methods, dispatched on machines. A machine wraps a model
 in data and the results of training. The model interface has a
