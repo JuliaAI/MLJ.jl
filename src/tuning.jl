@@ -17,6 +17,7 @@ mutable struct DeterministicTunedModel{T,M<:Deterministic} <: MLJ.Deterministic{
     measure
     operation
     nested_ranges::NamedTuple
+    minimize::Bool
     full_report::Bool
 end
 
@@ -27,6 +28,7 @@ mutable struct ProbabilisticTunedModel{T,M<:Probabilistic} <: MLJ.Probabilistic{
     measure
     operation
     nested_ranges::NamedTuple
+    minimize::Bool
     full_report::Bool
 end
 
@@ -34,12 +36,44 @@ const EitherTunedModel{T,M} = Union{DeterministicTunedModel{T,M},ProbabilisticTu
 
 MLJBase.is_wrapper(::Type{<:EitherTunedModel}) = true
 
+"""
+    tuned_model = TunedModel(; model=nothing,
+                             tuning=Grid(),
+                             resampling=Holdout(),
+                             measure=nothing,
+                             operation=predict,
+                             nested_ranges=NamedTuple(),
+                             minimize=true,
+                             full_report=true)
+
+Construct a model wrapper for hyperparameter optimization of a
+supervised learner.
+
+Calling `fit!(mach)` on a machine `mach=machine(tuned_model, X, y)`
+will: (i) Instigate a search over the hyperparameter ranges specified
+in `nested_ranges` over all clones of `model` for that model
+optimizing the specified `measure`, according to evaluations carried
+out using the specified `tuning` strategy and `resampling` strategy;
+and (ii) Fit a machine, `mach_optimal = mach.fitresult`, wrapping the
+optimal `model` object in *all* the provided data `X, y`. Calling
+`predict(mach, Xnew)` then returns predictions on `Xnew` of the
+machine `mach_optimal`. 
+
+If `measure` is a score, rather than a loss, specify `minimize=false`.
+
+The optimal clone of `model` is accessible as
+`fitted_params(mach).best_model`. In the case of two-parameter tuning,
+a Plots.jl plot of performance estimates is returned by `plot(mach)`
+or `heatmap(mach)`.
+
+"""
 function TunedModel(;model=nothing,
                     tuning=Grid(),
                     resampling=Holdout(),
                     measure=nothing,
                     operation=predict,
                     nested_ranges=NamedTuple(),
+                    minimize=true,
                     full_report=true)
     
     !isempty(nested_ranges) || error("You need to specify nested_ranges=... ")
@@ -50,10 +84,10 @@ function TunedModel(;model=nothing,
     
     if model isa Deterministic
         return DeterministicTunedModel(model, tuning, resampling,
-                      measure, operation, nested_ranges, full_report)
+                      measure, operation, nested_ranges, minimize, full_report)
     elseif model isa Probabilistic
         return ProbabilisticTunedModel(model, tuning, resampling,
-                      measure, operation, nested_ranges, full_report)
+                      measure, operation, nested_ranges, minimize, full_report)
     end
     error("$model does not appear to be a Supervised model.")
 end
@@ -108,7 +142,10 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
 
     # initialize search for best model:
     best_model = deepcopy(tuned_model.model)
-    best_measurement = Inf
+    best_measurement =
+        tuned_model.minimize ? Inf : -Inf
+    s =
+        tuned_model.minimize ? 1 : -1
 
     # evaluate all the models using specified resampling:
     # TODO: parallelize!
@@ -127,7 +164,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
 
         fit!(resampling_machine, verbosity=verbosity-1)
         e = mean(evaluate(resampling_machine))
-        if e < best_measurement
+        if s*(best_measurement - e) > 0
             best_model = deepcopy(clone)
             best_measurement = e
         end

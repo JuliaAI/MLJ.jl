@@ -45,10 +45,11 @@ MLJBase.show_as_constructed(::Type{<:CV}) = true
     evaluate!(mach, resampling=CV(), measure=nothing, operation=predict, verbosity=1)
 
 Estimate the performance of a machine `mach` using the specified
-`resampling` (defaulting to 6-fold cross-validation) and `measure`,
-which can be a single measure or vector. In general operation is
-mutating (only `mach.args`, the data stored in the machine, is
-preserved).
+`resampling` strategy (defaulting to 6-fold cross-validation) and `measure`,
+which can be a single measure or vector. 
+
+Although evaluate! is mutating, `mach.model` and `mach.args` are
+preserved.
 
 Resampling and testing is based exclusively on data in `rows`, when
 specified.
