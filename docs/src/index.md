@@ -96,19 +96,14 @@ predictors, a basic acquaintance with
 also assumed.
 
 
-### Data
+### Data containers and scientific types
 
-While MLJ is data *container* agnostic it is fussy about
-*element* types. The MLJ user should acquaint themselves with some
+While MLJ is data container agnostic, it is fussy about
+element types. The MLJ user should acquaint themselves with some
 basic assumptions about the form of data expected by MLJ, as outlined
 below. 
 
-> Eventually task constructors will make the coercion of data into the
-> requisite form more automated. The following remarks will be less
-> critical to the casual user. At present, however, task constructors
-> assume data is in the requisite form.
-
-In principle, anywhere a table is expected in MLJ (eg, `X` above) any
+In principle, anywhere a table is expected in MLJ - for example, `X` above - any
 tabular format supporting the
 [Tables.jl](https://github.com/JuliaData/Tables.jl) interface is
 allowed. (At present our API is more restrictive; see this
@@ -123,19 +118,30 @@ A single feature (such as the target `y` above) is expected to be a
 `Vector` or `CategoricalVector`, according to the *scientific type* of
 the data (see below). A multivariate target can be any table.
 
-On the other hand, the *element types* you use to represent your data
+On the other hand, the element types you use to represent your data
 has implicit consequences about how MLJ will interpret that data.
+
+> WIP: Eventually users will use task constructors to coerce element
+> types into the requisite form. At present, the user must do so
+> manually, before passing data to the constructors.
 
 To articulate MLJ's conventions about data representation, MLJ
 distinguishes between *machine* data types on the one hand (`Float64`,
 `Bool`, `String`, etc) and *scientific data types* on the other,
 represented by new Julia types: `Continuous`, `Multiclass{N}`,
 `FiniteOrderedFactor{N}`, and `Count` (unbounded ordered factor), with
-obvious interpretations. These types, which are part of a type
-hierarchy (see [Scientific Data Types](scientific_data_types.md)), are
-used by MLJ for dispatch, but have no corresponding instances.
+obvious interpretations. These types are organized in a type
+hierarchy rooted in a new abstract type `Found`:
 
-Scientific types appear when querying model metadata, as in this example:
+![](scitypes.png)
+
+Note that `Multiclass{2}` has the alias `Binary`.
+
+A *scientific type* is any subtype of
+`Union{Missing,Found}`. Scientific types have no instances.
+
+Scientific types appear when querying model metadata, as in this
+example:
 
 ```julia
 julia> info("DecisionTreeClassifier")[:target_scitype]

@@ -12,7 +12,7 @@ the representation. For example, we might count phone calls using the
 `UInt32` type but also use `UInt32` to represent a categorical
 feature, such as the species of conifers. MLJ mitigates such ambiguity
 by: (i) distinguishing between the machine and *[scientific
-type](scientific_data_types.md)* of scalar data; (ii) disallowing the
+type](index.md)* of scalar data; (ii) disallowing the
 representation of multiple scientific types by the same machine type
 during learning; and (iii) establising a convention for what
 scientific types a given machine type may represent (see the

@@ -160,12 +160,16 @@ described below, and the argument `Xnew` of the `predict` method, will
 be some table supporting the
 [Tables.jl](https://github.com/JuliaData/Tables.jl) API. The interface
 implementer can control the scientific type of data appearing in `X`
-with an appropriate `input_scitype` declaration (see [Trait declarations](@ref). If the core algorithm requires data in a
-different or more specific form, then `fit` will need to coerce the
-table into the form desired. To this end, MLJ provides the convenience
-method `MLJBase.matrix`; `MLJBase.matrix(Xtable)` has type `Matrix{T}`
-where `T` is the tightest common type of elements of `Xtable`, and
-`Xtable` is any table.
+with an appropriate `input_scitype` declaration (see [Trait
+declarations](@ref), as `union_scitypes(X) <:
+input_scitype(SomeSupervisedModel)` will always hold. See [Convenience
+methods](@ref) below for the definition of `union_scitypes`. If the
+core algorithm requires data in a different or more specific form,
+then `fit` will need to coerce the table into the form desired. To
+this end, MLJ provides the convenience method `MLJBase.matrix`;
+`MLJBase.matrix(Xtable)` has type `Matrix{T}` where `T` is the
+tightest common type of elements of `Xtable`, and `Xtable` is any
+table.
 
 > Tables.jl has recently added a `matrix` method as well.
 
@@ -173,7 +177,7 @@ Other convenience methods provided by MLJBase for handling tabular
 data are: `selectrows`, `selectcols`, `select`, `schema` (for
 extracting the size, names and eltypes of a table) and `table` (for
 materializing an abstract matrix, or named tuple of vectors, as a
-table matching a given prototype). Query the doc-strings for details.
+table matching a given prototype). See [Convenience methods](@ref) below for details.
 
 Note that generally the same type coercions applied to `X` by `fit` will need to
 be applied by `predict` to `Xnew`. 
@@ -181,11 +185,8 @@ be applied by `predict` to `Xnew`.
 **Important convention** It is to be understood that the columns of the
 table `X` correspond to features and the rows to patterns.
 
-The form of the target data `y` passed to `fit` is constrained by the
-`target_scitype` trait declaration. All elements of `y` will satisfy
-`scitype(y) <: target_scitype(SomeSupervisedModelType)`. Furthermore,
-for univariate targets, `y` is always a `Vector` or
-`CategoricalVector`, according to the value of the trait:
+For univariate targets, `y` is always a `Vector`
+or `CategoricalVector`, according to the value of the trait:
 
 `target_scitype(SomeSupervisedModelType)`  | type of `y`  | a supertype of `eltype(y)`
 ------------------------------|---------------------------|--------------------------------------------
@@ -193,6 +194,11 @@ for univariate targets, `y` is always a `Vector` or
 `<: Multiclass`               | `CategoricalVector`       | `Union{CategoricalString, CategoricalValue}`
 `<: FiniteOrderedFactor`      | `CategoricalVector`       | `Union{CategoricalString, CategoricalValue}`
 `Count`                       | `Vector`                  | `Integer`
+
+The form of the target data `y` passed to `fit` is constrained by the
+`target_scitype` trait declaration. In the univariate case, all
+elements of `y` will satisfy `union_scitype(y) <:
+target_scitype(SomeSupervisedModelType)`.
 
 So, for example, if your model is a binary classifier, you declare
 
@@ -208,9 +214,10 @@ target_scitype(SomeSupervisedModelType)=Union{Multiclass, FiniteOrderedFactor}
 
 See also the table in [Getting Started](index.md).
 
-For multivariate targets, `y` will be a table whose columns have the
-scitypes indicated in the `Tuple` type returned by `target_scitype`;
-for example, if you declare `target_scitype(SomeSupervisedModelType) = Tuple{Continuous,Count}`,
+For multivariate targets, the elements of `y`, a table, will be
+constrained by `column_scitypes_as_tuple(y) <:
+target_scitype(SomeSupervisedModelType)` For example, if you declare
+`target_scitype(SomeSupervisedModelType) = Tuple{Continuous,Count}`,
 then `y` will have two columns, the first with `Real` elements, the
 second with `Integer` elements.
 
@@ -392,7 +399,7 @@ Note that models predicting multivariate targets will need to need to have
 `target_scitype` return an appropriate `Tuple` type. 
 
 For an explanation of `Found` and `Other` in the table below, see [Scientific
-Types](scientific_data_types.md).
+Types](index.md).
 
 method                   | return type       | declarable return values           | default value
 -------------------------|-------------------|------------------------------------|---------------
@@ -450,6 +457,44 @@ TODO
 
 TODO
 
+
+### Convenience methods
+
+```@docs
+MLJBase.matrix
+```
+
+```@docs
+MLJBase.table
+```
+
+```@docs
+MLJBase.select
+```
+
+```@docs
+MLJBase.selectrows
+```
+
+```@docs
+MLJBase.selectcols
+```
+
+```@docs
+MLJBase.schema
+```
+
+```@docs
+MLJBase.nrows
+```
+
+```@docs
+MLJBase.union_scitypes
+```
+
+```@docs
+MLJBase.column_scitypes_as_tuple
+```
 
 ### Where to place code implementing new models
 

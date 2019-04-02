@@ -16,7 +16,7 @@ To quickly implement a new supervised model in MLJ, it suffices to:
 In the examples below, the training input `X` of `fit`, and the new
 input `Xnew` passed to `predict`, are tables. Each training target `y`
 is a `Vector` or `CategoricalVector`, according to its [scientific
-type](scientific_data_types.md), or a table in the multivariate case. 
+type](index.md), or a table in the multivariate case. 
 
 The predicitions returned by `predict` have the same form as `y` for
 deterministic models, but are `Vector`s of distibutions for
