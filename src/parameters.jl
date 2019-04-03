@@ -143,14 +143,26 @@ MLJ.inverse_transform(::SCALE, f::Function, x) = f(x) # not a typo!
 
 abstract type ParamRange <: MLJType end
 
-struct NominalRange{T} <: ParamRange
+struct NominalRange{field,T} <: ParamRange
     values::Tuple{Vararg{T}}
 end
 
-struct NumericRange{T,D} <: ParamRange
+struct NumericRange{field,T,D} <: ParamRange
     lower::T
     upper::T
     scale::D
+end
+
+function Base.show(stream::IO, object::ParamRange)
+    id = objectid(object)
+    field = typeof(object).parameters[1]
+    description = string(typeof(object).name.name, "{$field}")
+    str = "$description @ $(MLJBase.handle(object))"
+    if !isempty(fieldnames(typeof(object)))
+        printstyled(IOContext(stream, :color=> true), str, bold=true)#color=:blue
+    else
+        print(stream, str)
+    end
 end
 
 """ 
@@ -199,10 +211,10 @@ function Base.range(model::MLJType, field::Symbol; values=nothing,
     if T <: Real
         lower !=nothing && upper != nothing ||
             error("You must specify lower=... and upper=... .")
-        return NumericRange{T,D}(lower, upper, scale)
+        return NumericRange{field,T,D}(lower, upper, scale)
     else
         values !=nothing || error("You must specify values=... .")
-        return NominalRange{T}(Tuple(values))
+        return NominalRange{field,T}(Tuple(values))
     end
 end
 
@@ -216,7 +228,7 @@ possible return values are: `:none` (for a `NominalRange`), `:linear`,
 """
 scale(r::NominalRange) = :none
 scale(r::NumericRange) = :custom
-scale(r::NumericRange{T,Symbol}) where T =
+scale(r::NumericRange{field,T,Symbol}) where {field,T} =
     r.scale
 
 
@@ -224,7 +236,7 @@ scale(r::NumericRange{T,Symbol}) where T =
 
 iterator(param_range::NominalRange) = collect(param_range.values)
 
-function iterator(param_range::NumericRange{<:Real}, n::Int)
+function iterator(param_range::NumericRange{field,T}, n::Int) where {field,T<:Real}
     s = scale(param_range.scale) 
     transformed = range(transform(Scale, s, param_range.lower),
                 stop=transform(Scale, s, param_range.upper),
@@ -236,7 +248,7 @@ function iterator(param_range::NumericRange{<:Real}, n::Int)
 end
 
 # in special case of integers, round to nearest integer:
-function iterator(param_range::NumericRange{I}, n::Int) where I<:Integer
+function iterator(param_range::NumericRange{field, I}, n::Int) where {field,I<:Integer}
     s = scale(param_range.scale) 
     transformed = range(transform(Scale, s, param_range.lower),
                 stop=transform(Scale, s, param_range.upper),
