@@ -50,14 +50,14 @@ Construct a model wrapper for hyperparameter optimization of a
 supervised learner.
 
 Calling `fit!(mach)` on a machine `mach=machine(tuned_model, X, y)`
-will: (i) Instigate a search over the hyperparameter ranges specified
-in `nested_ranges` over all clones of `model` for that model
+will: (i) Instigate a search, over clones of `model` with the
+hyperparameter mutations specified by `nested_ranges`, for that model
 optimizing the specified `measure`, according to evaluations carried
 out using the specified `tuning` strategy and `resampling` strategy;
 and (ii) Fit a machine, `mach_optimal = mach.fitresult`, wrapping the
 optimal `model` object in *all* the provided data `X, y`. Calling
 `predict(mach, Xnew)` then returns predictions on `Xnew` of the
-machine `mach_optimal`. 
+machine `mach_optimal`.
 
 If `measure` is a score, rather than a loss, specify `minimize=false`.
 
