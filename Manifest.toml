@@ -138,8 +138,8 @@ uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 version = "0.1.0"
 
 [[MLJModels]]
-deps = ["CategoricalArrays", "Distances", "Distributions", "LinearAlgebra", "MLJBase", "Random", "Requires", "TOML", "XGBoost"]
-git-tree-sha1 = "e68c451f604647dc6d293cfab23550a720631f26"
+deps = ["CategoricalArrays", "Distances", "Distributions", "LinearAlgebra", "MLJBase", "Random", "Requires", "TOML"]
+git-tree-sha1 = "6cd019ba3643b08c3f9c3d7fe493170302f55ba8"
 repo-rev = "master"
 repo-url = "https://github.com/alan-turing-institute/MLJModels.jl"
 uuid = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
@@ -353,9 +353,3 @@ deps = ["Missings", "Random", "Test"]
 git-tree-sha1 = "960639a12ffd223ee463e93392aeb260fa325566"
 uuid = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
 version = "0.5.8"
-
-[[XGBoost]]
-deps = ["BinDeps", "Libdl", "Printf", "Random", "SparseArrays", "Statistics", "Test"]
-path = "/Users/anthony/.julia/dev/XGBoost"
-uuid = "009559a3-9522-5dbb-924b-0b6ed2b22bb9"
-version = "0.2.0+"
