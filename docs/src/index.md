@@ -22,7 +22,9 @@ julia> const X = iris[:, 1:4];
 julia> const y = iris[:, 5];
 ```
 
-A *model* is a container for hyperparameters:
+A *model* is a container for hyperparameters. Assuming the
+DecisionTree package is in your installation load path, we can
+instantiate a DecisionTreeClassifier model like this:
 
 ```julia
 julia> @load DecisionTreeClassifier

@@ -139,7 +139,7 @@ version = "0.1.0"
 
 [[MLJModels]]
 deps = ["CategoricalArrays", "Distances", "Distributions", "LinearAlgebra", "MLJBase", "Random", "Requires", "TOML"]
-git-tree-sha1 = "6cd019ba3643b08c3f9c3d7fe493170302f55ba8"
+git-tree-sha1 = "8045d10f57e08797a328cf830884a186c65d347c"
 repo-rev = "master"
 repo-url = "https://github.com/alan-turing-institute/MLJModels.jl"
 uuid = "d491faf4-2d78-11e9-2867-c94bc002c0b7"

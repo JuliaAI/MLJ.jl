@@ -461,6 +461,10 @@ TODO
 ### Convenience methods
 
 ```@docs
+MLJBase.CategoricalDecoder
+```
+
+```@docs
 MLJBase.matrix
 ```
 
