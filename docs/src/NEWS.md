@@ -5,6 +5,14 @@ Development news for MLJ and its satellite packages,
 [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl)
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
+
+
+### unversioned commits 8 April 2019 (some time after 20:00 GMT)
+
+- Addition of XGBoost models XGBoostRegressor, XGBoostClassifier and XGBoostCount. Resolves [#65](https://github.com/alan-turing-institute/MLJ.jl/issues/65).
+
+- Documentation reorganized as [GitHub pages](https://alan-turing-institute.github.io/MLJ.jl/dev/). Includes some additions but still a work in progress.
+
 ### unversioned commits 1 March 2019 (some time after 03:50 GMT)
 
 - Addition of "scientific type" hierarchy, including `Continuous`,
