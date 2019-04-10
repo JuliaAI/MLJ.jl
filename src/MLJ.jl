@@ -29,11 +29,11 @@ export OneHotEncoder
 # export IntegerToInt64Transformer
 # export UnivariateDiscretizer, Discretizer
 
-# rexport from Statistics, Distributions:
-export pdf, mode, median, mean, info
+# rexport from Random, Statistics, Distributions:
+export pdf, mode, median, mean, shuffle!
 
 # reexport from MLJBase:
-export nrows, nfeatures
+export nrows, nfeatures, info
 export SupervisedTask, UnsupervisedTask, MLJTask
 export Deterministic, Probabilistic, Unsupervised, Supervised
 export Found, Continuous, Discrete, OrderedFactor    
@@ -68,6 +68,7 @@ import Tables
 
 # to be extended:
 import Base.==
+import StatsBase.fit!
 
 # from Standard Library:
 using Statistics
@@ -88,6 +89,7 @@ include("resampling.jl")    # evaluating models by assorted resampling strategie
 include("parameters.jl")    # hyper-parameter range constructors and nested hyper-parameter API
 include("tuning.jl")
 include("ensembles.jl")     # homogeneous ensembles
+include("tasks.jl")         # enhancements to task interface defined in MLJBase
 
 
 ## LOAD BUILT-IN MODELS

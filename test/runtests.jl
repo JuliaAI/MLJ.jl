@@ -64,6 +64,11 @@ end
   @test include("LocalMultivariateStats.jl")
 end
 
+@testset "tasks" begin
+  @test include("tasks.jl")
+end
+
+
 ## TEST THE EXAMPLES
 
 const exdir = joinpath(MLJ.srcdir, "..", "examples")

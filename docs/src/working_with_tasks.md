@@ -1,8 +1,8 @@
 # Working with Tasks
 
 In MLJ a *task* is a synthesis of three elements: *data*, an
-*interpretation* of data, and a *learning objective*. Once one has a
-task - no more and no less - one is ready to choose a learning model.
+*interpretation* of that data, and a *learning objective*. Once one has a
+task one is ready to choose learning models.
 
 ### Scientific types and the interpretation of data
 
@@ -35,17 +35,21 @@ part of the data is relevant and what role is each part to play.
 
 ### Sample usage
 
+Load a built-in task:
+
 ```@example 1
-# load a built-in task:
 using MLJ
 task = load_iris()
 ```
 
+Extract input and target:
+
 ```@example 1 
-# deconstruct:
 X, y = task()
 X[1:3, :]
 ```
+
+Constructing a task from data:
 
 ```@example 1
 # reconstruct:
@@ -55,9 +59,32 @@ task = SupervisedTask(data=df, target=:species, is_probabilistic=true)
 show(task, 1)
 ```
 
+List models matching a task:
+
 ```@example 1
 models(task)
 ```
+
+Row selection for a task:
+
+```@example 1
+nrows(task)
+```
+
+```@example 1
+task[1:2].y
+```
+
+Shuffle the rows of a task:
+
+```@example 1
+using Random
+rng = MersenneTwister(1234)
+shuffle!(rng, task) # rng is optional
+task[1:2].y
+```
+
+Binding a model to a task and evalutating performance:
 
 ```@example 1
 @load DecisionTreeClassifier
@@ -66,7 +93,7 @@ evaluate!(mach, operation=predict_mode, resampling=Holdout(), measure=misclassif
 ```
 
 
-### API    
+### API Reference   
 
 ```@docs
 UnsupervisedTask

@@ -279,7 +279,7 @@ plot(curves.parameter_values, curves.measurements, xlab=curves.parameter_name)
 function learning_curve!(mach::Machine{<:Supervised};
                         resolution=30,
                         resampling=Holdout(),
-                        measure=rms, operation=predict, nested_range=nothing, verbosity=0, n=1)
+                        measure=rms, operation=predict, nested_range=nothing, verbosity=1, n=1)
 
     nested_range != nothing || error("No param range specified. Use nested_range=... ")
 
