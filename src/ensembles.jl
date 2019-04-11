@@ -138,7 +138,7 @@ mutable struct DeterministicEnsembleModel{R,Atom<:Deterministic{R}} <: Determini
     rng_seed::Int
     n::Int
     parallel::Bool
-    out_of_bag_measures
+    out_of_bag_measure # TODO: type this
 end
 
 function clean!(model::DeterministicEnsembleModel{R}) where R
@@ -166,15 +166,15 @@ end
 
 # constructor to infer type automatically:
 DeterministicEnsembleModel(atom::Atom, weights,
-                           bagging_fraction, rng_seed, n, parallel, out_of_bag_measures) where {R, Atom<:Deterministic{R}} =
+                           bagging_fraction, rng_seed, n, parallel, out_of_bag_measure) where {R, Atom<:Deterministic{R}} =
                                DeterministicEnsembleModel{R, Atom}(atom, weights,
-                                                                   bagging_fraction, rng_seed, n, parallel, out_of_bag_measures)
+                                                                   bagging_fraction, rng_seed, n, parallel, out_of_bag_measure)
 
 # lazy keyword constructors:
 function DeterministicEnsembleModel(;atom=DeterministicConstantClassifier(), weights=Float64[],
-    bagging_fraction=0.8, rng_seed::Int=0, n::Int=100, parallel=true, out_of_bag_measures=[])
+    bagging_fraction=0.8, rng_seed::Int=0, n::Int=100, parallel=true, out_of_bag_measure=[])
 
-    model = DeterministicEnsembleModel(atom, weights, bagging_fraction, rng_seed, n, parallel, out_of_bag_measures)
+    model = DeterministicEnsembleModel(atom, weights, bagging_fraction, rng_seed, n, parallel, out_of_bag_measure)
 
     message = clean!(model)
     isempty(message) || @warn message
@@ -192,7 +192,7 @@ mutable struct ProbabilisticEnsembleModel{R,Atom<:Probabilistic{R}} <: Probabili
     rng_seed::Int
     n::Int
     parallel::Bool
-    out_of_bag_measures
+    out_of_bag_measure
 end
 
 function clean!(model::ProbabilisticEnsembleModel{R}) where R
@@ -218,14 +218,14 @@ function clean!(model::ProbabilisticEnsembleModel{R}) where R
 end
 
 # constructor to infer type automatically:
-ProbabilisticEnsembleModel(atom::Atom, weights, bagging_fraction, rng_seed, n, parallel, out_of_bag_measures) where {R, Atom<:Probabilistic{R}} =
-                               ProbabilisticEnsembleModel{R, Atom}(atom, weights, bagging_fraction, rng_seed, n, parallel, out_of_bag_measures)
+ProbabilisticEnsembleModel(atom::Atom, weights, bagging_fraction, rng_seed, n, parallel, out_of_bag_measure) where {R, Atom<:Probabilistic{R}} =
+                               ProbabilisticEnsembleModel{R, Atom}(atom, weights, bagging_fraction, rng_seed, n, parallel, out_of_bag_measure)
 
 # lazy keyword constructor:
 function ProbabilisticEnsembleModel(;atom=ConstantProbabilisticClassifier(), weights=Float64[],
-    bagging_fraction=0.8, rng_seed::Int=0, n::Int=100, parallel=true, out_of_bag_measures=[])
+    bagging_fraction=0.8, rng_seed::Int=0, n::Int=100, parallel=true, out_of_bag_measure=[])
 
-    model = ProbabilisticEnsembleModel(atom, weights, bagging_fraction, rng_seed, n, parallel,out_of_bag_measures)
+    model = ProbabilisticEnsembleModel(atom, weights, bagging_fraction, rng_seed, n, parallel,out_of_bag_measure)
 
     message = clean!(model)
     isempty(message) || @warn message
@@ -285,7 +285,13 @@ MLJBase.is_wrapper(::Type{<:EitherEnsembleModel}) = true
 function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) where {R,Atom<:Supervised{R}}
 
     parallel = model.parallel
-    out_of_bag_measures= model.out_of_bag_measures
+
+    if model.out_of_bag_measure isa Vector
+        out_of_bag_measure = model.out_of_bag_measure
+    else
+        out_of_bag_measure = [model.out_of_bag_measure,]
+    end
+        
     if model.rng_seed == 0
         seed = round(Int,time()*1000000)
     else
@@ -302,7 +308,7 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) wher
                               barglyphs=BarGlyphs("[=> ]"), barlen=50, color=:yellow)
 
     if !parallel || nworkers() == 1 # build in serial
-        @show ensemble, ensemble_inds = get_ensemble(atom, verbosity, X, ys,
+        ensemble, ensemble_inds = get_ensemble(atom, verbosity, X, ys,
                                 n, n_patterns, n_train, rng, progress_meter)
     else # build in parallel
         if verbosity > 0
@@ -322,29 +328,29 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) wher
     report = NamedTuple()
 
 
-    if length(out_of_bag_measures)>0
+    if !isempty(out_of_bag_measure)
 
-        metrics=zeros(length(ensemble),length(out_of_bag_measures))
+        metrics=zeros(length(ensemble),length(out_of_bag_measure))
         for i= 1:length(ensemble)
             #oob indices
             ooB_inds=  setdiff([1:length(ys[1]);],ensemble_inds[i])
             if length(ooB_inds)==0
-                error("There is no out of bag data index - #data might be too small or bagging_fraction too close to 1.0")
+                error("There is no out of bag data index - #data might be too small or bagging_fraction too close to 1.0. ")
             end
             predictions = predict(atom, ensemble[i], selectrows(X,ooB_inds))
 
-            for k=1:length(out_of_bag_measures)
-                metrics[i,k] = out_of_bag_measures[k](predictions,vec(ys[1][ooB_inds]))
+            for k in eachindex(out_of_bag_measure)
+                metrics[i,k] = out_of_bag_measure[k](predictions,vec(ys[1][ooB_inds]))
             end
 
         end
-        metrics=mean(metrics,dims=1)
+        metrics=mean(metrics, dims=1)
         # else TODO
         #     @show hcat([metrics[k,:]*model.weights[k] for k=1:length(ensemble)]...)
         #     metrics=mean(hcat([metrics[k,:]*model.weights[k] for k=1:length(ensemble)]...),dims=1)
         # end
 
-        names = Symbol.(string.(out_of_bag_measures))
+        names = Symbol.(string.(out_of_bag_measure))
         oob_estimates=NamedTuple{Tuple(names)}(Tuple(vec(metrics)))
         report=(oob_estimates=oob_estimates,)
 

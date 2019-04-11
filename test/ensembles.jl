@@ -68,7 +68,7 @@ weights = rand(10)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
-# @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
+@test MLJBase.target_scitype(ensemble_model) == MLJBase.target_scitype(atom)
 
 # target is :deterministic :continuous false:
 atom = MLJ.DeterministicConstantRegressor(target_type=Float64)
@@ -98,11 +98,15 @@ X = MLJ.table(randn(10,3))
 y = randn(10)
 train, test = partition(1:length(y), 0.8);
 ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom,rng_seed=rng_seed )
-ensemble_model.out_of_bag_measures = [MLJ.rms,MLJ.rmsp]
+ensemble_model.out_of_bag_measure = [MLJ.rms,MLJ.rmsp]
 ensemble_model.n = 2
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 @test report[:oob_estimates][1] ≈ 1.083490899041915
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
+ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom,rng_seed=rng_seed )
+ensemble_model.out_of_bag_measure = MLJ.rms
+ensemble_model.n = 2
+fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 
 # target is :probabilistic :multiclass false:
 atom = ConstantClassifier(target_type=Char)
