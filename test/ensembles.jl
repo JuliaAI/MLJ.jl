@@ -1,5 +1,10 @@
 module TestEnsembles
 
+
+# uncomment two lines for testing parallelized ensembling
+# using Distributed
+# addprocs(2)
+
 # using Revise
 using Test
 using Random

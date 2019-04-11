@@ -112,14 +112,14 @@ function get_ensemble(atom::Supervised{R}, verbosity, X, y, n, n_patterns,
                       n_train, rng, progress_meter) where R
 
     ensemble = Vector{R}(undef, n)
-    ensemble_inds=[]
+    ensemble_inds = Vector{Vector{Int}}(undef, n)
     for i in 1:n
         verbosity < 1 || next!(progress_meter)
         train_rows = StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
-        push!(ensemble_inds,train_rows)
+        ensemble_inds[i] = train_rows
         atom_fitresult, atom_cache, atom_report =
             fit(atom, verbosity - 1, selectrows(X, train_rows), selectrows(y, train_rows))
-   ensemble[i] = atom_fitresult
+        ensemble[i] = atom_fitresult
     end
     verbosity < 1 || println()
 
@@ -127,6 +127,8 @@ function get_ensemble(atom::Supervised{R}, verbosity, X, y, n, n_patterns,
 
 end
 
+pair_vcat(p, q) = (vcat(p[1], q[1]), vcat(p[2], q[2]))
+    
 
 ## ENSEMBLE MODEL FOR DETERMINISTIC MODELS
 
@@ -315,11 +317,13 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, y) where {R
         end
         chunk_size = div(n, nworkers())
         left_over = mod(n, nworkers())
-        ensemble =  @distributed (vcat) for i = 1:nworkers()
+        ensemble, ensemble_inds =  @distributed (pair_vcat) for i = 1:nworkers()
             if i != nworkers()
-                get_ensemble(atom, 0, X, y, chunk_size, n_patterns, n_train, rng, progress_meter)
+                get_ensemble(atom, 0, X, y, chunk_size, n_patterns, n_train,
+                             rng, progress_meter)
             else
-                get_ensemble(atom, 0, X, y, chunk_size + left_over, n_patterns, n_train, rng, progress_meter)
+                get_ensemble(atom, 0, X, y, chunk_size + left_over, n_patterns, n_train,
+                             rng, progress_meter)
             end
         end
     end
@@ -333,8 +337,10 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, y) where {R
         for i= 1:length(ensemble)
             #oob indices
             ooB_inds=  setdiff(1:n_patterns, ensemble_inds[i])
-            if length(ooB_inds)==0
-                error("There is no out of bag data index - #data might be too small or bagging_fraction too close to 1.0. ")
+            if isempty(ooB_inds)
+                error("Empty out-of-bag sample. "*
+                      "Data size too small or "*
+                      "bagging_fraction too close to 1.0. ")
             end
             predictions = predict(atom, ensemble[i], selectrows(X,ooB_inds))
 
@@ -344,6 +350,7 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, y) where {R
 
         end
         metrics=mean(metrics, dims=1)
+
         # else TODO
         #     @show hcat([metrics[k,:]*model.weights[k] for k=1:length(ensemble)]...)
         #     metrics=mean(hcat([metrics[k,:]*model.weights[k] for k=1:length(ensemble)]...),dims=1)
