@@ -131,15 +131,15 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MLJBase]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "Distributions", "InteractiveUtils", "Random", "SparseArrays", "Statistics", "StatsBase", "Tables"]
-git-tree-sha1 = "63d629c7676a531a45e5fa1c515630aa2f56ed79"
+git-tree-sha1 = "63dc804b8777bc1748aca7de94ce1227fa18be01"
 repo-rev = "master"
 repo-url = "https://github.com/alan-turing-institute/MLJBase.jl"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 version = "0.1.0"
 
 [[MLJModels]]
-deps = ["CategoricalArrays", "Distances", "Distributions", "LinearAlgebra", "MLJBase", "Random", "Requires", "TOML"]
-git-tree-sha1 = "91fde5df91dcb843b1a481a8af2cb6acab84a0a0"
+deps = ["CategoricalArrays", "Distances", "Distributions", "LinearAlgebra", "MLJBase", "Pkg", "Random", "Requires"]
+git-tree-sha1 = "c76f6b90f433fe6f198cc921c5a4eefdcd43905e"
 repo-rev = "master"
 repo-url = "https://github.com/alan-turing-institute/MLJModels.jl"
 uuid = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
@@ -304,14 +304,6 @@ version = "0.8.0"
 [[SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "SparseArrays"]
 uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
-
-[[TOML]]
-deps = ["Dates"]
-git-tree-sha1 = "70c12a7129b147aa9e43325c86f32f7fbb88245a"
-repo-rev = "master"
-repo-url = "https://github.com/wildart/TOML.jl"
-uuid = "191fdcea-f9f2-43e0-b922-d33f71e2abc3"
-version = "0.4.0"
 
 [[TableTraits]]
 deps = ["IteratorInterfaceExtensions", "Test"]

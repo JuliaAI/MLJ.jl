@@ -57,7 +57,7 @@ import MLJBase: transform, inverse_transform, se, evaluate, fitted_params
 import MLJBase: show_as_constructed, params
 
 using RemoteFiles
-import TOML
+import Pkg.TOML
 import Requires.@require  # lazy code loading package
 using  CategoricalArrays
 import Distributions: pdf, mode
