@@ -108,7 +108,7 @@ end
 
 ## CORE ENSEMBLE-BUILDING FUNCTION
 
-function get_ensemble(atom::Supervised{R}, verbosity, X, ys, n, n_patterns,
+function get_ensemble(atom::Supervised{R}, verbosity, X, y, n, n_patterns,
                       n_train, rng, progress_meter) where R
 
     ensemble = Vector{R}(undef, n)
@@ -118,8 +118,7 @@ function get_ensemble(atom::Supervised{R}, verbosity, X, ys, n, n_patterns,
         train_rows = StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
         push!(ensemble_inds,train_rows)
         atom_fitresult, atom_cache, atom_report =
-            fit(atom, verbosity - 1, MLJBase.selectrows(X, train_rows),
-            [y[train_rows] for y in ys]...)
+            fit(atom, verbosity - 1, selectrows(X, train_rows), selectrows(y, train_rows))
    ensemble[i] = atom_fitresult
     end
     verbosity < 1 || println()
@@ -282,7 +281,7 @@ const EitherEnsembleModel{R,Atom} = Union{DeterministicEnsembleModel{R,Atom}, Pr
 
 MLJBase.is_wrapper(::Type{<:EitherEnsembleModel}) = true
 
-function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) where {R,Atom<:Supervised{R}}
+function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, y) where {R,Atom<:Supervised{R}}
 
     parallel = model.parallel
 
@@ -301,14 +300,14 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) wher
 
     atom = model.atom
     n = model.n
-    n_patterns = length(ys[1])
+    n_patterns = nrows(X)
     n_train = round(Int, floor(model.bagging_fraction*n_patterns))
 
     progress_meter = Progress(n, dt=0.5, desc="Training ensemble: ",
                               barglyphs=BarGlyphs("[=> ]"), barlen=50, color=:yellow)
 
     if !parallel || nworkers() == 1 # build in serial
-        ensemble, ensemble_inds = get_ensemble(atom, verbosity, X, ys,
+        ensemble, ensemble_inds = get_ensemble(atom, verbosity, X, y,
                                 n, n_patterns, n_train, rng, progress_meter)
     else # build in parallel
         if verbosity > 0
@@ -318,9 +317,9 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) wher
         left_over = mod(n, nworkers())
         ensemble =  @distributed (vcat) for i = 1:nworkers()
             if i != nworkers()
-                get_ensemble(atom, 0, X, ys, chunk_size, n_patterns, n_train, rng, progress_meter)
+                get_ensemble(atom, 0, X, y, chunk_size, n_patterns, n_train, rng, progress_meter)
             else
-                get_ensemble(atom, 0, X, ys, chunk_size + left_over, n_patterns, n_train, rng, progress_meter)
+                get_ensemble(atom, 0, X, y, chunk_size + left_over, n_patterns, n_train, rng, progress_meter)
             end
         end
     end
@@ -333,14 +332,14 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, ys...) wher
         metrics=zeros(length(ensemble),length(out_of_bag_measure))
         for i= 1:length(ensemble)
             #oob indices
-            ooB_inds=  setdiff([1:length(ys[1]);],ensemble_inds[i])
+            ooB_inds=  setdiff(1:n_patterns, ensemble_inds[i])
             if length(ooB_inds)==0
                 error("There is no out of bag data index - #data might be too small or bagging_fraction too close to 1.0. ")
             end
             predictions = predict(atom, ensemble[i], selectrows(X,ooB_inds))
 
             for k in eachindex(out_of_bag_measure)
-                metrics[i,k] = out_of_bag_measure[k](predictions,vec(ys[1][ooB_inds]))
+                metrics[i,k] = out_of_bag_measure[k](predictions,selectrows(y, ooB_inds))
             end
 
         end
