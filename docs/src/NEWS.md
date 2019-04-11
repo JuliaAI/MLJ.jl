@@ -6,6 +6,11 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+### unversioned commits 11 April 2019 (before noon, GMT)
+
+- Removed dependency on unregistered package TOML.jl (using, Pkg.TOML
+  instead). Resolves
+  [#113](https://github.com/alan-turing-institute/MLJ.jl/issues/113)
 
 ### unversioned commits 8 April 2019 (some time after 20:00 GMT)
 
