@@ -6,6 +6,13 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+### unversioned commits 12 April 2019 (around 00:10, GMT)
+
+- Added out-of-bag estimates for performance in homogeneous
+  ensembles. Resolves:
+  [#77](https://github.com/alan-turing-institute/MLJ.jl/issues/77)
+
+
 ### unversioned commits 11 April 2019 (before noon, GMT)
 
 - Removed dependency on unregistered package TOML.jl (using, Pkg.TOML
