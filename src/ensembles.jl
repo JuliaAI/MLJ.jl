@@ -1,3 +1,8 @@
+# shorter display of MersenneTwister:
+Base.show(stream::IO, t::Random.MersenneTwister) =
+    print(stream, "MersenneTwister($(t.seed))")
+
+
 ## WEIGHTED ENSEMBLES OF FITRESULTS
 
 # R is atomic fitresult type
@@ -136,7 +141,7 @@ mutable struct DeterministicEnsembleModel{R,Atom<:Deterministic{R}} <: Determini
     atom::Atom
     weights::Vector{Float64}
     bagging_fraction::Float64
-    rng_seed::Int
+    rng::Union{Int,AbstractRNG}
     n::Int
     parallel::Bool
     out_of_bag_measure # TODO: type this
@@ -167,15 +172,21 @@ end
 
 # constructor to infer type automatically:
 DeterministicEnsembleModel(atom::Atom, weights,
-                           bagging_fraction, rng_seed, n, parallel, out_of_bag_measure) where {R, Atom<:Deterministic{R}} =
+                           bagging_fraction, rng, n, parallel, out_of_bag_measure) where {R, Atom<:Deterministic{R}} =
                                DeterministicEnsembleModel{R, Atom}(atom, weights,
-                                                                   bagging_fraction, rng_seed, n, parallel, out_of_bag_measure)
+                                                                   bagging_fraction, rng, n, parallel, out_of_bag_measure)
 
 # lazy keyword constructors:
-function DeterministicEnsembleModel(;atom=DeterministicConstantClassifier(), weights=Float64[],
-    bagging_fraction=0.8, rng_seed::Int=0, n::Int=100, parallel=true, out_of_bag_measure=[])
+function DeterministicEnsembleModel(;atom=DeterministicConstantClassifier(),
+                                    weights=Float64[],
+                                    bagging_fraction=0.8,
+                                    rng=Random.GLOBAL_RNG,
+                                    n::Int=100,
+                                    parallel=true,
+                                    out_of_bag_measure=[])
 
-    model = DeterministicEnsembleModel(atom, weights, bagging_fraction, rng_seed, n, parallel, out_of_bag_measure)
+    model = DeterministicEnsembleModel(atom, weights, bagging_fraction, rng,
+                                       n, parallel, out_of_bag_measure)
 
     message = clean!(model)
     isempty(message) || @warn message
@@ -190,7 +201,7 @@ mutable struct ProbabilisticEnsembleModel{R,Atom<:Probabilistic{R}} <: Probabili
     atom::Atom
     weights::Vector{Float64}
     bagging_fraction::Float64
-    rng_seed::Int
+    rng::Union{Int, AbstractRNG}
     n::Int
     parallel::Bool
     out_of_bag_measure
@@ -219,14 +230,19 @@ function clean!(model::ProbabilisticEnsembleModel{R}) where R
 end
 
 # constructor to infer type automatically:
-ProbabilisticEnsembleModel(atom::Atom, weights, bagging_fraction, rng_seed, n, parallel, out_of_bag_measure) where {R, Atom<:Probabilistic{R}} =
-                               ProbabilisticEnsembleModel{R, Atom}(atom, weights, bagging_fraction, rng_seed, n, parallel, out_of_bag_measure)
+ProbabilisticEnsembleModel(atom::Atom, weights, bagging_fraction, rng, n, parallel, out_of_bag_measure) where {R, Atom<:Probabilistic{R}} =
+                               ProbabilisticEnsembleModel{R, Atom}(atom, weights, bagging_fraction, rng, n, parallel, out_of_bag_measure)
 
 # lazy keyword constructor:
-function ProbabilisticEnsembleModel(;atom=ConstantProbabilisticClassifier(), weights=Float64[],
-    bagging_fraction=0.8, rng_seed::Int=0, n::Int=100, parallel=true, out_of_bag_measure=[])
+function ProbabilisticEnsembleModel(;atom=ConstantProbabilisticClassifier(),
+                                    weights=Float64[],
+                                    bagging_fraction=0.8,
+                                    rng=Random.GLOBAL_RNG,
+                                    n::Int=100,
+                                    parallel=true,
+                                    out_of_bag_measure=[])
 
-    model = ProbabilisticEnsembleModel(atom, weights, bagging_fraction, rng_seed, n, parallel,out_of_bag_measure)
+    model = ProbabilisticEnsembleModel(atom, weights, bagging_fraction, rng, n, parallel,out_of_bag_measure)
 
     message = clean!(model)
     isempty(message) || @warn message
@@ -238,7 +254,7 @@ end
 ## COMMON CONSTRUCTOR
 
 """
-    EnsembleModel(atom=nothing, weights=Float64[], bagging_fraction=0.8, rng_seed=0, n=100, parallel=true)
+    EnsembleModel(atom=nothing, weights=Float64[], bagging_fraction=0.8, rng=GLOBAL_RNG, n=100, parallel=true, out_of_bag_measure=[])
 
 Create a model for training an ensemble of `n` learners, with optional
 bagging, each with associated model `atom`. Ensembling is useful if
@@ -247,6 +263,10 @@ repeated calls (ie, is a stochastic model, such as a decision tree
 with randomized node selection criteria), or if `bagging_fraction` is
 set to a value less than 1.0, or both. The constructor fails if no
 `atom` is specified.
+
+If `rng` is an integer, then `MersenneTwister(rng)` is the random
+number generator used for bagging. Otherwise some `AbstractRNG` object
+is expected.
 
 Predictions are weighted according to the vector `weights` (to allow
 for external optimization) except in the case that `atom` is a
@@ -263,6 +283,10 @@ probability distribution/mass functions; in particular, for regressors, the
 ensemble prediction on each input pattern has the type
 `MixtureModel{VF,VS,D}` from the Distributions.jl package, where `D`
 is the type of predicted distribution for `atom`.
+
+If a single measure or non-empty vector of measusres is specified by
+`out_of_bag_measure`, then out of bag estimates of performance are
+reported.
 
 """
 function EnsembleModel(; args...)
@@ -293,12 +317,11 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, y) where {R
         out_of_bag_measure = [model.out_of_bag_measure,]
     end
         
-    if model.rng_seed == 0
-        seed = round(Int,time()*1000000)
+    if model.rng isa Integer
+        rng = MersenneTwister(model.rng)
     else
-        seed = model.rng_seed
+        rng = model.rng
     end
-    rng = MersenneTwister(seed)
 
     atom = model.atom
     n = model.n
@@ -328,8 +351,6 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, y) where {R
         end
     end
     fitresult = WrappedEnsemble(model.atom, ensemble)
-    report = NamedTuple()
-
 
     if !isempty(out_of_bag_measure)
 
@@ -358,10 +379,12 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, y) where {R
 
         names = Symbol.(string.(out_of_bag_measure))
         oob_estimates=NamedTuple{Tuple(names)}(Tuple(vec(metrics)))
-        report=(oob_estimates=oob_estimates,)
 
-
+    else
+        oob_estimates=NamedTuple()
     end
+
+    report=(oob_estimates=oob_estimates,)
     cache = deepcopy(model)
 
     return fitresult, cache, report

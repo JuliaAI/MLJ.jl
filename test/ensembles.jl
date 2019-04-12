@@ -1,7 +1,6 @@
 module TestEnsembles
 
-
-# uncomment two lines for testing parallelized ensembling
+# uncomment two lines for testing distributed processing
 # using Distributed
 # addprocs(2)
 
@@ -96,19 +95,17 @@ info(ensemble_model)
 
 # target is :deterministic :continuous false:
 atom = MLJ.DeterministicConstantRegressor(target_type=Float64)
-rng_seed=1
-Random.seed!(1234)
-
+Random.seed!(1234) 
 X = MLJ.table(randn(10,3))
 y = randn(10)
 train, test = partition(1:length(y), 0.8);
-ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom,rng_seed=rng_seed )
+ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom, rng=1)
 ensemble_model.out_of_bag_measure = [MLJ.rms,MLJ.rmsp]
 ensemble_model.n = 2
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 @test report[:oob_estimates][1] ≈ 1.083490899041915
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
-ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom,rng_seed=rng_seed )
+ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom,rng=Random.MersenneTwister(1))
 ensemble_model.out_of_bag_measure = MLJ.rms
 ensemble_model.n = 2
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
