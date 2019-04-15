@@ -4,6 +4,7 @@ module TestTasks
 using Test
 using MLJ
 using Random
+using CategoricalArrays
 
 # shuffle!(::SupervisedTask):
 X=(x=10:10:44, y=1:4, z=collect("abcd"))
@@ -31,6 +32,19 @@ task2 = task[:]
 end == 0
 @test task[2:3].X.z == ['b', 'c']
 @test task[2:3].y == [2, 3]
+
+@testset "Type coercion" begin
+    types = Dict(:x => MLJ.Continuous, :z => MLJ.Multiclass)
+    X_coerced = MLJ.coerce(types, task.X)
+    @test X_coerced.x isa Vector{Float64}
+    @test X_coerced.z isa CategoricalVector{Char, UInt32}
+    @test_throws MethodError MLJ.coerce(Count, ["a", "b", "c"])
+    # Check no-op coercion
+    y1 = rand(Float64, 5)
+    @test MLJ.coerce(MLJ.Continuous, y1) === y1
+    y2 = rand(Int, 5)
+    @test MLJ.coerce(MLJ.Count, y2) === y2
+end
 
 end # module
 true
