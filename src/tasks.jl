@@ -57,3 +57,8 @@ function coerce(types::Dict{Symbol, Type}, X)
                                  for name in names)
     return MLJBase.table(coltable, prototype=X)
 end
+
+supervisedtask(; data=nothing, types=nothing, kwargs...) =
+    SupervisedTask(; data = coerce(types, data), kwargs...)
+unsupervisedtask(; data=nothing, types=nothing, kwargs...) =
+    UnsupervisedTask(; data = coerce(types, data), kwargs...)
