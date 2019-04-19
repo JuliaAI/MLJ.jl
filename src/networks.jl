@@ -242,7 +242,7 @@ istoobig(d::Tuple{AbstractNode}) = length(d) > 10
 # overload show method
 function _recursive_show(stream::IO, X::AbstractNode)
     if X isa Source
-        printstyled(IOContext(stream, :color=>true), MLJBase.handle(X), bold=false, color=blue)
+        printstyled(IOContext(stream, :color=>true), MLJBase.handle(X), bold=false, color=:blue)
     else
         detail = (X.machine == nothing ? "(" : "($(MLJBase.handle(X.machine)), ")
         operation_name = typeof(X.operation).name.mt.name
@@ -268,7 +268,7 @@ function Base.show(stream::IO, ::MIME"text/plain", X::AbstractNode)
     id = objectid(X) 
     description = string(typeof(X).name.name)
     str = "$description @ $(MLJBase.handle(X))"
-    printstyled(IOContext(stream, :color=> true), str, bold=false, color=blue)
+    printstyled(IOContext(stream, :color=> true), str, bold=false, color=:blue)
     if !(X isa Source)
         print(stream, " = ")
         _recursive_show(stream, X)
