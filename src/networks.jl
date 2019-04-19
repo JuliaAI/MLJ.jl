@@ -268,7 +268,7 @@ function Base.show(stream::IO, ::MIME"text/plain", X::AbstractNode)
     id = objectid(X) 
     description = string(typeof(X).name.name)
     str = "$description @ $(MLJBase.handle(X))"
-    printstyled(IOContext(stream, :color=> true), str, bold=true)
+    printstyled(IOContext(stream, :color=> true), str, bold=false, color=blue)
     if !(X isa Source)
         print(stream, " = ")
         _recursive_show(stream, X)
