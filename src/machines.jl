@@ -1,5 +1,7 @@
 abstract type AbstractMachine{M} <: MLJType end
 
+
+# TODO: write out separate method for machine(::Model, ::MLJTask) to simplify logic. 
 mutable struct Machine{M<:Model} <: AbstractMachine{M}
 
     model::M
@@ -8,7 +10,7 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
     args::Tuple
     report
     rows # remember last rows used for convenience
-    
+
     function Machine{M}(model::M, args...) where M<:Model
 
         # checks on args:
@@ -17,43 +19,36 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
                 length(args) > 2
                 error("Use machine(model, task) or machine(model, X, y) "*
                       "for a supervised model.")
-            elseif length(args) == 2 && !Tables.istable(args[1])
-                error("The X in machine(model, X, y) should be a table.")
+            elseif length(args) == 2 && !(container_type(args[1]) in [:table, :sparse])
+                error("The X in machine(model, X, y) should be a table. ")
             end
             if length(args) == 2
                 X, y = args
-                union_scitypes(X) <: input_scitypes(model) ||
-                        error("The scitypes of elments of X, in machine(model, X, y), should be a subtype of $(input_scitypes(model)). ")
-                T =  target_scitype(model)
-                if T <: Tuple
-                    container_type(y) in [:table, :sparse] ||
-                        error("The y, in machine(model, X, y), should be a table or sparse table.")
-                    column_scitypes_as_tuple(y) <: T ||
-                        error("The tuple scitype defined by columns of y, in machine(model, X, y), "*
-                              "should be a subtype of $T. ")
-                else
-                    U = union_scitypes(y)
-                    if U  <: Union{Continuous,Count}
-                        y isa Vector ||
-                            error("y in machine(model, X, y) should be a Vector. ")
-                    elseif U <: Union{Multiclass,FiniteOrderedFactor}
-                        y isa CategoricalArray ||
-                            error("y in machine(model, X, y) should be a CategoricalVector. ")
-                    end
-                    U <: T ||
-                        error("The scitype of elements of y, in machine(model, X, y), should be a subtype of $T. ")
-                end
+                T =
+                    input_is_multivariate(model) ? Union{scitypes(X)...} : scitype_union(X)
+                T <: input_scitype_union(model) ||
+                    error("The scitypes of elements of X, in machine(model, X, y), should be a subtype of $(input_scitype_union(model)). ")
+                y isa Vector || y isa CategoricalVector ||
+                    error("The y, in machine(model, X, y), should be a vector "*
+                          "(of tuples for multivariate targets) or a categorical vector. ")
+                scitype_union(y) <: target_scitype_union(model) || 
+                    error("The scitype of elements of y, in machine(model, X, y), should be a subtype of $(target_scitype_union(model)). ")
             end
         end
         if M <: Unsupervised
             length(args) == 1 ||
                 error("Wrong number of arguments. "*
                       "Use machine(model, X) or machine(model, task) for an unsupervised model.")
-            container_type(args[1]) in [:table, :sparse] || args[1] isa UnsupervisedTask ||
-                error("The X, in machine(model, X), should be a table, sparse table, or  UnsupervisedTask. "*
+            @show args
+            container_type(args[1]) in [:table, :sparse] || args[1] isa UnsupervisedTask || args[1] isa Vector || args[1] isa CategoricalVector ||
+                error("The X, in machine(model, X), should be a vector, categorical vector, table or UnsupervisedTask. "*
                       "Use MLJ.table(X) to wrap an abstract matrix X as a table. ")
-            if container_type(args[1]) in [:table, :sparse]  && !(union_scitypes(args[1]) <: input_scitypes(model))
-                error("The scitype of elements of X, in machine(model, X), should be a subtype of $(input_scitypes(model)). ")
+            if container_type(args[1]) in [:table, :sparse]
+                X = args[1]
+                U =
+                    input_is_multivariate(model) ?  Union{scitypes(X)...} : scitype_union(X)
+                U <: input_scitype_union(model) || 
+                error("The scitype of elements of X, in machine(model, X), should be a subtype of $(input_scitype_union(model)). ")
             end
         end
 

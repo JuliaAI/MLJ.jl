@@ -3,13 +3,13 @@
 module Transformers
 
 export FeatureSelector
-export ToIntTransformer
+# export ToIntTransformer
 export UnivariateStandardizer, Standardizer
 export UnivariateBoxCoxTransformer
 export OneHotEncoder
 
 import MLJBase: MLJType, Unsupervised
-import MLJBase: schema, selectcols, table, union_scitypes
+import MLJBase: schema, selectcols, table, scitype, scitype_union, scitypes
 import MLJBase
 import Distributions
 using CategoricalArrays
@@ -17,7 +17,7 @@ using Statistics
 using Tables
 
 # to be extended:
-import MLJBase: fit, transform, inverse_transform, scitype
+import MLJBase: fit, transform, inverse_transform
 import MLJBase: Found, Continuous, Discrete, Multiclass
 import MLJBase: FiniteOrderedFactor, Other, OrderedFactor, Count
 
@@ -73,115 +73,115 @@ MLJBase.package_url(::Type{<:FeatureSelector}) = "https://github.com/alan-turing
 MLJBase.package_name(::Type{<:FeatureSelector}) = "MLJ"
 MLJBase.package_uuid(::Type{<:FeatureSelector}) = ""
 MLJBase.is_pure_julia(::Type{<:FeatureSelector}) = true
-MLJBase.input_scitypes(::Type{<:FeatureSelector}) = Union{Missing,MLJBase.Found}
-MLJBase.output_scitypes(::Type{<:FeatureSelector}) = Union{Missing,MLJBase.Found}
+MLJBase.input_scitype_union(::Type{<:FeatureSelector}) = Union{Missing,MLJBase.Found}
+MLJBase.output_scitype_union(::Type{<:FeatureSelector}) = Union{Missing,MLJBase.Found}
 MLJBase.output_is_multivariate(::Type{<:FeatureSelector}) = true
 
 
-## FOR RELABELLING BY CONSECUTIVE INTEGERS
+# ## FOR RELABELLING BY CONSECUTIVE INTEGERS
 
-# TODO: Fix so categorical levels are maintained, even "invisible"
-# ones. Or depreciate in favour of (wrapped version of)
-# MLJBase.CategoricalDecoder (but which does not respect order)?
-"""
-    ToIntTransformer
+# # TODO: Fix so categorical levels are maintained, even "invisible"
+# # ones. Or depreciate in favour of (wrapped version of)
+# # MLJBase.CategoricalDecoder (but which does not respect order)?
+# """
+#     ToIntTransformer
 
-Univariate transformer for relabelling data of any type with
-consecutive integers. Does not keep all levels of a
-`CategoricalVector` - only those manifest in the fitting input. 
+# Univariate transformer for relabelling data of any type with
+# consecutive integers. Does not keep all levels of a
+# `CategoricalVector` - only those manifest in the fitting input. 
 
-Somewhat obsolete given new requirements for categorical data. May be
-depreciated in favour of MLJBase.CategoricalDecoder.
+# Somewhat obsolete given new requirements for categorical data. May be
+# depreciated in favour of MLJBase.CategoricalDecoder.
 
-See also: MLJBase.CategoricalDecoder
-"""
-mutable struct ToIntTransformer <: Unsupervised
-    sorted::Bool
-    initial_label::Int # ususally 0 or 1
-    map_unseen_to_minus_one::Bool # unseen inputs are transformed to -1
-end
+# See also: MLJBase.CategoricalDecoder
+# """
+# mutable struct ToIntTransformer <: Unsupervised
+#     sorted::Bool
+#     initial_label::Int # ususally 0 or 1
+#     map_unseen_to_minus_one::Bool # unseen inputs are transformed to -1
+# end
 
-ToIntTransformer(; sorted=true, initial_label=1
-                 , map_unseen_to_minus_one=false) =
-                     ToIntTransformer(sorted, initial_label,
-                                      map_unseen_to_minus_one)
+# ToIntTransformer(; sorted=true, initial_label=1
+#                  , map_unseen_to_minus_one=false) =
+#                      ToIntTransformer(sorted, initial_label,
+#                                       map_unseen_to_minus_one)
 
-struct ToIntFitResult{T} <: MLJType
-    n_levels::Int
-    int_given_T::Dict{T, Int}
-    T_given_int::Dict{Int, T}
-end
+# struct ToIntFitResult{T} <: MLJType
+#     n_levels::Int
+#     int_given_T::Dict{T, Int}
+#     T_given_int::Dict{Int, T}
+# end
 
-# null fitresult constructor:
-ToIntFitResult(S::Type{T}) where T =
-    ToIntFitResult{T}(0, Dict{T, Int}(), Dict{Int, T}())
+# # null fitresult constructor:
+# ToIntFitResult(S::Type{T}) where T =
+#     ToIntFitResult{T}(0, Dict{T, Int}(), Dict{Int, T}())
 
-function fit(transformer::ToIntTransformer
-             , verbosity::Int
-             , v::AbstractVector{T}) where T
+# function fit(transformer::ToIntTransformer
+#              , verbosity::Int
+#              , v::AbstractVector{T}) where T
 
-    int_given_T = Dict{T, Int}()
-    T_given_int = Dict{Int, T}()
-    vals = collect(Set(v)) 
-    if transformer.sorted
-        sort!(vals)
-    end
-    n_levels = length(vals)
-    if n_levels > 2^62 - 1
-        error("Cannot encode with integers a vector "*
-                         "having more than $(2^62 - 1) values.")
-    end
-    i = transformer.initial_label
-    for c in vals
-        int_given_T[c] = i
-        T_given_int[i] = c
-        i = i + 1
-    end
+#     int_given_T = Dict{T, Int}()
+#     T_given_int = Dict{Int, T}()
+#     vals = collect(Set(v)) 
+#     if transformer.sorted
+#         sort!(vals)
+#     end
+#     n_levels = length(vals)
+#     if n_levels > 2^62 - 1
+#         error("Cannot encode with integers a vector "*
+#                          "having more than $(2^62 - 1) values.")
+#     end
+#     i = transformer.initial_label
+#     for c in vals
+#         int_given_T[c] = i
+#         T_given_int[i] = c
+#         i = i + 1
+#     end
 
-    fitresult = ToIntFitResult{T}(n_levels, int_given_T, T_given_int)
-    cache = nothing
-    report= (values=vals,)
+#     fitresult = ToIntFitResult{T}(n_levels, int_given_T, T_given_int)
+#     cache = nothing
+#     report= (values=vals,)
 
-    return fitresult, cache, report
+#     return fitresult, cache, report
 
-end
+# end
 
-# scalar case:
-function transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T}, x::T) where T
-    ret = 0 # otherwise ret below stays in local scope
-    try 
-        ret = fitresult.int_given_T[x]
-    catch exception
-        if isa(exception, KeyError)
-            if transformer.map_unseen_to_minus_one 
-                ret = -1
-            else
-                throw(exception)
-            end
-        end 
-    end
-    return ret
-end 
-inverse_transform(transformer::ToIntTransformer, fitresult, y::Int) =
-    fitresult.T_given_int[y]
+# # scalar case:
+# function transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T}, x::T) where T
+#     ret = 0 # otherwise ret below stays in local scope
+#     try 
+#         ret = fitresult.int_given_T[x]
+#     catch exception
+#         if isa(exception, KeyError)
+#             if transformer.map_unseen_to_minus_one 
+#                 ret = -1
+#             else
+#                 throw(exception)
+#             end
+#         end 
+#     end
+#     return ret
+# end 
+# inverse_transform(transformer::ToIntTransformer, fitresult, y::Int) =
+#     fitresult.T_given_int[y]
 
-# vector case:
-function transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T},
-                   v::AbstractVector{T}) where T
-    return Int[transform(transformer, fitresult, x) for x in v]
-end
-inverse_transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T},
-                  w::AbstractVector{Int}) where T = T[fitresult.T_given_int[y] for y in w]
+# # vector case:
+# function transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T},
+#                    v::AbstractVector{T}) where T
+#     return Int[transform(transformer, fitresult, x) for x in v]
+# end
+# inverse_transform(transformer::ToIntTransformer, fitresult::ToIntFitResult{T},
+#                   w::AbstractVector{Int}) where T = T[fitresult.T_given_int[y] for y in w]
 
-MLJBase.load_path(::Type{<:ToIntTransformer}) = "MLJ.ToIntTransformer" 
-MLJBase.package_url(::Type{<:ToIntTransformer}) = "https://github.com/alan-turing-institute/MLJ.jl"
-MLJBase.package_name(::Type{<:ToIntTransformer}) = "MLJ"
-MLJBase.package_uuid(::Type{<:ToIntTransformer}) = ""
-MLJBase.is_pure_julia(::Type{<:ToIntTransformer}) = true
-MLJBase.input_scitypes(::Type{<:ToIntTransformer}) = MLJBase.Discrete
-MLJBase.input_is_multivariate(::Type{<:ToIntTransformer}) = false
-MLJBase.output_scitypes(::Type{<:ToIntTransformer}) = Count
-MLJBase.output_is_multivariate(::Type{<:ToIntTransformer}) = false
+# MLJBase.load_path(::Type{<:ToIntTransformer}) = "MLJ.ToIntTransformer" 
+# MLJBase.package_url(::Type{<:ToIntTransformer}) = "https://github.com/alan-turing-institute/MLJ.jl"
+# MLJBase.package_name(::Type{<:ToIntTransformer}) = "MLJ"
+# MLJBase.package_uuid(::Type{<:ToIntTransformer}) = ""
+# MLJBase.is_pure_julia(::Type{<:ToIntTransformer}) = true
+# MLJBase.input_scitype_union(::Type{<:ToIntTransformer}) = MLJBase.Discrete
+# MLJBase.input_is_multivariate(::Type{<:ToIntTransformer}) = false
+# MLJBase.output_scitype_union(::Type{<:ToIntTransformer}) = Count
+# MLJBase.output_is_multivariate(::Type{<:ToIntTransformer}) = false
 
 
 ## UNIVARIATE STANDARDIZATION
@@ -225,9 +225,9 @@ MLJBase.package_url(::Type{<:UnivariateStandardizer}) = "https://github.com/alan
 MLJBase.package_name(::Type{<:UnivariateStandardizer}) = "MLJ"
 MLJBase.package_uuid(::Type{<:UnivariateStandardizer}) = ""
 MLJBase.is_pure_julia(::Type{<:UnivariateStandardizer}) = true
-MLJBase.input_scitypes(::Type{<:UnivariateStandardizer}) = Union{Continuous, OrderedFactor}
+MLJBase.input_scitype_union(::Type{<:UnivariateStandardizer}) = Union{Continuous, OrderedFactor}
 MLJBase.input_is_multivariate(::Type{<:UnivariateStandardizer}) = false
-MLJBase.output_scitypes(::Type{<:UnivariateStandardizer}) = Continuous
+MLJBase.output_scitype_union(::Type{<:UnivariateStandardizer}) = Continuous
 MLJBase.output_is_multivariate(::Type{<:UnivariateStandardizer}) = false
 
 
@@ -266,15 +266,16 @@ function fit(transformer::Standardizer, verbosity::Int, X::Any)
 
     _schema =  schema(X)
     all_features = _schema.names
+    types = scitypes(X)
     
     # determine indices of all_features to be transformed
     if isempty(transformer.features)
         cols_to_fit = filter!(eachindex(all_features)|>collect) do j
-            union_scitypes(MLJBase.selectcols(X, j)) <: Continuous
+            types[j] <: Continuous
         end
     else
         cols_to_fit = filter!(eachindex(all_features)|>collect) do j
-            all_features[j] in transformer.features && union_scitypes(MLJBase.selectcols(X, j)) <: Continuous
+            all_features[j] in transformer.features && types[j] <: Continuous
         end
     end
     
@@ -333,9 +334,9 @@ MLJBase.package_url(::Type{<:Standardizer}) = "https://github.com/alan-turing-in
 MLJBase.package_name(::Type{<:Standardizer}) = "MLJ"
 MLJBase.package_uuid(::Type{<:Standardizer}) = ""
 MLJBase.is_pure_julia(::Type{<:Standardizer}) = true
-MLJBase.input_scitypes(::Type{<:Standardizer}) = Union{Found,Missing}
+MLJBase.input_scitype_union(::Type{<:Standardizer}) = Union{Found,Missing}
 MLJBase.input_is_multivariate(::Type{<:Standardizer}) = true
-MLJBase.output_scitypes(::Type{<:Standardizer}) = Union{Found,Missing}
+MLJBase.output_scitype_union(::Type{<:Standardizer}) = Union{Found,Missing}
 MLJBase.output_is_multivariate(::Type{<:Standardizer}) = true
 
 
@@ -465,9 +466,9 @@ MLJBase.package_url(::Type{<:UnivariateBoxCoxTransformer}) = "https://github.com
 MLJBase.package_name(::Type{<:UnivariateBoxCoxTransformer}) = "MLJ"
 MLJBase.package_uuid(::Type{<:UnivariateBoxCoxTransformer}) = ""
 MLJBase.is_pure_julia(::Type{<:UnivariateBoxCoxTransformer}) = true
-MLJBase.input_scitypes(::Type{<:UnivariateBoxCoxTransformer}) = MLJBase.Continuous
+MLJBase.input_scitype_union(::Type{<:UnivariateBoxCoxTransformer}) = MLJBase.Continuous
 MLJBase.input_is_multivariate(::Type{<:UnivariateBoxCoxTransformer}) = false
-MLJBase.output_scitypes(::Type{<:UnivariateBoxCoxTransformer}) = MLJBase.Continuous
+MLJBase.output_scitype_union(::Type{<:UnivariateBoxCoxTransformer}) = MLJBase.Continuous
 MLJBase.output_is_multivariate(::Type{<:UnivariateBoxCoxTransformer}) = false
 
 
@@ -535,7 +536,7 @@ function fit(transformer::OneHotEncoder{R}, verbosity::Int, X) where R
     for j in eachindex(all_features)
         ftr = all_features[j]
         col = MLJBase.selectcols(X,j)
-        T = union_scitypes(col)
+        T = scitype_union(col)
         if T <: Union{Multiclass,FiniteOrderedFactor} && ftr in specified_features
             ref_name_pairs_given_feature[ftr] = Pair{R,Symbol}[]
             shift = transformer.drop_last ? 1 : 0
@@ -604,9 +605,9 @@ MLJBase.package_url(::Type{<:OneHotEncoder}) = "https://github.com/alan-turing-i
 MLJBase.package_name(::Type{<:OneHotEncoder}) = "MLJ"
 MLJBase.package_uuid(::Type{<:OneHotEncoder}) = ""
 MLJBase.is_pure_julia(::Type{<:OneHotEncoder}) = true
-MLJBase.input_scitypes(::Type{<:OneHotEncoder}) = Union{Missing,Found}
+MLJBase.input_scitype_union(::Type{<:OneHotEncoder}) = Union{Missing,Found}
 MLJBase.input_is_multivariate(::Type{<:OneHotEncoder}) = true
-MLJBase.output_scitypes(::Type{<:OneHotEncoder}) = Union{Missing,Found}
+MLJBase.output_scitype_union(::Type{<:OneHotEncoder}) = Union{Missing,Found}
 MLJBase.output_is_multivariate(::Type{<:OneHotEncoder}) = true
 
 

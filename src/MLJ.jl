@@ -39,7 +39,7 @@ export Deterministic, Probabilistic, Unsupervised, Supervised
 export Found, Continuous, Discrete, OrderedFactor    
 export FiniteOrderedFactor, Other
 export Count, Multiclass, Binary
-export scitype, union_scitypes, column_scitypes_as_tuple
+export scitype, scitype_union, scitypes
 export predict, predict_mean, predict_median, predict_mode
 export transform, inverse_transform, se, evaluate, fitted_params
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal

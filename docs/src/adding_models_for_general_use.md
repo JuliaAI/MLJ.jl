@@ -160,10 +160,10 @@ described below, and the argument `Xnew` of the `predict` method, will
 be some table supporting the
 [Tables.jl](https://github.com/JuliaData/Tables.jl) API. The interface
 implementer can control the scientific type of data appearing in `X`
-with an appropriate `input_scitype` declaration (see [Trait
-declarations](@ref), as `union_scitypes(X) <:
-input_scitype(SomeSupervisedModel)` will always hold. See [Convenience
-methods](@ref) below for the definition of `union_scitypes`. If the
+with an appropriate `input_scitype_union` declaration (see [Trait
+declarations](@ref), as `Union{scitypes(X)...} <:
+input_scitype_union(SomeSupervisedModel)` will always hold. See [Convenience
+methods](@ref) below for the definition of `scitypes`. If the
 core algorithm requires data in a different or more specific form,
 then `fit` will need to coerce the table into the form desired. To
 this end, MLJ provides the convenience method `MLJBase.matrix`;
@@ -188,7 +188,7 @@ table `X` correspond to features and the rows to patterns.
 For univariate targets, `y` is always a `Vector`
 or `CategoricalVector`, according to the value of the trait:
 
-`target_scitype(SomeSupervisedModelType)`  | type of `y`  | a supertype of `eltype(y)`
+`target_scitype_union(SomeSupervisedModelType)`  | type of `y`  | a supertype of `eltype(y)`
 ------------------------------|---------------------------|--------------------------------------------
 `Continuous`                  | `Vector`                  | `Real`
 `<: Multiclass`               | `CategoricalVector`       | `Union{CategoricalString, CategoricalValue}`
@@ -196,30 +196,30 @@ or `CategoricalVector`, according to the value of the trait:
 `Count`                       | `Vector`                  | `Integer`
 
 The form of the target data `y` passed to `fit` is constrained by the
-`target_scitype` trait declaration. In the univariate case, all
-elements of `y` will satisfy `union_scitype(y) <:
-target_scitype(SomeSupervisedModelType)`.
+`target_scitype_union` trait declaration as `scitype_union(y) <:
+target_scitype_union(SomeSupervisedModelType)` will always hold. See
+See [Convenience methods](@ref) for the definition of `scitype_union`.
 
 So, for example, if your model is a binary classifier, you declare
 
 ````julia
-target_scitype(SomeSupervisedModelType)=Multiclass{2}
+target_scitype_union(SomeSupervisedModelType)=Multiclass{2}
 ````
 
 If it can predict any number of classes, you might instead declare
 
 ````julia
-target_scitype(SomeSupervisedModelType)=Union{Multiclass, FiniteOrderedFactor}
+target_scitype_union(SomeSupervisedModelType)=Union{Multiclass, FiniteOrderedFactor}
 ````
 
 See also the table in [Getting Started](index.md).
 
-For multivariate targets, the elements of `y`, a table, will be
-constrained by `column_scitypes_as_tuple(y) <:
-target_scitype(SomeSupervisedModelType)` For example, if you declare
-`target_scitype(SomeSupervisedModelType) = Tuple{Continuous,Count}`,
-then `y` will have two columns, the first with `Real` elements, the
-second with `Integer` elements.
+In the case of a multivariate target, in which case `y` is a vector of
+tuples, the same constraint `scitype_union(y) <:
+target_scitype_union(SomeSupervisedModelType)` holds. For example, if
+you declare `target_scitype_union(SomeSupervisedModelType) =
+Tuple{Continuous,Count}`, then each element of `y` will be a tuple of
+type `Tuple{Real,Integer}`.
 
 
 #### The fit method
@@ -391,20 +391,20 @@ MLJBase.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f
 MLJBase.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bensadeghi/DecisionTree.jl"
 MLJBase.is_pure_julia(::Type{<:DecisionTreeClassifier}) = true
 MLJBase.input_is_multivariate(::Type{<:DecisionTreeClassifier}) = true
-MLJBase.input_scitypes(::Type{<:DecisionTreeClassifier}) = MLJBase.Continuous
-MLJBase.target_scitype(::Type{<:DecisionTreeClassifier}) = MLJBase.Multiclass
+MLJBase.input_scitype_union(::Type{<:DecisionTreeClassifier}) = MLJBase.Continuous
+MLJBase.target_scitype_union(::Type{<:DecisionTreeClassifier}) = MLJBase.Multiclass
 ````
 
 Note that models predicting multivariate targets will need to need to have
-`target_scitype` return an appropriate `Tuple` type. 
+`target_scitype_union` return an appropriate `Tuple` type. 
 
 For an explanation of `Found` and `Other` in the table below, see [Scientific
 Types](index.md).
 
 method                   | return type       | declarable return values           | default value
 -------------------------|-------------------|------------------------------------|---------------
-`target_scitype`         | `DataType`        | subtype of `Found` or tuple of such types | `Union{Found,NTuple{<:Found}}`
-`input_scitypes`         | `DataType`        | subtype of `Union{Missing,Found}`  |  `Union{Missing,Found}`
+`target_scitype_union`         | `DataType`        | subtype of `Found` or tuple of such types | `Union{Found,NTuple{<:Found}}`
+`input_scitype_union`         | `DataType`        | subtype of `Union{Missing,Found}`  |  `Union{Missing,Found}`
 `input_is_multivariate`  | `Bool`            | `true` or `false`                  | `true`
 `is_pure_julia`          | `Bool`            | `true` or `false`                  | `false`
 `load_path`              | `String`          | unrestricted                       | "unknown"
@@ -493,11 +493,15 @@ MLJBase.nrows
 ```
 
 ```@docs
-MLJBase.union_scitypes
+MLJBase.scitype
 ```
 
 ```@docs
-MLJBase.column_scitypes_as_tuple
+MLJBase.scitype_union
+```
+
+```@docs
+MLJBase.scitypes
 ```
 
 ### Where to place code implementing new models

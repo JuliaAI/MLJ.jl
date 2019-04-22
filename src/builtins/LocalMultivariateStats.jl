@@ -121,8 +121,8 @@ MLJBase.package_name(::Type{<:RidgeRegressor}) = "MultivariateStats"
 MLJBase.package_uuid(::Type{<:RidgeRegressor}) = "6f286f6a-111f-5878-ab1e-185364afe411"
 MLJBase.package_url(::Type{<:RidgeRegressor})  = "https://github.com/JuliaStats/MultivariateStats.jl"
 MLJBase.is_pure_julia(::Type{<:RidgeRegressor}) = true
-MLJBase.input_scitypes(::Type{<:RidgeRegressor}) = MLJBase.Continuous
-MLJBase.target_scitype(::Type{<:RidgeRegressor}) = MLJBase.Continuous
+MLJBase.input_scitype_union(::Type{<:RidgeRegressor}) = MLJBase.Continuous
+MLJBase.target_scitype_union(::Type{<:RidgeRegressor}) = MLJBase.Continuous
 
 ####
 #### PCA
@@ -221,8 +221,8 @@ MLJBase.package_name(::Type{<:PCA})  = MLJBase.package_name(RidgeRegressor)
 MLJBase.package_uuid(::Type{<:PCA})  = MLJBase.package_uuid(RidgeRegressor)
 MLJBase.package_url(::Type{<:PCA})  = MLJBase.package_url(RidgeRegressor)
 MLJBase.is_pure_julia(::Type{<:PCA}) = true
-MLJBase.input_scitypes(::Type{<:PCA}) = MLJBase.Continuous
-MLJBase.output_scitypes(::Type{<:PCA}) = MLJBase.Continuous
+MLJBase.input_scitype_union(::Type{<:PCA}) = MLJBase.Continuous
+MLJBase.output_scitype_union(::Type{<:PCA}) = MLJBase.Continuous
 
 
 end # of module

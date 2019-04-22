@@ -45,7 +45,7 @@ DecisionTreeClassifier(target_type = String,
                        merge_purity_threshold = 0.9,) @ 1…72
 ```
 
-Wrapping the model in data creates a *machine* which will store training outcomes (called *fit-results*):
+Wrapping the model in data creates a *machine* which will store training outcomes:
 
 ```julia
 julia> tree = machine(tree_model, X, y)
@@ -104,22 +104,36 @@ The MLJ user should acquaint themselves with some
 basic assumptions about the form of data expected by MLJ, as outlined
 below. 
 
-In principle, anywhere a table is expected in MLJ - for example, `X` above - any
-tabular format supporting the
-[Tables.jl](https://github.com/JuliaData/Tables.jl) interface is
-allowed. (At present our API is more restrictive; see this
-[issue](https://github.com/JuliaData/Tables.jl/issues/74) with
-Tables.jl. If your Tables.jl compatible format is not working in MLJ,
-please post an issue.) In particular, `DataFrame`,
-`JuliaDB.IndexedTable` and `TypedTables.Table` objects are supported,
-as are named tuples of equi-length vectors ("column tables" in
-Tables.jl parlance).
+```
+machine(model::Supervised, X, y) 
+machine(model::Unsupervised, X)
+```
 
-A single feature (such as the target `y` above) is expected to be a
-`Vector` or `CategoricalVector`, according to the *scientific type* of
-the data (see below). A multivariate target can be any table.
+The input `X` in the above machine constructors can be any table, where
+*table* means any data type supporting the
+[Tables.jl](https://github.com/JuliaData/Tables.jl) interface. 
 
-On the other hand, the element types you use to represent your data
+> At present our API is more restrictive; see this
+> [issue](https://github.com/JuliaData/Tables.jl/issues/74) with
+> Tables.jl. If your Tables.jl compatible format is not working in
+> MLJ, please post an issue.
+
+In particular, `DataFrame`, `JuliaDB.IndexedTable` and
+`TypedTables.Table` objects are supported, as are two Julia native
+formats: *column tables* (named tuples of equal length vectors) and
+*row tables* (vectors of named tuples sharing the same
+keys).
+
+For models which handle only univariate inputs
+(`input_is_multivariate(model)=false`) `X` cannot be a table but is
+expected to have `Vector` or `CategoricalVector` type.
+
+The target `y` in the first constructor above must be a
+`Vector` or `CategoricalVector`. A multivariate target `y` will be
+vector of *tuples*. The tuples need not have uniform length, so 
+some forms of sequence prediction are supported.
+
+Conversely, the choice of element types used to represent your data
 has implicit consequences about how MLJ will interpret that data.
 
 > WIP: Eventually users will use task constructors to coerce element
@@ -130,13 +144,11 @@ To articulate MLJ's conventions about data representation, MLJ
 distinguishes between *machine* data types on the one hand (`Float64`,
 `Bool`, `String`, etc) and *scientific data types* on the other,
 represented by new Julia types: `Continuous`, `Multiclass{N}`,
-`FiniteOrderedFactor{N}`, and `Count` (unbounded ordered factor), with
-obvious interpretations. These types are organized in a type
-hierarchy rooted in a new abstract type `Found`:
+`FiniteOrderedFactor{N}`, `Count` (unbounded ordered factor), and
+`Unknown`, with obvious interpretations.  These types are organized in
+a type hierarchy rooted in a new abstract type `Found`:
 
 ![](scitypes.png)
-
-Note that `Multiclass{2}` has the alias `Binary`.
 
 A *scientific type* is any subtype of
 `Union{Missing,Found}`. Scientific types have no instances.
@@ -145,19 +157,18 @@ Scientific types appear when querying model metadata, as in this
 example:
 
 ```julia
-julia> info("DecisionTreeClassifier")[:target_scitype]
+julia> info("DecisionTreeClassifier")[:target_scitype_union]
 
 Union{Multiclass,FiniteOrderedFactor}
 ```
 
 **Basic data convention.** The scientific type of data that a Julia
 object `x` can represent is defined by `scitype(x)`. If `scitype(x) ==
-Other`, then `x` cannot represent scalar data in MLJ.
+Unknown`, then the interpretation of `x` by an MLJ model is unpredictable. 
 
-```julia
-julia> (scitype(42), scitype(π), scitype("Julia"))
-
-(Count, Continuous, MLJBase.Other)
+```@example 2
+using MLJ # hide
+(scitype(42), scitype(π), scitype("Julia"))
 ```
 
 In particular, *integers cannot be used to represent* `Multiclass` *or*
@@ -176,4 +187,5 @@ ordered `CategoricalValue` or `CategoricalString`:
 `Integer`                 | `Count`
 
 Here `nlevels(x) = length(levels(x.pool))`.
+
 

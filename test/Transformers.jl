@@ -22,24 +22,24 @@ fitresult, cache, report = MLJBase.fit(selector, 1, X)
 @test transform(selector, fitresult, X[1:2,:]) ==
     MLJBase.selectcols(MLJBase.selectrows(X, 1:2), [:Zn, :Crim])
 
-# relabelling with integer transformer:
-y = rand(Char, 50)
-allrows = eachindex(y)
-test = 3:37
-to_int_hypers = ToIntTransformer()
-info(to_int_hypers)
-fitresult, cache, report = MLJBase.fit(to_int_hypers, 1, y)
-# to_int = Trainable(to_int_hypers, y)
-# fit!(to_int, allrows)
-z = transform(to_int_hypers, fitresult, y[test])
-@test y[test] == inverse_transform(to_int_hypers, fitresult, z)
-to_int_hypers.map_unseen_to_minus_one = true
-fitresult, cache, report = MLJBase.fit(to_int_hypers, 1, [1, 2, 3, 4, 3])
-@test report.values == [1, 2, 3, 4]
-#to_int = Trainable(to_int_hypers, [1,2,3,4])
-#fitresult, cache, report = fit!(to_int, [1,2,3,4])
-@test transform(to_int_hypers, fitresult, 5) == -1
-@test transform(to_int_hypers, fitresult, [5,1])[1] == -1 
+# # relabelling with integer transformer:
+# y = rand(Char, 50)
+# allrows = eachindex(y)
+# test = 3:37
+# to_int_hypers = ToIntTransformer()
+# info(to_int_hypers)
+# fitresult, cache, report = MLJBase.fit(to_int_hypers, 1, y)
+# # to_int = Trainable(to_int_hypers, y)
+# # fit!(to_int, allrows)
+# z = transform(to_int_hypers, fitresult, y[test])
+# @test y[test] == inverse_transform(to_int_hypers, fitresult, z)
+# to_int_hypers.map_unseen_to_minus_one = true
+# fitresult, cache, report = MLJBase.fit(to_int_hypers, 1, [1, 2, 3, 4, 3])
+# @test report.values == [1, 2, 3, 4]
+# #to_int = Trainable(to_int_hypers, [1,2,3,4])
+# #fitresult, cache, report = fit!(to_int, [1,2,3,4])
+# @test transform(to_int_hypers, fitresult, 5) == -1
+# @test transform(to_int_hypers, fitresult, [5,1])[1] == -1 
 
 # `UnivariateStandardizer`:
 stand = UnivariateStandardizer()

@@ -72,7 +72,7 @@ weights = rand(10)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
-@test MLJBase.target_scitype(ensemble_model) == MLJBase.target_scitype(atom)
+@test MLJBase.target_scitype_union(ensemble_model) == MLJBase.target_scitype_union(atom)
 
 # target is :deterministic :continuous false:
 atom = MLJ.DeterministicConstantRegressor(target_type=Float64)

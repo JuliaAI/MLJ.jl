@@ -1,16 +1,18 @@
-function Base.getindex(task::SupervisedTask{U}, r) where U
+function Base.getindex(task::SupervisedTask, r)
     X = selectrows(task.X, r)
-    y = selectrows(task.y, r)
+    y = task.y[r]
     is_probabilistic = task.is_probabilistic
-    target_scitype = task.target_scitype
-    input_scitypes = task.input_scitypes
+    input_scitypes = scitypes(X)
+    input_scitype_union = Union{input_scitypes...}
+    target_scitype_union = scitype_union(y)
     input_is_multivariate = task.input_is_multivariate
-    return SupervisedTask{U}(X,
-                             y,
-                             is_probabilistic,
-                             target_scitype,
-                             input_scitypes,
-                             input_is_multivariate)
+    return SupervisedTask(X,
+                          y,
+                          is_probabilistic,
+                          input_scitypes,
+                          input_scitype_union,
+                          target_scitype_union,
+                          input_is_multivariate)
 end
 
 function Random.shuffle!(rng::AbstractRNG, task::SupervisedTask)

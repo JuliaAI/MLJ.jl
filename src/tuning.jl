@@ -222,17 +222,17 @@ MLJBase.package_name(::Type{<:DeterministicTunedModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:DeterministicTunedModel}) = ""
 MLJBase.package_url(::Type{<:DeterministicTunedModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
 MLJBase.is_pure_julia(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.is_pure_julia(M)
-MLJBase.input_scitypes(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.input_scitypes(M)
+MLJBase.input_scitype_union(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.input_scitype_union(M)
 MLJBase.input_is_multivariate(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.input_is_multivariate(M)
-MLJBase.target_scitype(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.target_scitype(M)
+MLJBase.target_scitype_union(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.target_scitype_union(M)
 
 MLJBase.load_path(::Type{<:ProbabilisticTunedModel}) = "MLJ.ProbabilisticTunedModel"
 MLJBase.package_name(::Type{<:ProbabilisticTunedModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:ProbabilisticTunedModel}) = ""
 MLJBase.package_url(::Type{<:ProbabilisticTunedModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
 MLJBase.is_pure_julia(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.is_pure_julia(M)
-MLJBase.input_scitypes(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.input_scitypes(M)
-MLJBase.target_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.target_scitype(M)
+MLJBase.input_scitype_union(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.input_scitype_union(M)
+MLJBase.target_scitype_union(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.target_scitype_union(M)
 MLJBase.input_is_multivariate(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.input_is_multivariate(M)
 
 

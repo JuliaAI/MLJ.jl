@@ -99,8 +99,8 @@ function models(task::SupervisedTask; args...)
                 info_ = info(model, pkg=pkg)
                 info_[:is_supervised] &&
                     info_[:is_wrapper] == false && 
-                    task.target_scitype <: info_[:target_scitype] &&
-                    task.input_scitypes <: info_[:input_scitypes] &&
+                    task.target_scitype_union <: info_[:target_scitype_union] &&
+                    task.input_scitype_union <: info_[:input_scitype_union] &&
                     task.is_probabilistic == info_[:is_probabilistic]
             end
         isempty(models_in_pkg) || (ret[pkg] = models_in_pkg)

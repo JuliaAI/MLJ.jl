@@ -63,6 +63,6 @@ MLJBase.package_name(::Type{<:SimpleDeterministicCompositeModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:SimpleDeterministicCompositeModel}) = ""
 MLJBase.package_url(::Type{<:SimpleDeterministicCompositeModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
 MLJBase.is_pure_julia(::Type{<:SimpleDeterministicCompositeModel}) = true
-# MLJBase.input_scitypes(::Type{<:SimpleDeterministicCompositeModel}) = 
-# MLJBase.target_scitype(::Type{<:SimpleDeterministicCompositeModel}) = 
+# MLJBase.input_scitype_union(::Type{<:SimpleDeterministicCompositeModel}) = 
+# MLJBase.target_scitype_union(::Type{<:SimpleDeterministicCompositeModel}) = 
 
