@@ -52,7 +52,7 @@ X[1:3, :]
 Constructing a task from data:
 
 ```@example 1
-using CategoricalArrays, DataFrames
+using CategoricalArrays
 coltable = (height = Float64[183, 145, 160, 78, 182, 76],
             gender = categorical([:m, :f, :f, :f, :m, :m]),
             weight = Float64[92, 67, 62, 25, 80, 31],
