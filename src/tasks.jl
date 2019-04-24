@@ -33,12 +33,27 @@ Random.shuffle(rng::AbstractRNG, task::SupervisedTask) = task[shuffle!(rng, Vect
 Random.shuffle(task::SupervisedTask) = task[shuffle!(Vector(1:nrows(task)))]
 
 
-coerce(T::Type{Continuous}, y) = convert(Vector{Float64}, y)
+coerce(T::Type{Continuous}, y) = float(y)
 coerce(T::Type{Count}, y)      = convert(Vector{Int}, y)
-coerce(T::Type{Multiclass}, y)          = categorical(y, ordered = false)
-coerce(T::Type{FiniteOrderedFactor}, y) = categorical(y, ordered = true)
+coerce(T::Type{Count}, y::AbstractVector{<:Integer}) = y
+function coerce(T::Type{Multiclass}, y)
+    if scitype_union(y) <: T
+        return y
+    else
+        return categorical(y, ordered = false)
+    end
+end
+function coerce(T::Type{FiniteOrderedFactor}, y)
+    if scitype_union(y) <: T
+        return y
+    else
+        return categorical(y, ordered = true)
+    end
+end
 
 function coerce(types::Dict{Symbol, Type}, X)
     names = schema(X).names
-    NamedTuple{names}(coerce(types[name], selectcols(X, name)) for name in names)
+    coltable = NamedTuple{names}(coerce(types[name], selectcols(X, name))
+                                 for name in names)
+    return MLJBase.table(coltable, prototype=X)
 end
