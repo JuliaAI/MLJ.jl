@@ -131,13 +131,17 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MLJBase]]
 deps = ["CSV", "CategoricalArrays", "DataFrames", "Distributions", "InteractiveUtils", "Random", "SparseArrays", "Statistics", "StatsBase", "Tables"]
-git-tree-sha1 = "a99b92405b1436b512db6bf1850b46e6b62bb00d"
+git-tree-sha1 = "b033e2496bb1f54fd2552f3b6b02c23d47f15cf6"
+repo-rev = "master"
+repo-url = "https://github.com/alan-turing-institute/MLJBase.jl"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
-version = "0.1.0"
+version = "0.1.1"
 
 [[MLJModels]]
 deps = ["CategoricalArrays", "Distances", "Distributions", "LinearAlgebra", "MLJBase", "Pkg", "Random", "Requires"]
-git-tree-sha1 = "4d2ec022c3ef6912f2f927cfa16e211816831178"
+git-tree-sha1 = "581ffd3e7547ff762d420be2403d9701291f58ee"
+repo-rev = "master"
+repo-url = "https://github.com/alan-turing-institute/MLJModels.jl"
 uuid = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
 version = "0.1.0"
 
@@ -168,9 +172,9 @@ version = "0.6.0"
 
 [[OrderedCollections]]
 deps = ["Random", "Serialization", "Test"]
-git-tree-sha1 = "85619a3f3e17bb4761fe1b1fd47f0e979f964d5b"
+git-tree-sha1 = "c4c13474d23c60d20a67b217f1d7f22a40edf8f1"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-version = "1.0.2"
+version = "1.1.0"
 
 [[PDMats]]
 deps = ["Arpack", "LinearAlgebra", "SparseArrays", "SuiteSparse", "Test"]
@@ -318,10 +322,10 @@ deps = ["Distributed", "InteractiveUtils", "Logging", "Random"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[TranscodingStreams]]
-deps = ["Pkg", "Random", "Test"]
-git-tree-sha1 = "f42956022d8084539f1d7219f632542b0ea686ce"
+deps = ["Random", "Test"]
+git-tree-sha1 = "a25d8e5a28c3b1b06d3859f30757d43106791919"
 uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
-version = "0.9.3"
+version = "0.9.4"
 
 [[URIParser]]
 deps = ["Test", "Unicode"]
