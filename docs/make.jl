@@ -10,6 +10,7 @@ using Pkg
 using Documenter
 using MLJ
 using MLJBase
+using MLJ.Transformers
 using MLJModels
 
 #prettyurls to be changed

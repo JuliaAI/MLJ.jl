@@ -186,6 +186,13 @@ MLJBase.output_is_multivariate(::Type{<:FeatureSelector}) = true
 
 ## UNIVARIATE STANDARDIZATION
 
+
+"""
+    UnivariateStandardizer()
+
+Unsupervised model for standardizing (whitening) univariate data. 
+
+"""
 mutable struct UnivariateStandardizer <: Unsupervised
 end
 

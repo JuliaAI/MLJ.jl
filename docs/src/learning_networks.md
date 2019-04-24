@@ -50,15 +50,17 @@ then inverse-transforms those predictions, for later comparison with
 the original test data. The machines are labelled yellow.
 
 To implement the network, we begin by loading data needed for training
-and evaluation into *source nodes*. For testing purposes, we use
+and evaluation into *source nodes*. For testing purposes, let's use
 synthetic data:
 
 ```@example 1
 using MLJ # hide
-using DataFrames, Statistics # hide
-Xraw = rand(300,3)
-y = exp(Xraw[:,1] - Xraw[:,2] - 2Xraw[:,3] + 0.1*rand(300))
-X = DataFrame(Xraw)
+using Statistics, DataFrames # hide
+x1 = rand(300)
+x2 = rand(300)
+x3 = rand(300)
+y = exp.(x1 - x2 -2x3 + 0.1*rand(300))
+X = DataFrame(x1=x1, x2=x2, x3=x3) # a column table
 ys = source(y)
 Xs = source(X)
 ```

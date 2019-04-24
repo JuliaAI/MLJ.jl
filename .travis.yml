@@ -31,7 +31,7 @@ jobs:
         - |
           julia --color=yes --project=docs/ -e'
             using Pkg
-            Pkg.add(PackageSpec(name="Documenter", rev="master"));Pkg.clone("https://github.com/wildart/TOML.jl");Pkg.clone("https://github.com/alan-turing-institute/MLJBase.jl");Pkg.clone("https://github.com/alan-turing-institute/MLJModels.jl")
+            Pkg.add(PackageSpec(name="Documenter", rev="master"));Pkg.add(name="DecisionTree", rev="master");Pkg.add(name="DataFrames", rev="master");Pkg.clone("https://github.com/alan-turing-institute/MLJBase.jl");Pkg.clone("https://github.com/alan-turing-institute/MLJModels.jl")
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
             include("docs/make.jl")
