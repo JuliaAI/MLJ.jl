@@ -49,7 +49,7 @@ X, y = task()
 X[1:3, :]
 ```
 
-Constructing a task from data:
+Supposing we have some new data, say
 
 ```@example 1
 coltable = (height = Float64[183, 145, 160, 78, 182, 76],
@@ -57,10 +57,23 @@ coltable = (height = Float64[183, 145, 160, 78, 182, 76],
             weight = Float64[92, 67, 62, 25, 80, 31],
             age = Float64[53, 12, 60, 5, 31, 7],
             overall_health = categorical([1, 2, 1, 3, 3, 1], ordered=true))
+```
+
+we can check MLJ's default interpretation of that data:
+
+```@example 1
+scitypes(X)
+```
+
+And construct a associated task:
+
+```@example 1
 task = SupervisedTask(data=coltable, target=:overall_health, ignore=:gender, is_probabilistic=true)
 ```
 
-List models matching a task:
+> WIP: In the near future users will be able to override the default interpretation of the data.
+
+To list models matching a task:
 
 ```@example 1
 models(task)

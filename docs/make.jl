@@ -11,6 +11,7 @@ using Documenter
 using MLJ
 using MLJBase
 using MLJ.Transformers
+using MLJ.Constant
 using MLJModels
 
 #prettyurls to be changed

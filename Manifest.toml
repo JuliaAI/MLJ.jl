@@ -139,11 +139,9 @@ version = "0.1.1"
 
 [[MLJModels]]
 deps = ["CategoricalArrays", "Distances", "Distributions", "LinearAlgebra", "MLJBase", "Pkg", "Random", "Requires"]
-git-tree-sha1 = "581ffd3e7547ff762d420be2403d9701291f58ee"
-repo-rev = "master"
-repo-url = "https://github.com/alan-turing-institute/MLJModels.jl"
+git-tree-sha1 = "f2be8e6105445974dc28ab82f60f1bd8d8cd1690"
 uuid = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
-version = "0.1.0"
+version = "0.1.1"
 
 [[Markdown]]
 deps = ["Base64"]
@@ -178,9 +176,9 @@ version = "1.1.0"
 
 [[PDMats]]
 deps = ["Arpack", "LinearAlgebra", "SparseArrays", "SuiteSparse", "Test"]
-git-tree-sha1 = "b6c91fc0ab970c0563cbbe69af18d741a49ce551"
+git-tree-sha1 = "8b68513175b2dc4023a564cb0e917ce90e74fd69"
 uuid = "90014a1f-27ba-587c-ab20-58faa44d9150"
-version = "0.9.6"
+version = "0.9.7"
 
 [[Parsers]]
 deps = ["Dates", "Mmap", "Test", "WeakRefStrings"]
