@@ -28,9 +28,8 @@ A list of models implementing the MLJ interface:
 In the Julia REPL:
 
 ````julia
-]add "https://github.com/alan-turing-institute/MLJBase.jl"
-add "https://github.com/alan-turing-institute/MLJModels.jl"
-add "https://github.com/alan-turing-institute/MLJ.jl"
+]add MLJ
+add MLJModels
 ````
 
 A docker image with installation [instructions](https://github.com/ysimillides/mlj-docker) is also available.
