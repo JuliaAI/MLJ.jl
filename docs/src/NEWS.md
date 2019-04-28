@@ -6,6 +6,10 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+### Official registered versions of MLJBase 0.1.1, MLJModels 0.1.1, MLJ 0.1.1 released
+
+- Minor revisions to the repos, doc updates, and a small breaking change around scitype method names and associated traits. Resolves: [#119](https://github.com/alan-turing-institute/MLJ.jl/issues/119)
+
 ### unversioned commits 12 April 2019 (around 00:10, GMT)
 
 - Added out-of-bag estimates for performance in homogeneous

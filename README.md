@@ -22,6 +22,8 @@ The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html).
 A list of models implementing the MLJ interface:
 [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl/blob/master/Models.toml)
 
+[MLJ News](https://alan-turing-institute.github.io/MLJ.jl/dev/NEWS/)
+
 
 ### Installation
 

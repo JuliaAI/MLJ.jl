@@ -175,16 +175,16 @@ In particular, *integers cannot be used to represent* `Multiclass` *or*
 `FiniteOrderedFactor` *data*; these can be represented by an unordered or
 ordered `CategoricalValue` or `CategoricalString`:
 
-`T`                     |     `scitype(x)` for `x::T`
-------------------------|:--------------------------------
-`Missing`                 |      `Missing`
-`Real`                    |      `Continuous`
-`Integer`                |        `Count`
-`CategoricalValue`       | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false` 
-`CategoricalString`       | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false`
-`CategoricalValue`       | `FiniteOrderedFactor{N}` where `N = nlevels(x)`, provided `x.pool.ordered == true` 
-`CategoricalString`       | `FiniteOrderedFactor{N}` where `N = nlevels(x)` provided `x.pool.ordered == true`
-`Integer`                 | `Count`
+`T`                         |     `scitype(x)` for `x::T`
+----------------------------|:--------------------------------
+`Missing`                   |      `Missing`
+`AbstractFloat`             |      `Continuous`
+`Inte   ger`                |        `Count`
+`CategoricalValue`          | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false` 
+`CategoricalString`         | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false`
+`CategoricalValue`          | `FiniteOrderedFactor{N}` where `N = nlevels(x)`, provided `x.pool.ordered == true` 
+`CategoricalString`         | `FiniteOrderedFactor{N}` where `N = nlevels(x)` provided `x.pool.ordered == true`
+`Integer`                   | `Count`
 
 Here `nlevels(x) = length(levels(x.pool))`.
 
