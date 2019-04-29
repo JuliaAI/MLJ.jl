@@ -5,15 +5,15 @@ Base.show(stream::IO, t::Random.MersenneTwister) =
 
 ## WEIGHTED ENSEMBLES OF FITRESULTS
 
-# R is atomic fitresult type
 # Atom is atomic model type, eg, DecisionTree
+# R will be the tightest type of the atom fit-results.
 using StatsBase
-mutable struct WrappedEnsemble{R,Atom <: Supervised{R}} <: MLJType
+mutable struct WrappedEnsemble{R,Atom <: Supervised} <: MLJType
     atom::Atom
     ensemble::Vector{R}
 end
 
-Nominal = Union{Multiclass,FiniteOrderedFactor}
+FiniteDiscrete = Union{Multiclass,FiniteOrderedFactor}
 
 # to enable trait-based dispatch of predict:
 predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom<:Deterministic} =
@@ -21,7 +21,7 @@ predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom<:Determinist
 predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom<:Probabilistic} =
     predict(wens, weights, Xnew, Probabilistic, target_scitype_union(Atom))
 
-function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Deterministic}, ::Type{<:Nominal})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Deterministic}, ::Type{<:FiniteDiscrete})
 
     # weights ignored in this case
 
@@ -57,7 +57,7 @@ function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Deterministic}, ::
     return prediction
 end
 
-function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Probabilistic}, ::Type{<:Nominal})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Probabilistic}, ::Type{<:FiniteDiscrete})
 
     ensemble = wens.ensemble
 
@@ -111,24 +111,42 @@ function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Probabilistic}, ::
 end
 
 
-## CORE ENSEMBLE-BUILDING FUNCTION
+## CORE ENSEMBLE-BUILDING FUNCTIONS
 
-function get_ensemble(atom::Supervised{R}, verbosity, X, y, n, n_patterns,
-                      n_train, rng, progress_meter) where R
-
-    ensemble = Vector{R}(undef, n)
-    ensemble_inds = Vector{Vector{Int}}(undef, n)
-    for i in 1:n
+# for when out-of-bag performance estimates are requested:
+function get_ensemble_and_indices(atom::Supervised, verbosity, X, y, n, n_patterns,
+                      n_train, rng, progress_meter)
+    
+    ensemble_indices = [StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
+                        for i in 1:n]
+    ensemble = map(ensemble_indices) do train_rows
         verbosity < 1 || next!(progress_meter)
-        train_rows = StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
-        ensemble_inds[i] = train_rows
         atom_fitresult, atom_cache, atom_report =
             fit(atom, verbosity - 1, selectrows(X, train_rows), selectrows(y, train_rows))
-        ensemble[i] = atom_fitresult
+        atom_fitresult
     end
     verbosity < 1 || println()
 
-    return (ensemble, ensemble_inds)
+    return (ensemble, ensemble_indices)
+
+end
+
+# for when out-of-bag performance estimates are not requested:
+function get_ensemble(atom::Supervised, verbosity, X, y, n, n_patterns,
+                      n_train, rng, progress_meter)
+
+    # define generator of training rows:
+    ensemble_indices = (StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
+                        for i in 1:n)
+    ensemble = map(ensemble_indices) do train_rows
+        verbosity < 1 || next!(progress_meter)
+        atom_fitresult, atom_cache, atom_report =
+            fit(atom, verbosity - 1, selectrows(X, train_rows), selectrows(y, train_rows))
+        atom_fitresult
+    end
+    verbosity < 1 || println()
+
+    return ensemble
 
 end
 
@@ -156,7 +174,7 @@ function clean!(model::DeterministicEnsembleModel{R}) where R
         "in the range (0,1]. Reset to 1. "
         model.bagging_fraction = 1.0
     end
-    if target_scitype_union(model.atom)<:Nominal && !isempty(model.weights)
+    if target_scitype_union(model.atom)<:FiniteDiscrete && !isempty(model.weights)
         message = message*"weights will be ignored to form predictions. "
     elseif !isempty(model.weights)
         total = sum(model.weights)
@@ -331,25 +349,52 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, y) where {R
     progress_meter = Progress(n, dt=0.5, desc="Training ensemble: ",
                               barglyphs=BarGlyphs("[=> ]"), barlen=50, color=:yellow)
 
-    if !parallel || nworkers() == 1 # build in serial
-        ensemble, ensemble_inds = get_ensemble(atom, verbosity, X, y,
-                                n, n_patterns, n_train, rng, progress_meter)
-    else # build in parallel
-        if verbosity > 0
-            println("Ensemble-building in parallel on $(nworkers()) processors.")
+
+    if !isempty(out_of_bag_measure)
+        
+        if !parallel || nworkers() == 1 # build in serial
+            ensemble, ensemble_indices = get_ensemble_and_indices(atom, verbosity, X, y,
+                                                   n, n_patterns, n_train, rng, progress_meter)
+        else # build in parallel
+            if verbosity > 0
+                println("Ensemble-building in parallel on $(nworkers()) processors.")
+            end
+            chunk_size = div(n, nworkers())
+            left_over = mod(n, nworkers())
+            ensemble, ensemble_indices =  @distributed (pair_vcat) for i = 1:nworkers()
+                if i != nworkers()
+                    get_ensemble_and_indices(atom, 0, X, y, chunk_size, n_patterns, n_train,
+                                 rng, progress_meter)
+                else
+                    get_ensemble_and_indices(atom, 0, X, y, chunk_size + left_over, n_patterns, n_train,
+                                 rng, progress_meter)
+                end
+            end
         end
-        chunk_size = div(n, nworkers())
-        left_over = mod(n, nworkers())
-        ensemble, ensemble_inds =  @distributed (pair_vcat) for i = 1:nworkers()
-            if i != nworkers()
-                get_ensemble(atom, 0, X, y, chunk_size, n_patterns, n_train,
-                             rng, progress_meter)
-            else
-                get_ensemble(atom, 0, X, y, chunk_size + left_over, n_patterns, n_train,
-                             rng, progress_meter)
+
+    else
+        
+        if !parallel || nworkers() == 1 # build in serial
+            ensemble = get_ensemble(atom, verbosity, X, y,
+                                    n, n_patterns, n_train, rng, progress_meter)
+        else # build in parallel
+            if verbosity > 0
+                println("Ensemble-building in parallel on $(nworkers()) processors.")
+            end
+            chunk_size = div(n, nworkers())
+            left_over = mod(n, nworkers())
+            ensemble =  @distributed (vcat) for i = 1:nworkers()
+                if i != nworkers()
+                    get_ensemble(atom, 0, X, y, chunk_size, n_patterns, n_train,
+                                 rng, progress_meter)
+                else
+                    get_ensemble(atom, 0, X, y, chunk_size + left_over, n_patterns, n_train,
+                                 rng, progress_meter)
+                end
             end
         end
     end
+
     fitresult = WrappedEnsemble(model.atom, ensemble)
 
     if !isempty(out_of_bag_measure)
@@ -357,16 +402,16 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, y) where {R
         metrics=zeros(length(ensemble),length(out_of_bag_measure))
         for i= 1:length(ensemble)
             #oob indices
-            ooB_inds=  setdiff(1:n_patterns, ensemble_inds[i])
-            if isempty(ooB_inds)
+            ooB_indices=  setdiff(1:n_patterns, ensemble_indices[i])
+            if isempty(ooB_indices)
                 error("Empty out-of-bag sample. "*
                       "Data size too small or "*
                       "bagging_fraction too close to 1.0. ")
             end
-            predictions = predict(atom, ensemble[i], selectrows(X,ooB_inds))
+            predictions = predict(atom, ensemble[i], selectrows(X,ooB_indices))
 
             for k in eachindex(out_of_bag_measure)
-                metrics[i,k] = out_of_bag_measure[k](predictions,selectrows(y, ooB_inds))
+                metrics[i,k] = out_of_bag_measure[k](predictions,selectrows(y, ooB_indices))
             end
 
         end

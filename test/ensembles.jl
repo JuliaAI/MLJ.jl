@@ -3,6 +3,8 @@ module TestEnsembles
 # uncomment two lines for testing distributed processing
 # using Distributed
 # addprocs(2)
+# @everywhere using Pkg
+# @everywhere Pkg.activate("working", shared=true)
 
 # using Revise
 using Test
@@ -103,6 +105,7 @@ ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom, rng=1)
 ensemble_model.out_of_bag_measure = [MLJ.rms,MLJ.rmsp]
 ensemble_model.n = 2
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+# TODO: the following test fails in distributed version (because of multiple rng's ?)
 @test report[:oob_estimates][1] ≈ 1.083490899041915
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom,rng=Random.MersenneTwister(1))
@@ -181,7 +184,6 @@ ensemble_model.n = 10
 fit!(ensemble);
 @test length(ensemble.fitresult.ensemble) == 10
 @test !isnan(predict(ensemble, MLJ.selectrows(X, test))[1])
-
 
 # old Koala tests
 # # check that providing fixed seed gives identical predictions each
