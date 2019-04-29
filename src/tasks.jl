@@ -32,10 +32,46 @@ end
 Random.shuffle(rng::AbstractRNG, task::SupervisedTask) = task[shuffle!(rng, Vector(1:nrows(task)))]
 Random.shuffle(task::SupervisedTask) = task[shuffle!(Vector(1:nrows(task)))]
 
+## Coercion
+_coerce_missing_warn(T) =
+    @warn "Missing values encountered. Coerced to Union{Missing,$T} instead of $T."
 
-coerce(T::Type{Continuous}, y) = float(y)
-coerce(T::Type{Count}, y)      = convert(Vector{Int}, y)
+# Vector to Continuous
+coerce(T::Type{Continuous}, y::AbstractVector{<:Number}) = float(y)
+function coerce(T::Type{Continuous}, y::AbstractVector{Union{<:Number,Missing}})
+    _coerce_missing_warn(T)
+    return float(y)
+end
+function coerce(T::Type{Continuous}, y::AbstractVector)
+    for el in y
+        if ismissing(el)
+            _coerce_missing_warn(T)
+            break
+        end
+    end
+    return float.(y)
+end
+
+# Vector to Count
+_int(::Missing) = missing
+_int(x) = Int(x)
+
 coerce(T::Type{Count}, y::AbstractVector{<:Integer}) = y
+function coerce(T::Type{Count}, y::AbstractVector{Union{<:Real,Missing}})
+    _coerce_missing_warn(T)
+    return convert(Vector{Missing,Int}, y)
+end
+function coerce(T::Type{Count}, y::AbstractVector)
+    for el in y
+        if ismissing(el)
+            _coerce_missing_warn(T)
+            break
+        end
+    end
+    return _int.(y)
+end
+
+# Vector to Multiclass
 function coerce(T::Type{Multiclass}, y)
     if scitype_union(y) <: T
         return y
@@ -43,6 +79,8 @@ function coerce(T::Type{Multiclass}, y)
         return categorical(y, ordered = false)
     end
 end
+
+# Vector to FiniteOrderedFactor
 function coerce(T::Type{FiniteOrderedFactor}, y)
     if scitype_union(y) <: T
         return y
@@ -51,6 +89,7 @@ function coerce(T::Type{FiniteOrderedFactor}, y)
     end
 end
 
+# Coerce table
 function coerce(types::Dict{Symbol, Type}, X)
     names = schema(X).names
     coltable = NamedTuple{names}(coerce(types[name], selectcols(X, name))

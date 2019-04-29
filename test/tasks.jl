@@ -34,37 +34,62 @@ end == 0
 @test task[2:3].y == [2, 3]
 
 @testset "Type coercion" begin
-    types = Dict(:x => MLJ.Continuous, :z => MLJ.Multiclass)
-    X_coerced = MLJ.coerce(types, task.X)
+    import MLJ: coerce
+    types = Dict(:x => Continuous, :z => Multiclass)
+    X_coerced = coerce(types, task.X)
     @test X_coerced.x isa AbstractVector{Float64}
     @test X_coerced.z isa CategoricalVector{Char, UInt32}
     @test !X_coerced.z.pool.ordered
-    @test_throws MethodError MLJ.coerce(Count, ["a", "b", "c"])
+    @test_throws MethodError coerce(Count, ["a", "b", "c"])
     y = collect(Float64, 1:5)
-    y_coerced = MLJ.coerce(MLJ.Count, y)
+    y_coerced = coerce(Count, y)
     @test y_coerced isa Vector{Int}
     @test y_coerced == y
     y = [1//2, 3//4, 6//5]
-    y_coerced = MLJ.coerce(MLJ.Continuous, y)
+    y_coerced = coerce(Continuous, y)
     @test y_coerced isa Vector{Float64}
     @test y_coerced ≈ y
     y = task.X.z
-    y_coerced = MLJ.coerce(FiniteOrderedFactor, y)
+    y_coerced = coerce(FiniteOrderedFactor, y)
     @test y_coerced isa CategoricalVector{Char, UInt32}
     @test y_coerced.pool.ordered
     # Check no-op coercion
     y = rand(Float64, 5)
-    @test MLJ.coerce(MLJ.Continuous, y) === y
+    @test coerce(Continuous, y) === y
     y = rand(Float32, 5)
-    @test MLJ.coerce(MLJ.Continuous, y) === y
+    @test coerce(Continuous, y) === y
     y = rand(BigFloat, 5)
-    @test MLJ.coerce(MLJ.Continuous, y) === y
+    @test coerce(Continuous, y) === y
     y = rand(Int, 5)
-    @test MLJ.coerce(MLJ.Count, y) === y
+    @test coerce(Count, y) === y
     y = big.(y)
-    @test MLJ.coerce(MLJ.Count, y) === y
+    @test coerce(Count, y) === y
     y = rand(UInt32, 5)
-    @test MLJ.coerce(MLJ.Count, y) === y
+    @test coerce(Count, y) === y
+    # missing values
+    y_coerced = @test_logs((:warn, r"Missing values encountered"),
+                           coerce(Continuous, [4, 7, missing]))
+    @test ismissing(y_coerced == [4.0, 7.0, missing])
+    @test y_coerced isa Vector{Union{Missing,Float64}}
+    y_coerced = @test_logs((:warn, r"Missing values encountered"),
+                           coerce(Continuous, Any[4, 7.0, missing]))
+    @test ismissing(y_coerced == [4.0, 7.0, missing])
+    @test y_coerced isa Vector{Union{Missing,Float64}}
+    y_coerced = @test_logs((:warn, r"Missing values encountered"),
+                           coerce(Count, [4.0, 7.0, missing]))
+    @test ismissing(y_coerced == [4, 7, missing])
+    @test y_coerced isa Vector{Union{Missing,Int}}
+    y_coerced = @test_logs((:warn, r"Missing values encountered"),
+                           coerce(Count, Any[4, 7.0, missing]))
+    @test ismissing(y_coerced == [4, 7, missing])
+    @test y_coerced isa Vector{Union{Missing,Int}}
+    @test eltype(coerce(Multiclass, [:x, :y, missing])) ==
+        Union{Missing, CategoricalValue{Symbol,UInt32}}
+    @test eltype(coerce(FiniteOrderedFactor, [:x, :y, missing])) ==
+        Union{Missing, CategoricalValue{Symbol,UInt32}}
+    # non-missing Any vectors
+    @test coerce(Continuous, Any[4, 7]) == [4.0, 7.0]
+    @test coerce(Count, Any[4.0, 7.0]) == [4, 7]
 end
 
 end # module
