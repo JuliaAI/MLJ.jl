@@ -246,9 +246,9 @@ fit!(yhat, rows=1:1300)
 Because of Julia's generic programming features, any kind of operation
 you would normally apply to data (arithmetic, row selection, column
 concatenation, etc) can be overloaded to work with nodes. In this way,
-MLJ's network-building syntax is ecomical, intuitive and easy to
+MLJ's network-building syntax is economical, intuitive and easy to
 read. In this respect we have been inspired by [On Machine Learning
 and Programming Languages](https://julialang.org/blog/2017/12/ml&pl).
 
 ## Invitation to the community
-We now invite the community, to try out our newly registered packages, [MLJ](https://github.com/alan-turing-institute/MLJ.jl), [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl) and [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl), and provide any feedback or suggestions you may have going forward. We are also particularly interested in hearing how you would use our package, and what features it may be lacking. 
+We now invite the community to try out our newly registered packages, [MLJ](https://github.com/alan-turing-institute/MLJ.jl)alongside [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl), and provide any feedback or suggestions you may have going forward. We are also particularly interested in hearing how you would use our package, and what features it may be lacking. 
