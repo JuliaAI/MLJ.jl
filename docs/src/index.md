@@ -168,6 +168,7 @@ Unknown`, then the interpretation of `x` by an MLJ model is unpredictable.
 
 ```@example 2
 using MLJ # hide
+
 (scitype(42), scitype(π), scitype("Julia"))
 ```
 

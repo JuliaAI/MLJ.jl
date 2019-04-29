@@ -39,6 +39,7 @@ Load a built-in task:
 
 ```@example 1
 using MLJ
+MLJ.color_off() # hide
 task = load_iris()
 ```
 
