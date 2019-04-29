@@ -5,9 +5,8 @@ Anthony Blaom, Diego Arenas, Franz Kiraly, Yiannis Simillides, Sebastian Vollmer
 **May 1st, 2019.** Blog post to appear shortly on the JuliaLanguage website. 
 
 
-        &nbsp; |  &nbsp;
-------------------------|---------------------------
 ![](learningcurves.png) | ![](heatmap.png)
+------------------------|--------------------------
 ![](wrapped_ridge.png)  | ![](MLPackages.png)
 
 
