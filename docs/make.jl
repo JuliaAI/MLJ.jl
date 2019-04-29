@@ -29,7 +29,8 @@ makedocs(
                 "Glossary"=>"glossary.md",
                 "API"=>"api.md",
                 "FAQ" => "frequently_asked_questions.md",
-                "MLJ News"=>"NEWS.md"]
+                "MLJ News"=>"NEWS.md",
+                 "Julia BlogPost"=>"julia_blogpost.md"]
 )
 
 deploydocs(
