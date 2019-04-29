@@ -1,29 +1,9 @@
-<!---
-![](https://github.com/JuliaLang/www.julialang.org/tree/master/images/blog/2019-04-26-MLJ/learningcurves.png)
-![](https://github.com/JuliaLang/www.julialang.org/tree/master/images/blog/2019-04-26-MLJ/heatmap.png)
-![](https://github.com/JuliaLang/www.julialang.org/tree/master/images/blog/2019-04-26-MLJ/packages.jpg)
-![](https://github.com/ysimillides/www.julialang.org/blob/master/images/blog/2019-04-26-MLJ/)
-Images to be placed
--->
-<!-- Diagrams drew with with http://dia-installer.de -->
 # Beyond machine learning pipelines with MLJ
 
 Anthony Blaom, Diego Arenas, Franz Kiraly, Yiannis Simillides, Sebastian Vollmer
 
-## This post will also appear on the JuliaLanguage blogpost in due course, and a link will be added to this blog referencing it
-<!---
-- learning curves (from `examples/random_forest.jl`)
-- tuning plots (from `examples/two_parameter_plot.jl`)
--->
-<p float="left" align="middle">
-  <img src="https://github.com/ysimillides/www.julialang.org/blob/master/images/blog/2019-04-26-MLJ/learningcurves.png" width="400" />
-  <img src="https://github.com/ysimillides/www.julialang.org/blob/master/images/blog/2019-04-26-MLJ/heatmap.png" width="400" /> 
-</p>
+This post will also appear on the JuliaLanguage blogpost in due course alongside images, and a link will be added to this blog referencing it.
 
-<p float="left" align="middle">
-  <img src="https://github.com/ysimillides/www.julialang.org/blob/master/images/blog/2019-04-26-MLJ/wrapped_ridge.png" width="400" />
-  <img src="https://github.com/ysimillides/www.julialang.org/blob/master/images/blog/2019-04-26-MLJ/MLPackages.png" width="400" /> 
-</p>
 
 
 ## Introduction
@@ -45,35 +25,27 @@ composition.
 
 **Quick links:**
 
-&#9758; [MLJ vs ScikitLearn.jl](https://alan-turing-institute.github.io/MLJ.jl/dev/frequently_asked_questions/)  
+- [MLJ vs ScikitLearn.jl](https://alan-turing-institute.github.io/MLJ.jl/dev/frequently_asked_questions/)  
 
-&#9758; Video from [London Julia User Group meetup in March 2019](https://www.youtube.com/watch?v=CfHkjNmj1eE) (skip to [demo at 21'39](https://youtu.be/CfHkjNmj1eE?t=21m39s)) &nbsp; 
+- Video from [London Julia User Group meetup in March 2019](https://www.youtube.com/watch?v=CfHkjNmj1eE) (skip to [demo at 21'39](https://youtu.be/CfHkjNmj1eE?t=21m39s)) &nbsp; 
 
-[![London Julia User Group](images/0.jpg)](http://www.youtube.com/watch?v=CfHkjNmj1eE)
+- [![London Julia User Group](images/0.jpg)](http://www.youtube.com/watch?v=CfHkjNmj1eE)
 
-&#9758;  The MLJ [tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/tour.ipynb) 
-&nbsp; 
+- The MLJ [tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/tour.ipynb) 
 
-&#9758; Building a [self-tuning random
-  forest](https://github.com/alan-turing-institute/MLJ.jl/blob/master/examples/random_forest.ipynb)
-&nbsp; 
+- Building a [self-tuning random forest](https://github.com/alan-turing-institute/MLJ.jl/blob/master/examples/random_forest.ipynb)
+ 
+- An MLJ [docker image](https://github.com/ysimillides/mlj-docker) (including tour)
 
-&#9758; An MLJ [docker image](https://github.com/ysimillides/mlj-docker) (including tour)
+- Implementing the MLJ interface for a [new model](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/) 
 
-&#9758; Implementing the MLJ interface for a [new model](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/) 
-&nbsp; 
+- How to [contribute](https://github.com/alan-turing-institute/MLJ.jl/blob/master/CONTRIBUTE.md)
 
-&#9758; How to [contribute](https://github.com/alan-turing-institute/MLJ.jl/blob/master/CONTRIBUTE.md)
+- Julia [Slack](http://julialang.slack.com) channel: \#mlj.
 
-&#9758; Julia [Slack](http://julialang.slack.com) channel: \#mlj.
+- Star'ing us to show support for [MLJ](https://github.com/alan-turing-institute/MLJ.jl) would be greatly appreciated!
 
-&#9758; Star'ing us to show support for [MLJ](https://github.com/alan-turing-institute/MLJ.jl) would be greatly appreciated!
-
-
-<!---
-![](https://github.com/ysimillides/www.julialang.org/blob/master/images/blog/2019-04-26-MLJ/wrapped_ridge.png)
--->
-
+![](wrapped_ridge.png)
 
 ## MLJ features
 
@@ -129,10 +101,7 @@ in prediction and training modes is different. This can be seen from
 the following schematic of a simple two-model stack, viewed as a
 network:
 
-<!---
-![](https://github.com/ysimillides/www.julialang.org/blob/master/images/blog/2019-04-26-MLJ/two_model_stack.png)
--->
-![](https://github.com/ysimillides/www.julialang.org/blob/master/images/blog/2019-04-26-MLJ/two_model_stack.png)
+![](two_model_stack.png)
 
 ## Building a simple network
 
