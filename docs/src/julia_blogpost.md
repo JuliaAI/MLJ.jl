@@ -2,8 +2,13 @@
 
 Anthony Blaom, Diego Arenas, Franz Kiraly, Yiannis Simillides, Sebastian Vollmer
 
-This post will also appear on the JuliaLanguage blogpost in due course alongside images, and a link will be added to this blog referencing it.
+**May 1st, 2019.** Blog post to appear shortly on the JuliaLanguage website. 
 
+
+        &nbsp; |  &nbsp;
+------------------------|---------------------------
+![](learningcurves.png) | ![](heatmap.png)
+![](wrapped_ridge.png)  | ![](MLPackages.png)
 
 
 ## Introduction
@@ -29,7 +34,7 @@ composition.
 
 - Video from [London Julia User Group meetup in March 2019](https://www.youtube.com/watch?v=CfHkjNmj1eE) (skip to [demo at 21'39](https://youtu.be/CfHkjNmj1eE?t=21m39s)) &nbsp; 
 
-- [![London Julia User Group](images/0.jpg)](http://www.youtube.com/watch?v=CfHkjNmj1eE)
+- [![London Julia User Group](0_small.jpg)](http://www.youtube.com/watch?v=CfHkjNmj1eE)
 
 - The MLJ [tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/tour.ipynb) 
 
@@ -45,7 +50,6 @@ composition.
 
 - Star'ing us to show support for [MLJ](https://github.com/alan-turing-institute/MLJ.jl) would be greatly appreciated!
 
-![](wrapped_ridge.png)
 
 ## MLJ features
 
