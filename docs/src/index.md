@@ -1,9 +1,7 @@
-[MLJ homepage](https://github.com/alan-turing-institute/MLJ.jl)
-
-For installation instructions, please see the MLJ package [README.md](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md) file.
-
-
 # Getting Started
+
+### [Installation instructions](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md)
+
 
 ### Basic supervised training and testing
 
