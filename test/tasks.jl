@@ -49,10 +49,10 @@ end == 0
     y_coerced = coerce(Continuous, y)
     @test y_coerced isa Vector{Float64}
     @test y_coerced ≈ y
-    y = task.X.z
-    y_coerced = coerce(FiniteOrderedFactor, y)
-    @test y_coerced isa CategoricalVector{Char, UInt32}
-    @test y_coerced.pool.ordered
+    X_coerced = coerce(Dict(:z => FiniteOrderedFactor), task.X)
+    @test X_coerced.x === task.X.x
+    @test X_coerced.z isa CategoricalVector{Char, UInt32}
+    @test X_coerced.z.pool.ordered
     # Check no-op coercion
     y = rand(Float64, 5)
     @test coerce(Continuous, y) === y
@@ -66,6 +66,9 @@ end == 0
     @test coerce(Count, y) === y
     y = rand(UInt32, 5)
     @test coerce(Count, y) === y
+    X_coerced = coerce(Dict(), task.X)
+    @test X_coerced.x === task.X.x
+    @test X_coerced.z === task.X.z
     # missing values
     y_coerced = @test_logs((:warn, r"Missing values encountered"),
                            coerce(Continuous, [4, 7, missing]))

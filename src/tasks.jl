@@ -90,9 +90,17 @@ function coerce(T::Type{FiniteOrderedFactor}, y)
 end
 
 # Coerce table
-function coerce(types::Dict{Symbol, Type}, X)
+function _coerce_col(X, name, types)
+    y = selectcols(X, name)
+    if haskey(types, name)
+        return coerce(types[name], y)
+    else
+        return y
+    end
+end
+
+function coerce(types::Dict, X)
     names = schema(X).names
-    coltable = NamedTuple{names}(coerce(types[name], selectcols(X, name))
-                                 for name in names)
+    coltable = NamedTuple{names}(_coerce_col(X, name, types) for name in names)
     return MLJBase.table(coltable, prototype=X)
 end
