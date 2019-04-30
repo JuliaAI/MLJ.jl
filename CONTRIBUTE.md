@@ -87,8 +87,8 @@ Julia Computing.
 
 #### Other contributors, past and present
 
-Diego Arenas, Edoardo Barp, Gergö Bohner, Valentin Churavy, Harvey
-Devereux, Thibaut Lienart, Mohammed Nook, Annika Stechemesser, Ayush
-Shridar, Yiannis Simillides
+Diego Arenas, Edoardo Barp, Gergö Bohner, Michael K. Borregaard,
+Valentin Churavy, Harvey Devereux, Mosè Giordano, Thibaut Lienart,
+Mohammed Nook, Annika Stechemesser, Ayush Shridar, Yiannis Simillides
 
 
