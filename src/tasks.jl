@@ -73,7 +73,11 @@ end
 
 # Vector to Multiclass
 function coerce(T::Type{Multiclass}, y)
-    if scitype_union(y) <: T
+    su = scitype_union(y)
+    if su >: Missing
+        _coerce_missing_warn(T)
+    end
+    if su <: T
         return y
     else
         return categorical(y, ordered = false)
@@ -82,7 +86,11 @@ end
 
 # Vector to FiniteOrderedFactor
 function coerce(T::Type{FiniteOrderedFactor}, y)
-    if scitype_union(y) <: T
+    su = scitype_union(y)
+    if su >: Missing
+        _coerce_missing_warn(T)
+    end
+    if su <: T
         return y
     else
         return categorical(y, ordered = true)
