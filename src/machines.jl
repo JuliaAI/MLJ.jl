@@ -39,7 +39,7 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
             length(args) == 1 ||
                 error("Wrong number of arguments. "*
                       "Use machine(model, X) or machine(model, task) for an unsupervised model.")
-            @show args
+
             container_type(args[1]) in [:table, :sparse] || args[1] isa UnsupervisedTask || args[1] isa Vector || args[1] isa CategoricalVector ||
                 error("The X, in machine(model, X), should be a vector, categorical vector, table or UnsupervisedTask. "*
                       "Use MLJ.table(X) to wrap an abstract matrix X as a table. ")
