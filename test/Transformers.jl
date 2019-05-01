@@ -108,7 +108,10 @@ X = DataFrame(name=identity.(categorical(["Ben", "John", "Mary", "John"], ordere
 
 t = OneHotEncoder()
 info(t)
-fitresult, cache, nothing = MLJBase.fit(t, 1, X)
+fitresult, cache, _ =
+    @test_logs((:info, r"Spawned 4 sub-features"),
+               (:info, r"Spawned 4 sub-features"),
+               MLJBase.fit(t, 1, X))
 Xt = transform(t, fitresult, X)
 @test Xt.name__John == float.([false, true, false, true])
 @test Xt.height == X.height
@@ -119,7 +122,10 @@ Xt = transform(t, fitresult, X)
                                   :favourite_number__7, :favourite_number__10, :age) 
 
 # test that *entire* pool of categoricals is used in fit, including unseen levels:
-fitresult_small, cache, nothing = MLJBase.fit(t, 1, MLJBase.selectrows(X,1:2))
+fitresult_small, cache, _ =
+    @test_logs((:info, r"Spawned 2 sub-features"),
+               (:info, r"Spawned 2 sub-features"),
+               MLJBase.fit(t, 1, MLJBase.selectrows(X,1:2)))
 Xtsmall = transform(t, fitresult_small, X)
 @test Xt == Xtsmall
 
@@ -130,7 +136,7 @@ Xtsmall = transform(t, fitresult_small, X)
 
 # test exclusion of ordered factors:
 t = OneHotEncoder(ordered_factor=false)
-fitresult, cache, nothing = MLJBase.fit(t, 1, X)
+fitresult, cache, _ = MLJBase.fit(t, 1, X)
 Xt = transform(t, fitresult, X)
 @test :name in MLJ.schema(Xt).names
 @test :favourite_number__5 in MLJ.schema(Xt).names

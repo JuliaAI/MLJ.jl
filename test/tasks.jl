@@ -8,7 +8,8 @@ using CategoricalArrays
 
 # shuffle!(::SupervisedTask):
 X=(x=10:10:44, y=1:4, z=collect("abcd"))
-task = SupervisedTask(data=X, target=:y, is_probabilistic=true)
+task = @test_logs((:warn, r"An Unknown"), (:info, r"is_probabilistic = true"),
+                  SupervisedTask(data=X, target=:y, is_probabilistic=true))
 task0=deepcopy(task)
 rng = MersenneTwister(1234)
 shuffle!(rng, task0)
