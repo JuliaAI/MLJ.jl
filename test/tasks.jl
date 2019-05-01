@@ -34,24 +34,23 @@ end == 0
 @test task[2:3].y == [2, 3]
 
 @testset "Type coercion" begin
-    import MLJ: coerce
     types = Dict(:x => Continuous, :z => Multiclass)
     X_coerced = coerce(types, task.X)
-    @test X_coerced.x isa AbstractVector{Float64}
-    @test X_coerced.z isa CategoricalVector{Char, UInt32}
+    @test scitype_union(X_coerced.x) === Continuous
+    @test scitype_union(X_coerced.z) <: Multiclass
     @test !X_coerced.z.pool.ordered
     @test_throws MethodError coerce(Count, ["a", "b", "c"])
     y = collect(Float64, 1:5)
     y_coerced = coerce(Count, y)
-    @test y_coerced isa Vector{Int}
+    @test scitype_union(y_coerced) === Count
     @test y_coerced == y
     y = [1//2, 3//4, 6//5]
     y_coerced = coerce(Continuous, y)
-    @test y_coerced isa Vector{Float64}
+    @test scitype_union(y_coerced) === Continuous
     @test y_coerced ≈ y
     X_coerced = coerce(Dict(:z => FiniteOrderedFactor), task.X)
     @test X_coerced.x === task.X.x
-    @test X_coerced.z isa CategoricalVector{Char, UInt32}
+    @test scitype_union(X_coerced.z) <: FiniteOrderedFactor
     @test X_coerced.z.pool.ordered
     # Check no-op coercion
     y = rand(Float64, 5)
@@ -73,19 +72,19 @@ end == 0
     y_coerced = @test_logs((:warn, r"Missing values encountered"),
                            coerce(Continuous, [4, 7, missing]))
     @test ismissing(y_coerced == [4.0, 7.0, missing])
-    @test y_coerced isa Vector{Union{Missing,Float64}}
+    @test scitype_union(y_coerced) === Union{Missing,Continuous}
     y_coerced = @test_logs((:warn, r"Missing values encountered"),
                            coerce(Continuous, Any[4, 7.0, missing]))
     @test ismissing(y_coerced == [4.0, 7.0, missing])
-    @test y_coerced isa Vector{Union{Missing,Float64}}
+    @test scitype_union(y_coerced) === Union{Missing,Continuous}
     y_coerced = @test_logs((:warn, r"Missing values encountered"),
                            coerce(Count, [4.0, 7.0, missing]))
     @test ismissing(y_coerced == [4, 7, missing])
-    @test y_coerced isa Vector{Union{Missing,Int}}
+    @test scitype_union(y_coerced) === Union{Missing,Count}
     y_coerced = @test_logs((:warn, r"Missing values encountered"),
                            coerce(Count, Any[4, 7.0, missing]))
     @test ismissing(y_coerced == [4, 7, missing])
-    @test y_coerced isa Vector{Union{Missing,Int}}
+    @test scitype_union(y_coerced) === Union{Missing,Count}
     @test eltype(coerce(Multiclass, [:x, :y, missing])) ==
         Union{Missing, CategoricalValue{Symbol,UInt32}}
     @test eltype(coerce(FiniteOrderedFactor, [:x, :y, missing])) ==
