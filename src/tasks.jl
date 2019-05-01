@@ -71,29 +71,18 @@ function coerce(T::Type{Count}, y::AbstractVector)
     return _int.(y)
 end
 
-# Vector to Multiclass
-function coerce(T::Type{Multiclass}, y)
-    su = scitype_union(y)
-    if su >: Missing
-        _coerce_missing_warn(T)
-    end
-    if su <: T
-        return y
-    else
-        return categorical(y, ordered = false)
-    end
-end
-
-# Vector to FiniteOrderedFactor
-function coerce(T::Type{FiniteOrderedFactor}, y)
-    su = scitype_union(y)
-    if su >: Missing
-        _coerce_missing_warn(T)
-    end
-    if su <: T
-        return y
-    else
-        return categorical(y, ordered = true)
+# Vector to Multiclass and FiniteOrderedFactor
+for (T, ordered) in ((Multiclass, false), (FiniteOrderedFactor, true))
+    @eval function coerce(::Type{$T}, y)
+        su = scitype_union(y)
+        if su >: Missing
+            _coerce_missing_warn($T)
+        end
+        if su <: $T
+            return y
+        else
+            return categorical(y, ordered = $ordered)
+        end
     end
 end
 
