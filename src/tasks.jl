@@ -43,11 +43,13 @@ Random.shuffle(task::SupervisedTask) = task[shuffle!(Vector(1:nrows(task)))]
 _coerce_missing_warn(T) =
     @warn "Missing values encountered. Coerced to Union{Missing,$T} instead of $T."
 
+
+# Vector to Continuous
 """
     coerce(T, v::AbstractVector)
 
 Coerce the machine types of elements of `v` to ensure the returned
-vector has `scitype_union` `T`, or `Union{Missing,T}`, if `v` has
+vector has `T` as its `scitype_union`, or `Union{Missing,T}`, if `v` has
 missing values.
 
     julia> v = coerce(Continous, [1.0, missing, 5.0])
@@ -56,15 +58,9 @@ missing values.
     julia> scitype_union(v)
     Union{Missing,Continuous}
 
-    coerce(d::Dict, X)
-
-Return a copy of the table `X` with columns named in the keys of `d`
-coerced to have `scitype_union` equal to the corresponding value. 
+See also scitype, scitype_union, scitypes
 
 """
-function coerce end
-
-# Vector to Continuous
 coerce(T::Type{Continuous}, y::AbstractVector{<:Number}) = float(y)
 function coerce(T::Type{Continuous}, y::AbstractVector{Union{<:Number,Missing}})
     _coerce_missing_warn(T)
@@ -124,6 +120,13 @@ function _coerce_col(X, name, types)
     end
 end
 
+"""
+    coerce(d::Dict, X)
+
+Return a copy of the table `X` with columns named in the keys of `d`
+coerced to have `scitype_union` equal to the corresponding value. 
+
+"""
 function coerce(types::Dict, X)
     names = schema(X).names
     coltable = NamedTuple{names}(_coerce_col(X, name, types) for name in names)
@@ -208,6 +211,8 @@ ignored.
     X = task()
 
 Return the input data in form to be used in models.
+
+See also scitype, scitype_union, scitypes
 
 """
 unsupervised(; data=nothing, types=nothing, kwargs...) =

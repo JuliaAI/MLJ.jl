@@ -13,8 +13,8 @@ julia> iris = dataset("datasets", "iris"); # a DataFrame
 ```
 
 In MLJ one can either wrap data for supervised learning in a formal
-*task* (see [Working with Tasks](working_with_tasks.md)), or work directly with the
-data, split into its input and target parts:
+*task* (see [Working with Tasks](working_with_tasks.md)), or work
+directly with the data, split into its input and target parts:
 
 
 ```julia
@@ -130,20 +130,15 @@ expected to have `Vector` or `CategoricalVector` type.
 
 The target `y` in the first constructor above must be a
 `Vector` or `CategoricalVector`. A multivariate target `y` will be
-vector of *tuples*. The tuples need not have uniform length, so 
+a vector of *tuples*. The tuples need not have uniform length, so 
 some forms of sequence prediction are supported.
 
-Conversely, the choice of element types used to represent your data
-has implicit consequences about how MLJ will interpret that data.
-
-> WIP: Eventually users will use task constructors to coerce element
-> types into the requisite form. At present, the user must do so
-> manually, before passing data to the constructors.
-
-To articulate MLJ's conventions about data representation, MLJ
-distinguishes between *machine* data types on the one hand (`Float64`,
-`Bool`, `String`, etc) and *scientific data types* on the other,
-represented by new Julia types: `Continuous`, `Multiclass{N}`,
+While MLJ is not too fussy about the format of data, your choice of
+element types has implicit consequences about how MLJ will interpret
+that data.  To articulate MLJ's conventions about data representation,
+MLJ distinguishes between *machine* data types on the one hand
+(`Float64`, `Bool`, `String`, etc) and *scientific data types* on the
+other, represented by new Julia types: `Continuous`, `Multiclass{N}`,
 `FiniteOrderedFactor{N}`, `Count` (unbounded ordered factor), and
 `Unknown`, with obvious interpretations.  These types are organized in
 a type hierarchy rooted in a new abstract type `Found`:
@@ -151,16 +146,20 @@ a type hierarchy rooted in a new abstract type `Found`:
 ![](scitypes.png)
 
 A *scientific type* is any subtype of
-`Union{Missing,Found}`. Scientific types have no instances.
-
-Scientific types appear when querying model metadata, as in this
-example:
+`Union{Missing,Found}`. Scientific types have no instances. (Their
+primary role is as values for model trait functions.) Such types
+appear, for example, when querying model metadata:
 
 ```julia
 julia> info("DecisionTreeClassifier")[:target_scitype_union]
 
 Union{Multiclass,FiniteOrderedFactor}
 ```
+
+which means that the `DecisionTreeClassifier` is model for predicting
+univariate targets that whose values are finite factors, unordered or
+ordered. The corresponding value for a binary classification model
+would be `Multiclass{2}`. 
 
 **Basic data convention.** The scientific type of data that a Julia
 object `x` can represent is defined by `scitype(x)`. If `scitype(x) ==
@@ -172,15 +171,17 @@ using MLJ # hide
 (scitype(42), scitype(π), scitype("Julia"))
 ```
 
-In particular, *integers cannot be used to represent* `Multiclass` *or*
-`FiniteOrderedFactor` *data*; these can be represented by an unordered or
-ordered `CategoricalValue` or `CategoricalString`:
+In particular, *integers cannot be used to represent* `Multiclass`
+*or* `FiniteOrderedFactor` *data*; these can be represented by an
+unordered or ordered `CategoricalValue` or `CategoricalString`
+(automatic if your table is a `DataFrame`, or other column-based table,
+and the column in question is a `CategoricalArray`):
 
 `T`                         |     `scitype(x)` for `x::T`
 ----------------------------|:--------------------------------
 `Missing`                   |      `Missing`
 `AbstractFloat`             |      `Continuous`
-`Inte   ger`                |        `Count`
+`Integer`                   |        `Count`
 `CategoricalValue`          | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false` 
 `CategoricalString`         | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false`
 `CategoricalValue`          | `FiniteOrderedFactor{N}` where `N = nlevels(x)`, provided `x.pool.ordered == true` 
@@ -188,5 +189,17 @@ ordered `CategoricalValue` or `CategoricalString`:
 `Integer`                   | `Count`
 
 Here `nlevels(x) = length(levels(x.pool))`.
+
+Methods exist to coerce the scientific type of a vector or table (see
+below). [Task](working_with_tasks.md) constructors also allow one to
+force the data being wrapped to have the desired scientific type.
+
+```@docs
+coerce
+```
+
+
+
+
 
 

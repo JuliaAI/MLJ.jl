@@ -22,8 +22,6 @@ Explicitly specifying scientific types during the construction of a
 MLJ task is the user's opportunity to articulate how the supplied data
 should be interpreted.
 
-> WIP: At present scitypes cannot be specified and the user must manually coerce data before task construction. 
-
 
 ### Learning objectives
 
@@ -50,44 +48,35 @@ X, y = task()
 X[1:3, :]
 ```
 
-Supposing we have some new data, say
+Now, starting with some tabular data...
 
 ```@example 1
-coltable = (height = Float64[183, 145, 160, 78, 182, 76],
-            gender = categorical([:m, :f, :f, :f, :m, :m]),
-            weight = Float64[92, 67, 62, 25, 80, 31],
-            age = Float64[53, 12, 60, 5, 31, 7],
-            overall_health = categorical([1, 2, 1, 3, 3, 1], ordered=true))
+using RDatasets
+
+df = dataset("boot", "channing");
+first(df, 4)
 ```
 
-we can check MLJ's default interpretation of that data:
+...we can check MLJ's interpretation of that data:
 
 ```@example 1
-scitypes(X)
+scitypes(df)
 ```
 
-And construct a associated task:
+And construct a task by wrapping the data in a learning objective, and
+correcting erroneous interpretations of the data; the middle three
+fields refer to ages in months, the last is a flag:
 
 ```@example 1
-task = SupervisedTask(data=coltable, target=:overall_health, ignore=:gender, is_probabilistic=true)
-```
-
-> WIP: In the near future users will be able to override the default interpretation of the data.
-
-To list models matching a task:
-
-```@example 1
-models(task)
-```
-
-Row selection for a task:
-
-```@example 1
-nrows(task)
-```
-
-```@example 1
-task[1:2].y
+types = 
+task = supervised(data=df,
+                  target=:Exit,
+                  ignore=:Time,
+                  is_probabilistic=true,
+                  types=Dict(:Entry=>Continuous,
+                             :Exit=>Continuous,
+                             :Cens=>Multiclass))
+first(task.X, 4)
 ```
 
 Shuffle the rows of a task:
@@ -100,6 +89,22 @@ shuffle!(rng, task) # rng is optional
 task[1:4].y
 ```
 
+Counting and selecting rows of a task:
+
+```@example 1
+nrows(task)
+```
+
+```@example 1
+task[1:2].y
+```
+
+Listing the models available to complete a task:
+
+```@example 1
+models(task)
+```
+
 Binding a model to a task and evalutating performance:
 
 ```@example 1
@@ -108,15 +113,14 @@ mach = machine(DecisionTreeClassifier(target_type=String), task)
 evaluate!(mach, operation=predict_mode, resampling=Holdout(), measure=misclassification_rate, verbosity=0)
 ```
 
-
-### API Reference   
+### API Reference
 
 ```@docs
-UnsupervisedTask
+supervised
 ```
 
 ```@docs
-SupervisedTask
+unsupervised
 ```
 
 ```@docs
