@@ -94,6 +94,11 @@ end == 0
     # non-missing Any vectors
     @test coerce(Continuous, Any[4, 7]) == [4.0, 7.0]
     @test coerce(Count, Any[4.0, 7.0]) == [4, 7]
+
+    # corner case of using dictionary of types on an abstract vector:
+    @test scitype_union(coerce(Dict(:x=>Count), [1.0, 2.0])) <:  Count
+
+
 end
 
 # task constructors:
