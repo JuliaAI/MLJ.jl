@@ -98,7 +98,6 @@ end == 0
     # corner case of using dictionary of types on an abstract vector:
     @test scitype_union(coerce(Dict(:x=>Count), [1.0, 2.0])) <:  Count
 
-
 end
 
 # task constructors:

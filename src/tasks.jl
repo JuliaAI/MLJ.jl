@@ -135,7 +135,7 @@ function coerce(types::Dict, v::AbstractVector)
     kys = keys(types)
     length(kys) == 1 || error("Cannot coerce a vector using a multi-keyed dictionary of types. ")
     key = first(kys)
-    return coerce(key, v)
+    return coerce(types[key], v)
 end
 
 
