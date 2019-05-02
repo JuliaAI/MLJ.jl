@@ -86,11 +86,11 @@ end == 0
     @test ismissing(y_coerced == [4, 7, missing])
     @test scitype_union(y_coerced) === Union{Missing,Count}
     @test scitype_union(@test_logs((:warn, r"Missing values encountered"),
-                                   coerce(Multiclass, [:x, :y, missing]))) <:
-        Union{Missing, Multiclass}
+                                   coerce(Multiclass, [:x, :y, missing]))) ===
+        Union{Missing, Multiclass{2}}
     @test scitype_union(@test_logs((:warn, r"Missing values encountered"),
-                                   coerce(FiniteOrderedFactor, [:x, :y, missing]))) <:
-        Union{Missing, FiniteOrderedFactor}
+                                   coerce(FiniteOrderedFactor, [:x, :y, missing]))) ===
+                                       Union{Missing, FiniteOrderedFactor{2}}
     # non-missing Any vectors
     @test coerce(Continuous, Any[4, 7]) == [4.0, 7.0]
     @test coerce(Count, Any[4.0, 7.0]) == [4, 7]
@@ -103,10 +103,10 @@ end
 # task constructors:
 df = (x=10:10:44, y=1:4, z=collect("abcd"), w=[1.0, 3.0, missing])
 types = Dict(:x => Continuous, :z => Multiclass, :w => Count)
-task = supervised(data=df, types=types, target=:y, ignore=:y,
-                  is_probabilistic=false)
+task = @test_logs((:warn, r"Missing values encountered"), (:info, r"\n"),
+                  supervised(data=df, types=types, target=:y, ignore=:y, is_probabilistic=false))
 @test scitype_union(task.X.x) <: Continuous
-@test scitype_union(task.X.w) <: Union{Count, Missing}
+@test scitype_union(task.X.w) === Union{Count, Missing}
 @test scitype_union(task.y) <: Count
 
 end # module
