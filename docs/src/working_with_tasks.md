@@ -52,7 +52,6 @@ Now, starting with some tabular data...
 
 ```@example 1
 using RDatasets
-
 df = dataset("boot", "channing");
 first(df, 4)
 ```
