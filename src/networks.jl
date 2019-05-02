@@ -242,15 +242,15 @@ istoobig(d::Tuple{AbstractNode}) = length(d) > 10
 # overload show method
 function _recursive_show(stream::IO, X::AbstractNode)
     if X isa Source
-        printstyled(IOContext(stream, :color=>true), MLJBase.handle(X), bold=false, color=:blue)
+        printstyled(IOContext(stream, :color=>MLJBase.SHOW_COLOR), MLJBase.handle(X), color=:blue)
     else
         detail = (X.machine == nothing ? "(" : "($(MLJBase.handle(X.machine)), ")
         operation_name = typeof(X.operation).name.mt.name
         print(stream, operation_name, "(")
         if X.machine != nothing
             color = (X.machine.frozen ? :red : :green)
-            printstyled(IOContext(stream, :color=>true), MLJBase.handle(X.machine),
-                        bold=true)
+            printstyled(IOContext(stream, :color=>MLJBase.SHOW_COLOR), MLJBase.handle(X.machine),
+                        bold=MLJBase.SHOW_COLOR)
             print(stream, ", ")
         end
         n_args = length(X.args)
@@ -268,7 +268,7 @@ function Base.show(stream::IO, ::MIME"text/plain", X::AbstractNode)
     id = objectid(X) 
     description = string(typeof(X).name.name)
     str = "$description @ $(MLJBase.handle(X))"
-    printstyled(IOContext(stream, :color=> true), str, bold=false, color=:blue)
+    printstyled(IOContext(stream, :color=>MLJBase.SHOW_COLOR), str, color=:blue)
     if !(X isa Source)
         print(stream, " = ")
         _recursive_show(stream, X)
@@ -279,13 +279,13 @@ function Base.show(stream::IO, ::MIME"text/plain", machine::NodalMachine)
     id = objectid(machine) 
     description = string(typeof(machine).name.name)
     str = "$description @ $(MLJBase.handle(machine))"
-    printstyled(IOContext(stream, :color=> true), str, bold=true)
+    printstyled(IOContext(stream, :color=>MLJBase.SHOW_COLOR), str, bold=MLJBase.SHOW_COLOR)
     print(stream, " = ")
     print(stream, "machine($(machine.model), ")
     n_args = length(machine.args)
     counter = 1
     for arg in machine.args
-        printstyled(IOContext(stream, :color=>true), MLJBase.handle(arg), bold=true)
+        printstyled(IOContext(stream, :color=>MLJBase.SHOW_COLOR), MLJBase.handle(arg), bold=MLJBase.SHOW_COLOR)
         counter >= n_args || print(stream, ", ")
         counter += 1
     end

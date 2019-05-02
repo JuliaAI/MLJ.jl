@@ -1,18 +1,4 @@
 
-[GaussianProcesses.GPClassifier]
-":input_is_multivariate" = "`true`"
-":package_uuid" = "891a1506-143c-57d2-908e-e1f8e92e6de9"
-":load_path" = "MLJModels.GaussianProcesses_.GPClassifier"
-":is_pure_julia" = "`true`"
-":is_supervised" = "`true`"
-":package_url" = "https://github.com/STOR-i/GaussianProcesses.jl"
-":package_name" = "GaussianProcesses"
-":name" = "GPClassifier"
-":is_probabilistic" = "`false`"
-":target_scitype_union" = "`Union{FiniteOrderedFactor, Multiclass}`"
-":input_scitype_union" = "`MLJBase.Continuous`"
-":is_wrapper" = "`false`"
-
 [DecisionTree.DecisionTreeRegressor]
 ":input_is_multivariate" = "`true`"
 ":package_uuid" = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
@@ -181,34 +167,6 @@
 ":input_scitype_union" = "`MLJBase.Continuous`"
 ":is_wrapper" = "`false`"
 
-[NaiveBayes.GaussianNBClassifier]
-":input_is_multivariate" = "`true`"
-":package_uuid" = "9bbee03b-0db5-5f46-924f-b5c9c21b8c60"
-":load_path" = "MLJModels.NaiveBayes_.GaussianNBClassifier"
-":is_pure_julia" = "`true`"
-":is_supervised" = "`true`"
-":package_url" = "https://github.com/dfdx/NaiveBayes.jl"
-":package_name" = "NaiveBayes"
-":name" = "GaussianNBClassifier"
-":is_probabilistic" = "`true`"
-":target_scitype_union" = "`Union{FiniteOrderedFactor, Multiclass}`"
-":input_scitype_union" = "`MLJBase.Continuous`"
-":is_wrapper" = "`false`"
-
-[NaiveBayes.MultinomialNBClassifier]
-":input_is_multivariate" = "`true`"
-":package_uuid" = "9bbee03b-0db5-5f46-924f-b5c9c21b8c60"
-":load_path" = "MLJModels.NaiveBayes_.MultinomialNBClassifier"
-":is_pure_julia" = "`true`"
-":is_supervised" = "`true`"
-":package_url" = "https://github.com/dfdx/NaiveBayes.jl"
-":package_name" = "NaiveBayes"
-":name" = "MultinomialNBClassifier"
-":is_probabilistic" = "`true`"
-":target_scitype_union" = "`Union{FiniteOrderedFactor, Multiclass}`"
-":input_scitype_union" = "`MLJBase.Count`"
-":is_wrapper" = "`false`"
-
 [XGBoost.XGBoostCount]
 ":input_is_multivariate" = "`true`"
 ":package_uuid" = "009559a3-9522-5dbb-924b-0b6ed2b22bb9"
@@ -249,4 +207,32 @@
 ":is_probabilistic" = "`true`"
 ":target_scitype_union" = "`Union{FiniteOrderedFactor, Multiclass}`"
 ":input_scitype_union" = "`MLJBase.Continuous`"
+":is_wrapper" = "`false`"
+
+[NaiveBayes.GaussianNBClassifier]
+":input_is_multivariate" = "`true`"
+":package_uuid" = "9bbee03b-0db5-5f46-924f-b5c9c21b8c60"
+":load_path" = "MLJModels.NaiveBayes_.GaussianNBClassifier"
+":is_pure_julia" = "`true`"
+":is_supervised" = "`true`"
+":package_url" = "https://github.com/dfdx/NaiveBayes.jl"
+":package_name" = "NaiveBayes"
+":name" = "GaussianNBClassifier"
+":is_probabilistic" = "`true`"
+":target_scitype_union" = "`Union{FiniteOrderedFactor, Multiclass}`"
+":input_scitype_union" = "`MLJBase.Continuous`"
+":is_wrapper" = "`false`"
+
+[NaiveBayes.MultinomialNBClassifier]
+":input_is_multivariate" = "`true`"
+":package_uuid" = "9bbee03b-0db5-5f46-924f-b5c9c21b8c60"
+":load_path" = "MLJModels.NaiveBayes_.MultinomialNBClassifier"
+":is_pure_julia" = "`true`"
+":is_supervised" = "`true`"
+":package_url" = "https://github.com/dfdx/NaiveBayes.jl"
+":package_name" = "NaiveBayes"
+":name" = "MultinomialNBClassifier"
+":is_probabilistic" = "`true`"
+":target_scitype_union" = "`Union{FiniteOrderedFactor, Multiclass}`"
+":input_scitype_union" = "`MLJBase.Count`"
 ":is_wrapper" = "`false`"

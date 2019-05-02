@@ -5,6 +5,7 @@ export @curve, @pcurve                               # utilities.jl
 export mav, rms, rmsl, rmslp1, rmsp                  # metrics.jl
 export misclassification_rate, cross_entropy         # metrics.jl
 export default_measure                               # metrics.jl
+export coerce, supervised, unsupervised              # tasks.jl
 export report                                        # machines.jl
 export Holdout, CV, evaluate!, Resampler             # resampling.jl
 export Params, params, set_params!                   # parameters.jl
@@ -22,7 +23,6 @@ export source, node, fit!, freeze!, thaw!, Node, sources
 
 # defined in include file "builtins/Transformers.jl":
 export FeatureSelector
-export ToIntTransformer
 export UnivariateStandardizer, Standardizer
 export UnivariateBoxCoxTransformer
 export OneHotEncoder
@@ -37,7 +37,7 @@ export nrows, nfeatures, info
 export SupervisedTask, UnsupervisedTask, MLJTask
 export Deterministic, Probabilistic, Unsupervised, Supervised
 export Found, Continuous, Discrete, OrderedFactor    
-export FiniteOrderedFactor, Other
+export FiniteOrderedFactor, Unknown
 export Count, Multiclass, Binary
 export scitype, scitype_union, scitypes
 export predict, predict_mean, predict_median, predict_mode

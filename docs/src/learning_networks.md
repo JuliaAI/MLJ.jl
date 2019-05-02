@@ -55,6 +55,7 @@ synthetic data:
 
 ```@example 1
 using MLJ # hide
+MLJ.color_off() # hide
 using Statistics, DataFrames # hide
 x1 = rand(300)
 x2 = rand(300)
@@ -153,7 +154,8 @@ mutable struct WrappedRidge <: Deterministic{Node}
     ridge_model
 end
 
-WrappedRidge(; ridge_model=RidgeRegressor) = WrappedRidge(ridge_model); # keyword constructor
+# keyword constructor
+WrappedRidge(; ridge_model=RidgeRegressor) = WrappedRidge(ridge_model); 
 ```
 
 Now satisfied that our wrapped Ridge Regression learning network
@@ -209,13 +211,11 @@ applying "dynamic" operations like `predict` and `transform` to nodes,
 overload ordinary "static" operations as well. Common operations, like
 addition, scalar multiplication, `exp` and `log` work out-of-the
 box. To demonstrate this, consider the code below defining a composite
-model that:
-
-(1) one-hot encodes the input table `X`
-(2) log transforms the continuous target `y`
-(3) fits specified K-nearest neighbour and ridge regressor models to the data
-(4) computes a weighted average of individual model predictions
-(5) inverse transforms (exponentiates) the blended predictions
+model that: (i) One-hot encodes the input table `X`; (ii) Log
+transforms the continuous target `y`; (iii) Fits specified K-nearest
+neighbour and ridge regressor models to the data; (iv) Computes a
+weighted average of individual model predictions; and (v) Inverse
+transforms (exponentiates) the blended predictions.
 
 Note, in particular, the lines defining `zhat` and `yhat`, which
 combine several static node operations.
@@ -270,9 +270,9 @@ mach = machine(blended_model, task)
 evaluate!(mach, resampling=Holdout(fraction_train=0.7), measure=rmsl) 
 ```
 
-To overerload a function for application to nodes, we the `node`
-method.  Here are some examples taken from MLJ source (at work in the
-example above):
+A `node` method allows us to overerload a given function to
+node arguments.  Here are some examples taken from MLJ source
+(at work in the example above):
 
 ```julia
 Base.log(v::Vector{<:Number}) = log.(v)
@@ -288,14 +288,9 @@ Here `AbstractNode` is the common supertype of `Node` and `Source`.
 
 As a final example, here's how to extend row shuffling to nodes:
 
-```julia
+```example 1
 using Random
 Random.shuffle(X::AbstractNode) = node(Y -> MLJ.selectrows(Y, Random.shuffle(1:nrows(Y))), X)
-```
-
-```@example 1
-using Random # hide 
-Random.shuffle(X::AbstractNode) = node(Y -> MLJ.selectrows(Y, Random.shuffle(1:nrows(Y))), X) # hide
 X = (x1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
      x2 = [:one, :two, :three, :four, :five, :six, :seven, :eight, :nine, :ten])
 Xs = source(X)

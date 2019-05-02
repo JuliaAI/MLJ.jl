@@ -12,10 +12,10 @@ MLJ aims to be a flexible framework for combining and tuning machine
 learning models, written in the high performance, rapid development,
 scientific programming language, [Julia](https://julialang.org). 
 
-MLJ is in a relatively early stage of development and welcomes new
-collaborators. Click [here](CONTRIBUTE.md) if you are interested in
-contributing, or if you are interested in implementing the MLJ
-interface for an existing Julia machine learning algorithm.
+MLJ is being actively developed and welcomes new collaborators. Click
+[here](CONTRIBUTE.md) if you are interested in contributing, or if you
+are interested in implementing the MLJ interface for an existing Julia
+machine learning algorithm.
 
 The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html).
 
