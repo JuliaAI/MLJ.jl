@@ -20,6 +20,9 @@ export RidgeRegressor, PCA                           # builtins/LocalMulitivaria
 export Machine, NodalMachine, machine, AbstractNode
 export source, node, fit!, freeze!, thaw!, Node, sources
 
+# defined in "tasks.jl"
+export coerce
+
 # defined in include file "builtins/Transformers.jl":
 export FeatureSelector
 export ToIntTransformer
