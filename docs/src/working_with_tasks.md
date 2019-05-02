@@ -63,8 +63,8 @@ scitypes(df)
 ```
 
 And construct a task by wrapping the data in a learning objective, and
-correcting erroneous interpretations of the data; the middle three
-fields refer to ages in months, the last is a flag:
+coercing the data into a form MLJ will correctly interpret. (The middle three
+fields of `df` refer to ages, in months, the last is a flag.):
 
 ```@example 1
 task = supervised(data=df,
