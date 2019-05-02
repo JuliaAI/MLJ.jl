@@ -67,7 +67,6 @@ correcting erroneous interpretations of the data; the middle three
 fields refer to ages in months, the last is a flag:
 
 ```@example 1
-types = 
 task = supervised(data=df,
                   target=:Exit,
                   ignore=:Time,
