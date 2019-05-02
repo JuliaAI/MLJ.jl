@@ -1,3 +1,5 @@
+## ROW INDEXING
+
 function Base.getindex(task::SupervisedTask, r)
     X = selectrows(task.X, r)
     y = task.y[r]
@@ -14,6 +16,9 @@ function Base.getindex(task::SupervisedTask, r)
                           target_scitype_union,
                           input_is_multivariate)
 end
+
+
+## ROWS SHUFFLING
 
 function Random.shuffle!(rng::AbstractRNG, task::SupervisedTask)
     rows = shuffle!(rng, Vector(1:nrows(task)))
@@ -32,7 +37,9 @@ end
 Random.shuffle(rng::AbstractRNG, task::SupervisedTask) = task[shuffle!(rng, Vector(1:nrows(task)))]
 Random.shuffle(task::SupervisedTask) = task[shuffle!(Vector(1:nrows(task)))]
 
-## Coercion
+
+## COERCION
+
 _coerce_missing_warn(T) =
     @warn "Missing values encountered. Coerced to Union{Missing,$T} instead of $T."
 
@@ -101,3 +108,11 @@ function coerce(types::Dict, X)
     coltable = NamedTuple{names}(_coerce_col(X, name, types) for name in names)
     return MLJBase.table(coltable, prototype=X)
 end
+
+
+## TASK CONSTRUCORS WITH OPTIONAL TYPE COERCION
+
+supervised(; data=nothing, types=nothing, kwargs...) =
+	    SupervisedTask(; data = coerce(types, data), kwargs...)
+unsupervised(; data=nothing, types=nothing, kwargs...) =
+	    UnsupervisedTask(; data = coerce(types, data), kwargs...)
