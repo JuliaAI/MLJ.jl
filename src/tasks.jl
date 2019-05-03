@@ -105,7 +105,7 @@ for (T, ordered) in ((Multiclass, false), (FiniteOrderedFactor, true))
         if su <: $T
             return y
         else
-            return categorical(y, ordered = $ordered)
+            return categorical(y, true, ordered = $ordered)
         end
     end
 end
