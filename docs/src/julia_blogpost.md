@@ -2,7 +2,7 @@
 
 Anthony Blaom, Diego Arenas, Franz Kiraly, Yiannis Simillides, Sebastian Vollmer
 
-**May 1st, 2019.** Blog post to appear shortly on the JuliaLanguage website. 
+**May 1st, 2019.** Blog post also posted on the [Julia Language Blog](https://julialang.org/blog/2019/05/beyond-ml-pipelines-with-mlj)
 
 
 ![](learningcurves.png) | ![](heatmap.png)
