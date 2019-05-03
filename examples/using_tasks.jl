@@ -17,7 +17,7 @@ iris = iris[shuffle(1:size(iris,1)), :];
 first(iris, 6)
 
 # define a task:
-task = SupervisedTask(data=iris, targets=:Species, is_probabilistic=false)
+task = supervised(data=iris, targets=:Species, is_probabilistic=false)
 
 # find models matching the task:
 models(task)
@@ -30,7 +30,7 @@ models(task)
 localmodels(task)
 
 # instantiate a model, wrap in a task and evaluate:
-tree = DecisionTreeClassifier(target_type=String)
+tree = DecisionTreeClassifier()
 tree.max_depth = 3
 mach = machine(tree, task)
 evaluate!(mach, resampling=Holdout(fraction_train=0.8), measure=misclassification_rate)

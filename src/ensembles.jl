@@ -21,7 +21,10 @@ predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom<:Determinist
 predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom<:Probabilistic} =
     predict(wens, weights, Xnew, Probabilistic, target_scitype_union(Atom))
 
-function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Deterministic}, ::Type{<:FiniteDiscrete})
+function predict(wens::WrappedEnsemble,
+                 weights,
+                 Xnew,
+                 ::Type{Deterministic}, ::Type{<:FiniteDiscrete})
 
     # weights ignored in this case
 
@@ -34,10 +37,12 @@ function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Deterministic}, ::
 
     # TODO: make this more memory efficient but note that the type of
     # Xnew is unknown (ie, model dependent)
-    predictions = reduce(hcat, [predict(atom, fitresult, Xnew) for fitresult in ensemble])
-    null = categorical(levels(predictions))[1:0] # empty vector with all levels
-    prediction = vcat(null, [mode(predictions[i,:]) for i in 1:size(predictions, 1)])
-
+    predictions =
+        reduce(hcat, [predict(atom, fitresult, Xnew) for fitresult in ensemble])
+    classes = levels(predictions)
+    n = size(predictions, 1)
+    prediction =
+        categorical(vcat([mode(predictions[i,:]) for i in 1:n], classes))[1:n]
     return prediction
 end
 
@@ -155,7 +160,7 @@ pair_vcat(p, q) = (vcat(p[1], q[1]), vcat(p[2], q[2]))
 
 ## ENSEMBLE MODEL FOR DETERMINISTIC MODELS
 
-mutable struct DeterministicEnsembleModel{R,Atom<:Deterministic{R}} <: Deterministic{WrappedEnsemble{R,Atom}}
+mutable struct DeterministicEnsembleModel{Atom<:Deterministic} <: Deterministic
     atom::Atom
     weights::Vector{Float64}
     bagging_fraction::Float64
@@ -165,7 +170,7 @@ mutable struct DeterministicEnsembleModel{R,Atom<:Deterministic{R}} <: Determini
     out_of_bag_measure # TODO: type this
 end
 
-function clean!(model::DeterministicEnsembleModel{R}) where R
+function clean!(model::DeterministicEnsembleModel) 
 
     message = ""
 
@@ -190,8 +195,8 @@ end
 
 # constructor to infer type automatically:
 DeterministicEnsembleModel(atom::Atom, weights,
-                           bagging_fraction, rng, n, parallel, out_of_bag_measure) where {R, Atom<:Deterministic{R}} =
-                               DeterministicEnsembleModel{R, Atom}(atom, weights,
+                           bagging_fraction, rng, n, parallel, out_of_bag_measure) where Atom<:Deterministic =
+                               DeterministicEnsembleModel{Atom}(atom, weights,
                                                                    bagging_fraction, rng, n, parallel, out_of_bag_measure)
 
 # lazy keyword constructors:
@@ -215,7 +220,7 @@ end
 
 ## ENSEMBLE MODEL FOR PROBABILISTIC MODELS
 
-mutable struct ProbabilisticEnsembleModel{R,Atom<:Probabilistic{R}} <: Probabilistic{WrappedEnsemble{R,Atom}}
+mutable struct ProbabilisticEnsembleModel{Atom<:Probabilistic} <: Probabilistic
     atom::Atom
     weights::Vector{Float64}
     bagging_fraction::Float64
@@ -225,7 +230,7 @@ mutable struct ProbabilisticEnsembleModel{R,Atom<:Probabilistic{R}} <: Probabili
     out_of_bag_measure
 end
 
-function clean!(model::ProbabilisticEnsembleModel{R}) where R
+function clean!(model::ProbabilisticEnsembleModel) 
 
     message = ""
 
@@ -248,8 +253,8 @@ function clean!(model::ProbabilisticEnsembleModel{R}) where R
 end
 
 # constructor to infer type automatically:
-ProbabilisticEnsembleModel(atom::Atom, weights, bagging_fraction, rng, n, parallel, out_of_bag_measure) where {R, Atom<:Probabilistic{R}} =
-                               ProbabilisticEnsembleModel{R, Atom}(atom, weights, bagging_fraction, rng, n, parallel, out_of_bag_measure)
+ProbabilisticEnsembleModel(atom::Atom, weights, bagging_fraction, rng, n, parallel, out_of_bag_measure) where Atom<:Probabilistic =
+                               ProbabilisticEnsembleModel{Atom}(atom, weights, bagging_fraction, rng, n, parallel, out_of_bag_measure)
 
 # lazy keyword constructor:
 function ProbabilisticEnsembleModel(;atom=ConstantProbabilisticClassifier(),
@@ -272,7 +277,12 @@ end
 ## COMMON CONSTRUCTOR
 
 """
-    EnsembleModel(atom=nothing, weights=Float64[], bagging_fraction=0.8, rng=GLOBAL_RNG, n=100, parallel=true, out_of_bag_measure=[])
+    EnsembleModel(atom=nothing, 
+                  weights=Float64[],
+                  bagging_fraction=0.8,
+                  rng=GLOBAL_RNG, n=100,
+                  parallel=true,
+                  out_of_bag_measure=[])
 
 Create a model for training an ensemble of `n` learners, with optional
 bagging, each with associated model `atom`. Ensembling is useful if
@@ -303,7 +313,7 @@ ensemble prediction on each input pattern has the type
 is the type of predicted distribution for `atom`.
 
 If a single measure or non-empty vector of measusres is specified by
-`out_of_bag_measure`, then out of bag estimates of performance are
+`out_of_bag_measure`, then out-of-bag estimates of performance are
 reported.
 
 """
@@ -321,11 +331,11 @@ end
 
 ## THE COMMON FIT AND PREDICT METHODS
 
-const EitherEnsembleModel{R,Atom} = Union{DeterministicEnsembleModel{R,Atom}, ProbabilisticEnsembleModel{R,Atom}}
+const EitherEnsembleModel{Atom} = Union{DeterministicEnsembleModel{Atom}, ProbabilisticEnsembleModel{Atom}}
 
 MLJBase.is_wrapper(::Type{<:EitherEnsembleModel}) = true
 
-function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, y) where {R,Atom<:Supervised{R}}
+function fit(model::EitherEnsembleModel{Atom}, verbosity::Int, X, y) where Atom<:Supervised
 
     parallel = model.parallel
 
@@ -417,6 +427,7 @@ function fit(model::EitherEnsembleModel{R, Atom}, verbosity::Int, X, y) where {R
         end
         metrics=mean(metrics, dims=1)
 
+        # Anthony thinks inclusion of this code is wrong:
         # else TODO
         #     @show hcat([metrics[k,:]*model.weights[k] for k=1:length(ensemble)]...)
         #     metrics=mean(hcat([metrics[k,:]*model.weights[k] for k=1:length(ensemble)]...),dims=1)
@@ -488,19 +499,19 @@ MLJBase.load_path(::Type{<:DeterministicEnsembleModel}) = "MLJ.DeterministicEnse
 MLJBase.package_name(::Type{<:DeterministicEnsembleModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:DeterministicEnsembleModel}) = ""
 MLJBase.package_url(::Type{<:DeterministicEnsembleModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
-MLJBase.is_pure_julia(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.is_pure_julia(Atom)
-MLJBase.input_scitype_union(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.input_scitype_union(Atom)
-MLJBase.target_scitype_union(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.target_scitype_union(Atom)
-MLJBase.input_is_multivariate(::Type{<:DeterministicEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.input_is_multivariate(Atom)
+MLJBase.is_pure_julia(::Type{<:DeterministicEnsembleModel{Atom}}) where Atom = MLJBase.is_pure_julia(Atom)
+MLJBase.input_scitype_union(::Type{<:DeterministicEnsembleModel{Atom}}) where Atom = MLJBase.input_scitype_union(Atom)
+MLJBase.target_scitype_union(::Type{<:DeterministicEnsembleModel{Atom}}) where Atom = MLJBase.target_scitype_union(Atom)
+MLJBase.input_is_multivariate(::Type{<:DeterministicEnsembleModel{Atom}}) where Atom = MLJBase.input_is_multivariate(Atom)
 
 MLJBase.load_path(::Type{<:ProbabilisticEnsembleModel}) = "MLJ.ProbabilisticEnsembleModel"
 MLJBase.package_name(::Type{<:ProbabilisticEnsembleModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:ProbabilisticEnsembleModel}) = ""
 MLJBase.package_url(::Type{<:ProbabilisticEnsembleModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
-MLJBase.is_pure_julia(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.is_pure_julia(Atom)
-MLJBase.input_scitype_union(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.input_scitype_union(Atom)
-MLJBase.target_scitype_union(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.target_scitype_union(Atom)
-MLJBase.input_is_multivariate(::Type{<:ProbabilisticEnsembleModel{R,Atom}}) where {R,Atom} = MLJBase.input_is_multivariate(Atom)
+MLJBase.is_pure_julia(::Type{<:ProbabilisticEnsembleModel{Atom}}) where Atom = MLJBase.is_pure_julia(Atom)
+MLJBase.input_scitype_union(::Type{<:ProbabilisticEnsembleModel{Atom}}) where Atom = MLJBase.input_scitype_union(Atom)
+MLJBase.target_scitype_union(::Type{<:ProbabilisticEnsembleModel{Atom}}) where Atom = MLJBase.target_scitype_union(Atom)
+MLJBase.input_is_multivariate(::Type{<:ProbabilisticEnsembleModel{Atom}}) where Atom = MLJBase.input_is_multivariate(Atom)
 
 ### old KoalaEnsembles code for optimizing the weights in the deterministic regressor case:
 

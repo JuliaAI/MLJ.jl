@@ -4,7 +4,7 @@ module TestParameters
 using MLJ
 using Test
 
-mutable struct DummyModel <: Deterministic{Int}
+mutable struct DummyModel <: Deterministic
     K::Int
     metric::Float64
     kernel::Char
@@ -15,7 +15,7 @@ dummy_model = DummyModel(4, 9.5, 'k')
     (K = 4, metric = 9.5, kernel = 'k')
 
 
-mutable struct SuperModel <: Deterministic{Any}
+mutable struct SuperModel <: Deterministic
     lambda::Float64
     model1::DummyModel
     model2::DummyModel

@@ -1,11 +1,13 @@
+const SupervisedNetwork = Union{DeterministicNetwork,ProbabilisticNetwork}
+
 # fall-back for updating learning networks exported as models:
-function MLJBase.update(model::Supervised{Node}, verbosity, fitresult, cache, args...)
+function MLJBase.update(model::SupervisedNetwork, verbosity, fitresult, cache, args...)
     fit!(fitresult; verbosity=verbosity)
     return fitresult, cache, nothing
 end
 
 # fall-back for predicting on learning networks exported as models
-MLJBase.predict(composite::Supervised{Node}, fitresult, Xnew) =
+MLJBase.predict(composite::SupervisedNetwork, fitresult, Xnew) =
     fitresult(Xnew)
 
 
@@ -19,7 +21,7 @@ intended for internal testing .
 
 """
 mutable struct SimpleDeterministicCompositeModel{L<:Deterministic,
-                             T<:Unsupervised} <: Deterministic{Node}
+                             T<:Unsupervised} <: DeterministicNetwork
     model::L
     transformer::T
     
@@ -56,7 +58,7 @@ function MLJBase.fit(composite::SimpleDeterministicCompositeModel, verbosity::In
     return fitresult, cache, report
 end
 
-MLJBase.predict(composite::SimpleDeterministicCompositeModel, fitresult, Xnew) = fitresult(Xnew)
+# MLJBase.predict(composite::SimpleDeterministicCompositeModel, fitresult, Xnew) = fitresult(Xnew)
 
 MLJBase.load_path(::Type{<:SimpleDeterministicCompositeModel}) = "MLJ.SimpleDeterministicCompositeModel"
 MLJBase.package_name(::Type{<:SimpleDeterministicCompositeModel}) = "MLJ"

@@ -58,7 +58,7 @@ yhat(Xin[test,:])
 
 ## EXPORTING LEARNING NETWORKS AS RE-USABLE STAND-ALONE MODELS
 
-mutable struct WrappedRidge <: Deterministic{Node}
+mutable struct WrappedRidge <: DeterministicNetwork
     ridge
 end
 

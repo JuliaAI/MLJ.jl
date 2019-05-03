@@ -7,7 +7,7 @@ using MLJ
 Xtr = [4 2 5 3;
        2 1 6 0.0];
 
-@test MLJ.KNN.distances_and_indices_of_closest(Float64, 3,
+@test MLJ.KNN.distances_and_indices_of_closest(3,
         MLJ.KNN.euclidean, Xtr, [1, 1])[2] == [2, 4, 1]
 
 X = Xtr' |> collect

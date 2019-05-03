@@ -36,6 +36,7 @@ export pdf, mode, median, mean, shuffle!, categorical
 export nrows, nfeatures, info
 export SupervisedTask, UnsupervisedTask, MLJTask
 export Deterministic, Probabilistic, Unsupervised, Supervised
+export DeterministicNetwork, ProbabilisticNetwork
 export Found, Continuous, Discrete, OrderedFactor    
 export FiniteOrderedFactor, Unknown
 export Count, Multiclass, Binary

@@ -10,7 +10,7 @@ MLJBase.show_as_constructed(::Type{<:Grid}) = true
 
 # TODO: make fitresult type `Machine` more concrete.
 
-mutable struct DeterministicTunedModel{T,M<:Deterministic} <: MLJ.Deterministic{MLJ.Machine}
+mutable struct DeterministicTunedModel{T,M<:Deterministic} <: MLJ.Deterministic
     model::M
     tuning::T  # tuning strategy 
     resampling # resampling strategy
@@ -21,7 +21,7 @@ mutable struct DeterministicTunedModel{T,M<:Deterministic} <: MLJ.Deterministic{
     full_report::Bool
 end
 
-mutable struct ProbabilisticTunedModel{T,M<:Probabilistic} <: MLJ.Probabilistic{MLJ.Machine}
+mutable struct ProbabilisticTunedModel{T,M<:Probabilistic} <: MLJ.Probabilistic
     model::M
     tuning::T  # tuning strategy 
     resampling # resampling strategy

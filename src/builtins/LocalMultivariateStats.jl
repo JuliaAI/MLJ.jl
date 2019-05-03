@@ -15,35 +15,11 @@ struct LinearFitresult{F} <: MLJBase.MLJType
     bias::F
 end
 
-# Following helper function returns a named tuple with with three elements:
-#
-#        name | description
-# :-----------|:-------------------------------------------------
-# `:index`    | indices of features used to train `fitresult`
-# `:feature`  | corresponding feature labels provided by `features`
-# `:coef`     | coefficients for that feature in the fitresult
-#
-# The rows are ordered by the absolute value of the coefficients.
-function coef_info(fitresult::LinearFitresult{F}, features) where F
-    coef_given_index = Dict{Int,F}()
-    abs_coef_given_index = Dict{Int,F}()
-    v = fitresult.coefficients
-    for k in eachindex(v)
-        coef_given_index[k] = v[k]
-        abs_coef_given_index[k] = abs(v[k])
-    end
-    index = reverse(MLJ.keys_ordered_by_values(abs_coef_given_index))
-    feature = [features[i] for i in index]
-    coef = [coef_given_index[i] for i in index]
-    return (index=index, feature=feature, coef=coef)
-end
-
 ####
 #### RIDGE
 ####
 
-mutable struct RidgeRegressor{F<:AbstractFloat} <: MLJBase.Deterministic{LinearFitresult{F}}
-    target_type::Type{F}
+mutable struct RidgeRegressor <: MLJBase.Deterministic
     lambda::Float64
 end
 
@@ -57,9 +33,9 @@ function MLJ.clean!(model::RidgeRegressor)
 end
 
 # keyword constructor
-function RidgeRegressor(; target_type=Float64, lambda=0.0)
+function RidgeRegressor(; lambda=0.0)
 
-    model = RidgeRegressor(target_type, lambda)
+    model = RidgeRegressor(lambda)
 
     message = MLJBase.clean!(model)
     isempty(message) || @warn message
@@ -68,12 +44,10 @@ function RidgeRegressor(; target_type=Float64, lambda=0.0)
     
 end
 
-function MLJBase.fit(model::RidgeRegressor{F},
+function MLJBase.fit(model::RidgeRegressor,
                      verbosity::Int,
                      X,
-                     y::Vector{F2}) where {F,F2}
-
-    F == F2 || error("Model specifies target_type=$F but target type is $F2.")
+                     y)
 
     Xmatrix = MLJBase.matrix(X)
     features = MLJBase.schema(X).names
@@ -85,22 +59,7 @@ function MLJBase.fit(model::RidgeRegressor{F},
 
     fitresult = LinearFitresult(coefficients, bias)
 
-    # report on the relative strength of each feature in the fitresult:
-    cinfo = coef_info(fitresult, features) # a named tuple of vectors
-    u = String[]
-    v = Float64[]
-    for i in 1:length(cinfo.feature)
-        feature, coef = (cinfo.feature[i], cinfo.coef[i])
-        coef = floor(1000*coef)/1000
-        if coef < 0
-            label = string(feature, " (-)")
-        else
-            label = string(feature, " (+)")
-        end
-        push!(u, label)
-        push!(v, abs(coef))
-    end
-    report= (feature_importance_curve=(u, v),)
+    report= nothing
     cache = nothing
 
     return fitresult, cache, report
@@ -108,9 +67,9 @@ function MLJBase.fit(model::RidgeRegressor{F},
 end
 
 MLJBase.fitted_params(::RidgeRegressor, fitresult) =
-    (coefs=fitresult.coefficients, bias=fitresult.bias)
+    (coefficients=fitresult.coefficients, bias=fitresult.bias)
 
-function MLJBase.predict(model::RidgeRegressor, fitresult::LinearFitresult, Xnew)
+function MLJBase.predict(model::RidgeRegressor, fitresult, Xnew)
     Xmatrix = MLJBase.matrix(Xnew)
     return Xmatrix*fitresult.coefficients .+ fitresult.bias
 end
