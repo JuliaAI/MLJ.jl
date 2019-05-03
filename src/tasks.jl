@@ -186,10 +186,9 @@ Returns the input `X` and target `y` of the task, also available as
 `task.X` and `task.y`.
 
 """
-supervised(; data=nothing, types=nothing, kwargs...) =
+supervised(; data=nothing, types=Dict(), kwargs...) =
 	    SupervisedTask(; data = coerce(types, data), kwargs...)
-supervised(X, y; kwargs...) =
-	    SupervisedTask(X, y; kwargs...)
+supervised(X, y; kwargs...) = SupervisedTask(X, y; kwargs...)
 """
     task = unsupervised(data=nothing, types=Dict(), ignore=Symbol[], verbosity=1)
 
@@ -215,5 +214,5 @@ Return the input data in form to be used in models.
 See also scitype, scitype_union, scitypes
 
 """
-unsupervised(; data=nothing, types=nothing, kwargs...) =
+unsupervised(; data=nothing, types=Dict(), kwargs...) =
 	    UnsupervisedTask(; data = coerce(types, data), kwargs...)
