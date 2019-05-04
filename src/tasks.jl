@@ -5,6 +5,7 @@ function Base.getindex(task::SupervisedTask, r)
     y = task.y[r]
     is_probabilistic = task.is_probabilistic
     input_scitypes = scitypes(X)
+    target = task.target
     input_scitype_union = Union{input_scitypes...}
     target_scitype_union = scitype_union(y)
     input_is_multivariate = task.input_is_multivariate
@@ -12,6 +13,7 @@ function Base.getindex(task::SupervisedTask, r)
                           y,
                           is_probabilistic,
                           input_scitypes,
+                          target,
                           input_scitype_union,
                           target_scitype_union,
                           input_is_multivariate)
