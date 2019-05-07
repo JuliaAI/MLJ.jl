@@ -18,8 +18,8 @@ using Tables
 
 # to be extended:
 import MLJBase: fit, transform, inverse_transform
-import MLJBase: Found, Continuous, Discrete, Multiclass
-import MLJBase: FiniteOrderedFactor, Other, OrderedFactor, Count
+import MLJBase: Found, Continuous, Multiclass
+import MLJBase: OrderedFactor, Other, Finite, Infinite, Count
 
 
 ## CONSTANTS
@@ -178,7 +178,7 @@ MLJBase.output_is_multivariate(::Type{<:FeatureSelector}) = true
 # MLJBase.package_name(::Type{<:ToIntTransformer}) = "MLJ"
 # MLJBase.package_uuid(::Type{<:ToIntTransformer}) = ""
 # MLJBase.is_pure_julia(::Type{<:ToIntTransformer}) = true
-# MLJBase.input_scitype_union(::Type{<:ToIntTransformer}) = MLJBase.Discrete
+# MLJBase.input_scitype_union(::Type{<:ToIntTransformer}) = MLJBase.Finite
 # MLJBase.input_is_multivariate(::Type{<:ToIntTransformer}) = false
 # MLJBase.output_scitype_union(::Type{<:ToIntTransformer}) = Count
 # MLJBase.output_is_multivariate(::Type{<:ToIntTransformer}) = false
@@ -232,7 +232,7 @@ MLJBase.package_url(::Type{<:UnivariateStandardizer}) = "https://github.com/alan
 MLJBase.package_name(::Type{<:UnivariateStandardizer}) = "MLJ"
 MLJBase.package_uuid(::Type{<:UnivariateStandardizer}) = ""
 MLJBase.is_pure_julia(::Type{<:UnivariateStandardizer}) = true
-MLJBase.input_scitype_union(::Type{<:UnivariateStandardizer}) = Union{Continuous, OrderedFactor}
+MLJBase.input_scitype_union(::Type{<:UnivariateStandardizer}) = Found
 MLJBase.input_is_multivariate(::Type{<:UnivariateStandardizer}) = false
 MLJBase.output_scitype_union(::Type{<:UnivariateStandardizer}) = Continuous
 MLJBase.output_is_multivariate(::Type{<:UnivariateStandardizer}) = false
@@ -484,9 +484,9 @@ MLJBase.output_is_multivariate(::Type{<:UnivariateBoxCoxTransformer}) = false
 """
     OneHotEncoder(; features=Symbol[], drop_last=false, ref_type=UInt32)
 
-Unsupervised model for one-hot encoding all features of `Multiclass`
-or `FiniteOrderedFactor` scitype, within some table. All such features
-are encoded, unless `features` is specified and non-empty.
+Unsupervised model for one-hot encoding all features of `Finite`
+scitype, within some table. All such features are encoded, unless
+`features` is specified and non-empty.
 
 If `drop_last` is true, the column for the last level of each
 categorical feature is dropped. New data to be transformed may lack
@@ -544,7 +544,7 @@ function fit(transformer::OneHotEncoder{R}, verbosity::Int, X) where R
         ftr = all_features[j]
         col = MLJBase.selectcols(X,j)
         T = scitype_union(col)
-        if T <: Union{Multiclass,FiniteOrderedFactor} && ftr in specified_features
+        if T <: Union{Multiclass,OrderedFactor} && ftr in specified_features
             ref_name_pairs_given_feature[ftr] = Pair{R,Symbol}[]
             shift = transformer.drop_last ? 1 : 0
             if verbosity > 0

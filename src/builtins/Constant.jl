@@ -140,7 +140,7 @@ MLJBase.package_uuid(::Type{<:ConstantClassifier}) = MLJBase.package_uuid(Consta
 MLJBase.package_url(::Type{<:ConstantClassifier}) = MLJBase.package_url(ConstantRegressor)
 MLJBase.is_pure_julia(::Type{<:ConstantClassifier}) = true
 MLJBase.input_scitype_union(::Type{<:ConstantClassifier}) = Union{MLJBase.Missing,MLJBase.Found}
-MLJBase.target_scitype_union(::Type{<:ConstantClassifier}) = Union{MLJBase.Multiclass,MLJBase.FiniteOrderedFactor}
+MLJBase.target_scitype_union(::Type{<:ConstantClassifier}) = Union{MLJBase.Multiclass,MLJBase.OrderedFactor}
 
 
 ## DETERMINISTIC CONSTANT CLASSIFIER (FOR TESTING)
@@ -175,7 +175,7 @@ MLJBase.package_uuid(::Type{<:DeterministicConstantClassifier}) = MLJBase.packag
 MLJBase.package_url(::Type{<:DeterministicConstantClassifier}) = MLJBase.package_url(ConstantRegressor)
 MLJBase.is_pure_julia(::Type{<:DeterministicConstantClassifier}) = true
 MLJBase.input_scitype_union(::Type{<:DeterministicConstantClassifier}) = Union{MLJBase.Missing,MLJBase.Found}
-MLJBase.target_scitype_union(::Type{<:DeterministicConstantClassifier}) = Union{MLJBase.Multiclass,MLJBase.FiniteOrderedFactor}
+MLJBase.target_scitype_union(::Type{<:DeterministicConstantClassifier}) = Union{MLJBase.Multiclass,MLJBase.OrderedFactor}
 
 
 end # module

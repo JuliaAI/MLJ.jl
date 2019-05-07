@@ -5,9 +5,9 @@ default_measure(model::M) where M<:Supervised =
 default_measure(model, ::Any) = nothing
 default_measure(model::Deterministic, ::Type{<:Continuous}) = rms
 default_measure(model::Probabilistic, ::Type{<:Continuous}) = rms
-default_measure(model::Deterministic, ::Type{<:Union{Multiclass,FiniteOrderedFactor}}) =
+default_measure(model::Deterministic, ::Type{<:Union{Multiclass,OrderedFactor}}) =
     misclassification_rate
-default_measure(model::Probabilistic, ::Type{<:Union{Multiclass,FiniteOrderedFactor}}) =
+default_measure(model::Probabilistic, ::Type{<:Union{Multiclass,OrderedFactor}}) =
                                 cross_entropy
 
 # TODO: the names to match MLR or MLMetrics?

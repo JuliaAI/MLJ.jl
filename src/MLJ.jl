@@ -37,8 +37,8 @@ export nrows, nfeatures, info
 export SupervisedTask, UnsupervisedTask, MLJTask
 export Deterministic, Probabilistic, Unsupervised, Supervised
 export DeterministicNetwork, ProbabilisticNetwork
-export Found, Continuous, Discrete, OrderedFactor    
-export FiniteOrderedFactor, Unknown
+export Found, Continuous, Finite, Infinite    
+export OrderedFactor, Unknown
 export Count, Multiclass, Binary
 export scitype, scitype_union, scitypes
 export predict, predict_mean, predict_median, predict_mode

@@ -13,8 +13,6 @@ mutable struct WrappedEnsemble{R,Atom <: Supervised} <: MLJType
     ensemble::Vector{R}
 end
 
-FiniteDiscrete = Union{Multiclass,FiniteOrderedFactor}
-
 # to enable trait-based dispatch of predict:
 predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom<:Deterministic} =
     predict(wens, weights, Xnew, Deterministic, target_scitype_union(Atom))
@@ -24,7 +22,7 @@ predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom<:Probabilist
 function predict(wens::WrappedEnsemble,
                  weights,
                  Xnew,
-                 ::Type{Deterministic}, ::Type{<:FiniteDiscrete})
+                 ::Type{Deterministic}, ::Type{<:Finite})
 
     # weights ignored in this case
 
@@ -62,7 +60,7 @@ function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Deterministic}, ::
     return prediction
 end
 
-function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Probabilistic}, ::Type{<:FiniteDiscrete})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Probabilistic}, ::Type{<:Finite})
 
     ensemble = wens.ensemble
 
@@ -179,7 +177,7 @@ function clean!(model::DeterministicEnsembleModel)
         "in the range (0,1]. Reset to 1. "
         model.bagging_fraction = 1.0
     end
-    if target_scitype_union(model.atom)<:FiniteDiscrete && !isempty(model.weights)
+    if target_scitype_union(model.atom)<:Finite && !isempty(model.weights)
         message = message*"weights will be ignored to form predictions. "
     elseif !isempty(model.weights)
         total = sum(model.weights)
@@ -303,7 +301,7 @@ zero length.
 
 The ensemble model is `Deterministic` or `Probabilistic`, according to
 the corresponding supertype of `atom`. In the case of deterministic classifiers
-(`target_scitype_union(atom) <: Union{Multiclass,FiniteOrderedFactor}`), the
+(`target_scitype_union(atom) <: Finite`), the
 predictions are majority votes, and for regressors
 (`target_scitype_union(atom)<: Continuous`) they are ordinary averages.
 Probabilistic predictions are obtained by averaging the atomic

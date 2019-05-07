@@ -1,3 +1,7 @@
+# to be depreciated:
+const FiniteOrderedFactor = OrderedFactor
+
+
 ## LOADING METADATA FOR EXTERNAL PACKAGE MODELS
 
 const path_to_metadata_dot_toml = joinpath(srcdir, "../") # todo: make os independent
