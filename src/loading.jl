@@ -6,7 +6,7 @@ const FiniteOrderedFactor = OrderedFactor
 
 const path_to_metadata_dot_toml = joinpath(srcdir, "../") # todo: make os independent
 const remote_file =
-    @RemoteFile "https://raw.githubusercontent.com/alan-turing-institute/MLJRegistry.jl/master/Metadata.toml" dir=path_to_metadata_dot_toml
+    @RemoteFile "https://raw.githubusercontent.com/alan-turing-institute/MLJRegistry.jl/dev/Metadata.toml" dir=path_to_metadata_dot_toml
 
 const local_metadata_file = joinpath(path_to_metadata_dot_toml, "Metadata.toml")
 

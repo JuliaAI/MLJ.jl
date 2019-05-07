@@ -1,5 +1,9 @@
 const SupervisedNetwork = Union{DeterministicNetwork,ProbabilisticNetwork}
 
+# to suppress inclusion in models():
+MLJBase.is_wrapper(::Type{DeterministicNetwork}) = true
+MLJBase.is_wrapper(::Type{ProbabilisticNetwork}) = true
+
 # fall-back for updating learning networks exported as models:
 function MLJBase.update(model::SupervisedNetwork, verbosity, fitresult, cache, args...)
     fit!(fitresult; verbosity=verbosity)
