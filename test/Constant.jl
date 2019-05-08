@@ -33,11 +33,11 @@ y = categorical(yraw)
 
 model = ConstantClassifier()
 fitresult, cache, report = MLJ.fit(model, 1, X, y)
-d = MLJ.UnivariateNominal(["Perry", "Antonia", "Skater"], [0.5, 0.25, 0.25]) 
+d = MLJ.UnivariateNominal([y[1], y[2], y[4]], [0.5, 0.25, 0.25]) 
 @test fitresult == d
 
 yhat = predict_mode(model, fitresult, X)
-@test levels(yhat) == levels(y)
+@test MLJ.classes(yhat[1]) == MLJ.classes(y[1])
 @test yhat[5] == y[1] 
 @test length(yhat) == 10
 

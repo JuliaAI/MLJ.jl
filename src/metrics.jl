@@ -5,10 +5,10 @@ default_measure(model::M) where M<:Supervised =
 default_measure(model, ::Any) = nothing
 default_measure(model::Deterministic, ::Type{<:Continuous}) = rms
 default_measure(model::Probabilistic, ::Type{<:Continuous}) = rms
-default_measure(model::Deterministic, ::Type{<:Union{Multiclass,OrderedFactor}}) =
+default_measure(model::Deterministic, ::Type{<:Finite}) =
     misclassification_rate
-default_measure(model::Probabilistic, ::Type{<:Union{Multiclass,OrderedFactor}}) =
-                                cross_entropy
+default_measure(model::Probabilistic, ::Type{<:Finite}) =
+    cross_entropy
 
 # TODO: the names to match MLR or MLMetrics?
 
@@ -85,9 +85,9 @@ rmsp(yhat, y) = rmsp(mean.(yhat), y)
 
 ## CLASSIFICATION METRICS (FOR DETERMINISTIC PREDICTIONS)
 
-misclassification_rate(yhat::CategoricalVector{L}, y::CategoricalVector{L}) where L =
+misclassification_rate(yhat::AbstractVector, y::AbstractVector) =
     mean(y .!= yhat)
-misclassification_rate(yhat, y::CategoricalArray) =
+misclassification_rate(yhat, y::AbstractVector) =
     misclassification_rate(categorical(mode.(yhat)), y)
 
 # TODO: multivariate case 
@@ -98,9 +98,10 @@ misclassification_rate(yhat, y::CategoricalArray) =
 # for single pattern:
 cross_entropy(d::UnivariateNominal, y) = -log(d.prob_given_level[y])
 
-cross_entropy(yhat::Vector{<:UnivariateNominal{L}}, y::CategoricalVector{L}) where L =
-    broadcast(cross_entropy, yhat, y) |> mean
-
+function cross_entropy(yhat::Vector{<:UnivariateNominal}, y::AbstractVector)
+    length(y) == length(yhat) || throw(DimensionMismatch())
+    return broadcast(cross_entropy, yhat, y) |> mean
+end
 
 # function auc(truelabel::L) where L
 #     _auc(y::AbstractVector{L}, yhat::AbstractVector{T}) where T<:Real = 
