@@ -3,7 +3,7 @@
 To quickly implement a new supervised model in MLJ, it suffices to:
 
 - Define a `mutable struct` to store hyperparameters. This is either a subtype
-  of `Probabilistic{Any}` or `Deterministic{Any}`, depending on
+  of `Probabilistic` or `Deterministic`, depending on
   whether probabilistic or ordinary point predictions are
   intended. This `struct` is the *model*.
   
@@ -15,8 +15,7 @@ To quickly implement a new supervised model in MLJ, it suffices to:
   
 In the examples below, the training input `X` of `fit`, and the new
 input `Xnew` passed to `predict`, are tables. Each training target `y`
-is a `Vector` or `CategoricalVector`, according to its [scientific
-type](index.md), or a table in the multivariate case. 
+is a `AbstractVector`.
 
 The predicitions returned by `predict` have the same form as `y` for
 deterministic models, but are `Vector`s of distibutions for
@@ -31,7 +30,8 @@ to implement additional traits. A `clean!` method can be defined to
 check that hyperparameter values are within normal ranges. For details, see
 [Adding Models for General Use](adding_models_for_general_use.md).
 
-For an unsupervised model, implement `transform` and, optionally, `inverse_transform` using the same signature at `predict below.
+For an unsupervised model, implement `transform` and, optionally,
+`inverse_transform` using the same signature at `predict below.
 
 
 ### A simple deterministic regressor
@@ -42,9 +42,10 @@ Here's a quick-and-dirty implementation of a ridge regressor with no intercept:
 import MLJBase
 using LinearAlgebra
 
-mutable struct MyRegressor <: MLJBase.Deterministic{Any}
+mutable struct MyRegressor <: MLJBase.Deterministic
     lambda::Float64
 end
+MyRegressor(; lambda=0.1) = MyRegressor(lambda)
 
 # fit returns coefficients minimizing a penalized rms loss function:
 function MLJBase.fit(model::MyRegressor, X, y)
@@ -77,10 +78,9 @@ and returns this pdf for any new pattern:
 
 ````julia
 import MLJBase
-import Tables
 import Distributions
 
-struct MyClassifier <: MLJBase.Probabilistic{Any}
+struct MyClassifier <: MLJBase.Probabilistic
 end
 
 # `fit` ignores the inputs X and returns the training target y
@@ -91,10 +91,8 @@ function MLJBase.fit(model::MyClassifier, X, y)
 end
 
 # `predict` retunrs the passed fitresult (pdf) for all new patterns:
-function MLJBase.predict(model::MyClassifier, fitresult, Xnew)
-    row_iterator = Tables.rows(Xnew)
-    return [fitresult for r in row_iterator]
-end
+MLJBase.predict(model::MyClassifier, fitresult, Xnew) = 
+    [fitresult for r in 1:nrows(Xnew)]
 ````
 
 For more details on the `UnivariateNominal` distribution, query

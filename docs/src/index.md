@@ -183,8 +183,9 @@ You can use `scitype(x)` to determine the scientific type of a scalar
 object `x`. Non-scalar objects (with the exception of tuples of
 scalars) have `Unknown` scitype. 
 
-```@example 2
-	(scitype(42), scitype(float(π)), scitype("Julia"))
+```julia
+julia> (scitype(42), scitype(float(π)), scitype("Julia"))
+(Count, Continuous, Unknown)
 ```
 
 **Special note on using integers.** According to the above, integers

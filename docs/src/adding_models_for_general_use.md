@@ -129,48 +129,80 @@ concrete type `SomeSupervisedModel <: MLJBase.Supervised` are
 summarized below. An `=` indicates the return value for a fallback
 version of the method.
 
+
+#### Summary of methods
+
+Compulsory:
+
 ```julia
-# compulsory:
 MLJBase.fit(model::SomeSupervisedModel, verbosity::Integer, X, y) -> fitresult, cache, report
 MLJBase.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
+```
 
-# this fallback to be overidden if model input is univariate:
+Fallback to be overidden if model input is univariate:
+
+```julia
 MLJBase.input_is_multivariate(::Type{<:SomeSupervisedModel}) = true
+```
 
-# optional, to check and correct invalid hyperparameter values:
+Optional, to check and correct invalid hyperparameter values:
+
+```julia
 MLJBase.clean!(model::SomeSupervisedModel) = "" 
+```
 
-# optional, to return user-friendly form of fitted parameters:
+Optional, to return user-friendly form of fitted parameters:
+
+```julia
 MLJBase.fitted_params(model::SomeSupervisedModel, fitresult) = fitresult
+```
 
-# optional, to avoid redundant calculations when refitting machines:
+Optional, to avoid redundant calculations when refitting machines:
+
+```julia
 MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) =
    MLJBase.fit(model, verbosity, X, y)
+```
 
-# optional, if SomeSupervisedModel <: Probabilistic:
+Optional, if `SomeSupervisedModel <: Probabilistic`:
+
+```julia
 MLJBase.predict_mode(model::SomeSupervisedModel, fitresult, Xnew) =
     mode.(predict(model, fitresult, Xnew))
 MLJBase.predict_mean(model::SomeSupervisedModel, fitresult, Xnew) =
     mean.(predict(model, fitresult, Xnew))
 MLJBase.predict_median(model::SomeSupervisedModel, fitresult, Xnew) =
     median.(predict(model, fitresult, Xnew))
+```
 
-# required, if model is to be registered (findable by general users):
+Required, if model is to be registered (findable by general users):
+
+```julia
 MLJBase.load_path(::Type{<:SomeSupervisedModel})    = ""
 MLJBase.package_name(::Type{<:SomeSupervisedModel}) = "Unknown"
 MLJBase.package_uuid(::Type{<:SomeSupervisedModel}) = "Unknown"
+```
 
-# recommended, to constrain the form of input data passed to fit and predict:
+Recommended, to constrain the form of input data passed to fit and predict:
+
+```julia
 MLJBase.input_scitype_union(::Type{<:SomeSupervisedModel}) = Union{Missing,Found}
+```
 
-# recommended, to constrain the form of target data passed to fit
-# (and compulsory if target is multivariate):
+Recommended, to constrain the form of target data passed to fit (and
+compulsory if target is multivariate/sequential):
+
+```julia
 MLJBase.target_scitype_union(::Type{<:SomeSupervisedModel}) = Union{Found,NTuple{<:Found}}
+```
 
-# optional but recommended:
+Optional but recommended:
+
+```julia
 MLJBase.package_url(::Type{<:SomeSupervisedModel})  = "Unknown"
 MLJBase.is_pure_julia(::Type{<:SomeSupervisedModel}) = false
 ```
+
 
 #### The form of data for fitting and predicting
 
@@ -463,12 +495,12 @@ The trait functions controlling the form of data are summarized as follows:
 
 method                   | return type       | declarable return values                  | default value
 -------------------------|-------------------|-------------------------------------------|---------------
-`target_scitype_union`   | `DataType`        | subtype of `Found` or tuple of such types | `Union{Found,NTuple{<:Found}}`
-`input_scitype_union`    | `DataType`        | subtype of `Union{Missing,Found}`         | `Union{Missing,Found}`
 `input_is_multivariate`  | `Bool`            | `true` or `false`                         | `true`
+`input_scitype_union`    | `DataType`        | subtype of `Union{Missing,Found}`         | `Union{Missing,Found}`
+`target_scitype_union`   | `DataType`        | subtype of `Found` or tuple of such types | `Union{Found,NTuple{<:Found}}`
 
 
-Additional trait functions tell the `@load` macro how to find your
+Additional trait functions tell MLJ's `@load` macro how to find your
 model if it is registered, and provide other self-explanatory metadata
 about the model:
 
