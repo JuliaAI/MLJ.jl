@@ -165,7 +165,7 @@ end
 function MLJBase.predict(model::DeterministicConstantClassifier, fitresult, Xnew)
     n = nrows(Xnew)
     yhat = fill(fitresult, n)
-    return MLJBase.reconstruct(yhat)
+    return yhat
 end
 
 # metadata:

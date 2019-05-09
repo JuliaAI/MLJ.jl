@@ -83,16 +83,17 @@ julia> evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true), mea
 ### Next steps
 
 To learn a little more about what MLJ can do, take the MLJ
-[tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/tour.ipynb). Read
-the remainder of this document before considering more serious use of
-MLJ.
+[tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/tour.ipynb),
+and then return to the manual as needed. Read at least the remainder
+of this page before considering serious use of MLJ.
 
 
 ### Prerequisites
 
-MLJ assumes some familiarity with the
-[CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl)
-package, used for representing categorical data. For probabilistic
+MLJ assumes some familiarity with the `CategoricalValue` and
+`CategoricalString` types from
+[CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl),
+used here for representing categorical data. For probabilistic
 predictors, a basic acquaintance with
 [Distributions.jl](https://github.com/JuliaStats/Distributions.jl) is
 also assumed.
@@ -109,9 +110,10 @@ machine(model::Supervised, X, y)
 machine(model::Unsupervised, X)
 ```
 
-The input `X` in the above machine constructors can be any table, where
-*table* means any data type supporting the
-[Tables.jl](https://github.com/JuliaData/Tables.jl) interface. 
+**Multivariate input.** The input `X` in the above machine
+constructors can be any table, where *table* means any data type
+supporting the [Tables.jl](https://github.com/JuliaData/Tables.jl)
+interface.
 
 > At present our API is more restrictive; see this
 > [issue](https://github.com/JuliaData/Tables.jl/issues/74) with
@@ -124,62 +126,48 @@ formats: *column tables* (named tuples of equal length vectors) and
 *row tables* (vectors of named tuples sharing the same
 keys).
 
-For models which handle only univariate inputs
+> Certain `JuliaDB.NDSparse` tables can be used for sparse data, but
+> this is experimental and undocumented.
+
+**Univariate input.** For models which handle only univariate inputs
 (`input_is_multivariate(model)=false`) `X` cannot be a table but is
-expected to have `Vector` or `CategoricalVector` type.
+expected to be some `AbstractVector` type.
 
-The target `y` in the first constructor above must be a
-`Vector` or `CategoricalVector`. A multivariate target `y` will be
-a vector of *tuples*. The tuples need not have uniform length, so 
-some forms of sequence prediction are supported.
+**Targets.** The target `y` in the first constructor above must be an
+`AbstractVector`. A multivariate target `y` will be a vector of
+*tuples*. The tuples need not have uniform length, so some forms of
+sequence prediction are supported. Only the element types of `y`
+matter (the types of `y[j]` for each `j`). Indeed if a machine accepts
+`y` as an argument it will be just as happy with `identity.(y)`.
 
-While MLJ is not too fussy about the format of data, your choice of
-element types has implicit consequences about how MLJ will interpret
-that data.  To articulate MLJ's conventions about data representation,
-MLJ distinguishes between *machine* data types on the one hand
-(`Float64`, `Bool`, `String`, etc) and *scientific data types* on the
-other, represented by new Julia types: `Continuous`, `Multiclass{N}`,
-`FiniteOrderedFactor{N}`, `Count` (unbounded ordered factor), and
-`Unknown`, with obvious interpretations.  These types are organized in
-a type hierarchy rooted in a new abstract type `Found`:
+**Element types.** The types of input and target *elements* has strict
+consequences for MLJ's behaviour. 
 
-![](scitypes.png)
+To articulate MLJ's conventions about data representation, MLJ
+distinguishes between *machine* data types on the one hand (`Float64`,
+`Bool`, `String`, etc) and *scientific data types* on the other,
+represented by new Julia types: `Continuous`, `Count`,
+`Multiclass{N}`, `OrderedFactor{N}` and `Unknown`, with obvious
+interpretations.  These types are organized in a type
+[hierarchy](scitypes.png) rooted in a new abstract type `Found`.
 
 A *scientific type* is any subtype of
-`Union{Missing,Found}`. Scientific types have no instances. (Their
-primary role is as values for model trait functions.) Such types
-appear, for example, when querying model metadata:
+`Union{Missing,Found}`. Scientific types have no instances. (They are
+used behind the scenes is values for model trait functions.) Such
+types appear, for example, when querying model metadata:
 
-```julia
-julia> info("DecisionTreeClassifier")[:target_scitype_union]
-
-Union{Multiclass,FiniteOrderedFactor}
-```
-
-which means that the `DecisionTreeClassifier` is model for predicting
-univariate targets that whose values are finite factors, unordered or
-ordered. The corresponding value for a binary classification model
-would be `Multiclass{2}`. 
-
-**Basic data convention.** The scientific type of data that a Julia
-object `x` can represent is defined by `scitype(x)`. If `scitype(x) ==
-Unknown`, then the interpretation of `x` by an MLJ model is unpredictable. 
-
-```@example 2
+```julia ;;;
 using MLJ # hide
-
-(scitype(42), scitype(π), scitype("Julia"))
+julia> info("DecisionTreeClassifier")[:target_scitype_union]
 ```
 
-In particular, *integers cannot be used to represent* `Multiclass`
-*or* `FiniteOrderedFactor` *data*; these can be represented by an
-unordered or ordered `CategoricalValue` or `CategoricalString`
-(automatic if your table is a `DataFrame`, or other column-based table,
-and the column in question is a `CategoricalArray`):
+This means that the union of scientific types of all elements 
+a `DecisionTreeClassier` target must be a subtype of `Finite`.
+
+The table below shows machine types that have scientific types different from `Unknown`:
 
 `T`                         |     `scitype(x)` for `x::T`
 ----------------------------|:--------------------------------
-`Missing`                   |      `Missing`
 `AbstractFloat`             |      `Continuous`
 `Integer`                   |        `Count`
 `CategoricalValue`          | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false` 
@@ -187,8 +175,23 @@ and the column in question is a `CategoricalArray`):
 `CategoricalValue`          | `FiniteOrderedFactor{N}` where `N = nlevels(x)`, provided `x.pool.ordered == true` 
 `CategoricalString`         | `FiniteOrderedFactor{N}` where `N = nlevels(x)` provided `x.pool.ordered == true`
 `Integer`                   | `Count`
+`Missing`                   |      `Missing`
 
 Here `nlevels(x) = length(levels(x.pool))`.
+
+You can use `scitype(x)` to determine the scientific type of a scalar
+object `x`. Non-scalar objects (with the exception of tuples of
+scalars) have `Unknown` scitype. 
+
+```@example 2
+	(scitype(42), scitype(float(π)), scitype("Julia"))
+```
+
+**Special note on using integers.** According to the above, integers
+cannot be used to represent `Multiclass` or `OrderedFactor` data. They
+these can be represented by an unordered or ordered `CategoricalValue`
+or `CategoricalString` (automatic if they are elements of a
+`CategoricalArray`).
 
 Methods exist to coerce the scientific type of a vector or table (see
 below). [Task](working_with_tasks.md) constructors also allow one to

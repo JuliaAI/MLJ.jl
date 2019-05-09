@@ -107,7 +107,7 @@ Binding a model to a task and evalutating performance:
 
 ```@example 1
 @load DecisionTreeClassifier
-mach = machine(DecisionTreeClassifier(target_type=String), task)
+mach = machine(DecisionTreeClassifier(), task)
 evaluate!(mach, operation=predict_mode, resampling=Holdout(), measure=misclassification_rate, verbosity=0)
 ```
 

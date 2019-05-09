@@ -23,7 +23,7 @@ following packages is also helpful:
 
 - [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl)
   (essential if you are implementing a model handling data of
-  `Multiclass` or `FiniteOrderedFactor` scitype)
+  `Multiclass` or `OrderedFactor` scitype)
 
 - [Tables.jl](https://github.com/JuliaData/Tables.jl) (if you're
   algorithm needs input data in a novel format).
@@ -45,7 +45,7 @@ excluded.
 
 The name of the Julia type associated with a model indicates the
 associated algorithm (e.g., `DecisionTreeClassifier`). The outcome of
-training a learning algorithm is called a *fit-result*. For
+training a learning algorithm is called a *fitresult*. For
 ordinary multilinear regression, for example, this would be the
 coefficients and intercept. For a general supervised model, it is the
 (generally minimal) information needed to make new predictions.
@@ -53,75 +53,54 @@ coefficients and intercept. For a general supervised model, it is the
 The ultimate supertype of all models is `MLJBase.Model`, which
 has two abstract subtypes:
 
-````julia
-abstract type Supervised{R} <: Model end
+```julia
+abstract type Supervised <: Model end
 abstract type Unsupervised <: Model end
-````
-
-Here the parameter `R` refers to a fit-result type. By declaring a
-model to be a subtype of `MLJBase.Supervised{R}` you guarantee
-the fit-result to be of type `R` and, if `R` is concrete, one may
-improve the performance of homogeneous ensembles of the model (as
-defined by the built-in MLJ `EnsembleModel` wrapper). There is no abstract
-type for fit-results because these types are generally declared
-outside of MLJBase.
-
-> WIP: The necessity to declare the fitresult type `R` may disappear in the future (issue #93).
+```
 
 `Supervised` models are further divided according to whether they are
-able to furnish probabilistic predictions of the target(s) (which they
-will do so by default) or directly predict "point" estimates, for each
+able to furnish probabilistic predictions of the target (which they
+will then do so by default) or directly predict "point" estimates, for each
 new input pattern:
 
-````julia
-abstract type Probabilistic{R} <: Supervised{R} end
-abstract type Deterministic{R} <: Supervised{R} end
-````
+```julia
+abstract type Probabilistic <: Supervised end
+abstract type Deterministic <: Supervised end
+```
 
 Further division of model types is realized through [Trait declarations](@ref).
 
 Associated with every concrete subtype of `Model` there must be a
 `fit` method, which implements the associated algorithm to produce the
-fit-result. Additionally, every `Supervised` model has a `predict`
+fitresult. Additionally, every `Supervised` model has a `predict`
 method, while `Unsupervised` models must have a `transform`
 method. More generally, methods such as these, that are dispatched on
-a model instance and a fit-result (plus other data), are called
-*operations*. `Probabilistic` supervised models optionally implement
-a `predict_mode` operation (in the case of classifiers) or a
+a model instance and a fitresult (plus other data), are called
+*operations*. `Probabilistic` supervised models optionally implement a
+`predict_mode` operation (in the case of classifiers) or a
 `predict_mean` and/or `predict_median` operations (in the case of
-regressors) overriding obvious fallbacks provided by
-`MLJBase`. `Unsupervised` models may implement an
+regressors) although MLJBase also provides fallbacks that will suffice
+in most cases. `Unsupervised` models may implement an
 `inverse_transform` operation.
 
 
 ### New model type declarations and optional clean! method
 
-Here is an example of a concrete supervised model type declaration, made after defining an appropriate fit-result type (an optional step):
+Here is an example of a concrete supervised model type declaration:
 
-````julia
+```julia
 import MLJ
 
-struct LinearFitResult{F<:AbstractFloat} <: MLJBase.MLJType
-    coefficients::Vector{F}
-    bias::F
-end
-
-mutable struct RidgeRegressor{F} <: MLJBase.Deterministic{LinearFitResult{F}}
-    target_type::Type{F}
+mutable struct RidgeRegressor <: MLJBase.Deterministic
     lambda::Float64
 end
-````
-
-**Note.** Model fields may be of any type except `NamedTuple`. 
-(This is because named tuples are used to represented the nested hyperparameters 
-of composite models (models that have other models as fields.)
+```
 
 Models (which are mutable) should not be given internal
 constructors. It is recommended that they be given an external lazy
 keyword constructor of the same name. This constructor defines default values for
 every field, and optionally corrects invalid field values by calling a `clean!` method
 (whose fallback returns an empty message string):
-
 
 ```julia
 function MLJ.clean!(model::RidgeRegressor)
@@ -134,105 +113,113 @@ function MLJ.clean!(model::RidgeRegressor)
 end
 
 # keyword constructor
-function RidgeRegressor(; target_type=Float64, lambda=0.0)
-
-    model = RidgeRegressor(target_type, lambda)
-
+function RidgeRegressor(; lambda=0.0)
+    model = RidgeRegressor(lambda)
     message = MLJBase.clean!(model)
     isempty(message) || @warn message
-
     return model
-    
 end
 ```
 
 
 ### Supervised models
 
-Below we describe the compulsory and optional methods to be specified
-for each concrete type `SomeSupervisedModelType{R} <: MLJBase.Supervised{R}`. 
+The compulsory and optional methods to be implemented for each
+concrete type `SomeSupervisedModel <: MLJBase.Supervised` are
+summarized below. An `=` indicates the return value for a fallback
+version of the method.
 
+```julia
+# compulsory:
+MLJBase.fit(model::SomeSupervisedModel, verbosity::Integer, X, y) -> fitresult, cache, report
+MLJBase.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
+
+# this fallback to be overidden if model input is univariate:
+MLJBase.input_is_multivariate(::Type{<:SomeSupervisedModel}) = true
+
+# optional, to check and correct invalid hyperparameter values:
+MLJBase.clean!(model::SomeSupervisedModel) = "" 
+
+# optional, to return user-friendly form of fitted parameters:
+MLJBase.fitted_params(model::SomeSupervisedModel, fitresult) = fitresult
+
+# optional, to avoid redundant calculations when refitting machines:
+MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) =
+   MLJBase.fit(model, verbosity, X, y)
+
+# optional, if SomeSupervisedModel <: Probabilistic:
+MLJBase.predict_mode(model::SomeSupervisedModel, fitresult, Xnew) =
+    mode.(predict(model, fitresult, Xnew))
+MLJBase.predict_mean(model::SomeSupervisedModel, fitresult, Xnew) =
+    mean.(predict(model, fitresult, Xnew))
+MLJBase.predict_median(model::SomeSupervisedModel, fitresult, Xnew) =
+    median.(predict(model, fitresult, Xnew))
+
+# required, if model is to be registered (findable by general users):
+MLJBase.load_path(::Type{<:SomeSupervisedModel})    = ""
+MLJBase.package_name(::Type{<:SomeSupervisedModel}) = "Unknown"
+MLJBase.package_uuid(::Type{<:SomeSupervisedModel}) = "Unknown"
+
+# recommended, to constrain the form of input data passed to fit and predict:
+MLJBase.input_scitype_union(::Type{<:SomeSupervisedModel}) = Union{Missing,Found}
+
+# recommended, to constrain the form of target data passed to fit
+# (and compulsory if target is multivariate):
+MLJBase.target_scitype_union(::Type{<:SomeSupervisedModel}) = Union{Found,NTuple{<:Found}}
+
+# optional but recommended:
+MLJBase.package_url(::Type{<:SomeSupervisedModel})  = "Unknown"
+MLJBase.is_pure_julia(::Type{<:SomeSupervisedModel}) = false
+```
 
 #### The form of data for fitting and predicting
 
-In every circumstance, the argument `X` passed to the `fit` method
-described below, and the argument `Xnew` of the `predict` method, will
-be some table supporting the
-[Tables.jl](https://github.com/JuliaData/Tables.jl) API. The interface
-implementer can control the scientific type of data appearing in `X`
-with an appropriate `input_scitype_union` declaration (see [Trait
-declarations](@ref), as `Union{scitypes(X)...} <:
-input_scitype_union(SomeSupervisedModel)` will always hold. See [Convenience
-methods](@ref) below for the definition of `scitypes`. If the
-core algorithm requires data in a different or more specific form,
-then `fit` will need to coerce the table into the form desired. To
-this end, MLJ provides the convenience method `MLJBase.matrix`;
-`MLJBase.matrix(Xtable)` has type `Matrix{T}` where `T` is the
-tightest common type of elements of `Xtable`, and `Xtable` is any
-table.
+The inputs `X` and `Xnew` for `fit` and `predict` are
+always tables, unless one defines
 
-> Tables.jl has recently added a `matrix` method as well.
+```julia
+MLJBase.input_is_multivariate(::Type{<:SomeSupervisedModel}) = false
+```
 
-Other convenience methods provided by MLJBase for handling tabular
-data are: `selectrows`, `selectcols`, `select`, `schema` (for
-extracting the size, names and eltypes of a table) and `table` (for
-materializing an abstract matrix, or named tuple of vectors, as a
-table matching a given prototype). See [Convenience methods](@ref) below for details.
+The target `y` is always an `AbstractVector` (see the discussion in
+[Getting Started](@ref)). For mulitivariate or sequence-valued
+targets, a `target_scitype_union` declaration is required. This is
+disussed under [Trait functions](@ref) below, which also describes how
+to constrain the element types of data.
 
-Note that generally the same type coercions applied to `X` by `fit` will need to
-be applied by `predict` to `Xnew`. 
+##### Additional type coercions
 
-**Important convention** It is to be understood that the columns of the
+If the core algorithm being wrapped requires data in a different or
+more specific form, then `fit` will need to coerce the table into the
+form desired (and the same coercions applied to `X` will have to be
+repeated for `Xnew` in `predict`). To assist with common cases, MLJ
+provides the convenience method
+`MLJBase.matrix`. `MLJBase.matrix(Xtable)` has type `Matrix{T}` where
+`T` is the tightest common type of elements of `Xtable`, and `Xtable`
+is any table.
+
+Other auxilliary methods provided by MLJBase for handling tabular data
+are: `selectrows`, `selectcols`, `select` and `schema` (for extracting
+the size, names and eltypes of a table). See [Convenience
+methods](@ref) below for details.
+
+##### Important convention
+
+It is to be understood that the columns of the
 table `X` correspond to features and the rows to patterns.
-
-For univariate targets, `y` is always a `Vector`
-or `CategoricalVector`, according to the value of the trait:
-
-`target_scitype_union(SomeSupervisedModelType)`  | type of `y`  | a supertype of `eltype(y)`
-------------------------------|---------------------------|--------------------------------------------
-`Continuous`                  | `Vector`                  | `Real`
-`<: Multiclass`               | `CategoricalVector`       | `Union{CategoricalString, CategoricalValue}`
-`<: FiniteOrderedFactor`      | `CategoricalVector`       | `Union{CategoricalString, CategoricalValue}`
-`Count`                       | `Vector`                  | `Integer`
-
-The form of the target data `y` passed to `fit` is constrained by the
-`target_scitype_union` trait declaration as `scitype_union(y) <:
-target_scitype_union(SomeSupervisedModelType)` will always hold. See
-See [Convenience methods](@ref) for the definition of `scitype_union`.
-
-So, for example, if your model is a binary classifier, you declare
-
-````julia
-target_scitype_union(SomeSupervisedModelType)=Multiclass{2}
-````
-
-If it can predict any number of classes, you might instead declare
-
-````julia
-target_scitype_union(SomeSupervisedModelType)=Union{Multiclass, FiniteOrderedFactor}
-````
-
-See also the table in [Getting Started](index.md).
-
-In the case of a multivariate target, in which case `y` is a vector of
-tuples, the same constraint `scitype_union(y) <:
-target_scitype_union(SomeSupervisedModelType)` holds. For example, if
-you declare `target_scitype_union(SomeSupervisedModelType) =
-Tuple{Continuous,Count}`, then each element of `y` will be a tuple of
-type `Tuple{Real,Integer}`.
 
 
 #### The fit method
 
 A compulsory `fit` method returns three objects:
 
-````julia
-MLJBase.fit(model::SomeSupervisedModelType, verbosity::Int, X, y) -> fitresult, cache, report
-````
+```julia
+MLJBase.fit(model::SomeSupervisedModel, verbosity::Int, X, y) -> fitresult, cache, report
+```
 
 Note: The `Int` typing of `verbosity` cannot be omitted.
 
-1. `fitresult::R` is the fit-result in the sense above (which becomes an
+1. `fitresult::R` is the fitresult in the sense above (which becomes an
     argument for `predict` discussed below).
 
 2.  `report` is a (possibly empty) `NamedTuple`, for example,
@@ -243,7 +230,7 @@ Note: The `Int` typing of `verbosity` cannot be omitted.
     controlled by hyperparameters (the fields of `model`). Fitted
     parameters, such as the coefficients of a linear model, do not go
     in the report as they will be extractable from `fitresult` (and
-    accessible to MLJ through the `fitted_params` method, see below).
+    accessible to MLJ through the `fitted_params` method described below).
 
 3.	The value of `cache` can be `nothing`, unless one is also defining
       an `update` method (see below). The Julia type of `cache` is not
@@ -256,7 +243,7 @@ The method `fit` should never alter hyperparameter values. If the
 package is able to suggest better hyperparameters, as a byproduct of
 training, return these in the report field.
 
-One should test that actual fit-results have the type declared in the model
+One should test that actual fitresults have the type declared in the model
 `mutable struct` declaration. To help with this,
 `MLJBase.fitresult_type(m)` returns the declared type, for any
 supervised model (or model type) `m`.
@@ -273,9 +260,9 @@ to provide MLJ accesss to a user-friendly representation of the
 learned parameters of the model (as opposed to the
 hyperparameters). They must be extractable from `fitresult`.
 
-````julia
-MLJBase.fitted_params(model::SomeSupervisedModelType, fitresult) -> friendly_fitresult::NamedTuple
-````
+```julia
+MLJBase.fitted_params(model::SomeSupervisedModel, fitresult) -> friendly_fitresult::NamedTuple
+```
 
 For a linear model, for example, one might declare something like
 `friendly_fitresult=(coefs=[...], bias=...)`.
@@ -286,160 +273,257 @@ The fallback is to return `(fitresult=fitresult,)`.
 #### The predict method
 
 A compulsory `predict` method has the form
-````julia
-MLJBase.predict(model::SomeSupervisedModelType, fitresult, Xnew) -> yhat
-````
+```julia
+MLJBase.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
+```
 
-Here `Xnew` is an any table whose entries satisfy the same scitype
-constraints as discussed for `X` above.
+Here `Xnew` will be have the same form as the `X` passed to `fit`.
 
-**Prediction types for deterministic responses.** In the case of
-`Deterministic` models, `yhat` must have the same form as the target
-`y` passed to the `fit` method (see above discussion on the form of
-data for fitting), with one exception: If predicting a `Count`, the
-prediction may be `Continuous`. For all models predicting a
-`Multiclass` or `FiniteOrderedFactor`, the categorical vectors
-returned by `predict` **must have the levels in the categorical pool
-of the target data presented in training**, even if not all levels
-appear in the training data or prediction itself. That is, we must
-have `levels(yhat) == levels(y)`.
+##### Prediction types for deterministic responses.
+
+In the case of `Deterministic` models, `yhat` should be an
+`AbstractVector` (commonly a plain `Vector`) with the same element
+type as the target `y` passed to the `fit` method (see above). Any
+`CategoricalValue` or `CategoricalString` appearing in `yhat` **must
+have the same levels in its the pool as was present in the elements of
+the target `y` presented in training**, even if not all levels appear
+in the training data or prediction itself. For example, in the
+univariate target case, this means `MLJ.classes(yhat[i]) =
+MLJ.classes(y[j])` for all admissible `i` and `j`. (The method
+`classes` is described under [Convenience methods](@ref) below).
 
 Unfortunately, code not written with the preservation of categorical
-levels in mind poses special problems. To help with this, MLJ provides
-a utility `CategoricalDecoder` which can decode a `CategoricalArray`
-into a plain array, and re-encode a prediction with the original
-levels intact. The `CategoricalDecoder` object created during `fit`
-will need to be bundled with `fitresult` to make it available to
-`predict` during re-encoding. 
+levels in mind poses special problems. To help with this, MLJBase
+provides three utility methods: `int` (for converting a
+`CategoricalValue` or `CategoricalString` into an integer, the
+ordering of these integers being consistent with that of the pool),
+`decoder` (for constructing a callable object that decodes the
+integers back into `CategoricalValue`/`CategoricalString` objects),
+and `classes`, for extracting the complete pool from a single
+value. Refer to [Convenience methods](@ref) below for important
+details.
 
-So, for example, if the core algorithm being wrapped by `fit` expects
-a nominal target `yint` of type `Vector{Int64}` then a `fit` method
+Note that a decoder created during `fit` may need to be bundled with
+`fitresult` to make it available to `predict` during re-encoding. So,
+for example, if the core algorithm being wrapped by `fit` expects a
+nominal target `yint` of type `Vector{<:Integer}` then a `fit` method
 may look something like this:
 
-````julia
-function MLJBase.fit(model::SomeSupervisedModelType, verbosity, X, y)
-    decoder = MLJBase.CategoricalDecoder(y, Int64)
-    yint = transform(decoder, y)
+```julia
+function MLJBase.fit(model::SomeSupervisedModel, verbosity, X, y)
+    yint = MLJBase.int(y) 
+    a_target_element = y[1]                    # a CategoricalValue/String
+	decode = MLJBase.decoder(a_target_element) # can be called on integers
+	
     core_fitresult = SomePackage.fit(X, yint, verbosity=verbosity)
-    fitresult = (decoder, core_fitresult)
+
+    fitresult = (decode, core_fitresult)
     cache = nothing
     report = nothing
     return fitresult, cache, report
 end
-````
+```
+
 while a corresponding deterministic `predict` operation might look like this:
 
-````julia
-function MLJBase.predict(model::SomeSupervisedModelType, fitresult, Xnew)
-    decoder, core_fitresult = fitresult
+```julia
+function MLJBase.predict(model::SomeSupervisedModel, fitresult, Xnew)
+    decode, core_fitresult = fitresult
     yhat = SomePackage.predict(core_fitresult, Xnew)
-    return inverse_transform(decoder, yhat)
+    return decode.(yhat)  # or decode(yhat) also works
 end
-````
-Query `?MLJBase.DecodeCategorical` for more information.
+```
 
-If you are coding a learning algorithm from scratch, rather than
-wrapping an existing one, conversions may be unnecessary. It may
-suffice to record the pool of `y` and bundle that with the fitresult
-for `predict` to append to the levels of its categorical output.
+For a concrete example, refer to the
+[code](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/ScikitLearn.jl)
+for `SVMClassifier`.
 
-**Prediction types for probabilistic responses.** In the case of
-`Probabilistic` models with univariate targets, `yhat` must be a
-`Vector` whose elements are distributions (one distribution per row of
-`Xnew`).
+Of course, if you are coding a learning algorithm from scratch, rather
+than wrapping an existing one, these extra measures may be unnecessary.
 
-A *distribution* is any instance of a subtype of
-`Distributions.Distribution` from the package Distributions.jl, or any
-instance of the additional types `UnivariateNominal` and
-`MultivariateNominal` defined in MLJBase.jl (or any other type
-`D` you define for which `MLJBase.isdistribution(::D) = true`, meaning `Base.rand`
-and `Distributions.pdf` are implemented, as well
-`Distributions.mean`/`Distribution.median` or `Distributions.mode`).
+##### Prediction types for probabilistic responses
 
-Use `UnivariateNominal` for `Probabilistic` models predicting
-`Multiclass` or `FiniteOrderedFactor` targets. For example, suppose
-`levels(y)=["yes", "no", "maybe"]` and set `L=levels(y)`. Then, if the
-predicted probabilities for some input pattern are `[0.1, 0.7, 0.2]`,
-respectively, then the prediction returned for that pattern will be
-`UnivariateNominal(L, [0.1, 0.7, 0.2])`. Query `?UnivariateNominal`
-for more information.
+In the case of `Probabilistic` models with univariate targets, `yhat`
+must be a `Vector` whose elements are distributions (one distribution
+per row of `Xnew`).
 
-The `predict` method will need access to all levels in the pool of the target
-variable presented `y` presented for training, which consequently need
-to be encoded in the `fitresult` returned by `fit`. If a
-`CategoricalDecoder` object, `decoder`, has been bundled in
-`fitresult`, as in the deterministic example above, then the levels
-are given by `levels(decoder)`. Levels not observed in the training data 
-(i.e., only in its pool) should be assigned probability zero.
+Presently, a *distribution* is any object `d` for which
+`MLJBase.isdistribution(::d) = true`, which includes all objects of
+type `Distributions.Distribution` from the package
+Distributions.jl. The declaration `MLJBase.isdistribution(::d) = true`
+implies that at least `Base.rand(d)` is implemented, but the rest of
+this API is still a work-in-progress.
+
+Use the distribution `MLJBase.UnivariateNominal` for `Probabilistic`
+models predicting a target with `Finite` scitype (classifiers). In
+this case each element of the training target `y` is a
+`CategoricalValue` or `CategoricalString`, as in this contrived example:
+
+```julia
+using CategoricalArrays
+y = identity.(categorical([:yes, :no, :no, :maybe, :maybe]))
+```
+
+Note that, as in this case, we cannot assume `y` is a
+`CategoricalVector`, and we rely on elements for pool information (if
+we need it); this is accessible using the convenience method
+`MLJ.classes`:
+
+```julia
+julia> yes = y[1]
+julia> levels = MLJBase.classes(yes)
+3-element Array{CategoricalValue{Symbol,UInt32},1}:
+ :maybe
+ :no
+ :yes
+```
+
+Now supposing that, for some new input pattern, the elements `yes =
+y[1]` and `no = y[2]` are to be assigned respective probabilities of
+0.2 and 0.8. Then the corresponding distribution `d` is constructed as
+follows:
+
+```julia
+julia> d = MLJBase.UnivariateNominal([yes, no], [0.2, 0.8])
+UnivariateNominal{CategoricalValue{Symbol,UInt32},Float64}(Dict(:yes=>0.2,:maybe=>0.0,:no=>0.8))
+
+julia> pdf(d, yes)
+0.2
+
+julia> maybe = y[4]; pdf(d, maybe)
+0.0
+```
+
+Alternatively, a dictionary can be passed to the constructor. 
+
+```@docs
+MLJBase.UnivariateNominal
+```
 
 
 #### Trait declarations
 
-There are a number of recommended trait declarations for each model
-mutable structure `SomeSupervisedModelType <: Supervised` you define. Basic
-fitting, resampling and tuning in MLJ does not require these traits
-but some advanced MLJ meta-algorithms may require them now, or in the
-future. In particular, MLJ's `models(::Task)` method (matching models
-to user-specified tasks) can only identify models having a complete
-set of trait declarations. A full set of declarations is shown below
-for the `DecisionTreeClassifier` type (defined in the submodule DecisionTree_ of MLJModels):
+Two trait functions allow the implementer to restrict the types of
+elements appearing in the inputs `X`, and `Xnew` passed to `fit` and
+`predict`, and the elements appearing in the training target `y`. The
+MLJ task interface also uses these traits to match models to tasks. So
+if they are omitted (and your model is registered) then a general user
+may attempt to use your model with inapporpriately typed data.
 
-````julia
+The trait functions `input_scitype_union` and `target_scitype_union`
+take scientific data types as values (see [Getting Started](@ref) for
+scitype basics). These types are organized in the following heirarchy:
+
+![](scitypes.png)
+
+For example,  to ensure that elements of `X` presented to the `DecisionTreeClassifier` `fit` method all have `Continous`
+scitype (and hence `AbstractFloat` machine type), one declares
+
+```julia
+MLJBase.input_scitype_union(::Type{<:DecisionTreeClassifier}) = MLJBase.Continuous
+```
+
+For, in general, MLJ will never call `fit(model::SomeSuperivsedModel,
+verbosity, X, y)` unless `Union{scitypes(X)...} <:
+inputs_scitype_union(SomeSupervisedModel)` holds. (See [Convenience
+methods](@ref) below for more on the `scitypes` and related
+`scitype_union` methods.)
+
+Similarly, one declares
+
+```julia
+MLJBase.target_scitype_union(::Type{<:DecisionTreeClassifier}) = MLJBase.Finite
+```
+
+to ensure that all elements of the target `y` (which is always an
+`AbstractVector`) have `Finite` scitype (and hence `CategoricalValue`
+or `CategoricalString` machine type). This is because, in the general
+case, MLJ guarantees that `scitype_union(y) <:
+target_scitype_union(SomeSupervisedModel)`.
+
+##### Multivariate targets
+
+The above remarks continue to hold unchanged for the case multivariate
+targets.  In this case the elements of the `AbstractVector` `y` are
+now tuples. If, for example, you declare
+
+```julia
+target_scitype_union(SomeSupervisedModel) = Tuple{Continuous,Count}
+```
+
+then each element of `y` will be a tuple of type
+`Tuple{AbstractFloat,Integer}`. For predicting variable length
+sequences of, say, binary values, use
+
+```julia
+target_scitype_union(SomeSupervisedModel) = NTuple{<:Multiclass{2}}
+```
+
+The trait functions controlling the form of data are summarized as follows:
+
+method                   | return type       | declarable return values                  | default value
+-------------------------|-------------------|-------------------------------------------|---------------
+`target_scitype_union`   | `DataType`        | subtype of `Found` or tuple of such types | `Union{Found,NTuple{<:Found}}`
+`input_scitype_union`    | `DataType`        | subtype of `Union{Missing,Found}`         | `Union{Missing,Found}`
+`input_is_multivariate`  | `Bool`            | `true` or `false`                         | `true`
+
+
+Additional trait functions tell the `@load` macro how to find your
+model if it is registered, and provide other self-explanatory metadata
+about the model:
+
+method                   | return type       | declarable return values           | default value
+-------------------------|-------------------|------------------------------------|---------------
+`load_path`              | `String`          | unrestricted                       | "unknown"
+`package_name`           | `String`          | unrestricted                       | "unknown"
+`package_uuid`           | `String`          | unrestricted                       | "unknown"
+`package_url`            | `String`          | unrestricted                       | "unknown"
+`is_pure_julia`          | `Bool`            | `true` or `false`                  | `false`
+
+Here is the complete list of trait function declarations for `DecistionTreeClassifier` 
+([source](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/DecisionTree.jl)):
+
+```julia
+MLJBase.input_is_multivariate(::Type{<:DecisionTreeClassifier}) = true
+MLJBase.input_scitype_union(::Type{<:DecisionTreeClassifier}) = MLJBase.Continuous
+MLJBase.target_scitype_union(::Type{<:DecisionTreeClassifier}) = MLJBase.Finite
 MLJBase.load_path(::Type{<:DecisionTreeClassifier}) = "MLJModels.DecisionTree_.DecisionTreeClassifier" 
 MLJBase.package_name(::Type{<:DecisionTreeClassifier}) = "DecisionTree"
 MLJBase.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 MLJBase.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bensadeghi/DecisionTree.jl"
 MLJBase.is_pure_julia(::Type{<:DecisionTreeClassifier}) = true
-MLJBase.input_is_multivariate(::Type{<:DecisionTreeClassifier}) = true
-MLJBase.input_scitype_union(::Type{<:DecisionTreeClassifier}) = MLJBase.Continuous
-MLJBase.target_scitype_union(::Type{<:DecisionTreeClassifier}) = MLJBase.Multiclass
-````
+```
 
-Note that models predicting multivariate targets will need to need to have
-`target_scitype_union` return an appropriate `Tuple` type. 
-
-For an explanation of `Found` and `Other` in the table below, see [Scientific
-Types](index.md).
-
-method                   | return type       | declarable return values           | default value
--------------------------|-------------------|------------------------------------|---------------
-`target_scitype_union`         | `DataType`        | subtype of `Found` or tuple of such types | `Union{Found,NTuple{<:Found}}`
-`input_scitype_union`         | `DataType`        | subtype of `Union{Missing,Found}`  |  `Union{Missing,Found}`
-`input_is_multivariate`  | `Bool`            | `true` or `false`                  | `true`
-`is_pure_julia`          | `Bool`            | `true` or `false`                  | `false`
-`load_path`              | `String`          | unrestricted                       | "unknown"
-`package_name`           | `String`          | unrestricted                       | "unknown"
-`package_uuid`           | `String`          | unrestricted                       | "unknown"
-`package_url`            | `String`          | unrestricted                       | "unknown"
+You can test all your declarations of traits by calling `info(SomeModel)`.
 
 
-You can test declarations of traits by calling `info(SomeModelType)`.
+#### Iterative models and the update! method
 
-
-#### The update! method
-
-An `update` method may be optionally overloaded to enable a call by MLJ to
-retrain a model (on the same training data) to avoid repeating
+An `update` method may be optionally overloaded to enable a call by
+MLJ to retrain a model (on the same training data) to avoid repeating
 computations unnecessarily.
 
-````julia
-MLJBase.update(model::SomeSupervisedModelType, verbosity, old_fitresult, old_cache, X, y) -> fitresult, cache, report
-````
+```julia
+MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) -> fitresult, cache, report
+```
 
 If an MLJ `Machine` is being `fit!` and it is not the first time, then
-`update` is called instead of `fit` unless `fit!` has been called with
-new rows. However, `MLJBase` defines a fallback for `update` which
-just calls `fit`. For context, see [MLJ
-Internals](internals.md). 
+`update` is called instead of `fit`, unless the machine `fit!` has
+been called with a new `rows` keyword argument. However, `MLJBase`
+defines a fallback for `update` which just calls `fit`. For context,
+see [MLJ Internals](internals.md).
 
-Learning networks wrapped as models constitute one use-case: One would
-like each component model to be retrained only when hyperparameter
-changes "upstream" make this necessary. In this case MLJ provides a
-fallback (specifically, the fallback is for any subtype of
-`Supervised{Node}`). A second important use-case is iterative models,
-where calls to increase the number of iterations only restarts the
-iterative procedure if other hyperparameters have also changed. For an
-example, see `builtins/Ensembles.jl`.
+Learning networks wrapped as models constitute one use-case (see
+[Learning Networks](@ref)): One would like each component model to be
+retrained only when hyperparameter changes "upstream" make this
+necessary. In this case MLJ provides a fallback (specifically, the
+fallback is for any subtype of `SupervisedNetwork =
+Union{DeterministicNetwork,ProbabilisticNetwork}`). A second more
+generally relevant use-case is iterative models, where calls to
+increase the number of iterations only restarts the iterative
+procedure if other hyperparameters have also changed. For an example,
+see the MLJ [ensemble
+code](https://github.com/alan-turing-institute/MLJ.jl/blob/master/src/ensembles.jl).
 
 In the event that the argument `fitresult` (returned by a preceding
 call to `fit`) is not sufficient for performing an update, the author
@@ -448,20 +532,33 @@ additional information required, as this is also passed as an argument
 to the `update` method.
 
 
-#### Multivariate models
-
-TODO
-
-
 ### Unsupervised models
 
 TODO
+
+- `transform` should return a table unless `output_is_multivariate` is
+set `false`. Convenience method: `table` (for materializing an
+`AbstractMatrix`, or named tuple of vectors, as a table matching a
+given prototype)
+
+- instead of `target_scitype_union` have `output_scitype_union`
+
+-  `input_is_multivariate` and `input_scitype_union` are the same 
+
 
 
 ### Convenience methods
 
 ```@docs
-MLJBase.CategoricalDecoder
+MLJBase.int
+```
+
+```@docs
+MLJBase.classes
+```
+
+```@docs
+MLJBase.decoder
 ```
 
 ```@docs
