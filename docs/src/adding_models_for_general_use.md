@@ -139,7 +139,7 @@ MLJBase.fit(model::SomeSupervisedModel, verbosity::Integer, X, y) -> fitresult, 
 MLJBase.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
 ```
 
-Fallback to be overidden if model input is univariate:
+Fallback to be overridden if model input is univariate:
 
 ```julia
 MLJBase.input_is_multivariate(::Type{<:SomeSupervisedModel}) = true
@@ -157,7 +157,7 @@ Optional, to return user-friendly form of fitted parameters:
 MLJBase.fitted_params(model::SomeSupervisedModel, fitresult) = fitresult
 ```
 
-Optional, to avoid redundant calculations when refitting machines:
+Optional, to avoid redundant calculations when re-fitting machines:
 
 ```julia
 MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) =
@@ -214,9 +214,9 @@ MLJBase.input_is_multivariate(::Type{<:SomeSupervisedModel}) = false
 ```
 
 The target `y` is always an `AbstractVector` (see the discussion in
-[Getting Started](@ref)). For mulitivariate or sequence-valued
+[Getting Started](@ref)). For multivariate or sequence-valued
 targets, a `target_scitype_union` declaration is required. This is
-disussed under [Trait functions](@ref) below, which also describes how
+discussed under [Trait declarations](@ref) below, which also describes how
 to constrain the element types of data.
 
 ##### Additional type coercions
@@ -230,7 +230,7 @@ provides the convenience method
 `T` is the tightest common type of elements of `Xtable`, and `Xtable`
 is any table.
 
-Other auxilliary methods provided by MLJBase for handling tabular data
+Other auxiliary methods provided by MLJBase for handling tabular data
 are: `selectrows`, `selectcols`, `select` and `schema` (for extracting
 the size, names and eltypes of a table). See [Convenience
 methods](@ref) below for details.
@@ -288,7 +288,7 @@ generally avoid doing any of its own logging.
 #### The fitted_params method
 
 A `fitted_params` method may be optionally overloaded. It's purpose is
-to provide MLJ accesss to a user-friendly representation of the
+to provide MLJ access to a user-friendly representation of the
 learned parameters of the model (as opposed to the
 hyperparameters). They must be extractable from `fitresult`.
 
@@ -440,15 +440,15 @@ elements appearing in the inputs `X`, and `Xnew` passed to `fit` and
 `predict`, and the elements appearing in the training target `y`. The
 MLJ task interface also uses these traits to match models to tasks. So
 if they are omitted (and your model is registered) then a general user
-may attempt to use your model with inapporpriately typed data.
+may attempt to use your model with inappropriately typed data.
 
 The trait functions `input_scitype_union` and `target_scitype_union`
 take scientific data types as values (see [Getting Started](@ref) for
-scitype basics). These types are organized in the following heirarchy:
+scitype basics). These types are organized in the following hierarchy:
 
 ![](scitypes.png)
 
-For example,  to ensure that elements of `X` presented to the `DecisionTreeClassifier` `fit` method all have `Continous`
+For example,  to ensure that elements of `X` presented to the `DecisionTreeClassifier` `fit` method all have `Continuous`
 scitype (and hence `AbstractFloat` machine type), one declares
 
 ```julia
