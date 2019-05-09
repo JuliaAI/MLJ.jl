@@ -1,3 +1,4 @@
+
 ## NESTED PARAMATER INTERFACE
 
 function set_params!(model::Model, key::Symbol, value)
@@ -159,7 +160,8 @@ function Base.show(stream::IO, object::ParamRange)
     description = string(typeof(object).name.name, "{$field}")
     str = "$description @ $(MLJBase.handle(object))"
     if !isempty(fieldnames(typeof(object)))
-        printstyled(IOContext(stream, :color=> true), str, bold=true)#color=:blue
+        printstyled(IOContext(stream, :color=> MLJBase.SHOW_COLOR),
+                    str, color=:blue)
     else
         print(stream, str)
     end

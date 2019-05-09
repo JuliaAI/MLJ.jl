@@ -36,9 +36,9 @@ yhat = categorical(collect("asdfaadfaasssdf"))
 
 y = categorical(collect("abb"))
 L = ['a', 'b']
-d1 = UnivariateNominal(L, [0.1, 0.9])
-d2 = UnivariateNominal(L, [0.4, 0.6])
-d3 = UnivariateNominal(L, [0.2, 0.8])
+d1 = UnivariateFinite(L, [0.1, 0.9])
+d2 = UnivariateFinite(L, [0.4, 0.6])
+d3 = UnivariateFinite(L, [0.2, 0.8])
 yhat = [d1, d2, d3]
 @test cross_entropy(yhat, y) ≈ -(log(0.1) + log(0.6) + log(0.8))/3
 

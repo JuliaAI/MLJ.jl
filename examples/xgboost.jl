@@ -17,7 +17,7 @@ plotly()
 
 # load a task (data plus learning objective):
 task = load_crabs()
-shuffle!(task, rng=MersenneTwister(1234))
+shuffle!(MersenneTwister(134), task)
 
 # list models matching the task:
 models(task)

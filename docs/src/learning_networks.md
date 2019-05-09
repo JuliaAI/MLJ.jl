@@ -146,11 +146,11 @@ To export a learning network:
 - Wrap the learning network code in a model `fit` method.
 
 All learning networks that make determinisic (or, probabilistic)
-predictions export as models of subtype `Deterministic{Node}`
-(respectively, `Probabilistic{Node}`):
+predictions export as models of subtype `DeterministicNetwork`
+(respectively, `ProbabilisticNetwork`):
 
 ```@example 1
-mutable struct WrappedRidge <: Deterministic{Node}
+mutable struct WrappedRidge <: DeterministicNetwork
     ridge_model
 end
 
@@ -188,7 +188,7 @@ end
 
 The line marked `###`, where the new exported model's hyperparameter `ridge_model` is spliced into the network, is the only modification.
 
-> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](adding_models_for_general_use.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding machine `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the node returned by `fit` on the data supplied: `MLJ.predict(model::Supervised{Node}, Xnew) = yhat(Xnew)`.
+> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](adding_models_for_general_use.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding machine `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the node returned by `fit` on the data supplied: `MLJ.predict(model::SupervisedNetwork, Xnew) = yhat(Xnew)`.
 
 The export process is complete and we can wrap our exported model
 around any data or task we like, and evaluate like any other model:
@@ -221,7 +221,7 @@ Note, in particular, the lines defining `zhat` and `yhat`, which
 combine several static node operations.
 
 ```@example 1
-mutable struct KNNRidgeBlend <:Deterministic{Node}
+mutable struct KNNRidgeBlend <:DeterministicNetwork
 
     knn_model
     ridge_model

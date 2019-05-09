@@ -17,7 +17,7 @@ fit!(t)
 predict(t, X[test,:])
 @test rms(predict(t, X[test,:]), y[test]) < std(y)
 
-mach = machine(ConstantRegressor(target_type=Float64), task)
+mach = machine(ConstantRegressor(), task)
 fit!(mach)
 yhat = predict_mean(mach, X)
 

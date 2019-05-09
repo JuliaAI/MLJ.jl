@@ -48,9 +48,9 @@ end == 0
     y_coerced = coerce(Continuous, y)
     @test scitype_union(y_coerced) === Continuous
     @test y_coerced ≈ y
-    X_coerced = @test_logs coerce(Dict(:z => FiniteOrderedFactor), task.X)
+    X_coerced = @test_logs coerce(Dict(:z => OrderedFactor), task.X)
     @test X_coerced.x === task.X.x
-    @test scitype_union(X_coerced.z) <: FiniteOrderedFactor
+    @test scitype_union(X_coerced.z) <: OrderedFactor
     @test X_coerced.z.pool.ordered
     # Check no-op coercion
     y = rand(Float64, 5)
@@ -89,8 +89,8 @@ end == 0
                                    coerce(Multiclass, [:x, :y, missing]))) ===
         Union{Missing, Multiclass{2}}
     @test scitype_union(@test_logs((:warn, r"Missing values encountered"),
-                                   coerce(FiniteOrderedFactor, [:x, :y, missing]))) ===
-                                       Union{Missing, FiniteOrderedFactor{2}}
+                                   coerce(OrderedFactor, [:x, :y, missing]))) ===
+                                       Union{Missing, OrderedFactor{2}}
     # non-missing Any vectors
     @test coerce(Continuous, Any[4, 7]) == [4.0, 7.0]
     @test coerce(Count, Any[4.0, 7.0]) == [4, 7]

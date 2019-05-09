@@ -36,13 +36,14 @@ export pdf, mode, median, mean, shuffle!, categorical
 export nrows, nfeatures, info
 export SupervisedTask, UnsupervisedTask, MLJTask
 export Deterministic, Probabilistic, Unsupervised, Supervised
-export Found, Continuous, Discrete, OrderedFactor    
-export FiniteOrderedFactor, Unknown
+export DeterministicNetwork, ProbabilisticNetwork
+export Found, Continuous, Finite, Infinite    
+export OrderedFactor, Unknown
 export Count, Multiclass, Binary
 export scitype, scitype_union, scitypes
 export predict, predict_mean, predict_median, predict_mode
 export transform, inverse_transform, se, evaluate, fitted_params
-export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
+export @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite
 export partition, X_and_y
 export load_boston, load_ames, load_iris, load_reduced_ames
 export load_crabs, datanow                

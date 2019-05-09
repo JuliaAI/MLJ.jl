@@ -15,50 +15,38 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
 
         # checks on args:
         if M <: Supervised
-            if  (length(args) == 1 && !(args[1] isa SupervisedTask)) ||
-                length(args) > 2
-                error("Use machine(model, task) or machine(model, X, y) "*
-                      "for a supervised model.")
-            elseif length(args) == 2 && !(container_type(args[1]) in [:table, :sparse])
-                error("The X in machine(model, X, y) should be a table. ")
-            end
-            if length(args) == 2
-                X, y = args
-                T =
-                    input_is_multivariate(model) ? Union{scitypes(X)...} : scitype_union(X)
-                T <: input_scitype_union(model) ||
-                    error("The scitypes of elements of X, in machine(model, X, y), should be a subtype of $(input_scitype_union(model)). ")
-                y isa Vector || y isa CategoricalVector ||
-                    error("The y, in machine(model, X, y), should be a vector "*
-                          "(of tuples for multivariate targets) or a categorical vector. ")
-                scitype_union(y) <: target_scitype_union(model) || 
-                    error("The scitype of elements of y, in machine(model, X, y), should be a subtype of $(target_scitype_union(model)). ")
-            end
+            (length(args) == 2) ||
+                error("Use machine(model, X, y) for a supervised model. ")
+            X, y = args
+            T =
+                input_is_multivariate(model) ? Union{scitypes(X)...} : scitype_union(X)
+            T <: input_scitype_union(model) ||
+                error("The scitypes of elements of X, in machine(model, X, y), "*
+                      "should be a subtype of $(input_scitype_union(model)). ")
+            y isa AbstractVector ||
+                error("The y, in machine(model, X, y), should be an AbstractVector "*
+                      "(possibly of tuples). ")
+            scitype_union(y) <: target_scitype_union(model) || 
+                error("The scitype of elements of y, in machine(model, X, y), "*
+                      "should be a subtype of $(target_scitype_union(model)). ")
         end
         if M <: Unsupervised
             length(args) == 1 ||
                 error("Wrong number of arguments. "*
-                      "Use machine(model, X) or machine(model, task) for an unsupervised model.")
-
-            container_type(args[1]) in [:table, :sparse] || args[1] isa UnsupervisedTask || args[1] isa Vector || args[1] isa CategoricalVector ||
-                error("The X, in machine(model, X), should be a vector, categorical vector, table or UnsupervisedTask. "*
-                      "Use MLJ.table(X) to wrap an abstract matrix X as a table. ")
-            if container_type(args[1]) in [:table, :sparse]
-                X = args[1]
-                U =
-                    input_is_multivariate(model) ?  Union{scitypes(X)...} : scitype_union(X)
-                U <: input_scitype_union(model) || 
-                error("The scitype of elements of X, in machine(model, X), should be a subtype of $(input_scitype_union(model)). ")
-            end
+                      "Use machine(model, X) for an unsupervised model.")
+            X = args[1]
+            container_type(X) in [:table, :sparse] || args[1] isa AbstractVector ||
+                error("The X, in machine(model, X), should be a table, sparse table or AbstractVector. "*
+                      "Use MLJ.table(X) to wrap an AbstractMatrix X as a table. ")
+            U =
+                input_is_multivariate(model) ?  Union{scitypes(X)...} : scitype_union(X)
+            U <: input_scitype_union(model) || 
+                error("The scitype of elements of X, in machine(model, X), should be a subtype "*
+                      "of $(input_scitype_union(model)). ")
         end
 
         machine = new{M}(model)
-
-        if args[1] isa MLJTask
-            machine.args = args[1]()
-        else
-            machine.args = args
-        end
+        machine.args = args
         
         return machine
 
@@ -67,6 +55,10 @@ end
 
 # automatically detect type parameter:
 Machine(model::M, args...) where M<:Model = Machine{M}(model, args...)
+
+machine(model::Model, task::SupervisedTask) = machine(model, task.X, task.y)
+machine(model::Model, task::UnsupervisedTask) = machine(model, task.X)
+
 
 # Note: The following method is written to fit `NodalMachine`s
 # defined in networks.jl, in addition to `Machine`s defined above.

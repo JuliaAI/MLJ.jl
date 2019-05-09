@@ -3,6 +3,8 @@ module TestEnsembles
 # uncomment two lines for testing distributed processing
 # using Distributed
 # addprocs(2)
+# @everywhere using Pkg
+# @everywhere Pkg.activate("working", shared=true)
 
 # using Revise
 using Test
@@ -16,14 +18,15 @@ using Distributions
 ## WRAPPED ENSEMBLES OF FITRESULTS
 
 # target is :deterministic :multiclass false:
-atom = MLJ.DeterministicConstantClassifier(target_type=Char)
+atom = MLJ.DeterministicConstantClassifier()
 L = ['a', 'b', 'j']
-ensemble = [('a', L), ('j', L), ('j', L), ('b', L)]
+L2 = categorical(L)
+ensemble = [L2[1], L2[3], L2[3], L2[2]]
 n=length(ensemble)
 weights = fill(1/n, n) # ignored by predict below
 wens = MLJ.WrappedEnsemble(atom, ensemble)
 X = MLJ.table(rand(3,5))
-@test predict(wens, weights, X) == categorical(['j','j','j'])
+@test predict(wens, weights, X) == categorical(vcat(['j','j','j'],L))[1:3]
 
 # target is :deterministic :continuous false:
 atom = MLJ.DeterministicConstantRegressor()
@@ -33,10 +36,10 @@ wens = MLJ.WrappedEnsemble(atom, ensemble)
 @test predict(wens, weights, X) ≈ [5.5, 5.5, 5.5]
 
 # target is :probabilistic :multiclass false:
-atom = ConstantClassifier(target_type=Char)
+atom = ConstantClassifier()
 L = ['a', 'b', 'j']
-d1 = UnivariateNominal(L, [0.1, 0.2, 0.7])
-d2 = UnivariateNominal(L, [0.2, 0.3, 0.5])
+d1 = UnivariateFinite(L, [0.1, 0.2, 0.7])
+d2 = UnivariateFinite(L, [0.2, 0.3, 0.5])
 ensemble = [d2,  d1, d2, d2]
 weights = [0.1, 0.5, 0.2, 0.2]
 wens = MLJ.WrappedEnsemble(atom, ensemble)
@@ -47,7 +50,7 @@ d = predict(wens, weights, X)[1]
 @test pdf(d, 'j') ≈ 0.6
 
 # target is :probabilistic :continuous false:
-atom = ConstantRegressor(target_type=Float64)
+atom = ConstantRegressor()
 d1 = Distributions.Normal(1, 2)
 d2 = Distributions.Normal(3, 4)
 ensemble = [d2,  d1, d2, d2]
@@ -60,7 +63,7 @@ d = predict(wens, weights, X)[1]
 ## ENSEMBLE MODEL
 
 # target is :deterministic :multiclass false:
-atom=MLJ.DeterministicConstantClassifier(target_type=Char)
+atom=MLJ.DeterministicConstantClassifier()
 X = MLJ.table(ones(5,3))
 y = categorical(collect("asdfa"))
 train, test = partition(1:length(y), 0.8);
@@ -75,7 +78,7 @@ info(ensemble_model)
 @test MLJBase.target_scitype_union(ensemble_model) == MLJBase.target_scitype_union(atom)
 
 # target is :deterministic :continuous false:
-atom = MLJ.DeterministicConstantRegressor(target_type=Float64)
+atom = MLJ.DeterministicConstantRegressor()
 X = MLJ.table(ones(5,3))
 y = Float64[1.0, 2.0, 1.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
@@ -94,7 +97,7 @@ predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
 
 # target is :deterministic :continuous false:
-atom = MLJ.DeterministicConstantRegressor(target_type=Float64)
+atom = MLJ.DeterministicConstantRegressor()
 Random.seed!(1234) 
 X = MLJ.table(randn(10,3))
 y = randn(10)
@@ -103,6 +106,7 @@ ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom, rng=1)
 ensemble_model.out_of_bag_measure = [MLJ.rms,MLJ.rmsp]
 ensemble_model.n = 2
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+# TODO: the following test fails in distributed version (because of multiple rng's ?)
 @test report[:oob_estimates][1] ≈ 1.083490899041915
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom,rng=Random.MersenneTwister(1))
@@ -111,7 +115,7 @@ ensemble_model.n = 2
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 
 # target is :probabilistic :multiclass false:
-atom = ConstantClassifier(target_type=Char)
+atom = ConstantClassifier()
 X = MLJ.table(ones(5,3))
 y = categorical(collect("asdfa"))
 train, test = partition(1:length(y), 0.8);
@@ -135,7 +139,7 @@ info(ensemble_model)
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # target is :probabilistic :continuous false:
-atom = ConstantRegressor(target_type=Float64)
+atom = ConstantRegressor()
 X = MLJ.table(ones(5,3))
 y = Float64[1.0, 2.0, 2.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
@@ -181,7 +185,6 @@ ensemble_model.n = 10
 fit!(ensemble);
 @test length(ensemble.fitresult.ensemble) == 10
 @test !isnan(predict(ensemble, MLJ.selectrows(X, test))[1])
-
 
 # old Koala tests
 # # check that providing fixed seed gives identical predictions each

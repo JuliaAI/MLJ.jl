@@ -202,7 +202,7 @@ end
 
 # this is needed for the `TunedModel` `fit` defined in tuning.jl
 
-mutable struct Resampler{S,M<:Supervised} <: Supervised{Any}
+mutable struct Resampler{S,M<:Supervised} <: Supervised
     model::M
     resampling::S # resampling strategy
     measure

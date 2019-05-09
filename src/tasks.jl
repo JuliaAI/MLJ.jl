@@ -36,7 +36,8 @@ function Random.shuffle!(task::SupervisedTask)
     return task
 end
 
-Random.shuffle(rng::AbstractRNG, task::SupervisedTask) = task[shuffle!(rng, Vector(1:nrows(task)))]
+Random.shuffle(rng::AbstractRNG, task::SupervisedTask) =
+    task[shuffle!(rng, Vector(1:nrows(task)))]
 Random.shuffle(task::SupervisedTask) = task[shuffle!(Vector(1:nrows(task)))]
 
 
@@ -97,8 +98,8 @@ function coerce(T::Type{Count}, y::AbstractVector)
     return _int.(y)
 end
 
-# Vector to Multiclass and FiniteOrderedFactor
-for (T, ordered) in ((Multiclass, false), (FiniteOrderedFactor, true))
+# Vector to Multiclass and OrderedFactor
+for (T, ordered) in ((Multiclass, false), (OrderedFactor, true))
     @eval function coerce(::Type{$T}, y)
         su = scitype_union(y)
         if su >: Missing
@@ -164,7 +165,7 @@ which case it is a vector.
 The data types of elements in a column of `data` named as a key of the
 dictionary `types` are coerced to have a scientific type given by the
 corresponding value. Possible values are `Continuous`, `Multiclass`,
-`FiniteOrderedFactor` and `Count`. So, for example,
+`OrderedFactor` and `Count`. So, for example,
 `types=Dict(:x1=>Count)` means elements of the column of `data` named
 `:x1` will be coerced into integers (whose scitypes are always `Count`).
 
@@ -201,7 +202,7 @@ vector.
 The data types of elements in a column of `data` named as a key of the
 dictionary `types` are coerced to have a scientific type given by the
 corresponding value. Possible values are `Continuous`, `Multiclass`,
-`FiniteOrderedFactor` and `Count`. So, for example,
+`OrderedFactor` and `Count`. So, for example,
 `types=Dict(:x1=>Count)` means elements of the column of `data` named
 `:x1` will be coerced into integers (whose scitypes are always `Count`).
 
