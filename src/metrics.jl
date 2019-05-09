@@ -96,9 +96,9 @@ misclassification_rate(yhat, y::AbstractVector) =
 ## CLASSIFICATION METRICS (FOR PROBABILISTIC PREDICTIONS)
 
 # for single pattern:
-cross_entropy(d::UnivariateNominal, y) = -log(d.prob_given_level[y])
+cross_entropy(d::UnivariateFinite, y) = -log(d.prob_given_level[y])
 
-function cross_entropy(yhat::Vector{<:UnivariateNominal}, y::AbstractVector)
+function cross_entropy(yhat::Vector{<:UnivariateFinite}, y::AbstractVector)
     length(y) == length(yhat) || throw(DimensionMismatch())
     return broadcast(cross_entropy, yhat, y) |> mean
 end

@@ -43,7 +43,7 @@ export Count, Multiclass, Binary
 export scitype, scitype_union, scitypes
 export predict, predict_mean, predict_median, predict_mode
 export transform, inverse_transform, se, evaluate, fitted_params
-export @constant, @more, HANDLE_GIVEN_ID, UnivariateNominal
+export @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite
 export partition, X_and_y
 export load_boston, load_ames, load_iris, load_reduced_ames
 export load_crabs, datanow                

@@ -386,7 +386,7 @@ Distributions.jl. The declaration `MLJBase.isdistribution(::d) = true`
 implies that at least `Base.rand(d)` is implemented, but the rest of
 this API is still a work-in-progress.
 
-Use the distribution `MLJBase.UnivariateNominal` for `Probabilistic`
+Use the distribution `MLJBase.UnivariateFinite` for `Probabilistic`
 models predicting a target with `Finite` scitype (classifiers). In
 this case each element of the training target `y` is a
 `CategoricalValue` or `CategoricalString`, as in this contrived example:
@@ -416,8 +416,8 @@ y[1]` and `no = y[2]` are to be assigned respective probabilities of
 follows:
 
 ```julia
-julia> d = MLJBase.UnivariateNominal([yes, no], [0.2, 0.8])
-UnivariateNominal{CategoricalValue{Symbol,UInt32},Float64}(Dict(:yes=>0.2,:maybe=>0.0,:no=>0.8))
+julia> d = MLJBase.UnivariateFinite([yes, no], [0.2, 0.8])
+UnivariateFinite{CategoricalValue{Symbol,UInt32},Float64}(Dict(:yes=>0.2,:maybe=>0.0,:no=>0.8))
 
 julia> pdf(d, yes)
 0.2
@@ -429,7 +429,7 @@ julia> maybe = y[4]; pdf(d, maybe)
 Alternatively, a dictionary can be passed to the constructor. 
 
 ```@docs
-MLJBase.UnivariateNominal
+MLJBase.UnivariateFinite
 ```
 
 

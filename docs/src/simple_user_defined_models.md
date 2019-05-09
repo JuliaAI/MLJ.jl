@@ -86,7 +86,7 @@ end
 # `fit` ignores the inputs X and returns the training target y
 # probability distribution:
 function MLJBase.fit(model::MyClassifier, X, y)
-    fitresult = Distributions.fit(MLJBase.UnivariateNominal, y)
+    fitresult = Distributions.fit(MLJBase.UnivariateFinite, y)
     return fitresult
 end
 
@@ -95,5 +95,5 @@ MLJBase.predict(model::MyClassifier, fitresult, Xnew) =
     [fitresult for r in 1:nrows(Xnew)]
 ````
 
-For more details on the `UnivariateNominal` distribution, query
-`MLJBase.UnivariateNominal`.
+For more details on the `UnivariateFinite` distribution, query
+`MLJBase.UnivariateFinite`.

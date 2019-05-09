@@ -95,7 +95,7 @@ MLJBase.target_scitype_union(::Type{<:DeterministicConstantRegressor}) = MLJBase
     ConstantClassifier()
 
 A classifier that, for any new input pattern, `predict`s the
-`UnivariateNominal` probability distribution `d` best fitting the
+`UnivariateFinite` probability distribution `d` best fitting the
 training target data. So, `pdf(d, level)` is the proportion of levels
 in the training data coinciding with `level`. Use `predict_mode` to
 obtain the training target mode instead.
@@ -106,7 +106,7 @@ struct ConstantClassifier <: MLJBase.Probabilistic end
 function MLJBase.fit(model::ConstantClassifier,
                  verbosity::Int, X, y) 
 
-    fitresult = Distributions.fit(MLJBase.UnivariateNominal, y)
+    fitresult = Distributions.fit(MLJBase.UnivariateFinite, y)
 
     verbosity < 1 || @info "probabilities: \n$(fitresult.prob_given_level)"
     cache = nothing
