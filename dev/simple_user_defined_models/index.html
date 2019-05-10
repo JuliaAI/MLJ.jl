@@ -17,7 +17,7 @@ end
 # predict uses coefficients to make new prediction:
 MLJBase.predict(model::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew)fitresult</code></pre><p>After loading this code, all MLJ&#39;s basic meta-algorithms can be applied to <code>MyRegressor</code>:</p><pre><code class="language-julia">julia&gt; using MLJ
 julia&gt; task = load_boston()
-julia&gt; model = MyRegressor(1.0)
+julia&gt; model = MyRegressor(lambda=1.0)
 julia&gt; regressor = machine(model, task)
 julia&gt; evaluate!(regressor, resampling=CV(), measure=rms) |&gt; mean
 7.434221318358656
