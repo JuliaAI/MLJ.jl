@@ -14,7 +14,7 @@ feature, such as the species of conifers. MLJ mitigates such ambiguity
 by: (i) distinguishing between the machine and *[scientific
 type](index.md)* of scalar data; (ii) disallowing the
 representation of multiple scientific types by the same machine type
-during learning; and (iii) establising a convention for what
+during learning; and (iii) establishing a convention for what
 scientific types a given machine type may represent (see the
 table at the end of [Getting Started](index.md)).
 
@@ -25,7 +25,7 @@ should be interpreted.
 
 ### Learning objectives
 
-In MLJ specifying a learing objective means specifying: (i) whether
+In MLJ specifying a learning objective means specifying: (i) whether
 learning is supervised or not; (ii) whether, in the supervised case,
 predictions are to be probabilistic or deterministic; and (iii) what
 part of the data is relevant and what role is each part to play.
@@ -109,7 +109,7 @@ Listing the models available to complete a task:
 models(task)
 ```
 
-Binding a model to a task and evalutating performance:
+Binding a model to a task and evaluating performance:
 
 ```@example 1
 @load DecisionTreeClassifier
