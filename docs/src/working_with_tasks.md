@@ -66,7 +66,7 @@ And construct a task by wrapping the data in a learning objective, and
 coercing the data into a form MLJ will correctly interpret. (The middle three
 fields of `df` refer to ages, in months, the last is a flag.):
 
-```@example 1
+```julia
 task = supervised(data=df,
                   target=:Exit,
                   ignore=:Time,
@@ -74,7 +74,13 @@ task = supervised(data=df,
                   types=Dict(:Entry=>Continuous,
                              :Exit=>Continuous,
                              :Cens=>Multiclass))
-first(task.X, 4)
+scitypes(task.X)
+```
+
+```julia
+(Sex = Multiclass{2},
+ Entry = Continuous,
+ Cens = Multiclass{2},)
 ```
 
 Shuffle the rows of a task:
