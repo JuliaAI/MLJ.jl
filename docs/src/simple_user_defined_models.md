@@ -63,7 +63,7 @@ After loading this code, all MLJ's basic meta-algorithms can be applied to `MyRe
 ````julia
 julia> using MLJ
 julia> task = load_boston()
-julia> model = MyRegressor(1.0)
+julia> model = MyRegressor(lambda=1.0)
 julia> regressor = machine(model, task)
 julia> evaluate!(regressor, resampling=CV(), measure=rms) |> mean
 7.434221318358656
