@@ -5,7 +5,6 @@ module LocalMultivariateStats
 export RidgeRegressor, PCA
 
 import MLJBase
-import MLJ
 import MultivariateStats
 
 const MS = MultivariateStats
@@ -23,7 +22,7 @@ mutable struct RidgeRegressor <: MLJBase.Deterministic
     lambda::Float64
 end
 
-function MLJ.clean!(model::RidgeRegressor)
+function MLJBase.clean!(model::RidgeRegressor)
     warning = ""
     if model.lambda < 0
         warning *= "Need lambda ≥ 0. Resetting lambda=0. "
