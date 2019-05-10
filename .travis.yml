@@ -31,7 +31,7 @@ jobs:
         - |
           julia --color=yes --project=docs/ -e'
             using Pkg
-            Pkg.add(PackageSpec(name="RDatasets"));Pkg.add(PackageSpec(name="Documenter"));Pkg.add(PackageSpec(name="DecisionTree"));Pkg.add(PackageSpec(name="DataFrames"));Pkg.add(PackageSpec(name="MLJBase", rev="master"));Pkg.add(PackageSpec(name="MLJ.jl", rev="master"));Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.add(PackageSpec(name="RDatasets"));Pkg.add(PackageSpec(name="Documenter"));Pkg.add(PackageSpec(name="DecisionTree"));Pkg.add(PackageSpec(name="DataFrames"));Pkg.add(PackageSpec(name="MLJBase", rev="master"));Pkg.add(PackageSpec(name="MLJ", rev="master"));Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
             include("docs/make.jl")
           '
