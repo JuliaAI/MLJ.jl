@@ -20,6 +20,10 @@ end
   @test include("KNN.jl")
 end
 
+@testset "SimpleRidgeRegressor" begin
+  @test include("SimpleRidgeRegressor.jl")
+end
+
 @testset "Constant" begin
     @test include("Constant.jl")
 end

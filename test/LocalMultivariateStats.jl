@@ -21,7 +21,7 @@ seed!(1234)
 
     # Train model on all data with no regularization and no
     # standardization of target:
-    ridge = RidgeRegressor(lambda=0.0)
+    ridge = SimpleRidgeRegressor(lambda=0.0)
 
     fitresult, report, cache = fit(ridge, 0, Xtable, y)
 
