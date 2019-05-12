@@ -240,6 +240,9 @@ end
 istoobig(d::Tuple{AbstractNode}) = length(d) > 10
 
 # overload show method
+
+
+
 function _recursive_show(stream::IO, X::AbstractNode)
     if X isa Source
         printstyled(IOContext(stream, :color=>MLJBase.SHOW_COLOR), MLJBase.handle(X), color=:blue)
@@ -276,7 +279,7 @@ function Base.show(stream::IO, ::MIME"text/plain", X::AbstractNode)
 end
     
 function Base.show(stream::IO, ::MIME"text/plain", machine::NodalMachine)
-    id = objectid(machine) 
+    id = objectid(machine)
     description = string(typeof(machine).name.name)
     str = "$description @ $(MLJBase.handle(machine))"
     printstyled(IOContext(stream, :color=>MLJBase.SHOW_COLOR), str, bold=MLJBase.SHOW_COLOR)

@@ -18,6 +18,11 @@ default_measure(model::Probabilistic, ::Type{<:Finite}) =
 # metric is a regression metric or a classification metric). In this
 # way each deterministic metric is overloaded as a probabilistic one.
 
+# TODO: Above behaviour not ideal. Should explicitly test if yhat is a
+# vector of distributions (either using isdistribution trait or
+# Sampleable type). Throw warning if a deterministic measure is being
+# used in a probabilistic context.
+
 ## REGRESSOR METRICS (FOR DETERMINISTIC PREDICTIONS)
 
 
@@ -85,10 +90,11 @@ rmsp(yhat, y) = rmsp(mean.(yhat), y)
 
 ## CLASSIFICATION METRICS (FOR DETERMINISTIC PREDICTIONS)
 
-misclassification_rate(yhat::AbstractVector, y::AbstractVector) =
-    mean(y .!= yhat)
-misclassification_rate(yhat, y::AbstractVector) =
-    misclassification_rate(categorical(mode.(yhat)), y)
+misclassification_rate(yhat::AbstractVector{<:CategoricalElement},
+                       y::AbstractVector) = mean(y .!= yhat)
+misclassification_rate(yhat, y::AbstractVector) = 
+    misclassification_rate(mode.(yhat), y)
+
 
 # TODO: multivariate case 
 

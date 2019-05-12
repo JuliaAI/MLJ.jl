@@ -59,7 +59,7 @@ import MLJBase: show_as_constructed, params
 
 using RemoteFiles
 import Pkg.TOML
-import Requires.@require  # lazy code loading package
+#import Requires.@require  # lazy code loading package
 using  CategoricalArrays
 import Distributions: pdf, mode
 import Distributions
@@ -79,6 +79,7 @@ import Distributed: @distributed, nworkers, pmap
 using RecipesBase # for plotting
 
 const srcdir = dirname(@__FILE__) # the directory containing this file:
+const CategoricalElement = Union{CategoricalString,CategoricalValue}
 
 include("utilities.jl")     # general purpose utilities
 include("metrics.jl")       # loss functions

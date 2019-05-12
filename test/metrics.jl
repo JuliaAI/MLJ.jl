@@ -34,6 +34,11 @@ y    = categorical(collect("asdfasdfaaassdd"))
 yhat = categorical(collect("asdfaadfaasssdf"))
 @test misclassification_rate(yhat, y) ≈ 0.2
 
+# probabilistic version:
+d= MLJ.fit(UnivariateFinite, y[end-2:end]) # mode of `d`
+yhat = fill(d, length(y))
+@test misclassification_rate(yhat, y) ≈ 11/15
+
 y = categorical(collect("abb"))
 L = ['a', 'b']
 d1 = UnivariateFinite(L, [0.1, 0.9])

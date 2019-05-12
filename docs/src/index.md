@@ -32,9 +32,8 @@ import MLJModels ✔
 import DecisionTree ✔
 import MLJModels.DecisionTree_.DecisionTreeClassifier ✔
 
-julia> tree_model = DecisionTreeClassifier(target_type=String, max_depth=2)
-DecisionTreeClassifier(target_type = String,
-                       pruning_purity = 1.0,
+julia> tree_model = DecisionTreeClassifier(max_depth=2)
+DecisionTreeClassifier(pruning_purity = 1.0,
                        max_depth = 2,
                        min_samples_leaf = 1,
                        min_samples_split = 2,
@@ -42,14 +41,15 @@ DecisionTreeClassifier(target_type = String,
                        n_subfeatures = 0.0,
                        display_depth = 5,
                        post_prune = false,
-                       merge_purity_threshold = 0.9,) @ 1…72
+                       merge_purity_threshold = 0.9,) @ 1…85
 ```
-
-Wrapping the model in data creates a *machine* which will store training outcomes:
+    
+Wrapping the model in data creates a *machine* which will store
+training outcomes:
 
 ```julia
 julia> tree = machine(tree_model, X, y)
-Machine @ 5…78
+Machine{DecisionTreeClassifier} @ 9…45
 ```
 
 Training and testing on a hold-out set:
@@ -58,11 +58,12 @@ Training and testing on a hold-out set:
 julia> train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
 julia> fit!(tree, rows=train)
 julia> yhat = predict(tree, X[test,:]);
-julia> misclassification_rate(yhat, y[test]);
+julia> misclassification_rate(yhat, y[test])
 
-┌ Info: Training Machine{DecisionTreeClassifier{S…} @ 1…36.
-└ @ MLJ /Users/anthony/Dropbox/Julia7/MLJ/src/machines.jl:68
-0.08888888888888889
+[ Info: Training Machine{DecisionTreeClassifier} @ 9…45.
+Machine{DecisionTreeClassifier} @ 9…45
+
+0.044444444444444446
 ```
 
 Or, in one line:
@@ -156,9 +157,24 @@ A *scientific type* is any subtype of
 used behind the scenes is values for model trait functions.) Such
 types appear, for example, when querying model metadata:
 
-```julia ;;;
-using MLJ # hide
-julia> info("DecisionTreeClassifier")[:target_scitype_union]
+```julia
+julia> info("DecisionTreeClassifier")[:input_scitype_union]
+```
+
+```julia
+Dict{Any,Any} with 12 entries:
+  :is_pure_julia         => true
+  :input_is_multivariate => true
+  :is_wrapper            => false
+  :package_uuid          => "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+  :package_url           => "https://github.com/bensadeghi/DecisionTree.jl"
+  :target_scitype_union  => Union{Multiclass, OrderedFactor}
+  :name                  => "DecisionTreeClassifier"
+  :is_supervised         => true
+  :is_probabilistic      => true
+  :load_path             => "MLJModels.DecisionTree_.DecisionTreeClassifier"
+  :input_scitype_union   => Continuous
+  :package_name          => "DecisionTree"
 ```
 
 This means that the union of scientific types of all elements 

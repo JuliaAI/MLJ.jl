@@ -55,8 +55,11 @@ Coerce the machine types of elements of `v` to ensure the returned
 vector has `T` as its `scitype_union`, or `Union{Missing,T}`, if `v` has
 missing values.
 
-    julia> v = coerce(Continous, [1.0, missing, 5.0])
-    Union{Missing, Int64}[1, missing, 5]
+    julia> v = coerce(Continuous, [1, missing, 5])
+    3-element Array{Union{Missing, Float64},1}:
+     1.0     
+     missing
+     5.0  
 
     julia> scitype_union(v)
     Union{Missing,Continuous}
@@ -157,7 +160,7 @@ end
 
 Construct a supervised learning task with input features `X` and
 target `y`, where: `y` is the column vector from `data` named
-`target`, if this is a single symbol, or, a vector of tuples, if
+`target`, if this is a single symbol, or a vector of tuples, if
 `target` is a vector; `X` consists of all remaining columns of `data`
 not named in `ignore`, and is a table unless it has only one column, in
 which case it is a vector.
