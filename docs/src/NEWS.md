@@ -6,6 +6,12 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+## MLJ v0.2.1 
+
+- Fix a bug and related problem in "Getting Started" docs:
+  [#126](https://github.com/alan-turing-institute/MLJ.jl/issues/126 .
+
+
 ### MLJBase 0.2.0, MLJModels 0.2.0, MLJ 0.2.0
 
 - Model API refactored to resolve
