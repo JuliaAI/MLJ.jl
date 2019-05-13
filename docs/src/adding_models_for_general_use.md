@@ -251,7 +251,7 @@ MLJBase.fit(model::SomeSupervisedModel, verbosity::Int, X, y) -> fitresult, cach
 
 Note: The `Int` typing of `verbosity` cannot be omitted.
 
-1. `fitresult::R` is the fitresult in the sense above (which becomes an
+1. `fitresult` is the fitresult in the sense above (which becomes an
     argument for `predict` discussed below).
 
 2.  `report` is a (possibly empty) `NamedTuple`, for example,
@@ -274,11 +274,6 @@ It is not necessary for `fit` to provide dimension checks or to call
 The method `fit` should never alter hyperparameter values. If the
 package is able to suggest better hyperparameters, as a byproduct of
 training, return these in the report field.
-
-One should test that actual fitresults have the type declared in the model
-`mutable struct` declaration. To help with this,
-`MLJBase.fitresult_type(m)` returns the declared type, for any
-supervised model (or model type) `m`.
 
 The `verbosity` level (0 for silent) is for passing to learning
 algorithm itself. A `fit` method wrapping such an algorithm should
@@ -317,7 +312,7 @@ In the case of `Deterministic` models, `yhat` should be an
 `AbstractVector` (commonly a plain `Vector`) with the same element
 type as the target `y` passed to the `fit` method (see above). Any
 `CategoricalValue` or `CategoricalString` appearing in `yhat` **must
-have the same levels in its the pool as was present in the elements of
+have the same levels in its pool as was present in the elements of
 the target `y` presented in training**, even if not all levels appear
 in the training data or prediction itself. For example, in the
 univariate target case, this means `MLJ.classes(yhat[i]) =
@@ -345,7 +340,7 @@ may look something like this:
 function MLJBase.fit(model::SomeSupervisedModel, verbosity, X, y)
     yint = MLJBase.int(y) 
     a_target_element = y[1]                    # a CategoricalValue/String
-	decode = MLJBase.decoder(a_target_element) # can be called on integers
+    decode = MLJBase.decoder(a_target_element) # can be called on integers
 	
     core_fitresult = SomePackage.fit(X, yint, verbosity=verbosity)
 
@@ -382,7 +377,8 @@ per row of `Xnew`).
 Presently, a *distribution* is any object `d` for which
 `MLJBase.isdistribution(::d) = true`, which includes all objects of
 type `Distributions.Distribution` from the package
-Distributions.jl. The declaration `MLJBase.isdistribution(::d) = true`
+Distributions.jl. (Soon any `Distributions.Sampleable` will be
+included.) The declaration `MLJBase.isdistribution(::d) = true`
 implies that at least `Base.rand(d)` is implemented, but the rest of
 this API is still a work-in-progress.
 
