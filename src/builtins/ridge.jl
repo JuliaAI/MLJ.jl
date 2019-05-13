@@ -28,6 +28,9 @@ function MLJ.clean!(model::SimpleRidgeRegressor)
     return warning
 end
 
+function MLJBase.fitted_params(::SimpleRidgeRegressor, fitresult)
+    return (coefficients=fitresult.coefficients, bias=fitresult.bias)
+end
 
 function MLJBase.fit(model::SimpleRidgeRegressor, verbosity::Int, X, y)
     x = MLJBase.matrix(X)
