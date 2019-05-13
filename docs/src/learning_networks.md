@@ -50,8 +50,8 @@ then inverse-transforms those predictions, for later comparison with
 the original test data. The machines are labelled yellow.
 
 To implement the network, we begin by loading data needed for training
-and evaluation into *source nodes*. For testing purposes, let's use
-synthetic data:
+and evaluation into *source nodes*. For testing purposes, we'll use a
+small synthetic data set:
 
 ```@example 1
 using MLJ # hide
@@ -125,6 +125,9 @@ it was trained earlier:
 
 ```@example 1
 fit!(yhat, rows=train)
+```
+
+```@example 1
 rms(y[test], yhat(rows=test)) # evaluate
 ```
 
@@ -133,10 +136,13 @@ We can change a hyperparameters and retrain:
 ```@example 1
 ridge_model.lambda = 0.01
 fit!(yhat, rows=train) 
+```
+    
+```@example 1
 rms(y[test], yhat(rows=test))
 ```
 
-> **Notable feature.** The machine, `ridge::NodalMachine{RidgeRegressor}`, is retrained, because its underlying model has been mutated. However, since the outcome of this training has no effect on the training inputs of the machines `stand` and `box`, these transformers are left untouched. (During construction, each node and machine in a learning network determines and records all machines on which it depends.) This behaviour, which extends to exported learning networks, means we can tune our wrapped regressor without re-computing transformations each time the hyperparameter is changed. 
+> **Notable feature.** The machine, `ridge::NodalMachine{RidgeRegressor}`, is retrained, because its underlying model has been mutated. However, since the outcome of this training has no effect on the training inputs of the machines `stand` and `box`, these transformers are left untouched. (During construction, each node and machine in a learning network determines and records all machines on which it depends.) This behaviour, which extends to exported learning networks, means we can tune our wrapped regressor (using a holdout set) without re-computing transformations each time the hyperparameter is changed. 
 
 
 ### Exporting a learning network as a stand-alone model
@@ -158,8 +164,8 @@ end
 WrappedRidge(; ridge_model=RidgeRegressor) = WrappedRidge(ridge_model); 
 ```
 
-Now satisfied that our wrapped Ridge Regression learning network
-works, we simply cut and paste its defining code into a `fit` method:
+Now satisfied that the learning network we defined above works, we
+simply cut and paste its defining code into a `fit` method:
 
 
 ```@example 1
@@ -188,7 +194,7 @@ end
 
 The line marked `###`, where the new exported model's hyperparameter `ridge_model` is spliced into the network, is the only modification.
 
-> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](adding_models_for_general_use.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding machine `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the node returned by `fit` on the data supplied: `MLJ.predict(model::SupervisedNetwork, Xnew) = yhat(Xnew)`.
+> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding machine `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the node returned by `fit` on the data supplied: `MLJ.predict(model::SupervisedNetwork, Xnew) = yhat(Xnew)`.
 
 The export process is complete and we can wrap our exported model
 around any data or task we like, and evaluate like any other model:

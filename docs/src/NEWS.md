@@ -6,9 +6,31 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+### MLJBase 0.2.0, MLJModels 0.2.0, MLJ 0.2.0
+
+- Model API refactored to resolve
+  [#93](https://github.com/alan-turing-institute/MLJ.jl/issues/93) and
+  [#119](https://github.com/alan-turing-institute/MLJ.jl/issues/119)
+  and hence simplify the model interface. This breaks all
+  implementations of supervised models, and some scitype
+  methods. However, for the regular user the effects are restricted
+  to: (i) no more `target_type` hyperparameter for some models; (ii)
+  `Deterministic{Node}` is now `DeterministicNetwork` and
+  `Probabillistic{Node}` is now `ProbabilisticNetwork` when exporting
+  learning networks as models.
+  
+- New feature: Task constructors now allow the user to explicitly
+  specify scitypes of features/target. There is a `coerce` method for
+  vectors and tables for the user who wants to do this
+  manually. Resolves:
+  [#119](https://github.com/alan-turing-institute/MLJ.jl/issues/119)
+
+
 ### Official registered versions of MLJBase 0.1.1, MLJModels 0.1.1, MLJ 0.1.1 released
 
-- Minor revisions to the repos, doc updates, and a small breaking change around scitype method names and associated traits. Resolves: [#119](https://github.com/alan-turing-institute/MLJ.jl/issues/119)
+- Minor revisions to the repos, doc updates, and a small breaking
+  change around scitype method names and associated traits. Resolves:
+  [#119](https://github.com/alan-turing-institute/MLJ.jl/issues/119)
 
 ### unversioned commits 12 April 2019 (around 00:10, GMT)
 
