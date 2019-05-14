@@ -158,27 +158,25 @@ used behind the scenes is values for model trait functions.) Such
 types appear, for example, when querying model metadata:
 
 ```julia
-julia> info("DecisionTreeClassifier")[:input_scitype_union]
+julia> info("DecisionTreeClassifier")[:target_scitype_union]
 ```
 
 ```julia
-Dict{Any,Any} with 12 entries:
-  :is_pure_julia         => true
-  :input_is_multivariate => true
-  :is_wrapper            => false
-  :package_uuid          => "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
-  :package_url           => "https://github.com/bensadeghi/DecisionTree.jl"
-  :target_scitype_union  => Union{Multiclass, OrderedFactor}
-  :name                  => "DecisionTreeClassifier"
-  :is_supervised         => true
-  :is_probabilistic      => true
-  :load_path             => "MLJModels.DecisionTree_.DecisionTreeClassifier"
-  :input_scitype_union   => Continuous
-  :package_name          => "DecisionTree"
+Finite
 ```
 
-This means that the union of scientific types of all elements 
-a `DecisionTreeClassier` target must be a subtype of `Finite`.
+```julia
+subtypes(Finite)
+```
+
+```julia
+2-element Array{Any,1}:
+ Multiclass   
+ OrderedFactor
+```
+
+This means that the scitype of all elements of `DecisionTreeClassier`
+target must be `Multiclass` or `OrderedFactor`.
 
 The table below shows machine types that have scientific types different from `Unknown`:
 
