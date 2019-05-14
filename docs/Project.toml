@@ -1,5 +1,10 @@
 [deps]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
+MLJModels = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
+RDatasets = "ce6b1742-4840-55fa-b093-852dadbb1d8b"
 
 [compat]
 Documenter = "~0.22"
