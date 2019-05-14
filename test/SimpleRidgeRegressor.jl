@@ -9,14 +9,11 @@ op = [-1, 1, -6, 11, 3]
 
 ip = ip' |> collect
 
-# adding a bias
-op = op .+ 2
-
 model = MLJ.SimpleRidgeRegressor(lambda = 0.0)
 
 fitresult, report ,cache = MLJ.fit(model, 0, ip, op);
 
-@test MLJ.predict(model, fitresult, Float64[-1,0,2]')[1] ≈ 5
-@test fitresult.bias ≈ 2
+@test MLJ.predict(model, fitresult, Float64[-1,0,2]')[1] ≈ 3
+
 end
 true

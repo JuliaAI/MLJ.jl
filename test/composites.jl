@@ -25,13 +25,13 @@ selector_old = deepcopy(selector)
 
 # this should trigger no retraining:
 fitresult, cache, report = MLJ.update(composite, 3, fitresult, cache, Xtrain, ytrain);
-@test ridge.fitresult.coefficients == ridge_old.fitresult.coefficients
+@test ridge.fitresult == ridge_old.fitresult
 @test selector.fitresult == selector_old.fitresult
 
 # this should trigger retraining of selector and ridge:
 selector_model.features = [:Crim, :Rm] 
 fitresult, cache, report = MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain)
-@test ridge.fitresult.bias != ridge_old.fitresult.bias
+@test ridge.fitresult != ridge_old.fitresult
 @test selector.fitresult != selector_old.fitresult
 ridge_old = deepcopy(ridge)
 selector_old = deepcopy(selector)
@@ -39,7 +39,7 @@ selector_old = deepcopy(selector)
 # this should trigger retraining of ridge only:
 ridge_model.lambda = 1.0
 fitresult, cache, report = MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain)
-@test ridge.fitresult.bias != ridge_old.fitresult.bias
+@test ridge.fitresult != ridge_old.fitresult
 @test selector.fitresult == selector_old.fitresult
 
 predict(composite, fitresult, Xin[test,:]);

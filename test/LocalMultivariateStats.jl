@@ -31,8 +31,7 @@ seed!(1234)
 
     # Get the true bias?
     fr = fitted_params(ridge, fitresult)
-    @test abs(fr.bias) < 1e-10
-    @test norm(fr.coefficients - coefficients) < 1e-10
+    @test norm(fr - coefficients) < 1e-10
 
     info(ridge)
 
