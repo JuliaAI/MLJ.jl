@@ -5,7 +5,7 @@ issues or the Julia [slack
 channel](https://slackinvite.julialang.org), #MLJ.
 
 
-- [List of presently implemented models](https://github.com/alan-turing-institute/MLJRegistry.jl/blob/master/Models.toml) (excluding built-ins)
+- [List of presently implemented models](https://github.com/alan-turing-institute/MLJRegistry.jl/blob/dev/Models.toml), excluding built-ins (or run `models()` in MLJ)
 
 - [Enhancement requests](https://github.com/alan-turing-institute/MLJ.jl/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3A%22enhancement%22)
 
