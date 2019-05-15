@@ -1,3 +1,6 @@
+# Defines a simple deterministic regressor for MLJ testing purposes
+# only. MLJ users should use RidgeRegressor from MultivariateStats.
+
 import MLJBase
 using LinearAlgebra
 
@@ -41,6 +44,11 @@ function MLJBase.predict(model::SimpleRidgeRegressor, fitresult, Xnew)
     return x*fitresult
 end
 
+# to hide from models generated from calls to models()
+MLJBase.is_wrapper(::Type{<:SimpleRidgeRegressor}) = true
+
+
+# metadata:
 MLJBase.load_path(::Type{<:SimpleRidgeRegressor}) = "MLJ.SimpleRidgeRegressor"
 MLJBase.package_name(::Type{<:SimpleRidgeRegressor}) = "MLJ"
 MLJBase.package_uuid(::Type{<:SimpleRidgeRegressor}) = ""

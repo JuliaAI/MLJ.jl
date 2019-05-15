@@ -21,7 +21,7 @@ seed!(1234)
 
     # Train model on all data with no regularization and no
     # standardization of target:
-    ridge = SimpleRidgeRegressor(lambda=0.0)
+    ridge = RidgeRegressor(lambda=0.0)
 
     fitresult, report, cache = fit(ridge, 0, Xtable, y)
 
@@ -31,7 +31,8 @@ seed!(1234)
 
     # Get the true bias?
     fr = fitted_params(ridge, fitresult)
-    @test norm(fr - coefficients) < 1e-10
+    @test abs(fr.bias) < 1e-10
+    @test norm(fr.coefficients - coefficients) < 1e-10
 
     info(ridge)
 
