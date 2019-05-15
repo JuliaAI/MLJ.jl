@@ -10,7 +10,7 @@ train, test = partition(eachindex(yin), 0.7);
 Xtrain = Xin[train,:];
 ytrain = yin[train];
 
-ridge_model = RidgeRegressor(lambda=0.1)
+ridge_model = SimpleRidgeRegressor(lambda=0.1)
 selector_model = FeatureSelector()
 
 composite = MLJ.SimpleDeterministicCompositeModel(model=ridge_model, transformer=selector_model)
@@ -25,13 +25,13 @@ selector_old = deepcopy(selector)
 
 # this should trigger no retraining:
 fitresult, cache, report = MLJ.update(composite, 3, fitresult, cache, Xtrain, ytrain);
-@test ridge.fitresult.coefficients == ridge_old.fitresult.coefficients
+@test ridge.fitresult == ridge_old.fitresult
 @test selector.fitresult == selector_old.fitresult
 
 # this should trigger retraining of selector and ridge:
 selector_model.features = [:Crim, :Rm] 
 fitresult, cache, report = MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain)
-@test ridge.fitresult.bias != ridge_old.fitresult.bias
+@test ridge.fitresult != ridge_old.fitresult
 @test selector.fitresult != selector_old.fitresult
 ridge_old = deepcopy(ridge)
 selector_old = deepcopy(selector)
@@ -39,7 +39,7 @@ selector_old = deepcopy(selector)
 # this should trigger retraining of ridge only:
 ridge_model.lambda = 1.0
 fitresult, cache, report = MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain)
-@test ridge.fitresult.bias != ridge_old.fitresult.bias
+@test ridge.fitresult != ridge_old.fitresult
 @test selector.fitresult == selector_old.fitresult
 
 predict(composite, fitresult, Xin[test,:]);
@@ -84,7 +84,7 @@ end
 
 X, y = datanow()
 
-ridge = RidgeRegressor(lambda=0.1)
+ridge = SimpleRidgeRegressor(lambda=0.1)
 model = WrappedRidge(ridge)
 mach = machine(model, X, y)
 fit!(mach)

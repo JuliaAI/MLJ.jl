@@ -20,6 +20,10 @@ end
   @test include("KNN.jl")
 end
 
+@testset "ridge" begin
+  @test include("ridge.jl")
+end
+
 @testset "Constant" begin
     @test include("Constant.jl")
 end

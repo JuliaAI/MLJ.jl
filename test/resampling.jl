@@ -44,7 +44,7 @@ end
 
 # holdout:
 X, y = datanow()
-ridge_model = RidgeRegressor(lambda=20.0)
+ridge_model = SimpleRidgeRegressor(lambda=20.0)
 resampler = Resampler(resampling=holdout, model=ridge_model)
 resampling_machine = machine(resampler, X, y)
 fit!(resampling_machine)
