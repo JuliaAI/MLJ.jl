@@ -7,7 +7,7 @@ using MLJ
 ip = [1 0 3 4 5; 2 1 3 -3 4; 0 1 -3 2 1]
 op = [-1, 1, -6, 11, 3]
 
-ip = ip' |> collect
+ip = MLJ.table(ip')
 
 model = MLJ.SimpleRidgeRegressor(lambda = 0.0)
 
