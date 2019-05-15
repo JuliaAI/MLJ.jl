@@ -2,6 +2,25 @@
 
 A pure Julia machine learning framework.
 
+### `join!(MLJ, YourModel)`
+
+**Call for help.** MLJ is [getting
+attention](https://github.com/trending/julia?since=monthly) but its
+small project team needs help to ensure its success. This depends
+crucially on:
+
+- Existing and developing ML algorithms implementing the MLJ model interface
+
+- Improvements to existing but poorly maintained Julia ML algorithms 
+
+The MLJ model interface is now relatively stable and
+[well-documented](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/),
+and the core team is happy to respond to [issue requests](https://github.com/alan-turing-institute/MLJ.jl/issues) for
+assistance. Please click [here](CONTRIBUTE.md) for more details on
+contributing.
+
+MLJ is presently supported by a small Alan Turing Institute grant and is looking for new funding sources to grow the project.
+
 [![Build Status](https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master)](https://travis-ci.com/alan-turing-institute/MLJ.jl)
 [![Slack Channel mlj](https://img.shields.io/badge/chat-on%20slack-yellow.svg)](https://slackinvite.julialang.org/)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://alan-turing-institute.github.io/MLJ.jl/dev/)
@@ -12,10 +31,6 @@ MLJ aims to be a flexible framework for combining and tuning machine
 learning models, written in the high performance, rapid development,
 scientific programming language, [Julia](https://julialang.org). 
 
-MLJ is being actively developed and welcomes new collaborators. Click
-[here](CONTRIBUTE.md) if you are interested in contributing, or if you
-are interested in implementing the MLJ interface for an existing Julia
-machine learning algorithm.
 
 The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html).
 
@@ -23,6 +38,8 @@ A list of models implementing the MLJ interface:
 [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl/blob/dev/Models.toml)
 
 [MLJ News](https://alan-turing-institute.github.io/MLJ.jl/dev/NEWS/)
+
+
 
 
 ### Installation
@@ -58,7 +75,7 @@ A docker image with installation [instructions](https://github.com/ysimillides/m
 - Performant parallel implementation of large homogeneous **ensembles**
   of arbitrary models (e.g., random forests). &#10004;
 
-- **Task** interface matches machine learning problem to available models. &#10004; (mostly)
+- **Task** interface matches machine learning problem to available models. &#10004; 
 
 - **Benchmarking** a battery of assorted models for a given task.
 
@@ -74,6 +91,9 @@ See [here](docs/src/frequently_asked_questions.md).
 
 - The ScikitLearn SVM models will not work under Julia 1.0.3 but do work under Julia 1.1 due to [Issue #29208](https://github.com/JuliaLang/julia/issues/29208)
 
+- When MLJRegistry is updated with new models you may need to force a new
+  precompilation of MLJ to make new models available.
+  
 
 ### Getting started
 
