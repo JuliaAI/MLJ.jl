@@ -42,28 +42,28 @@ Here's a quick-and-dirty implementation of a ridge regressor with no intercept:
 import MLJBase
 using LinearAlgebra
 
-mutable struct SimpleRidgeRegressor <: MLJBase.Deterministic
+mutable struct MyRegressor <: MLJBase.Deterministic
     lambda::Float64
 end
-SimpleRidgeRegressor(; lambda=0.1) = SimpleRidgeRegressor(lambda)
+MyRegressor(; lambda=0.1) = MyRegressor(lambda)
 
 # fit returns coefficients minimizing a penalized rms loss function:
-function MLJBase.fit(model::SimpleRidgeRegressor, X, y)
+function MLJBase.fit(model::MyRegressor, X, y)
     x = MLJBase.matrix(X)                     # convert table to matrix
     fitresult = (x'x - model.lambda*I)\(x'y)  # the coefficients
     return fitresult
 end
 
 # predict uses coefficients to make new prediction:
-MLJBase.predict(model::SimpleRidgeRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew)fitresult
+MLJBase.predict(model::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew)fitresult
 ````
 
-After loading this code, all MLJ's basic meta-algorithms can be applied to `SimpleRidgeRegressor`:
+After loading this code, all MLJ's basic meta-algorithms can be applied to `MyRegressor`:
 
 ````julia
 julia> using MLJ
 julia> task = load_boston()
-julia> model = SimpleRidgeRegressor(lambda=1.0)
+julia> model = MyRegressor(lambda=1.0)
 julia> regressor = machine(model, task)
 julia> evaluate!(regressor, resampling=CV(), measure=rms) |> mean
 7.434221318358656
