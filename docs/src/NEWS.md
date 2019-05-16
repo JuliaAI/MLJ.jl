@@ -6,6 +6,13 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+## MLJModels v0.2.2
+
+- MulitivariateStats models RidgeRegressor and PCA migrated here from
+  MLJ. Addresses: MLJ
+  [#125](https://github.com/alan-turing-institute/MLJ.jl/issues/125).
+
+
 ## MLJModels v0.2.1
 
 - ScikitLearn wraps ElasticNet and ElasticNetCV now available (and
