@@ -47,16 +47,20 @@ The diagram above depicts a learning network which standardises the
 input data `X`, learns an optimal Box-Cox transformation for the
 target `y`, predicts new target values using ridge regression, and
 then inverse-transforms those predictions, for later comparison with
-the original test data. The machines are labelled yellow.
+the original test data. The machines are labelled yellow. We first
+need to import the RidgeRegressor model (you will need MLJModels in
+your load path):
+
+```julia
+@load RidgeRegressor
+```
 
 To implement the network, we begin by loading data needed for training
 and evaluation into *source nodes*. For testing purposes, we'll use a
 small synthetic data set:
 
-```@example 1
-using MLJ # hide
-MLJ.color_off() # hide
-using Statistics, DataFrames # hide
+```julia
+using Statistics, DataFrames
 x1 = rand(300)
 x2 = rand(300)
 x3 = rand(300)
@@ -66,6 +70,10 @@ ys = source(y)
 Xs = source(X)
 ```
 
+```julia
+Source @ 3…40
+```
+
 We label nodes we will construct according to their outputs in the
 diagram. Notice that the nodes `z` and `yhat` use the same machine,
 namely `box`, for different operations.
@@ -73,17 +81,25 @@ namely `box`, for different operations.
 To construct the `W` node we first need to define the machine `stand`
 that it will use to transform inputs.
 
-```@example 1
+```julia
 stand_model = Standardizer()
 stand = machine(stand_model, Xs)
+```
+
+```julia
+NodalMachine @ 6…82 = machine(Standardizer{} @ 1…82, 3…40)
 ```
 
 Because `Xs` is a node, instead of concrete data, we can call
 `transform` on the machine without first training it, and the result
 is the new node `W`, instead of concrete transformed data:
 
-```@example 1
+```julia
 W = transform(stand, Xs)
+```
+
+```julia
+Node @ 1…67 = transform(6…82, 3…40)
 ```
 
 To get actual transformed data we *call* the node appropriately, which
@@ -91,7 +107,7 @@ will require we first train the node. Training a node, rather than a
 machine, triggers training of *all* necessary machines in the network.
 
 
-```@example 1
+```julia
 test, train = partition(eachindex(y), 0.8)
 fit!(W, rows=train)
 W()           # transform all data
@@ -99,6 +115,15 @@ W(rows=test ) # transform only test data
 W(X[3:4,:])   # transform any data, new or old
 ```
 
+```julia
+2×3 DataFrame
+│ Row │ x1        │ x2       │ x3        │
+│     │ Float64   │ Float64  │ Float64   │
+├─────┼───────────┼──────────┼───────────┤
+│ 1   │ -0.516373 │ 0.675257 │ 1.27734   │
+│ 2   │ 0.63249   │ -1.70306 │ 0.0479891 │
+```
+    
 If you like, you can think of `W` (and the other nodes we will define)
 as "dynamic data": `W` is *data*, in the sense that it an be called
 ("indexed") on rows, but *dynamic*, in the sense the result depends on
@@ -106,7 +131,7 @@ the outcome of training events.
 
 The other nodes of our network are defined similarly:
 
-```@example 1
+```julia
 box_model = UnivariateBoxCoxTransformer()  # for making data look normally-distributed
 box = machine(box_model, ys)
 z = transform(box, ys)
@@ -118,28 +143,53 @@ zhat = predict(ridge, W)
 yhat = inverse_transform(box, zhat)
 ```
 
+```julia
+Node @ 1…07 = inverse_transform(1…09, predict(2…66, transform(6…82, 3…40)))
+```
+
 We are ready to train and evaluate the completed network. Notice that
 the standardizer, `stand`, is *not* retrained, as MLJ remembers that
 it was trained earlier:
 
 
-```@example 1
+```julia
 fit!(yhat, rows=train)
 ```
 
-```@example 1
+```julia
+[ Info: Not retraining NodalMachine{Standardizer} @ 6…82. It is up-to-date.
+[ Info: Training NodalMachine{UnivariateBoxCoxTransformer} @ 1…09.
+[ Info: Training NodalMachine{RidgeRegressor} @ 2…66.
+Node @ 1…07 = inverse_transform(1…09, predict(2…66, transform(6…82, 3…40)))
+```
+
+```julia
 rms(y[test], yhat(rows=test)) # evaluate
+```
+
+```julia
+0.022837595088079567
 ```
 
 We can change a hyperparameters and retrain:
 
-```@example 1
+```julia
 ridge_model.lambda = 0.01
 fit!(yhat, rows=train) 
 ```
+
+```julia
+[ Info: Not retraining NodalMachine{UnivariateBoxCoxTransformer} @ 1…09. It is up-to-date.
+[ Info: Not retraining NodalMachine{Standardizer} @ 6…82. It is up-to-date.
+[ Info: Updating NodalMachine{RidgeRegressor} @ 2…66.
+Node @ 1…07 = inverse_transform(1…09, predict(2…66, transform(6…82, 3…40)))
+```
+
+And re-evaluate:
     
-```@example 1
+```julia
 rms(y[test], yhat(rows=test))
+0.039410306910269116
 ```
 
 > **Notable feature.** The machine, `ridge::NodalMachine{RidgeRegressor}`, is retrained, because its underlying model has been mutated. However, since the outcome of this training has no effect on the training inputs of the machines `stand` and `box`, these transformers are left untouched. (During construction, each node and machine in a learning network determines and records all machines on which it depends.) This behaviour, which extends to exported learning networks, means we can tune our wrapped regressor (using a holdout set) without re-computing transformations each time the hyperparameter is changed. 
@@ -148,14 +198,16 @@ rms(y[test], yhat(rows=test))
 ### Exporting a learning network as a stand-alone model
 
 To export a learning network:
+
 - Define a new `mutable struct` model type.
+
 - Wrap the learning network code in a model `fit` method.
 
-All learning networks that make determinisic (or, probabilistic)
+All learning networks that make determinisic (respectively, probabilistic)
 predictions export as models of subtype `DeterministicNetwork`
 (respectively, `ProbabilisticNetwork`):
 
-```@example 1
+```julia
 mutable struct WrappedRidge <: DeterministicNetwork
     ridge_model
 end
@@ -168,7 +220,7 @@ Now satisfied that the learning network we defined above works, we
 simply cut and paste its defining code into a `fit` method:
 
 
-```@example 1
+```julia
 function MLJ.fit(model::WrappedRidge, X, y)
     Xs = source(X)
     ys = source(y)
@@ -199,13 +251,23 @@ The line marked `###`, where the new exported model's hyperparameter `ridge_mode
 The export process is complete and we can wrap our exported model
 around any data or task we like, and evaluate like any other model:
 
-```@example 1
+```julia
 task = load_boston()
 wrapped_model = WrappedRidge(ridge_model=ridge_model)
 mach = machine(wrapped_model, task)
 evaluate!(mach, resampling=CV(), measure=rms, verbosity=0)
 ```
 
+```julia
+6-element Array{Float64,1}:
+ 3.0225867093289347
+ 4.755707358891049 
+ 5.011312664189936 
+ 4.226827668908119 
+ 8.93385968738185  
+ 3.4788524973220545
+```
+    
 Another example of an exported learning network is given in the next
 subsection.
 
@@ -226,7 +288,7 @@ transforms (exponentiates) the blended predictions.
 Note, in particular, the lines defining `zhat` and `yhat`, which
 combine several static node operations.
 
-```@example 1
+```julia
 mutable struct KNNRidgeBlend <:DeterministicNetwork
 
     knn_model
@@ -266,7 +328,7 @@ end
 
 ```
 
-```@example 1
+```julia
 task = load_boston()
 knn_model = KNNRegressor(K=2)
 ridge_model = RidgeRegressor(lambda=0.1)
@@ -274,6 +336,16 @@ weights = (0.9, 0.1)
 blended_model = KNNRidgeBlend(knn_model, ridge_model, weights)
 mach = machine(blended_model, task)
 evaluate!(mach, resampling=Holdout(fraction_train=0.7), measure=rmsl) 
+```
+
+```julia
+┌ Info: Evaluating using a holdout set. 
+│ fraction_train=0.7 
+│ shuffle=false 
+│ measure=MLJ.rmsl 
+│ operation=StatsBase.predict 
+└ Resampling from all rows. 
+0.5277143032101871
 ```
 
 A `node` method allows us to overerload a given function to
@@ -294,7 +366,7 @@ Here `AbstractNode` is the common supertype of `Node` and `Source`.
 
 As a final example, here's how to extend row shuffling to nodes:
 
-```example 1
+```julia
 using Random
 Random.shuffle(X::AbstractNode) = node(Y -> MLJ.selectrows(Y, Random.shuffle(1:nrows(Y))), X)
 X = (x1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -302,8 +374,18 @@ X = (x1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
 Xs = source(X)
 W = shuffle(Xs)
 ```
-```@example 1
+
+```julia
+Node @ 9…86 = #4(6…62)
+```
+    
+```julia
 W()
+```
+
+```julia
+(x1 = [1, 4, 3, 6, 8, 5, 7, 2, 9, 10],
+ x2 = Symbol[:one, :four, :three, :six, :eight, :five, :seven, :two, :nine, :ten],)
 ```
     
     

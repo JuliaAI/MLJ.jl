@@ -41,12 +41,13 @@ or the rotation and projection matrices of PCA reduction scheme.
 #### operation
 
 Data-manipulating operations (methods) parameterized by some
-fit-result. For supervised learners, the `predict` or `predict_mode` methods, for
-transformers, the `transform` or `inverse_transform` method. In some
-contexts, such an operation might be replaced by an ordinary operation
-(method) that does *not* depend on an fit-result, which are then then
-called *static* operations for clarity. An operation that is not static
-is *dynamic*.
+fit-result. For supervised learners, the `predict`, `predict_mean`,
+`predict_median`, or `predict_mode` methods; for transformers, the
+`transform` or `inverse_transform` method. In some contexts, such an
+operation might be replaced by an ordinary operation (method) that
+does *not* depend on an fit-result, which are then then called
+*static* operations for clarity. An operation that is not static is
+*dynamic*.
 
 
 #### machine (object of type `Machine`)
