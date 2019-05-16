@@ -15,7 +15,6 @@ export EnsembleModel                                 # ensembles.jl
 export ConstantRegressor, ConstantClassifier         # builtins/Constant.jl
 export models, localmodels, @load                    # loading.jl
 export KNNRegressor                                  # builtins/KNN.jl
-export RidgeRegressor, PCA                           # builtins/LocalMulitivariateStats.jl
 
 # defined in include files "machines.jl and "networks.jl":
 export Machine, NodalMachine, machine, AbstractNode
@@ -99,7 +98,6 @@ include("tasks.jl")         # enhancements to task interface defined in MLJBase
 include("builtins/Transformers.jl")
 include("builtins/Constant.jl")
 include("builtins/KNN.jl")
-include("builtins/LocalMultivariateStats.jl") 
 include("builtins/ridge.jl")
 
 ## GET THE EXTERNAL MODEL METADATA AND MERGE WITH MLJ MODEL METADATA

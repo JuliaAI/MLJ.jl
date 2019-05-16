@@ -64,10 +64,6 @@ end
     @test include("loading.jl")
 end
 
-@testset "MultivariateStats" begin
-  @test include("LocalMultivariateStats.jl")
-end
-
 @testset "tasks" begin
   @test include("tasks.jl")
 end
