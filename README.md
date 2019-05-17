@@ -24,6 +24,8 @@ MLJ is presently supported by a small Alan Turing Institute grant and is looking
 [![Build Status](https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master)](https://travis-ci.com/alan-turing-institute/MLJ.jl)
 [![Slack Channel mlj](https://img.shields.io/badge/chat-on%20slack-yellow.svg)](https://slackinvite.julialang.org/)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://alan-turing-institute.github.io/MLJ.jl/dev/)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://alan-turing-institute.github.io/MLJ.jl/stable/)
+[![Coverage Status](https://coveralls.io/repos/github/alan-turing-institute/MLJ.jl/badge.svg?branch=master)](https://coveralls.io/github/alan-turing-institute/MLJ.jl?branch=master)
 
 ![](docs/src/two_model_stack.png)
 
