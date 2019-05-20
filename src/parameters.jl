@@ -1,12 +1,12 @@
 
 ## NESTED PARAMATER INTERFACE
 
-function set_params!(model::Model, key::Symbol, value)
+function set_params!(model, key::Symbol, value)
     setfield!(model, key, value)
     return model
 end
 
-function set_params!(model::Model, key::Symbol, params::NamedTuple)
+function set_params!(model, key::Symbol, params::NamedTuple)
     submodel = getfield(model, key)
     set_params!(submodel, params)
     return model
@@ -185,15 +185,15 @@ end
 """
     r = range(model, :hyper; values=nothing)
 
-Defines a `NominalRange` object for a field `hyper` of `model`. Note
-that `r` is not directly iterable but `iterator(r)` iterates over
-`values`.
+    Defines a `NominalRange` object for a field `hyper` of `model`,
+assuming the field is a not a subtype of `Real`. Note that `r` is not
+directly iterable but `iterator(r)` iterates over `values`.
 
     r = range(model, :hyper; upper=nothing, lower=nothing, scale=:linear)
 
-Defines a `NumericRange` object for a field `hyper` of `model`.  Note
-that `r` is not directly iteratable but `iterator(r, n)` iterates over
-`n` values between `lower` and `upper` values, according to the
+Defines a `NumericRange` object for a `Real` field `hyper` of `model`.
+Note that `r` is not directly iteratable but `iterator(r, n)` iterates
+over `n` values between `lower` and `upper` values, according to the
 specified `scale`. The supported scales are `:linear, :log, :log10,
 :log2`. Values for `Integer` types are rounded (with duplicate values
 removed, resulting in possibly less than `n` values).
@@ -207,7 +207,7 @@ and `upper`.
 See also: iterator
 
 """
-function Base.range(model::MLJType, field::Symbol; values=nothing,
+function Base.range(model, field::Symbol; values=nothing,
                     lower=nothing, upper=nothing, scale::D=:linear) where D
     T = get_type(typeof(model), field)
     if T <: Real
