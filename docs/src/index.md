@@ -178,39 +178,46 @@ subtypes(Finite)
 This means that the scitype of all elements of `DecisionTreeClassier`
 target must be `Multiclass` or `OrderedFactor`.
 
-The table below shows machine types that have scientific types different from `Unknown`:
+To see how MLJ will interpret an object `x` appearing in table or
+vector input `X`, or target vector `y`, call `scitype(x)`. The fallback
+this function is `scitype(::Any) = Unknown`. 
+
+```julia
+julia> (scitype(42), scitype(float(π)), scitype("Julia"))
+```
+
+```julia
+(Count, Continuous, Unknown)
+```
+    
+The table below shows machine types that have scientific types
+different from `Unknown`:
 
 `T`                         |     `scitype(x)` for `x::T`
 ----------------------------|:--------------------------------
 `AbstractFloat`             |      `Continuous`
 `Integer`                   |        `Count`
 `CategoricalValue`          | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false` 
-`CategoricalString`         | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false`
-`CategoricalValue`          | `FiniteOrderedFactor{N}` where `N = nlevels(x)`, provided `x.pool.ordered == true` 
-`CategoricalString`         | `FiniteOrderedFactor{N}` where `N = nlevels(x)` provided `x.pool.ordered == true`
+`CategoricalString`         | `Multiclass{N}` where `N =p nlevels(x)`, provided `x.pool.ordered == false`
+`CategoricalValue`          | `OrderedFactor{N}` where `N = nlevels(x)`, provided `x.pool.ordered == true` 
+`CategoricalString`         | `OrderedFactor{N}` where `N = nlevels(x)` provided `x.pool.ordered == true`
 `Integer`                   | `Count`
-`Missing`                   |      `Missing`
+`Missing`                   | `Missing`
 
 Here `nlevels(x) = length(levels(x.pool))`.
 
-You can use `scitype(x)` to determine the scientific type of a scalar
-object `x`. Non-scalar objects (with the exception of tuples of
-scalars) have `Unknown` scitype. 
-
-```julia
-julia> (scitype(42), scitype(float(π)), scitype("Julia"))
-(Count, Continuous, Unknown)
-```
-
 **Special note on using integers.** According to the above, integers
-cannot be used to represent `Multiclass` or `OrderedFactor` data. They
-these can be represented by an unordered or ordered `CategoricalValue`
+cannot be used to represent `Multiclass` or `OrderedFactor` data. These can be represented by an unordered or ordered `CategoricalValue`
 or `CategoricalString` (automatic if they are elements of a
 `CategoricalArray`).
 
 Methods exist to coerce the scientific type of a vector or table (see
 below). [Task](working_with_tasks.md) constructors also allow one to
 force the data being wrapped to have the desired scientific type.
+
+For more about scientific types and their role, see [Adding Models for
+General Use](adding_models_for_general_use.md)
+
 
 ```@docs
 coerce
