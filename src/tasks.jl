@@ -68,11 +68,12 @@ See also scitype, scitype_union, scitypes
 
 """
 coerce(T::Type{Continuous}, y::AbstractVector{<:Number}) = float(y)
-function coerce(T::Type{Continuous}, y::AbstractVector{Union{<:Number,Missing}})
+function coerce(T::Type{Continuous}, y::V) where {N<:Number,
+                                                  V<:AbstractVector{Union{N,Missing}}}
     _coerce_missing_warn(T)
     return float(y)
 end
-function coerce(T::Type{Continuous}, y::AbstractVector)
+function coerce(T::Type{Continuous}, y::AbstractVector{S}) where S
     for el in y
         if ismissing(el)
             _coerce_missing_warn(T)
@@ -87,11 +88,12 @@ _int(::Missing) = missing
 _int(x) = Int(x)
 
 coerce(T::Type{Count}, y::AbstractVector{<:Integer}) = y
-function coerce(T::Type{Count}, y::AbstractVector{Union{<:Real,Missing}})
+function coerce(T::Type{Count}, y::V) where {R<:Real,
+                                             V<:AbstractVector{Union{R,Missing}}}
     _coerce_missing_warn(T)
-    return convert(Vector{Missing,Int}, y)
+    return convert(Vector{Union{Missing,Int}}, y)
 end
-function coerce(T::Type{Count}, y::AbstractVector)
+function coerce(T::Type{Count}, y::V) where {S,V<:AbstractVector{S}}
     for el in y
         if ismissing(el)
             _coerce_missing_warn(T)
@@ -217,7 +219,7 @@ ignored.
 
 Return the input data in form to be used in models.
 
-See also scitype, scitype_union, scitypes
+See also [`scitype`](@ref), [`scitype_union`](@ref), [`scitypes`](@ref).
 
 """
 unsupervised(; data=nothing, types=Dict(), kwargs...) =
