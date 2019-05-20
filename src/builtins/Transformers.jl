@@ -25,7 +25,7 @@ import MLJBase: OrderedFactor, Other, Finite, Infinite, Count
 ## CONSTANTS
 
 const N_VALUES_THRESH = 16 # for BoxCoxTransformation
-
+const CategoricalElement = Union{CategoricalValue,CategoricalString}
 
 ## FOR FEATURE (COLUMN) SELECTION
 
@@ -376,43 +376,40 @@ MLJBase.output_is_multivariate(::Type{<:UnivariateBoxCoxTransformer}) = false
 ## ONE HOT ENCODING
 
 """
-    OneHotEncoder(; features=Symbol[], drop_last=false, ref_type=UInt32)
+    OneHotEncoder(; features=Symbol[], drop_last=false, ordered_factor=true)
 
 Unsupervised model for one-hot encoding all features of `Finite`
-scitype, within some table. All such features are encoded, unless
-`features` is specified and non-empty.
+scitype, within some table. If `ordered_factor=false` then
+only `Multiclass` features are considered. The features encoded is
+further restricted to those in `features`, when specified and
+non-empty.
 
 If `drop_last` is true, the column for the last level of each
 categorical feature is dropped. New data to be transformed may lack
 features present in the fit data, but no new features can be present.
 
-All categorical features to be transformed (which are necessarily of
-`CategoricalValue` or `CategoricalString` eltype) must have a reference type
-promotable to `ref_type`. Usually `ref_type=UInt32` suffices, but
-`ref_type=Int` will always work.
-
-*Warning:* This transformer assumes that a categorical feature in new
- data to be transformed will have the same pool encountered
- during the fit.
+*Warning:* This transformer assumes that the elements of a categorical
+ feature in new data to be transformed point to the same
+ CategoricalPool object encountered during the fit.
 
 """
-mutable struct OneHotEncoder{R<:Integer} <: Unsupervised
+mutable struct OneHotEncoder <: Unsupervised
     features::Vector{Symbol}
     drop_last::Bool
-    ref_type::Type{R}
+    ordered_factor::Bool
 end
 
 # lazy keyword constructor:
-OneHotEncoder(; features=Symbol[], drop_last::Bool=false, ref_type=UInt32) =
-    OneHotEncoder(features, drop_last, ref_type)
+OneHotEncoder(; features=Symbol[], drop_last=false, ordered_factor=true) =
+    OneHotEncoder(features, drop_last, ordered_factor)
 
 # we store the categorical refs for each feature to be encoded and the
 # corresponing feature labels generated (called
 # "names"). `all_features` is stored to ensure no new features appear
 # in new input data, causing potential name clashes.
-struct OneHotEncoderResult{R} <: MLJType
+struct OneHotEncoderResult <: MLJType
     all_features::Vector{Symbol} # all feature labels
-    ref_name_pairs_given_feature::Dict{Symbol,Vector{Pair{R,Symbol}}}
+    ref_name_pairs_given_feature::Dict{Symbol,Vector{Pair{<:Unsigned,Symbol}}}
 end
 
 # join feature and level into new label without clashing with anything
@@ -426,26 +423,29 @@ function compound_label(all_features, feature, level)
     return label
 end
 
-function fit(transformer::OneHotEncoder{R}, verbosity::Int, X) where R
+function fit(transformer::OneHotEncoder, verbosity::Int, X)
 
     all_features = Tables.schema(X).names # a tuple not vector
     specified_features =
         isempty(transformer.features) ? collect(all_features) : transformer.features
 
-    ref_name_pairs_given_feature = Dict{Symbol,Vector{Pair{R,Symbol}}}()
+    ref_name_pairs_given_feature = Dict{Symbol,Vector{Pair{<:Unsigned,Symbol}}}()
+    allowed_scitypes =
+        transformer.ordered_factor == true ? Finite : Multiclass
 
     for j in eachindex(all_features)
         ftr = all_features[j]
         col = MLJBase.selectcols(X,j)
         T = scitype_union(col)
-        if T <: Union{Multiclass,OrderedFactor} && ftr in specified_features
-            ref_name_pairs_given_feature[ftr] = Pair{R,Symbol}[]
+        if T <: allowed_scitypes && ftr in specified_features
+            ref_name_pairs_given_feature[ftr] = Pair{<:Unsigned,Symbol}[]
             shift = transformer.drop_last ? 1 : 0
             if verbosity > 0
                 @info "Spawned $(length(col)-shift) sub-features to one-hot encode feature :$ftr."
             end
-            for level in levels(col)[1:end-shift]
-                ref = get(col.pool, level)
+            levels = MLJBase.classes(first(col))
+            for level in levels[1:end-shift]
+                ref = MLJBase.int(level)
                 name = compound_label(all_features, ftr, level)
                 push!(ref_name_pairs_given_feature[ftr], ref => name)
             end
@@ -460,10 +460,10 @@ function fit(transformer::OneHotEncoder{R}, verbosity::Int, X) where R
 
 end
 
-# suppose 'a' gets reference `ref` in `v=categorical('a', 'a', 'b', 'a', 'c')`.
+# If v=categorical('a', 'a', 'b', 'a', 'c') and MLJBase.int(v[1]) = ref
 # then `hot(v, ref) = [true, true, false, true, false]` 
-hot(v::CategoricalVector, ref) = map(v.refs) do r
-    r == ref
+hot(v::AbstractVector{<:CategoricalElement}, ref) = map(v) do c
+    MLJBase.int(c) == ref
 end
 
 function transform(transformer::OneHotEncoder, fitresult, X)
