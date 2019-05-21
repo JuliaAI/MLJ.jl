@@ -153,6 +153,34 @@ function try_to_get_package(model::String)
     return (pop!(pkgs), true)
 end
 
+function _load(model, pkg, mdl)
+    # get load path:
+    info = METADATA[pkg][model]
+    path = info[:load_path]
+    path_components = split(path, '.')
+
+    # if needed, put MLJModels in the calling module's namespace (it
+    # is already loaded into MLJ's namespace):
+    if path_components[1] == "MLJModels"
+        print("import MLJModels ")
+        mdl.eval(:(import MLJModels))
+        println('\u2714')
+    end
+
+    # load the package (triggering lazy-load of implementation code if
+    # this is in MLJModels):
+    pkg_ex = Symbol(pkg)
+    print("import $pkg_ex ")
+    mdl.eval(:(import $pkg_ex))
+    println('\u2714')
+
+    # load the model:
+    load_ex = Meta.parse("import $path")
+    print(string(load_ex, " "))
+    mdl.eval(load_ex)
+    println('\u2714')
+end
+
 macro load(model_ex)
     model_ = string(model_ex)
 
@@ -170,68 +198,14 @@ macro load(model_ex)
         error(pkg*"Use @load $model pkg=\"PackageName\". ")
     end
 
-    # get load path:
-    info = METADATA[pkg][model]
-    path = info[:load_path]
-    path_components = split(path, '.')
-
-    # if needed, put MLJModels in the calling module's namespace (it
-    # is already loaded into MLJ's namespace):
-    if path_components[1] == "MLJModels"
-        print("import MLJModels ")
-        __module__.eval(:(import MLJModels))
-        println('\u2714')
-    end
-
-    # load the package (triggering lazy-load of implementation code if
-    # this is in MLJModels):
-    pkg_ex = Symbol(pkg)
-    print("import $pkg_ex ")
-    __module__.eval(:(import $pkg_ex))
-    println('\u2714')
-
-    # load the model:
-    load_ex = Meta.parse("import $path")
-    print(string(load_ex, " "))
-    __module__.eval(load_ex)
-    println('\u2714')
-
+    _load(model, pkg, __module__)
 end
-
-
-# TODO: elminate duplicate code (above and below are same after "# get
-# load path:"
 
 macro load(model_ex, pkg_ex)
     model = string(model_ex)
     pkg = string(pkg_ex.args[2])
 
-    # get load path:
-    info = METADATA[pkg][model]
-    path = info[:load_path]
-    path_components = split(path, '.')
-
-    # if needed, put MLJModels in the calling module's namespace (it
-    # is already loaded into MLJ's namespace):
-    if path_components[1] == "MLJModels"
-        print("import MLJModels ")
-        __module__.eval(:(import MLJModels))
-        println('\u2714')
-    end
-
-    # load the package (triggering lazy-load of implementation code if
-    # this is in MLJModels):
-    pkg_ex = Symbol(pkg)
-    print("import $pkg_ex ")
-    __module__.eval(:(import $pkg_ex))
-    println('\u2714')
-
-    # load the model:
-    load_ex = Meta.parse("import $path")
-    print(string(load_ex, " "))
-    __module__.eval(load_ex)
-    println('\u2714')
-
+    _load(model, pkg, __module__)
 end
 
 
