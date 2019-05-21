@@ -26,10 +26,10 @@ Xs = source(Xtrain)
 ys = source(ytrain)
 
 knn1 = machine(knn_, Xs, ys)
-fit!(knn1, verbosity=3)
+@test_logs (:info, r"Training") fit!(knn1, verbosity=3)
 knn_.K = 5
-fit!(knn1, rows=train[1:end-10], verbosity=2)
-fit!(knn1, verbosity=2)
+@test_logs (:info, r"Training") fit!(knn1, rows=train[1:end-10], verbosity=2)
+@test_logs (:info, r"Training") fit!(knn1, verbosity=2)
 yhat = predict(knn1, Xs)
 yhat(X_frame[test,:])
 rms(yhat(X_frame[test,:]), y[test])
@@ -77,11 +77,39 @@ zhat = predict(knn, Xa)
 yhat = inverse_transform(uscale, zhat)
 
 # fit-through training:
-fit!(yhat, rows=1:50, verbosity=2)
-fit!(yhat, rows=:, verbosity=2) # will retrain 
-fit!(yhat, verbosity=2) # will not retrain; nothing changed
+@test_logs((:info, r"Training"),
+           (:info, r"Training"),
+           (:info, r"Features standarized: "),
+           (:info, r" *:Crim"),
+           (:info, r" *:Zn"),
+           (:info, r" *:Indus"),
+           (:info, r" *:NOx"),
+           (:info, r" *:Rm"),
+           (:info, r" *:Age"),
+           (:info, r" *:Dis"),
+           (:info, r" *:Rad"),
+           (:info, r" *:Tax"),
+           (:info, r" *:PTRatio"),
+           (:info, r" *:Black"),
+           (:info, r" *:LStat"),
+           (:info, r"Training"),
+           fit!(yhat, rows=1:50, verbosity=2))
+@test_logs(# will retrain
+           (:info, r"Not retraining"),
+           (:info, r"Not retraining"),
+           (:info, r"Not retraining"),
+           fit!(yhat, rows=:, verbosity=2))
+@test_logs(# will not retrain; nothing changed
+           (:info, r"Not retraining"),
+           (:info, r"Not retraining"),
+           (:info, r"Not retraining"),
+           fit!(yhat, verbosity=2))
 knn_.K =4
-fit!(yhat, verbosity=2) # will retrain; new hyperparameter
+@test_logs(# will retrain; new hyperparameter
+           (:info, r"Not retraining"),
+           (:info, r"Not retraining"),
+           (:info, r"Training"),
+           fit!(yhat, verbosity=2))
 @test !MLJ.is_stale(XX) # sources always fresh
 
 rms(yhat(X_frame[test,:]), y[test])
