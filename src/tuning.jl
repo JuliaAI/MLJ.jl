@@ -103,6 +103,8 @@ end
 
 function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y) where M
 
+    parameter_names = flat_keys(tuned_model.nested_ranges)
+    
     # the mutating model:
     clone = deepcopy(tuned_model.model)
 
@@ -152,18 +154,28 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
 
     meter = Progress(N+1, dt=0, desc="Iterating over a $N-point grid: ",
                      barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
-    verbosity < 1 || next!(meter)
+    verbosity != 1 || next!(meter)
     for i in 1:N
 
-        verbosity < 1 || next!(meter)
+        verbosity != 1 || next!(meter)
 
-        new_params = copy(nested_iterators, Tuple(A[i,:]))   
+        A_row = Tuple(A[i,:])
+
+        new_params = copy(nested_iterators, A_row)   
 
         # mutate `clone` (the model to which `resampler` points):
         set_params!(clone, new_params)
 
         fit!(resampling_machine, verbosity=verbosity-1)
         e = mean(evaluate(resampling_machine))
+
+        if verbosity > 1
+            text = reduce(*, ["$(parameter_names[j])=$(A_row[j]) \t"
+                              for j in 1:length(A_row)])
+            text *= "measurement=$e"
+            println(text)
+        end
+        
         if s*(best_measurement - e) > 0
             best_model = deepcopy(clone)
             best_measurement = e
@@ -188,7 +200,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     if tuned_model.full_report
         report = (# models=models,
                   # best_model=best_model,
-                  parameter_names= permutedims(flat_keys(tuned_model.nested_ranges)), # row vector
+                  parameter_names= permutedims(parameter_names), # row vector
                   parameter_scales=permutedims(scales),  # row vector
                   parameter_values=A,
                   measurements=measurements,
@@ -196,7 +208,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     else
         report = (# models=[deepcopy(clone),][1:0],         # empty vector
                   # best_model=best_model,
-                  parameter_names= permutedims(flat_keys(tuned_model.nested_ranges)), # row vector
+                  parameter_names= permutedims(parameter_names), # row vector
                   parameter_scales=permutedims(scales),   # row vector
                   parameter_values=A[1:0,1:0],            # empty matrix
                   measurements=[best_measurement, ][1:0], # empty vector
