@@ -275,10 +275,11 @@ using Plots
 plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)
 ````
 
-Smart fitting applies. For example, if the model is an ensemble model,
-and the hyperparemeter parameter is `n`, then atomic models are
-progressively added to the ensemble, not recomputed from scratch for
-each new value of `n`.
+If the specified hyperparameter is the number of iterations in some
+iterative model (and that model has an appropriately overloaded
+`MLJBase.update` method) then training is not restarted from scratch
+for each increment of the parameter, ie the model is trained
+progressively.
 
 ````julia
 atom.lambda=1.0
@@ -300,7 +301,8 @@ function learning_curve!(mach::Machine{<:Supervised};
                              resampling=resampling, measure=measure, full_report=true)
     tuned = machine(tuned_model, mach.args...)
 
-    measurements = reduce(hcat, [(fit!(tuned, verbosity=verbosity); tuned.report.measurements) for i in 1:n])
+    measurements = reduce(hcat, [(fit!(tuned, verbosity=verbosity - 1);
+                                  tuned.report.measurements) for i in 1:n])
     report = tuned.report
     parameter_name=report.parameter_names[1]
     parameter_scale=report.parameter_scales[1]
