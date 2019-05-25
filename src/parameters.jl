@@ -12,6 +12,49 @@ function set_params!(model, key::Symbol, params::NamedTuple)
     return model
 end
 
+
+"""
+   set_params!(model, nested_params)
+
+Mutate the possibly nested fields of `model`, as returned by
+`params(model)`, by specifying a named tuple `nested_params` matching
+the pattern of `params(model)`.
+
+    julia> rf = EnsembleModel(atom=DecisionTreeClassifier());
+    julia> params(rf)
+    (atom = (pruning_purity = 1.0,
+             max_depth = -1,
+             min_samples_leaf = 1,
+             min_samples_split = 2,
+             min_purity_increase = 0.0,
+             n_subfeatures = 0.0,
+             display_depth = 5,
+             post_prune = false,
+             merge_purity_threshold = 0.9,),
+     weights = Float64[],
+     bagging_fraction = 0.8,
+     n = 100,
+     parallel = true,
+     out_of_bag_measure = Any[],)
+
+    julia> set_params!(rf, (atom = (max_depth = 2,), n = 200));
+    julia> params(rf)
+    (atom = (pruning_purity = 1.0,
+             max_depth = 2,
+             min_samples_leaf = 1,
+             min_samples_split = 2,
+             min_purity_increase = 0.0,
+             n_subfeatures = 0.0,
+             display_depth = 5,
+             post_prune = false,
+             merge_purity_threshold = 0.9,),
+     weights = Float64[],
+     bagging_fraction = 0.8,
+     n = 200,
+     parallel = true,
+     out_of_bag_measure = Any[],)
+
+"""
 function set_params!(model, params::NamedTuple)
     for k in keys(params)
         set_params!(model, k,  getproperty(params, k))

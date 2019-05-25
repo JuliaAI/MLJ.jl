@@ -26,7 +26,8 @@ nested_ranges = (transformer = (features=features_,), model = (lambda=lambda_,))
 holdout = Holdout(fraction_train=0.8)
 grid = Grid(resolution=10)
 
-tuned_model = TunedModel(model=composite, tuning=grid, resampling=holdout, measure=rms,
+tuned_model = TunedModel(model=composite, tuning=grid,
+                         resampling=holdout, measure=rms,
                          nested_ranges=nested_ranges, full_report=false)
 
 info(tuned_model)
