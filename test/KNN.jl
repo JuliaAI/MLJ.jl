@@ -30,7 +30,7 @@ info(knn)
 
 X, y = X_and_y(load_boston())
 knnM = machine(knn, X, y)
-fit!(knnM)
+@test_logs (:info, r"Training") fit!(knnM)
 predict(knnM, MLJ.selectrows(X, 1:10))
 
 end

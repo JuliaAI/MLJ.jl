@@ -11,10 +11,10 @@ pkgs = keys(MLJ.metadata())
 @test "DecisionTreeClassifier" in models()["DecisionTree"]
 @test "ConstantClassifier" in models()["MLJ"]
 
-## if you put these back, need to add DecisionTree and MLJModels to
-## [extras] and [targets]:
-# @load DecisionTreeClassifier
-# @test @isdefined DecisionTreeClassifier
+@load DecisionTreeClassifier
+@test @isdefined DecisionTreeClassifier
+@load DecisionTreeRegressor pkg=DecisionTree
+@test @isdefined DecisionTreeRegressor
 
 end # module
 true
