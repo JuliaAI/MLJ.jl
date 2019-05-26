@@ -169,7 +169,12 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
         # mutate `clone` (the model to which `resampler` points):
         set_params!(clone, new_params)
 
-        fit!(resampling_machine, verbosity=verbosity-1)
+        if verbosity == 2
+            fit!(resampling_machine, verbosity=0)
+
+        else
+            fit!(resampling_machine, verbosity=verbosity-1)
+        end
         e = mean(evaluate(resampling_machine))
 
         if verbosity > 1
