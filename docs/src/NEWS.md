@@ -6,6 +6,18 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+## Announcement: MLJ tutorial and development sprint
+
+ - Details
+   [here](https://github.com/alan-turing-institute/MLJ.jl/wiki/2019-MLJ---sktime-tutorial-and-development-sprint)
+   Applications close **May 29th** 5pm (GMTT + 1 = London)
+
+
+## MLJModels v0.2.3
+
+- The following support vector machine models from LIBSVM.jl have been
+  added: EpsilonSVR, LinearSVC, NuSVR, NuSVC, SVC, OneClassSVM.
+
 ## MLJModels v0.2.2
 
 - MulitivariateStats models RidgeRegressor and PCA migrated here from
