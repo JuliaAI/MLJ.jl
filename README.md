@@ -3,12 +3,12 @@
 A pure Julia machine learning framework.
 
 
-### Announcement: MLJ tutorial and development sprint
+# Announcement: MLJ tutorial and development sprint
 
 Details [here](https://github.com/alan-turing-institute/MLJ.jl/wiki/2019-MLJ---sktime-tutorial-and-development-sprint) Applications close **May 29th** 5pm (GMTT + 1 = London)
 
 
-### `join!(MLJ, YourModel)`
+# `join!(MLJ, YourModel)`
 
 **Call for help.** MLJ is [getting
 attention](https://github.com/trending/julia?since=monthly) but its
