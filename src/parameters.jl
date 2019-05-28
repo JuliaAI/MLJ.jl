@@ -160,12 +160,12 @@ end
 # parameter ranges. We require different behaviour for scales and
 # functions:
 
-#      transform(Scale, scale(:log), 100) = 2
-#      inverse_transform(Scale, scale(:log), 2) = 100
+#      transform(Scale, scale(:log10), 100) = 2
+#      inverse_transform(Scale, scale(:log10), 2) = 100
 
 # but
-#     transform(Scale, scale(log), 100) = 100       # identity
-#     inverse_transform(Scale, scale(log), 100) = 2 
+#     transform(Scale, scale(log10), 100) = 100       # identity
+#     inverse_transform(Scale, scale(log10), 100) = 2
 
 
 # See also: strange
@@ -254,11 +254,11 @@ function Base.range(model, field::Symbol; values=nothing,
                     lower=nothing, upper=nothing, scale::D=:linear) where D
     T = get_type(typeof(model), field)
     if T <: Real
-        lower !=nothing && upper != nothing ||
+        (lower === nothing || upper === nothing) &&
             error("You must specify lower=... and upper=... .")
         return NumericRange{field,T,D}(lower, upper, scale)
     else
-        values !=nothing || error("You must specify values=... .")
+        values === nothing && error("You must specify values=... .")
         return NominalRange{field,T}(Tuple(values))
     end
 end
