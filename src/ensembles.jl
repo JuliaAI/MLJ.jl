@@ -1,8 +1,3 @@
-# shorter display of MersenneTwister:
-Base.show(stream::IO, t::Random.MersenneTwister) =
-    print(stream, "MersenneTwister($(t.seed))")
-
-
 ## WEIGHTED ENSEMBLES OF FITRESULTS
 
 # Atom is atomic model type, eg, DecisionTree
