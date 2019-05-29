@@ -440,10 +440,11 @@ function fit(transformer::OneHotEncoder, verbosity::Int, X)
         if T <: allowed_scitypes && ftr in specified_features
             ref_name_pairs_given_feature[ftr] = Pair{<:Unsigned,Symbol}[]
             shift = transformer.drop_last ? 1 : 0
-            if verbosity > 0
-                @info "Spawned $(length(col)-shift) sub-features to one-hot encode feature :$ftr."
-            end
             levels = MLJBase.classes(first(col))
+            if verbosity > 0
+                @info "Spawning $(length(levels)-shift) sub-features "*
+                "to one-hot encode feature :$ftr."
+            end
             for level in levels[1:end-shift]
                 ref = MLJBase.int(level)
                 name = compound_label(all_features, ftr, level)
