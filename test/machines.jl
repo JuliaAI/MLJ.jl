@@ -31,6 +31,12 @@ rms(yhat, y) ≈ std(y)*sqrt(1 - 1/n)
 # test an unsupervised univariate case:
 mach = machine(UnivariateStandardizer(), float.(1:5))
 @test_logs (:info, r"Training") fit!(mach)
+@test isempty(params(mach))
+
+# test a frozen NodalMachine
+stand = machine(Standardizer(), source((x1=rand(10),)))
+freeze!(stand)
+@test_logs (:warn, r"not trained as it is frozen\.$") fit!(stand)
 
 
 end # module
