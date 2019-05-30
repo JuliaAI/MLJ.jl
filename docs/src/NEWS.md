@@ -6,6 +6,14 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+## MLJBase v0.2.2
+
+- Fix some minor bugs. 
+
+- Added compatibility requirement CSV v0.5 or higher to allow removal
+  of `allowmissing` keyword in `CSV.read`, which is to be depreciated.
+
+
 ## Announcement: MLJ tutorial and development sprint
 
  - Details
