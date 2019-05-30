@@ -459,6 +459,9 @@ node
 fit!(N::Node; rows=nothing, verbosity=1, force=false)
 ```
 
+```@docs
+fit!(mach::MLJ.AbstractMachine; rows=nothing, verbosity=1, force=false)
+```
 
 
 

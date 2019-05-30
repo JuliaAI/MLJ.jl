@@ -99,8 +99,7 @@ on those rows) and that this calling is a recursive operation on nodes
 upstream of those arguments.
 
 """
-function fit!(mach::AbstractMachine; rows=nothing, verbosity=1,
-force=false)
+function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
     if mach isa NodalMachine && mach.frozen 
         verbosity < 0 || @warn "$mach not trained as it is frozen."
