@@ -91,7 +91,7 @@ called. Otherwise `MLJBase.update` is called.
 A machine `mach` is *stale* if `mach.model` has changed since the last
 time a fit-result was computed, or if if one of its training arguments
 is `stale`. A node `N` is stale if `N.machine` is stale or one of its
-arguments is stale. 
+arguments is stale. Source nodes are never stale. 
 
 Note that a nodal machine obtains its training data by *calling* its
 node arguments on the specified `rows` (rather *indexing* its arguments

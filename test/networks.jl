@@ -96,7 +96,6 @@ tape = MLJ.get_tape
 
 XX = source(X_frame[train,:])
 yy = source(y[train])
-@test !MLJ.is_stale(XX)
 
 # construct a transformer to standardize the target:
 uscale_ = UnivariateStandardizer()
@@ -161,4 +160,10 @@ knn_.K =67
            fit!(yhat, verbosity=1))
 
 end
+
+
+## TEST REBINDING OF SOURCE DATA
+
+
+
 true

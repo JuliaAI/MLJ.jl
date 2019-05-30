@@ -3,17 +3,13 @@
 abstract type AbstractNode <: MLJType end
 
 mutable struct Source <: AbstractNode
-    data           # training data
-    is_stale::Bool
-#    Source(data) = new(data, true)
-    Source(data) = new(data, false)
+    data  # training data
 end
 
-is_stale(s::Source) = s.is_stale
+is_stale(s::Source) = false
 
 # make source nodes callable:
 function (s::Source)(; rows=:)
-    s.is_stale = false
     if rows == (:)
         return s.data
     else
@@ -28,9 +24,9 @@ end
 Attach new data `X` to an existing source node `s`.
 
 """
-function rebind(s::Source, X)
+function rebind!(s::Source, X)
     s.data = X
-    s.is_stale = true
+    return s
 end
 
 
