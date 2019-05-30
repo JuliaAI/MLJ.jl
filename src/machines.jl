@@ -5,6 +5,7 @@ abstract type AbstractMachine{M} <: MLJType end
 mutable struct Machine{M<:Model} <: AbstractMachine{M}
 
     model::M
+    previous_model::M
     fitresult
     cache
     args::Tuple
@@ -96,13 +97,30 @@ force=false)
 
     rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
 
+    if mach isa NodalMachine
+        # determine if concrete data to be used in training may have changed:
+        upstream_state = broadcast(m -> m.state, mach.tape)
+        data_has_changed = rows_have_changed || (upstream_state != mach.upstream_state)
+    else
+        data_has_changed = rows_have_changed
+    end
+
     args = [selectrows(arg, rows) for arg in mach.args]
-    
-    if !isdefined(mach, :fitresult) || rows_have_changed || force 
+
+    if !isdefined(mach, :fitresult) || data_has_changed || force
+        # fit the model:
         verbosity < 1 || @info "Training $mach."
         mach.fitresult, mach.cache, mach.report =
             fit(mach.model, verbosity, args...)
-    else # call `update`:
+    elseif !is_stale(mach)
+        # don't fit the model
+        if verbosity > 0
+            @info "Not retraining $mach.\n It appears up-to-date. "*
+            "Use force=true to force retraining."
+        end
+        return mach
+    else
+        # update the model:
         verbosity < 1 || @info "Updating $mach."
         mach.fitresult, mach.cache, mach.report =
             update(mach.model, verbosity, mach.fitresult, mach.cache, args...)
@@ -112,13 +130,19 @@ force=false)
         mach.rows = deepcopy(rows)
     end
 
+    mach.previous_model = deepcopy(mach.model)
+
     if mach isa NodalMachine
-        mach.previous_model = deepcopy(mach.model)
+        mach.upstream_state = upstream_state
+        mach.state = mach.state + 1
     end
     
     return mach
 
 end
+
+is_stale(mach::Machine) =
+    !isdefined(mach, :fitresult) || (mach.model != mach.previous_model)
 
 machine(model::Model, args...) = Machine(model, args...)
 
