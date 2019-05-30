@@ -24,21 +24,33 @@ ridge_old = deepcopy(ridge)
 selector_old = deepcopy(selector)
 
 # this should trigger no retraining:
-fitresult, cache, report = MLJ.update(composite, 3, fitresult, cache, Xtrain, ytrain);
+fitresult, cache, report =
+    @test_logs(
+        (:info, r"^Not"),
+        (:info, r"^Not"),
+        MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain))
 @test ridge.fitresult == ridge_old.fitresult
 @test selector.fitresult == selector_old.fitresult
 
-# this should trigger retraining of selector and ridge:
+# this should trigger update of selector and training of ridge:
 selector_model.features = [:Crim, :Rm] 
-fitresult, cache, report = MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain)
+fitresult, cache, report =
+    @test_logs(
+        (:info, r"^Updating"),
+        (:info, r"^Training"),
+        MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain))
 @test ridge.fitresult != ridge_old.fitresult
 @test selector.fitresult != selector_old.fitresult
 ridge_old = deepcopy(ridge)
 selector_old = deepcopy(selector)
 
-# this should trigger retraining of ridge only:
+# this should trigger updating of ridge only:
 ridge_model.lambda = 1.0
-fitresult, cache, report = MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain)
+fitresult, cache, report =
+    @test_logs(
+            (:info, r"^Not"),
+            (:info, r"^Updating"),
+            MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain))
 @test ridge.fitresult != ridge_old.fitresult
 @test selector.fitresult == selector_old.fitresult
 
