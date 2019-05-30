@@ -109,8 +109,8 @@ X = DataFrame(name=identity.(categorical(["Ben", "John", "Mary", "John"], ordere
 t = OneHotEncoder()
 info(t)
 fitresult, cache, _ =
-    @test_logs((:info, r"Spawned 4 sub-features"),
-               (:info, r"Spawned 4 sub-features"),
+    @test_logs((:info, r"Spawning 3"),
+               (:info, r"Spawning 3"),
                MLJBase.fit(t, 1, X))
 Xt = transform(t, fitresult, X)
 @test Xt.name__John == float.([false, true, false, true])
@@ -123,8 +123,8 @@ Xt = transform(t, fitresult, X)
 
 # test that *entire* pool of categoricals is used in fit, including unseen levels:
 fitresult_small, cache, _ =
-    @test_logs((:info, r"Spawned 2 sub-features"),
-               (:info, r"Spawned 2 sub-features"),
+    @test_logs((:info, r"Spawning 3"),
+               (:info, r"Spawning 3"),
                MLJBase.fit(t, 1, MLJBase.selectrows(X,1:2)))
 Xtsmall = transform(t, fitresult_small, X)
 @test Xt == Xtsmall
