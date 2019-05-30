@@ -77,6 +77,17 @@ knn.K = 17
 
 ## SECOND TEST OF NETWORK TRAINING
 
+# test smart updating of an ensemble within a network:
+forest = EnsembleModel(atom=ConstantRegressor(), n=4)
+forestM = machine(forest, W, y)
+zhat = predict(forestM, W)
+@test_logs (:info, r"^Not") (:info, r"^Train") fit!(zhat)
+forest.n = 6
+@test_logs (:info, r"^Not") (:info, r"^Updating") (:info, r"Build.*length 4") fit!(zhat)
+
+
+## THIRD TEST OF NETWORK TRAINING
+
 X_frame, y = datanow();  # boston data
 
 tape = MLJ.get_tape

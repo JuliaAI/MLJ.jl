@@ -65,19 +65,38 @@ machine(model::Model, task::UnsupervisedTask) = machine(model, task.X)
 # defined in networks.jl, in addition to `Machine`s defined above.
 
 """
-    fit!(mach::Machine; rows=nothing, verbosity=1)
+    fit!(mach::Machine; rows=nothing, verbosity=1, force=false)
 
-Train the machine `mach` using the algorithm and hyperparameters
-specified by `mach.model`, using those rows of the wrapped data having
-indices in `rows`.
+When called for the first time, call `MLJBase.fit` on `mach.model` and
+store the returned fit-result and report. Subsequent calls do nothing
+unless: (i) `force=true`, or (ii) the specified `rows` are different
+from those used the last time a fit-result was computed, or (iii)
+`mach.model` has changed since the last time a fit-result was computed
+(the machine is *stale*). In cases (i) or (ii) `MLJBase.fit` is 
+called on `mach.model`. Otherwise, `MLJBase.update` is called.
 
-    fit!(mach::NodalMachine; rows=nothing, verbosity=1)
+    fit!(mach::NodalMachine; rows=nothing, verbosity=1, force=false)
 
-A nodal machine is trained in the same way as a regular machine with
-one difference: Instead of training the model on the wrapped data
-*indexed* on `rows`, it is trained on the wrapped nodes *called* on
-`rows`, with calling being a recursive operation on nodes within a
-learning network.
+When called for the first time, attempt to call `MLJBase.fit` on
+`fit.model`. This will fail if a machine in the dependency tape of
+`mach` has not been trained yet, which can be resolved by fitting any
+downstream node instead. Subsequent `fit!` calls do nothing unless:
+(i) `force=true`, or (ii) some machine in the dependency tape of
+`mach` has computed a new fit-result since `mach` last computed its
+fit-result, or (iii) the specified `rows` have changed since the last
+time a fit-result was last computed, or (iv) `mach` is stale (see
+below). In cases (i), (ii) or (iii), `MLJBase.fit` is
+called. Otherwise `MLJBase.update` is called.
+
+A machine `mach` is *stale* if `mach.model` has changed since the last
+time a fit-result was computed, or if if one of its training arguments
+is `stale`. A node `N` is stale if `N.machine` is stale or one of its
+arguments is stale. 
+
+Note that a nodal machine obtains its training data by *calling* its
+node arguments on the specified `rows` (rather *indexing* its arguments
+on those rows) and that this calling is a recursive operation on nodes
+upstream of those arguments.
 
 """
 function fit!(mach::AbstractMachine; rows=nothing, verbosity=1,

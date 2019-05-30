@@ -215,20 +215,7 @@ MLJBase.selectrows(X::AbstractNode, r) = X(rows=r)
 """
     fit!(N::Node; rows=nothing, verbosity=1, force=false)
 
-When called for the first time, train all machines in the dependency
-tape of `N`, a necessary and sufficient condition for `N()` to be
-defined. Use only those rows with indices in `rows`, or use all rows
-if unspecified. 
-
-In subsequent calls to `fit!` the same machines are updated, but only
-if `force=true`, or if the rows specified for training are different
-from the last train, or if they are stale.
-
-A machine `mach` is *stale* if `mach.model` has changed since it was
-last trained, or if if one of its training arguments is `stale`. A
-node `N` is stale if `N.machine` is stale or one of its arguments is
-stale. Source nodes are never stale. 
-
+Call `fit!(mach)` on each machine `mach` upstream of `N`. 
 """
 function fit!(y::Node; rows=nothing, verbosity=1, force=false)
     if rows == nothing
