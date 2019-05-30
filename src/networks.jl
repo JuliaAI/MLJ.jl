@@ -344,10 +344,8 @@ machine(model::Model, X::AbstractNode, y) = NodalMachine(model, X, source(y))
 
 MLJBase.matrix(X::AbstractNode) = node(MLJBase.matrix, X)
 
-Base.log(v::Vector{<:Number}) = log.(v)
-Base.exp(v::Vector{<:Number}) = exp.(v)
-Base.log(X::AbstractNode) = node(log, X)
-Base.exp(X::AbstractNode) = node(exp, X)
+Base.log(X::AbstractNode) = node(v->log.(v), X)
+Base.exp(X::AbstractNode) = node(v->exp.(v), X)
 
 import Base.+
 +(y1::AbstractNode, y2::AbstractNode) = node(+, y1, y2)
