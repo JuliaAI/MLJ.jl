@@ -306,7 +306,7 @@ source(X) = Source(X) # here `X` is data
     N = node(f::Function, args...)
  
 Defines a `Node` object `N` wrapping a static operation `f` and arguments
-`args`. Each of the `n` element of `args` must be a `Node` or `Source`
+`args`. Each of the `n` elements of `args` must be a `Node` or `Source`
 object. The node `N` has the following calling behaviour:
 
     N() = f(args[1](), args[2](), ..., args[n]())
@@ -327,9 +327,19 @@ arguments) is this:
 
 Generally `n=1` or `n=2` in this latter case. 
 
+    predict(mach, X::AbsractNode, y::AbstractNode)
+    predict_mean(mach, X::AbstractNode, y::AbstractNode)
+    predict_median(mach, X::AbstractNode, y::AbstractNode)
+    predict_mode(mach, X::AbstractNode, y::AbstractNode)
+    transform(mach, X::AbstractNode)
+    inverse_transform(mach, X::AbstractNode)
+
+Shortcuts for `J = node(predcit, mach, X, y)`, etc. 
+
 Calling a node is a recursive operation which terminates in the call
 to a source node (or nodes). Calling nodes on new data `X` fails unless the
-number of source nodes is unique.  
+number of source nodes is unique. 
+ 
 
 See also: source, sources
 
