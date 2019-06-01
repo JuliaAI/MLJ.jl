@@ -33,7 +33,10 @@ end
 """
     sources(N)
 
-Return a list of all ultimate sources of  a node `N`. 
+Return a list of all sources of a node `N` accessed by a call
+`N()`. These are the sources of the acyclic directed graph terminating
+at `N` of the associated learning network, if training input edges are
+deleted.
 
 See also: node, source
 
