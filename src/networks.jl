@@ -133,7 +133,6 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
         # check the number of arguments:
         if machine == nothing
             length(args) > 0 || throw(error("`args` in `Node(::Function, args...)` must be non-empty. "))
-
         end
 
         origins_ = unique(vcat([origins(arg) for arg in args]...))
@@ -238,11 +237,56 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
         mach != nothing
     end
 
+    #=
     for mach in machines
         fit!(mach; rows=rows, verbosity=verbosity, force=force)
     end
+    =#
+
+    dag = construct_dag(y; rows=rows, verbosity=verbosity, force=force)
+    if dag isa Thunk
+        collect(dag)
+    end
 
     return y
+end
+
+function construct_dag(y::Node; rows=nothing, verbosity=1, force=false, mach_set=Set())
+    DAGGER_DEBUG[] && printstyled("Construct DAG for $(typeof(y)), rows=$(repr(rows))\n"; color=:cyan)
+
+    # get the DAGs of each arg
+    arg_dags = Thunk[]
+    append!(arg_dags, [construct_dag(arg; rows=rows, verbosity=verbosity, force=force, mach_set=mach_set) for arg in y.args])
+    if y.machine !== nothing
+        append!(arg_dags, [construct_dag(arg; rows=rows, verbosity=verbosity, force=force, mach_set=mach_set) for arg in y.machine.args])
+    end
+
+    # create the DAG for the node
+    uniq_mach = false
+    if y.machine !== nothing && !(y.machine in mach_set)
+        uniq_mach = true
+        push!(mach_set, y.machine)
+    end
+    return delayed((args...) -> begin
+        if DAGGER_DEBUG[]
+            printstyled("In DAG for $(typeof(y))\n"; color=:green)
+            printstyled(join(typeof.(args), ", "), '\n'; color=:magenta)
+        end
+        if uniq_mach
+            if y.machine !== nothing
+                fit!(y.machine; rows=rows, verbosity=verbosity, force=force)
+            else
+                DAGGER_DEBUG[] && printstyled("DAG: not training static $(typeof(y))\n"; color=:red)
+            end
+        else
+            DAGGER_DEBUG[] && printstyled("DAG: not training non-unique $(typeof(y))\n"; color=:red)
+        end
+        return y.machine
+    end)(arg_dags...)
+end
+function construct_dag(y::Source; rows=nothing, verbosity=1, force=false, mach_set=Set())
+    DAGGER_DEBUG[] && printstyled("Construct DAG for Source, rows=$(repr(rows))\n"; color=:cyan)
+    return delayed(identity)(y.data)
 end
 
 # allow arguments of `Nodes` and `NodalMachine`s to appear
@@ -364,10 +408,10 @@ number of such nodes is one.
 See also: [`source`](@ref), [`origins`](@ref).
 
 """
-node = Node
+const node = Node
 
 # unless no arguments are `AbstractNode`s, `machine` creates a
-# NodalTrainablaeModel, rather than a `Machine`:
+# NodalTrainableModel, rather than a `Machine`:
 machine(model::Model, args::AbstractNode...) = NodalMachine(model, args...)
 machine(model::Model, X, y::AbstractNode) = NodalMachine(model, source(X), y)
 machine(model::Model, X::AbstractNode, y) = NodalMachine(model, X, source(y))

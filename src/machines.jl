@@ -114,10 +114,10 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
     end
 
     warning = clean!(mach.model)
-    isempty(warning) || verbosity < 0 || @warn warning 
-    
+    isempty(warning) || verbosity < 0 || @warn warning
+
     if rows == nothing
-        rows = (:) 
+        rows = (:)
     end
 
     rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
@@ -164,7 +164,7 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
         mach.upstream_state = upstream_state
         mach.state = mach.state + 1
     end
-    
+
     return mach
 
 end

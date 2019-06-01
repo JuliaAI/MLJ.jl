@@ -77,6 +77,12 @@ using Random
 import Distributed: @distributed, nworkers, pmap
 using RecipesBase # for plotting
 
+# for DAG multiprocessing:
+import Dagger
+import Dagger: Thunk, delayed, compute, collect
+# FIXME: Remove me
+const DAGGER_DEBUG = Ref(get(ENV, "MLJ_DAGGER_DEBUG", "0") == "1")
+
 # submodules of this module:
 include("registry/src/Registry.jl") 
 import .Registry
