@@ -23,7 +23,7 @@ euclidean(v1, v2) = norm(v2 - v1)
 reciprocal(d) = d < eps(Float64) ? sign(d)/eps(Float64) : 1/d
 
 # lazy keywork constructor:
-function KNNRegressor(; K=1,
+function KNNRegressor(; K=2,
                       metric=euclidean,
                       kernel=reciprocal)
     model = KNNRegressor(K, metric, kernel)
