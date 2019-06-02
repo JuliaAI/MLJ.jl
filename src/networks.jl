@@ -41,7 +41,7 @@ deleted.
 See also: node, source
 
 """
-sources(s::Source) = Set([s])
+sources(s::Source) = [s,]
 
 
 ## DEPENDENCY TAPES
@@ -139,7 +139,7 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
     operation             # that can be dispatched on a fit-result (eg, `predict`) or a static operation
     machine::T          # is `nothing` for static operations
     args::Tuple{Vararg{AbstractNode}}       # nodes where `operation` looks for its arguments
-    sources::Set{Source}
+    sources::Vector{Source}
     tape::Vector{NodalMachine}    # for tracking dependencies
 
     function Node{T}(operation,
@@ -151,8 +151,9 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
             length(args) > 0 || throw(error("`args` in `Node(::Function, args...)` must be non-empty. "))
         end
 
-        sources_ = union([sources(arg) for arg in args]...)
-        length(sources_) == 1 || @warn "Node with multiple sources defined."
+        sources_ = unique(vcat([sources(arg) for arg in args]...))
+        length(sources_) == 1 ||
+            @warn "Node with multiple non-training sources defined:\n$(sources_). "
 
         # get the machine's dependencies:
         tape = copy(get_tape(machine))
@@ -172,9 +173,6 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
     end
 end
 
-# ... where
-#get_depth(::Source) = 0
-#get_depth(X::Node) = X.depth
 sources(X::Node) = X.sources
 
 function is_stale(X::Node)
@@ -198,8 +196,9 @@ Node(operation, args::AbstractNode...) = Node(operation, nothing, args...)
 # make nodes callable:
 (y::Node)(; rows=:) = (y.operation)(y.machine, [arg(rows=rows) for arg in y.args]...)
 function (y::Node)(Xnew)
-    length(y.sources) == 1 || error("Nodes with multiple sources are not callable on new data. "*
-                                    "The sources of the node called are $(y.sources)")
+    length(y.sources) == 1 ||
+        error("Nodes with multiple non-training sources are not callable on new data. "*
+              "Use sources(node) to inspect. ")
     return (y.operation)(y.machine, [arg(Xnew) for arg in y.args]...)
 end
 
@@ -340,9 +339,8 @@ Generally `n=1` or `n=2` in this latter case.
 Shortcuts for `J = node(predcit, mach, X, y)`, etc. 
 
 Calling a node is a recursive operation which terminates in the call
-to a source node (or nodes). Calling nodes on new data `X` fails unless the
-number of source nodes is unique. 
- 
+to a source node (or nodes). Calling nodes on *new* data `X` fails unless the
+number of such nodes is one.  
 
 See also: source, sources
 
