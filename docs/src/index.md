@@ -44,6 +44,23 @@ DecisionTreeClassifier(pruning_purity = 1.0,
                        merge_purity_threshold = 0.9,) @ 1…85
 ```
     
+A `DecisionTreeClassifier` needs the target labels to be encoded as a `CategoricalArray`  of `Int64` values. We can do the conversion as follows:
+```
+function map_class_to_int(y; y_enc_type=Int64)
+    class_values = Set(y)
+    y_enc = zeros(y_enc_type, length(y))
+    label_to_int = Dict(class=>y_enc_type(j) for (j,class) in enumerate(class_values))
+    
+    for (j,class) in enumerate(class_values)
+        y_enc[y .==class] .= y_enc_type(j)
+    end
+    return y_enc, label_to_int
+end
+
+y_enc, label_to_int = map_class_to_int(y; y_enc_type=Int64);
+y = CategoricalArray(y)
+
+    
 Wrapping the model in data creates a *machine* which will store
 training outcomes:
 
