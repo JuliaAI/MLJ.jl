@@ -102,7 +102,7 @@ See [here](docs/src/frequently_asked_questions.md).
 
 Get started
 [here](https://alan-turing-institute.github.io/MLJ.jl/dev/),
-or take the MLJ [tour](docs/src/tour.ipynb).
+or take the MLJ [tour](/examples/tour/tour.ipynb).
 
 
 ### History

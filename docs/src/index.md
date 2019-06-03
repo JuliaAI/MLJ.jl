@@ -84,7 +84,7 @@ julia> evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true), mea
 ### Next steps
 
 To learn a little more about what MLJ can do, take the MLJ
-[tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/tour.ipynb),
+[tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/examples/tour/tour.ipynb),
 and then return to the manual as needed. Read at least the remainder
 of this page before considering serious use of MLJ.
 
