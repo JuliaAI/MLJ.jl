@@ -6,6 +6,33 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+
+## MLJ v0.2.2
+
+- Resolved these isssues: 
+
+    - Specifying new rows in calls to `fit!` on a Node not triggering
+      retraining.
+      [(#147)](https://github.com/alan-turing-institute/MLJ.jl/issues/147)
+	
+    - fit! of Node sometimes calls `update` on model when it should
+      call `fit` on model
+      [(#146)](https://github.com/alan-turing-institute/MLJ.jl/issues/146)
+	
+    - Error running the tour.ipynb notebook
+      [(#140)](https://github.com/alan-turing-institute/MLJ.jl/issues/140)
+	
+    - For reproducibility, include a Manifest.toml file with all
+      examples. [(#137)](https://github.com/alan-turing-institute/MLJ.jl/issues/137)
+	
+- Activated overalls code coverage
+  [(#131)](https://github.com/alan-turing-institute/MLJ.jl/issues/131)
+	
+- Removed local version of MultivariateStats (now in MLJModels, see below).
+
+- Minor changes to OneHotEncoder, in line with scitype philosophy.
+	
+
 ## MLJBase v0.2.2
 
 - Fix some minor bugs. 
