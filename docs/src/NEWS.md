@@ -6,6 +6,14 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+## MLJ v0.2.3
+
+- Fixed bug in models(::MLJTask) method which excluded some relevant
+  models. [(#153)](https://github.com/alan-turing-institute/MLJ.jl/issues/153)
+
+- Fixed some broken links to the tour.ipynb.
+
+
 
 ## MLJ v0.2.2
 
