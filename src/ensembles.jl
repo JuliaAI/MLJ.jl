@@ -120,10 +120,11 @@ end
 function get_ensemble_and_indices(atom::Supervised, verbosity, X, y, n, n_patterns,
                       n_train, rng, progress_meter)
     
-    ensemble_indices = [StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
+ ensemble_indices = [StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
                         for i in 1:n]
     ensemble = map(ensemble_indices) do train_rows
-        verbosity < 1 || next!(progress_meter)
+        verbosity == 1 && next!(progress_meter)
+        verbosity < 2 ||  print("#")
         atom_fitresult, atom_cache, atom_report =
             fit(atom, verbosity - 1, selectrows(X, train_rows), selectrows(y, train_rows))
         atom_fitresult
@@ -142,7 +143,8 @@ function get_ensemble(atom::Supervised, verbosity, X, y, n, n_patterns,
     ensemble_indices = (StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
                         for i in 1:n)
     ensemble = map(ensemble_indices) do train_rows
-        verbosity < 1 || next!(progress_meter)
+        verbosity == 1 && next!(progress_meter)
+        verbosity < 2 ||  print("#")
         atom_fitresult, atom_cache, atom_report =
             fit(atom, verbosity - 1, selectrows(X, train_rows), selectrows(y, train_rows))
         atom_fitresult
@@ -357,10 +359,10 @@ function fit(model::EitherEnsembleModel{Atom}, verbosity::Int, X, y) where Atom<
     progress_meter = Progress(n, dt=0.5, desc="Training ensemble: ",
                               barglyphs=BarGlyphs("[=> ]"), barlen=50, color=:yellow)
 
-
     if !isempty(out_of_bag_measure)
         
         if !parallel || nworkers() == 1 # build in serial
+            verbosity < 2 ||  @info "One hash per new atom trained: "
             ensemble, ensemble_indices = get_ensemble_and_indices(atom, verbosity, X, y,
                                                    n, n_patterns, n_train, rng, progress_meter)
         else # build in parallel
@@ -383,6 +385,7 @@ function fit(model::EitherEnsembleModel{Atom}, verbosity::Int, X, y) where Atom<
     else
         
         if !parallel || nworkers() == 1 # build in serial
+            verbosity < 2 ||  @info "One hash per new atom trained: "
             ensemble = get_ensemble(atom, verbosity, X, y,
                                     n, n_patterns, n_train, rng, progress_meter)
         else # build in parallel
