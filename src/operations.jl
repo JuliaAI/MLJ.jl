@@ -22,6 +22,7 @@
 
 ## TODO: need to add checks on the arguments of
 ## predict(::AbstractMachine, ) and transform(::AbstractMachine, )
+## Refactor using simpler non-macro code generation
 
 macro extend_to_machines(operation)
     quote
@@ -34,7 +35,7 @@ macro extend_to_machines(operation)
                                          machine.fitresult,
                                          args...)
             else
-                throw(error("$machine has not trained."))
+                throw(error("$machine has not been trained."))
             end
         end
     end

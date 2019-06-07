@@ -34,9 +34,9 @@ end
     sources(N)
 
 Return a list of all sources of a node `N` accessed by a call
-`N()`. These are the sources of the acyclic directed graph terminating
-at `N` of the associated learning network, if training input edges are
-deleted.
+`N()`. These are the sources of the acyclic directed graph associated
+learning network terminating at `N` of the, if edges corresponding to
+training data flow are excluded.
 
 See also: node, source
 
@@ -153,7 +153,8 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
 
         sources_ = unique(vcat([sources(arg) for arg in args]...))
         length(sources_) == 1 ||
-            @warn "Node with multiple non-training sources defined:\n$(sources_). "
+            @warn "A node referencing multiple sources when called "*
+        "has been defined:\n$(sources_). "
 
         # get the machine's dependencies:
         tape = copy(get_tape(machine))
