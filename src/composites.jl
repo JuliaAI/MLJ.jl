@@ -41,6 +41,22 @@ function tree(W::MLJ.Node)
                    endvalues...)
     return NamedTuple{keys}(values)
 end
+tree2(s::MLJ.Source) = (source = s,)
+function tree2(W::MLJ.Node)
+    mach = W.machine
+    if mach == nothing
+        value2 = nothing
+        endvalue=[]
+    else
+        value2 = mach.model        
+        endvalue = Any[tree2(arg) for arg in mach.args]
+    end
+    keys = tuple(:operation,  :model, :args, :train_args)
+    values = tuple(W.operation, value2,
+                   Any[tree(arg) for arg in W.args],
+                   endvalue)
+    return NamedTuple{keys}(values)
+end
 
 """
 
