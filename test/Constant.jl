@@ -22,7 +22,6 @@ d=Distributions.Normal(1.5, 0.5)
 @test predict(model, fitresult, X) == fill(d, 10)
 @test predict_mean(model, fitresult, X) == fill(1.5, 10)
 
-@show model
 info(model)
 info(MLJ.DeterministicConstantRegressor)
 
@@ -45,7 +44,6 @@ yhat = predict_mode(model, fitresult, X)
 yhat = predict(model, fitresult, X)
 @test yhat == fill(d, 10)
 
-@show model
 info(model)
 info(MLJ.DeterministicConstantClassifier)
 
