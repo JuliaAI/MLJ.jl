@@ -108,7 +108,6 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
             merge!(tape, get_tape(arg))
         end
         machine.tape = tape
-        @show args
         machine.upstream_state = Tuple([state(arg) for arg in args])
 
         return machine
