@@ -78,7 +78,7 @@ function args(tree)
     keys_ = filter(keys(tree) |> collect) do key
         match(r"^arg[0-9]*", string(key)) != nothing
     end
-    return (getproperty(tree, key) for key in keys_)
+    return [getproperty(tree, key) for key in keys_]
 end
         
 # get the top level train_args of the tree of some node:
@@ -86,7 +86,7 @@ function train_args(tree)
     keys_ = filter(keys(tree) |> collect) do key
         match(r"^train_arg[0-9]*", string(key)) != nothing
     end
-    return (getproperty(tree, key) for key in keys_)
+    return [getproperty(tree, key) for key in keys_]
 end    
 
 """
@@ -144,17 +144,30 @@ function sources(W::MLJ.AbstractNode)
     return unique(sources_)
 end
 
+machines(W::MLJ.Source) = Any[]
+function machines(W::MLJ.Node)
+    if W.machine == nothing
+        return vcat([machines(arg) for arg in W.args]...) |> unique
+    else
+        return vcat(Any[W.machine, ],
+                   [machines(arg) for arg in W.args]..., 
+                   [machines(arg) for arg in W.machine.args]...) |> unique
+    end
+end
+
 """
     reset!(N::Node)
 
 Place the learning network terminating at node `N` into a state in
-which `fit!(N)` will retrain from scratch all machines in its dependency
-tape. Does not actually train any machine or alter fit-results.
+which `fit!(N)` will retrain from scratch all machines in its
+dependency tape. Does not actually train any machine or alter
+fit-results. (The method simply resets `m.state` to zero, for every
+machine `m` in the network.)
 
 """
 function reset!(W::Node)
-    for mach in W.tape
-        mach.state = 0
+    for mach in machines(W)
+        mach.state = 0 # to do: replace with dagger object
     end
 end
 
