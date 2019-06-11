@@ -18,7 +18,7 @@ export KNNRegressor                                  # builtins/KNN.jl
 
 # defined in include files "machines.jl and "networks.jl":
 export Machine, NodalMachine, machine, AbstractNode
-export source, node, fit!, freeze!, thaw!, Node, sources
+export source, node, fit!, freeze!, thaw!, Node, sources, origins
 
 # defined in include file "builtins/Transformers.jl":
 export FeatureSelector

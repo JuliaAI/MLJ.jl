@@ -31,17 +31,21 @@ end
 
 
 """
-    sources(N)
+    origins(N)
 
-Return a list of all sources of a node `N` accessed by a call
-`N()`. These are the sources of the acyclic directed graph associated
-learning network terminating at `N` of the, if edges corresponding to
-training data flow are excluded.
+Return a list of all origins of a node `N` accessed by a call
+`N()`. These are the source nodes of the acyclic directed graph
+associated learning network terminating at `N` of the, if edges
+corresponding to training arguments are excluded. A `Node` object
+cannot be called on new data unles it has a unique origin.
+
+Not to be confused with `sources(N)` which refers to the same graph
+but without the training edge deletions.
 
 See also: node, source
 
 """
-sources(s::Source) = [s,]
+origins(s::Source) = [s,]
 
 
 ## DEPENDENCY TAPES
@@ -141,7 +145,7 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
     operation             # that can be dispatched on a fit-result (eg, `predict`) or a static operation
     machine::T          # is `nothing` for static operations
     args::Tuple{Vararg{AbstractNode}}       # nodes where `operation` looks for its arguments
-    sources::Vector{Source}
+    origins::Vector{Source}
     tape::Vector{NodalMachine}    # for tracking dependencies
 
     function Node{T}(operation,
@@ -153,10 +157,10 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
             length(args) > 0 || throw(error("`args` in `Node(::Function, args...)` must be non-empty. "))
         end
 
-        sources_ = unique(vcat([sources(arg) for arg in args]...))
-        length(sources_) == 1 ||
-            @warn "A node referencing multiple sources when called "*
-        "has been defined:\n$(sources_). "
+        origins_ = unique(vcat([origins(arg) for arg in args]...))
+        length(origins_) == 1 ||
+            @warn "A node referencing multiple origins when called "*
+        "has been defined:\n$(origins_). "
 
         # get the machine's dependencies:
         tape = copy(get_tape(machine))
@@ -171,12 +175,12 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
             merge!(tape, get_tape(arg))
         end
 
-        return new{T}(operation, machine, args, sources_, tape)
+        return new{T}(operation, machine, args, origins_, tape)
 
     end
 end
 
-sources(X::Node) = X.sources
+origins(X::Node) = X.origins
 
 function is_stale(X::Node)
     (X.machine != nothing && is_stale(X.machine)) ||
@@ -220,9 +224,9 @@ Node(operation, args::AbstractNode...) = Node(operation, nothing, args...)
 # make nodes callable:
 (y::Node)(; rows=:) = (y.operation)(y.machine, [arg(rows=rows) for arg in y.args]...)
 function (y::Node)(Xnew)
-    length(y.sources) == 1 ||
-        error("Nodes with multiple non-training sources are not callable on new data. "*
-              "Use sources(node) to inspect. ")
+    length(y.origins) == 1 ||
+        error("Nodes with multiple origins are not callable on new data. "*
+              "Use origins(node) to inspect. ")
     return (y.operation)(y.machine, [arg(Xnew) for arg in y.args]...)
 end
 
@@ -323,7 +327,7 @@ categorical vector, or table. The calling behaviour of a source node is this:
     Xs(rows=r) = selectrows(X, r)  # eg, X[r,:] for a DataFrame
     Xs(Xnew) = Xnew
 
-See also: sources, node
+See also: origins, node
 
 """
 source(X) = Source(X) # here `X` is data
@@ -366,7 +370,7 @@ Calling a node is a recursive operation which terminates in the call
 to a source node (or nodes). Calling nodes on *new* data `X` fails unless the
 number of such nodes is one.  
 
-See also: source, sources
+See also: source, origins
 
 """
 node = Node

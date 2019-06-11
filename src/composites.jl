@@ -126,15 +126,18 @@ function models(W::MLJ.AbstractNode)
 end
 
 """
-   allsources(N::AbstractNode)
+   sources(N::AbstractNode)
 
 A vector of all sources referenced by calls `N()` and `fit!(N)`. These
 are the sources of the directed acyclic graph associated with the
-learning network terminating at `N`, including all edges corresponding
-to training data flow.
+learning network terminating at `N`.
+
+Not to be confused with `origins(N)` which refers to the same graph with edges corresponding to training arguments deleted.
+
+See also: orgins, source
 
 """
-function allsources(W::MLJ.AbstractNode)
+function sources(W::MLJ.AbstractNode)
     sources_ = filter(MLJ.flat_values(tree(W)) |> collect) do model
         model isa MLJ.Source
     end
@@ -158,7 +161,7 @@ end
 # create a deep copy of the node N, with its sources stripped of
 # content (data set to nothing):
 function stripped_copy(N)
-    sources = allsources(N)
+    sources = sources(N)
     X = sources[1].data
     y = sources[2].data
     sources[1].data = nothing
@@ -178,7 +181,7 @@ function fit_method(N::Node)
 
     function fit(::Any, verbosity, X, y)
         yhat = MLJ.stripped_copy(N)
-        X_, y_ = MLJ.allsources(yhat)
+        X_, y_ = MLJ.sources(yhat)
         X_.data = X
         y_.data = y
         MLJ.reset!(yhat)
