@@ -119,7 +119,7 @@ nested keys remain unchanged.
 
 If `values` is not specified a deep copy is returned. 
 
-"""
+""" # type piracy here:
 function Base.copy(params::NamedTuple, values=nothing)
 
     values != nothing || return deepcopy(params)

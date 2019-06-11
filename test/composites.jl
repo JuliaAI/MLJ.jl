@@ -109,12 +109,10 @@ fit!(mach)
 
 ## EXPORTING THE LEARNING NETWORK DEFINED BY A NODE
 
-using CategoricalArrays
-
-x1 = map(n -> mod(n,3), rand(UInt8, 100)) |> categorical
-x2 = randn(100)
-X = (x1=x1, x2=x2)
-y = x2.^2
+x1 = map(n -> mod(n,3), rand(UInt8, 100)) |> categorical;
+x2 = randn(100);
+X = (x1=x1, x2=x2);
+y = x2.^2;
 
 @load DecisionTreeRegressor
 
@@ -140,14 +138,32 @@ yhat = exp(zhat)
 fit!(yhat)
 @test sum(MLJ.state(W) |> MLJ.flat_values) == 1
 
-# test that a node can be reconstructed from its tree representation:
-t = MLJ.tree(yhat)
-yhat2 = MLJ.reconstruct(t)
+hot2 = deepcopy(hot)
+knn2 = deepcopy(knn)
+ys2 = source(nothing)
+
+# duplicate a network:
+yhat2 = replace(yhat, hot=>hot2, knn=>knn2, ys=>source(ys.data))
+@test_logs((:info, r"^Train.*Univ"),
+           (:info, r"^Train.*OneHot"),
+           (:info, r"^Spawn"),
+           (:info, r"^Train.*KNN"),
+           (:info, r"^Train.*Dec"), fit!(yhat2))
+@test length(MLJ.machines(yhat)) == length(MLJ.machines(yhat2))
 @test models(yhat) == models(yhat2)
 @test sources(yhat) == sources(yhat2)
 @test MLJ.tree(yhat) == MLJ.tree(yhat2)
+fit!(yhat)
+@test yhat() ≈ yhat2()
 
-
+# this change should trigger retraining of all machines except the
+# univariate standardizer:
+hot2.drop_last = true
+@test_logs((:info, r"^Not.*Univ"),
+           (:info, r"^Updating.*OneHot"),
+           (:info, r"^Spawn"),
+           (:info, r"^Train.*KNN"),
+           (:info, r"^Train.*Dec"), fit!(yhat2))
 
 end
 true

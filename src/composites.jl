@@ -60,19 +60,6 @@ function tree2(W::MLJ.Node)
     return NamedTuple{keys}(values)
 end
 
-"""
-    replace(W::MLJ.Node, a1=>b1, a2=>b2, ....)
-
-Create a deep copy of a node `W`, and whence replicate the learning
-network terminating at `W`, but replace any specified sources and
-models `a1, a2, ...` of the original network by the specified targets
-`b1, b2, ...`.
-
-"""
-
-function Base.replace(W::Node, pairs...)
-end
-
 # get the top level args of the tree of some node:
 function args(tree) 
     keys_ = filter(keys(tree) |> collect) do key
@@ -119,7 +106,7 @@ appearing exactly once.
 
 """
 function models(W::MLJ.AbstractNode)
-    models_ = filter(MLJ.flat_values(tree(W)) |> collect) do model
+    models_ = filter(flat_values(tree(W)) |> collect) do model
         model isa MLJ.Model
     end
     return unique(models_)
@@ -144,6 +131,12 @@ function sources(W::MLJ.AbstractNode)
     return unique(sources_)
 end
 
+""" 
+    machines(N)
+
+List all machines in the learning network terminating at node `N`.
+
+"""
 machines(W::MLJ.Source) = Any[]
 function machines(W::MLJ.Node)
     if W.machine == nothing
@@ -154,6 +147,70 @@ function machines(W::MLJ.Node)
                    [machines(arg) for arg in W.machine.args]...) |> unique
     end
 end
+
+"""
+    replace(W::MLJ.Node, a1=>b1, a2=>b2, ....)
+
+Create a deep copy of a node `W`, and thereby replicate the learning
+network terminating at `W`, but replace any specified sources and
+models `a1, a2, ...` of the original network by the specified targets
+`b1, b2, ...`.
+
+"""
+function Base.replace(W::Node, pairs::Pair...) where N
+
+    # Note: It is convenient to construct nodes of the new network as
+    # values of a dictionary keyed on the nodes of the old network.
+    
+    # build model dict:
+    model_pairs = filter(collect(pairs)) do pair
+        first(pair) isa Model
+    end
+    models_ = models(W)
+    models_to_copy = setdiff(models_, first.(model_pairs))
+    model_copy_pairs = [model=>deepcopy(model) for model in models_to_copy]
+    newmodel_given_old = IdDict(vcat(model_pairs, model_copy_pairs))
+
+    # build complete source pairs:
+    source_pairs = filter(collect(pairs)) do pair
+        first(pair) isa Source
+    end
+    sources_ = sources(W)
+    sources_to_copy = setdiff(sources_, first.(source_pairs))
+    source_copy_pairs = [source=>deepcopy(source) for source in sources_to_copy]
+    all_source_pairs = vcat(source_pairs, source_copy_pairs)
+
+    # drop source nodes from all nodes of network terminating at W:
+    nodes_ = filter(nodes(W)) do N
+        !(N isa Source)
+    end
+    
+    # instantiate node and machine dictionaries:
+    newnode_given_old =
+        IdDict{AbstractNode,AbstractNode}(all_source_pairs) 
+    newmach_given_old = IdDict{NodalMachine,NodalMachine}()
+
+    # build the new network:
+    for N in nodes_
+        args = [newnode_given_old[arg] for arg in N.args]
+        if N.machine == nothing
+            newnode_given_old[N] = node(N.operation, args...)
+        else
+            if N.machine in keys(newmach_given_old)
+                mach = newmach_given_old[N.machine]
+            else
+                train_args = [newnode_given_old[arg] for arg in N.machine.args]
+                mach = machine(newmodel_given_old[N.machine.model], train_args...)
+                newmach_given_old[N.machine] = mach
+            end
+            newnode_given_old[N] = N.operation(mach, args...)
+        end
+    end
+    
+    return newnode_given_old[nodes_[end]]
+    
+end
+
 
 """
     reset!(N::Node)

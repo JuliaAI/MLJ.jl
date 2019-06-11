@@ -50,7 +50,6 @@ origins(s::Source) = [s,]
 
 ## DEPENDENCY TAPES
 
-# a tape is a vector of `NodalMachines` defined below, used to track dependencies
 """ 
     merge!(tape1, tape2)
 
@@ -142,11 +141,12 @@ state(machine::NodalMachine) = machine.state
 
 struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
 
-    operation             # that can be dispatched on a fit-result (eg, `predict`) or a static operation
+    operation           # that can be dispatched on a fit-result (eg, `predict`) or a static operation
     machine::T          # is `nothing` for static operations
     args::Tuple{Vararg{AbstractNode}}       # nodes where `operation` looks for its arguments
     origins::Vector{Source}
     tape::Vector{NodalMachine}    # for tracking dependencies
+    nodes::Vector{AbstractNode}   # all upstream nodes
 
     function Node{T}(operation,
                      machine::T,
@@ -155,6 +155,7 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
         # check the number of arguments:
         if machine == nothing
             length(args) > 0 || throw(error("`args` in `Node(::Function, args...)` must be non-empty. "))
+            
         end
 
         origins_ = unique(vcat([origins(arg) for arg in args]...))
@@ -165,6 +166,7 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
         # get the machine's dependencies:
         tape = copy(get_tape(machine))
 
+        # SHOULD THIS NOT HAPPEN LAST, IE AFTER ARGS IN NEXT BLOCK?
         # add the machine itself as a dependency:
         if machine != nothing
             merge!(tape, [machine, ])
@@ -175,12 +177,26 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
             merge!(tape, get_tape(arg))
         end
 
-        return new{T}(operation, machine, args, origins_, tape)
+        # compute the node tape
+        nodes_ = AbstractNode[]
+
+        for arg in args
+            merge!(nodes_, nodes(arg))
+        end
+        if machine != nothing
+            for arg in machine.args
+                merge!(nodes_, nodes(arg))
+            end
+        end
+
+        return new{T}(operation, machine, args, origins_, tape, nodes_)
 
     end
 end
 
 origins(X::Node) = X.origins
+nodes(X::Node) = AbstractNode[X.nodes..., X]
+nodes(S::Source) = AbstractNode[S, ]
 
 function is_stale(X::Node)
     (X.machine != nothing && is_stale(X.machine)) ||
