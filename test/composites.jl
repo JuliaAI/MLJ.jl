@@ -3,6 +3,7 @@ module TestComposites
 # using Revise
 using Test
 using MLJ
+using CategoricalArrays
 
 Xin, yin = datanow(); # boston
 
@@ -68,7 +69,7 @@ fit!(yhat, rows=1:20, verbosity=3)
 yhat(Xin[test,:])
 
 
-## EXPORTING LEARNING NETWORKS AS RE-USABLE STAND-ALONE MODELS
+## EXPORTING A NETWORK BY HAND
 
 mutable struct WrappedRidge <: DeterministicNetwork
     ridge
@@ -104,6 +105,49 @@ yhat=predict(mach, X)
 ridge.lambda = 1.0
 fit!(mach)
 @test predict(mach, X) != yhat
+
+
+## EXPORTING THE LEARNING NETWORK DEFINED BY A NODE
+
+using CategoricalArrays
+
+x1 = map(n -> mod(n,3), rand(UInt8, 100)) |> categorical
+x2 = randn(100)
+X = (x1=x1, x2=x2)
+y = x2.^2
+
+@load DecisionTreeRegressor
+
+Xs = source(X)
+ys = source(y)
+z = log(ys)
+stand = UnivariateStandardizer()
+standM = machine(stand, z)
+u = transform(standM, z)
+hot = OneHotEncoder()
+hotM = machine(hot, Xs)
+W = transform(hotM, Xs)
+knn = KNNRegressor()
+knnM = machine(knn, W, u)
+oak = DecisionTreeRegressor()
+oakM = machine(oak, W, u)
+uhat = 0.5*(predict(knnM, W) + predict(oakM, W))
+zhat = inverse_transform(standM, uhat)
+yhat = exp(zhat)
+
+# test that state changes after fit:
+@test sum(MLJ.state(yhat) |> MLJ.flat_values) == 0
+fit!(yhat)
+@test sum(MLJ.state(W) |> MLJ.flat_values) == 1
+
+# test that a node can be reconstructed from its tree representation:
+t = MLJ.tree(yhat)
+yhat2 = MLJ.reconstruct(t)
+@test models(yhat) == models(yhat2)
+@test sources(yhat) == sources(yhat2)
+@test MLJ.tree(yhat) == MLJ.tree(yhat2)
+
+
 
 end
 true

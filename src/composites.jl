@@ -41,6 +41,8 @@ function tree(W::MLJ.Node)
                    endvalues...)
     return NamedTuple{keys}(values)
 end
+
+# similar to tree but returns arguments as vectors, rather than individually
 tree2(s::MLJ.Source) = (source = s,)
 function tree2(W::MLJ.Node)
     mach = W.machine
@@ -58,6 +60,56 @@ function tree2(W::MLJ.Node)
     return NamedTuple{keys}(values)
 end
 
+"""
+    replace(W::MLJ.Node, a1=>b1, a2=>b2, ....)
+
+Create a deep copy of a node `W`, and whence replicate the learning
+network terminating at `W`, but replace any specified sources and
+models `a1, a2, ...` of the original network by the specified targets
+`b1, b2, ...`.
+
+"""
+
+function Base.replace(W::Node, pairs...)
+end
+
+# get the top level args of the tree of some node:
+function args(tree) 
+    keys_ = filter(keys(tree) |> collect) do key
+        match(r"^arg[0-9]*", string(key)) != nothing
+    end
+    return (getproperty(tree, key) for key in keys_)
+end
+        
+# get the top level train_args of the tree of some node:
+function train_args(tree) 
+    keys_ = filter(keys(tree) |> collect) do key
+        match(r"^train_arg[0-9]*", string(key)) != nothing
+    end
+    return (getproperty(tree, key) for key in keys_)
+end    
+
+"""
+    MLJ.reconstruct(tree)
+
+Reconstruct a `Node` from its tree representation.
+
+See also MLJ.tree
+
+"""
+function reconstruct(tree)
+    if length(tree) == 1
+        return first(tree)
+    end
+    values_ = values(tree)
+    operation, model = values_[1], values_[2] 
+    if model == nothing
+        return node(operation, [reconstruct(arg) for arg in args(tree)]...)
+    end
+    mach = machine(model, [reconstruct(arg) for arg in train_args(tree)]...)
+    return operation(mach, [reconstruct(arg) for arg in args(tree)]...)
+end
+        
 """
 
     models(N::AbstractNode)
