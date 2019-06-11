@@ -42,7 +42,7 @@ MLJBase.show_as_constructed(::Type{<:CV}) = true
 # and a measure.)  We need an `evaluate!` for each strategy.
 
 """
-    evaluate!(mach, resampling=CV(), measure=nothing, operation=predict, verbosity=1)
+    evaluate!(mach, resampling=CV(), measure=nothing, operation=predict, force=false, verbosity=1)
 
 Estimate the performance of a machine `mach` using the specified
 `resampling` strategy (defaulting to 6-fold cross-validation) and `measure`,
@@ -64,7 +64,8 @@ evaluate!(mach::Machine;
 
 # holdout:
 function evaluate!(mach::Machine, resampling::Holdout;
-                   measure=nothing, operation=predict, rows=nothing, verbosity=1)
+                   measure=nothing, operation=predict,
+                   rows=nothing, force=false,verbosity=1)
 
     if measure == nothing
         _measures = default_measure(mach.model)
@@ -96,7 +97,7 @@ function evaluate!(mach::Machine, resampling::Holdout;
         "$which_rows"
     end
 
-    fit!(mach, rows=train, verbosity=verbosity-1)
+    fit!(mach, rows=train, verbosity=verbosity-1, force=force)
     yhat = operation(mach, selectrows(X, test))
 
     if !(_measures isa AbstractVector)
@@ -111,7 +112,8 @@ end
 
 # cv:
 function evaluate!(mach::Machine, resampling::CV;
-                   measure=nothing, operation=predict, rows=nothing, verbosity=1)
+                   measure=nothing, operation=predict,
+                   rows=nothing, force=false, verbosity=1)
 
     if measure == nothing
         _measures = default_measure(mach.model)
@@ -153,7 +155,7 @@ function evaluate!(mach::Machine, resampling::CV;
     function get_measure(f, s)
         test = all[f:s] # TODO: replace with views?
         train = vcat(all[1:(f - 1)], all[(s + 1):end])
-        fit!(mach; rows=train, verbosity=verbosity-1)
+        fit!(mach; rows=train, verbosity=verbosity-1, force=force)
         yhat = operation(mach, selectrows(X, test))
         if !(_measures isa AbstractVector) 
             return _measures(yhat, y[test])

@@ -2,6 +2,8 @@
 
 A pure Julia machine learning framework.
 
+[MLJ News](https://alan-turing-institute.github.io/MLJ.jl/dev/NEWS/)
+
 
 ## `join!(MLJ, YourModel)`
 
@@ -40,7 +42,6 @@ The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html).
 A list of models implementing the MLJ interface:
 [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl/blob/dev/Models.toml)
 
-[MLJ News](https://alan-turing-institute.github.io/MLJ.jl/dev/NEWS/)
 
 
 
@@ -102,7 +103,7 @@ See [here](docs/src/frequently_asked_questions.md).
 
 Get started
 [here](https://alan-turing-institute.github.io/MLJ.jl/dev/),
-or take the MLJ [tour](docs/src/tour.ipynb).
+or take the MLJ [tour](/examples/tour/tour.ipynb).
 
 
 ### History

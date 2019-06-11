@@ -117,10 +117,10 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
     if mach isa NodalMachine
         # determine if concrete data to be used in training may have changed:
-        upstream_state = broadcast(m -> m.state, mach.tape)
-        data_has_changed = rows_have_changed || (upstream_state != mach.upstream_state)
-        previously_fit =
-            mach.state > 0
+        upstream_state = Tuple([state(arg) for arg in mach.args])
+        data_has_changed =
+            rows_have_changed || (upstream_state != mach.upstream_state)
+        previously_fit = (mach.state > 0)
     else
         data_has_changed = rows_have_changed
         previously_fit =  isdefined(mach, :fitresult)

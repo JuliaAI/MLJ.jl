@@ -76,9 +76,9 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
     report
     tape::Vector{NodalMachine}
     frozen::Bool
-    rows                        # for remembering the rows used in last call to `fit!`
-    state::Int                  # number of times fit! has been called on machine
-    upstream_state::Vector{Int} # for remembering the upstream state in last call to `fit!`
+    rows            # for remembering the rows used in last call to `fit!`
+    state::Int      # number of times fit! has been called on machine
+    upstream_state  # for remembering the upstream state in last call to `fit!`
     
     function NodalMachine{M}(model::M, args::AbstractNode...) where M<:Model
 
@@ -108,7 +108,7 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
             merge!(tape, get_tape(arg))
         end
         machine.tape = tape
-        machine.upstream_state = broadcast(m -> m.state, tape)
+        machine.upstream_state = Tuple([state(arg) for arg in args])
 
         return machine
     end
@@ -130,6 +130,8 @@ function is_stale(machine::NodalMachine)
         machine.model != machine.previous_model ||
         reduce(|,[is_stale(arg) for arg in machine.args])
 end
+
+state(machine::NodalMachine) = machine.state
 
 
 ## NODES
@@ -179,6 +181,27 @@ sources(X::Node) = X.sources
 function is_stale(X::Node)
     (X.machine != nothing && is_stale(X.machine)) ||
         reduce(|, [is_stale(arg) for arg in X.args])
+end
+
+state(s::MLJ.Source) = (state = 0, )
+function state(W::MLJ.Node)
+    mach = W.machine
+    state_ =
+        W.machine == nothing ? 0 : state(W.machine)
+    if mach == nothing
+        trainkeys=[]
+        trainvalues=[]
+    else
+        trainkeys = [Symbol("train_arg", i) for i in eachindex(mach.args)]
+        trainvalues = [state(arg) for arg in mach.args]
+    end
+    keys = tuple(:state,
+                 [Symbol("arg", i) for i in eachindex(W.args)]...,
+                 trainkeys...)
+    values = tuple(state_,
+                   [state(arg) for arg in W.args]...,
+                   trainvalues...)
+    return NamedTuple{keys}(values)
 end
 
 # to complete the definition of `NodalMachine` and `Node`

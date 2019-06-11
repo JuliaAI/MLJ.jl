@@ -13,14 +13,14 @@ const local_metadata_file = joinpath(path_to_metadata_dot_toml, "Metadata.toml")
 # update locally archived Metadata.toml:
 try 
     download(remote_file, quiet=true, force=true)
-catch
+catch 
     @info "Unable to update model metadata from github.alan-turing-institute/MLJRegistry. "*
     "Using locally archived metadata. "
 end
 
 # metadata for models in external packages (`decode_dic` restores
 # symbols from string representations):
-const METADATA = decode_dic(TOML.parsefile(local_metadata_file))
+const METADATA = TOML.parsefile(local_metadata_file)
 
 """
    info(model, pkg=nothing)
@@ -55,7 +55,7 @@ function metadata()
         modelname = string(M) #_info[:name]
         info_given_model[modelname] = _info
     end
-    ret = deepcopy(METADATA)
+    ret = decode_dic(METADATA)
     ret["MLJ"] = info_given_model
     return ret
 end
@@ -155,7 +155,7 @@ end
 
 function _load(model, pkg, mdl)
     # get load path:
-    info = METADATA[pkg][model]
+    info = decode_dic(METADATA)[pkg][model]
     path = info[:load_path]
     path_components = split(path, '.')
 

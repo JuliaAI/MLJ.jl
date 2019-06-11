@@ -1,4 +1,4 @@
-# Adding New Models
+# Adding Models for General Use
 
 This guide outlines in detail the specification of the MLJ model interface and
 provides guidelines for implementing the interface for models intended
