@@ -218,7 +218,9 @@ MLJBase.selectrows(X::AbstractNode, r) = X(rows=r)
 """
     fit!(N::Node; rows=nothing, verbosity=1, force=false)
 
-Call `fit!(mach)` on each machine `mach` upstream of `N`. 
+Train the machines of all dynamic nodes in the learning network terminating at
+`N` in an appropriate order.
+
 """
 function fit!(y::Node; rows=nothing, verbosity=1, force=false)
     if rows == nothing
