@@ -160,14 +160,14 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
         # get the machine's dependencies:
         tape = copy(get_tape(machine))
 
-        # add the machine itself as a dependency:
-        if machine != nothing
-            merge!(tape, [machine, ])
-        end
-
         # append the dependency tapes of all arguments:
         for arg in args
             merge!(tape, get_tape(arg))
+        end
+
+        # add the machine itself as a dependency:
+        if machine != nothing
+            merge!(tape, [machine, ])
         end
 
         return new{T}(operation, machine, args, sources_, tape)
