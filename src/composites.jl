@@ -160,7 +160,10 @@ models `a1, a2, ...` of the original network by the specified targets
 function Base.replace(W::Node, pairs::Pair...) where N
 
     # Note: It is convenient to construct nodes of the new network as
-    # values of a dictionary keyed on the nodes of the old network.
+    # values of a dictionary keyed on the nodes of the old
+    # network. Additionally, there are dictionaries of models keyed on
+    # old models and machines keyed on old machines. The node and
+    # machine dictionaries must be built simultaneously.
     
     # build model dict:
     model_pairs = filter(collect(pairs)) do pair
@@ -171,7 +174,7 @@ function Base.replace(W::Node, pairs::Pair...) where N
     model_copy_pairs = [model=>deepcopy(model) for model in models_to_copy]
     newmodel_given_old = IdDict(vcat(model_pairs, model_copy_pairs))
 
-    # build complete source pairs:
+    # build complete source replacement pairs:
     source_pairs = filter(collect(pairs)) do pair
         first(pair) isa Source
     end
