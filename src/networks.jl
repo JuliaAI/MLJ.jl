@@ -193,7 +193,7 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
             end
         end
 
-        return new{T}(operation, machine, args, sources_, tape)
+        return new{T}(operation, machine, args, origins_, tape, nodes_)
 
     end
 end

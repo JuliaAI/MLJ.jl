@@ -144,9 +144,9 @@ ys2 = source(nothing)
 
 # duplicate a network:
 yhat2 = replace(yhat, hot=>hot2, knn=>knn2, ys=>source(ys.data))
-@test_logs((:info, r"^Train.*Univ"),
-           (:info, r"^Train.*OneHot"),
+@test_logs((:info, r"^Train.*OneHot"),
            (:info, r"^Spawn"),
+           (:info, r"^Train.*Univ"),
            (:info, r"^Train.*KNN"),
            (:info, r"^Train.*Dec"), fit!(yhat2))
 @test length(MLJ.machines(yhat)) == length(MLJ.machines(yhat2))
@@ -159,9 +159,9 @@ fit!(yhat)
 # this change should trigger retraining of all machines except the
 # univariate standardizer:
 hot2.drop_last = true
-@test_logs((:info, r"^Not.*Univ"),
-           (:info, r"^Updating.*OneHot"),
+@test_logs((:info, r"^Updating.*OneHot"),
            (:info, r"^Spawn"),
+           (:info, r"^Not.*Univ"),
            (:info, r"^Train.*KNN"),
            (:info, r"^Train.*Dec"), fit!(yhat2))
 
