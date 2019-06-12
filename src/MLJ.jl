@@ -15,6 +15,7 @@ export EnsembleModel                                 # ensembles.jl
 export ConstantRegressor, ConstantClassifier         # builtins/Constant.jl
 export models, localmodels, @load                    # loading.jl
 export KNNRegressor                                  # builtins/KNN.jl
+export @from_network, machines, sources              # composites.jl
 
 # defined in include files "machines.jl and "networks.jl":
 export Machine, NodalMachine, machine, AbstractNode

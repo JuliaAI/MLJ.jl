@@ -165,5 +165,38 @@ hot2.drop_last = true
            (:info, r"^Train.*KNN"),
            (:info, r"^Train.*Dec"), fit!(yhat2))
 
+# export a supervised network:
+model = @from_network Composite(knn_rgs=knn, one_hot_enc=hot) <= (Xs, ys, yhat)
+mach = machine(model, Xs, ys)
+@test_logs((:info, r"^Train.*Composite"),
+           (:info, r"^Train.*OneHot"),
+           (:info, r"^Spawn"),
+           (:info, r"^Train.*Univ"),
+           (:info, r"^Train.*KNN"),
+           (:info, r"^Train.*Dec"), fit!(mach))
+model.knn_rgs.K = 5
+@test_logs((:info, r"^Updat.*Composite"),
+           (:info, r"^Not.*OneHot"),
+           (:info, r"^Not.*Univ"),
+           (:info, r"^Updat.*KNN"),
+           (:info, r"^Not.*Dec"), fit!(mach))
+
+# export an unsupervised model
+multistand = Standardizer()
+multistandM = machine(multistand, W)
+W2 = transform(multistandM, W)
+model = @from_network Transf(one_hot=hot) <= (Xs, W2)
+mach = machine(model, Xs)
+@test_logs((:info, r"^Training.*Transf"),
+           (:info, r"^Train.*OneHot"),
+           (:info, r"^Spawn"),
+           (:info, r"Train.*Stand"), fit!(mach))
+model.one_hot.drop_last=true
+@test_logs((:info, r"^Updating.*Transf"),
+           (:info, r"^Updating.*OneHot"),
+           (:info, r"^Spawn"),
+           (:info, r"Train.*Stand"), fit!(mach))
+
+
 end
 true
