@@ -166,30 +166,34 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
         # get the machine's dependencies:
         tape = copy(get_tape(machine))
 
-        # SHOULD THIS NOT HAPPEN LAST, IE AFTER ARGS IN NEXT BLOCK?
-        # add the machine itself as a dependency:
-        if machine != nothing
-            merge!(tape, [machine, ])
-        end
-
         # append the dependency tapes of all arguments:
         for arg in args
             merge!(tape, get_tape(arg))
         end
 
-        # compute the node tape
+        # add the machine itself as a dependency:
+        if machine != nothing
+            merge!(tape, [machine, ])
+        end
+
+        # compute the nodes tape
+
+        # initialize the list of upstream nodes:
         nodes_ = AbstractNode[]
 
+        # merge the lists from arguments:
         for arg in args
             merge!(nodes_, nodes(arg))
         end
+
+        # merge the lists from training arguments:
         if machine != nothing
             for arg in machine.args
                 merge!(nodes_, nodes(arg))
             end
         end
 
-        return new{T}(operation, machine, args, origins_, tape, nodes_)
+        return new{T}(operation, machine, args, sources_, tape)
 
     end
 end
