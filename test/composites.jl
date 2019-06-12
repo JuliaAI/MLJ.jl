@@ -19,8 +19,8 @@ composite = MLJ.SimpleDeterministicCompositeModel(model=ridge_model, transformer
 fitresult, cache, report = MLJ.fit(composite, 3, Xtrain, ytrain)
 
 # to check internals:
-ridge = fitresult.tape[2]
-selector = fitresult.tape[1]
+ridge = MLJ.machines(fitresult)[1]
+selector = MLJ.machines(fitresult)[2]
 ridge_old = deepcopy(ridge)
 selector_old = deepcopy(selector)
 

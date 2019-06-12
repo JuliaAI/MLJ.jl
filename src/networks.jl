@@ -47,24 +47,16 @@ See also: node, source
 """
 origins(s::Source) = [s,]
 
-
-## DEPENDENCY TAPES
-
-""" 
-    merge!(tape1, tape2)
-
-Incrementally appends to `tape1` all elements in `tape2`, excluding
-any element previously added (or any element of `tape1` in its initial
-state).
-
-"""
-function Base.merge!(tape1::Vector, tape2::Vector)
-    for machine in tape2
-        if !(machine in tape1)
-            push!(tape1, machine)
+#  _merge!(nodes1, nodes2) incrementally appends to `nodes1` all
+# elements in `nodes2`, excluding any element previously added (or any
+# element of `nodes1` in its initial state). 
+function _merge!(nodes1, nodes2)
+    for x in nodes2
+        if !(x in nodes1)
+            push!(nodes1, x)
         end
     end
-    return tape1
+    return nodes1
 end
 
 # Note that `fit!` has already been defined for any  AbstractMachine in machines.jl
@@ -77,7 +69,6 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
     cache
     args::Tuple{Vararg{AbstractNode}}
     report
-    tape::Vector{NodalMachine}
     frozen::Bool
     rows            # for remembering the rows used in last call to `fit!`
     state::Int      # number of times fit! has been called on machine
@@ -98,19 +89,7 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
         machine.frozen = false
         machine.state = 0
         machine.args = args
-#        machine.report = NamedTuple()
 
-        # note: `get_tape(arg)` returns arg.tape where this makes
-        # sense and an empty tape otherwise.  However, the complete
-        # definition of `get_tape` must be postponed until
-        # `Node` type is defined.
-
-        # combine the tapes of all arguments to make a new tape:
-        tape = get_tape(nothing) # returns blank tape 
-        for arg in args
-            merge!(tape, get_tape(arg))
-        end
-        machine.tape = tape
         machine.upstream_state = Tuple([state(arg) for arg in args])
 
         return machine
@@ -141,12 +120,11 @@ state(machine::NodalMachine) = machine.state
 
 struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
 
-    operation           # that can be dispatched on a fit-result (eg, `predict`) or a static operation
-    machine::T          # is `nothing` for static operations
-    args::Tuple{Vararg{AbstractNode}}       # nodes where `operation` looks for its arguments
+    operation  # that can be dispatched on a fit-result (eg, `predict`) or a static operation
+    machine::T  # is `nothing` for static operations
+    args::Tuple{Vararg{AbstractNode}}  # nodes where `operation` looks for its arguments
     origins::Vector{Source}
-    tape::Vector{NodalMachine}    # for tracking dependencies
-    nodes::Vector{AbstractNode}   # all upstream nodes
+    nodes::Vector{AbstractNode}  # all upstream nodes, order consistent with DAG order (the node "tape")
 
     function Node{T}(operation,
                      machine::T,
@@ -163,37 +141,22 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
             @warn "A node referencing multiple origins when called "*
         "has been defined:\n$(origins_). "
 
-        # get the machine's dependencies:
-        tape = copy(get_tape(machine))
-
-        # append the dependency tapes of all arguments:
-        for arg in args
-            merge!(tape, get_tape(arg))
-        end
-
-        # add the machine itself as a dependency:
-        if machine != nothing
-            merge!(tape, [machine, ])
-        end
-
-        # compute the nodes tape
-
         # initialize the list of upstream nodes:
         nodes_ = AbstractNode[]
 
         # merge the lists from arguments:
         for arg in args
-            merge!(nodes_, nodes(arg))
+            _merge!(nodes_, nodes(arg))
         end
 
         # merge the lists from training arguments:
         if machine != nothing
             for arg in machine.args
-                merge!(nodes_, nodes(arg))
+                _merge!(nodes_, nodes(arg))
             end
         end
 
-        return new{T}(operation, machine, args, origins_, tape, nodes_)
+        return new{T}(operation, machine, args, origins_, nodes_)
 
     end
 end
@@ -227,12 +190,6 @@ function state(W::MLJ.Node)
                    trainvalues...)
     return NamedTuple{keys}(values)
 end
-
-# to complete the definition of `NodalMachine` and `Node`
-# constructors:
-get_tape(::Any) = NodalMachine[]
-get_tape(X::Node) = X.tape
-get_tape(machine::NodalMachine) = machine.tape
 
 # autodetect type parameter:
 Node(operation, machine::M, args...) where M<:Union{NodalMachine, Nothing} =
@@ -268,7 +225,18 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
         rows = (:)
     end
 
-    for mach in y.tape
+    # get non-source nodes:
+    nodes_ = filter(nodes(y)) do n
+        n isa Node
+    end
+
+    # get machines to fit:
+    machines = map(n -> n.machine, nodes_)
+    machines = filter(unique(machines)) do mach
+        mach != nothing
+    end
+
+    for mach in machines
         fit!(mach; rows=rows, verbosity=verbosity, force=force)
     end
     

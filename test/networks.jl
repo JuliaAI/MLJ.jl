@@ -90,10 +90,6 @@ forest.n = 6
 
 X_frame, y = datanow();  # boston data
 
-tape = MLJ.get_tape
-@test isempty(tape(nothing))
-@test isempty(tape(knn1))
-
 XX = source(X_frame[train,:])
 yy = source(y[train])
 
