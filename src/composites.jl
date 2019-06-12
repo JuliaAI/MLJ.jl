@@ -17,8 +17,8 @@ MLJBase.predict(composite::SupervisedNetwork, fitresult, Xnew) =
 """
     MLJ.tree(N::Node)
 
-Return a tree-like summary of the learning network terminating at node
-`N`.
+Return a description of the tree defined by the learning network
+terminating at node `N`. 
 
 """
 tree(s::MLJ.Source) = (source = s,)
@@ -42,23 +42,23 @@ function tree(W::MLJ.Node)
     return NamedTuple{keys}(values)
 end
 
-# similar to tree but returns arguments as vectors, rather than individually
-tree2(s::MLJ.Source) = (source = s,)
-function tree2(W::MLJ.Node)
-    mach = W.machine
-    if mach == nothing
-        value2 = nothing
-        endvalue=[]
-    else
-        value2 = mach.model        
-        endvalue = Any[tree2(arg) for arg in mach.args]
-    end
-    keys = tuple(:operation,  :model, :args, :train_args)
-    values = tuple(W.operation, value2,
-                   Any[tree(arg) for arg in W.args],
-                   endvalue)
-    return NamedTuple{keys}(values)
-end
+# # similar to tree but returns arguments as vectors, rather than individually
+# tree2(s::MLJ.Source) = (source = s,)
+# function tree2(W::MLJ.Node)
+#     mach = W.machine
+#     if mach == nothing
+#         value2 = nothing
+#         endvalue=[]
+#     else
+#         value2 = mach.model        
+#         endvalue = Any[tree2(arg) for arg in mach.args]
+#     end
+#     keys = tuple(:operation,  :model, :args, :train_args)
+#     values = tuple(W.operation, value2,
+#                    Any[tree(arg) for arg in W.args],
+#                    endvalue)
+#     return NamedTuple{keys}(values)
+# end
 
 # get the top level args of the tree of some node:
 function args(tree) 
@@ -75,27 +75,6 @@ function train_args(tree)
     end
     return [getproperty(tree, key) for key in keys_]
 end    
-
-"""
-    MLJ.reconstruct(tree)
-
-Reconstruct a `Node` from its tree representation.
-
-See also MLJ.tree
-
-"""
-function reconstruct(tree)
-    if length(tree) == 1
-        return first(tree)
-    end
-    values_ = values(tree)
-    operation, model = values_[1], values_[2] 
-    if model == nothing
-        return node(operation, [reconstruct(arg) for arg in args(tree)]...)
-    end
-    mach = machine(model, [reconstruct(arg) for arg in train_args(tree)]...)
-    return operation(mach, [reconstruct(arg) for arg in args(tree)]...)
-end
         
 """
 
@@ -152,18 +131,18 @@ end
     replace(W::MLJ.Node, a1=>b1, a2=>b2, ....)
 
 Create a deep copy of a node `W`, and thereby replicate the learning
-network terminating at `W`, but replace any specified sources and
-models `a1, a2, ...` of the original network by the specified targets
+network terminating at `W`, but replacing any specified sources and
+models `a1, a2, ...` of the original network with the specified targets
 `b1, b2, ...`.
 
 """
 function Base.replace(W::Node, pairs::Pair...) where N
 
-    # Note: It is convenient to construct nodes of the new network as
-    # values of a dictionary keyed on the nodes of the old
-    # network. Additionally, there are dictionaries of models keyed on
-    # old models and machines keyed on old machines. The node and
-    # machine dictionaries must be built simultaneously.
+    # Note: We construct nodes of the new network as values of a
+    # dictionary keyed on the nodes of the old network. Additionally,
+    # there are dictionaries of models keyed on old models and
+    # machines keyed on old machines. The node and machine
+    # dictionaries must be built simultaneously.
     
     # build model dict:
     model_pairs = filter(collect(pairs)) do pair
@@ -213,7 +192,6 @@ function Base.replace(W::Node, pairs::Pair...) where N
     return newnode_given_old[nodes_[end]]
     
 end
-
 
 """
     reset!(N::Node)
