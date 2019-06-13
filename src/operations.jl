@@ -26,15 +26,14 @@
 macro extend_to_machines(operation)
     quote
 
-        # most general (no coersion):
+        # with arguments specified:
         function $(esc(operation))(machine::AbstractMachine, args...) 
             if isdefined(machine, :fitresult)
-                tst = machine isa Supervised
                 return $(esc(operation))(machine.model,
                                          machine.fitresult,
                                          args...)
             else
-                throw(error("$machine has not trained."))
+                throw(error("$machine has not been trained."))
             end
         end
     end
@@ -65,7 +64,11 @@ end
 @sugar inverse_transform
 @sugar se
 
-# experimental:
-predict(machine::Machine{<:Supervised}; rows=rows) =
+# 
+predict(machine::Machine{<:Supervised}; rows=:) =
     predict(machine, selectrows(machine.args[1], rows))
+transform(machine::Machine{<:Unsupervised}; rows=:) =
+    transform(machine, selectrows(machine.args[1], rows))
+inverse_transform(machine::Machine{<:Unsupervised}; rows=:) =
+    inverse_transform(machine, selectrows(machine.args[1], rows))
 
