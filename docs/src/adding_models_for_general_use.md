@@ -271,9 +271,10 @@ Note: The `Int` typing of `verbosity` cannot be omitted.
 It is not necessary for `fit` to provide dimension checks or to call
 `clean!` on the model; MLJ will carry out such checks.
 
-The method `fit` should never alter hyperparameter values. If the
-package is able to suggest better hyperparameters, as a byproduct of
-training, return these in the report field.
+The method `fit` should never alter hyperparameter values, fields with
+type `<:AbstractRNG` begin the sole exception. If the package is able
+to suggest better hyperparameters, as a byproduct of training, return
+these in the report field.
 
 The `verbosity` level (0 for silent) is for passing to learning
 algorithm itself. A `fit` method wrapping such an algorithm should
