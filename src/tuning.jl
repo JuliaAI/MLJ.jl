@@ -51,22 +51,21 @@ MLJBase.is_wrapper(::Type{<:EitherTunedModel}) = true
 Construct a model wrapper for hyperparameter optimization of a
 supervised learner.
 
-Calling `fit!(mach)` on a machine `mach=machine(tuned_model, X, y)`
-will: (i) Instigate a search, over clones of `model` with the
-hyperparameter mutations specified by `nested_ranges`, for that model
-optimizing the specified `measure`, according to evaluations carried
-out using the specified `tuning` strategy and `resampling` strategy;
-and (ii) Fit a machine, `mach_optimal = mach.fitresult`, wrapping the
-optimal `model` object in *all* the provided data `X, y`. Calling
+Calling `fit!(mach)` on a machine `mach=machine(tuned_model, X, y)` or
+`mach=machine(tuned_model, task)` will: (i) Instigate a search, over
+clones of `model` with the hyperparameter mutations specified by
+`nested_ranges`, for that model optimizing the specified `measure`,
+according to evaluations carried out using the specified `tuning`
+strategy and `resampling` strategy; and (ii) Fit a machine,
+`mach_optimal = fitted_params(mach).best_model`, wrapping the optimal
+`model` object in *all* the provided data `X, y` (or in `task`). Calling
 `predict(mach, Xnew)` then returns predictions on `Xnew` of the
 machine `mach_optimal`.
 
 If `measure` is a score, rather than a loss, specify `minimize=false`.
 
-The optimal clone of `model` is accessible as
-`fitted_params(mach).best_model`. In the case of two-parameter tuning,
-a Plots.jl plot of performance estimates is returned by `plot(mach)`
-or `heatmap(mach)`.
+In the case of two-parameter tuning, a Plots.jl plot of performance
+estimates is returned by `plot(mach)` or `heatmap(mach)`.
 
 """
 function TunedModel(;model=nothing,
