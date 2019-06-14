@@ -36,6 +36,11 @@ macro extend_to_machines(operation)
                 throw(error("$machine has not been trained."))
             end
         end
+        $(esc(operation))(machine::Machine; rows=:) =
+            $(esc(operation))(machine, selectrows(machine.args[1], rows))
+        $(esc(operation))(machine::Machine, task::MLJTask) =
+            $(esc(operation))(machine, task.X)
+        
     end
 end
 
@@ -53,8 +58,6 @@ end
 @extend_to_machines transform
 @extend_to_machines inverse_transform
 @extend_to_machines se
-@extend_to_machines evaluate
-@extend_to_machines fitted_params
 
 @sugar predict
 @sugar predict_mode
@@ -64,11 +67,21 @@ end
 @sugar inverse_transform
 @sugar se
 
-# 
-predict(machine::Machine{<:Supervised}; rows=:) =
-    predict(machine, selectrows(machine.args[1], rows))
-transform(machine::Machine{<:Unsupervised}; rows=:) =
-    transform(machine, selectrows(machine.args[1], rows))
-inverse_transform(machine::Machine{<:Unsupervised}; rows=:) =
-    inverse_transform(machine, selectrows(machine.args[1], rows))
+
+# the zero argument special cases:
+function evaluate(machine::AbstractMachine) 
+    if isdefined(machine, :fitresult)
+        return evaluate(machine.model, machine.fitresult)
+    else
+        throw(error("$machine has not been trained."))
+    end
+end
+function fitted_params(machine::AbstractMachine) 
+    if isdefined(machine, :fitresult)
+        return fitted_params(machine.model, machine.fitresult)
+    else
+        throw(error("$machine has not been trained."))
+    end
+end
+
 
