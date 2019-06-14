@@ -29,7 +29,7 @@ export OneHotEncoder
 # export UnivariateDiscretizer, Discretizer
 
 # rexport from Random, Statistics, Distributions, CategoricalArrays:
-export pdf, mode, median, mean, shuffle!, categorical
+export pdf, mode, median, mean, shuffle!, categorical, shuffle
 
 # reexport from MLJBase:
 export nrows, nfeatures, info
