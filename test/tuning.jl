@@ -15,7 +15,7 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
 
 sel = FeatureSelector()
 stand = UnivariateStandardizer()
-ridge = SimpleRidgeRegressor()
+ridge = FooBarRegressor()
 composite = MLJ.SimpleDeterministicCompositeModel(transformer=sel, model=ridge)
 
 features_ = range(sel, :features, values=[[:x1], [:x1, :x2], [:x2, :x3], [:x1, :x2, :x3]])
@@ -56,7 +56,7 @@ e = rms(y, predict(tuned, X))
 r = e/tuned.report.best_measurement
 @test r < 10 && r > 0.1
 
-ridge = SimpleRidgeRegressor()
+ridge = FooBarRegressor()
 tuned_model = TunedModel(model=ridge,
                           nested_ranges=(lambda = range(ridge, :lambda, lower=0.01, upper=1.0),))
 tuned = machine(tuned_model, X, y)
@@ -66,7 +66,7 @@ fit!(tuned)
 ## LEARNING CURVE
 
 X, y = datanow()
-atom = SimpleRidgeRegressor()
+atom = FooBarRegressor()
 ensemble = EnsembleModel(atom=atom)
 mach = machine(ensemble, X, y)
 r_lambda = range(atom, :lambda, lower=0.1, upper=100, scale=:log10)

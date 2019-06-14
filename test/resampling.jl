@@ -56,7 +56,7 @@ end
 
 # holdout:
 X, y = datanow()
-ridge_model = SimpleRidgeRegressor(lambda=20.0)
+ridge_model = FooBarRegressor(lambda=20.0)
 resampler = Resampler(resampling=holdout, model=ridge_model)
 resampling_machine = machine(resampler, X, y)
 @test_logs((:info, r"^Training"), fit!(resampling_machine))

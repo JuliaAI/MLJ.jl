@@ -4,20 +4,20 @@
 import MLJBase
 using LinearAlgebra
 
-export SimpleRidgeRegressor
+export FooBarRegressor
 
-mutable struct SimpleRidgeRegressor <: MLJBase.Deterministic
+mutable struct FooBarRegressor <: MLJBase.Deterministic
     lambda::Float64
 end
 
-function SimpleRidgeRegressor(; lambda=0.0)
-    simpleridgemodel = SimpleRidgeRegressor(lambda)
+function FooBarRegressor(; lambda=0.0)
+    simpleridgemodel = FooBarRegressor(lambda)
     message = MLJBase.clean!(simpleridgemodel)
     isempty(message) || @warn message
     return simpleridgemodel
 end
 
-function MLJ.clean!(model::SimpleRidgeRegressor)
+function MLJ.clean!(model::FooBarRegressor)
     warning = ""
     if model.lambda < 0
         warning *= "Need lambda ≥ 0. Resetting lambda=0. "
@@ -26,11 +26,11 @@ function MLJ.clean!(model::SimpleRidgeRegressor)
     return warning
 end
 
-function MLJBase.fitted_params(::SimpleRidgeRegressor, fitresult)
+function MLJBase.fitted_params(::FooBarRegressor, fitresult)
     return (coefficients=fitresult)
 end
 
-function MLJBase.fit(model::SimpleRidgeRegressor, verbosity::Int, X, y)
+function MLJBase.fit(model::FooBarRegressor, verbosity::Int, X, y)
     x = MLJBase.matrix(X)
     fitresult = (x'x - model.lambda*I)\(x'y)
     cache = nothing
@@ -39,19 +39,18 @@ function MLJBase.fit(model::SimpleRidgeRegressor, verbosity::Int, X, y)
 end
 
 
-function MLJBase.predict(model::SimpleRidgeRegressor, fitresult, Xnew)
+function MLJBase.predict(model::FooBarRegressor, fitresult, Xnew)
     x = MLJBase.matrix(Xnew)
     return x*fitresult
 end
 
 # to hide from models generated from calls to models()
-MLJBase.is_wrapper(::Type{<:SimpleRidgeRegressor}) = true
-
+MLJBase.is_wrapper(::Type{<:FooBarRegressor}) = true
 
 # metadata:
-MLJBase.load_path(::Type{<:SimpleRidgeRegressor}) = "MLJ.SimpleRidgeRegressor"
-MLJBase.package_name(::Type{<:SimpleRidgeRegressor}) = "MLJ"
-MLJBase.package_uuid(::Type{<:SimpleRidgeRegressor}) = ""
-MLJBase.is_pure_julia(::Type{<:SimpleRidgeRegressor}) = true
-MLJBase.input_scitype_union(::Type{<:SimpleRidgeRegressor}) = MLJBase.Continuous
-MLJBase.target_scitype_union(::Type{<:SimpleRidgeRegressor}) = MLJBase.Continuous
+MLJBase.load_path(::Type{<:FooBarRegressor}) = "MLJ.FooBarRegressor"
+MLJBase.package_name(::Type{<:FooBarRegressor}) = "MLJ"
+MLJBase.package_uuid(::Type{<:FooBarRegressor}) = ""
+MLJBase.is_pure_julia(::Type{<:FooBarRegressor}) = true
+MLJBase.input_scitype_union(::Type{<:FooBarRegressor}) = MLJBase.Continuous
+MLJBase.target_scitype_union(::Type{<:FooBarRegressor}) = MLJBase.Continuous
