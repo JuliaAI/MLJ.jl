@@ -272,8 +272,23 @@ macro from_network(ex)
     N isa Node ||
         error("$(typeof(N)) given where Node was expected. ")
 
+    models_ = [__module__.eval(e) for e in model_exs]
+    @show models_
+    @show models(N)
+    issubset(models_, models(N)) ||
+        error("One or more specified models not in the learning network "*
+              "terminating at $N_ex.\n Use models($N_ex) to inspect models. ")
+
+    nodes_  = nodes(N)
+    Xs = __module__.eval(Xs_ex)
+    Xs in nodes_ ||
+        error("Specified input source $Xs_ex is not a source of $N_ex.")
+    
     if length(ex.args[3].args) == 3
         ys_ex = ex.args[3].args[2] # target node
+        ys = __module__.eval(ys_ex) 
+        ys in nodes_ ||
+        error("Specified target source $ys_ex is not a source of $N_ex.")
         from_network_(__module__, modeltype_ex, fieldname_exs, model_exs,
                    Xs_ex, ys_ex, N_ex)
     else
@@ -312,7 +327,9 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
     
     program2 = quote
         defaults = 
-        MLJBase.@set_defaults $modeltype_ex deepcopy.([$(model_exs...)])
+            MLJBase.@set_defaults $modeltype_ex deepcopy.([$(model_exs...)])
+#        MLJBase.target_scitype_union($modeltype) =
+
     end
     
     mod.eval(program1)   
@@ -349,6 +366,8 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
     mod.eval(program2)
 
 end
+
+
 
 
 ## A COMPOSITE FOR TESTING PURPOSES
