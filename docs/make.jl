@@ -28,7 +28,7 @@ makedocs(
                 "Internals"=>"internals.md",
                 "Glossary"=>"glossary.md",
                 "API"=>"api.md",
-#                "MLJ Cheatsheet" => "mlj_cheatsheet.md",
+                "MLJ Cheatsheet" => "mlj_cheatsheet.md",
                 "MLJ News"=>"NEWS.md",
                 "FAQ" => "frequently_asked_questions.md",
                  "Julia BlogPost"=>"julia_blogpost.md"]
