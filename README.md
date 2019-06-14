@@ -42,7 +42,7 @@ The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html).
 A list of models implementing the MLJ interface:
 [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl/blob/dev/Models.toml)
 
-
+[MLJ Cheatsheet](docs/src/mlj_cheatsheet.md)
 
 
 
