@@ -11,7 +11,7 @@ train, test = partition(eachindex(yin), 0.7);
 Xtrain = Xin[train,:];
 ytrain = yin[train];
 
-ridge_model = SimpleRidgeRegressor(lambda=0.1)
+ridge_model = FooBarRegressor(lambda=0.1)
 selector_model = FeatureSelector()
 
 composite = MLJ.SimpleDeterministicCompositeModel(model=ridge_model, transformer=selector_model)
@@ -97,7 +97,7 @@ end
 
 X, y = datanow()
 
-ridge = SimpleRidgeRegressor(lambda=0.1)
+ridge = FooBarRegressor(lambda=0.1)
 model = WrappedRidge(ridge)
 mach = machine(model, X, y)
 fit!(mach)

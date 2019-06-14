@@ -99,7 +99,8 @@ include("tasks.jl")         # enhancements to task interface defined in MLJBase
 include("builtins/Transformers.jl")
 include("builtins/Constant.jl")
 include("builtins/KNN.jl")
-include("builtins/ridge.jl")
+include("builtins/ridge.jl") # defines a model for testing only
+
 
 ## GET THE EXTERNAL MODEL METADATA AND MERGE WITH MLJ MODEL METADATA
 

@@ -1,4 +1,4 @@
-module TestSimpleRidgeRegressor
+module TestFooBarRegressor
 
 using Test
 using MLJ
@@ -9,7 +9,7 @@ op = [-1, 1, -6, 11, 3]
 
 ip = MLJ.table(ip')
 
-model = MLJ.SimpleRidgeRegressor(lambda = 0.0)
+model = MLJ.FooBarRegressor(lambda = 0.0)
 
 fitresult, report ,cache = MLJ.fit(model, 0, ip, op);
 

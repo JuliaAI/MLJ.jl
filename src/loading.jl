@@ -61,71 +61,75 @@ function metadata()
 end
 
 """
-    models(; show_dotted=false)
+    models()
 
-List all models as a dictionary indexed on package name. Models
-available for immediate use appear under the key "MLJ". 
+List all model as a dictionary indexed on package name`. Models
+available for immediate use appear under the key "MLJ".
 
-By declaring `show_dotted=true` models not in the top-level of the
-current namespace - which require dots to call, such as
-`MLJ.DeterministicConstantModel` - are also included.
+    models(conditional)
 
-    models(task; show_dotted=false)
+Restrict results to package model pairs `(m, p)` satisfying
+`conditional(info(m, pkg=p)) == true`.
+
+    models(task::MLJTask)
 
 List all models matching the specified `task`. 
+
+### Example
+
+To retrieve all proababilistic classifiers:
+
+    models(x -> x[:is_supervised] && x[:is_probabilistic]==true)
 
 See also: localmodels
 
 """
-function models(; show_dotted=false)
+function models(conditional)
     _models_given_pkg = Dict()
     meta = metadata()
     packages = keys(meta) |> collect
     for pkg in packages
-        _models_given_pkg[pkg] = collect(keys(meta[pkg]))
-    end
-    # by default models not in the immediate (undotted) namespace are
-    # hidden:
-    if !show_dotted
-        _models_given_pkg["MLJ"] = filter(_models_given_pkg["MLJ"]) do model
-            !('.' in model)
+        _models = filter(keys(meta[pkg]) |> collect) do model
+            conditional(info(model, pkg=pkg)) 
         end
+        isempty(_models) || (_models_given_pkg[pkg] = _models)
     end
     return _models_given_pkg
 end
 
-function models(task::SupervisedTask; args...)
+models() = models(x->true)
+
+function models(task::SupervisedTask; kwargs...)
     ret = Dict{String, Any}()
-    allmodels = models(; args...)
-    for pkg in keys(allmodels)
-        models_in_pkg = 
-            filter(allmodels[pkg]) do model
-                info_ = info(model, pkg=pkg)
-                info_[:is_supervised] &&
-                    info_[:is_wrapper] == false && 
-                    task.target_scitype_union <: info_[:target_scitype_union] &&
-                    task.input_scitype_union <: info_[:input_scitype_union] &&
-                    task.is_probabilistic == info_[:is_probabilistic]
-            end
-        isempty(models_in_pkg) || (ret[pkg] = models_in_pkg)
-    end
-    return ret
+    conditional(x) =
+        x[:is_supervised] &&
+        x[:is_wrapper] == false && 
+        task.target_scitype_union <: x[:target_scitype_union] &&
+        task.input_scitype_union <: x[:input_scitype_union] &&
+        task.is_probabilistic == x[:is_probabilistic] &&
+        task.input_is_multivariate == x[:input_is_multivariate]
+    return models(conditional, kwargs...)
+end
+
+function models(task::UnsupervisedTask; kwargs...)
+    ret = Dict{String, Any}()
+    conditional(x) =
+        x[:is_wrapper] == false && 
+        task.input_scitype_union <: x[:input_scitype_union] &&
+        task.input_is_multivariate == x[:input_is_multivariate] &&
+    return models(conditional, kwargs...)
 end
 
 """
     localmodels()
 
 List all models available for immediate use. Equivalent to
-`models()["MLJ"]`
-
-    localmodels(task)
-
-List all such models additionally matching the specified
-`task`. Equivalent to `models(task)["MLJ"]`.
+`models()["MLJ"]`. Can also be given a condition function or task as
+argument. See `models`.
 
 """
-localmodels(; args...) = models(; args...)["MLJ"]
-localmodels(task::SupervisedTask; args...) = models(task; args...)["MLJ"]
+localmodels(; kwargs...) = models(; kwargs...)["MLJ"]
+localmodels(arg; kwargs...) = models(arg; kwargs...)["MLJ"]
 
 
 ## MACROS TO LOAD MODELS
