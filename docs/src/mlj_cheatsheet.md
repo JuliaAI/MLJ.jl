@@ -2,34 +2,47 @@
 
 #### Tasks 
 
-`task = supervised(data=…, types=…, target=…, ignore=…, is_probabilistic=false, verbosity=1)`   
+`task = supervised(data=…, types=…, target=…, ignore=…, is_probabilistic=false, verbosity=1)`
+ 
 `task = unsupervised(data=…, types=…, ignore=…, verbosity=1)`   
 
 
-`task.X` for inputs (a vector or table)  
-`task.y` for target (a vector)  
-`shuffle(task)`  
-`task[1:10]`  
-`nrows(task)`  
+`task.X` for inputs (a vector or table)
+
+`task.y` for target (a vector)
+
+`shuffle(task)`
+
+`task[1:10]`
+
+`nrows(task)`
+
 `models(task)` is all models adapted to the task
 
 
 #### Data and scitypes
 
-`Finite{N}` has subtypes `Multiclass{N}` and `OrderedFactor{N}`.   
+`Finite{N}` has subtypes `Multiclass{N}` and `OrderedFactor{N}`.
+ 
 `Infinite` has subtypes `Continuous` and `Count`
 
-`scitype(x)` is the scientific type of `x`   
-`scitypes(X)` is the scitype schema of table `X`   
-`coerce(Multiclass, y)` attempts coercion of all elements of `y` into scientific type `Multiclass`  
+`scitype(x)` is the scientific type of `x`
+ 
+`scitypes(X)` is the scitype schema of table `X`
+ 
+`coerce(Multiclass, y)` attempts coercion of all elements of `y` into scientific type `Multiclass`
+
 `coerce(Dict(:x1 => Continuous, :x2 => OrderedFactor), X)` to coerce columns `:x1` and `:x2` of `X`.
 
 
 #### Machine construction
 
-Supervised case:   
-`model = KNNRegressor(K=1)` and `mach = machine(model, X, y)` or `mach = machine(model, task)`   
-Unsupervised case:  
+Supervised case:
+ 
+`model = KNNRegressor(K=1)` and `mach = machine(model, X, y)` or `mach = machine(model, task)`
+ 
+Unsupervised case:
+
 `model = OneHotEncoder()` and `mach = machine(model, X)` or `mach = machine(model, task)`
 
     
@@ -40,20 +53,23 @@ Unsupervised case:
 
 #### Inspecting fitting results
 
-`fitted_params(mach)` for learned parameters  
+`fitted_params(mach)` for learned parameters
+
 `report(mach)` for other results (e.g. feature rankings)
 
 
 #### Prediction
 
-Supervised case: `predict(mach, Xnew)` or `predict(mach, rows=:)`    
+Supervised case: `predict(mach, Xnew)` or `predict(mach, rows=:)`
+  
 Also, for probabilistic models: `predict_mode`, `predict_mean` and `predict_median`.
 
 Unsupervised case: `transform(mach, rows=:)` or `inverse_transform(mach, rows)`
 
 #### Resampling strategies
     
-`Holdout(fraction_train=…, shuffle=false)` for simple holdout   
+`Holdout(fraction_train=…, shuffle=false)` for simple holdout
+ 
 `CV(nfolds=6, parallel=true, shuffle=false)` for cross-validation
 
 
@@ -63,7 +79,8 @@ Unsupervised case: `transform(mach, rows=:)` or `inverse_transform(mach, rows)`
 
 #### Ranges for tuning
 
-If `r = range(KNNRegressor(), :K, lower=1, upper = 20, scale=:log)` then `iterator(r, 6) = [1, 2, 3, 6, 11, 20]`  
+If `r = range(KNNRegressor(), :K, lower=1, upper = 20, scale=:log)` then `iterator(r, 6) = [1, 2, 3, 6, 11, 20]`
+
 For non-numeric ranges use `r = range(model, :parameter, values=…)`.
 
 
@@ -79,9 +96,12 @@ For non-numeric ranges use `r = range(model, :parameter, values=…)`.
 
 #### Learning curves
 
-`curve = learning_curve!(mach, resolution=30, resampling=Holdout(), measure=…, operation=predict, nested_range=…,, n=1)`   
+`curve = learning_curve!(mach, resolution=30, resampling=Holdout(), measure=…, operation=predict, nested_range=…,, n=1)`
+ 
 
 If using Plots.jl:
+
+
 `plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)` 
 
 
@@ -92,17 +112,13 @@ If using Plots.jl:
 
 #### Built-in measures
 
-`export` `mav`, `rms`, `rmsl`, `rmslp1`, `rmsp`,
-`misclassification_rate`, `cross_entropy`
+`export` `mav`, `rms`, `rmsl`, `rmslp1`, `rmsp`, `misclassification_rate`, `cross_entropy`
 
 
 #### Transformers 
 
-Built-ins include: `Standardizer`, `OneHotEncoder`,
-`UnivariateBoxCoxTransformer`, `FeatureSelector`,
-`UnivariateStandardizer`
+Built-ins include: `Standardizer`, `OneHotEncoder`, `UnivariateBoxCoxTransformer`, `FeatureSelector`, `UnivariateStandardizer`
 
-Externals include: `PCA` (in MultivariateStats), `KMeans`,
-`KMedoids` (in Clustering).
+Externals include: `PCA` (in MultivariateStats), `KMeans`, `KMedoids` (in Clustering).
 
 Full list: do `models(m -> !m[:is_supervised])`
