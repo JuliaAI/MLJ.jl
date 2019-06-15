@@ -94,7 +94,7 @@ yhat = predict(mach, X);
 yhat[1:4]
 
 
-# ### Specicial to probabilistic models
+# ### Special to probabilistic models
 
 mean.(yhat[1:4])
 
@@ -276,7 +276,7 @@ yhat(rows=1:10)
 
 yhat(task.X)
 
-# The new data is "plugged into" the orgin node, which must be unique:
+# The new data is "plugged into" the origin node, which must be unique:
 
 origins(yhat) == [X,]
 
