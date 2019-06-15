@@ -6,6 +6,11 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+## MLJModels v0.2.4
+
+- Add compatibility requirement MLJBase="0.2.3" 
+
+
 ## MLJBase v0.2.3
 
 - Small changes on definitions of `==` and `isequal` for `MLJType`
