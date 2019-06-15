@@ -239,6 +239,7 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
     end
 
     for mach in machines
+        @show mach
         fit!(mach; rows=rows, verbosity=verbosity, force=force)
     end
     

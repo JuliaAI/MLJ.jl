@@ -273,8 +273,6 @@ macro from_network(ex)
         error("$(typeof(N)) given where Node was expected. ")
 
     models_ = [__module__.eval(e) for e in model_exs]
-    @show models_
-    @show models(N)
     issubset(models_, models(N)) ||
         error("One or more specified models not in the learning network "*
               "terminating at $N_ex.\n Use models($N_ex) to inspect models. ")
@@ -320,15 +318,14 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
             $(fieldname_exs...)
         end
         
-        MLJBase.fit(model::$modeltype_ex, verbosity::Integer, X, y) =
+        MLJ.fit(model::$modeltype_ex, verbosity::Integer, X, y) =
             MLJ.supervised_fit_method($Xs_ex, $ys_ex, $N_ex,
                                       $(model_exs...))(model, verbosity, X, y)
     end
     
     program2 = quote
         defaults = 
-            MLJBase.@set_defaults $modeltype_ex deepcopy.([$(model_exs...)])
-#        MLJBase.target_scitype_union($modeltype) =
+            MLJ.@set_defaults $modeltype_ex deepcopy.([$(model_exs...)])
 
     end
     
