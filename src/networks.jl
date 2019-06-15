@@ -239,7 +239,6 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
     end
 
     for mach in machines
-        @show mach
         fit!(mach; rows=rows, verbosity=verbosity, force=force)
     end
     
@@ -322,6 +321,7 @@ See also: origins, node
 
 """
 source(X) = Source(X) # here `X` is data
+source(X::Source) = X
 
 """
     N = node(f::Function, args...)

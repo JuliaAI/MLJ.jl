@@ -65,7 +65,7 @@ x1 = rand(300)
 x2 = rand(300)
 x3 = rand(300)
 y = exp.(x1 - x2 -2x3 + 0.1*rand(300))
-X = DataFrame(x1=x1, x2=x2, x3=x3) # a column table
+X = DataFrame(x1=x1, x2=x2, x3=x3) 
 ys = source(y)
 Xs = source(X)
 ```
@@ -329,7 +329,7 @@ end
 ```
 
 ```julia
-task = load_boston()
+task = load_reduced_ames()
 knn_model = KNNRegressor(K=2)
 ridge_model = RidgeRegressor(lambda=0.1)
 weights = (0.9, 0.1)
@@ -339,13 +339,17 @@ evaluate!(mach, resampling=Holdout(fraction_train=0.7), measure=rmsl)
 ```
 
 ```julia
+julia> evaluate!(mach, resampling=Holdout(fraction_train=0.7), measure=rmsl)
 ┌ Info: Evaluating using a holdout set. 
 │ fraction_train=0.7 
 │ shuffle=false 
 │ measure=MLJ.rmsl 
 │ operation=StatsBase.predict 
 └ Resampling from all rows. 
-0.5277143032101871
+mach = NodalMachine{OneHotEncoder} @ 1…14
+mach = NodalMachine{RidgeRegressor} @ 1…87
+mach = NodalMachine{KNNRegressor} @ 1…02
+0.13108966715886725
 ```
 
 A `node` method allows us to overerload a given function to

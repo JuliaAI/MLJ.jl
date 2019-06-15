@@ -206,6 +206,10 @@ function supervised_fit_method(network_Xs, network_ys, network_N,
         source_replacements = [network_Xs => Xs, network_ys => ys]
         replacements = vcat(model_replacements, source_replacements)
         yhat = replace(network_N, replacements...)
+
+        Set([Xs, ys]) == Set(sources(yhat)) ||
+            error("Failed to replace sources in network blueprint. ")
+
         fit!(yhat, verbosity=verbosity)
         cache = nothing
         report = nothing
@@ -226,6 +230,8 @@ function unsupervised_fit_method(network_Xs, network_N,
         source_replacements = [network_Xs => Xs,]
         replacements = vcat(model_replacements, source_replacements)
         Xout = replace(network_N, replacements...)
+        Set([Xs]) == Set(sources(Xout)) ||
+            error("Failed to replace sources in network blueprint. ")
         fit!(Xout, verbosity=verbosity)
         cache = nothing
         report = nothing
@@ -312,8 +318,6 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
     # code defining the composite model struct and fit method:
     program1 = quote
         
-        import MLJBase
-        
         mutable struct $modeltype_ex <: MLJ.$subtype_ex
             $(fieldname_exs...)
         end
@@ -328,7 +332,7 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
             MLJ.@set_defaults $modeltype_ex deepcopy.([$(model_exs...)])
 
     end
-    
+
     mod.eval(program1)   
     mod.eval(program2)
 
@@ -343,22 +347,20 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
     # code defining the composite model struct and fit method:
     program1 = quote
         
-        import MLJBase
-        
         mutable struct $modeltype_ex <: MLJ.$subtype_ex
             $(fieldname_exs...)
         end
         
-        MLJBase.fit(model::$modeltype_ex, verbosity::Integer, X) =
+        MLJ.fit(model::$modeltype_ex, verbosity::Integer, X) =
             MLJ.unsupervised_fit_method($Xs_ex, $N_ex,
                                       $(model_exs...))(model, verbosity, X)
     end
     
     program2 = quote
         defaults = 
-        MLJBase.@set_defaults $modeltype_ex deepcopy.([$(model_exs...)])
+        MLJ.@set_defaults $modeltype_ex deepcopy.([$(model_exs...)])
     end
-    
+
     mod.eval(program1)   
     mod.eval(program2)
 
