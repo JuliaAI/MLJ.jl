@@ -116,11 +116,6 @@ constructors can be any table, where *table* means any data type
 supporting the [Tables.jl](https://github.com/JuliaData/Tables.jl)
 interface.
 
-> At present our API is more restrictive; see this
-> [issue](https://github.com/JuliaData/Tables.jl/issues/74) with
-> Tables.jl. If your Tables.jl compatible format is not working in
-> MLJ, please post an issue.
-
 In particular, `DataFrame`, `JuliaDB.IndexedTable` and
 `TypedTables.Table` objects are supported, as are two Julia native
 formats: *column tables* (named tuples of equal length vectors) and
