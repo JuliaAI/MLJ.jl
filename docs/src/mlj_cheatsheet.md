@@ -45,13 +45,16 @@ Unsupervised case:
 
 `model = OneHotEncoder()` and `mach = machine(model, X)` or `mach = machine(model, task)`
 
-    
+#### Inspect all model hyperparameters, even nested ones:
+
+`params(model)`
+
 #### Fitting
 
 `fit!(mach, rows=:, verbosity=1, force=false)`
 
 
-#### Inspecting fitting results
+#### Inspecting results of fitting
 
 `fitted_params(mach)` for learned parameters
 
@@ -60,11 +63,11 @@ Unsupervised case:
 
 #### Prediction
 
-Supervised case: `predict(mach, Xnew)` or `predict(mach, rows=:)`
+Supervised case: `predict(mach, Xnew)` or `predict(mach, rows=:)` or `predict(mach, task)`
   
-Also, for probabilistic models: `predict_mode`, `predict_mean` and `predict_median`.
+Similarly, for probabilistic models: `predict_mode`, `predict_mean` and `predict_median`.
 
-Unsupervised case: `transform(mach, rows=:)` or `inverse_transform(mach, rows)`
+Unsupervised case: `transform(mach, rows=:)` or `inverse_transform(mach, rows)`, etc.
 
 #### Resampling strategies
     
@@ -92,6 +95,8 @@ For non-numeric ranges use `r = range(model, :parameter, values=…)`.
 #### Tuning model wrapper
 
 `tuned_model = TunedModel(model=…, tuning=Grid(), resampling=Holdout(), measure=…, operation=predict, nested_ranges=…, minimize=true, full_report=true)`
+
+Use `params(model)` to get pattern to match in specifying `nested_ranges`.
 
 
 #### Learning curves
