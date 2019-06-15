@@ -313,7 +313,7 @@ function learning_curve!(mach::Machine{<:Supervised};
                              full_report=true, train_best=false)
     tuned = machine(tuned_model, mach.args...)
 
-    measurements = reduce(hcat, [(fit!(tuned, verbosity=verbosity);
+    measurements = reduce(hcat, [(fit!(tuned, verbosity=verbosity, force=true);
                                   tuned.report.measurements) for c in 1:n])
     report = tuned.report
     parameter_name=report.parameter_names[1]
