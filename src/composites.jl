@@ -269,7 +269,7 @@ macro from_network(ex)
     kw_exs = ex.args[2].args[2:end]
     fieldname_exs = [k.args[1] for k in kw_exs]
     model_exs = [k.args[2] for k in kw_exs] 
-    Xs_ex = ex.args[3].args[1] # input node
+    Xs_ex = ex.args[3].args[1]   # input node
     N_ex = ex.args[3].args[end]  # output node
 
     # TODO: add more type and syntax checks here:
@@ -314,6 +314,9 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
     else
         subtype_ex = :DeterministicNetwork
     end
+
+    XX = gensym(:X)
+    yy = gensym(:y)
     
     # code defining the composite model struct and fit method:
     program1 = quote
@@ -322,9 +325,9 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
             $(fieldname_exs...)
         end
         
-        MLJ.fit(model::$modeltype_ex, verbosity::Integer, X, y) =
+        MLJ.fit(model::$modeltype_ex, verbosity::Integer, $XX, $yy) =
             MLJ.supervised_fit_method($Xs_ex, $ys_ex, $N_ex,
-                                      $(model_exs...))(model, verbosity, X, y)
+                            $(model_exs...))(model, verbosity, $XX, $yy)
     end
     
     program2 = quote
@@ -343,6 +346,8 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
                     Xs_ex, N_ex)
 
     subtype_ex = :UnsupervisedNetwork
+
+    XX = gensym(:X)
     
     # code defining the composite model struct and fit method:
     program1 = quote
@@ -351,9 +356,9 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
             $(fieldname_exs...)
         end
         
-        MLJ.fit(model::$modeltype_ex, verbosity::Integer, X) =
+        MLJ.fit(model::$modeltype_ex, verbosity::Integer, $XX) =
             MLJ.unsupervised_fit_method($Xs_ex, $N_ex,
-                                      $(model_exs...))(model, verbosity, X)
+                                      $(model_exs...))(model, verbosity, $XX)
     end
     
     program2 = quote
