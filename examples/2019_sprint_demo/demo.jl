@@ -1,4 +1,4 @@
-# # MLJ Demo from the June 2019 MLJ/sktime Sprint
+# MLJ Demo from the June 2019 MLJ/sktime Sprint
 
 # ### Load environment and seed RNG
 
@@ -32,7 +32,7 @@ task = supervised(data=boston,
                   target=:MedV,
                   ignore=:Chas,
                   types=Dict(:Rad=>Continuous,:Tax=>Continuous),
-                  is_probabilistic=false)
+                  is_probabilistic=true)
 
 #-
 
@@ -44,25 +44,29 @@ models(task)
 
 #-
 
-task.is_probabilistic=true
+task.is_probabilistic=false
 models(task)
 
 
 # ### Binding a task to a model
 
-@load OLSRegressor
-model = OLSRegressor()
+@load RidgeRegressor
+model = RidgeRegressor()
 
 #-
-mach = machine(model, task)
 
+model.lambda = 0.1
+
+#-
+
+mach = machine(model, task)
 
 # ### Evaluation
 
-evaluate!(mach, resampling=CV(nfolds=5), measure=rms)
+evaluate!(mach, resampling=Holdout(fraction_train=0.7),
+          measure=rms)
 
 # ### Fitting
-
 
 train, test = partition(1:nrows(task), 0.7)
 
@@ -70,17 +74,20 @@ train, test = partition(1:nrows(task), 0.7)
 
 fit!(mach, rows=train)
 
-
-# ### Predicting on training data
-
-yhat = predict(mach, rows=train);
-yhat = predict(mach, task[train]);
-yhat[1:3]
-
 #-
 
-y = task[train].y;
-y[1:3]
+fitted_params(mach)
+report(mach)
+
+# ### Predicting on data in the task:
+
+yhat = predict(mach, rows=test);
+yhat = predict(mach, task)[test];
+yhat = predict(mach, task[test]);
+yhat[1:3]
+#-
+
+y = task[test].y;
 
 #-
 
@@ -92,20 +99,6 @@ rms(yhat, y)
 X = task[test].X; 
 yhat = predict(mach, X);
 yhat[1:4]
-
-
-# ### Special to probabilistic models
-
-mean.(yhat[1:4])
-
-#-
-
-mean.(yhat) == predict_mean(mach, X)
-
-#-                   
-
-import Distributions
-[Distributions.cdf(d, 10.0) for d in yhat[1:4]]
 
 
 # ## 2. Random Forests - Case Study in Ensembling and Tuning
@@ -137,9 +130,10 @@ forest = EnsembleModel(atom=tree)
 
 #-
 
-
 mach = machine(forest, task)
+
 r = range(forest, :n, lower=10, upper=1000, scale=:log10)
+
 iterator(r,5)
 
 #-
@@ -207,7 +201,6 @@ plot(mach)
 # ## 3. Learning Networks
 
 task = load_reduced_ames()
-show(task, 1)
 
 #-
 
@@ -276,25 +269,23 @@ yhat(rows=1:10)
 
 yhat(task.X)
 
-# The new data is "plugged into" the origin node, which must be unique:
+# The new data is "plugged into" the orgin node, which must be unique:
 
 origins(yhat) == [X,]
 
 
 # ## Exporting pipeline as stand-alone model
 
-comp = @from_network SmartKNN(one_hot_encoding=hot, knn_regressor=knn) <= (X, y, yhat)
+comp = @from_network SmartKNNRegressor(one_hot_encoding=hot, knn_regressor=knn) <= (X, y, yhat)
 
 #-
+
 params(comp)
-
-#-
-
 mach = machine(comp, task)
 evaluate!(mach, measure=rms)
 
 
-# ## A more complicated example
+## # More complicated example
 
 using CategoricalArrays
 x1 = rand(6);
@@ -308,8 +299,6 @@ X = (x1=x1, x2=x2, x3=x3)
 # K-nearest neighbour and ridge regressor models to the data; (iv)
 # Computes an average of individual model predictions; and (v) Inverse
 # transforms (exponentiates) the blended predictions.
-
-@load RidgeRegressor
 
 X = source(X)
 y = source(y)
@@ -345,6 +334,8 @@ blend = @from_network Blen(ridge=ridge, knn=knn) <= (X, y, yhat)
 blend.ridge.lambda = 0.2
 mach = machine(blend, load_reduced_ames())
 evaluate!(mach, measure=rms)
+
+
 
 
 
