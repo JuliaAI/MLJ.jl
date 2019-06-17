@@ -15,7 +15,7 @@
         return machine
     end
 
-end</code></pre><h4><a class="nav-anchor" id="Constructor-1" href="#Constructor-1">Constructor</a></h4><pre><code class="language-julia">machine(model::M, Xtable, y) = Machine{M}(model, Xtable, y)</code></pre><h4><a class="nav-anchor" id="fit!-and-predict/transform-1" href="#fit!-and-predict/transform-1">fit! and predict/transform</a></h4><pre><code class="language-julia">function fit!(machine::Machine; rows=nothing, verbosity=1) 
+end</code></pre><h4><a class="nav-anchor" id="Constructor-1" href="#Constructor-1">Constructor</a></h4><pre><code class="language-julia">machine(model::M, Xtable, y) = Machine{M}(model, Xtable, y)</code></pre><h4><a class="nav-anchor" id="fit!-and-predict/transform-1" href="#fit!-and-predict/transform-1">fit! and predict/transform</a></h4><pre><code class="language-julia">function fit!(machine::Machine; rows=nothing, force=false, verbosity=1) 
 
     warning = clean!(mach.model)
     isempty(warning) || verbosity &lt; 0 || @warn warning 
