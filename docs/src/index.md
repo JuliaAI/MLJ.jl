@@ -196,7 +196,6 @@ different from `Unknown`:
 `CategoricalString`         | `Multiclass{N}` where `N =p nlevels(x)`, provided `x.pool.ordered == false`
 `CategoricalValue`          | `OrderedFactor{N}` where `N = nlevels(x)`, provided `x.pool.ordered == true` 
 `CategoricalString`         | `OrderedFactor{N}` where `N = nlevels(x)` provided `x.pool.ordered == true`
-`Integer`                   | `Count`
 `Missing`                   | `Missing`
 
 Here `nlevels(x) = length(levels(x.pool))`.
