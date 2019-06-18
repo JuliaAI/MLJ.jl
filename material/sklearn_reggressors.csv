@@ -1,0 +1,577 @@
+,class,parameter,data_type,default_value,url
+0,sklearn.compose.TransformedTargetRegressor,regressor,object,None,https://scikit-learn.org/stable/modules/generated/sklearn.compose.TransformedTargetRegressor.html
+1,sklearn.compose.TransformedTargetRegressor,transformer,object,None,https://scikit-learn.org/stable/modules/generated/sklearn.compose.TransformedTargetRegressor.html
+2,sklearn.compose.TransformedTargetRegressor,func,function,None,https://scikit-learn.org/stable/modules/generated/sklearn.compose.TransformedTargetRegressor.html
+3,sklearn.compose.TransformedTargetRegressor,inverse_func,function,None,https://scikit-learn.org/stable/modules/generated/sklearn.compose.TransformedTargetRegressor.html
+4,sklearn.compose.TransformedTargetRegressor,check_inverse,bool,True,https://scikit-learn.org/stable/modules/generated/sklearn.compose.TransformedTargetRegressor.html
+0,sklearn.covariance.GraphicalLassoCV,alphas,integer,4,https://scikit-learn.org/stable/modules/generated/sklearn.covariance.GraphicalLassoCV.html
+1,sklearn.covariance.GraphicalLassoCV,n_refinements,strictly positive integer,4,https://scikit-learn.org/stable/modules/generated/sklearn.covariance.GraphicalLassoCV.html
+2,sklearn.covariance.GraphicalLassoCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.covariance.GraphicalLassoCV.html
+3,sklearn.covariance.GraphicalLassoCV,tol,positive float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.covariance.GraphicalLassoCV.html
+4,sklearn.covariance.GraphicalLassoCV,enet_tol,positive float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.covariance.GraphicalLassoCV.html
+5,sklearn.covariance.GraphicalLassoCV,max_iter,integer,100,https://scikit-learn.org/stable/modules/generated/sklearn.covariance.GraphicalLassoCV.html
+6,sklearn.covariance.GraphicalLassoCV,mode,"{‘cd’, ‘lars’}",’cd’,https://scikit-learn.org/stable/modules/generated/sklearn.covariance.GraphicalLassoCV.html
+7,sklearn.covariance.GraphicalLassoCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.covariance.GraphicalLassoCV.html
+8,sklearn.covariance.GraphicalLassoCV,verbose,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.covariance.GraphicalLassoCV.html
+9,sklearn.covariance.GraphicalLassoCV,assume_centered,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.covariance.GraphicalLassoCV.html
+0,sklearn.dummy.DummyRegressor,strategy,str,’mean’,https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyRegressor.html
+1,sklearn.dummy.DummyRegressor,constant,int or float or array of shape = [n_outputs],None,https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyRegressor.html
+2,sklearn.dummy.DummyRegressor,quantile,float in [0.0,None,https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyRegressor.html
+0,sklearn.ensemble.AdaBoostRegressor,base_estimator,object,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostRegressor.html
+1,sklearn.ensemble.AdaBoostRegressor,n_estimators,integer,50,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostRegressor.html
+2,sklearn.ensemble.AdaBoostRegressor,learning_rate,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostRegressor.html
+3,sklearn.ensemble.AdaBoostRegressor,loss,"{‘linear’, ‘square’, ‘exponential’}",’linear’,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostRegressor.html
+4,sklearn.ensemble.AdaBoostRegressor,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.AdaBoostRegressor.html
+0,sklearn.ensemble.BaggingRegressor,base_estimator,object or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html
+1,sklearn.ensemble.BaggingRegressor,n_estimators,int,10,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html
+2,sklearn.ensemble.BaggingRegressor,max_samples,int or float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html
+3,sklearn.ensemble.BaggingRegressor,max_features,int or float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html
+4,sklearn.ensemble.BaggingRegressor,bootstrap,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html
+5,sklearn.ensemble.BaggingRegressor,bootstrap_features,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html
+6,sklearn.ensemble.BaggingRegressor,oob_score,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html
+7,sklearn.ensemble.BaggingRegressor,warm_start,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html
+8,sklearn.ensemble.BaggingRegressor,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html
+9,sklearn.ensemble.BaggingRegressor,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html
+10,sklearn.ensemble.BaggingRegressor,verbose,int,0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html
+0,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,loss,"{‘ls’, ‘lad’, ‘huber’, ‘quantile’}",’ls’,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+1,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,learning_rate,float,0.1,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+2,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,n_estimators,int (default=100),100,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+3,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,subsample,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+4,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,criterion,string,’friedman_mse’,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+5,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,min_samples_split,int,2,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+6,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,min_samples_leaf,int,1,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+7,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,min_weight_fraction_leaf,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+8,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,max_depth,integer,3,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+9,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,min_impurity_decrease,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+10,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,min_impurity_split,float,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+11,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,init,estimator or ‘zero’,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+12,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+13,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,max_features,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+14,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,alpha,float (default=0.9),0.9,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+15,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,verbose,int,0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+16,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,max_leaf_nodes,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+17,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,warm_start,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+18,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,presort,bool or ‘auto’,’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+19,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,validation_fraction,float,0.1,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+20,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,n_iter_no_change,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+21,3.2.4.3.6. sklearn.ensemble.GradientBoostingRegressor,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html
+0,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,n_estimators,integer,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+1,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,criterion,string,’mse’,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+2,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,max_depth,integer or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+3,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,min_samples_split,int,2,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+4,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,min_samples_leaf,int,1,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+5,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,min_weight_fraction_leaf,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+6,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,max_features,int,’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+7,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,max_leaf_nodes,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+8,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,min_impurity_decrease,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+9,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,min_impurity_split,float,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+10,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,bootstrap,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+11,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,oob_score,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+12,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+13,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+14,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,verbose,int,0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+15,3.2.4.3.2. sklearn.ensemble.RandomForestRegressor,warm_start,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html
+0,sklearn.ensemble.VotingRegressor,weights,array-like,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.VotingRegressor.html
+1,sklearn.ensemble.VotingRegressor,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.VotingRegressor.html
+0,sklearn.ensemble.HistGradientBoostingRegressor,loss,{‘least_squares’},’least_squares’,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+0,sklearn.ensemble.HistGradientBoostingRegressor,loss,{‘least_squares’},’least_squares’,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+1,sklearn.ensemble.HistGradientBoostingRegressor,learning_rate,float,0.1,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+1,sklearn.ensemble.HistGradientBoostingRegressor,learning_rate,float,0.1,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+2,sklearn.ensemble.HistGradientBoostingRegressor,max_iter,int,100,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+2,sklearn.ensemble.HistGradientBoostingRegressor,max_iter,int,100,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+3,sklearn.ensemble.HistGradientBoostingRegressor,max_leaf_nodes,int or None,31,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+3,sklearn.ensemble.HistGradientBoostingRegressor,max_leaf_nodes,int or None,31,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+4,sklearn.ensemble.HistGradientBoostingRegressor,max_depth,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+4,sklearn.ensemble.HistGradientBoostingRegressor,max_depth,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+5,sklearn.ensemble.HistGradientBoostingRegressor,min_samples_leaf,int,20,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+5,sklearn.ensemble.HistGradientBoostingRegressor,min_samples_leaf,int,20,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+6,sklearn.ensemble.HistGradientBoostingRegressor,l2_regularization,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+6,sklearn.ensemble.HistGradientBoostingRegressor,l2_regularization,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+7,sklearn.ensemble.HistGradientBoostingRegressor,max_bins,int,256,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+7,sklearn.ensemble.HistGradientBoostingRegressor,max_bins,int,256,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+8,sklearn.ensemble.HistGradientBoostingRegressor,scoring,str or callable or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+8,sklearn.ensemble.HistGradientBoostingRegressor,scoring,str or callable or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+9,sklearn.ensemble.HistGradientBoostingRegressor,validation_fraction,int or float or None,0.1,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+9,sklearn.ensemble.HistGradientBoostingRegressor,validation_fraction,int or float or None,0.1,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+10,sklearn.ensemble.HistGradientBoostingRegressor,n_iter_no_change,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+10,sklearn.ensemble.HistGradientBoostingRegressor,n_iter_no_change,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+11,sklearn.ensemble.HistGradientBoostingRegressor,tol,float or None,1e-07,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+11,sklearn.ensemble.HistGradientBoostingRegressor,tol,float or None,1e-07,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+12,sklearn.ensemble.HistGradientBoostingRegressor,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+12,sklearn.ensemble.HistGradientBoostingRegressor,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
+0,sklearn.gaussian_process.GaussianProcessRegressor,kernel,kernel object,None,https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessRegressor.html
+1,sklearn.gaussian_process.GaussianProcessRegressor,alpha,float or array-like,1e-10,https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessRegressor.html
+2,sklearn.gaussian_process.GaussianProcessRegressor,optimizer,string or callable,’fmin_l_bfgs_b’,https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessRegressor.html
+3,sklearn.gaussian_process.GaussianProcessRegressor,n_restarts_optimizer,int,0,https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessRegressor.html
+4,sklearn.gaussian_process.GaussianProcessRegressor,normalize_y,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessRegressor.html
+5,sklearn.gaussian_process.GaussianProcessRegressor,copy_X_train,bool,True,https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessRegressor.html
+6,sklearn.gaussian_process.GaussianProcessRegressor,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessRegressor.html
+0,sklearn.isotonic.IsotonicRegression,y_min,optional,None,https://scikit-learn.org/stable/modules/generated/sklearn.isotonic.IsotonicRegression.html
+1,sklearn.isotonic.IsotonicRegression,y_max,optional,None,https://scikit-learn.org/stable/modules/generated/sklearn.isotonic.IsotonicRegression.html
+2,sklearn.isotonic.IsotonicRegression,increasing,boolean or string,True,https://scikit-learn.org/stable/modules/generated/sklearn.isotonic.IsotonicRegression.html
+3,sklearn.isotonic.IsotonicRegression,out_of_bounds,string,’nan’,https://scikit-learn.org/stable/modules/generated/sklearn.isotonic.IsotonicRegression.html
+0,sklearn.kernel_ridge.KernelRidge,alpha,"{float, array-like}",1,https://scikit-learn.org/stable/modules/generated/sklearn.kernel_ridge.KernelRidge.html
+0,sklearn.kernel_ridge.KernelRidge,alpha,"{float, array-like}",1,https://scikit-learn.org/stable/modules/generated/sklearn.kernel_ridge.KernelRidge.html
+1,sklearn.kernel_ridge.KernelRidge,kernel,string or callable,’linear’,https://scikit-learn.org/stable/modules/generated/sklearn.kernel_ridge.KernelRidge.html
+1,sklearn.kernel_ridge.KernelRidge,kernel,string or callable,’linear’,https://scikit-learn.org/stable/modules/generated/sklearn.kernel_ridge.KernelRidge.html
+2,sklearn.kernel_ridge.KernelRidge,gamma,float,None,https://scikit-learn.org/stable/modules/generated/sklearn.kernel_ridge.KernelRidge.html
+2,sklearn.kernel_ridge.KernelRidge,gamma,float,None,https://scikit-learn.org/stable/modules/generated/sklearn.kernel_ridge.KernelRidge.html
+3,sklearn.kernel_ridge.KernelRidge,degree,float,3,https://scikit-learn.org/stable/modules/generated/sklearn.kernel_ridge.KernelRidge.html
+3,sklearn.kernel_ridge.KernelRidge,degree,float,3,https://scikit-learn.org/stable/modules/generated/sklearn.kernel_ridge.KernelRidge.html
+4,sklearn.kernel_ridge.KernelRidge,coef0,float,1,https://scikit-learn.org/stable/modules/generated/sklearn.kernel_ridge.KernelRidge.html
+4,sklearn.kernel_ridge.KernelRidge,coef0,float,1,https://scikit-learn.org/stable/modules/generated/sklearn.kernel_ridge.KernelRidge.html
+5,sklearn.kernel_ridge.KernelRidge,kernel_params,mapping of string to any,None,https://scikit-learn.org/stable/modules/generated/sklearn.kernel_ridge.KernelRidge.html
+5,sklearn.kernel_ridge.KernelRidge,kernel_params,mapping of string to any,None,https://scikit-learn.org/stable/modules/generated/sklearn.kernel_ridge.KernelRidge.html
+0,sklearn.linear_model.ARDRegression,n_iter,int,300,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html
+1,sklearn.linear_model.ARDRegression,tol,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html
+2,sklearn.linear_model.ARDRegression,alpha_1,float,1e-06,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html
+3,sklearn.linear_model.ARDRegression,alpha_2,float,1e-06,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html
+4,sklearn.linear_model.ARDRegression,lambda_1,float,1e-06,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html
+5,sklearn.linear_model.ARDRegression,lambda_2,float,1e-06,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html
+6,sklearn.linear_model.ARDRegression,compute_score,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html
+7,sklearn.linear_model.ARDRegression,threshold_lambda,float,10000.0,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html
+8,sklearn.linear_model.ARDRegression,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html
+9,sklearn.linear_model.ARDRegression,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html
+10,sklearn.linear_model.ARDRegression,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html
+11,sklearn.linear_model.ARDRegression,verbose,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ARDRegression.html
+0,sklearn.linear_model.BayesianRidge,n_iter,int,300,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+0,sklearn.linear_model.BayesianRidge,n_iter,int,300,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+1,sklearn.linear_model.BayesianRidge,tol,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+1,sklearn.linear_model.BayesianRidge,tol,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+2,sklearn.linear_model.BayesianRidge,alpha_1,float,1e-06,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+2,sklearn.linear_model.BayesianRidge,alpha_1,float,1e-06,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+3,sklearn.linear_model.BayesianRidge,alpha_2,float,1e-06,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+3,sklearn.linear_model.BayesianRidge,alpha_2,float,1e-06,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+4,sklearn.linear_model.BayesianRidge,lambda_1,float,1e-06,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+4,sklearn.linear_model.BayesianRidge,lambda_1,float,1e-06,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+5,sklearn.linear_model.BayesianRidge,lambda_2,float,1e-06,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+5,sklearn.linear_model.BayesianRidge,lambda_2,float,1e-06,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+6,sklearn.linear_model.BayesianRidge,compute_score,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+6,sklearn.linear_model.BayesianRidge,compute_score,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+7,sklearn.linear_model.BayesianRidge,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+7,sklearn.linear_model.BayesianRidge,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+8,sklearn.linear_model.BayesianRidge,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+8,sklearn.linear_model.BayesianRidge,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+9,sklearn.linear_model.BayesianRidge,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+9,sklearn.linear_model.BayesianRidge,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+10,sklearn.linear_model.BayesianRidge,verbose,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+10,sklearn.linear_model.BayesianRidge,verbose,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.BayesianRidge.html
+0,sklearn.linear_model.ElasticNet,alpha,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+1,sklearn.linear_model.ElasticNet,l1_ratio,float,0.5,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+2,sklearn.linear_model.ElasticNet,fit_intercept,bool,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+3,sklearn.linear_model.ElasticNet,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+4,sklearn.linear_model.ElasticNet,precompute,True | False | array-like,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+5,sklearn.linear_model.ElasticNet,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+6,sklearn.linear_model.ElasticNet,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+7,sklearn.linear_model.ElasticNet,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+8,sklearn.linear_model.ElasticNet,warm_start,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+9,sklearn.linear_model.ElasticNet,positive,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+10,sklearn.linear_model.ElasticNet,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+11,sklearn.linear_model.ElasticNet,selection,str,’cyclic’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html
+0,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,l1_ratio,float or array of floats,0.5,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+0,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,l1_ratio,float or array of floats,0.5,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+1,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,eps,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+1,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,eps,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+2,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,n_alphas,int,100,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+2,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,n_alphas,int,100,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+3,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,alphas,numpy array,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+3,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,alphas,numpy array,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+4,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+4,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+5,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+5,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+6,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,precompute,True | False | ‘auto’ | array-like,’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+6,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,precompute,True | False | ‘auto’ | array-like,’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+7,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+7,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+8,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+8,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+9,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+9,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+10,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+10,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+11,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,verbose,bool or integer,0,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+11,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,verbose,bool or integer,0,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+12,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+12,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+13,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,positive,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+13,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,positive,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+14,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+14,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+15,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,selection,str,’cyclic’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+15,3.2.4.1.1. sklearn.linear_model.ElasticNetCV,selection,str,’cyclic’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNetCV.html
+0,sklearn.linear_model.HuberRegressor,epsilon,float,1.35,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.HuberRegressor.html
+1,sklearn.linear_model.HuberRegressor,max_iter,int,100,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.HuberRegressor.html
+2,sklearn.linear_model.HuberRegressor,alpha,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.HuberRegressor.html
+3,sklearn.linear_model.HuberRegressor,warm_start,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.HuberRegressor.html
+4,sklearn.linear_model.HuberRegressor,fit_intercept,bool,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.HuberRegressor.html
+5,sklearn.linear_model.HuberRegressor,tol,float,1e-05,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.HuberRegressor.html
+0,sklearn.linear_model.Lars,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lars.html
+1,sklearn.linear_model.Lars,verbose,boolean or integer,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lars.html
+2,sklearn.linear_model.Lars,normalize,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lars.html
+3,sklearn.linear_model.Lars,precompute,True | False | ‘auto’ | array-like,’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lars.html
+4,sklearn.linear_model.Lars,n_nonzero_coefs,int,500,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lars.html
+5,sklearn.linear_model.Lars,eps,float,2.220446049250313e-16,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lars.html
+6,sklearn.linear_model.Lars,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lars.html
+7,sklearn.linear_model.Lars,fit_path,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lars.html
+8,sklearn.linear_model.Lars,positive,boolean (default=False),False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lars.html
+0,3.2.4.1.2. sklearn.linear_model.LarsCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html
+1,3.2.4.1.2. sklearn.linear_model.LarsCV,verbose,boolean or integer,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html
+2,3.2.4.1.2. sklearn.linear_model.LarsCV,max_iter,integer,500,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html
+3,3.2.4.1.2. sklearn.linear_model.LarsCV,normalize,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html
+4,3.2.4.1.2. sklearn.linear_model.LarsCV,precompute,True | False | ‘auto’ | array-like,’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html
+5,3.2.4.1.2. sklearn.linear_model.LarsCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html
+6,3.2.4.1.2. sklearn.linear_model.LarsCV,max_n_alphas,integer,1000,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html
+7,3.2.4.1.2. sklearn.linear_model.LarsCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html
+8,3.2.4.1.2. sklearn.linear_model.LarsCV,eps,float,2.220446049250313e-16,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html
+9,3.2.4.1.2. sklearn.linear_model.LarsCV,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html
+10,3.2.4.1.2. sklearn.linear_model.LarsCV,positive,boolean (default=False),False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LarsCV.html
+0,3.2.4.1.3. sklearn.linear_model.LassoCV,eps,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+1,3.2.4.1.3. sklearn.linear_model.LassoCV,n_alphas,int,100,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+2,3.2.4.1.3. sklearn.linear_model.LassoCV,alphas,numpy array,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+3,3.2.4.1.3. sklearn.linear_model.LassoCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+4,3.2.4.1.3. sklearn.linear_model.LassoCV,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+5,3.2.4.1.3. sklearn.linear_model.LassoCV,precompute,True | False | ‘auto’ | array-like,’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+6,3.2.4.1.3. sklearn.linear_model.LassoCV,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+7,3.2.4.1.3. sklearn.linear_model.LassoCV,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+8,3.2.4.1.3. sklearn.linear_model.LassoCV,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+9,3.2.4.1.3. sklearn.linear_model.LassoCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+10,3.2.4.1.3. sklearn.linear_model.LassoCV,verbose,bool or integer,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+11,3.2.4.1.3. sklearn.linear_model.LassoCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+12,3.2.4.1.3. sklearn.linear_model.LassoCV,positive,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+13,3.2.4.1.3. sklearn.linear_model.LassoCV,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+14,3.2.4.1.3. sklearn.linear_model.LassoCV,selection,str,’cyclic’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoCV.html
+0,sklearn.linear_model.LassoLars,alpha,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLars.html
+1,sklearn.linear_model.LassoLars,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLars.html
+2,sklearn.linear_model.LassoLars,verbose,boolean or integer,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLars.html
+3,sklearn.linear_model.LassoLars,normalize,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLars.html
+4,sklearn.linear_model.LassoLars,precompute,True | False | ‘auto’ | array-like,’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLars.html
+5,sklearn.linear_model.LassoLars,max_iter,integer,500,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLars.html
+6,sklearn.linear_model.LassoLars,eps,float,2.220446049250313e-16,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLars.html
+7,sklearn.linear_model.LassoLars,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLars.html
+8,sklearn.linear_model.LassoLars,fit_path,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLars.html
+9,sklearn.linear_model.LassoLars,positive,boolean (default=False),False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLars.html
+0,3.2.4.1.4. sklearn.linear_model.LassoLarsCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html
+1,3.2.4.1.4. sklearn.linear_model.LassoLarsCV,verbose,boolean or integer,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html
+2,3.2.4.1.4. sklearn.linear_model.LassoLarsCV,max_iter,integer,500,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html
+3,3.2.4.1.4. sklearn.linear_model.LassoLarsCV,normalize,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html
+4,3.2.4.1.4. sklearn.linear_model.LassoLarsCV,precompute,True | False | ‘auto’,’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html
+5,3.2.4.1.4. sklearn.linear_model.LassoLarsCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html
+6,3.2.4.1.4. sklearn.linear_model.LassoLarsCV,max_n_alphas,integer,1000,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html
+7,3.2.4.1.4. sklearn.linear_model.LassoLarsCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html
+8,3.2.4.1.4. sklearn.linear_model.LassoLarsCV,eps,float,2.220446049250313e-16,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html
+9,3.2.4.1.4. sklearn.linear_model.LassoLarsCV,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html
+10,3.2.4.1.4. sklearn.linear_model.LassoLarsCV,positive,boolean (default=False),False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsCV.html
+0,3.2.4.2.1. sklearn.linear_model.LassoLarsIC,criterion,‘bic’ | ‘aic’,’aic’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsIC.html
+1,3.2.4.2.1. sklearn.linear_model.LassoLarsIC,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsIC.html
+2,3.2.4.2.1. sklearn.linear_model.LassoLarsIC,verbose,boolean or integer,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsIC.html
+3,3.2.4.2.1. sklearn.linear_model.LassoLarsIC,normalize,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsIC.html
+4,3.2.4.2.1. sklearn.linear_model.LassoLarsIC,precompute,True | False | ‘auto’ | array-like,’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsIC.html
+5,3.2.4.2.1. sklearn.linear_model.LassoLarsIC,max_iter,integer,500,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsIC.html
+6,3.2.4.2.1. sklearn.linear_model.LassoLarsIC,eps,float,2.220446049250313e-16,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsIC.html
+7,3.2.4.2.1. sklearn.linear_model.LassoLarsIC,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsIC.html
+8,3.2.4.2.1. sklearn.linear_model.LassoLarsIC,positive,boolean (default=False),False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LassoLarsIC.html
+0,sklearn.linear_model.LinearRegression,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
+1,sklearn.linear_model.LinearRegression,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
+2,sklearn.linear_model.LinearRegression,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
+3,sklearn.linear_model.LinearRegression,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
+0,sklearn.linear_model.MultiTaskElasticNet,alpha,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNet.html
+1,sklearn.linear_model.MultiTaskElasticNet,l1_ratio,float,0.5,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNet.html
+2,sklearn.linear_model.MultiTaskElasticNet,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNet.html
+3,sklearn.linear_model.MultiTaskElasticNet,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNet.html
+4,sklearn.linear_model.MultiTaskElasticNet,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNet.html
+5,sklearn.linear_model.MultiTaskElasticNet,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNet.html
+6,sklearn.linear_model.MultiTaskElasticNet,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNet.html
+7,sklearn.linear_model.MultiTaskElasticNet,warm_start,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNet.html
+8,sklearn.linear_model.MultiTaskElasticNet,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNet.html
+9,sklearn.linear_model.MultiTaskElasticNet,selection,str,’cyclic’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNet.html
+0,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,eps,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+0,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,eps,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+1,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,n_alphas,int,100,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+1,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,n_alphas,int,100,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+2,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,alphas,array-like,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+2,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,alphas,array-like,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+3,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+3,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+4,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+4,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+5,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+5,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+6,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+6,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+7,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+7,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+8,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+8,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+9,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,verbose,bool or integer,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+9,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,verbose,bool or integer,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+10,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+10,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+11,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+11,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+12,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,selection,str,’cyclic’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+12,3.2.4.1.7. sklearn.linear_model.MultiTaskLassoCV,selection,str,’cyclic’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskLassoCV.html
+0,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,l1_ratio,float or array of floats,0.5,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+0,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,l1_ratio,float or array of floats,0.5,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+0,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,l1_ratio,float or array of floats,0.5,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+1,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,eps,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+1,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,eps,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+1,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,eps,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+2,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,n_alphas,int,100,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+2,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,n_alphas,int,100,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+2,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,n_alphas,int,100,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+3,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,alphas,array-like,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+3,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,alphas,array-like,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+3,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,alphas,array-like,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+4,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+4,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+4,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+5,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+5,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+5,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+6,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+6,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+6,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+7,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+7,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+7,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+8,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+8,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+8,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+9,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+9,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+9,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+10,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,verbose,bool or integer,0,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+10,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,verbose,bool or integer,0,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+10,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,verbose,bool or integer,0,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+11,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+11,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+11,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+12,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+12,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+12,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+13,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,selection,str,’cyclic’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+13,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,selection,str,’cyclic’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+13,3.2.4.1.6. sklearn.linear_model.MultiTaskElasticNetCV,selection,str,’cyclic’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.MultiTaskElasticNetCV.html
+0,sklearn.linear_model.OrthogonalMatchingPursuit,n_nonzero_coefs,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuit.html
+1,sklearn.linear_model.OrthogonalMatchingPursuit,tol,float,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuit.html
+2,sklearn.linear_model.OrthogonalMatchingPursuit,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuit.html
+3,sklearn.linear_model.OrthogonalMatchingPursuit,normalize,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuit.html
+4,sklearn.linear_model.OrthogonalMatchingPursuit,precompute,"{True, False, ‘auto’}",’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuit.html
+0,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,copy,bool,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+0,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,copy,bool,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+1,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+1,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+2,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,normalize,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+2,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,normalize,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+3,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,max_iter,integer,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+3,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,max_iter,integer,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+4,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+4,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,cv,int,’warn’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+5,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+5,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+6,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,verbose,boolean or integer,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+6,3.2.4.1.8. sklearn.linear_model.OrthogonalMatchingPursuitCV,verbose,boolean or integer,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.OrthogonalMatchingPursuitCV.html
+0,sklearn.linear_model.RANSACRegressor,base_estimator,object,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+1,sklearn.linear_model.RANSACRegressor,min_samples,int (>= 1) or float ([0,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+2,sklearn.linear_model.RANSACRegressor,residual_threshold,float,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+3,sklearn.linear_model.RANSACRegressor,is_data_valid,callable,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+4,sklearn.linear_model.RANSACRegressor,is_model_valid,callable,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+5,sklearn.linear_model.RANSACRegressor,max_trials,int,100,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+6,sklearn.linear_model.RANSACRegressor,max_skips,int,inf,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+7,sklearn.linear_model.RANSACRegressor,stop_n_inliers,int,inf,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+8,sklearn.linear_model.RANSACRegressor,stop_score,float,inf,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+9,sklearn.linear_model.RANSACRegressor,stop_probability,float in range [0,0.99,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+10,sklearn.linear_model.RANSACRegressor,loss,string,’absolute_loss’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+11,sklearn.linear_model.RANSACRegressor,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RANSACRegressor.html
+0,sklearn.linear_model.Ridge,alpha,"{float, array-like}",1.0,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html
+1,sklearn.linear_model.Ridge,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html
+2,sklearn.linear_model.Ridge,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html
+3,sklearn.linear_model.Ridge,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html
+4,sklearn.linear_model.Ridge,max_iter,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html
+5,sklearn.linear_model.Ridge,tol,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html
+6,sklearn.linear_model.Ridge,solver,"{‘auto’, ‘svd’, ‘cholesky’, ‘lsqr’, ‘sparse_cg’, ‘sag’, ‘saga’}",’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html
+7,sklearn.linear_model.Ridge,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html
+0,sklearn.linear_model.RidgeClassifier,alpha,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html
+1,sklearn.linear_model.RidgeClassifier,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html
+2,sklearn.linear_model.RidgeClassifier,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html
+3,sklearn.linear_model.RidgeClassifier,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html
+4,sklearn.linear_model.RidgeClassifier,max_iter,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html
+5,sklearn.linear_model.RidgeClassifier,tol,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html
+6,sklearn.linear_model.RidgeClassifier,class_weight,dict or ‘balanced’,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html
+7,sklearn.linear_model.RidgeClassifier,solver,"{‘auto’, ‘svd’, ‘cholesky’, ‘lsqr’, ‘sparse_cg’, ‘sag’, ‘saga’}",’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html
+8,sklearn.linear_model.RidgeClassifier,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifier.html
+0,3.2.4.1.10. sklearn.linear_model.RidgeClassifierCV,alphas,numpy array of shape [n_alphas],,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifierCV.html
+1,3.2.4.1.10. sklearn.linear_model.RidgeClassifierCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifierCV.html
+2,3.2.4.1.10. sklearn.linear_model.RidgeClassifierCV,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifierCV.html
+3,3.2.4.1.10. sklearn.linear_model.RidgeClassifierCV,scoring,string,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifierCV.html
+4,3.2.4.1.10. sklearn.linear_model.RidgeClassifierCV,cv,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifierCV.html
+5,3.2.4.1.10. sklearn.linear_model.RidgeClassifierCV,class_weight,dict or ‘balanced’,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifierCV.html
+6,3.2.4.1.10. sklearn.linear_model.RidgeClassifierCV,store_cv_values,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeClassifierCV.html
+0,3.2.4.1.9. sklearn.linear_model.RidgeCV,alphas,numpy array of shape [n_alphas],,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+0,3.2.4.1.9. sklearn.linear_model.RidgeCV,alphas,numpy array of shape [n_alphas],,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+1,3.2.4.1.9. sklearn.linear_model.RidgeCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+1,3.2.4.1.9. sklearn.linear_model.RidgeCV,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+2,3.2.4.1.9. sklearn.linear_model.RidgeCV,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+2,3.2.4.1.9. sklearn.linear_model.RidgeCV,normalize,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+3,3.2.4.1.9. sklearn.linear_model.RidgeCV,scoring,string,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+3,3.2.4.1.9. sklearn.linear_model.RidgeCV,scoring,string,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+4,3.2.4.1.9. sklearn.linear_model.RidgeCV,cv,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+4,3.2.4.1.9. sklearn.linear_model.RidgeCV,cv,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+5,3.2.4.1.9. sklearn.linear_model.RidgeCV,gcv_mode,"{None, ‘auto’, ‘svd’, eigen’}",None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+5,3.2.4.1.9. sklearn.linear_model.RidgeCV,gcv_mode,"{None, ‘auto’, ‘svd’, eigen’}",None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+6,3.2.4.1.9. sklearn.linear_model.RidgeCV,store_cv_values,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+6,3.2.4.1.9. sklearn.linear_model.RidgeCV,store_cv_values,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.RidgeCV.html
+0,sklearn.linear_model.TheilSenRegressor,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TheilSenRegressor.html
+1,sklearn.linear_model.TheilSenRegressor,copy_X,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TheilSenRegressor.html
+2,sklearn.linear_model.TheilSenRegressor,max_subpopulation,int,10000.0,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TheilSenRegressor.html
+3,sklearn.linear_model.TheilSenRegressor,n_subsamples,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TheilSenRegressor.html
+4,sklearn.linear_model.TheilSenRegressor,max_iter,int,300,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TheilSenRegressor.html
+5,sklearn.linear_model.TheilSenRegressor,tol,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TheilSenRegressor.html
+6,sklearn.linear_model.TheilSenRegressor,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TheilSenRegressor.html
+7,sklearn.linear_model.TheilSenRegressor,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TheilSenRegressor.html
+8,sklearn.linear_model.TheilSenRegressor,verbose,boolean,False,https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.TheilSenRegressor.html
+0,sklearn.multioutput.MultiOutputRegressor,n_jobs,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.multioutput.MultiOutputRegressor.html
+0,sklearn.multioutput.RegressorChain,order,array-like,None,https://scikit-learn.org/stable/modules/generated/sklearn.multioutput.RegressorChain.html
+1,sklearn.multioutput.RegressorChain,cv,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.multioutput.RegressorChain.html
+2,sklearn.multioutput.RegressorChain,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.multioutput.RegressorChain.html
+0,sklearn.neural_network.MLPRegressor,hidden_layer_sizes,tuple,,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+1,sklearn.neural_network.MLPRegressor,activation,"{‘identity’, ‘logistic’, ‘tanh’, ‘relu’}",’relu’,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+2,sklearn.neural_network.MLPRegressor,solver,"{‘lbfgs’, ‘sgd’, ‘adam’}",’adam’,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+3,sklearn.neural_network.MLPRegressor,alpha,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+4,sklearn.neural_network.MLPRegressor,batch_size,int,’auto’,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+5,sklearn.neural_network.MLPRegressor,learning_rate,"{‘constant’, ‘invscaling’, ‘adaptive’}",’constant’,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+6,sklearn.neural_network.MLPRegressor,learning_rate_init,double,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+7,sklearn.neural_network.MLPRegressor,power_t,double,0.5,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+8,sklearn.neural_network.MLPRegressor,max_iter,int,200,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+9,sklearn.neural_network.MLPRegressor,shuffle,bool,True,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+10,sklearn.neural_network.MLPRegressor,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+11,sklearn.neural_network.MLPRegressor,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+12,sklearn.neural_network.MLPRegressor,verbose,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+13,sklearn.neural_network.MLPRegressor,warm_start,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+14,sklearn.neural_network.MLPRegressor,momentum,float,0.9,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+15,sklearn.neural_network.MLPRegressor,nesterovs_momentum,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+16,sklearn.neural_network.MLPRegressor,early_stopping,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+17,sklearn.neural_network.MLPRegressor,validation_fraction,float,0.1,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+18,sklearn.neural_network.MLPRegressor,beta_1,float,0.9,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+19,sklearn.neural_network.MLPRegressor,beta_2,float,0.999,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+20,sklearn.neural_network.MLPRegressor,epsilon,float,1e-08,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+21,sklearn.neural_network.MLPRegressor,n_iter_no_change,int,10,https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html
+0,sklearn.svm.LinearSVR,epsilon,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+0,sklearn.svm.LinearSVR,epsilon,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+1,sklearn.svm.LinearSVR,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+1,sklearn.svm.LinearSVR,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+2,sklearn.svm.LinearSVR,C,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+2,sklearn.svm.LinearSVR,C,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+3,sklearn.svm.LinearSVR,loss,string,’epsilon_insensitive’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+3,sklearn.svm.LinearSVR,loss,string,’epsilon_insensitive’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+4,sklearn.svm.LinearSVR,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+4,sklearn.svm.LinearSVR,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+5,sklearn.svm.LinearSVR,intercept_scaling,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+5,sklearn.svm.LinearSVR,intercept_scaling,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+6,sklearn.svm.LinearSVR,dual,bool,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+6,sklearn.svm.LinearSVR,dual,bool,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+7,sklearn.svm.LinearSVR,verbose,int,0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+7,sklearn.svm.LinearSVR,verbose,int,0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+8,sklearn.svm.LinearSVR,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+8,sklearn.svm.LinearSVR,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+9,sklearn.svm.LinearSVR,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+9,sklearn.svm.LinearSVR,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+0,sklearn.svm.NuSVR,nu,float,0.5,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+0,sklearn.svm.NuSVR,nu,float,0.5,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+1,sklearn.svm.NuSVR,C,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+1,sklearn.svm.NuSVR,C,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+2,sklearn.svm.NuSVR,kernel,string,’rbf’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+2,sklearn.svm.NuSVR,kernel,string,’rbf’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+3,sklearn.svm.NuSVR,degree,int,3,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+3,sklearn.svm.NuSVR,degree,int,3,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+4,sklearn.svm.NuSVR,gamma,float,’auto_deprecated’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+4,sklearn.svm.NuSVR,gamma,float,’auto_deprecated’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+5,sklearn.svm.NuSVR,coef0,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+5,sklearn.svm.NuSVR,coef0,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+6,sklearn.svm.NuSVR,shrinking,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+6,sklearn.svm.NuSVR,shrinking,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+7,sklearn.svm.NuSVR,tol,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+7,sklearn.svm.NuSVR,tol,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+8,sklearn.svm.NuSVR,cache_size,float,200,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+8,sklearn.svm.NuSVR,cache_size,float,200,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+9,sklearn.svm.NuSVR,verbose,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+9,sklearn.svm.NuSVR,verbose,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+10,sklearn.svm.NuSVR,max_iter,int,-1,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+10,sklearn.svm.NuSVR,max_iter,int,-1,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+0,sklearn.svm.SVR,kernel,string,’rbf’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+1,sklearn.svm.SVR,degree,int,3,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+2,sklearn.svm.SVR,gamma,float,’auto_deprecated’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+3,sklearn.svm.SVR,coef0,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+4,sklearn.svm.SVR,tol,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+5,sklearn.svm.SVR,C,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+6,sklearn.svm.SVR,epsilon,float,0.1,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+7,sklearn.svm.SVR,shrinking,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+8,sklearn.svm.SVR,cache_size,float,200,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+9,sklearn.svm.SVR,verbose,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+10,sklearn.svm.SVR,max_iter,int,-1,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+0,sklearn.svm.LinearSVR,epsilon,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+0,sklearn.svm.LinearSVR,epsilon,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+1,sklearn.svm.LinearSVR,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+1,sklearn.svm.LinearSVR,tol,float,0.0001,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+2,sklearn.svm.LinearSVR,C,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+2,sklearn.svm.LinearSVR,C,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+3,sklearn.svm.LinearSVR,loss,string,’epsilon_insensitive’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+3,sklearn.svm.LinearSVR,loss,string,’epsilon_insensitive’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+4,sklearn.svm.LinearSVR,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+4,sklearn.svm.LinearSVR,fit_intercept,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+5,sklearn.svm.LinearSVR,intercept_scaling,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+5,sklearn.svm.LinearSVR,intercept_scaling,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+6,sklearn.svm.LinearSVR,dual,bool,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+6,sklearn.svm.LinearSVR,dual,bool,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+7,sklearn.svm.LinearSVR,verbose,int,0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+7,sklearn.svm.LinearSVR,verbose,int,0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+8,sklearn.svm.LinearSVR,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+8,sklearn.svm.LinearSVR,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+9,sklearn.svm.LinearSVR,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+9,sklearn.svm.LinearSVR,max_iter,int,1000,https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html
+0,sklearn.svm.NuSVR,nu,float,0.5,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+0,sklearn.svm.NuSVR,nu,float,0.5,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+1,sklearn.svm.NuSVR,C,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+1,sklearn.svm.NuSVR,C,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+2,sklearn.svm.NuSVR,kernel,string,’rbf’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+2,sklearn.svm.NuSVR,kernel,string,’rbf’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+3,sklearn.svm.NuSVR,degree,int,3,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+3,sklearn.svm.NuSVR,degree,int,3,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+4,sklearn.svm.NuSVR,gamma,float,’auto_deprecated’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+4,sklearn.svm.NuSVR,gamma,float,’auto_deprecated’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+5,sklearn.svm.NuSVR,coef0,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+5,sklearn.svm.NuSVR,coef0,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+6,sklearn.svm.NuSVR,shrinking,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+6,sklearn.svm.NuSVR,shrinking,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+7,sklearn.svm.NuSVR,tol,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+7,sklearn.svm.NuSVR,tol,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+8,sklearn.svm.NuSVR,cache_size,float,200,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+8,sklearn.svm.NuSVR,cache_size,float,200,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+9,sklearn.svm.NuSVR,verbose,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+9,sklearn.svm.NuSVR,verbose,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+10,sklearn.svm.NuSVR,max_iter,int,-1,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+10,sklearn.svm.NuSVR,max_iter,int,-1,https://scikit-learn.org/stable/modules/generated/sklearn.svm.NuSVR.html
+0,sklearn.svm.SVR,kernel,string,’rbf’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+1,sklearn.svm.SVR,degree,int,3,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+2,sklearn.svm.SVR,gamma,float,’auto_deprecated’,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+3,sklearn.svm.SVR,coef0,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+4,sklearn.svm.SVR,tol,float,0.001,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+5,sklearn.svm.SVR,C,float,1.0,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+6,sklearn.svm.SVR,epsilon,float,0.1,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+7,sklearn.svm.SVR,shrinking,boolean,True,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+8,sklearn.svm.SVR,cache_size,float,200,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+9,sklearn.svm.SVR,verbose,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+10,sklearn.svm.SVR,max_iter,int,-1,https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html
+0,sklearn.tree.DecisionTreeRegressor,criterion,string,’mse’,https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html
+1,sklearn.tree.DecisionTreeRegressor,splitter,string,’best’,https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html
+2,sklearn.tree.DecisionTreeRegressor,max_depth,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html
+3,sklearn.tree.DecisionTreeRegressor,min_samples_split,int,2,https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html
+4,sklearn.tree.DecisionTreeRegressor,min_samples_leaf,int,1,https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html
+5,sklearn.tree.DecisionTreeRegressor,min_weight_fraction_leaf,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html
+6,sklearn.tree.DecisionTreeRegressor,max_features,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html
+7,sklearn.tree.DecisionTreeRegressor,random_state,int,None,https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html
+8,sklearn.tree.DecisionTreeRegressor,max_leaf_nodes,int or None,None,https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html
+9,sklearn.tree.DecisionTreeRegressor,min_impurity_decrease,float,0.0,https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html
+10,sklearn.tree.DecisionTreeRegressor,min_impurity_split,float,None,https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html
+11,sklearn.tree.DecisionTreeRegressor,presort,bool,False,https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html
