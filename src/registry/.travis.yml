@@ -1,0 +1,34 @@
+
+## Documentation: http://docs.travis-ci.com/user/languages/julia/
+language: julia
+os:
+  - linux
+  - osx
+julia:
+  - 1.0
+  - 1.1
+  - nightly
+notifications:
+  email: false
+git:
+  depth: 99999999
+
+## uncomment the following lines to allow failures on nightly julia
+## (tests will run but not make your overall status red)
+matrix:
+  allow_failures:
+  - julia: nightly
+
+## uncomment following lines to deploy documentation
+#jobs:
+#  include:
+#    - stage: Documentation
+#      julia: 1.0
+#      os: linux
+#      script:
+#        - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.develop(PackageSpec(path=pwd()))'
+#        - julia --project=docs --color=yes docs/make.jl
+#      after_success: skip
+after_success:
+  - julia --project=test/coverage -e 'using Pkg; Pkg.instantiate()'
+  - julia --project=test/coverage test/coverage/coverage.jl

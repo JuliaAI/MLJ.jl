@@ -1,27 +1,6 @@
 # to be depreciated:
 const FiniteOrderedFactor = OrderedFactor
 
-
-## LOADING METADATA FOR EXTERNAL PACKAGE MODELS
-
-const path_to_metadata_dot_toml = joinpath(srcdir, "../") # todo: make os independent
-const remote_file =
-    @RemoteFile "https://raw.githubusercontent.com/alan-turing-institute/MLJRegistry.jl/dev/Metadata.toml" dir=path_to_metadata_dot_toml
-
-const local_metadata_file = joinpath(path_to_metadata_dot_toml, "Metadata.toml")
-
-# update locally archived Metadata.toml:
-try 
-    download(remote_file, quiet=true, force=true)
-catch 
-    @info "Unable to update model metadata from github.alan-turing-institute/MLJRegistry. "*
-    "Using locally archived metadata. "
-end
-
-# metadata for models in external packages (`decode_dic` restores
-# symbols from string representations):
-const METADATA = TOML.parsefile(local_metadata_file)
-
 """
    info(model, pkg=nothing)
 

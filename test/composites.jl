@@ -143,7 +143,9 @@ knn2 = deepcopy(knn)
 ys2 = source(nothing)
 
 # duplicate a network:
+############################
 yhat2 = replace(yhat, hot=>hot2, knn=>knn2, ys=>source(ys.data))
+
 @test_logs((:info, r"^Train.*OneHot"),
            (:info, r"^Spawn"),
            (:info, r"^Train.*Univ"),

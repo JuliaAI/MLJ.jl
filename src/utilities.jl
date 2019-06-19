@@ -1,9 +1,24 @@
+## FOR ENCODING AND DECODING MODEL METADATA
 
-# NOTE: The next three functions should be identical to those defined
-# in MLJRegistry/src/MLJRegistry.jl (not explicitly shared for
-# dependency reasons).
+function encode_dic(s)
+    if s isa Symbol
+        return string(":", s)
+    elseif s isa AbstractString
+        return string(s)
+    else
+        return string("`", s, "`")
+    end
+end
 
-# for decoding metadata:
+encode_dic(v::Vector) = encode_dic.(v)
+function encode_dic(d::Dict)
+    ret = Dict{}()
+    for (k, v) in d
+        ret[encode_dic(k)] = encode_dic(v)
+    end
+    return ret
+end
+
 function decode_dic(s::String)
     if !isempty(s)
         if  s[1] == ':'
@@ -17,6 +32,7 @@ function decode_dic(s::String)
         return ""
     end
 end
+
 decode_dic(v::Vector) = decode_dic.(v)
 function decode_dic(d::Dict)
     ret = Dict()
@@ -41,6 +57,9 @@ function inverse(d::Dict{S,Set{T}}) where {S,T}
     end
     return dinv
 end
+
+
+## SOME GENERAL PURPOSE MACROS
 
 macro colon(p)
     Expr(:quote, p)

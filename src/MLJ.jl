@@ -59,7 +59,6 @@ import MLJBase: show_as_constructed, params
 
 using RemoteFiles
 import Pkg.TOML
-#import Requires.@require  # lazy code loading package
 using  CategoricalArrays
 import Distributions: pdf, mode
 import Distributions
@@ -77,6 +76,10 @@ using LinearAlgebra
 using Random
 import Distributed: @distributed, nworkers, pmap
 using RecipesBase # for plotting
+
+# submodules of this module:
+include("registry/src/Registry.jl") 
+import .Registry
 
 const srcdir = dirname(@__FILE__) # the directory containing this file:
 const CategoricalElement = Union{CategoricalString,CategoricalValue}
@@ -102,9 +105,17 @@ include("builtins/KNN.jl")
 include("builtins/ridge.jl") # defines a model for testing only
 
 
-## GET THE EXTERNAL MODEL METADATA AND MERGE WITH MLJ MODEL METADATA
+include("loading.jl") # model metadata processing
 
-include("loading.jl")      # model metadata processing
+
+## GET THE EXTERNAL MODEL METADATA
+
+function __init__()
+    global metadata_file = joinpath(srcdir, "registry", "Metadata.toml")
+    global METADATA = TOML.parsefile(metadata_file)
+end
+
+
 
 
 ## SIMPLE PLOTTING RECIPE

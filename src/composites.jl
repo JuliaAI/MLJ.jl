@@ -142,14 +142,17 @@ function Base.replace(W::Node, pairs::Pair...) where N
     end
     sources_ = sources(W)
     sources_to_copy = setdiff(sources_, first.(source_pairs))
+    isempty(sources_to_copy) ||
+        @warn "No replacement specified for one or more source nodes. "*
+    "Data there will be duplicated. "
     source_copy_pairs = [source=>deepcopy(source) for source in sources_to_copy]
     all_source_pairs = vcat(source_pairs, source_copy_pairs)
-
+    
     # drop source nodes from all nodes of network terminating at W:
     nodes_ = filter(nodes(W)) do N
         !(N isa Source)
     end
-    
+    isempty(nodes_) && error("All nodes in network are source nodes. ")
     # instantiate node and machine dictionaries:
     newnode_given_old =
         IdDict{AbstractNode,AbstractNode}(all_source_pairs) 
@@ -157,24 +160,24 @@ function Base.replace(W::Node, pairs::Pair...) where N
 
     # build the new network:
     for N in nodes_
-        args = [newnode_given_old[arg] for arg in N.args]
-        if N.machine == nothing
-            newnode_given_old[N] = node(N.operation, args...)
-        else
-            if N.machine in keys(newmach_given_old)
-                mach = newmach_given_old[N.machine]
-            else
-                train_args = [newnode_given_old[arg] for arg in N.machine.args]
-                mach = machine(newmodel_given_old[N.machine.model], train_args...)
-                newmach_given_old[N.machine] = mach
-            end
-            newnode_given_old[N] = N.operation(mach, args...)
+       args = [newnode_given_old[arg] for arg in N.args]
+         if N.machine == nothing
+             newnode_given_old[N] = node(N.operation, args...)
+         else
+             if N.machine in keys(newmach_given_old)
+                 mach = newmach_given_old[N.machine]
+             else
+                 train_args = [newnode_given_old[arg] for arg in N.machine.args]
+                 mach = machine(newmodel_given_old[N.machine.model], train_args...)
+                 newmach_given_old[N.machine] = mach
+             end
+             newnode_given_old[N] = N.operation(mach, args...)
         end
     end
-    
+
     return newnode_given_old[nodes_[end]]
-    
-end
+  
+ end
 
 """
     reset!(N::Node)

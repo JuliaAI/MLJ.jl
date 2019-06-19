@@ -26,6 +26,16 @@ dinv = Dict(
 
 @test MLJ.inverse(d) == dinv
 
+d = Dict()
+d[:test] = Tuple{Union{Continuous,Missing}, Finite}
+d["junk"] = Dict{Any,Any}("H" => Missing, :cross => "lemon", :t => :w, "r" => "r")
+d["a"] = "b"
+d[:f] = true
+d["j"] = :post
+
+@test MLJ.decode_dic(MLJ.encode_dic(d)) == d
+
+true
 
 end # module
 true
