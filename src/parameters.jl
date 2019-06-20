@@ -216,11 +216,11 @@ end
 Returns the type of the field `field` of a model M.
 """
 function get_type(M, field::Symbol)
-	if isdefined(M, field)
-		return typeof(getproperty(M, field))
-	else
-		error("Model $M does not have a field $field.")
-	end
+    if isdefined(M, field)
+        return typeof(getproperty(M, field))
+    else
+        error("Model $M does not have a field $field.")
+    end
 end
 
 """
