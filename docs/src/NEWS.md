@@ -6,6 +6,15 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+## MLJ v.0.2.5
+
+- Add MLJ [cheatsheet](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/mlj_cheatsheet.md)
+
+- Allow `models` to query specific traits, in addition to tasks. Query `?models` for details
+
+- add `@from_networks` macro for exporting learning networks as models (experimental). 
+
+
 ## MLJModels v0.2.4
 
 - Add compatibility requirement MLJBase="0.2.3" 
