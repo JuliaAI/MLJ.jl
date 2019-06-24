@@ -119,7 +119,7 @@ models `a1, a2, ...` of the original network with the specified targets
 `b1, b2, ...`.
 
 """
-function Base.replace(W::Node, pairs::Pair...) where N
+function Base.replace(W::Node, pairs::Pair...) 
 
     # Note: We construct nodes of the new network as values of a
     # dictionary keyed on the nodes of the old network. Additionally,
