@@ -38,6 +38,5 @@ stand = machine(Standardizer(), source((x1=rand(10),)))
 freeze!(stand)
 @test_logs (:warn, r"not trained as it is frozen\.$") fit!(stand)
 
-
 end # module
 true
