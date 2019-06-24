@@ -22,14 +22,14 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
             T =
                 input_is_multivariate(model) ? Union{scitypes(X)...} : scitype_union(X)
             T <: input_scitype_union(model) ||
-                error("The scitypes of elements of X, in machine(model, X, y), "*
-                      "should be a subtype of $(input_scitype_union(model)). ")
+                @warn "The scitypes of elements of X, in machine(model, X, y), "*
+                      "should be a subtype of $(input_scitype_union(model)). "
             y isa AbstractVector ||
-                error("The y, in machine(model, X, y), should be an AbstractVector "*
-                      "(possibly of tuples). ")
+                @warn "The y, in machine(model, X, y), should be an AbstractVector "*
+                      "(possibly of tuples). "
             scitype_union(y) <: target_scitype_union(model) || 
-                error("The scitype of elements of y, in machine(model, X, y), "*
-                      "should be a subtype of $(target_scitype_union(model)). ")
+                @warn "The scitype of elements of y, in machine(model, X, y), "*
+                      "should be a subtype of $(target_scitype_union(model)). "
         end
         if M <: Unsupervised
             length(args) == 1 ||
@@ -37,13 +37,13 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
                       "Use machine(model, X) for an unsupervised model.")
             X = args[1]
             container_type(X) in [:table, :sparse] || args[1] isa AbstractVector ||
-                error("The X, in machine(model, X), should be a table, sparse table or AbstractVector. "*
-                      "Use MLJ.table(X) to wrap an AbstractMatrix X as a table. ")
+                @warn "The X, in machine(model, X), should be a table, sparse table or AbstractVector. "*
+                      "Use MLJ.table(X) to wrap an AbstractMatrix X as a table. "
             U =
                 input_is_multivariate(model) ?  Union{scitypes(X)...} : scitype_union(X)
             U <: input_scitype_union(model) || 
-                error("The scitype of elements of X, in machine(model, X), should be a subtype "*
-                      "of $(input_scitype_union(model)). ")
+                @warn "The scitype of elements of X, in machine(model, X), should be a subtype "*
+                      "of $(input_scitype_union(model)). "
         end
 
         machine = new{M}(model)
