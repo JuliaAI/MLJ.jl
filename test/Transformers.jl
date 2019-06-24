@@ -39,7 +39,7 @@ fitresult, cache, report = MLJBase.fit(selector, 1, X)
 # #to_int = Trainable(to_int_hypers, [1,2,3,4])
 # #fitresult, cache, report = fit!(to_int, [1,2,3,4])
 # @test transform(to_int_hypers, fitresult, 5) == -1
-# @test transform(to_int_hypers, fitresult, [5,1])[1] == -1 
+# @test transform(to_int_hypers, fitresult, [5,1])[1] == -1
 
 # `UnivariateStandardizer`:
 stand = UnivariateStandardizer()
@@ -47,7 +47,7 @@ info(stand)
 #fit!(stand, 1:3)
 fitresult, cache, report = MLJBase.fit(stand, 1, [0, 2, 4])
 @test round.(Int, transform(stand, fitresult, [0,4,8])) == [-1.0,1.0,3.0]
-@test round.(Int, inverse_transform(stand, fitresult, [-1, 1, 3])) == [0, 4, 8] 
+@test round.(Int, inverse_transform(stand, fitresult, [-1, 1, 3])) == [0, 4, 8]
 
 # `Standardizer`:
 X, y = X_and_y(load_reduced_ames())
@@ -119,7 +119,7 @@ Xt = transform(t, fitresult, X)
 @test Xt.age == X.age
 @test Tables.schema(Xt).names == (:name__Ben, :name__John, :name__Mary,
                                   :height, :favourite_number__5,
-                                  :favourite_number__7, :favourite_number__10, :age) 
+                                  :favourite_number__7, :favourite_number__10, :age)
 
 # test that *entire* pool of categoricals is used in fit, including unseen levels:
 fitresult_small, cache, _ =
@@ -146,6 +146,27 @@ X.gender = categorical(['M', 'M', 'F', 'M'])
 @test_throws Exception transform(t, fitresult, X)
 
 #
+
+
+@testset "Imputer" begin
+    df=DataFrame(x=vcat([missing,1.0],ones(10)),y=vcat([missing,1.0],ones(10)),z=vcat([missing,1.0],ones(10)))
+    scitype(df[:y])
+    imp=fillImputer()
+    impRes=fit(imp,df)[1]
+    transform(imp,impRes,df)
+    @test !ismissing(df[:x])
+    df=DataFrame(x=categorical(vcat([missing for i=1:4], [["Old", "Young", "Middle", "Young"] for i=1:4]...)))
+    imp=fillImputer(features=[:x])
+    fitresult=fit(imp, df)[1]
+    transform(imp,fitresult,df)
+    @test !ismissing(df[:x])
+    imp=fillImputer()
+    df=DataFrame(x=[missing,missing,1,1,1,1,1,5])
+    fitresult=fit(imp, df)[1]
+    transform(imp,fitresult,df)
+    @test !ismissing(df[:x])
+end
+
 
 end
 true
