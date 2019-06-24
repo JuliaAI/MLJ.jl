@@ -478,10 +478,6 @@ end
 
 function predict(model::EitherEnsembleModel, fitresult, Xnew)
 
-    # because weights could have changed since last fit:
-    message = clean!(model)
-    isempty(message) || @warn message
-
     n = model.n
     if isempty(model.weights)
         weights = fill(1/n, n)

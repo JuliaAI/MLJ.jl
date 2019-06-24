@@ -61,7 +61,7 @@ d = predict(wens, weights, X)[1]
 
 
 ## ENSEMBLE MODEL
-
+;;;;
 # target is :deterministic :multiclass false:
 atom=MLJ.DeterministicConstantClassifier()
 X = MLJ.table(ones(5,3))
@@ -72,7 +72,9 @@ ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 weights = rand(10)
+weights = weights/sum(weights)
 ensemble_model.weights = weights
+fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
 @test MLJBase.target_scitype_union(ensemble_model) == MLJBase.target_scitype_union(atom)
@@ -92,6 +94,7 @@ fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 @test unique(fitresult.ensemble) ≈ [1.2]
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 weights = rand(10)
+weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
@@ -133,6 +136,7 @@ d = predict(ensemble_model, fitresult, MLJ.selectrows(X, test))[1]
 @test pdf(d, 'd') ≈ 1/5
 @test pdf(d, 'f') ≈ 1/5
 weights = rand(10)
+weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
@@ -160,6 +164,7 @@ d = predict(ensemble_model, fitresult, MLJ.selectrows(X, test))[1]
 d3 = fit(Distributions.Normal, y)
 @test pdf(d, 1.52) ≈ pdf(d3, 1.52)
 weights = rand(10)
+weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
