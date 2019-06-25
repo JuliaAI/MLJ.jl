@@ -211,18 +211,16 @@ function Base.show(stream::IO, object::ParamRange)
 end
 
 """ 
-   get_type(T, field::Symbol)
+   get_type(M, field::Symbol)
 
-Returns the type of the field `field` of `DataType` T. Not a
-type-stable function.  
-
+Returns the type of the field `field` of a model M.
 """
-function get_type(T, field::Symbol)
-    position = findfirst(fieldnames(T)) do fld
-        fld == field
+function get_type(M, field::Symbol)
+    if isdefined(M, field)
+        return typeof(getproperty(M, field))
+    else
+        error("Model $M does not have a field $field.")
     end
-    position != nothing || error("Type $T does not have $field as a field.")
-    return T.types[position]
 end
 
 """
@@ -252,7 +250,7 @@ See also: iterator
 """
 function Base.range(model, field::Symbol; values=nothing,
                     lower=nothing, upper=nothing, scale::D=:linear) where D
-    T = get_type(typeof(model), field)
+    T = get_type(model, field)
     if T <: Real
         (lower === nothing || upper === nothing) &&
             error("You must specify lower=... and upper=... .")
