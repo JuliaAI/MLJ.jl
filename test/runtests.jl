@@ -68,9 +68,9 @@ end
   @test include("tasks.jl")
 end
 
-@testset "registry environment compatibility" begin
-    @test MLJ.Registry.@update(true)
-end
+# @testset "registry environment compatibility" begin
+#     @test MLJ.Registry.@update(true)
+# end
 
 
 ## TEST THE EXAMPLES

@@ -82,9 +82,9 @@ function _update(mod, test_env_only)
         for pkg in $packages
             println(pkg)
         end
-        @info "Resolving registry environment..."
         using Pkg
         Pkg.activate($environment_path)
+        @info "resolving registry environment..."
         Pkg.resolve()
     end
 
