@@ -5,7 +5,9 @@ issues or the Julia [slack
 channel](https://slackinvite.julialang.org), #MLJ.
 
 
-- [List of presently implemented models](https://github.com/alan-turing-institute/MLJRegistry.jl/blob/dev/Models.toml), excluding built-ins (or run `models()` in MLJ)
+- [List of presently implemented
+  models](https://github.com/alan-turing-institute/MLJ.jl/blob/master/src/registry/Models.toml),
+  excluding built-in models. For full list, do `models()` in MLJ.
 
 - [Enhancement requests](https://github.com/alan-turing-institute/MLJ.jl/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3A%22enhancement%22)
 
@@ -34,7 +36,7 @@ A generalization of machine, called a *nodal* machine, is the key
 element of *learning networks* which combine several models
 together. See the [tour](docs/src/tour.ipynb) for more on these.
 
-The MLJ ecosystem is currently spread across four repositories:
+The core MLJ ecosystem is currently spread across three repositories:
 
 - [MLJ](https://github.com/alan-turing-institute/MLJ.jl) is the
   ordinary user's point-of-entry. It implements the meta-algorithms
@@ -43,13 +45,7 @@ The MLJ ecosystem is currently spread across four repositories:
 - [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl)
   defines the model interface which new algorithms must implement to
   participate in MLJ. 
-  
-- [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl)
-  stores metadata on all models "registered" with MLJ, which become
-  available to the MLJ user through the task interface, before external
-  packages implementing the models need be loaded. This is for MLJ
-  administrators.
-  
+    
 - [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   contains the implementation code for models in external packages
   that do not natively support the MLJ interface.
@@ -81,29 +77,30 @@ Longer term goals, are likely to be driven by end-user feedback; refer or add to
 requests](https://github.com/alan-turing-institute/MLJ.jl/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3A%22enhancement%22).
 
 
+
 #### Funding
 
 Development of MLJ is currently sponsored through the Alan Turing
 Institute “Machine Learning in Julia" project, in cooperation with
-Julia Computing. 
+Julia Computing and New Zealand eScience Infrastructure.
 
 
-#### The team at Turing
+#### Authors
 
-- Sebastian Vollmer (director, consultant)
-- Franz Kiraly (director, consultant)
-- Anthony Blaom, through an arrangement with NeSI (lead contributor, coordinator) 
-- Yiannis Simillides (contributor)
-- Ayush Shridar, UCL summer intern (contributor)
+**Core design.** Anthony Blaom, Franz Kiraly, Sebastian Vollmer
 
-#### At Julia Computing
+**Lead programmer.** Anthony Blaom
 
-- Mike Innes
+**Julia language consultants.** Mike Innes, Avik Sengupta
 
-#### Other contributors, past and present
+**Other contributors, past and present.** Diego Arenas, Edoardo Barp,
+Gergö Bohner, Michael K. Borregaard, Valentin Churavy, Harvey
+Devereux, Mosè Giordano, Thibaut Lienart, Mohammed Nook, Annika
+Stechemesser, Ayush Shridar, Yiannis Simillides
 
-Diego Arenas, Edoardo Barp, Gergö Bohner, Michael K. Borregaard,
-Valentin Churavy, Harvey Devereux, Mosè Giordano, Thibaut Lienart,
-Mohammed Nook, Annika Stechemesser, Ayush Shridar, Yiannis Simillides
+
+
+
+
 
 

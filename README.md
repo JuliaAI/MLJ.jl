@@ -39,8 +39,8 @@ scientific programming language, [Julia](https://julialang.org).
 
 The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html).
 
-A list of models implementing the MLJ interface:
-[MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl/blob/dev/Models.toml)
+A list of models in external packages that can be used with MLJ:
+[MLJRegistry](https://github.com/alan-turing-institute/MLJ.jl/blob/master/src/registry/Models.toml)
 
 [MLJ Cheatsheet](docs/src/mlj_cheatsheet.md)
 
@@ -48,14 +48,57 @@ A list of models implementing the MLJ interface:
 
 ### Installation
 
-In the Julia REPL:
+At the julia REPL prompt
 
-````julia
-]add MLJ
-add MLJModels
-````
+```julia
+using Pkg
+Pkg.add("MLJ")
+Pkg.add("MLJModels")
+```
 
-A docker image with installation [instructions](https://github.com/ysimillides/mlj-docker) is also available.
+To obtain a dictionary of all registered models, keyed on package name:
+
+```julia
+using MLJ
+models()
+```
+
+To add a package - for example,  DecisionTree - to your load path:
+
+```julia
+using Pkg
+Pkg.add("DecisionTree")
+```
+
+To load all code needed to use a model - for example, DecisionTreeClassifier:
+
+```julia
+@load DecisionTreeClassifier
+```
+
+Refer to the
+[documentation](https://alan-turing-institute.github.io/MLJ.jl/stable/)
+for for instantiating and running loaded models.
+
+
+**Package conflicts.** If you encounter package conflicts during
+installation, and are not familiar with the Julia package manager,
+then you can try installation in a fresh environment by first entering
+these commmands:
+
+
+```julia
+using Pkg
+Pkg.activate("my_mlj_env", shared=true)
+```
+
+In future REPL sessions, you can activate your (now populuted)
+environment with the same command.
+
+
+A docker image with installation
+[instructions](https://github.com/ysimillides/mlj-docker) is also
+available.
 
 
 ### Features to include:
