@@ -82,13 +82,16 @@ function _update(mod, test_env_only)
         for pkg in $packages
             println(pkg)
         end
-        @info "Instantiating registry environment..."
+        @info "Resolving registry environment..."
         using Pkg
         Pkg.activate($environment_path)
-        Pkg.instantiate()
+        Pkg.resolve()
     end
 
     program2 = quote
+
+        @info "Instantiating registry environment..."
+        Pkg.instantiate()
 
         @info "Loading registered packages..."
         import MLJBase
