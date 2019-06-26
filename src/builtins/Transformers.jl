@@ -7,6 +7,7 @@ export FeatureSelector
 export UnivariateStandardizer, Standardizer
 export UnivariateBoxCoxTransformer
 export OneHotEncoder
+export FillImputer
 
 import MLJBase: MLJType, Unsupervised
 import MLJBase: schema, selectcols, table, scitype, scitype_union, scitypes
@@ -15,7 +16,8 @@ import Distributions
 using CategoricalArrays
 using Statistics
 using Tables
-using FreqTables
+using DataFrames
+using StatsBase
 
 # to be extended:
 import MLJBase: fit, transform, inverse_transform
@@ -28,8 +30,8 @@ import MLJBase: OrderedFactor, Other, Finite, Infinite, Count
 const N_VALUES_THRESH = 16 # for BoxCoxTransformation
 const CategoricalElement = Union{CategoricalValue,CategoricalString}
 
-## FOR FEATURE (COLUMN) SELECTION
 
+## FOR FEATURE (COLUMN) SELECTION
 """
     FeatureSelector(features=Symbol[])
 
@@ -516,26 +518,13 @@ MLJBase.output_is_multivariate(::Type{<:OneHotEncoder}) = true
 
 ## Imputer
 """
-    fillImputer -   imputes by applying function to non missing values
+    FillImputer -   imputes by applying function to non missing values
                     default for continuous(median), CategoricalArray(most common),
                         Count (rounded median)
 
 
 """
-
-function commonCategoryFiller(vec::CategoricalArray)
-    ftab= freqtable(vec)
-    return names(ftab)[1][findmax(ftab)[2]]
-end
-
-function basetype(A::B) where {T,N,B<:AbstractArray{T,N}}
-    T
-end
-
-
-
-
-mutable struct fillImputer <: Unsupervised
+mutable struct FillImputer <: Unsupervised
     features::Vector{Symbol}
     continuous_fill::Union{Function}
     count_fill::Union{Function}
@@ -543,31 +532,36 @@ mutable struct fillImputer <: Unsupervised
     allowed_scitypes::Array{Any}
 
 end
-function common_cat_filler(vec::CategoricalArray)
+
+FillImputer(;features=Symbol[], continuous_fill=median,
+    count_fill=basic_count_fill ,categorical_fill=x->common_cat_filler(x),
+    allowed_scitypes=[Union{Continuous,Missing},Union{Count,Missing},Union{Multiclass,Missing}])= FillImputer(features,
+        continuous_fill,count_fill,categorical_fill,allowed_scitypes)
+
+
+function commonCategoryFiller(vec::CategoricalArray)
     ftab= freqtable(vec)
     return names(ftab)[1][findmax(ftab)[2]]
 end
 
 
-function basetype(A::B) where {T,N,B<:AbstractArray{T,N}}
-    T
+function common_cat_filler(vec::CategoricalArray)
+    return StatsBase.mode(vec)
 end
+
+
 
 function basic_count_fill(v)
-    round(basetype(v),median(v))
+    round(eltype(v),median(v))
 end
 
-fillImputer(;features=Symbol[], continuous_fill=median,
-    count_fill=basic_count_fill ,categorical_fill=x->common_cat_filler(x),
-    allowed_scitypes=[Union{Continuous,Missing},Union{Count,Missing},Union{Multiclass,Missing}])= fillImputer(features,
-        continuous_fill,count_fill,categorical_fill,allowed_scitypes)
 
 
-mutable struct fillImputerResult <: Unsupervised
+mutable struct FillImputerResult <: Unsupervised
     features::Vector{Symbol}
 end
 
-function fit(transformer::fillImputer,X)
+function fit(transformer::FillImputer,X)
     all_features = Tables.schema(X).names # a tuple not vector
     specified_features =isempty(transformer.features) ? collect(all_features) : transformer.features
 
@@ -582,7 +576,7 @@ function fit(transformer::fillImputer,X)
 
     end
 
-    fitresult = fillImputerResult(collect(features))
+    fitresult = FillImputerResult(collect(features))
     report = nothing
     cache = nothing
 
@@ -590,7 +584,8 @@ function fit(transformer::fillImputer,X)
 end
 
 
-function transform(transformer::fillImputer, fitresult, X)
+function transform(transformer::FillImputer, fitresult, X)
+
     df=DataFrame(X)
     features = Tables.schema(X).names # tuple not vector
     issubset(Set(fitresult.features), Set(features) ) ||
@@ -611,15 +606,15 @@ function transform(transformer::fillImputer, fitresult, X)
     end
     df
 end
-MLJBase.load_path(::Type{<:fillImputer}) = "MLJ.fillImputer"
-MLJBase.package_url(::Type{<:fillImputer}) = "https://github.com/alan-turing-institute/MLJ.jl"
-MLJBase.package_name(::Type{<:fillImputer}) = "MLJ"
-MLJBase.package_uuid(::Type{<:fillImputer}) = ""
-MLJBase.is_pure_julia(::Type{<:fillImputer}) = true
-MLJBase.input_scitype_union(::Type{<:fillImputer}) = Union{Missing,Found}
-MLJBase.input_is_multivariate(::Type{<:fillImputer}) = true
-MLJBase.output_scitype_union(::Type{<:fillImputer}) = Union{Missing,Found}
-MLJBase.output_is_multivariate(::Type{<:fillImputer}) = true
+MLJBase.load_path(::Type{<:FillImputer}) = "MLJ.FillImputer"
+MLJBase.package_url(::Type{<:FillImputer}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.package_name(::Type{<:FillImputer}) = "MLJ"
+MLJBase.package_uuid(::Type{<:FillImputer}) = ""
+MLJBase.is_pure_julia(::Type{<:FillImputer}) = true
+MLJBase.input_scitype_union(::Type{<:FillImputer}) = Union{Missing,Found}
+MLJBase.input_is_multivariate(::Type{<:FillImputer}) = true
+MLJBase.output_scitype_union(::Type{<:FillImputer}) = Union{Missing,Found}
+MLJBase.output_is_multivariate(::Type{<:FillImputer}) = true
 
 
 

@@ -151,16 +151,16 @@ X.gender = categorical(['M', 'M', 'F', 'M'])
 @testset "Imputer" begin
     df=DataFrame(x=vcat([missing,1.0],ones(10)),y=vcat([missing,1.0],ones(10)),z=vcat([missing,1.0],ones(10)))
     scitype(df[:y])
-    imp=fillImputer()
+    imp=FillImputer()
     impRes=fit(imp,df)[1]
     transform(imp,impRes,df)
     @test !ismissing(df[:x])
     df=DataFrame(x=categorical(vcat([missing for i=1:4], [["Old", "Young", "Middle", "Young"] for i=1:4]...)))
-    imp=fillImputer(features=[:x])
+    imp=FillImputer(features=[:x])
     fitresult=fit(imp, df)[1]
     transform(imp,fitresult,df)
     @test !ismissing(df[:x])
-    imp=fillImputer()
+    imp=FillImputer()
     df=DataFrame(x=[missing,missing,1,1,1,1,1,5])
     fitresult=fit(imp, df)[1]
     transform(imp,fitresult,df)

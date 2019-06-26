@@ -26,6 +26,7 @@ export FeatureSelector
 export UnivariateStandardizer, Standardizer
 export UnivariateBoxCoxTransformer
 export OneHotEncoder
+export FillImputer
 # export IntegerToInt64Transformer
 # export UnivariateDiscretizer, Discretizer
 
@@ -37,7 +38,7 @@ export nrows, nfeatures, info
 export SupervisedTask, UnsupervisedTask, MLJTask
 export Deterministic, Probabilistic, Unsupervised, Supervised
 export DeterministicNetwork, ProbabilisticNetwork
-export Found, Continuous, Finite, Infinite    
+export Found, Continuous, Finite, Infinite
 export OrderedFactor, Unknown
 export Count, Multiclass, Binary
 export scitype, scitype_union, scitypes
@@ -46,7 +47,7 @@ export transform, inverse_transform, se, evaluate, fitted_params
 export @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite
 export partition, X_and_y
 export load_boston, load_ames, load_iris, load_reduced_ames
-export load_crabs, datanow                
+export load_crabs, datanow
 export features, X_and_y
 
 using MLJBase
