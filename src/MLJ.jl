@@ -111,11 +111,10 @@ include("loading.jl") # model metadata processing
 ## GET THE EXTERNAL MODEL METADATA
 
 function __init__()
+    @info "Loading model metadata"
     global metadata_file = joinpath(srcdir, "registry", "Metadata.toml")
     global METADATA = TOML.parsefile(metadata_file)
 end
-
-
 
 
 ## SIMPLE PLOTTING RECIPE

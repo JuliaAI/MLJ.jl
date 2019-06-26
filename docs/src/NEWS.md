@@ -6,7 +6,16 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
-## MLJ v.0.2.5
+## MLJBase v0.2.4
+
+- Add ColorImage and GreyImage scitypes
+
+- Overload `in` method for subtypes of `Model` (apparently causing
+  Julia crashes in an untagged commit, because of a method signature
+  ambiguity, now resolved).
+
+
+## MLJ v0.2.5
 
 - Add MLJ [cheatsheet](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/mlj_cheatsheet.md)
 

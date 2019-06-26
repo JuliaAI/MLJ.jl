@@ -2,6 +2,8 @@
 
 ### [Installation instructions](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md)
 
+### [Glossary](glossary.md)
+
 
 ### Basic supervised training and testing
 
