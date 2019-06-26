@@ -165,5 +165,4 @@ Julia at the time ([in-depth](https://github.com/dominusmi/Julia-Machine-Learnin
 Further work culminated in the first MLJ
 [proof-of-concept](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
 
-
-
+For administrators: [Applying requests to register new models](REGISTRY.md).

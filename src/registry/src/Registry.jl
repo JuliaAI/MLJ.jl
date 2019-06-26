@@ -12,35 +12,6 @@ import MLJBase: OrderedFactor, Count, Multiclass, Binary
 const srcdir = dirname(@__FILE__) # the directory containing this file
 const environment_path = joinpath(srcdir, "..")
 
-## METHODS TO WRITE THE METADATA TO THE ARCHIVE
-
-
-# for decoding metadata:
-function decode_dic(s::String)
-    if !isempty(s)
-        if  s[1] == ':'
-            return Symbol(s[2:end])
-        elseif s[1] == '`'
-            return eval(Meta.parse(s[2:end-1]))
-        else
-            return s
-        end
-    else
-        return ""
-    end
-end
-decode_dic(v::Vector) = decode_dic.(v)
-function decode_dic(d::Dict)
-    ret = Dict()
-    for (k, v) in d
-        ret[decode_dic(k)] = decode_dic(v)
-    end
-    return ret
-end
-
-# TODO: make these OS independent (../ not working on windows?)
-# metadata() = TOML.parsefile(joinpath(srcdir, "../", "Metadata.toml")) |> decode_dic
-
 
 ## METHODS TO GENERATE METADATA AND WRITE TO ARCHIVE
 
