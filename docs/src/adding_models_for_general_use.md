@@ -644,7 +644,7 @@ to all MLJ users:
    code lives in the same package that contains the learning
    algorithms implementing the interface. In this case, it is
    sufficient to open an issue at
-   [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl)
+   [MLJ](https://github.com/alan-turing-institute/MLJ.jl)
    requesting the package to be registered with MLJ. Registering a package allows
    the MLJ user to access its models' metadata and to selectively load them.
 
@@ -657,8 +657,8 @@ to all MLJ users:
    via a pull-request, and test code at
    [MLJModels/test](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/test).
    Assuming `SomePkg` is the only package imported by the
-   implementation code, one needs to: (i) register `SomePkg` at
-   MLJRegistry as explained above; and (ii) add a corresponding
+   implementation code, one needs to: (i) register `SomePkg` with
+   MLJ as explained above; and (ii) add a corresponding
    `@require` line in the PR to
    [MLJModels/src/MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src/MLJModels.jl)
    to enable lazy-loading of that package by MLJ (following the
@@ -672,7 +672,7 @@ the `package_name` and `load_path` model traits appropriately, so that
 `MLJ`'s `@load` macro can find the necessary code (see
 [MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src)
 for examples). The `@load` command can only be tested after
-registration. If changes are made, lodge an issue at
-[MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl)
-to make the changes available to MLJ.  
+registration. If changes are made, lodge an new issue at
+[MLJ](https://github.com/alan-turing-institute/MLJ) requesting your 
+changes to be updated. 
 
