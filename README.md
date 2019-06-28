@@ -66,6 +66,10 @@ models()
 To add a package - for example,  DecisionTree - to your load path:
 
 ```julia
+julia> models()["DecisionTree"]
+2-element Array{Any,1}:
+ "DecisionTreeRegressor" 
+ "DecisionTreeClassifier"
 using Pkg
 Pkg.add("DecisionTree")
 ```
