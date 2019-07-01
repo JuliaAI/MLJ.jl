@@ -119,9 +119,10 @@ end
 # for when out-of-bag performance estimates are requested:
 function get_ensemble_and_indices(atom::Supervised, verbosity, X, y, n, n_patterns,
                       n_train, rng, progress_meter)
-    
- ensemble_indices = [StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
-                        for i in 1:n]
+
+    ensemble_indices =
+        [StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
+         for i in 1:n]
     ensemble = map(ensemble_indices) do train_rows
         verbosity == 1 && next!(progress_meter)
         verbosity < 2 ||  print("#")
@@ -427,12 +428,6 @@ function fit(model::EitherEnsembleModel{Atom}, verbosity::Int, X, y) where Atom<
 
         end
         metrics=mean(metrics, dims=1)
-
-        # Anthony thinks inclusion of this code is wrong:
-        # else TODO
-        #     @show hcat([metrics[k,:]*model.weights[k] for k=1:length(ensemble)]...)
-        #     metrics=mean(hcat([metrics[k,:]*model.weights[k] for k=1:length(ensemble)]...),dims=1)
-        # end
 
         names = Symbol.(string.(out_of_bag_measure))
         oob_estimates=NamedTuple{Tuple(names)}(Tuple(vec(metrics)))
