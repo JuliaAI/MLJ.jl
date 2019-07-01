@@ -15,7 +15,7 @@ t = Machine(KNNRegressor(K=4), X, y)
 @test_logs (:info, r"Training") fit!(t, rows=train)
 @test_logs (:info, r"Not retraining") fit!(t, rows=train)
 @test_logs (:info, r"Training") fit!(t)
-set_params!(t.model, (K = 5,))
+setproperty!(t, :(model.K),  5)
 @test_logs (:info, r"Updating") fit!(t)
 
 predict(t, X[test,:])

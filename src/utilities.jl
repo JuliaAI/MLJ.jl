@@ -1,3 +1,31 @@
+"""
+
+    flat_values(t::NamedTuple)
+
+Viewing a nested named tuple as a tree, return, as a tuple, the values
+at the leaves, in the order they appear in the tuple.
+
+```
+julia> t = (X = (x = 1, y = 2), Y = 3)
+julia> flat_values(t)
+(1, 2, 3)
+```
+
+"""
+function flat_values(params::NamedTuple)
+    values = []
+    for k in keys(params)
+        value = getproperty(params, k)
+        if value isa NamedTuple
+            append!(values, flat_values(value))
+        else
+            push!(values, value)
+        end
+    end
+    return Tuple(values)
+end
+
+
 ## FOR ENCODING AND DECODING MODEL METADATA
 
 function encode_dic(s)

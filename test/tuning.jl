@@ -33,7 +33,7 @@ info(tuned_model)
 
 tuned = machine(tuned_model, X, y)
 
-fit!(tuned, force=true, verbosity=2)
+fit!(tuned)
 report(tuned)
 tuned_model.full_report=true
 fit!(tuned)
