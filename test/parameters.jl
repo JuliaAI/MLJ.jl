@@ -57,7 +57,6 @@ tree = params(super_model)
     (lambda = 2.0, model1 = (K = 2, metric = 19, kernel = 'z'),
           model2 = (K = 6, metric = 20, kernel = 'x'))
 
-
 p1 = range(dummy_model, :K, lower=1, upper=10, scale=:log10) 
 p2 = range(dummy_model, :kernel, values=['c', 'd']) 
 p3 = range(super_model, :lambda, lower=0.1, upper=1, scale=:log2) 
@@ -65,7 +64,6 @@ p4 = range(dummy_model, :K, lower=1, upper=3, scale=x->2x)
 @test_throws ErrorException range(dummy_model, :K, lower=1, values=['c', 'd'])
 @test_throws ErrorException range(dummy_model, :kernel, upper=10)
 
-@test occursin(r"\e\[34mNumericRange\{K\} @ .*\e\[39m", repr(TestParameters.p1))
 @test MLJ.scale(p1) == :log10
 @test MLJ.scale(p2) == :none
 @test MLJ.scale(p3) == :log2
@@ -79,6 +77,11 @@ p4 = range(dummy_model, :K, lower=1, upper=3, scale=x->2x)
 u = 2^(log2(0.1)/2)
 @test MLJ.iterator(p3, 3) ≈ [0.1, u, 1]
 @test MLJ.iterator(p4, 3) == [2, 4, 6]
+
+# test ranges constructed from neste parameters specified with dots:
+q1 = range(super_model, :(model1.K) , lower=1, upper=10, scale=:log10) 
+@test iterator(q1, 5) == iterator(p1, 5)
+q2 = range
 
 # test unwinding of iterators
 iterators = ([1, 2], ["a","b"], ["x", "y", "z"])

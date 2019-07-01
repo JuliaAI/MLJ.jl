@@ -187,41 +187,31 @@ MLJ.inverse_transform(::SCALE, f::Function, x) = f(x) # not a typo!
 
 abstract type ParamRange <: MLJType end
 
-struct NominalRange{field,T} <: ParamRange
+Base.isempty(::ParamRange) = false
+
+struct NominalRange{T} <: ParamRange
+    field::Union{Symbol,Expr}
     values::Tuple{Vararg{T}}
 end
 
-struct NumericRange{field,T,D} <: ParamRange
+struct NumericRange{T,D} <: ParamRange
+    field::Union{Symbol,Expr}
     lower::T
     upper::T
     scale::D
 end
 
-function Base.show(stream::IO, object::ParamRange)
-    id = objectid(object)
-    field = typeof(object).parameters[1]
-    description = string(typeof(object).name.name, "{$field}")
-    str = "$description @ $(MLJBase.handle(object))"
-    if !isempty(fieldnames(typeof(object)))
-        printstyled(IOContext(stream, :color=> MLJBase.SHOW_COLOR),
-                    str, color=:blue)
-    else
-        print(stream, str)
-    end
-end
+# function Base.show(stream::IO, object::ParamRange)
+#     id = objectid(object)
+#     T = typeof(object).parameters[1]
+#     description = string(typeof(object).name.name, "{$T}")
+#     str = "$description @ $(MLJBase.handle(object))"
+#     printstyled(IOContext(stream, :color=> MLJBase.SHOW_COLOR),
+#                 str, color=:blue)
+#     print(stream, " for $(object.field)")
 
-""" 
-   get_type(M, field::Symbol)
 
-Returns the type of the field `field` of a model M.
-"""
-function get_type(M, field::Symbol)
-    if isdefined(M, field)
-        return typeof(getproperty(M, field))
-    else
-        error("Model $M does not have a field $field.")
-    end
-end
+MLJBase.show_as_constructed(::Type{<:ParamRange}) = true
 
 """
     r = range(model, :hyper; values=nothing)
@@ -248,16 +238,17 @@ and `upper`.
 See also: iterator
 
 """
-function Base.range(model, field::Symbol; values=nothing,
+function Base.range(model, field::Union{Symbol,Expr}; values=nothing,
                     lower=nothing, upper=nothing, scale::D=:linear) where D
-    T = get_type(model, field)
+    value = getproperty(model, field)
+    T = typeof(value)
     if T <: Real
         (lower === nothing || upper === nothing) &&
             error("You must specify lower=... and upper=... .")
-        return NumericRange{field,T,D}(lower, upper, scale)
+        return NumericRange{T,D}(field, lower, upper, scale)
     else
         values === nothing && error("You must specify values=... .")
-        return NominalRange{field,T}(Tuple(values))
+        return NominalRange{T}(field, Tuple(values))
     end
 end
 
@@ -271,7 +262,7 @@ possible return values are: `:none` (for a `NominalRange`), `:linear`,
 """
 scale(r::NominalRange) = :none
 scale(r::NumericRange) = :custom
-scale(r::NumericRange{field,T,Symbol}) where {field,T} =
+scale(r::NumericRange{T,Symbol}) where T =
     r.scale
 
 
@@ -279,7 +270,7 @@ scale(r::NumericRange{field,T,Symbol}) where {field,T} =
 
 iterator(param_range::NominalRange) = collect(param_range.values)
 
-function iterator(param_range::NumericRange{field,T}, n::Int) where {field,T<:Real}
+function iterator(param_range::NumericRange{T}, n::Int) where {T<:Real}
     s = scale(param_range.scale) 
     transformed = range(transform(Scale, s, param_range.lower),
                 stop=transform(Scale, s, param_range.upper),
@@ -291,7 +282,7 @@ function iterator(param_range::NumericRange{field,T}, n::Int) where {field,T<:Re
 end
 
 # in special case of integers, round to nearest integer:
-function iterator(param_range::NumericRange{field, I}, n::Int) where {field,I<:Integer}
+function iterator(param_range::NumericRange{I}, n::Int) where {I<:Integer}
     s = scale(param_range.scale) 
     transformed = range(transform(Scale, s, param_range.lower),
                 stop=transform(Scale, s, param_range.upper),
