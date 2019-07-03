@@ -172,8 +172,6 @@ end
 is_stale(mach::Machine) =
     !isdefined(mach, :fitresult) || (mach.model != mach.previous_model)
 
-machine(model::Model, args...) = Machine(model, args...)
-
 params(mach::AbstractMachine) = params(mach.model)
 report(mach::AbstractMachine) = mach.report
 
