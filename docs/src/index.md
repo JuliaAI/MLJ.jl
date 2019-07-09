@@ -195,7 +195,7 @@ different from `Unknown`:
 `AbstractFloat`             |      `Continuous`
 `Integer`                   |        `Count`
 `CategoricalValue`          | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false` 
-`CategoricalString`         | `Multiclass{N}` where `N =p nlevels(x)`, provided `x.pool.ordered == false`
+`CategoricalString`         | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false`
 `CategoricalValue`          | `OrderedFactor{N}` where `N = nlevels(x)`, provided `x.pool.ordered == true` 
 `CategoricalString`         | `OrderedFactor{N}` where `N = nlevels(x)` provided `x.pool.ordered == true`
 `Missing`                   | `Missing`
