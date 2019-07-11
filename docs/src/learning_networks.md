@@ -47,8 +47,8 @@ The diagram above depicts a learning network which standardises the
 input data `X`, learns an optimal Box-Cox transformation for the
 target `y`, predicts new target values using ridge regression, and
 then inverse-transforms those predictions, for later comparison with
-the original test data. The machines are labelled yellow. We first
-need to import the RidgeRegressor model (you will need MLJModels in
+the original test data. The machines are labelled in yellow. We first
+need to import the RidgeRegressor model (you will need `MLJModels` in
 your load path):
 
 ```julia
