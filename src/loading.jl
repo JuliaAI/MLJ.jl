@@ -15,7 +15,7 @@ function MLJBase.info(model::String; pkg=nothing)
             pkg = "MLJ"
         else
             pkg, success = try_to_get_package(model)
-            if !success 
+            if !success
                 error(pkg*"Use info($model, pkg=...)")
             end
         end
@@ -52,7 +52,7 @@ Restrict results to package model pairs `(m, p)` satisfying
 
     models(task::MLJTask)
 
-List all models matching the specified `task`. 
+List all models matching the specified `task`.
 
 ### Example
 
@@ -60,7 +60,7 @@ To retrieve all proababilistic classifiers:
 
     models(x -> x[:is_supervised] && x[:is_probabilistic]==true)
 
-See also: localmodels
+See also: [`localmodels`](@ref).
 
 """
 function models(conditional)
@@ -69,7 +69,7 @@ function models(conditional)
     packages = keys(meta) |> collect
     for pkg in packages
         _models = filter(keys(meta[pkg]) |> collect) do model
-            conditional(info(model, pkg=pkg)) 
+            conditional(info(model, pkg=pkg))
         end
         isempty(_models) || (_models_given_pkg[pkg] = _models)
     end
@@ -82,7 +82,7 @@ function models(task::SupervisedTask; kwargs...)
     ret = Dict{String, Any}()
     conditional(x) =
         x[:is_supervised] &&
-        x[:is_wrapper] == false && 
+        x[:is_wrapper] == false &&
         task.target_scitype_union <: x[:target_scitype_union] &&
         task.input_scitype_union <: x[:input_scitype_union] &&
         task.is_probabilistic == x[:is_probabilistic] &&
@@ -93,7 +93,7 @@ end
 function models(task::UnsupervisedTask; kwargs...)
     ret = Dict{String, Any}()
     conditional(x) =
-        x[:is_wrapper] == false && 
+        x[:is_wrapper] == false &&
         task.input_scitype_union <: x[:input_scitype_union] &&
         task.input_is_multivariate == x[:input_is_multivariate] &&
     return models(conditional, kwargs...)
@@ -190,6 +190,3 @@ macro load(model_ex, pkg_ex)
 
     _load(model, pkg, __module__)
 end
-
-
-    

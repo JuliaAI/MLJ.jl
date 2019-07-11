@@ -57,14 +57,14 @@ missing values.
 
     julia> v = coerce(Continuous, [1, missing, 5])
     3-element Array{Union{Missing, Float64},1}:
-     1.0     
+     1.0
      missing
-     5.0  
+     5.0
 
     julia> scitype_union(v)
     Union{Missing,Continuous}
 
-See also scitype, scitype_union, scitypes
+See also [`scitype`](@ref), [`scitype_union`](@ref), [`scitypes`](@ref).
 
 """
 coerce(T::Type{Continuous}, y::AbstractVector{<:Number}) = float(y)
@@ -132,7 +132,7 @@ end
     coerce(d::Dict, X)
 
 Return a copy of the table `X` with columns named in the keys of `d`
-coerced to have `scitype_union` equal to the corresponding value. 
+coerced to have `scitype_union` equal to the corresponding value.
 
 """
 function coerce(types::Dict, X)
@@ -153,11 +153,11 @@ end
 ## TASK CONSTRUCORS WITH OPTIONAL TYPE COERCION
 
 """
-    task = supervised(data=nothing, 
-                      types=Dict(), 
-                      target=nothing,  
-                      ignore=Symbol[], 
-                      is_probabilistic=false, 
+    task = supervised(data=nothing,
+                      types=Dict(),
+                      target=nothing,
+                      ignore=Symbol[],
+                      is_probabilistic=false,
                       verbosity=1)
 
 Construct a supervised learning task with input features `X` and
@@ -174,9 +174,9 @@ corresponding value. Possible values are `Continuous`, `Multiclass`,
 `types=Dict(:x1=>Count)` means elements of the column of `data` named
 `:x1` will be coerced into integers (whose scitypes are always `Count`).
 
-    task = supervised(X, y; 
-                      input_is_multivariate=true, 
-                      is_probabilistic=false, 
+    task = supervised(X, y;
+                      input_is_multivariate=true,
+                      is_probabilistic=false,
                       verbosity=1)
 
 A more customizable constructor, this returns a supervised learning
@@ -186,7 +186,7 @@ univariate, while `y` must be a vector whose elements are scalars, or
 tuples scalars (of constant length for ordinary multivariate
 predictions, and of variable length for sequence prediction). Table
 rows must correspond to patterns and columns to features. Type
-coercion is not available for this constructor (but see also `coerce`).
+coercion is not available for this constructor (but see also [`coerce`](@ref)).
 
     X, y = task()
 
@@ -202,7 +202,7 @@ supervised(X, y; kwargs...) = SupervisedTask(X, y; kwargs...)
 
 Construct an unsupervised learning task with given input `data`, which
 should be a table or, in the case of univariate inputs, a single
-vector. 
+vector.
 
 The data types of elements in a column of `data` named as a key of the
 dictionary `types` are coerced to have a scientific type given by the
@@ -224,5 +224,3 @@ See also [`scitype`](@ref), [`scitype_union`](@ref), [`scitypes`](@ref).
 """
 unsupervised(; data=nothing, types=Dict(), kwargs...) =
 	    UnsupervisedTask(; data = coerce(types, data), kwargs...)
-
-

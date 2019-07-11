@@ -42,14 +42,14 @@ cannot be called on new data unles it has a unique origin.
 Not to be confused with `sources(N)` which refers to the same graph
 but without the training edge deletions.
 
-See also: node, source
+See also: [`node`](@ref), [`source`](@ref).
 
 """
 origins(s::Source) = [s,]
 
 #  _merge!(nodes1, nodes2) incrementally appends to `nodes1` all
 # elements in `nodes2`, excluding any element previously added (or any
-# element of `nodes1` in its initial state). 
+# element of `nodes1` in its initial state).
 function _merge!(nodes1, nodes2)
     for x in nodes2
         if !(x in nodes1)
@@ -73,7 +73,7 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
     rows            # for remembering the rows used in last call to `fit!`
     state::Int      # number of times fit! has been called on machine
     upstream_state  # for remembering the upstream state in last call to `fit!`
-    
+
     function NodalMachine{M}(model::M, args::AbstractNode...) where M<:Model
 
         # check number of arguments for model subtypes:
@@ -84,7 +84,7 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
         !(M <: Unsupervised) || length(args) == 1 ||
             throw(error("Wrong number of arguments. "*
                         "Use NodalMachine(model, X) for an unsupervised model."))
-        
+
         machine = new{M}(model)
         machine.frozen = false
         machine.state = 0
@@ -133,7 +133,7 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
         # check the number of arguments:
         if machine == nothing
             length(args) > 0 || throw(error("`args` in `Node(::Function, args...)` must be non-empty. "))
-            
+
         end
 
         origins_ = unique(vcat([origins(arg) for arg in args]...))
@@ -241,7 +241,7 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
     for mach in machines
         fit!(mach; rows=rows, verbosity=verbosity, force=force)
     end
-    
+
     return y
 end
 
@@ -278,7 +278,7 @@ function _recursive_show(stream::IO, X::AbstractNode)
 end
 
 function Base.show(stream::IO, ::MIME"text/plain", X::AbstractNode)
-    id = objectid(X) 
+    id = objectid(X)
     description = string(typeof(X).name.name)
     str = "$description @ $(MLJBase.handle(X))"
     printstyled(IOContext(stream, :color=>MLJBase.SHOW_COLOR), str, color=:blue)
@@ -287,7 +287,7 @@ function Base.show(stream::IO, ::MIME"text/plain", X::AbstractNode)
         _recursive_show(stream, X)
     end
 end
-    
+
 function Base.show(stream::IO, ::MIME"text/plain", machine::NodalMachine)
     id = objectid(machine)
     description = string(typeof(machine).name.name)
@@ -317,7 +317,7 @@ categorical vector, or table. The calling behaviour of a source node is this:
     Xs(rows=r) = selectrows(X, r)  # eg, X[r,:] for a DataFrame
     Xs(Xnew) = Xnew
 
-See also: origins, node
+See also: [`origins`](@ref), [`node`](@ref).
 
 """
 source(X) = Source(X) # here `X` is data
@@ -325,7 +325,7 @@ source(X::Source) = X
 
 """
     N = node(f::Function, args...)
- 
+
 Defines a `Node` object `N` wrapping a static operation `f` and arguments
 `args`. Each of the `n` elements of `args` must be a `Node` or `Source`
 object. The node `N` has the following calling behaviour:
@@ -346,7 +346,7 @@ arguments) is this:
     J(rows=r) = f(mach, args[1](rows=r), args[2](rows=r), ..., args[n](rows=r))
     J(X) = f(mach, args[1](X), args[2](X), ..., args[n](X))
 
-Generally `n=1` or `n=2` in this latter case. 
+Generally `n=1` or `n=2` in this latter case.
 
     predict(mach, X::AbsractNode, y::AbstractNode)
     predict_mean(mach, X::AbstractNode, y::AbstractNode)
@@ -355,13 +355,13 @@ Generally `n=1` or `n=2` in this latter case.
     transform(mach, X::AbstractNode)
     inverse_transform(mach, X::AbstractNode)
 
-Shortcuts for `J = node(predict, mach, X, y)`, etc. 
+Shortcuts for `J = node(predict, mach, X, y)`, etc.
 
 Calling a node is a recursive operation which terminates in the call
 to a source node (or nodes). Calling nodes on *new* data `X` fails unless the
-number of such nodes is one.  
+number of such nodes is one.
 
-See also: source, origins
+See also: [`source`](@ref), [`origins`](@ref).
 
 """
 node = Node
@@ -384,4 +384,3 @@ import Base.+
 
 import Base.*
 *(lambda::Real, y::AbstractNode) = node(y->lambda*y, y)
-

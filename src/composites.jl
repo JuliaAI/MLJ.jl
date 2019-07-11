@@ -19,7 +19,7 @@ MLJBase.predict(composite::SupervisedNetwork, fitresult, Xnew) =
     MLJ.tree(N::Node)
 
 Return a description of the tree defined by the learning network
-terminating at node `N`. 
+terminating at node `N`.
 
 """
 tree(s::MLJ.Source) = (source = s,)
@@ -30,7 +30,7 @@ function tree(W::MLJ.Node)
         endkeys=[]
         endvalues=[]
     else
-        value2 = mach.model        
+        value2 = mach.model
         endkeys = [Symbol("train_arg", i) for i in eachindex(mach.args)]
         endvalues = [tree(arg) for arg in mach.args]
     end
@@ -44,21 +44,21 @@ function tree(W::MLJ.Node)
 end
 
 # get the top level args of the tree of some node:
-function args(tree) 
+function args(tree)
     keys_ = filter(keys(tree) |> collect) do key
         match(r"^arg[0-9]*", string(key)) != nothing
     end
     return [getproperty(tree, key) for key in keys_]
 end
-        
+
 # get the top level train_args of the tree of some node:
-function train_args(tree) 
+function train_args(tree)
     keys_ = filter(keys(tree) |> collect) do key
         match(r"^train_arg[0-9]*", string(key)) != nothing
     end
     return [getproperty(tree, key) for key in keys_]
-end    
-        
+end
+
 """
 
     models(N::AbstractNode)
@@ -83,7 +83,7 @@ learning network terminating at `N`.
 
 Not to be confused with `origins(N)` which refers to the same graph with edges corresponding to training arguments deleted.
 
-See also: orgins, source
+See also: [`origins`](@ref), [`source`](@ref).
 
 """
 function sources(W::MLJ.AbstractNode)
@@ -93,7 +93,7 @@ function sources(W::MLJ.AbstractNode)
     return unique(sources_)
 end
 
-""" 
+"""
     machines(N)
 
 List all machines in the learning network terminating at node `N`.
@@ -105,7 +105,7 @@ function machines(W::MLJ.Node)
         return vcat([machines(arg) for arg in W.args]...) |> unique
     else
         return vcat(Any[W.machine, ],
-                   [machines(arg) for arg in W.args]..., 
+                   [machines(arg) for arg in W.args]...,
                    [machines(arg) for arg in W.machine.args]...) |> unique
     end
 end
@@ -119,14 +119,14 @@ models `a1, a2, ...` of the original network with the specified targets
 `b1, b2, ...`.
 
 """
-function Base.replace(W::Node, pairs::Pair...) 
+function Base.replace(W::Node, pairs::Pair...)
 
     # Note: We construct nodes of the new network as values of a
     # dictionary keyed on the nodes of the old network. Additionally,
     # there are dictionaries of models keyed on old models and
     # machines keyed on old machines. The node and machine
     # dictionaries must be built simultaneously.
-    
+
     # build model dict:
     model_pairs = filter(collect(pairs)) do pair
         first(pair) isa Model
@@ -147,7 +147,7 @@ function Base.replace(W::Node, pairs::Pair...)
     "Data there will be duplicated. "
     source_copy_pairs = [source=>deepcopy(source) for source in sources_to_copy]
     all_source_pairs = vcat(source_pairs, source_copy_pairs)
-    
+
     # drop source nodes from all nodes of network terminating at W:
     nodes_ = filter(nodes(W)) do N
         !(N isa Source)
@@ -155,7 +155,7 @@ function Base.replace(W::Node, pairs::Pair...)
     isempty(nodes_) && error("All nodes in network are source nodes. ")
     # instantiate node and machine dictionaries:
     newnode_given_old =
-        IdDict{AbstractNode,AbstractNode}(all_source_pairs) 
+        IdDict{AbstractNode,AbstractNode}(all_source_pairs)
     newmach_given_old = IdDict{NodalMachine,NodalMachine}()
 
     # build the new network:
@@ -176,7 +176,7 @@ function Base.replace(W::Node, pairs::Pair...)
     end
 
     return newnode_given_old[nodes_[end]]
-  
+
  end
 
 """
@@ -243,12 +243,12 @@ function unsupervised_fit_method(network_Xs, network_N,
 
     return fit
 end
-        
+
 """
-    
+
    @from_network NewCompositeModel(fld1=model1, fld2=model2, ...) <= (Xs, N)
    @from_network NewCompositeModel(fld1=model1, fld2=model2, ...) <= (Xs, ys, N)
-   
+
 Create, respectively, a new stand-alone unsupervised or superivsed
 model type `NewCompositeModel` using a learning network as a
 blueprint. Here `Xs`, `ys` and `N` refer to the input source, node,
@@ -271,12 +271,12 @@ macro from_network(ex)
     modeltype_ex = ex.args[2].args[1]
     kw_exs = ex.args[2].args[2:end]
     fieldname_exs = [k.args[1] for k in kw_exs]
-    model_exs = [k.args[2] for k in kw_exs] 
+    model_exs = [k.args[2] for k in kw_exs]
     Xs_ex = ex.args[3].args[1]   # input node
     N_ex = ex.args[3].args[end]  # output node
 
     # TODO: add more type and syntax checks here:
-    
+
     N = __module__.eval(N_ex)
     N isa Node ||
         error("$(typeof(N)) given where Node was expected. ")
@@ -290,10 +290,10 @@ macro from_network(ex)
     Xs = __module__.eval(Xs_ex)
     Xs in nodes_ ||
         error("Specified input source $Xs_ex is not a source of $N_ex.")
-    
+
     if length(ex.args[3].args) == 3
         ys_ex = ex.args[3].args[2] # target node
-        ys = __module__.eval(ys_ex) 
+        ys = __module__.eval(ys_ex)
         ys in nodes_ ||
         error("Specified target source $ys_ex is not a source of $N_ex.")
         from_network_(__module__, modeltype_ex, fieldname_exs, model_exs,
@@ -320,26 +320,26 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
 
     XX = gensym(:X)
     yy = gensym(:y)
-    
+
     # code defining the composite model struct and fit method:
     program1 = quote
-        
+
         mutable struct $modeltype_ex <: MLJ.$subtype_ex
             $(fieldname_exs...)
         end
-        
+
         MLJ.fit(model::$modeltype_ex, verbosity::Integer, $XX, $yy) =
             MLJ.supervised_fit_method($Xs_ex, $ys_ex, $N_ex,
                             $(model_exs...))(model, verbosity, $XX, $yy)
     end
-    
+
     program2 = quote
-        defaults = 
+        defaults =
             MLJ.@set_defaults $modeltype_ex deepcopy.([$(model_exs...)])
 
     end
 
-    mod.eval(program1)   
+    mod.eval(program1)
     mod.eval(program2)
 
 end
@@ -351,25 +351,25 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
     subtype_ex = :UnsupervisedNetwork
 
     XX = gensym(:X)
-    
+
     # code defining the composite model struct and fit method:
     program1 = quote
-        
+
         mutable struct $modeltype_ex <: MLJ.$subtype_ex
             $(fieldname_exs...)
         end
-        
+
         MLJ.fit(model::$modeltype_ex, verbosity::Integer, $XX) =
             MLJ.unsupervised_fit_method($Xs_ex, $N_ex,
                                       $(model_exs...))(model, verbosity, $XX)
     end
-    
+
     program2 = quote
-        defaults = 
+        defaults =
         MLJ.@set_defaults $modeltype_ex deepcopy.([$(model_exs...)])
     end
 
-    mod.eval(program1)   
+    mod.eval(program1)
     mod.eval(program2)
 
 end
@@ -380,7 +380,7 @@ end
 ## A COMPOSITE FOR TESTING PURPOSES
 
 """
-    SimpleDeterministicCompositeModel(;regressor=ConstantRegressor(), 
+    SimpleDeterministicCompositeModel(;regressor=ConstantRegressor(),
                               transformer=FeatureSelector())
 
 Construct a composite model consisting of a transformer
@@ -392,10 +392,10 @@ mutable struct SimpleDeterministicCompositeModel{L<:Deterministic,
                              T<:Unsupervised} <: DeterministicNetwork
     model::L
     transformer::T
-    
+
 end
 
-function SimpleDeterministicCompositeModel(; model=DeterministicConstantRegressor(), 
+function SimpleDeterministicCompositeModel(; model=DeterministicConstantRegressor(),
                           transformer=FeatureSelector())
 
     composite =  SimpleDeterministicCompositeModel(model, transformer)
@@ -433,6 +433,5 @@ MLJBase.package_name(::Type{<:SimpleDeterministicCompositeModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:SimpleDeterministicCompositeModel}) = ""
 MLJBase.package_url(::Type{<:SimpleDeterministicCompositeModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
 MLJBase.is_pure_julia(::Type{<:SimpleDeterministicCompositeModel}) = true
-# MLJBase.input_scitype_union(::Type{<:SimpleDeterministicCompositeModel}) = 
-# MLJBase.target_scitype_union(::Type{<:SimpleDeterministicCompositeModel}) = 
-
+# MLJBase.input_scitype_union(::Type{<:SimpleDeterministicCompositeModel}) =
+# MLJBase.target_scitype_union(::Type{<:SimpleDeterministicCompositeModel}) =
