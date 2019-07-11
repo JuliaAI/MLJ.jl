@@ -355,7 +355,7 @@ Generally `n=1` or `n=2` in this latter case.
     transform(mach, X::AbstractNode)
     inverse_transform(mach, X::AbstractNode)
 
-Shortcuts for `J = node(predcit, mach, X, y)`, etc. 
+Shortcuts for `J = node(predict, mach, X, y)`, etc. 
 
 Calling a node is a recursive operation which terminates in the call
 to a source node (or nodes). Calling nodes on *new* data `X` fails unless the
