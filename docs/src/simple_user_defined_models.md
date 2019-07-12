@@ -6,13 +6,13 @@ To quickly implement a new supervised model in MLJ, it suffices to:
   of `Probabilistic` or `Deterministic`, depending on
   whether probabilistic or ordinary point predictions are
   intended. This `struct` is the *model*.
-  
+
 - Define a `fit` method, dispatched on the model, returning
   learned parameters, also known as the *fit-result*.
-  
+
 - Define a `predict` method, dispatched on the model, and passed the
   fit-result, to return predictions on new patterns.
-  
+
 In the examples below, the training input `X` of `fit`, and the new
 input `Xnew` passed to `predict`, are tables. Each training target `y`
 is a `AbstractVector`.
@@ -50,12 +50,12 @@ MyRegressor(; lambda=0.1) = MyRegressor(lambda)
 # fit returns coefficients minimizing a penalized rms loss function:
 function MLJBase.fit(model::MyRegressor, X, y)
     x = MLJBase.matrix(X)                     # convert table to matrix
-    fitresult = (x'x - model.lambda*I)\(x'y)  # the coefficients
+    fitresult = (x'x + model.lambda*I)\(x'y)  # the coefficients
     return fitresult
 end
 
 # predict uses coefficients to make new prediction:
-MLJBase.predict(model::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew)fitresult
+MLJBase.predict(::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew) * fitresult
 ````
 
 After loading this code, all MLJ's basic meta-algorithms can be applied to `MyRegressor`:
@@ -66,7 +66,7 @@ julia> task = load_boston()
 julia> model = MyRegressor(lambda=1.0)
 julia> regressor = machine(model, task)
 julia> evaluate!(regressor, resampling=CV(), measure=rms) |> mean
-7.434221318358656
+5.332558626486205
 
 ````
 
@@ -91,7 +91,7 @@ function MLJBase.fit(model::MyClassifier, X, y)
 end
 
 # `predict` retunrs the passed fitresult (pdf) for all new patterns:
-MLJBase.predict(model::MyClassifier, fitresult, Xnew) = 
+MLJBase.predict(model::MyClassifier, fitresult, Xnew) =
     [fitresult for r in 1:nrows(Xnew)]
 ````
 
