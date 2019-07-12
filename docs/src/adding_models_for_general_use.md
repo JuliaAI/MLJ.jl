@@ -25,7 +25,7 @@ following packages is also helpful:
   (essential if you are implementing a model handling data of
   `Multiclass` or `OrderedFactor` scitype)
 
-- [Tables.jl](https://github.com/JuliaData/Tables.jl) (if you're
+- [Tables.jl](https://github.com/JuliaData/Tables.jl) (if your
   algorithm needs input data in a novel format).
 
 In MLJ, the basic interface exposed to the user, built atop the model
@@ -46,7 +46,7 @@ excluded.
 The name of the Julia type associated with a model indicates the
 associated algorithm (e.g., `DecisionTreeClassifier`). The outcome of
 training a learning algorithm is called a *fitresult*. For
-ordinary multilinear regression, for example, this would be the
+ordinary multivariate regression, for example, this would be the
 coefficients and intercept. For a general supervised model, it is the
 (generally minimal) information needed to make new predictions.
 
@@ -60,7 +60,7 @@ abstract type Unsupervised <: Model end
 
 `Supervised` models are further divided according to whether they are
 able to furnish probabilistic predictions of the target (which they
-will then do so by default) or directly predict "point" estimates, for each
+will then do by default) or directly predict "point" estimates, for each
 new input pattern:
 
 ```julia
@@ -139,7 +139,7 @@ MLJBase.fit(model::SomeSupervisedModel, verbosity::Integer, X, y) -> fitresult, 
 MLJBase.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
 ```
 
-Fallback to be overridden if model input is univariate:
+Fallback to be overridden if the model input is univariate:
 
 ```julia
 MLJBase.input_is_multivariate(::Type{<:SomeSupervisedModel}) = true
@@ -148,7 +148,7 @@ MLJBase.input_is_multivariate(::Type{<:SomeSupervisedModel}) = true
 Optional, to check and correct invalid hyperparameter values:
 
 ```julia
-MLJBase.clean!(model::SomeSupervisedModel) = "" 
+MLJBase.clean!(model::SomeSupervisedModel) = ""
 ```
 
 Optional, to return user-friendly form of fitted parameters:
@@ -175,7 +175,7 @@ MLJBase.predict_median(model::SomeSupervisedModel, fitresult, Xnew) =
     median.(predict(model, fitresult, Xnew))
 ```
 
-Required, if model is to be registered (findable by general users):
+Required, if the model is to be registered (findable by general users):
 
 ```julia
 MLJBase.load_path(::Type{<:SomeSupervisedModel})    = ""
@@ -238,7 +238,9 @@ methods](@ref) below for details.
 ##### Important convention
 
 It is to be understood that the columns of the
-table `X` correspond to features and the rows to patterns.
+table `X` correspond to features and the rows to records
+so that a linear regression model would be written $y = X\beta$
+where $\beta$ is the vector of coefficients.
 
 
 #### The fit method
@@ -306,7 +308,7 @@ A compulsory `predict` method has the form
 MLJBase.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
 ```
 
-Here `Xnew` will be have the same form as the `X` passed to `fit`.
+Here `Xnew` will have the same form as the `X` passed to `fit`.
 
 ##### Prediction types for deterministic responses.
 
@@ -317,7 +319,7 @@ type as the target `y` passed to the `fit` method (see above). Any
 have the same levels in its pool as was present in the elements of
 the target `y` presented in training**, even if not all levels appear
 in the training data or prediction itself. For example, in the
-univariate target case, this means `MLJ.classes(yhat[i]) =
+univariate target case, this means `MLJ.classes(yhat[i]) ==
 MLJ.classes(y[j])` for all admissible `i` and `j`. (The method
 `classes` is described under [Convenience methods](@ref) below).
 
@@ -340,10 +342,10 @@ may look something like this:
 
 ```julia
 function MLJBase.fit(model::SomeSupervisedModel, verbosity, X, y)
-    yint = MLJBase.int(y) 
+    yint = MLJBase.int(y)
     a_target_element = y[1]                    # a CategoricalValue/String
     decode = MLJBase.decoder(a_target_element) # can be called on integers
-	
+
     core_fitresult = SomePackage.fit(X, yint, verbosity=verbosity)
 
     fitresult = (decode, core_fitresult)
@@ -424,7 +426,7 @@ julia> maybe = y[4]; pdf(d, maybe)
 0.0
 ```
 
-Alternatively, a dictionary can be passed to the constructor. 
+Alternatively, a dictionary can be passed to the constructor.
 
 ```@docs
 MLJBase.UnivariateFinite
@@ -510,14 +512,14 @@ method                   | return type       | declarable return values         
 `package_url`            | `String`          | unrestricted                       | "unknown"
 `is_pure_julia`          | `Bool`            | `true` or `false`                  | `false`
 
-Here is the complete list of trait function declarations for `DecistionTreeClassifier` 
+Here is the complete list of trait function declarations for `DecisionTreeClassifier`
 ([source](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/DecisionTree.jl)):
 
 ```julia
 MLJBase.input_is_multivariate(::Type{<:DecisionTreeClassifier}) = true
 MLJBase.input_scitype_union(::Type{<:DecisionTreeClassifier}) = MLJBase.Continuous
 MLJBase.target_scitype_union(::Type{<:DecisionTreeClassifier}) = MLJBase.Finite
-MLJBase.load_path(::Type{<:DecisionTreeClassifier}) = "MLJModels.DecisionTree_.DecisionTreeClassifier" 
+MLJBase.load_path(::Type{<:DecisionTreeClassifier}) = "MLJModels.DecisionTree_.DecisionTreeClassifier"
 MLJBase.package_name(::Type{<:DecisionTreeClassifier}) = "DecisionTree"
 MLJBase.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 MLJBase.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bensadeghi/DecisionTree.jl"
@@ -544,7 +546,7 @@ defines a fallback for `update` which just calls `fit`. For context,
 see [MLJ Internals](internals.md).
 
 Learning networks wrapped as models constitute one use-case (see
-[Learning Networks](@ref)): One would like each component model to be
+[Learning Networks](@ref)): one would like each component model to be
 retrained only when hyperparameter changes "upstream" make this
 necessary. In this case MLJ provides a fallback (specifically, the
 fallback is for any subtype of `SupervisedNetwork =
@@ -573,7 +575,7 @@ given prototype)
 
 - instead of `target_scitype_union` have `output_scitype_union`
 
--  `input_is_multivariate` and `input_scitype_union` are the same 
+-  `input_is_multivariate` and `input_scitype_union` are the same
 
 
 
@@ -666,13 +668,12 @@ to all MLJ users:
    add them to the MLJModels project file after checking they are not
    already there. If it is really necessary, packages can be also
    added to Project.toml for testing purposes.
-   
+
 Additionally, one needs to ensure that the implementation code defines
 the `package_name` and `load_path` model traits appropriately, so that
 `MLJ`'s `@load` macro can find the necessary code (see
 [MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src)
 for examples). The `@load` command can only be tested after
 registration. If changes are made, lodge an new issue at
-[MLJ](https://github.com/alan-turing-institute/MLJ) requesting your 
-changes to be updated. 
-
+[MLJ](https://github.com/alan-turing-institute/MLJ) requesting your
+changes to be updated.
