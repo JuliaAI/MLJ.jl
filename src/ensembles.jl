@@ -157,7 +157,7 @@ function get_ensemble(atom::Supervised, verbosity, X, y, n, n_patterns,
 end
 
 pair_vcat(p, q) = (vcat(p[1], q[1]), vcat(p[2], q[2]))
-    
+
 
 ## ENSEMBLE MODEL FOR DETERMINISTIC MODELS
 
@@ -171,7 +171,7 @@ mutable struct DeterministicEnsembleModel{Atom<:Deterministic} <: Deterministic
     out_of_bag_measure # TODO: type this
 end
 
-function clean!(model::DeterministicEnsembleModel) 
+function clean!(model::DeterministicEnsembleModel)
 
     message = ""
 
@@ -231,7 +231,7 @@ mutable struct ProbabilisticEnsembleModel{Atom<:Probabilistic} <: Probabilistic
     out_of_bag_measure
 end
 
-function clean!(model::ProbabilisticEnsembleModel) 
+function clean!(model::ProbabilisticEnsembleModel)
 
     message = ""
 
@@ -278,7 +278,7 @@ end
 ## COMMON CONSTRUCTOR
 
 """
-    EnsembleModel(atom=nothing, 
+    EnsembleModel(atom=nothing,
                   weights=Float64[],
                   bagging_fraction=0.8,
                   rng=GLOBAL_RNG, n=100,
@@ -313,7 +313,7 @@ ensemble prediction on each input pattern has the type
 `MixtureModel{VF,VS,D}` from the Distributions.jl package, where `D`
 is the type of predicted distribution for `atom`.
 
-If a single measure or non-empty vector of measusres is specified by
+If a single measure or non-empty vector of measures is specified by
 `out_of_bag_measure`, then out-of-bag estimates of performance are
 reported.
 
@@ -345,7 +345,7 @@ function fit(model::EitherEnsembleModel{Atom}, verbosity::Int, X, y) where Atom<
     else
         out_of_bag_measure = [model.out_of_bag_measure,]
     end
-        
+
     if model.rng isa Integer
         rng = MersenneTwister(model.rng)
     else
@@ -361,7 +361,7 @@ function fit(model::EitherEnsembleModel{Atom}, verbosity::Int, X, y) where Atom<
                               barglyphs=BarGlyphs("[=> ]"), barlen=50, color=:yellow)
 
     if !isempty(out_of_bag_measure)
-        
+
         if !parallel || nworkers() == 1 # build in serial
             verbosity < 2 ||  @info "One hash per new atom trained: "
             ensemble, ensemble_indices = get_ensemble_and_indices(atom, verbosity, X, y,
@@ -384,7 +384,7 @@ function fit(model::EitherEnsembleModel{Atom}, verbosity::Int, X, y) where Atom<
         end
 
     else
-        
+
         if !parallel || nworkers() == 1 # build in serial
             verbosity < 2 ||  @info "One hash per new atom trained: "
             ensemble = get_ensemble(atom, verbosity, X, y,

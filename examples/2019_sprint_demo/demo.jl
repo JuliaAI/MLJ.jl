@@ -16,7 +16,7 @@ Random.seed!(1234);
 using MLJ
 models()
 
-#- 
+#-
 
 using RDatasets
 boston = dataset("MASS", "Boston");
@@ -96,7 +96,7 @@ rms(yhat, y)
 
 # ### Predicting on "new" data
 
-X = task[test].X; 
+X = task[test].X;
 yhat = predict(mach, X);
 yhat[1:4]
 
@@ -140,7 +140,7 @@ iterator(r,5)
 
 curves = learning_curve!(mach,
                          resampling=Holdout(fraction_train=0.8),
-                         nested_range=(n=r,), 
+                         nested_range=r, 
                          measure=cross_entropy, n=4,
                          verbosity=0)
 #-
@@ -161,15 +161,15 @@ params(forest) # all hyperparameters, as a named tuple
 
 r1 = range(tree, :n_subfeatures, lower=1, upper=4);
 r2 = range(forest, :bagging_fraction, lower=0.4, upper=1.0);
-nested_ranges = (atom=(n_subfeatures=r1,), 
+nested_ranges = (atom=(n_subfeatures=r1,),
                  bagging_fraction=r2)
 
 #-
 
-tuned_forest = TunedModel(model=forest, 
+tuned_forest = TunedModel(model=forest,
                           tuning=Grid(resolution=12),
                           resampling=CV(nfolds=6),
-                          nested_ranges=nested_ranges, 
+                          nested_ranges=nested_ranges,
                           measure=cross_entropy)
 #-
 
@@ -231,7 +231,7 @@ yhat= predict(knnM, Xc)
 X = source(X)
 y = source(y)
 
-# Identical code to build network (`fit!`'s can be dropped) 
+# Identical code to build network (`fit!`'s can be dropped)
 
 hot = OneHotEncoder()
 hotM = machine(hot, X)
@@ -292,7 +292,7 @@ x1 = rand(6);
 x2 = categorical([mod(rand(Int),2) for i in 1:6]);
 x3 = rand(6);
 y = exp.(x1 -2x3 + 0.1*rand(6))
-X = (x1=x1, x2=x2, x3=x3) 
+X = (x1=x1, x2=x2, x3=x3)
 
 # Here's a learning network that: (i) One-hot encodes the input table `X`; (ii)
 # Log transforms the continuous target `y`; (iii) Fits specified
@@ -306,23 +306,23 @@ y = source(y)
 hot = machine(OneHotEncoder(), X)
 
 # `W`, `z`, `zhat` and `yhat` are nodes in the network:
-    
+
 W = transform(hot, X) # one-hot encode the input
 z = log(y) # transform the target
 
 ridge = RidgeRegressor(lambda=0.1)
 knn = KNNRegressor()
 
-ridgeM = machine(ridge, W, z) 
+ridgeM = machine(ridge, W, z)
 knnM = machine(knn, W, z)
 
 # Average the predictions of the KNN and ridge models:
 
-zhat = 0.5*predict(ridgeM, W) + 0.5*predict(knnM, W) 
+zhat = 0.5*predict(ridgeM, W) + 0.5*predict(knnM, W)
 
 # Inverse the target transformation:
 
-yhat = exp(zhat) 
+yhat = exp(zhat)
 
 # A tree "splat" of the learning network terminating at `yhat`:
 
@@ -334,9 +334,3 @@ blend = @from_network Blen(ridge=ridge, knn=knn) <= (X, y, yhat)
 blend.ridge.lambda = 0.2
 mach = machine(blend, load_reduced_ames())
 evaluate!(mach, measure=rms)
-
-
-
-
-
-
