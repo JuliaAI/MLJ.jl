@@ -70,7 +70,7 @@ function evaluate!(mach::Machine, resampling::Holdout;
                    rows=nothing, force=false,verbosity=1)
 
     if resampling.rng isa Integer
-        rng = MersenneTwister(model.rng)
+        rng = MersenneTwister(resampling.rng)
     else
         rng = resampling.rng
     end
@@ -124,7 +124,7 @@ function evaluate!(mach::Machine, resampling::CV;
                    rows=nothing, force=false, verbosity=1)
 
     if resampling.rng isa Integer
-        rng = MersenneTwister(model.rng)
+        rng = MersenneTwister(resampling.rng)
     else
         rng = resampling.rng
     end
@@ -160,7 +160,7 @@ function evaluate!(mach::Machine, resampling::CV;
     nfolds = resampling.nfolds
     
     if resampling.shuffle
-        shuffle!(rng, all)
+        shuffle!(rng, collect(all))
     end
     
     k = floor(Int,n_samples/nfolds)
