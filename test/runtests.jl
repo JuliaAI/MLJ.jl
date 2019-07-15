@@ -3,8 +3,13 @@
 # this test code be wrapped in a module. Any new module name will do -
 # eg, `module TestDatasets` for code testing `datasets.jl`.
 
+using Distributed
+addprocs(1)
+
+@everywhere begin
 using MLJ
 using Test
+end
 
 @constant junk=KNNRegressor()
 

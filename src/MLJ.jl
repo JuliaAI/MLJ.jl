@@ -80,8 +80,10 @@ using RecipesBase # for plotting
 # for DAG multiprocessing:
 import Dagger
 import Dagger: Thunk, delayed, compute, collect
-# FIXME: Remove me
-const DAGGER_DEBUG = Ref(get(ENV, "MLJ_DAGGER_DEBUG", "0") == "1")
+const DAGGER_DEBUG = Ref(get(ENV, "MLJ_DAGGER_DEBUG", "0") == "1") # FIXME: Remove me
+import MemPool
+import UUIDs: UUID, uuid4
+import Distributed: @everywhere, @spawnat, workers, fetch
 
 # submodules of this module:
 include("registry/src/Registry.jl") 

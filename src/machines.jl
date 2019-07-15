@@ -1,7 +1,7 @@
 abstract type AbstractMachine{M} <: MLJType end
 
 
-# TODO: write out separate method for machine(::Model, ::MLJTask) to simplify logic. 
+# TODO: write out separate method for machine(::Model, ::MLJTask) to simplify logic.
 mutable struct Machine{M<:Model} <: AbstractMachine{M}
 
     model::M

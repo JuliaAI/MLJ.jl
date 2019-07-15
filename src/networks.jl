@@ -214,6 +214,20 @@ MLJBase.selectrows(X::AbstractNode, r) = X(rows=r)
 (y::Node{Nothing})(; rows=:) = (y.operation)([arg(rows=rows) for arg in y.args]...)
 (y::Node{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
+# Node <-> UUID mappings for efficient transfer of node identity between workers
+const NODE_TO_UUID = IdDict{AbstractNode, UUID}()
+const UUID_TO_NODE = Dict{UUID, AbstractNode}()
+function _node_to_uuid(node::AbstractNode)
+    if haskey(NODE_TO_UUID, node)
+        uuid = NODE_TO_UUID[node]
+    else
+        uuid = uuid4()
+        NODE_TO_UUID[node] = uuid
+        UUID_TO_NODE[uuid] = node
+    end
+    return uuid
+end
+
 """
     fit!(N::Node; rows=nothing, verbosity=1, force=false)
 
@@ -226,6 +240,7 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
         rows = (:)
     end
 
+    #=
     # get non-source nodes:
     nodes_ = filter(nodes(y)) do n
         n isa Node
@@ -237,28 +252,121 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
         mach != nothing
     end
 
-    #=
     for mach in machines
         fit!(mach; rows=rows, verbosity=verbosity, force=force)
     end
     =#
 
-    dag = construct_dag(y; rows=rows, verbosity=verbosity, force=force)
-    if dag isa Thunk
-        collect(dag)
+    @everywhere begin
+        # HACK: Empty any pre-existing node/uuid mappings
+        # FIXME: This is *super* inefficient for multiple `fit!` calls
+        empty!(MLJ.NODE_TO_UUID)
+        empty!(MLJ.UUID_TO_NODE)
     end
+
+    # Register network on all workers
+    for w in workers()
+        fetch(@spawnat w MLJ._register!(y))
+    end
+
+    dag = construct_dag(y; rows=rows, verbosity=verbosity, force=force)
+    @assert dag isa Thunk
+    rnode = collect(dag)::ReducedNode
+
+    # sync final network back to master
+    _sync!(y, rnode)
 
     return y
 end
 
-function construct_dag(y::Node; rows=nothing, verbosity=1, force=false, mach_set=Set())
+struct ReducedNodalMachine{M} <: AbstractMachine{M}
+    model::M
+    previous_model
+    fitresult
+    cache
+    args::Vector{UUID}
+    report
+    frozen
+    rows
+    state
+    upstream_state
+    uuid::UUID
+end
+struct ReducedNode <: AbstractNode
+    operation
+    machine
+    args::Tuple{Vararg{UUID}}
+    origins::Vector{UUID}
+    nodes::Vector{UUID}
+    uuid::UUID
+end
+struct ReducedSource <: AbstractNode
+    data
+    uuid::UUID
+end
+reduce_node(node::Node) = ReducedNode(node).uuid
+reduce_node(source::Source) = ReducedSource(source).uuid
+function ReducedNode(node::Node, uuid::UUID=_node_to_uuid(node))
+    # FIXME: Recurse through node.machine.args if node.machine !== nothing
+    args = reduce_node.(node.args)
+    origins = reduce_node.(node.origins)
+    nodes = reduce_node.(node.nodes)
+    return ReducedNode(node.operation, node.machine, args, origins, nodes, uuid)
+end
+function ReducedSource(source::Source, uuid::UUID=_node_to_uuid(source))
+    ReducedSource(source.data, uuid)
+end
+
+function _get_reduced_nodes(node::Node, rnodes=AbstractNode[])
+    rnode = reduce_node(node)
+    push!(rnodes, rnode)
+    for arg in node.args
+        _get_reduced_nodes(arg, rnodes=rnodes)
+    end
+    return rnodes
+end
+_get_reduced_nodes(source::Source, rnodes=AbstractNode[]) =
+    (push!(rnodes, reduce_node(source)); rnodes)
+function _set_full_nodes(rnode::ReducedNode, rnodes::Dict)
+    # FIXME: args = [_set_full_nodes(for arg_uuid in rnode.args]
+    node = full_node(rnode)
+    uuid = rnode.uuid
+    NODE_TO_UUID[node] = uuid
+    UUID_TO_NODE[uuid] = node
+end
+function _sync!(lnode::AbstractNode, rnode::ReducedNode)
+    lnode.operation = rnode.operation
+    if rnode.machine !== nothing
+        lm = lnode.machine
+        rm = rnode.machine
+
+        lm.model = rm.model
+        lm.previous_model = rm.previous_model
+        lm.fitresult = rm.fitresult
+        lm.cache = rm.cache
+        lm.args = (UUID_TO_NODE[uuid] for uuid in rm.args)
+        lm.report = rm.report
+        lm.frozen = rm.frozen
+        lm.rows = rm.rows
+        lm.state = rm.upstream_state
+        lm.upstream_state = rm.upstream_state
+    end
+    lnode.args = [UUID_TO_NODE[arg] for arg in rnode.args]
+    lnode.origins = [UUID_TO_NODE[origin] for origin in rnode.origins]
+    lnode.nodes = [UUID_TO_NODE[node] for node in rnode.nodes]
+end
+
+# Convenience utility for constructing RemoteChannels for each worker
+_make_rchans() = nothing#Dict{Int,RemoteChannel}(RemoteChannel(w) for w in workers())
+
+function construct_dag(y::Node; rows=nothing, verbosity=1, force=false, mach_set=Set(), rchans=_make_rchans())
     DAGGER_DEBUG[] && printstyled("Construct DAG for $(typeof(y)), rows=$(repr(rows))\n"; color=:cyan)
 
     # get the DAGs of each arg
     arg_dags = Thunk[]
-    append!(arg_dags, [construct_dag(arg; rows=rows, verbosity=verbosity, force=force, mach_set=mach_set) for arg in y.args])
+    append!(arg_dags, [construct_dag(arg; rows=rows, verbosity=verbosity, force=force, mach_set=mach_set, rchans=rchans) for arg in y.args])
     if y.machine !== nothing
-        append!(arg_dags, [construct_dag(arg; rows=rows, verbosity=verbosity, force=force, mach_set=mach_set) for arg in y.machine.args])
+        append!(arg_dags, [construct_dag(arg; rows=rows, verbosity=verbosity, force=force, mach_set=mach_set, rchans=rchans) for arg in y.machine.args])
     end
 
     # create the DAG for the node
@@ -267,24 +375,31 @@ function construct_dag(y::Node; rows=nothing, verbosity=1, force=false, mach_set
         uniq_mach = true
         push!(mach_set, y.machine)
     end
-    return delayed((args...) -> begin
+    uuid = _node_to_uuid(y)
+    wdag = delayed((args...) -> begin
+        my_y = UUID_TO_NODE[uuid]
+        for arg in args
+            _sync!(my_y, arg)
+        end
         if DAGGER_DEBUG[]
-            printstyled("In DAG for $(typeof(y))\n"; color=:green)
+            printstyled("In DAG for $(typeof(my_y))\n"; color=:green)
             printstyled(join(typeof.(args), ", "), '\n'; color=:magenta)
         end
         if uniq_mach
-            if y.machine !== nothing
-                fit!(y.machine; rows=rows, verbosity=verbosity, force=force)
+            if my_y.machine !== nothing
+                fit!(my_y.machine; rows=rows, verbosity=verbosity, force=force)
             else
-                DAGGER_DEBUG[] && printstyled("DAG: not training static $(typeof(y))\n"; color=:red)
+                DAGGER_DEBUG[] && printstyled("DAG: not training static $(typeof(my_y))\n"; color=:red)
             end
         else
-            DAGGER_DEBUG[] && printstyled("DAG: not training non-unique $(typeof(y))\n"; color=:red)
+            DAGGER_DEBUG[] && printstyled("DAG: not training non-unique $(typeof(my_y))\n"; color=:red)
         end
-        return y.machine
+
+        return reduce_node(my_y)
     end)(arg_dags...)
+    return wdag
 end
-function construct_dag(y::Source; rows=nothing, verbosity=1, force=false, mach_set=Set())
+function construct_dag(y::Source; rows=nothing, verbosity=1, force=false, mach_set=Set(), rchans=_make_rchans())
     DAGGER_DEBUG[] && printstyled("Construct DAG for Source, rows=$(repr(rows))\n"; color=:cyan)
     return delayed(identity)(y.data)
 end
