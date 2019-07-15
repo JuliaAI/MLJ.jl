@@ -35,7 +35,7 @@ function mav(yhat::AbstractVector{<:Real}, y)
     end
     return ret/length(y)
 end
-mav(yhat, y) = mav(mean.(yhat), y) 
+mav(yhat, y) = mav(mean.(yhat), y)
 
 function rms(yhat::AbstractVector{<:Real}, y)
     length(y) == length(yhat) || throw(DimensionMismatch())
@@ -57,7 +57,7 @@ function rmsl(yhat::AbstractVector{<:Real}, y)
     end
     return sqrt(ret/length(y))
 end
-rmsl(yhat, y) = rmsl(mean.(yhat), y) 
+rmsl(yhat, y) = rmsl(mean.(yhat), y)
 
 function rmslp1(yhat::AbstractVector{<:Real}, y)
     length(y) == length(yhat) || throw(DimensionMismatch())
@@ -69,7 +69,6 @@ function rmslp1(yhat::AbstractVector{<:Real}, y)
     return sqrt(ret/length(y))
 end
 rmslp1(yhat, y) = rmslp1(y, mean.(yhat))
-
 
 """ Root mean squared percentage loss """
 function rmsp(yhat::AbstractVector{<:Real}, y)
@@ -85,18 +84,18 @@ function rmsp(yhat::AbstractVector{<:Real}, y)
     end
     return sqrt(ret/count)
 end
-rmsp(yhat, y) = rmsp(mean.(yhat), y) 
+rmsp(yhat, y) = rmsp(mean.(yhat), y)
 
 
 ## CLASSIFICATION METRICS (FOR DETERMINISTIC PREDICTIONS)
 
 misclassification_rate(yhat::AbstractVector{<:CategoricalElement},
                        y::AbstractVector) = mean(y .!= yhat)
-misclassification_rate(yhat, y::AbstractVector) = 
+misclassification_rate(yhat, y::AbstractVector) =
     misclassification_rate(mode.(yhat), y)
 
 
-# TODO: multivariate case 
+# TODO: multivariate case
 
 
 ## CLASSIFICATION METRICS (FOR PROBABILISTIC PREDICTIONS)
@@ -110,8 +109,7 @@ function cross_entropy(yhat::Vector{<:UnivariateFinite}, y::AbstractVector)
 end
 
 # function auc(truelabel::L) where L
-#     _auc(y::AbstractVector{L}, yhat::AbstractVector{T}) where T<:Real = 
+#     _auc(y::AbstractVector{L}, yhat::AbstractVector{T}) where T<:Real =
 #         ROC.AUC(ROC.roc(yhat, y, truelabel))
 #     return _auc
 # end
-

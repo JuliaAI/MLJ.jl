@@ -8,7 +8,7 @@ using CategoricalArrays
 
 ## REGRESSOR METRICS
 
-y = [1, 2, 3, 4]
+y    = [1, 2, 3, 4]
 yhat = y .+ 1
 @test isapprox(rms(yhat, y), 1.0)
 @test isapprox(rmsl(yhat, y),
@@ -17,7 +17,7 @@ yhat = y .+ 1
                sqrt((log(2/3)^2 + log(3/4)^2 + log(4/5)^2 + log(5/6)^2)/4))
 @test isapprox(rmsp(yhat, y), sqrt((1 + 1/4 + 1/9 + 1/16)/4))
 
-# probababilistic versions:
+# probabilistic versions:
 N = Distributions.Normal
 zhat = N.(yhat)
 @test isapprox(rms(zhat, y), 1.0)
@@ -46,8 +46,6 @@ d2 = UnivariateFinite(L, [0.4, 0.6])
 d3 = UnivariateFinite(L, [0.2, 0.8])
 yhat = [d1, d2, d3]
 @test cross_entropy(yhat, y) ≈ -(log(0.1) + log(0.6) + log(0.8))/3
-
-
 
 # for when ROC is added as working dependency:
 # y = ["n", "p", "n", "p", "n", "p"]
