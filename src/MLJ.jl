@@ -1,61 +1,61 @@
 module MLJ
 
 # defined in include files:
-export @curve, @pcurve                               # utilities.jl
-export mav, rms, rmsl, rmslp1, rmsp                  # metrics.jl
-export misclassification_rate, cross_entropy         # metrics.jl
-export default_measure                               # metrics.jl
-export coerce, supervised, unsupervised              # tasks.jl
-export report                                        # machines.jl
-export Holdout, CV, evaluate!, Resampler             # resampling.jl
-export Params, params, set_params!                   # parameters.jl
-export strange, iterator                             # parameters.jl
-export Grid, TunedModel, learning_curve!             # tuning.jl
-export EnsembleModel                                 # ensembles.jl
-export ConstantRegressor, ConstantClassifier         # builtins/Constant.jl
-export models, localmodels, @load                    # loading.jl
-export KNNRegressor                                  # builtins/KNN.jl
-export @from_network, machines, sources              # composites.jl
+export @curve, @pcurve,                               # utilities.jl
+        mav, rms, rmsl, rmslp1, rmsp,                 # metrics.jl
+        misclassification_rate, cross_entropy,        # metrics.jl
+        default_measure,                              # metrics.jl
+        coerce, supervised, unsupervised,             # tasks.jl
+        report,                                       # machines.jl
+        Holdout, CV, evaluate!, Resampler,            # resampling.jl
+        Params, params, set_params!,                  # parameters.jl
+        strange, iterator ,                           # parameters.jl
+        Grid, TunedModel, learning_curve!             # tuning.jl
+        EnsembleModel,                                # ensembles.jl
+        ConstantRegressor, ConstantClassifier,        # builtins/Constant.jl
+        models, localmodels, @load,                   # loading.jl
+        KNNRegressor,                                 # builtins/KNN.jl
+        @from_network, machines, sources              # composites.jl
 
 # defined in include files "machines.jl and "networks.jl":
-export Machine, NodalMachine, machine, AbstractNode
-export source, node, fit!, freeze!, thaw!, Node, sources, origins
+export Machine, NodalMachine, machine, AbstractNode,
+        source, node, fit!, freeze!, thaw!, Node, sources, origins
 
 # defined in include file "builtins/Transformers.jl":
-export FeatureSelector
-export UnivariateStandardizer, Standardizer
-export UnivariateBoxCoxTransformer
-export OneHotEncoder
-# export IntegerToInt64Transformer
-# export UnivariateDiscretizer, Discretizer
+export FeatureSelector,
+        UnivariateStandardizer, Standardizer,
+        UnivariateBoxCoxTransformer,
+        OneHotEncoder,
+        # IntegerToInt64Transformer,
+        # UnivariateDiscretizer, Discretizer
 
 # rexport from Random, Statistics, Distributions, CategoricalArrays:
 export pdf, mode, median, mean, shuffle!, categorical, shuffle
 
 # reexport from MLJBase:
-export nrows, nfeatures, info
-export SupervisedTask, UnsupervisedTask, MLJTask
-export Deterministic, Probabilistic, Unsupervised, Supervised
-export DeterministicNetwork, ProbabilisticNetwork
-export Found, Continuous, Finite, Infinite    
-export OrderedFactor, Unknown
-export Count, Multiclass, Binary
-export scitype, scitype_union, scitypes
-export predict, predict_mean, predict_median, predict_mode
-export transform, inverse_transform, se, evaluate, fitted_params
-export @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite
-export partition, X_and_y
-export load_boston, load_ames, load_iris, load_reduced_ames
-export load_crabs, datanow                
-export features, X_and_y
+export nrows, nfeatures, info,
+        SupervisedTask, UnsupervisedTask, MLJTask,
+        Deterministic, Probabilistic, Unsupervised, Supervised,
+        DeterministicNetwork, ProbabilisticNetwork,
+        Found, Continuous, Finite, Infinite,
+        OrderedFactor, Unknown,
+        Count, Multiclass, Binary,
+        scitype, scitype_union, scitypes,
+        predict, predict_mean, predict_median, predict_mode,
+        transform, inverse_transform, se, evaluate, fitted_params,
+        @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
+        partition, X_and_y,
+        load_boston, load_ames, load_iris, load_reduced_ames,
+        load_crabs, datanow,
+        features, X_and_y,
 
 using MLJBase
 
 # to be extended:
-import MLJBase: fit, update, clean!
-import MLJBase: predict, predict_mean, predict_median, predict_mode
-import MLJBase: transform, inverse_transform, se, evaluate, fitted_params
-import MLJBase: show_as_constructed, params
+import MLJBase: fit, update, clean!,
+                predict, predict_mean, predict_median, predict_mode,
+                transform, inverse_transform, se, evaluate, fitted_params,
+                show_as_constructed, params
 
 using RemoteFiles
 import Pkg.TOML
@@ -78,7 +78,7 @@ import Distributed: @distributed, nworkers, pmap
 using RecipesBase # for plotting
 
 # submodules of this module:
-include("registry/src/Registry.jl") 
+include("registry/src/Registry.jl")
 import .Registry
 
 const srcdir = dirname(@__FILE__) # the directory containing this file:
