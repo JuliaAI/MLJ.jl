@@ -1,5 +1,4 @@
-abstract type AbstractMachine{<:Model} <: MLJType end
-
+abstract type AbstractMachine{M<:Model} <: MLJType end
 
 # TODO: write out separate method for machine(::Model, ::MLJTask) to simplify logic.
 mutable struct Machine{M<:Model} <: AbstractMachine{M}
