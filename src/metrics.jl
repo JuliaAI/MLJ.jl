@@ -128,7 +128,7 @@ $SIGNATURES
 
 Root mean squared percentage loss:
 
-``\\text{RMSP} = m^{-1}∑ᵢ \left({yᵢ-ŷᵢ \over yᵢ}\right)^2``
+``\\text{RMSP} = m^{-1}∑ᵢ \\left({yᵢ-ŷᵢ \\over yᵢ}\\right)^2``
 
 where the sum is over indices such that `yᵢ≂̸0` and `m` is the number of such indices.
 """
