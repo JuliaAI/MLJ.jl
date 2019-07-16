@@ -64,7 +64,11 @@ import Distributions
 import StatsBase
 using ProgressMeter
 import Tables
+import Random
+
+# convenience packages
 using DocStringExtensions: SIGNATURES, TYPEDEF
+using Parameters
 
 # to be extended:
 import Base.==

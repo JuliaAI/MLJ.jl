@@ -1,37 +1,56 @@
 ## RESAMPLING STRATEGIES
 
 abstract type ResamplingStrategy <: MLJType end
-import Random
+
 # resampling strategies are `==` if they have the same type and their
 # field values are `==`:
-function ==(s1::S, s2::S) where S<:ResamplingStrategy
-    ret = true
-    for fld in fieldnames(S)
-        ret = ret && getfield(s1, fld) == getfield(s2, fld)
-    end
-    return ret
+function ==(s1::S, s2::S) where S <: ResamplingStrategy
+    return all(getfield(s1, fld) == getfield(s2, fld) for fld in fieldnames(S))
 end
 
-mutable struct Holdout <: ResamplingStrategy
-    fraction_train::Float64
-    shuffle::Bool
-    rng::Union{Int,AbstractRNG}
+"""
+$TYPEDEF
+
+Single train-test split with a (randomly selected) portion of the
+data being selected for training and the rest for testing.
+
+* `fraction_train` a number between 0 and 1 indicating the proportion
+of the samples to use for training
+* `shuffle` a boolean indicating whether to select the training samples
+at random
+* `rng` a random number generator to use
+"""
+@with_kw mutable struct Holdout <: ResamplingStrategy
+    fraction_train::Float64 = 0.7
+    shuffle::Bool = false
+    rng::Union{Int,AbstractRNG} = Random.GLOBAL_RNG
+
     function Holdout(fraction_train, shuffle, rng)
-        0 < fraction_train && fraction_train < 1 ||
-            error("fraction_train must be between 0 and 1.")
+        0 < fraction_train < 1 || error("`fraction_train` must be between 0 and 1.")
         return new(fraction_train, shuffle, rng)
     end
 end
-Holdout(; fraction_train=0.7, shuffle=false, rng=Random.GLOBAL_RNG) = Holdout(fraction_train, shuffle, rng)
+
 show_as_constructed(::Type{<:Holdout}) = true
 
-mutable struct CV <: ResamplingStrategy
-    nfolds::Int
-    parallel::Bool
-    shuffle::Bool ## TODO: add seed/rng
-    rng::Union{Int,AbstractRNG}
+"""
+$TYPEDEF
+
+Cross validation resampling where the data is (randomly) partitioned in `nfolds` folds
+and the model is evaluated `nfolds` time, each time taking one fold for testing and the
+other folds for training and the test  performances averaged.
+For instance if `nfolds=3` then the data will be partitioned in three folds A, B and C
+and the model will be trained three times, first with A and B and tested on C, then on
+A, C and tested on B and finally on B, C and tested on A. The test performances are then
+averaged over the three cases.
+"""
+@with_kw  mutable struct CV <: ResamplingStrategy
+    nfolds::Int = 6
+    parallel::Bool = true
+    shuffle::Bool = false ## TODO: add seed/rng
+    rng::Union{Int,AbstractRNG} = Random.GLOBAL_RNG
 end
-CV(; nfolds=6, parallel=true, shuffle=false, rng=Random.GLOBAL_RNG) = CV(nfolds, parallel, shuffle, rng)
+
 MLJBase.show_as_constructed(::Type{<:CV}) = true
 
 
@@ -88,21 +107,20 @@ function evaluate!(mach::Machine, resampling::Holdout;
     y = mach.args[2]
     length(mach.args) == 2 || error("Multivariate targets not yet supported.")
 
-    all =
-        rows === nothing ? eachindex(y) : rows
+    unspecified_rows = (rows === nothing)
+    all = unspecified_rows ? eachindex(y) : rows
 
     train, test = partition(all, resampling.fraction_train,
                             shuffle=resampling.shuffle, rng=rng)
     if verbosity > 0
-            all == eachindex(y) ? "Resampling from all rows. " : "Resampling from a subset of all rows. "
-        which_rows =
-            all == eachindex(y) ? "Resampling from all rows. " : "Resampling from a subset of all rows. "
-        @info "Evaluating using a holdout set. \n"*
-        "fraction_train=$(resampling.fraction_train) \n"*
-        "shuffle=$(resampling.shuffle) \n"*
-        "measure=$_measures \n"*
-        "operation=$operation \n"*
-        "$which_rows"
+        which_rows = ifelse(unspecified_rows, "Resampling from all rows. ",
+                                              "Resampling from a subset of all rows. ")
+        @info "Evaluating using a holdout set. \n" *
+              "fraction_train=$(resampling.fraction_train) \n" *
+              "shuffle=$(resampling.shuffle) \n" *
+              "measure=$_measures \n" *
+              "operation=$operation \n" *
+              "$which_rows"
     end
 
     fit!(mach, rows=train, verbosity=verbosity-1, force=force)
@@ -142,18 +160,18 @@ function evaluate!(mach::Machine, resampling::CV;
     y = mach.args[2]
     length(mach.args) == 2 || error("Multivariate targets not yet supported.")
 
-    all =
-        rows === nothing ? eachindex(y) : rows
+    unspecified_rows = (rows === nothing)
+    all = unspecified_rows ? eachindex(y) : rows
 
     if verbosity > 0
-        which_rows =
-            all == eachindex(y) ? "Resampling from all rows. " : "Resampling from a subset of all rows. "
-        @info "Evaluating using cross-validation. \n"*
-        "nfolds=$(resampling.nfolds). \n"*
-        "shuffle=$(resampling.shuffle) \n"*
-        "measure=$_measures \n"*
-        "operation=$operation \n"*
-        "$which_rows"
+        which_rows = ifelse(unspecified_rows, "Resampling from all rows. ",
+                                              "Resampling from a subset of all rows. ")
+        @info "Evaluating using cross-validation. \n" *
+              "nfolds=$(resampling.nfolds). \n" *
+              "shuffle=$(resampling.shuffle) \n" *
+              "measure=$_measures \n" *
+              "operation=$operation \n" *
+              "$which_rows"
     end
 
     n_samples = length(all)
@@ -163,7 +181,8 @@ function evaluate!(mach::Machine, resampling::CV;
         shuffle!(rng, collect(all))
     end
 
-    k = floor(Int,n_samples/nfolds)
+    # number of samples per fold
+    k = floor(Int, n_samples/nfolds)
 
     # function to return the measures for the fold `all[f:s]`:
     function get_measure(f, s)
@@ -184,8 +203,8 @@ function evaluate!(mach::Machine, resampling::CV;
     if resampling.parallel && nworkers() > 1
         ## TODO: progress meter for distributed case
         if verbosity > 0
-            @info "Distributing cross-validation computation "*
-            "among $(nworkers()) workers."
+            @info "Distributing cross-validation computation " *
+                  "among $(nworkers()) workers."
         end
         measure_values = @distributed vcat for n in 1:nfolds
             [get_measure(firsts[n], seconds[n])]
@@ -216,8 +235,11 @@ end
 
 ## RESAMPLER - A MODEL WRAPPER WITH `evaluate` OPERATION
 
-# this is needed for the `TunedModel` `fit` defined in tuning.jl
+"""
+$TYPEDEF
 
+Resampler structure for the `TunedModel` `fit` defined in `tuning.jl`.
+"""
 mutable struct Resampler{S,M<:Supervised} <: Supervised
     model::M
     resampling::S # resampling strategy
@@ -230,8 +252,9 @@ MLJBase.is_wrapper(::Type{<:Resampler}) = true
 
 
 Resampler(; model=ConstantRegressor(), resampling=Holdout(),
-          measure=nothing, operation=predict) =
-              Resampler(model, resampling, measure, operation)
+            measure=nothing, operation=predict) =
+                Resampler(model, resampling, measure, operation)
+
 
 function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
 
