@@ -20,45 +20,39 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
 end
 
 # automatically detect type parameter:
-Machine(model::M, args...) where M<:Model = Machine{M}(model, args...)
+Machine(model::M, args...) where M <: Model = Machine{M}(model, args...)
 
 # public constructor:
-function machine(model::M, args...) where M<:Model
-
+function machine(model::M, args...) where M <: Model
     # checks on args:
     if M <: Supervised
         (length(args) == 2) ||
             error("Use machine(model, X, y) for a supervised model. ")
         X, y = args
-        T =
-            input_is_multivariate(model) ? Union{scitypes(X)...} : scitype_union(X)
+        T = input_is_multivariate(model) ? Union{scitypes(X)...} : scitype_union(X)
         T <: input_scitype_union(model) ||
-            @warn "The scitypes of elements of X, in machine(model, X, y), "*
-        "should be a subtype of $(input_scitype_union(model)). "
+            @warn "The scitypes of elements of X, in machine(model, X, y), " *
+                  "should be a subtype of $(input_scitype_union(model)). "
         y isa AbstractVector ||
-            @warn "The y, in machine(model, X, y), should be an AbstractVector "*
-        "(possibly of tuples). "
+            @warn "The y, in machine(model, X, y), should be an AbstractVector " *
+                  "(possibly of tuples). "
         scitype_union(y) <: target_scitype_union(model) ||
-            @warn "The scitype of elements of y, in machine(model, X, y), "*
-        "should be a subtype of $(target_scitype_union(model)). "
-    end
-    if M <: Unsupervised
+            @warn "The scitype of elements of y, in machine(model, X, y), " *
+                  "should be a subtype of $(target_scitype_union(model)). "
+    else # M <: Unsupervised
         length(args) == 1 ||
-            error("Wrong number of arguments. "*
+            error("Wrong number of arguments. " *
                   "Use machine(model, X) for an unsupervised model.")
         X = args[1]
         container_type(X) in [:table, :sparse] || args[1] isa AbstractVector ||
             @warn "The X, in machine(model, X), should be a table, sparse table or AbstractVector. "*
         "Use MLJ.table(X) to wrap an AbstractMatrix X as a table. "
-        U =
-            input_is_multivariate(model) ?  Union{scitypes(X)...} : scitype_union(X)
+        U = input_is_multivariate(model) ? Union{scitypes(X)...} : scitype_union(X)
         U <: input_scitype_union(model) ||
-            @warn "The scitype of elements of X, in machine(model, X), should be a subtype "*
-        "of $(input_scitype_union(model)). "
+            @warn "The scitype of elements of X, in machine(model, X), should be a " *
+                  "subtype of $(input_scitype_union(model)). "
     end
-
     return Machine(model, args...)
-
 end
 
 machine(model::Model, task::SupervisedTask) = machine(model, task.X, task.y)
@@ -103,7 +97,6 @@ Note that a nodal machine obtains its training data by *calling* its
 node arguments on the specified `rows` (rather *indexing* its arguments
 on those rows) and that this calling is a recursive operation on nodes
 upstream of those arguments.
-
 """
 function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
@@ -115,21 +108,20 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
     warning = clean!(mach.model)
     isempty(warning) || verbosity < 0 || @warn warning
 
-    if rows == nothing
+    if rows === nothing
         rows = (:)
     end
 
-    rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
+    rows_have_changed = !isdefined(mach, :rows) || rows != mach.rows
 
     if mach isa NodalMachine
         # determine if concrete data to be used in training may have changed:
         upstream_state = Tuple([state(arg) for arg in mach.args])
-        data_has_changed =
-            rows_have_changed || (upstream_state != mach.upstream_state)
+        data_has_changed = rows_have_changed || (upstream_state != mach.upstream_state)
         previously_fit = (mach.state > 0)
     else
         data_has_changed = rows_have_changed
-        previously_fit =  isdefined(mach, :fitresult)
+        previously_fit = isdefined(mach, :fitresult)
     end
 
     args = [selectrows(arg, rows) for arg in mach.args]
@@ -139,11 +131,12 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
         verbosity < 1 || @info "Training $mach."
         mach.fitresult, mach.cache, mach.report =
             fit(mach.model, verbosity, args...)
+
     elseif !is_stale(mach)
         # don't fit the model
         if verbosity > 0
-            @info "Not retraining $mach.\n It appears up-to-date. "*
-            "Use force=true to force retraining."
+            @info "Not retraining $mach.\n It appears up-to-date. " *
+                  "Use `force=true` to force retraining."
         end
         return mach
     else
@@ -151,6 +144,7 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
         verbosity < 1 || @info "Updating $mach."
         mach.fitresult, mach.cache, mach.report =
             update(mach.model, verbosity, mach.fitresult, mach.cache, args...)
+
     end
 
     if rows_have_changed
@@ -165,7 +159,6 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
     end
 
     return mach
-
 end
 
 is_stale(mach::Machine) =

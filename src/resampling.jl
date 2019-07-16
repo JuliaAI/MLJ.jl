@@ -35,7 +35,7 @@ CV(; nfolds=6, parallel=true, shuffle=false, rng=Random.GLOBAL_RNG) = CV(nfolds,
 MLJBase.show_as_constructed(::Type{<:CV}) = true
 
 
-## DIRECT EVALUATION METHODS 
+## DIRECT EVALUATION METHODS
 
 # We first define an `evaluate!` to directly generate estimates of
 # performance according to some strategy
@@ -48,7 +48,7 @@ MLJBase.show_as_constructed(::Type{<:CV}) = true
 
 Estimate the performance of a machine `mach` using the specified
 `resampling` strategy (defaulting to 6-fold cross-validation) and `measure`,
-which can be a single measure or vector. 
+which can be a single measure or vector.
 
 Although evaluate! is mutating, `mach.model` and `mach.args` are
 preserved.
@@ -75,22 +75,22 @@ function evaluate!(mach::Machine, resampling::Holdout;
         rng = resampling.rng
     end
 
-    if measure == nothing
+    if measure === nothing
         _measures = default_measure(mach.model)
-        if _measures == nothing
+        if _measures === nothing
             error("You need to specify measure=... ")
         end
     else
         _measures = measure
     end
-    
+
     X = mach.args[1]
     y = mach.args[2]
     length(mach.args) == 2 || error("Multivariate targets not yet supported.")
-    
+
     all =
-        rows == nothing ? eachindex(y) : rows
-    
+        rows === nothing ? eachindex(y) : rows
+
     train, test = partition(all, resampling.fraction_train,
                             shuffle=resampling.shuffle, rng=rng)
     if verbosity > 0
@@ -129,9 +129,9 @@ function evaluate!(mach::Machine, resampling::CV;
         rng = resampling.rng
     end
 
-    if measure == nothing
+    if measure === nothing
         _measures = default_measure(mach.model)
-        if _measures == nothing
+        if _measures === nothing
             error("You need to specify measure=... ")
         end
     else
@@ -143,8 +143,8 @@ function evaluate!(mach::Machine, resampling::CV;
     length(mach.args) == 2 || error("Multivariate targets not yet supported.")
 
     all =
-        rows == nothing ? eachindex(y) : rows
-    
+        rows === nothing ? eachindex(y) : rows
+
     if verbosity > 0
         which_rows =
             all == eachindex(y) ? "Resampling from all rows. " : "Resampling from a subset of all rows. "
@@ -158,11 +158,11 @@ function evaluate!(mach::Machine, resampling::CV;
 
     n_samples = length(all)
     nfolds = resampling.nfolds
-    
+
     if resampling.shuffle
         shuffle!(rng, collect(all))
     end
-    
+
     k = floor(Int,n_samples/nfolds)
 
     # function to return the measures for the fold `all[f:s]`:
@@ -171,7 +171,7 @@ function evaluate!(mach::Machine, resampling::CV;
         train = vcat(all[1:(f - 1)], all[(s + 1):end])
         fit!(mach; rows=train, verbosity=verbosity-1, force=force)
         yhat = operation(mach, selectrows(X, test))
-        if !(_measures isa AbstractVector) 
+        if !(_measures isa AbstractVector)
             return _measures(yhat, y[test])
         else
             return [m(yhat, y[test]) for m in _measures]
@@ -198,7 +198,7 @@ function evaluate!(mach::Machine, resampling::CV;
             measure_values = [first((get_measure(firsts[n], seconds[n]), next!(p))) for n in 1:nfolds]
         else
             measure_values = [get_measure(firsts[n], seconds[n]) for n in 1:nfolds]
-        end            
+        end
     end
 
     if !(measure isa AbstractVector)
@@ -207,7 +207,7 @@ function evaluate!(mach::Machine, resampling::CV;
 
     # repackage measures:
     measures_reshaped = [[measure_values[i][j] for i in 1:nfolds] for j in 1:length(_measures)]
-    
+
     measure_names = Tuple(Symbol.(string.(_measures)))
     return NamedTuple{measure_names}(Tuple(measures_reshaped))
 
@@ -228,16 +228,16 @@ end
 MLJBase.package_name(::Type{<:Resampler}) = "MLJ"
 MLJBase.is_wrapper(::Type{<:Resampler}) = true
 
-    
+
 Resampler(; model=ConstantRegressor(), resampling=Holdout(),
           measure=nothing, operation=predict) =
-              Resampler(model, resampling, measure, operation) 
+              Resampler(model, resampling, measure, operation)
 
 function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
 
-    if resampler.measure == nothing
+    if resampler.measure === nothing
         measure = default_measure(resampler.model)
-        if measure == nothing
+        if measure === nothing
             error("You need to specify measure=... ")
         end
     else
@@ -250,12 +250,12 @@ function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
                          measure=measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)
-    
+
     cache = (mach, deepcopy(resampler.resampling))
     report = NamedTuple()
 
     return fitresult, cache, report
-    
+
 end
 
 # in special case of holdout, we can reuse the underlying model's
@@ -265,9 +265,9 @@ function MLJBase.update(resampler::Resampler{Holdout},
 
     old_mach, old_resampling = cache
 
-    if resampler.measure == nothing
+    if resampler.measure === nothing
         measure = default_measure(resampler.model)
-        if measure == nothing
+        if measure === nothing
             error("You need to specify measure=... ")
         end
     else
@@ -285,20 +285,11 @@ function MLJBase.update(resampler::Resampler{Holdout},
                          measure=resampler.measure,
                          operation=resampler.operation,
                          verbosity=verbosity-1)
-    
+
     report = NamedTuple
 
     return fitresult, cache, report
-    
+
 end
 
 MLJBase.evaluate(model::Resampler, fitresult) = fitresult
-
-
-
-
-
-
-    
-
-    

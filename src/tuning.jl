@@ -78,7 +78,7 @@ function TunedModel(;model=nothing,
                     train_best=true)
     
     !isempty(ranges) || error("You need to specify ranges=... ")
-    model != nothing || error("You need to specify model=... ")
+    model !== nothing || error("You need to specify model=... ")
 
     message = clean!(model)
     isempty(message) || @info message
@@ -95,7 +95,7 @@ end
 
 function MLJBase.clean!(model::EitherTunedModel)
     message = ""
-    if model.measure == nothing
+    if model.measure === nothing
         model.measure = default_measure(model)
         message *= "No measure specified. Using measure=$(model.measure). "
     end
@@ -314,7 +314,7 @@ function learning_curve!(mach::Machine{<:Supervised};
                         resampling=Holdout(),
                          measure=rms, operation=predict, range=nothing, verbosity=1, n=1)
 
-    range != nothing || error("No param range specified. Use range=... ")
+    range !== nothing || error("No param range specified. Use range=... ")
 
     tuned_model = TunedModel(model=mach.model, ranges=range,
                              tuning=Grid(resolution=resolution),

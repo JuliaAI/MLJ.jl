@@ -2,6 +2,11 @@
 
 abstract type AbstractNode <: MLJType end
 
+"""
+$TYPEDEF
+
+A Source node wraps training data in a format such as a table or a categorical vector.
+"""
 mutable struct Source <: AbstractNode
     data  # training data
 end
@@ -10,19 +15,15 @@ is_stale(s::Source) = false
 
 # make source nodes callable:
 function (s::Source)(; rows=:)
-    if rows == (:)
-        return s.data
-    else
-        return selectrows(s.data, rows)
-    end
+    rows == (:) && return s.data
+    return selectrows(s.data, rows)
 end
 (s::Source)(Xnew) = Xnew
 
 """
-   rebind(s::Source, X)
+$SIGNATURES
 
 Attach new data `X` to an existing source node `s`.
-
 """
 function rebind!(s::Source, X)
     s.data = X
@@ -31,25 +32,28 @@ end
 
 
 """
-    origins(N)
+$SIGNATURES
 
-Return a list of all origins of a node `N` accessed by a call
-`N()`. These are the source nodes of the acyclic directed graph
-associated learning network terminating at `N` of the, if edges
+Return a list of all origins of a node `N` accessed by a call `N()`.
+These are the source nodes of the acyclic directed graph (DAG)
+associated with the learning network terminating at `N`, if edges
 corresponding to training arguments are excluded. A `Node` object
-cannot be called on new data unles it has a unique origin.
+cannot be called on new data unless it has a unique origin.
 
 Not to be confused with `sources(N)` which refers to the same graph
 but without the training edge deletions.
 
 See also: [`node`](@ref), [`source`](@ref).
-
 """
 origins(s::Source) = [s,]
 
-#  _merge!(nodes1, nodes2) incrementally appends to `nodes1` all
-# elements in `nodes2`, excluding any element previously added (or any
-# element of `nodes1` in its initial state).
+
+"""
+$SIGNATURES
+
+Incrementally append to `nodes1` all elements in `nodes2`, excluding any elements
+previously added (or any element of `nodes1` in its initial state).
+"""
 function _merge!(nodes1, nodes2)
     for x in nodes2
         if !(x in nodes1)
@@ -61,6 +65,11 @@ end
 
 # Note that `fit!` has already been defined for any  AbstractMachine in machines.jl
 
+"""
+$TYPEDEF
+
+A NodalMachine wraps a model as part of a learning network.
+"""
 mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
 
     model::M
@@ -78,11 +87,11 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
 
         # check number of arguments for model subtypes:
         !(M <: Supervised) || length(args) > 1 ||
-            throw(error("Wrong number of arguments. "*
+            throw(error("Wrong number of arguments. " *
                         "You must provide target(s) for supervised models."))
 
         !(M <: Unsupervised) || length(args) == 1 ||
-            throw(error("Wrong number of arguments. "*
+            throw(error("Wrong number of arguments. " *
                         "Use NodalMachine(model, X) for an unsupervised model."))
 
         machine = new{M}(model)
@@ -99,20 +108,42 @@ end
 # automatically detect type parameter:
 NodalMachine(model::M, args...) where M<:Model = NodalMachine{M}(model, args...)
 
-# to turn fit-through fitting off and on:
+"""
+$SIGNATURES
+
+Turn fit-through off for a given `NodalMachine`.
+See also [`thaw!`](@ref).
+"""
 function freeze!(machine::NodalMachine)
     machine.frozen = true
 end
+
+"""
+$SIGNATURES
+
+Turn fit-through on for a given `NodalMachine`.
+See also [`freeze!`](@ref).
+"""
 function thaw!(machine::NodalMachine)
     machine.frozen = false
 end
 
+"""
+$SIGNATURES
+
+Check if a machine is stale.
+"""
 function is_stale(machine::NodalMachine)
     !isdefined(machine, :fitresult) ||
         machine.model != machine.previous_model ||
         reduce(|,[is_stale(arg) for arg in machine.args])
 end
 
+"""
+$SIGNATURES
+
+Return the state of a machine.
+"""
 state(machine::NodalMachine) = machine.state
 
 
@@ -120,7 +151,7 @@ state(machine::NodalMachine) = machine.state
 
 struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
 
-    operation  # that can be dispatched on a fit-result (eg, `predict`) or a static operation
+    operation   # that can be dispatched on a fit-result (eg, `predict`) or a static operation
     machine::T  # is `nothing` for static operations
     args::Tuple{Vararg{AbstractNode}}  # nodes where `operation` looks for its arguments
     origins::Vector{Source}
@@ -131,15 +162,14 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
                      args::AbstractNode...) where {M<:Model, T<:Union{NodalMachine{M},Nothing}}
 
         # check the number of arguments:
-        if machine == nothing
-            length(args) > 0 || throw(error("`args` in `Node(::Function, args...)` must be non-empty. "))
-
+        if machine === nothing && isempty(args)
+            throw(error("`args` in `Node(::Function, args...)` must be non-empty. "))
         end
 
         origins_ = unique(vcat([origins(arg) for arg in args]...))
         length(origins_) == 1 ||
-            @warn "A node referencing multiple origins when called "*
-        "has been defined:\n$(origins_). "
+            @warn "A node referencing multiple origins when called " *
+                  "has been defined:\n$(origins_). "
 
         # initialize the list of upstream nodes:
         nodes_ = AbstractNode[]
@@ -150,49 +180,69 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
         end
 
         # merge the lists from training arguments:
-        if machine != nothing
+        if machine !== nothing
             for arg in machine.args
                 _merge!(nodes_, nodes(arg))
             end
         end
 
         return new{T}(operation, machine, args, origins_, nodes_)
-
     end
 end
 
+"""
+$SIGNATURES
+
+Access the origins (source nodes) of a given node.
+"""
 origins(X::Node) = X.origins
+
+"""
+$SIGNATURES
+
+Return all nodes upstream of a node, including the node, in order consistent with the DAG.
+"""
 nodes(X::Node) = AbstractNode[X.nodes..., X]
 nodes(S::Source) = AbstractNode[S, ]
 
+"""
+$SIGNATURES
+
+Check if a node is stale.
+"""
 function is_stale(X::Node)
-    (X.machine != nothing && is_stale(X.machine)) ||
+    (X.machine !== nothing && is_stale(X.machine)) ||
         reduce(|, [is_stale(arg) for arg in X.args])
 end
 
 state(s::MLJ.Source) = (state = 0, )
+
+"""
+$SIGNATURES
+
+Return the state of a node.
+"""
 function state(W::MLJ.Node)
     mach = W.machine
-    state_ =
-        W.machine == nothing ? 0 : state(W.machine)
-    if mach == nothing
-        trainkeys=[]
-        trainvalues=[]
+    state_ = W.machine === nothing ? 0 : state(W.machine)
+    if mach === nothing
+        trainkeys   = []
+        trainvalues = []
     else
-        trainkeys = [Symbol("train_arg", i) for i in eachindex(mach.args)]
-        trainvalues = [state(arg) for arg in mach.args]
+        trainkeys   = (Symbol("train_arg", i) for i in eachindex(mach.args))
+        trainvalues = (state(arg) for arg in mach.args)
     end
     keys = tuple(:state,
-                 [Symbol("arg", i) for i in eachindex(W.args)]...,
+                 (Symbol("arg", i) for i in eachindex(W.args))...,
                  trainkeys...)
     values = tuple(state_,
-                   [state(arg) for arg in W.args]...,
+                   (state(arg) for arg in W.args)...,
                    trainvalues...)
     return NamedTuple{keys}(values)
 end
 
 # autodetect type parameter:
-Node(operation, machine::M, args...) where M<:Union{NodalMachine, Nothing} =
+Node(operation, machine::M, args...) where M <: Union{NodalMachine,Nothing} =
     Node{M}(operation, machine, args...)
 
 # constructor for static operations:
@@ -207,8 +257,12 @@ function (y::Node)(Xnew)
     return (y.operation)(y.machine, [arg(Xnew) for arg in y.args]...)
 end
 
-# Allow nodes to share the `selectrows(X, r)` syntax of concrete tabular data
-# (needed for `fit(::AbstractMachine, ...)` in machines.jl):
+"""
+$SIGNATURES
+
+Allow nodes to share the `selectrows(X, r)` syntax of concrete tabular data (needed for
+`fit(::AbstractMachine, ...)` in machines.jl).
+"""
 MLJBase.selectrows(X::AbstractNode, r) = X(rows=r)
 
 # and for the special case of static operations:
@@ -216,14 +270,13 @@ MLJBase.selectrows(X::AbstractNode, r) = X(rows=r)
 (y::Node{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
 """
-    fit!(N::Node; rows=nothing, verbosity=1, force=false)
+$SIGNATURES
 
 Train the machines of all dynamic nodes in the learning network terminating at
 `N` in an appropriate order.
-
 """
-function fit!(y::Node; rows=nothing, verbosity=1, force=false)
-    if rows == nothing
+function fit!(y::Node; rows=nothing, verbosity::Int=1, force::Bool=false)
+    if rows === nothing
         rows = (:)
     end
 
@@ -235,7 +288,7 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
     # get machines to fit:
     machines = map(n -> n.machine, nodes_)
     machines = filter(unique(machines)) do mach
-        mach != nothing
+        mach !== nothing
     end
 
     for mach in machines
@@ -251,16 +304,14 @@ istoobig(d::Tuple{AbstractNode}) = length(d) > 10
 
 # overload show method
 
-
-
 function _recursive_show(stream::IO, X::AbstractNode)
     if X isa Source
         printstyled(IOContext(stream, :color=>MLJBase.SHOW_COLOR), MLJBase.handle(X), color=:blue)
     else
-        detail = (X.machine == nothing ? "(" : "($(MLJBase.handle(X.machine)), ")
+        detail = (X.machine === nothing ? "(" : "($(MLJBase.handle(X.machine)), ")
         operation_name = typeof(X.operation).name.mt.name
         print(stream, operation_name, "(")
-        if X.machine != nothing
+        if X.machine !== nothing
             color = (X.machine.frozen ? :red : :green)
             printstyled(IOContext(stream, :color=>MLJBase.SHOW_COLOR), MLJBase.handle(X.machine),
                         bold=MLJBase.SHOW_COLOR)
@@ -367,7 +418,7 @@ See also: [`source`](@ref), [`origins`](@ref).
 node = Node
 
 # unless no arguments are `AbstractNode`s, `machine` creates a
-# NodalTrainablaeModel, rather than a `Machine`:
+# NodalTrainableModel, rather than a `Machine`:
 machine(model::Model, args::AbstractNode...) = NodalMachine(model, args...)
 machine(model::Model, X, y::AbstractNode) = NodalMachine(model, source(X), y)
 machine(model::Model, X::AbstractNode, y) = NodalMachine(model, X, source(y))

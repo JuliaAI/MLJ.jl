@@ -25,7 +25,7 @@ terminating at node `N`.
 tree(s::MLJ.Source) = (source = s,)
 function tree(W::MLJ.Node)
     mach = W.machine
-    if mach == nothing
+    if mach === nothing
         value2 = nothing
         endkeys=[]
         endvalues=[]
@@ -46,7 +46,7 @@ end
 # get the top level args of the tree of some node:
 function args(tree)
     keys_ = filter(keys(tree) |> collect) do key
-        match(r"^arg[0-9]*", string(key)) != nothing
+        match(r"^arg[0-9]*", string(key)) !== nothing
     end
     return [getproperty(tree, key) for key in keys_]
 end
@@ -54,7 +54,7 @@ end
 # get the top level train_args of the tree of some node:
 function train_args(tree)
     keys_ = filter(keys(tree) |> collect) do key
-        match(r"^train_arg[0-9]*", string(key)) != nothing
+        match(r"^train_arg[0-9]*", string(key)) !== nothing
     end
     return [getproperty(tree, key) for key in keys_]
 end
@@ -101,7 +101,7 @@ List all machines in the learning network terminating at node `N`.
 """
 machines(W::MLJ.Source) = Any[]
 function machines(W::MLJ.Node)
-    if W.machine == nothing
+    if W.machine === nothing
         return vcat([machines(arg) for arg in W.args]...) |> unique
     else
         return vcat(Any[W.machine, ],
@@ -161,7 +161,7 @@ function Base.replace(W::Node, pairs::Pair...)
     # build the new network:
     for N in nodes_
        args = [newnode_given_old[arg] for arg in N.args]
-         if N.machine == nothing
+         if N.machine === nothing
              newnode_given_old[N] = node(N.operation, args...)
          else
              if N.machine in keys(newmach_given_old)
