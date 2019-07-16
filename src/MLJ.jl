@@ -2,7 +2,7 @@ module MLJ
 
 # defined in include files:
 export @curve, @pcurve,                               # utilities.jl
-        mav, rms, rmsl, rmslp1, rmsp,                 # metrics.jl
+        mav, mae, rms, rmsl, rmslp1, rmsp,            # metrics.jl
         misclassification_rate, cross_entropy,        # metrics.jl
         default_measure,                              # metrics.jl
         coerce, supervised, unsupervised,             # tasks.jl
@@ -25,7 +25,7 @@ export Machine, NodalMachine, machine, AbstractNode,
 export FeatureSelector,
         UnivariateStandardizer, Standardizer,
         UnivariateBoxCoxTransformer,
-        OneHotEncoder,
+        OneHotEncoder
         # IntegerToInt64Transformer,
         # UnivariateDiscretizer, Discretizer
 
@@ -47,7 +47,7 @@ export nrows, nfeatures, info,
         partition, X_and_y,
         load_boston, load_ames, load_iris, load_reduced_ames,
         load_crabs, datanow,
-        features, X_and_y,
+        features, X_and_y
 
 using MLJBase
 
@@ -65,6 +65,7 @@ import Distributions
 import StatsBase
 using ProgressMeter
 import Tables
+using DocStringExtensions: SIGNATURES, TYPEDEF
 
 # to be extended:
 import Base.==
