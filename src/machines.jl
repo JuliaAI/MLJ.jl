@@ -1,7 +1,7 @@
-abstract type AbstractMachine{M} <: MLJType end
+abstract type AbstractMachine{<:Model} <: MLJType end
 
 
-# TODO: write out separate method for machine(::Model, ::MLJTask) to simplify logic. 
+# TODO: write out separate method for machine(::Model, ::MLJTask) to simplify logic.
 mutable struct Machine{M<:Model} <: AbstractMachine{M}
 
     model::M
@@ -39,7 +39,7 @@ function machine(model::M, args...) where M<:Model
         y isa AbstractVector ||
             @warn "The y, in machine(model, X, y), should be an AbstractVector "*
         "(possibly of tuples). "
-        scitype_union(y) <: target_scitype_union(model) || 
+        scitype_union(y) <: target_scitype_union(model) ||
             @warn "The scitype of elements of y, in machine(model, X, y), "*
         "should be a subtype of $(target_scitype_union(model)). "
     end
@@ -53,13 +53,13 @@ function machine(model::M, args...) where M<:Model
         "Use MLJ.table(X) to wrap an AbstractMatrix X as a table. "
         U =
             input_is_multivariate(model) ?  Union{scitypes(X)...} : scitype_union(X)
-        U <: input_scitype_union(model) || 
+        U <: input_scitype_union(model) ||
             @warn "The scitype of elements of X, in machine(model, X), should be a subtype "*
         "of $(input_scitype_union(model)). "
     end
-    
+
     return Machine(model, args...)
-    
+
 end
 
 machine(model::Model, task::SupervisedTask) = machine(model, task.X, task.y)
@@ -77,7 +77,7 @@ store the returned fit-result and report. Subsequent calls do nothing
 unless: (i) `force=true`, or (ii) the specified `rows` are different
 from those used the last time a fit-result was computed, or (iii)
 `mach.model` has changed since the last time a fit-result was computed
-(the machine is *stale*). In cases (i) or (ii) `MLJBase.fit` is 
+(the machine is *stale*). In cases (i) or (ii) `MLJBase.fit` is
 called on `mach.model`. Otherwise, `MLJBase.update` is called.
 
     fit!(mach::NodalMachine; rows=nothing, verbosity=1, force=false)
@@ -98,7 +98,7 @@ called.
 A machine `mach` is *stale* if `mach.model` has changed since the last
 time a fit-result was computed, or if if one of its training arguments
 is `stale`. A node `N` is stale if `N.machine` is stale or one of its
-arguments is stale. Source nodes are never stale. 
+arguments is stale. Source nodes are never stale.
 
 Note that a nodal machine obtains its training data by *calling* its
 node arguments on the specified `rows` (rather *indexing* its arguments
@@ -108,16 +108,16 @@ upstream of those arguments.
 """
 function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
-    if mach isa NodalMachine && mach.frozen 
+    if mach isa NodalMachine && mach.frozen
         verbosity < 0 || @warn "$mach not trained as it is frozen."
         return mach
     end
 
     warning = clean!(mach.model)
-    isempty(warning) || verbosity < 0 || @warn warning 
-    
+    isempty(warning) || verbosity < 0 || @warn warning
+
     if rows == nothing
-        rows = (:) 
+        rows = (:)
     end
 
     rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
@@ -164,7 +164,7 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
         mach.upstream_state = upstream_state
         mach.state = mach.state + 1
     end
-    
+
     return mach
 
 end
@@ -174,5 +174,3 @@ is_stale(mach::Machine) =
 
 params(mach::AbstractMachine) = params(mach.model)
 report(mach::AbstractMachine) = mach.report
-
-

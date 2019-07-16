@@ -28,7 +28,7 @@ $SIGNATURES
 
 Check that two vectors have compatible dimensions
 """
-function check_dimensions(ŷ::A, y::A) where A <: AbstractVector{<:Real}
+function check_dimensions(ŷ::AbstractVector, y::AbstractVector)
     length(y) == length(ŷ) || throw(DimensionMismatch("Vectors don't have the same length"))
     return nothing
 end
@@ -42,7 +42,7 @@ Mean absolute error (also known as MAE).
 
 ``\\text{MAV} =  n^{-1}∑ᵢ|yᵢ-ŷᵢ|``
 """
-function mav(ŷ::A, y::A) where A <: AbstractVector{<:Real}
+function mav(ŷ::AbstractVector{<:Real}, y)
     check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
@@ -69,7 +69,7 @@ Root mean squared error:
 
 ``\\text{RMS} = n^{-1}∑ᵢ|yᵢ-ŷᵢ|^2``
 """
-function rms(ŷ::A, y::A) where A <: AbstractVector{<:Real}
+function rms(ŷ::AbstractVector{<:Real}, y)
     check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
@@ -90,7 +90,7 @@ Root mean squared logarithmic error:
 
 See also [`rmslp1`](@ref).
 """
-function rmsl(ŷ::A, y::A) where A <: AbstractVector{<:Real}
+function rmsl(ŷ::AbstractVector{<:Real}, y)
     check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
@@ -111,7 +111,7 @@ Root mean squared logarithmic error with an offset of 1:
 
 See also [`rmsl`](@ref).
 """
-function rmslp1(ŷ::A, y::A) where A <: AbstractVector{<:Real}
+function rmslp1(ŷ::AbstractVector{<:Real}, y)
     check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
@@ -132,7 +132,7 @@ Root mean squared percentage loss:
 
 where the sum is over indices such that `yᵢ≂̸0` and `m` is the number of such indices.
 """
-function rmsp(ŷ::A, y::A) where A <: AbstractVector{<:Real}
+function rmsp(ŷ::AbstractVector{<:Real}, y)
     check_dimensions(ŷ, y)
     ret = 0.0
     count = 0
