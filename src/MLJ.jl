@@ -9,8 +9,8 @@ export @curve, @pcurve,                               # utilities.jl
         report,                                       # machines.jl
         Holdout, CV, evaluate!, Resampler,            # resampling.jl
         Params, params, set_params!,                  # parameters.jl
-        strange, iterator ,                           # parameters.jl
-        Grid, TunedModel, learning_curve!             # tuning.jl
+        strange, iterator,                            # parameters.jl
+        Grid, TunedModel, learning_curve!,            # tuning.jl
         EnsembleModel,                                # ensembles.jl
         ConstantRegressor, ConstantClassifier,        # builtins/Constant.jl
         models, localmodels, @load,                   # loading.jl
