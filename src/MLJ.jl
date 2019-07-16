@@ -49,6 +49,7 @@ export nrows, nfeatures, info,
         load_crabs, datanow,
         features, X_and_y
 
+using MLJBase
 # to be extended:
 import MLJBase: fit, update, clean!,
                 predict, predict_mean, predict_median, predict_mode,
