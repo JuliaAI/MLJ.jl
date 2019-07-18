@@ -4,6 +4,8 @@
 # eg, `module TestDatasets` for code testing `datasets.jl`.
 
 using MLJ
+using MLJBase
+using CSV
 using Test
 
 @constant junk=KNNRegressor()

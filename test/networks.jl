@@ -3,7 +3,8 @@ module TestLearningNetworks
 # using Revise
 using Test
 using MLJ
-import MLJBase
+using MLJBase
+using CSV
 using CategoricalArrays
 
 # TRAINABLE MODELS
