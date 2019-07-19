@@ -24,15 +24,18 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 
 [compat]
+CSV = "0.5"
 MLJBase = "0.2.6"
 MLJModels = "0.2.0"
 julia = "1"
 
 [extras]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 RDatasets = "ce6b1742-4840-55fa-b093-852dadbb1d8b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [targets]
-test = ["DecisionTree", "RDatasets", "Test", "UnicodePlots"]
+test = ["CSV", "DecisionTree", "MLJBase", "RDatasets", "Test", "UnicodePlots"]

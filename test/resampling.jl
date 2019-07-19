@@ -4,6 +4,7 @@ module TestResampling
 using Test
 using MLJ
 using MLJBase
+using CSV
 using DataFrames
 
 x1 = ones(4)

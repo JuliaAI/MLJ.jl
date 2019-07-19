@@ -10,7 +10,8 @@ module TestEnsembles
 using Test
 using Random
 using MLJ
-import MLJBase
+using MLJBase
+using CSV
 using CategoricalArrays
 using Distributions
 

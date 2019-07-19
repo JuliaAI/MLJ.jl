@@ -1,7 +1,9 @@
 module TestTransformer
 
 # using Revise
-using MLJ, MLJBase
+using MLJ
+using MLJBase
+using CSV
 using Test
 using Statistics
 using DataFrames

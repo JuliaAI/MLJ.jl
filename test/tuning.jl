@@ -4,7 +4,8 @@ module TestTuning
 using Test
 using MLJ
 # using UnicodePlots
-import MLJBase
+using MLJBase
+using CSV
 
 x1 = rand(100);
 x2 = rand(100);
