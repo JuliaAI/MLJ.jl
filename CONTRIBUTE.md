@@ -93,10 +93,11 @@ Julia Computing and New Zealand eScience Infrastructure.
 
 **Julia language consultants.** Mike Innes, Avik Sengupta
 
-**Other contributors, past and present.** Dilum Aluthge, Diego Arenas, Edoardo Barp,
-Gergö Bohner, Michael K. Borregaard, Valentin Churavy, Harvey
-Devereux, Mosè Giordano, Thibaut Lienart, Mohammed Nook, Julian Samaroo, Annika
-Stechemesser, Ayush Shridar, Yiannis Simillides
+**Other contributors, past and present.** Dilum Aluthge, Diego
+    Arenas, Edoardo Barp, Gergö Bohner, Michael K. Borregaard,
+    Valentin Churavy, Harvey Devereux, Mosè Giordano, Thibaut Lienart,
+    Mohammed Nook, Piotr Oleśkiewicz, Julian Samaroo, Ayush Shridar,
+    Yiannis Simillides, Annika Stechemesser
 
 
 
