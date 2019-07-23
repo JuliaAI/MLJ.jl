@@ -94,6 +94,7 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
 
         return machine
     end
+    NodalMachine{M}() where M<:Model = new{M}()
 end
 
 # automatically detect type parameter:
@@ -118,7 +119,7 @@ state(machine::NodalMachine) = machine.state
 
 ## NODES
 
-struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
+mutable struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
 
     operation  # that can be dispatched on a fit-result (eg, `predict`) or a static operation
     machine::T  # is `nothing` for static operations
@@ -215,9 +216,9 @@ MLJBase.selectrows(X::AbstractNode, r) = X(rows=r)
 (y::Node{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
 # Node <-> UUID mappings for efficient transfer of node identity between workers
-const NODE_TO_UUID = IdDict{AbstractNode, UUID}()
-const UUID_TO_NODE = Dict{UUID, AbstractNode}()
-function _node_to_uuid(node::AbstractNode)
+const NODE_TO_UUID = IdDict{Any, UUID}()
+const UUID_TO_NODE = Dict{UUID, Any}()
+function _node_to_uuid(node)
     if haskey(NODE_TO_UUID, node)
         uuid = NODE_TO_UUID[node]
     else
@@ -264,14 +265,17 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
         empty!(MLJ.UUID_TO_NODE)
     end
 
-    # Register network on all workers
+    # Register network (via UUIDs) on all workers
+    # TODO: We can still use @everywhere here...
+    rnodes = get_reduced_nodes(y)
+    root = rnodes[NODE_TO_UUID[y]]
     for w in workers()
-        fetch(@spawnat w MLJ._register!(y))
+        fetch(@spawnat w MLJ.set_full_nodes(root, rnodes))
     end
 
     dag = construct_dag(y; rows=rows, verbosity=verbosity, force=force)
     @assert dag isa Thunk
-    rnode = collect(dag)::ReducedNode
+    rnode, _ = collect(dag)
 
     # sync final network back to master
     _sync!(y, rnode)
@@ -279,22 +283,23 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
     return y
 end
 
-struct ReducedNodalMachine{M} <: AbstractMachine{M}
+mutable struct ReducedNodalMachine{M} <: AbstractMachine{M}
     model::M
-    previous_model
+    previous_model::M
     fitresult
     cache
-    args::Vector{UUID}
+    args::Tuple{Vararg{UUID}}
     report
     frozen
     rows
     state
     upstream_state
     uuid::UUID
+    ReducedNodalMachine{M}() where M = new{M}()
 end
-struct ReducedNode <: AbstractNode
+mutable struct ReducedNode{T<:Union{ReducedNodalMachine, Nothing}} <: AbstractNode
     operation
-    machine
+    machine::T
     args::Tuple{Vararg{UUID}}
     origins::Vector{UUID}
     nodes::Vector{UUID}
@@ -304,57 +309,157 @@ struct ReducedSource <: AbstractNode
     data
     uuid::UUID
 end
-reduce_node(node::Node) = ReducedNode(node).uuid
-reduce_node(source::Source) = ReducedSource(source).uuid
+reduce_node(mach::NodalMachine) = (rmach = ReducedNodalMachine(mach); (rmach, rmach.uuid))
+reduce_node(node::Node) = (rnode = ReducedNode(node); (rnode, rnode.uuid))
+reduce_node(source::Source) = (rsource = ReducedSource(source); (rsource, rsource.uuid))
+function ReducedNodalMachine(lmach::NodalMachine{M}, uuid::UUID=_node_to_uuid(lmach)) where M
+    rmach = ReducedNodalMachine{M}()
+    if isdefined(lmach, :model) rmach.model = lmach.model end
+    if isdefined(lmach, :previous_model) rmach.previous_model = lmach.previous_model end
+    if isdefined(lmach, :fitresult) rmach.fitresult = lmach.fitresult end
+    if isdefined(lmach, :cache) rmach.cache = lmach.cache end
+    rmach.args = last.(reduce_node.(lmach.args))
+    if isdefined(lmach, :report) rmach.report = lmach.report end
+    rmach.frozen = lmach.frozen
+    if isdefined(lmach, :rows) rmach.rows = lmach.rows end
+    rmach.state = lmach.state
+    rmach.upstream_state = lmach.upstream_state
+    rmach.uuid = uuid
+    return rmach
+end
 function ReducedNode(node::Node, uuid::UUID=_node_to_uuid(node))
-    # FIXME: Recurse through node.machine.args if node.machine !== nothing
-    args = reduce_node.(node.args)
-    origins = reduce_node.(node.origins)
-    nodes = reduce_node.(node.nodes)
-    return ReducedNode(node.operation, node.machine, args, origins, nodes, uuid)
+    if node.machine !== nothing
+        mach = ReducedNodalMachine(node.machine)
+    else
+        mach = nothing
+    end
+    args = last.(reduce_node.(node.args))
+    origins = last.(reduce_node.(node.origins))
+    nodes = last.(reduce_node.(node.nodes))
+    return ReducedNode(node.operation, mach, args, origins, nodes, uuid)
 end
 function ReducedSource(source::Source, uuid::UUID=_node_to_uuid(source))
     ReducedSource(source.data, uuid)
 end
 
-function _get_reduced_nodes(node::Node, rnodes=AbstractNode[])
-    rnode = reduce_node(node)
-    push!(rnodes, rnode)
-    for arg in node.args
-        _get_reduced_nodes(arg, rnodes=rnodes)
+isreducednode(::Union{ReducedNodalMachine,ReducedNode,ReducedSource}) = true
+isreducednode(x) = false
+
+function get_reduced_nodes(lmach::NodalMachine, rnodes=Dict{UUID,Any}())
+    rmach, uuid = reduce_node(lmach)
+    rnodes[uuid] = rmach
+    for arg in lmach.args
+        get_reduced_nodes(arg, rnodes)
     end
     return rnodes
 end
-_get_reduced_nodes(source::Source, rnodes=AbstractNode[]) =
-    (push!(rnodes, reduce_node(source)); rnodes)
-function _set_full_nodes(rnode::ReducedNode, rnodes::Dict)
-    # FIXME: args = [_set_full_nodes(for arg_uuid in rnode.args]
-    node = full_node(rnode)
-    uuid = rnode.uuid
-    NODE_TO_UUID[node] = uuid
-    UUID_TO_NODE[uuid] = node
+function get_reduced_nodes(lnode::Node, rnodes=Dict{UUID,Any}())
+    rnode, uuid = reduce_node(lnode)
+    if lnode.machine !== nothing
+        get_reduced_nodes(lnode.machine, rnodes)
+    end
+    rnodes[uuid] = rnode
+    for arg in lnode.args
+        get_reduced_nodes(arg, rnodes)
+    end
+    return rnodes
 end
-function _sync!(lnode::AbstractNode, rnode::ReducedNode)
+function get_reduced_nodes(lsource::Source, rnodes=Dict{UUID,Any}())
+    rsource, uuid = reduce_node(lsource)
+    rnodes[uuid] = rsource
+    return rnodes
+end
+set_full_nodes(root::ReducedNode, rnodes::Dict) = full_node(root, rnodes)
+function full_node(rmach::ReducedNodalMachine{M}, rnodes::Dict) where M
+    uuid = rmach.uuid
+    haskey(UUID_TO_NODE, uuid) && return UUID_TO_NODE[uuid]
+    if rmach !== nothing
+        lmach = NodalMachine{M}()
+        if isdefined(rmach, :model) lmach.model = rmach.model end
+        if isdefined(rmach, :previous_model) lmach.previous_model = rmach.previous_model end
+        if isdefined(rmach, :fitresult) lmach.fitresult = rmach.fitresult end
+        if isdefined(rmach, :cache) lmach.cache = rmach.cache end
+        lmach.args = ((_lookup_node(rnodes, uuid) for uuid in rmach.args)...,)
+        if isdefined(rmach, :report) lmach.report = rmach.report end
+        lmach.frozen = rmach.frozen
+        if isdefined(rmach, :rows) lmach.rows = rmach.rows end
+        lmach.state = rmach.state
+        lmach.upstream_state = rmach.upstream_state
+
+        #=
+        lmach.model = rmach.model
+        lmach.previous_model = rmach.previous_model
+        lmach.fitresult = rmach.fitresult
+        lmach.cache = rmach.cache
+        lmach.args = ((_lookup_node(rnodes, uuid) for uuid in rmach.args)...,)
+        lmach.report = rmach.report
+        lmach.frozen = rmach.frozen
+        lmach.rows = rmach.rows
+        lmach.state = rmach.state
+        lmach.upstream_state = rmach.upstream_state
+        =#
+    else
+        lmach = nothing
+    end
+    NODE_TO_UUID[lmach] = uuid
+    UUID_TO_NODE[uuid] = lmach
+    return lmach
+end
+full_node(rmach::Nothing, rnodes) = nothing
+function full_node(rnode::ReducedNode, rnodes::Dict)
+    uuid = rnode.uuid
+    haskey(UUID_TO_NODE, uuid) && return UUID_TO_NODE[uuid]
+    args = [_lookup_node(rnodes, arg) for arg in rnode.args]
+    origins = [_lookup_node(rnodes, origin) for origin in rnode.origins]
+    nodes = [_lookup_node(rnodes, node) for node in rnode.nodes]
+    lnode = Node(rnode.operation, full_node(rnode.machine, rnodes), args...) #, origins, nodes)
+    NODE_TO_UUID[lnode] = uuid
+    UUID_TO_NODE[uuid] = lnode
+    return lnode
+end
+function full_node(rsource::ReducedSource, rnodes::Dict)
+    uuid = rsource.uuid
+    uuid in keys(UUID_TO_NODE) && return UUID_TO_NODE[uuid]
+    lsource = Source(rsource.data)
+    NODE_TO_UUID[lsource] = uuid
+    UUID_TO_NODE[uuid] = lsource
+    return lsource
+end
+function _lookup_node(rnodes::Dict, uuid::UUID)
+    if haskey(UUID_TO_NODE, uuid)
+        return UUID_TO_NODE[uuid]
+    else
+        # TODO: Make this an assertion
+        if !haskey(rnodes, uuid)
+            @warn "UUID $uuid not found in rnodes"
+            @show rnodes
+            throw(ErrorException("UUID lookup failure"))
+        end
+        return full_node(rnodes[uuid], rnodes)
+    end
+end
+function _sync!(lnode::Node, rnode::ReducedNode)
     lnode.operation = rnode.operation
     if rnode.machine !== nothing
-        lm = lnode.machine
-        rm = rnode.machine
+        lmach = lnode.machine
+        rmach = rnode.machine
 
-        lm.model = rm.model
-        lm.previous_model = rm.previous_model
-        lm.fitresult = rm.fitresult
-        lm.cache = rm.cache
-        lm.args = (UUID_TO_NODE[uuid] for uuid in rm.args)
-        lm.report = rm.report
-        lm.frozen = rm.frozen
-        lm.rows = rm.rows
-        lm.state = rm.upstream_state
-        lm.upstream_state = rm.upstream_state
+        lmach.model = rmach.model
+        lmach.previous_model = rmach.previous_model
+        lmach.fitresult = rmach.fitresult
+        lmach.cache = rmach.cache
+        lmach.args = ((UUID_TO_NODE[uuid] for uuid in rmach.args)...,)
+        lmach.report = rmach.report
+        lmach.frozen = rmach.frozen
+        lmach.rows = rmach.rows
+        lmach.state = rmach.state
+        lmach.upstream_state = rmach.upstream_state
     end
-    lnode.args = [UUID_TO_NODE[arg] for arg in rnode.args]
+    lnode.args = ((UUID_TO_NODE[arg] for arg in rnode.args)...,)
     lnode.origins = [UUID_TO_NODE[origin] for origin in rnode.origins]
     lnode.nodes = [UUID_TO_NODE[node] for node in rnode.nodes]
 end
+_sync!(lsource::Source, rsource::ReducedSource) = (lsource.data = rsource.data;)
 
 # Convenience utility for constructing RemoteChannels for each worker
 _make_rchans() = nothing#Dict{Int,RemoteChannel}(RemoteChannel(w) for w in workers())
@@ -378,15 +483,20 @@ function construct_dag(y::Node; rows=nothing, verbosity=1, force=false, mach_set
     uuid = _node_to_uuid(y)
     wdag = delayed((args...) -> begin
         my_y = UUID_TO_NODE[uuid]
-        for arg in args
-            _sync!(my_y, arg)
-        end
+
         if DAGGER_DEBUG[]
             printstyled("In DAG for $(typeof(my_y))\n"; color=:green)
             printstyled(join(typeof.(args), ", "), '\n'; color=:magenta)
         end
+
+        # Synchronize reduced arguments
+        for arg in filter(a->(a isa Tuple && isreducednode(a[1])), collect(args))
+            rnode, uuid = arg
+            _sync!(UUID_TO_NODE[uuid], rnode)
+        end
         if uniq_mach
             if my_y.machine !== nothing
+                DAGGER_DEBUG[] && printstyled("DAG: training $(typeof(my_y))\n"; color=:red)
                 fit!(my_y.machine; rows=rows, verbosity=verbosity, force=force)
             else
                 DAGGER_DEBUG[] && printstyled("DAG: not training static $(typeof(my_y))\n"; color=:red)
@@ -395,7 +505,13 @@ function construct_dag(y::Node; rows=nothing, verbosity=1, force=false, mach_set
             DAGGER_DEBUG[] && printstyled("DAG: not training non-unique $(typeof(my_y))\n"; color=:red)
         end
 
-        return reduce_node(my_y)
+        rnode, uuid = reduce_node(my_y)
+        if uniq_mach && my_y.machine !== nothing
+            if isdefined(my_y.machine, :fitresult)
+                @assert isdefined(rnode.machine, :fitresult)
+            end
+        end
+        return rnode, uuid
     end)(arg_dags...)
     return wdag
 end
