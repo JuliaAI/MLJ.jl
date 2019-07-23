@@ -276,9 +276,11 @@ function fit!(y::Node; rows=nothing, verbosity=1, force=false)
     dag = construct_dag(y; rows=rows, verbosity=verbosity, force=force)
     @assert dag isa Thunk
     rnode, _ = collect(dag)
+    DAGGER_DEBUG[] && @info "Finished full DAG"
 
     # sync final network back to master
     _sync!(y, rnode)
+    DAGGER_DEBUG[] && @info "Synced back to master"
 
     return y
 end
@@ -492,7 +494,14 @@ function construct_dag(y::Node; rows=nothing, verbosity=1, force=false, mach_set
         # Synchronize reduced arguments
         for arg in filter(a->(a isa Tuple && isreducednode(a[1])), collect(args))
             rnode, uuid = arg
-            _sync!(UUID_TO_NODE[uuid], rnode)
+            lnode = UUID_TO_NODE[uuid]
+            _sync!(lnode, rnode)
+            if DAGGER_DEBUG[]
+                @info "Synced $arg for $my_y"
+                if lnode.machine !== nothing && !isdefined(lnode.machine, :fitresult)
+                    @warn "fitresult not defined!: $arg"
+                end
+            end
         end
         if uniq_mach
             if my_y.machine !== nothing
@@ -513,7 +522,15 @@ function construct_dag(y::Node; rows=nothing, verbosity=1, force=false, mach_set
         end
         return rnode, uuid
     end)(arg_dags...)
-    return wdag
+    # Force master to sync fitted node
+    options = Dagger.Sch.ThunkOptions(1)
+    mdag = delayed(rnode_uuid -> begin
+        rnode, uuid = rnode_uuid #collect(c)
+        lnode = UUID_TO_NODE[uuid]
+        _sync!(lnode, rnode)
+        return rnode_uuid
+    end; options=options)(wdag)
+    return mdag
 end
 function construct_dag(y::Source; rows=nothing, verbosity=1, force=false, mach_set=Set(), rchans=_make_rchans())
     DAGGER_DEBUG[] && printstyled("Construct DAG for Source, rows=$(repr(rows))\n"; color=:cyan)
