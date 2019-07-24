@@ -20,7 +20,7 @@ end</code></pre><h4><a class="nav-anchor" id="Constructor-1" href="#Constructor-
     warning = clean!(mach.model)
     isempty(warning) || verbosity &lt; 0 || @warn warning 
 
-    if rows == nothing
+    if rows === nothing
         rows = (:) 
     end
 
@@ -40,7 +40,7 @@ end</code></pre><h4><a class="nav-anchor" id="Constructor-1" href="#Constructor-
         mach.rows = deepcopy(rows)
     end
 
-    if report != nothing
+    if report !== nothing
         merge!(mach.report, report)
     end
 
