@@ -1,16 +1,14 @@
 """
+$SIGNATURES
 
-    flat_values(t::NamedTuple)
+Viewing a nested named tuple as a tree and return, as a tuple, the values
+at the leaves, in the order they appear in the original tuple.
 
-Viewing a nested named tuple as a tree, return, as a tuple, the values
-at the leaves, in the order they appear in the tuple.
-
-```
+```julia-repl
 julia> t = (X = (x = 1, y = 2), Y = 3)
 julia> flat_values(t)
 (1, 2, 3)
 ```
-
 """
 function flat_values(params::NamedTuple)
     values = []
@@ -70,7 +68,7 @@ function decode_dic(d::Dict)
     return ret
 end
 
-# the inverse of a multivalued dictionary is a mulitvalued
+# the inverse of a multivalued dictionary is a multivalued
 # dictionary:
 function inverse(d::Dict{S,Set{T}}) where {S,T}
     dinv = Dict{T,Set{S}}()
@@ -93,14 +91,24 @@ macro colon(p)
     Expr(:quote, p)
 end
 
-function keys_ordered_by_values(d::Dict{T,S}) where {T, S<:Real}
 
-    items = collect(d) # 1d array containing the (key, value) pairs
-    sort!(items, by=pair->pair[2], alg=QuickSort)
+"""
+$SIGNATURES
 
-    return T[pair[1] for pair in items]
+Take a dictionary of type `{T, <:Real}` and return the keys sorted according to
+the value associated with them.
 
-end
+```julia-repl
+julia> d = Dict("abc"=>5, "def"=>7, "ghi"=>2)
+julia> keys_ordered_by_values(d)
+3-element Array{String,1}:
+ "ghi"
+ "abc"
+ "def"
+```
+"""
+keys_ordered_by_values(d::Dict{T,<:Real} where T) = sort(collect(keys(d)), by=k->d[k])
+
 
 """
 ## `@curve`

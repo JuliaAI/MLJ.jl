@@ -10,7 +10,7 @@ to be specified.
 
 """
 function MLJBase.info(model::String; pkg=nothing)
-    if pkg == nothing
+    if pkg === nothing
         if model in string.(MLJBase.finaltypes(Model))
             pkg = "MLJ"
         else

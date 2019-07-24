@@ -41,7 +41,7 @@ function fit!(machine::Machine; rows=nothing, force=false, verbosity=1)
     warning = clean!(mach.model)
     isempty(warning) || verbosity < 0 || @warn warning 
 
-    if rows == nothing
+    if rows === nothing
         rows = (:) 
     end
 
@@ -61,7 +61,7 @@ function fit!(machine::Machine; rows=nothing, force=false, verbosity=1)
         mach.rows = deepcopy(rows)
     end
 
-    if report != nothing
+    if report !== nothing
         merge!(mach.report, report)
     end
 

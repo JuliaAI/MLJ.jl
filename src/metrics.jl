@@ -12,91 +12,151 @@ default_measure(model::Probabilistic, ::Type{<:Finite}) =
 
 # TODO: the names to match MLR or MLMetrics?
 
-# Note: If the `yhat` argument of a deterministic metric does not have
+# Note: If the `ŷ` argument of a deterministic metric does not have
 # the expected type, the metric assumes it is a distribution and
 # attempts first to compute its mean or mode (according to whether the
 # metric is a regression metric or a classification metric). In this
 # way each deterministic metric is overloaded as a probabilistic one.
 
-# TODO: Above behaviour not ideal. Should explicitly test if yhat is a
+# TODO: Above behaviour not ideal. Should explicitly test if ŷ is a
 # vector of distributions (either using isdistribution trait or
 # Sampleable type). Throw warning if a deterministic measure is being
 # used in a probabilistic context.
 
+"""
+$SIGNATURES
+
+Check that two vectors have compatible dimensions
+"""
+function check_dimensions(ŷ::AbstractVector, y::AbstractVector)
+    length(y) == length(ŷ) || throw(DimensionMismatch("Vectors don't have the same length"))
+    return nothing
+end
+
 ## REGRESSOR METRICS (FOR DETERMINISTIC PREDICTIONS)
 
+"""
+$SIGNATURES
 
-function mav(yhat::AbstractVector{<:Real}, y)
-    length(y) == length(yhat) || throw(DimensionMismatch())
+Mean absolute error (also known as MAE).
+
+``\\text{MAV} =  n^{-1}∑ᵢ|yᵢ-ŷᵢ|``
+"""
+function mav(ŷ::AbstractVector{<:Real}, y)
+    check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
-        dev = y[i] - yhat[i]
+        dev = y[i] - ŷ[i]
         ret += abs(dev)
     end
-    return ret/length(y)
+    return ret / length(y)
 end
-mav(yhat, y) = mav(mean.(yhat), y) 
+mav(ŷ, y) = mav(mean.(ŷ), y)
 
-function rms(yhat::AbstractVector{<:Real}, y)
-    length(y) == length(yhat) || throw(DimensionMismatch())
+# synonym
+"""
+mae(ŷ, y)
+
+See also [`mav`](@ref).
+"""
+mae = mav
+
+
+"""
+$SIGNATURES
+
+Root mean squared error:
+
+``\\text{RMS} = n^{-1}∑ᵢ|yᵢ-ŷᵢ|^2``
+"""
+function rms(ŷ::AbstractVector{<:Real}, y)
+    check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
-        dev = y[i] - yhat[i]
-        ret += dev*dev
+        dev = y[i] - ŷ[i]
+        ret += dev * dev
     end
-    return sqrt(ret/length(y))
+    return sqrt(ret / length(y))
 end
-rms(yhat, y) = rms(mean.(yhat), y)
+rms(ŷ, y) = rms(mean.(ŷ), y)
 
-function rmsl(yhat::AbstractVector{<:Real}, y)
-    length(y) == length(yhat) || throw(DimensionMismatch())
+
+"""
+$SIGNATURES
+
+Root mean squared logarithmic error:
+
+``\\text{RMSL} = n^{-1}∑ᵢ\\log\\left({yᵢ \\over ŷᵢ}\\right)``
+
+See also [`rmslp1`](@ref).
+"""
+function rmsl(ŷ::AbstractVector{<:Real}, y)
+    check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
-        dev = log(y[i]) - log(yhat[i])
-        ret += dev*dev
+        dev = log(y[i]) - log(ŷ[i])
+        ret += dev * dev
     end
-    return sqrt(ret/length(y))
+    return sqrt(ret / length(y))
 end
-rmsl(yhat, y) = rmsl(mean.(yhat), y) 
+rmsl(ŷ, y) = rmsl(mean.(ŷ), y)
 
-function rmslp1(yhat::AbstractVector{<:Real}, y)
-    length(y) == length(yhat) || throw(DimensionMismatch())
+
+"""
+$SIGNATURES
+
+Root mean squared logarithmic error with an offset of 1:
+
+``\\text{RMSLP1} = n^{-1}∑ᵢ\\log\\left({yᵢ + 1 \\over ŷᵢ + 1}\\right)``
+
+See also [`rmsl`](@ref).
+"""
+function rmslp1(ŷ::AbstractVector{<:Real}, y)
+    check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
-        dev = log(y[i] + 1) - log(yhat[i] + 1)
-        ret += dev*dev
+        dev = log(y[i] + 1) - log(ŷ[i] + 1)
+        ret += dev * dev
     end
-    return sqrt(ret/length(y))
+    return sqrt(ret / length(y))
 end
-rmslp1(yhat, y) = rmslp1(y, mean.(yhat))
+rmslp1(ŷ, y) = rmslp1(y, mean.(ŷ))
 
 
-""" Root mean squared percentage loss """
-function rmsp(yhat::AbstractVector{<:Real}, y)
-    length(y) == length(yhat) || throw(DimensionMismatch())
+"""
+$SIGNATURES
+
+Root mean squared percentage loss:
+
+``\\text{RMSP} = m^{-1}∑ᵢ \\left({yᵢ-ŷᵢ \\over yᵢ}\\right)^2``
+
+where the sum is over indices such that `yᵢ≂̸0` and `m` is the number of such indices.
+"""
+function rmsp(ŷ::AbstractVector{<:Real}, y)
+    check_dimensions(ŷ, y)
     ret = 0.0
     count = 0
     for i in eachindex(y)
         if y[i] != 0.0
-            dev = (y[i] - yhat[i])/y[i]
-            ret += dev*dev
+            dev = (y[i] - ŷ[i])/y[i]
+            ret += dev * dev
             count += 1
         end
     end
     return sqrt(ret/count)
 end
-rmsp(yhat, y) = rmsp(mean.(yhat), y) 
+rmsp(ŷ, y) = rmsp(mean.(ŷ), y)
 
 
 ## CLASSIFICATION METRICS (FOR DETERMINISTIC PREDICTIONS)
 
-misclassification_rate(yhat::AbstractVector{<:CategoricalElement},
-                       y::AbstractVector) = mean(y .!= yhat)
-misclassification_rate(yhat, y::AbstractVector) = 
-    misclassification_rate(mode.(yhat), y)
+misclassification_rate(ŷ::AbstractVector{<:CategoricalElement},
+                       y::AbstractVector) = mean(y .!= ŷ)
+misclassification_rate(ŷ, y::AbstractVector) =
+    misclassification_rate(mode.(ŷ), y)
 
 
-# TODO: multivariate case 
+# TODO: multivariate case
 
 
 ## CLASSIFICATION METRICS (FOR PROBABILISTIC PREDICTIONS)
@@ -104,14 +164,13 @@ misclassification_rate(yhat, y::AbstractVector) =
 # for single pattern:
 cross_entropy(d::UnivariateFinite, y) = -log(d.prob_given_level[y])
 
-function cross_entropy(yhat::Vector{<:UnivariateFinite}, y::AbstractVector)
-    length(y) == length(yhat) || throw(DimensionMismatch())
-    return broadcast(cross_entropy, yhat, y) |> mean
+function cross_entropy(ŷ::Vector{<:UnivariateFinite}, y::AbstractVector)
+    check_dimensions(ŷ, y)
+    return broadcast(cross_entropy, ŷ, y) |> mean
 end
 
 # function auc(truelabel::L) where L
-#     _auc(y::AbstractVector{L}, yhat::AbstractVector{T}) where T<:Real = 
-#         ROC.AUC(ROC.roc(yhat, y, truelabel))
+#     _auc(y::AbstractVector{L}, ŷ::AbstractVector{T}) where T<:Real =
+#         ROC.AUC(ROC.roc(ŷ, y, truelabel))
 #     return _auc
 # end
-
