@@ -111,7 +111,7 @@ NodalMachine(model::M, args...) where M<:Model = NodalMachine{M}(model, args...)
 """
 $SIGNATURES
 
-Turn fit-through off for a given `NodalMachine`.
+Freeze the machine `machine` so that it will never be retrained (unless it is thawed).
 See also [`thaw!`](@ref).
 """
 function freeze!(machine::NodalMachine)
@@ -121,7 +121,7 @@ end
 """
 $SIGNATURES
 
-Turn fit-through on for a given `NodalMachine`.
+Unfreeze the machine `machine` so that it can be retrained.
 See also [`freeze!`](@ref).
 """
 function thaw!(machine::NodalMachine)

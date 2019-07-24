@@ -38,11 +38,10 @@ $TYPEDEF
 
 Cross validation resampling where the data is (randomly) partitioned in `nfolds` folds
 and the model is evaluated `nfolds` time, each time taking one fold for testing and the
-other folds for training and the test  performances averaged.
+other folds for training.
 For instance if `nfolds=3` then the data will be partitioned in three folds A, B and C
 and the model will be trained three times, first with A and B and tested on C, then on
-A, C and tested on B and finally on B, C and tested on A. The test performances are then
-averaged over the three cases.
+A, C and tested on B and finally on B, C and tested on A.
 """
 @with_kw  mutable struct CV <: ResamplingStrategy
     nfolds::Int = 6
