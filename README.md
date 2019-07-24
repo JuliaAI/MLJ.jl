@@ -7,9 +7,7 @@ A pure Julia machine learning framework.
 
 ## `join!(MLJ, YourModel)`
 
-**Call for help.** MLJ is [getting
-attention](https://github.com/trending/julia?since=monthly) but its
-small project team needs help to ensure its success. This depends
+**Call for help.** MLJ needs your help to ensure its success. This depends
 crucially on:
 
 - Existing and developing ML algorithms implementing the MLJ model interface

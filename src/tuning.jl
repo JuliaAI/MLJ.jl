@@ -92,6 +92,7 @@ function TunedModel(;model=nothing,
 
     !isempty(ranges) || error("You need to specify ranges=... ")
     model !== nothing || error("You need to specify model=... ")
+    model isa Supervised || error("model must be a SupervisedModel. ")
 
     message = clean!(model)
     isempty(message) || @info message

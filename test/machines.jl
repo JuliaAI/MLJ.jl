@@ -2,7 +2,8 @@ module TestMachines
 
 # using Revise
 using MLJ
-import MLJBase
+using MLJBase
+using CSV
 using Test
 using Statistics
 
