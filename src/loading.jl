@@ -11,9 +11,9 @@ const remote_file =
 const local_metadata_file = joinpath(path_to_metadata_dot_toml, "Metadata.toml")
 
 # update locally archived Metadata.toml:
-try 
+try
     download(remote_file, quiet=true, force=true)
-catch 
+catch
     @info "Unable to update model metadata from github.alan-turing-institute/MLJRegistry. "*
     "Using locally archived metadata. "
 end
@@ -36,7 +36,7 @@ function MLJBase.info(model::String; pkg=nothing)
             pkg = "MLJ"
         else
             pkg, success = try_to_get_package(model)
-            if !success 
+            if !success
                 error(pkg*"Use info($model, pkg=...)")
             end
         end
@@ -73,7 +73,7 @@ Restrict results to package model pairs `(m, p)` satisfying
 
     models(task::MLJTask)
 
-List all models matching the specified `task`. 
+List all models matching the specified `task`.
 
 ### Example
 
@@ -90,7 +90,7 @@ function models(conditional)
     packages = keys(meta) |> collect
     for pkg in packages
         _models = filter(keys(meta[pkg]) |> collect) do model
-            conditional(info(model, pkg=pkg)) 
+            conditional(info(model, pkg=pkg))
         end
         isempty(_models) || (_models_given_pkg[pkg] = _models)
     end
@@ -103,7 +103,7 @@ function models(task::SupervisedTask; kwargs...)
     ret = Dict{String, Any}()
     conditional(x) =
         x[:is_supervised] &&
-        x[:is_wrapper] == false && 
+        x[:is_wrapper] == false &&
         task.target_scitype_union <: x[:target_scitype_union] &&
         task.input_scitype_union <: x[:input_scitype_union] &&
         task.is_probabilistic == x[:is_probabilistic] &&
@@ -114,7 +114,7 @@ end
 function models(task::UnsupervisedTask; kwargs...)
     ret = Dict{String, Any}()
     conditional(x) =
-        x[:is_wrapper] == false && 
+        x[:is_wrapper] == false &&
         task.input_scitype_union <: x[:input_scitype_union] &&
         task.input_is_multivariate == x[:input_is_multivariate] &&
     return models(conditional, kwargs...)
@@ -157,60 +157,72 @@ function try_to_get_package(model::String)
     return (pop!(pkgs), true)
 end
 
-function _load(model, pkg, mdl)
+function _load(model, pkg, mdl, verbosity)
     # get load path:
     info = decode_dic(METADATA)[pkg][model]
     path = info[:load_path]
     path_components = split(path, '.')
 
+    # decide what to print
+    toprint = verbosity > 0
+
     # if needed, put MLJModels in the calling module's namespace (it
     # is already loaded into MLJ's namespace):
     if path_components[1] == "MLJModels"
-        print("import MLJModels ")
+        toprint && print("import MLJModels ")
         mdl.eval(:(import MLJModels))
-        println('\u2714')
+        toprint && println('\u2714')
     end
 
     # load the package (triggering lazy-load of implementation code if
     # this is in MLJModels):
     pkg_ex = Symbol(pkg)
-    print("import $pkg_ex ")
+    toprint && print("import $pkg_ex ")
     mdl.eval(:(import $pkg_ex))
-    println('\u2714')
+    toprint && println('\u2714')
 
     # load the model:
     load_ex = Meta.parse("import $path")
-    print(string(load_ex, " "))
+    toprint && print(string(load_ex, " "))
     mdl.eval(load_ex)
-    println('\u2714')
+    toprint && println('\u2714')
+
+    nothing
 end
 
-macro load(model_ex)
+macro load(model_ex, verbosity_ex)
     model_ = string(model_ex)
+
+    # find out verbosity level
+    verbosity = verbosity_ex.args[2]
 
     # get rid brackets, as in "(MLJModels.Clustering).KMedoids":
     model = filter(model_) do c !(c in ['(',')']) end
 
-    if model in string.(MLJBase.finaltypes(Model))
-        @info "A model named \"$model\" is already loaded.\n"*
-        "Nothing new loaded. "
-        return
-    end
+    # return if model is already loaded
+    model ∈ string.(MLJBase.finaltypes(Model)) && return
 
     pkg, success = try_to_get_package(model)
     if !success # pkg is then a message
         error(pkg*"Use @load $model pkg=\"PackageName\". ")
     end
 
-    _load(model, pkg, __module__)
+    _load(model, pkg, __module__, verbosity)
 end
 
-macro load(model_ex, pkg_ex)
+macro load(model_ex, pkg_ex, verbosity_ex)
     model = string(model_ex)
     pkg = string(pkg_ex.args[2])
 
-    _load(model, pkg, __module__)
+    # find out verbosity level
+    verbosity = verbosity_ex.args[2]
+
+    _load(model, pkg, __module__, verbosity)
 end
 
-
-    
+# default verbosity is zero
+macro load(model_ex)
+    esc(quote
+        MLJ.@load $model_ex verbosity=0
+    end)
+end
