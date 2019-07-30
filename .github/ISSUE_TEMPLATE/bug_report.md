@@ -21,7 +21,7 @@ If the code is too long, feel free to put it in a public gist and link
 it in the issue: https://gist.github.com
 -->
 
-```python
+```julia
 [Past your code here.]
 ```
 
