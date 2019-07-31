@@ -13,7 +13,7 @@ pkgs = keys(MLJ.metadata())
 
 @load DecisionTreeClassifier
 @test @isdefined DecisionTreeClassifier
-@load DecisionTreeRegressor pkg=DecisionTree
+@load DecisionTreeRegressor pkg=DecisionTree verbosity=1
 @test @isdefined DecisionTreeRegressor
 
 end # module
