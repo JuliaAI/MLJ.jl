@@ -12,8 +12,9 @@ pkgs = keys(MLJ.metadata())
 @test "ConstantClassifier" in models()["MLJ"]
 
 @load DecisionTreeClassifier
+@load DecisionTreeClassifier verbosity=1
 @test @isdefined DecisionTreeClassifier
-@load DecisionTreeRegressor pkg=DecisionTree
+@load DecisionTreeRegressor pkg=DecisionTree verbosity=1
 @test @isdefined DecisionTreeRegressor
 
 end # module
