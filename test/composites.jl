@@ -4,6 +4,7 @@ module TestComposites
 using Test
 using MLJ
 using CategoricalArrays
+using CSV
 
 Xin, yin = datanow(); # boston
 
@@ -155,7 +156,7 @@ yhat2 = replace(yhat, hot=>hot2, knn=>knn2, ys=>source(ys.data))
 @test models(yhat) == models(yhat2)
 @test sources(yhat) == sources(yhat2)
 @test MLJ.tree(yhat) == MLJ.tree(yhat2)
-fit!(yhat)
+fit!(yhat2)
 @test yhat() ≈ yhat2()
 
 # this change should trigger retraining of all machines except the
@@ -169,7 +170,7 @@ hot2.drop_last = true
 
 # export a supervised network:
 model = @from_network Composite(knn_rgs=knn, one_hot_enc=hot) <= (Xs, ys, yhat)
-mach = machine(model, Xs, ys)
+mach = machine(model, X, y)
 @test_logs((:info, r"^Train.*Composite"),
            (:info, r"^Train.*OneHot"),
            (:info, r"^Spawn"),
@@ -183,12 +184,15 @@ model.knn_rgs.K = 5
            (:info, r"^Updat.*KNN"),
            (:info, r"^Not.*Dec"), fit!(mach))
 
+# check data anomynity:
+@test all(isnothing, [s.data for s in sources(mach.fitresult)])
+
 # export an unsupervised model
 multistand = Standardizer()
 multistandM = machine(multistand, W)
 W2 = transform(multistandM, W)
 model = @from_network Transf(one_hot=hot) <= (Xs, W2)
-mach = machine(model, Xs)
+mach = machine(model, X)
 @test_logs((:info, r"^Training.*Transf"),
            (:info, r"^Train.*OneHot"),
            (:info, r"^Spawn"),
@@ -199,6 +203,10 @@ model.one_hot.drop_last=true
            (:info, r"^Spawn"),
            (:info, r"Train.*Stand"), fit!(mach))
 
+# check data anomynity:
+@test all(isnothing, [s.data for s in sources(mach.fitresult)])
+
+transform(mach)
 
 end
 true

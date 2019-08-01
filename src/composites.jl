@@ -7,13 +7,33 @@ MLJBase.is_wrapper(::Type{ProbabilisticNetwork}) = true
 # fall-back for updating learning networks exported as models:
 function MLJBase.update(model::Union{SupervisedNetwork,UnsupervisedNetwork},
                         verbosity, fitresult, cache, args...)
+
+    anomynised_data = cache isa NamedTuple{(:sources, :data)}
+    
+    if anomynised_data
+        sources, data = cache.sources, cache.data
+        for k in eachindex(sources)
+            rebind!(sources[k], data[k])
+        end
+    end
     fit!(fitresult; verbosity=verbosity)
+    if anomynised_data
+        for s in sources
+            rebind!(s, nothing)
+        end
+    end
+    
     return fitresult, cache, nothing
 end
 
-# fall-back for predicting on learning networks exported as models
+# fall-back for predicting on supervised learning networks exported as models
 MLJBase.predict(composite::SupervisedNetwork, fitresult, Xnew) =
     fitresult(Xnew)
+
+# fall-back for transforming on learning networks exported as models
+MLJBase.transform(composite::UnsupervisedNetwork, fitresult, Xnew) =
+    fitresult(Xnew)
+
 
 """
 $SIGNATURES
@@ -205,8 +225,18 @@ function supervised_fit_method(network_Xs, network_ys, network_N,
             error("Failed to replace sources in network blueprint. ")
 
         fit!(yhat, verbosity=verbosity)
-        cache = nothing
+
+        # for data anonymity we must move the data from the source
+        # nodes into cache for rebinding in calls to `update`:
+  
+        cache = (sources=(Xs, ys), data=(Xs.data, ys.data))
+        rebind!(Xs, nothing)
+        rebind!(ys, nothing)
+
+        # TODO: make report a named tuple keyed on machines in the
+        # network, with values the individual reports.
         report = nothing
+        
         return yhat, cache, report
     end
 
@@ -227,8 +257,17 @@ function unsupervised_fit_method(network_Xs, network_N,
         Set([Xs]) == Set(sources(Xout)) ||
             error("Failed to replace sources in network blueprint. ")
         fit!(Xout, verbosity=verbosity)
-        cache = nothing
+
+        # for data anonymity we must move the data from the source
+        # nodes into cache for rebinding in calls to `update`:
+  
+        cache = (sources=(Xs,), data=(Xs.data,))
+        rebind!(Xs, nothing)
+
+        # TODO: make report a named tuple keyed on machines in the
+        # network, with values the individual reports.
         report = nothing
+        
         return Xout, cache, report
     end
 
@@ -413,7 +452,7 @@ function MLJBase.fit(composite::SimpleDeterministicCompositeModel, verbosity::In
     fit!(yhat, verbosity=verbosity)
     fitresult = yhat
     report = l.report
-    cache = l
+    cache = nothing
     return fitresult, cache, report
 end
 
