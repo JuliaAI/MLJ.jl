@@ -190,6 +190,7 @@ function Base.replace(W::Node, pairs::Pair...)
 
  end
 
+# TODO: Do we actually need this?
 """
     reset!(N::Node)
 
@@ -206,6 +207,20 @@ function reset!(W::Node)
     end
 end
 
+"""
+    anonymize!(sources...)
+
+Returns a named tuple `(sources=..., data=....)` whose values are the
+provided source nodes and their contents respectively, and clears the
+contents of those source nodes.
+
+"""
+function anonymize!(sources...)
+    data = Tuple(s.data for s in sources)
+    [MLJ.rebind!(s, nothing) for s in sources]
+    return (sources=sources, data=data)
+end
+    
 # closures for later:
 function supervised_fit_method(network_Xs, network_ys, network_N,
                                network_models...)
@@ -229,9 +244,7 @@ function supervised_fit_method(network_Xs, network_ys, network_N,
         # for data anonymity we must move the data from the source
         # nodes into cache for rebinding in calls to `update`:
   
-        cache = (sources=(Xs, ys), data=(Xs.data, ys.data))
-        rebind!(Xs, nothing)
-        rebind!(ys, nothing)
+        cache = anonymize!(Xs, ys)
 
         # TODO: make report a named tuple keyed on machines in the
         # network, with values the individual reports.
@@ -261,8 +274,7 @@ function unsupervised_fit_method(network_Xs, network_N,
         # for data anonymity we must move the data from the source
         # nodes into cache for rebinding in calls to `update`:
   
-        cache = (sources=(Xs,), data=(Xs.data,))
-        rebind!(Xs, nothing)
+        cache = anonymize!(Xs)
 
         # TODO: make report a named tuple keyed on machines in the
         # network, with values the individual reports.
