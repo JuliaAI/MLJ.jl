@@ -185,7 +185,7 @@ model.knn_rgs.K = 5
            (:info, r"^Not.*Dec"), fit!(mach))
 
 # check data anomynity:
-@test all(isnothing, [s.data for s in sources(mach.fitresult)])
+@test all(x->(x===nothing), [s.data for s in sources(mach.fitresult)])
 
 # export an unsupervised model
 multistand = Standardizer()
@@ -204,7 +204,7 @@ model.one_hot.drop_last=true
            (:info, r"Train.*Stand"), fit!(mach))
 
 # check data anomynity:
-@test all(isnothing, [s.data for s in sources(mach.fitresult)])
+@test all(x->(x===nothing), [s.data for s in sources(mach.fitresult)])
 
 transform(mach)
 
