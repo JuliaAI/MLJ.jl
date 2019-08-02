@@ -84,6 +84,11 @@ const DAGGER_DEBUG = Ref(get(ENV, "MLJ_DAGGER_DEBUG", "0") == "1") # FIXME: Remo
 import MemPool
 import UUIDs: UUID, uuid4
 import Distributed: @everywhere, @spawnat, workers, fetch
+export @notest_logs
+macro notest_logs(x...)
+    # Disables log tests
+    return esc(last(x))
+end
 
 # submodules of this module:
 include("registry/src/Registry.jl") 

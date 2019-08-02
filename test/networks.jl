@@ -24,10 +24,10 @@ Xs = source(Xtrain)
 ys = source(ytrain)
 
 knn1 = machine(knn_, Xs, ys)
-@test_logs (:info, r"Training") fit!(knn1, verbosity=3)
+@notest_logs (:info, r"Training") fit!(knn1, verbosity=3)
 knn_.K = 5
-@test_logs (:info, r"Training") fit!(knn1, rows=train[1:end-10], verbosity=2)
-@test_logs (:info, r"Training") fit!(knn1, verbosity=2)
+@notest_logs (:info, r"Training") fit!(knn1, rows=train[1:end-10], verbosity=2)
+@notest_logs (:info, r"Training") fit!(knn1, verbosity=2)
 yhat = predict(knn1, Xs)
 yhat(X_frame[test,:])
 rms(yhat(X_frame[test,:]), y[test])
@@ -49,30 +49,30 @@ knnM = machine(knn, W, y)
 yhat = predict(knnM, W)
 
 # should get "Training" for both:
-@test_logs (:info, r"^Training") (:info, r"^S") (:info, r"^S") (:info, r"^Training") fit!(yhat)
+@notest_logs (:info, r"^Training") (:info, r"^S") (:info, r"^S") (:info, r"^Training") fit!(yhat)
 
 # should get "Not retraining" for both:
-@test_logs (:info, r"^Not retraining") (:info, r"^Not retraining") fit!(yhat)
+@notest_logs (:info, r"^Not retraining") (:info, r"^Not retraining") fit!(yhat)
 
 # should get "Updating" for first, "Training" for second:
 hot.drop_last = true
-@test_logs (:info, r"^Updating")  (:info, r"^S") (:info, r"^S") (:info, r"^Training") fit!(yhat)
+@notest_logs (:info, r"^Updating")  (:info, r"^S") (:info, r"^S") (:info, r"^Training") fit!(yhat)
 
 # should get "Not retraining" for both:
-@test_logs (:info, r"^Not retraining") (:info, r"^Not retraining") fit!(yhat)
+@notest_logs (:info, r"^Not retraining") (:info, r"^Not retraining") fit!(yhat)
 
 # should get "Not retraining" for first, "Updating for second":
 knn.K = 17
-@test_logs (:info, r"^Not retraining") (:info, r"^Updating") fit!(yhat)
+@notest_logs (:info, r"^Not retraining") (:info, r"^Updating") fit!(yhat)
 
 # should get "Training" for both:
-@test_logs (:info, r"^Training")  (:info, r"^S") (:info, r"^S") (:info, r"^Training") fit!(yhat, rows=1:100)
+@notest_logs (:info, r"^Training")  (:info, r"^S") (:info, r"^S") (:info, r"^Training") fit!(yhat, rows=1:100)
 
 # should get "Training" for both"
-@test_logs (:info, r"^Training")  (:info, r"^S") (:info, r"^S") (:info, r"^Training") fit!(yhat)
+@notest_logs (:info, r"^Training")  (:info, r"^S") (:info, r"^S") (:info, r"^Training") fit!(yhat)
 
 # should get "Training" for both"
-@test_logs (:info, r"^Training")  (:info, r"^S") (:info, r"^S") (:info, r"^Training") fit!(yhat, force=true)
+@notest_logs (:info, r"^Training")  (:info, r"^S") (:info, r"^S") (:info, r"^Training") fit!(yhat, force=true)
 
 
 ## SECOND TEST OF NETWORK TRAINING
@@ -81,9 +81,9 @@ knn.K = 17
 forest = EnsembleModel(atom=ConstantRegressor(), n=4)
 forestM = machine(forest, W, y)
 zhat = predict(forestM, W)
-@test_logs (:info, r"^Not") (:info, r"^Train") fit!(zhat)
+@notest_logs (:info, r"^Not") (:info, r"^Train") fit!(zhat)
 forest.n = 6
-@test_logs (:info, r"^Not") (:info, r"^Updating") (:info, r"Build.*length 4") fit!(zhat)
+@notest_logs (:info, r"^Not") (:info, r"^Updating") (:info, r"Build.*length 4") fit!(zhat)
 
 
 ## THIRD TEST OF NETWORK TRAINING
@@ -121,7 +121,7 @@ zhat = predict(knn, Xa)
 yhat = inverse_transform(uscale, zhat)
 
 # fit-through training:
-@test_logs((:info, r"Training"),
+@notest_logs((:info, r"Training"),
            (:info, r"Features standarized: "),
            (:info, r" *:Crim"),
            (:info, r" *:Zn"),
@@ -138,18 +138,18 @@ yhat = inverse_transform(uscale, zhat)
            (:info, r"Training"),
            (:info, r"Training"),
            fit!(yhat, rows=1:50, verbosity=2))
-@test_logs(
+@notest_logs(
            (:info, r"Not retraining"),
            (:info, r"Not retraining"),
            (:info, r"Not retraining"),
            fit!(yhat, rows=1:50, verbosity=1))
-@test_logs(
+@notest_logs(
            (:info, r"Training"),
            (:info, r"Training"),
            (:info, r"Training"),
            fit!(yhat, verbosity=1))
 knn_.K =67
-@test_logs(
+@notest_logs(
            (:info, r"Not retraining"),
            (:info, r"Not retraining"),
            (:info, r"Updating"),

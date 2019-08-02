@@ -26,7 +26,7 @@ selector_old = deepcopy(selector)
 
 # this should trigger no retraining:
 fitresult, cache, report =
-    @test_logs(
+    @notest_logs(
         (:info, r"^Not"),
         (:info, r"^Not"),
         MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain))
@@ -36,7 +36,7 @@ fitresult, cache, report =
 # this should trigger update of selector and training of ridge:
 selector_model.features = [:Crim, :Rm] 
 fitresult, cache, report =
-    @test_logs(
+    @notest_logs(
         (:info, r"^Updating"),
         (:info, r"^Training"),
         MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain))
@@ -48,7 +48,7 @@ selector_old = deepcopy(selector)
 # this should trigger updating of ridge only:
 ridge_model.lambda = 1.0
 fitresult, cache, report =
-    @test_logs(
+    @notest_logs(
             (:info, r"^Not"),
             (:info, r"^Updating"),
             MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain))
@@ -146,7 +146,7 @@ ys2 = source(nothing)
 ############################
 yhat2 = replace(yhat, hot=>hot2, knn=>knn2, ys=>source(ys.data))
 
-@test_logs((:info, r"^Train.*OneHot"),
+@notest_logs((:info, r"^Train.*OneHot"),
            (:info, r"^Spawn"),
            (:info, r"^Train.*Univ"),
            (:info, r"^Train.*KNN"),
@@ -161,7 +161,7 @@ fit!(yhat)
 # this change should trigger retraining of all machines except the
 # univariate standardizer:
 hot2.drop_last = true
-@test_logs((:info, r"^Updating.*OneHot"),
+@notest_logs((:info, r"^Updating.*OneHot"),
            (:info, r"^Spawn"),
            (:info, r"^Not.*Univ"),
            (:info, r"^Train.*KNN"),
@@ -170,14 +170,14 @@ hot2.drop_last = true
 # export a supervised network:
 model = @from_network Composite(knn_rgs=knn, one_hot_enc=hot) <= (Xs, ys, yhat)
 mach = machine(model, Xs, ys)
-@test_logs((:info, r"^Train.*Composite"),
+@notest_logs((:info, r"^Train.*Composite"),
            (:info, r"^Train.*OneHot"),
            (:info, r"^Spawn"),
            (:info, r"^Train.*Univ"),
            (:info, r"^Train.*KNN"),
            (:info, r"^Train.*Dec"), fit!(mach))
 model.knn_rgs.K = 5
-@test_logs((:info, r"^Updat.*Composite"),
+@notest_logs((:info, r"^Updat.*Composite"),
            (:info, r"^Not.*OneHot"),
            (:info, r"^Not.*Univ"),
            (:info, r"^Updat.*KNN"),
@@ -189,12 +189,12 @@ multistandM = machine(multistand, W)
 W2 = transform(multistandM, W)
 model = @from_network Transf(one_hot=hot) <= (Xs, W2)
 mach = machine(model, Xs)
-@test_logs((:info, r"^Training.*Transf"),
+@notest_logs((:info, r"^Training.*Transf"),
            (:info, r"^Train.*OneHot"),
            (:info, r"^Spawn"),
            (:info, r"Train.*Stand"), fit!(mach))
 model.one_hot.drop_last=true
-@test_logs((:info, r"^Updating.*Transf"),
+@notest_logs((:info, r"^Updating.*Transf"),
            (:info, r"^Updating.*OneHot"),
            (:info, r"^Spawn"),
            (:info, r"Train.*Stand"), fit!(mach))
