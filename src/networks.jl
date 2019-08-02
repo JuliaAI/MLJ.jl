@@ -236,53 +236,131 @@ Train the machines of all dynamic nodes in the learning network terminating at
 `N` in an appropriate order.
 
 """
-function fit!(y::Node; rows=nothing, verbosity=1, force=false)
+function fit!(y::Node; rows=nothing, verbosity=1, force=false, parallel=true) # FIXME: parallel=false should be the default
     if rows == nothing
         rows = (:)
     end
 
-    #=
-    # get non-source nodes:
-    nodes_ = filter(nodes(y)) do n
-        n isa Node
+    if !parallel
+        # get non-source nodes:
+        nodes_ = filter(nodes(y)) do n
+            n isa Node
+        end
+
+        # get machines to fit:
+        machines = map(n -> n.machine, nodes_)
+        machines = filter(unique(machines)) do mach
+            mach != nothing
+        end
+
+        for mach in machines
+            fit!(mach; rows=rows, verbosity=verbosity, force=force)
+        end
+    else
+        @everywhere begin
+            # HACK: Empty any pre-existing node/uuid mappings
+            # FIXME: This is *super* inefficient for multiple `fit!` calls
+            empty!(MLJ.NODE_TO_UUID)
+            empty!(MLJ.UUID_TO_NODE)
+        end
+
+        # Register network (via UUIDs) on all workers
+        # TODO: We can still use @everywhere here...
+        rnodes = get_reduced_nodes(y)
+        root = rnodes[NODE_TO_UUID[y]]
+        for w in workers()
+            fetch(@spawnat w MLJ.set_full_nodes(root, rnodes))
+        end
+
+        @everywhere begin
+            println(length(keys(MLJ.NODE_TO_UUID)), " | ", length(keys(MLJ.UUID_TO_NODE)))
+        end
+
+        dag = construct_dag(y; rows=rows, verbosity=verbosity, force=force)
+        @assert dag isa Thunk
+        rnode, _ = collect(dag)
+        DAGGER_DEBUG[] && @info "Finished full DAG"
+
+        # sync final network back to master
+        _sync!(y, rnode)
+        DAGGER_DEBUG[] && @info "Synced back to master"
     end
-
-    # get machines to fit:
-    machines = map(n -> n.machine, nodes_)
-    machines = filter(unique(machines)) do mach
-        mach != nothing
-    end
-
-    for mach in machines
-        fit!(mach; rows=rows, verbosity=verbosity, force=force)
-    end
-    =#
-
-    @everywhere begin
-        # HACK: Empty any pre-existing node/uuid mappings
-        # FIXME: This is *super* inefficient for multiple `fit!` calls
-        empty!(MLJ.NODE_TO_UUID)
-        empty!(MLJ.UUID_TO_NODE)
-    end
-
-    # Register network (via UUIDs) on all workers
-    # TODO: We can still use @everywhere here...
-    rnodes = get_reduced_nodes(y)
-    root = rnodes[NODE_TO_UUID[y]]
-    for w in workers()
-        fetch(@spawnat w MLJ.set_full_nodes(root, rnodes))
-    end
-
-    dag = construct_dag(y; rows=rows, verbosity=verbosity, force=force)
-    @assert dag isa Thunk
-    rnode, _ = collect(dag)
-    DAGGER_DEBUG[] && @info "Finished full DAG"
-
-    # sync final network back to master
-    _sync!(y, rnode)
-    DAGGER_DEBUG[] && @info "Synced back to master"
 
     return y
+end
+
+# Convenience utility for constructing RemoteChannels for each worker
+_make_rchans() = nothing#Dict{Int,RemoteChannel}(RemoteChannel(w) for w in workers())
+
+function construct_dag(y::Node; rows=nothing, verbosity=1, force=false, mach_set=Set(), rchans=_make_rchans())
+    DAGGER_DEBUG[] && printstyled("Construct DAG for $(typeof(y)), rows=$(repr(rows))\n"; color=:cyan)
+
+    # get the DAGs of each arg
+    arg_dags = Thunk[]
+    append!(arg_dags, [construct_dag(arg; rows=rows, verbosity=verbosity, force=force, mach_set=mach_set, rchans=rchans) for arg in y.args])
+    if y.machine !== nothing
+        append!(arg_dags, [construct_dag(arg; rows=rows, verbosity=verbosity, force=force, mach_set=mach_set, rchans=rchans) for arg in y.machine.args])
+    end
+
+    # create the DAG for the node
+    uniq_mach = false
+    if y.machine !== nothing && !(y.machine in mach_set)
+        uniq_mach = true
+        push!(mach_set, y.machine)
+    end
+    uuid = _node_to_uuid(y)
+    wdag = delayed((args...) -> begin
+        my_y = UUID_TO_NODE[uuid]
+
+        if DAGGER_DEBUG[]
+            printstyled("In DAG for $(typeof(my_y))\n"; color=:green)
+            printstyled(join(typeof.(args), ", "), '\n'; color=:magenta)
+        end
+
+        # Synchronize reduced arguments
+        for arg in filter(a->(a isa Tuple && isreducednode(a[1])), collect(args))
+            rnode, uuid = arg
+            lnode = UUID_TO_NODE[uuid]
+            _sync!(lnode, rnode)
+            if DAGGER_DEBUG[]
+                @info "Synced $arg for $my_y"
+                if lnode.machine !== nothing && !isdefined(lnode.machine, :fitresult)
+                    @warn "fitresult not defined!: $arg"
+                end
+            end
+        end
+        if uniq_mach
+            if my_y.machine !== nothing
+                DAGGER_DEBUG[] && printstyled("DAG: training $(typeof(my_y))\n"; color=:red)
+                fit!(my_y.machine; rows=rows, verbosity=verbosity, force=force)
+            else
+                DAGGER_DEBUG[] && printstyled("DAG: not training static $(typeof(my_y))\n"; color=:red)
+            end
+        else
+            DAGGER_DEBUG[] && printstyled("DAG: not training non-unique $(typeof(my_y))\n"; color=:red)
+        end
+
+        rnode, uuid = reduce_node(my_y)
+        if uniq_mach && my_y.machine !== nothing
+            if isdefined(my_y.machine, :fitresult)
+                @assert isdefined(rnode.machine, :fitresult)
+            end
+        end
+        return rnode, uuid
+    end)(arg_dags...)
+    # Force master to sync fitted node
+    options = Dagger.Sch.ThunkOptions(1)
+    mdag = delayed(rnode_uuid -> begin
+        rnode, uuid = rnode_uuid #collect(c)
+        lnode = UUID_TO_NODE[uuid]
+        _sync!(lnode, rnode)
+        return rnode_uuid
+    end; options=options)(wdag)
+    return mdag
+end
+function construct_dag(y::Source; rows=nothing, verbosity=1, force=false, mach_set=Set(), rchans=_make_rchans())
+    DAGGER_DEBUG[] && printstyled("Construct DAG for Source, rows=$(repr(rows))\n"; color=:cyan)
+    return delayed(identity)(y.data)
 end
 
 mutable struct ReducedNodalMachine{M} <: AbstractMachine{M}
@@ -462,80 +540,6 @@ function _sync!(lnode::Node, rnode::ReducedNode)
     lnode.nodes = [UUID_TO_NODE[node] for node in rnode.nodes]
 end
 _sync!(lsource::Source, rsource::ReducedSource) = (lsource.data = rsource.data;)
-
-# Convenience utility for constructing RemoteChannels for each worker
-_make_rchans() = nothing#Dict{Int,RemoteChannel}(RemoteChannel(w) for w in workers())
-
-function construct_dag(y::Node; rows=nothing, verbosity=1, force=false, mach_set=Set(), rchans=_make_rchans())
-    DAGGER_DEBUG[] && printstyled("Construct DAG for $(typeof(y)), rows=$(repr(rows))\n"; color=:cyan)
-
-    # get the DAGs of each arg
-    arg_dags = Thunk[]
-    append!(arg_dags, [construct_dag(arg; rows=rows, verbosity=verbosity, force=force, mach_set=mach_set, rchans=rchans) for arg in y.args])
-    if y.machine !== nothing
-        append!(arg_dags, [construct_dag(arg; rows=rows, verbosity=verbosity, force=force, mach_set=mach_set, rchans=rchans) for arg in y.machine.args])
-    end
-
-    # create the DAG for the node
-    uniq_mach = false
-    if y.machine !== nothing && !(y.machine in mach_set)
-        uniq_mach = true
-        push!(mach_set, y.machine)
-    end
-    uuid = _node_to_uuid(y)
-    wdag = delayed((args...) -> begin
-        my_y = UUID_TO_NODE[uuid]
-
-        if DAGGER_DEBUG[]
-            printstyled("In DAG for $(typeof(my_y))\n"; color=:green)
-            printstyled(join(typeof.(args), ", "), '\n'; color=:magenta)
-        end
-
-        # Synchronize reduced arguments
-        for arg in filter(a->(a isa Tuple && isreducednode(a[1])), collect(args))
-            rnode, uuid = arg
-            lnode = UUID_TO_NODE[uuid]
-            _sync!(lnode, rnode)
-            if DAGGER_DEBUG[]
-                @info "Synced $arg for $my_y"
-                if lnode.machine !== nothing && !isdefined(lnode.machine, :fitresult)
-                    @warn "fitresult not defined!: $arg"
-                end
-            end
-        end
-        if uniq_mach
-            if my_y.machine !== nothing
-                DAGGER_DEBUG[] && printstyled("DAG: training $(typeof(my_y))\n"; color=:red)
-                fit!(my_y.machine; rows=rows, verbosity=verbosity, force=force)
-            else
-                DAGGER_DEBUG[] && printstyled("DAG: not training static $(typeof(my_y))\n"; color=:red)
-            end
-        else
-            DAGGER_DEBUG[] && printstyled("DAG: not training non-unique $(typeof(my_y))\n"; color=:red)
-        end
-
-        rnode, uuid = reduce_node(my_y)
-        if uniq_mach && my_y.machine !== nothing
-            if isdefined(my_y.machine, :fitresult)
-                @assert isdefined(rnode.machine, :fitresult)
-            end
-        end
-        return rnode, uuid
-    end)(arg_dags...)
-    # Force master to sync fitted node
-    options = Dagger.Sch.ThunkOptions(1)
-    mdag = delayed(rnode_uuid -> begin
-        rnode, uuid = rnode_uuid #collect(c)
-        lnode = UUID_TO_NODE[uuid]
-        _sync!(lnode, rnode)
-        return rnode_uuid
-    end; options=options)(wdag)
-    return mdag
-end
-function construct_dag(y::Source; rows=nothing, verbosity=1, force=false, mach_set=Set(), rchans=_make_rchans())
-    DAGGER_DEBUG[] && printstyled("Construct DAG for Source, rows=$(repr(rows))\n"; color=:cyan)
-    return delayed(identity)(y.data)
-end
 
 # allow arguments of `Nodes` and `NodalMachine`s to appear
 # at REPL:
