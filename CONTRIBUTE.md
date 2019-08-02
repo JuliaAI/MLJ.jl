@@ -51,7 +51,8 @@ The core MLJ ecosystem is currently spread across three repositories:
   that do not natively support the MLJ interface.
 
 
-### Current state of the project and directions (mid May 2019)
+
+### Road map (early August 2019)
 
 The MLJ model interface is now reasonably stable and well documented,
 and core functionality is now also in place. The success of the
@@ -63,29 +64,51 @@ PR's to MLJModels is also welcome; see the end of
 [here](docs/src/adding_models_for_general_use.md) for more on these
 two options.
 
-#### Short-term goals for improving functionality
+#### Enhancing functionality: Adding models
 
-- add benchmarking
+-  Wrap the scit-learn (python/C) models (WIP: Z.~Nugent, D.~Arenas)
+-  Flux.jl deep learning (WIP: A.~Shridhar)
+-  Turing.jl probabilistic programming (WIP: M.~Trapp) or other PP pkgs
+-  Geostats.jl (WIP: J.~Hoffimann)
+-  Time series models
+-  Data imputation (LowRankModels.jl?)
+-  Feature engineering (featuretools?)
 
-- add common learning network architectures as stand-alone models with
-  macros for quick instantiation
-  
-- replace existing metrics with LossFunctions with an enhanced
-  probabilistic API (e.g., proper scoring rules)
-  
-Longer term goals, are likely to be driven by end-user feedback; refer or add to the [Enhancement
+#### Enhancing core functionality
+
+-  Systematic benchmarking
+-  More comprehensive performance evaluation
+-  Tuning using Bayesian optimization
+-  Tuning using gradient descent and AD
+-  Iterative model control
+-  Serialization and deserialization of trained models
+
+#### Broadening scope
+
+-  Extend or supplement LossFunctions.jl to support probabilistic losses
+-  Add sparse data support (NLP)
+
+#### Improving scalability
+
+-  Online learning support and distributed data
+-  DAG scheduling (WIP: J.~Samaroo)
+-  Automated estimates of cpu/memory requirements
+
+
+
+See also the long wish list of [Feature enhancement
 requests](https://github.com/alan-turing-institute/MLJ.jl/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3A%22enhancement%22).
 
 
 
-#### Funding
+### Funding
 
 Development of MLJ is currently sponsored through the Alan Turing
 Institute “Machine Learning in Julia" project, in cooperation with
 Julia Computing and New Zealand eScience Infrastructure.
 
 
-#### Authors
+### Authors
 
 **Core design.** Anthony Blaom, Franz Kiraly, Sebastian Vollmer
 
