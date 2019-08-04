@@ -6,6 +6,8 @@ using MLJ
 # using UnicodePlots
 using MLJBase
 using CSV
+import Random.seed!
+seed!(1234)
 
 x1 = rand(100);
 x2 = rand(100);
@@ -46,8 +48,9 @@ measurements = tuned.report.measurements
 # should be all different:
 @test length(unique(measurements)) == length(measurements)
 
-# the following should only fail in extremely rare event:
 @test length(b.transformer.features) == 3
+@test abs(b.model.lambda - 0.027825) < 1e-6
+
 
 # get the training error of the tuned_model:
 e = rms(y, predict(tuned, X))
