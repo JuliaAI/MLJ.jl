@@ -8,21 +8,21 @@ MLJBase.is_wrapper(::Type{ProbabilisticNetwork}) = true
 function MLJBase.update(model::Union{SupervisedNetwork,UnsupervisedNetwork},
                         verbosity, fitresult, cache, args...)
 
-    anomynised_data = cache isa NamedTuple{(:sources, :data)}
-    
-    if anomynised_data
+    anonymised = cache isa NamedTuple{(:sources, :data)}
+
+    if anonymised
         sources, data = cache.sources, cache.data
         for k in eachindex(sources)
             rebind!(sources[k], data[k])
         end
     end
     fit!(fitresult; verbosity=verbosity)
-    if anomynised_data
+    if anonymised
         for s in sources
             rebind!(s, nothing)
         end
     end
-    
+
     return fitresult, cache, nothing
 end
 
@@ -220,7 +220,7 @@ function anonymize!(sources...)
     [MLJ.rebind!(s, nothing) for s in sources]
     return (sources=sources, data=data)
 end
-    
+
 # closures for later:
 function supervised_fit_method(network_Xs, network_ys, network_N,
                                network_models...)
@@ -243,13 +243,13 @@ function supervised_fit_method(network_Xs, network_ys, network_N,
 
         # for data anonymity we must move the data from the source
         # nodes into cache for rebinding in calls to `update`:
-  
+
         cache = anonymize!(Xs, ys)
 
         # TODO: make report a named tuple keyed on machines in the
         # network, with values the individual reports.
         report = nothing
-        
+
         return yhat, cache, report
     end
 
@@ -273,13 +273,13 @@ function unsupervised_fit_method(network_Xs, network_N,
 
         # for data anonymity we must move the data from the source
         # nodes into cache for rebinding in calls to `update`:
-  
+
         cache = anonymize!(Xs)
 
         # TODO: make report a named tuple keyed on machines in the
         # network, with values the individual reports.
         report = nothing
-        
+
         return Xout, cache, report
     end
 
