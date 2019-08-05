@@ -20,7 +20,7 @@ of the samples to use for training
 at random
 * `rng` a random number generator to use
 """
-@with_kw mutable struct Holdout <: ResamplingStrategy
+@with_kw_noshow mutable struct Holdout <: ResamplingStrategy
     fraction_train::Float64 = 0.7
     shuffle::Bool = false
     rng::Union{Int,AbstractRNG} = Random.GLOBAL_RNG
@@ -43,7 +43,7 @@ For instance if `nfolds=3` then the data will be partitioned in three folds A, B
 and the model will be trained three times, first with A and B and tested on C, then on
 A, C and tested on B and finally on B, C and tested on A.
 """
-@with_kw  mutable struct CV <: ResamplingStrategy
+@with_kw_noshow  mutable struct CV <: ResamplingStrategy
     nfolds::Int = 6
     parallel::Bool = true
     shuffle::Bool = false ## TODO: add seed/rng

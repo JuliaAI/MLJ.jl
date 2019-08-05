@@ -5,7 +5,7 @@ $TYPEDEF
 
 Grid object for a grid search tuning strategy.
 """
-@with_kw mutable struct Grid <: TuningStrategy
+@with_kw_noshow mutable struct Grid <: TuningStrategy
     resolution::Int = 10
     parallel::Bool = true
 end
