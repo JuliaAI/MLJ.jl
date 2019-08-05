@@ -9,7 +9,7 @@ function MLJBase.update(model::Union{SupervisedNetwork,UnsupervisedNetwork},
                         verbosity, fitresult, cache, args...)
 
     anomynised_data = cache isa NamedTuple{(:sources, :data)}
-    
+
     if anomynised_data
         sources, data = cache.sources, cache.data
         for k in eachindex(sources)
@@ -22,7 +22,7 @@ function MLJBase.update(model::Union{SupervisedNetwork,UnsupervisedNetwork},
             rebind!(s, nothing)
         end
     end
-    
+
     return fitresult, cache, nothing
 end
 
@@ -160,8 +160,8 @@ function Base.replace(W::Node, pairs::Pair...)
     all_source_pairs = vcat(source_pairs, source_copy_pairs)
 
     # drop source nodes from all nodes of network terminating at W:
-    nodes_ = filter(nodes(W)) do N
-        !(N isa Source)
+    nodes_ = filter(nodes(W)) do node
+        !(node isa Source)
     end
     isempty(nodes_) && error("All nodes in network are source nodes. ")
     # instantiate node and machine dictionaries:
@@ -170,19 +170,19 @@ function Base.replace(W::Node, pairs::Pair...)
     newmach_given_old = IdDict{NodalMachine,NodalMachine}()
 
     # build the new network:
-    for N in nodes_
-       args = [newnode_given_old[arg] for arg in N.args]
-         if N.machine === nothing
-             newnode_given_old[N] = node(N.operation, args...)
+    for node in nodes_
+       args = [newnode_given_old[arg] for arg in node.args]
+         if node.machine === nothing
+             newnode_given_old[node] = node(node.operation, args...)
          else
-             if N.machine in keys(newmach_given_old)
-                 mach = newmach_given_old[N.machine]
+             if node.machine in keys(newmach_given_old)
+                 mach = newmach_given_old[node.machine]
              else
-                 train_args = [newnode_given_old[arg] for arg in N.machine.args]
-                 mach = machine(newmodel_given_old[N.machine.model], train_args...)
-                 newmach_given_old[N.machine] = mach
+                 train_args = [newnode_given_old[arg] for arg in node.machine.args]
+                 mach = machine(newmodel_given_old[node.machine.model], train_args...)
+                 newmach_given_old[node.machine] = mach
              end
-             newnode_given_old[N] = N.operation(mach, args...)
+             newnode_given_old[node] = node.operation(mach, args...)
         end
     end
 
@@ -201,8 +201,8 @@ fit-results. (The method simply resets `m.state` to zero, for every
 machine `m` in the network.)
 
 """
-function reset!(W::Node)
-    for mach in machines(W)
+function reset!(N::Node)
+    for mach in machines(N)
         mach.state = 0 # to do: replace with dagger object
     end
 end
@@ -220,7 +220,7 @@ function anonymize!(sources...)
     [MLJ.rebind!(s, nothing) for s in sources]
     return (sources=sources, data=data)
 end
-    
+
 # closures for later:
 function supervised_fit_method(network_Xs, network_ys, network_N,
                                network_models...)
@@ -243,13 +243,13 @@ function supervised_fit_method(network_Xs, network_ys, network_N,
 
         # for data anonymity we must move the data from the source
         # nodes into cache for rebinding in calls to `update`:
-  
+
         cache = anonymize!(Xs, ys)
 
         # TODO: make report a named tuple keyed on machines in the
         # network, with values the individual reports.
         report = nothing
-        
+
         return yhat, cache, report
     end
 
@@ -273,13 +273,13 @@ function unsupervised_fit_method(network_Xs, network_N,
 
         # for data anonymity we must move the data from the source
         # nodes into cache for rebinding in calls to `update`:
-  
+
         cache = anonymize!(Xs)
 
         # TODO: make report a named tuple keyed on machines in the
         # network, with values the individual reports.
         report = nothing
-        
+
         return Xout, cache, report
     end
 
