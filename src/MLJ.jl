@@ -68,7 +68,6 @@ import Random
 
 # convenience packages
 using DocStringExtensions: SIGNATURES, TYPEDEF
-using Parameters
 
 # to be extended:
 import Base.==

@@ -5,10 +5,13 @@ $TYPEDEF
 
 Grid object for a grid search tuning strategy.
 """
-@with_kw mutable struct Grid <: TuningStrategy
-    resolution::Int = 10
-    parallel::Bool = true
+mutable struct Grid <: TuningStrategy
+    resolution::Int
+    parallel::Bool
 end
+
+# Constructor with keywords
+Grid(; resolution::Int=10, parallel::Bool=true) = Grid(resolution, parallel)
 
 MLJBase.show_as_constructed(::Type{<:Grid}) = true
 
