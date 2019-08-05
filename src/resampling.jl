@@ -21,7 +21,7 @@ at random
 * `rng` a random number generator to use
 """
 mutable struct Holdout <: ResamplingStrategy
-    fraction_train::Float64j
+    fraction_train::Float64
     shuffle::Bool
     rng::Union{Int,AbstractRNG}
 
