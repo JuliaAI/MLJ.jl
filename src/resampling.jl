@@ -20,16 +20,25 @@ of the samples to use for training
 at random
 * `rng` a random number generator to use
 """
-@with_kw mutable struct Holdout <: ResamplingStrategy
-    fraction_train::Float64 = 0.7
-    shuffle::Bool = false
-    rng::Union{Int,AbstractRNG} = Random.GLOBAL_RNG
+mutable struct Holdout <: ResamplingStrategy
+    fraction_train::Float64j
+    shuffle::Bool
+    rng::Union{Int,AbstractRNG}
 
     function Holdout(fraction_train, shuffle, rng)
         0 < fraction_train < 1 || error("`fraction_train` must be between 0 and 1.")
         return new(fraction_train, shuffle, rng)
     end
 end
+
+# Keyword Constructor
+function Holdout(; fraction_train::Float64=0.7,
+                   shuffle::Bool=false,
+                   rng::Union{Int,AbstractRNG}=Random.GLOBAL_RNG)
+    Holdout(fraction_train, shuffle, rng)
+end
+
+
 
 show_as_constructed(::Type{<:Holdout}) = true
 
@@ -43,11 +52,19 @@ For instance if `nfolds=3` then the data will be partitioned in three folds A, B
 and the model will be trained three times, first with A and B and tested on C, then on
 A, C and tested on B and finally on B, C and tested on A.
 """
-@with_kw  mutable struct CV <: ResamplingStrategy
-    nfolds::Int = 6
-    parallel::Bool = true
-    shuffle::Bool = false ## TODO: add seed/rng
+mutable struct CV <: ResamplingStrategy
+    nfolds::Int
+    parallel::Bool
+    shuffle::Bool
     rng::Union{Int,AbstractRNG} = Random.GLOBAL_RNG
+end
+
+# Constructor with keywords
+function CV(; nfolds::Int=6,
+              parallel::Bool=true,
+              shuffle::Bool=false,
+              rng::Union{Int,AbstractRNG}=Random.GLOBAL_RNG)
+    CV(nfolds, parallel, shuffle, rng)
 end
 
 MLJBase.show_as_constructed(::Type{<:CV}) = true
