@@ -160,7 +160,7 @@ function Base.replace(W::Node, pairs::Pair...)
     all_source_pairs = vcat(source_pairs, source_copy_pairs)
 
     # drop source nodes from all nodes of network terminating at W:
-    nodes_ = filter(N -> !isa(N, Source) nodes(W))
+    nodes_ = filter(N -> !isa(N, Source), nodes(W))
     isempty(nodes_) && error("All nodes in network are source nodes. ")
     # instantiate node and machine dictionaries:
     newnode_given_old =
