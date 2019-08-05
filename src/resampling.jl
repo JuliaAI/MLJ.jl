@@ -54,7 +54,7 @@ mutable struct CV <: ResamplingStrategy
     nfolds::Int
     parallel::Bool
     shuffle::Bool
-    rng::Union{Int,AbstractRNG} = Random.GLOBAL_RNG
+    rng::Union{Int,AbstractRNG}
 end
 
 # Constructor with keywords
