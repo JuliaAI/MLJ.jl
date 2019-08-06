@@ -4,19 +4,17 @@ function Base.getindex(task::SupervisedTask, r)
     X = selectrows(task.X, r)
     y = task.y[r]
     is_probabilistic = task.is_probabilistic
-    input_scitypes = scitypes(X)
+    input_scitypes = schema(X).scitypes
     target = task.target
-    input_scitype_union = Union{input_scitypes...}
-    target_scitype_union = scitype_union(y)
-    input_is_multivariate = task.input_is_multivariate
+    input_scitype = Union{input_scitypes...}
+    target_scitype = scitype_union(y)
     return SupervisedTask(X,
                           y,
                           is_probabilistic,
                           input_scitypes,
                           target,
-                          input_scitype_union,
-                          target_scitype_union,
-                          input_is_multivariate)
+                          input_scitype,
+                          target_scitype)
 end
 
 
@@ -40,114 +38,6 @@ Random.shuffle(rng::AbstractRNG, task::SupervisedTask) =
     task[shuffle!(rng, Vector(1:nrows(task)))]
 Random.shuffle(task::SupervisedTask) = task[shuffle!(Vector(1:nrows(task)))]
 
-
-## COERCION
-
-_coerce_missing_warn(T) =
-    @warn "Missing values encountered. Coerced to Union{Missing,$T} instead of $T."
-
-
-# Vector to Continuous
-"""
-    coerce(T, v::AbstractVector)
-
-Coerce the machine types of elements of `v` to ensure the returned
-vector has `T` as its `scitype_union`, or `Union{Missing,T}`, if `v` has
-missing values.
-
-    julia> v = coerce(Continuous, [1, missing, 5])
-    3-element Array{Union{Missing, Float64},1}:
-     1.0
-     missing
-     5.0
-
-    julia> scitype_union(v)
-    Union{Missing,Continuous}
-
-See also [`scitype`](@ref), [`scitype_union`](@ref), [`scitypes`](@ref).
-
-"""
-coerce(T::Type{Continuous}, y::AbstractVector{<:Number}) = float(y)
-function coerce(T::Type{Continuous}, y::V) where {N<:Number,
-                                                  V<:AbstractVector{Union{N,Missing}}}
-    _coerce_missing_warn(T)
-    return float(y)
-end
-function coerce(T::Type{Continuous}, y::AbstractVector{S}) where S
-    for el in y
-        if ismissing(el)
-            _coerce_missing_warn(T)
-            break
-        end
-    end
-    return float.(y)
-end
-
-# Vector to Count
-_int(::Missing) = missing
-_int(x) = Int(x)
-
-coerce(T::Type{Count}, y::AbstractVector{<:Integer}) = y
-function coerce(T::Type{Count}, y::V) where {R<:Real,
-                                             V<:AbstractVector{Union{R,Missing}}}
-    _coerce_missing_warn(T)
-    return convert(Vector{Union{Missing,Int}}, y)
-end
-function coerce(T::Type{Count}, y::V) where {S,V<:AbstractVector{S}}
-    for el in y
-        if ismissing(el)
-            _coerce_missing_warn(T)
-            break
-        end
-    end
-    return _int.(y)
-end
-
-# Vector to Multiclass and OrderedFactor
-for (T, ordered) in ((Multiclass, false), (OrderedFactor, true))
-    @eval function coerce(::Type{$T}, y)
-        su = scitype_union(y)
-        if su >: Missing
-            _coerce_missing_warn($T)
-        end
-        if su <: $T
-            return y
-        else
-            return categorical(y, true, ordered = $ordered)
-        end
-    end
-end
-
-# Coerce table
-function _coerce_col(X, name, types)
-    y = selectcols(X, name)
-    if haskey(types, name)
-        return coerce(types[name], y)
-    else
-        return y
-    end
-end
-
-"""
-    coerce(d::Dict, X)
-
-Return a copy of the table `X` with columns named in the keys of `d`
-coerced to have `scitype_union` equal to the corresponding value.
-
-"""
-function coerce(types::Dict, X)
-    names = schema(X).names
-    coltable = NamedTuple{names}(_coerce_col(X, name, types) for name in names)
-    return MLJBase.table(coltable, prototype=X)
-end
-
-# Attempt to coerce a vector using a dictionary with a single key (corner case):
-function coerce(types::Dict, v::AbstractVector)
-    kys = keys(types)
-    length(kys) == 1 || error("Cannot coerce a vector using a multi-keyed dictionary of types. ")
-    key = first(kys)
-    return coerce(types[key], v)
-end
 
 
 ## TASK CONSTRUCORS WITH OPTIONAL TYPE COERCION
@@ -175,18 +65,17 @@ corresponding value. Possible values are `Continuous`, `Multiclass`,
 `:x1` will be coerced into integers (whose scitypes are always `Count`).
 
     task = supervised(X, y;
-                      input_is_multivariate=true,
                       is_probabilistic=false,
                       verbosity=1)
 
 A more customizable constructor, this returns a supervised learning
-task with input features `X` and target `y`, where: `X` must be a
-table or vector, according to whether it is multivariate or
-univariate, while `y` must be a vector whose elements are scalars, or
-tuples scalars (of constant length for ordinary multivariate
-predictions, and of variable length for sequence prediction). Table
-rows must correspond to patterns and columns to features. Type
-coercion is not available for this constructor (but see also [`coerce`](@ref)).
+task with input features `X` and target `y`, where: `X` is a table or
+vector (univariate inputs), while `y` must be a vector whose elements
+are scalars, or tuples scalars (of constant length for ordinary
+multivariate predictions, and of variable length for sequence
+prediction). Table rows must correspond to patterns and columns to
+features. Type coercion is not available for this constructor (but see
+also [`coerce`](@ref)).
 
     X, y = task()
 

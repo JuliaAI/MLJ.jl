@@ -9,8 +9,9 @@ export UnivariateBoxCoxTransformer
 export OneHotEncoder
 
 import MLJBase: MLJType, Unsupervised
-import MLJBase: schema, selectcols, table, scitype, scitype_union, scitypes
+import MLJBase: selectcols, table
 import MLJBase
+using ScientificTypes
 import Distributions
 using CategoricalArrays
 using Statistics
@@ -18,8 +19,6 @@ using Tables
 
 # to be extended:
 import MLJBase: fit, transform, inverse_transform
-import MLJBase: Found, Continuous, Multiclass
-import MLJBase: OrderedFactor, Other, Finite, Infinite, Count
 
 
 ## CONSTANTS
@@ -73,10 +72,8 @@ MLJBase.package_url(::Type{<:FeatureSelector}) = "https://github.com/alan-turing
 MLJBase.package_name(::Type{<:FeatureSelector}) = "MLJ"
 MLJBase.package_uuid(::Type{<:FeatureSelector}) = ""
 MLJBase.is_pure_julia(::Type{<:FeatureSelector}) = true
-MLJBase.input_scitype_union(::Type{<:FeatureSelector}) = Union{Missing,MLJBase.Found}
-MLJBase.output_scitype_union(::Type{<:FeatureSelector}) = Union{Missing,MLJBase.Found}
-MLJBase.output_is_multivariate(::Type{<:FeatureSelector}) = true
-
+MLJBase.input_scitype(::Type{<:FeatureSelector}) = Table(Scientific) # anything goes
+MLJBase.ouput_scitype(::Type{<:FeatureSelector}) = Table(Scientific) 
 
 
 ## UNIVARIATE STANDARDIZATION
@@ -126,10 +123,8 @@ MLJBase.package_url(::Type{<:UnivariateStandardizer}) = "https://github.com/alan
 MLJBase.package_name(::Type{<:UnivariateStandardizer}) = "MLJ"
 MLJBase.package_uuid(::Type{<:UnivariateStandardizer}) = ""
 MLJBase.is_pure_julia(::Type{<:UnivariateStandardizer}) = true
-MLJBase.input_scitype_union(::Type{<:UnivariateStandardizer}) = Found
-MLJBase.input_is_multivariate(::Type{<:UnivariateStandardizer}) = false
-MLJBase.output_scitype_union(::Type{<:UnivariateStandardizer}) = Continuous
-MLJBase.output_is_multivariate(::Type{<:UnivariateStandardizer}) = false
+MLJBase.input_scitype(::Type{<:UnivariateStandardizer}) = AbstractVector{<:Union{Continuous, Count}}
+MLJBase.output_scitype(::Type{<:UnivariateStandardizer}) = AbstractVector{Continuous}
 
 
 ## STANDARDIZATION OF ORDINAL FEATURES OF TABULAR DATA
@@ -167,7 +162,7 @@ function fit(transformer::Standardizer, verbosity::Int, X::Any)
 
     _schema =  schema(X)
     all_features = _schema.names
-    types = scitypes(X)
+    types = schema(X).scitypes
 
     # determine indices of all_features to be transformed
     if isempty(transformer.features)
@@ -235,10 +230,8 @@ MLJBase.package_url(::Type{<:Standardizer}) = "https://github.com/alan-turing-in
 MLJBase.package_name(::Type{<:Standardizer}) = "MLJ"
 MLJBase.package_uuid(::Type{<:Standardizer}) = ""
 MLJBase.is_pure_julia(::Type{<:Standardizer}) = true
-MLJBase.input_scitype_union(::Type{<:Standardizer}) = Union{Found,Missing}
-MLJBase.input_is_multivariate(::Type{<:Standardizer}) = true
-MLJBase.output_scitype_union(::Type{<:Standardizer}) = Union{Found,Missing}
-MLJBase.output_is_multivariate(::Type{<:Standardizer}) = true
+MLJBase.input_scitype(::Type{<:Standardizer}) = Table(Scientific) # non-continuous features allowed but ignored
+MLJBase.output_scitype(::Type{<:Standardizer}) = Table(Scientific)
 
 
 ## UNIVARIATE BOX-COX TRANSFORMATIONS
@@ -364,10 +357,8 @@ MLJBase.package_url(::Type{<:UnivariateBoxCoxTransformer}) = "https://github.com
 MLJBase.package_name(::Type{<:UnivariateBoxCoxTransformer}) = "MLJ"
 MLJBase.package_uuid(::Type{<:UnivariateBoxCoxTransformer}) = ""
 MLJBase.is_pure_julia(::Type{<:UnivariateBoxCoxTransformer}) = true
-MLJBase.input_scitype_union(::Type{<:UnivariateBoxCoxTransformer}) = MLJBase.Continuous
-MLJBase.input_is_multivariate(::Type{<:UnivariateBoxCoxTransformer}) = false
-MLJBase.output_scitype_union(::Type{<:UnivariateBoxCoxTransformer}) = MLJBase.Continuous
-MLJBase.output_is_multivariate(::Type{<:UnivariateBoxCoxTransformer}) = false
+MLJBase.input_scitype(::Type{<:UnivariateBoxCoxTransformer}) = AbstractVector{Continuous}
+MLJBase.output_scitype(::Type{<:UnivariateBoxCoxTransformer}) = AbstractVector{Continuous}
 
 
 ## ONE HOT ENCODING
@@ -504,10 +495,8 @@ MLJBase.package_url(::Type{<:OneHotEncoder}) = "https://github.com/alan-turing-i
 MLJBase.package_name(::Type{<:OneHotEncoder}) = "MLJ"
 MLJBase.package_uuid(::Type{<:OneHotEncoder}) = ""
 MLJBase.is_pure_julia(::Type{<:OneHotEncoder}) = true
-MLJBase.input_scitype_union(::Type{<:OneHotEncoder}) = Union{Missing,Found}
-MLJBase.input_is_multivariate(::Type{<:OneHotEncoder}) = true
-MLJBase.output_scitype_union(::Type{<:OneHotEncoder}) = Union{Missing,Found}
-MLJBase.output_is_multivariate(::Type{<:OneHotEncoder}) = true
+MLJBase.input_scitype(::Type{<:OneHotEncoder}) = Table(Scientific) # non-finite allowed but ignored
+MLJBase.output_scitype(::Type{<:OneHotEncoder}) = Table(Scientific)
 
 
 end # end module

@@ -78,7 +78,7 @@ ensemble_model.weights = weights
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
-@test MLJBase.target_scitype_union(ensemble_model) == MLJBase.target_scitype_union(atom)
+@test MLJBase.target_scitype(ensemble_model) == MLJBase.target_scitype(atom)
 
 # target is :deterministic :continuous false:
 atom = MLJ.DeterministicConstantRegressor()

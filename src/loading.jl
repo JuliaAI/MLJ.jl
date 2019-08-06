@@ -83,10 +83,9 @@ function models(task::SupervisedTask; kwargs...)
     conditional(x) =
         x[:is_supervised] &&
         x[:is_wrapper] == false &&
-        task.target_scitype_union <: x[:target_scitype_union] &&
-        task.input_scitype_union <: x[:input_scitype_union] &&
-        task.is_probabilistic == x[:is_probabilistic] &&
-        task.input_is_multivariate == x[:input_is_multivariate]
+        task.target_scitype <: x[:target_scitype] &&
+        task.input_scitype <: x[:input_scitype] &&
+        task.is_probabilistic == x[:is_probabilistic]
     return models(conditional, kwargs...)
 end
 
@@ -94,8 +93,7 @@ function models(task::UnsupervisedTask; kwargs...)
     ret = Dict{String, Any}()
     conditional(x) =
         x[:is_wrapper] == false &&
-        task.input_scitype_union <: x[:input_scitype_union] &&
-        task.input_is_multivariate == x[:input_is_multivariate] &&
+        task.input_scitype <: x[:input_scitype] 
     return models(conditional, kwargs...)
 end
 

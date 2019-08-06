@@ -1,7 +1,7 @@
 ## DEFAULT MEASURES
 
 default_measure(model::M) where M<:Supervised =
-    default_measure(model, target_scitype_union(M))
+    default_measure(model, target_scitype(M))
 default_measure(model, ::Any) = nothing
 default_measure(model::Deterministic, ::Type{<:Continuous}) = rms
 default_measure(model::Probabilistic, ::Type{<:Continuous}) = rms

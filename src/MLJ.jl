@@ -32,15 +32,15 @@ export FeatureSelector,
 # rexport from Random, Statistics, Distributions, CategoricalArrays:
 export pdf, mode, median, mean, shuffle!, categorical, shuffle
 
-# reexport from MLJBase:
+# reexport from MLJBase and ScientificTypes:
 export nrows, nfeatures, info,
         SupervisedTask, UnsupervisedTask, MLJTask,
         Deterministic, Probabilistic, Unsupervised, Supervised,
         DeterministicNetwork, ProbabilisticNetwork,
         Found, Continuous, Finite, Infinite,
         OrderedFactor, Unknown,
-        Count, Multiclass, Binary,
-        scitype, scitype_union, scitypes,
+        Count, Multiclass, Binary, Scientific,
+        scitype, scitype_union, schema,
         predict, predict_mean, predict_median, predict_mode,
         transform, inverse_transform, se, evaluate, fitted_params,
         @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
@@ -56,7 +56,6 @@ import MLJBase: fit, update, clean!,
                 transform, inverse_transform, se, evaluate, fitted_params,
                 show_as_constructed, params
 
-using RemoteFiles
 import Pkg.TOML
 using  CategoricalArrays
 import Distributions: pdf, mode
@@ -65,6 +64,7 @@ import StatsBase
 using ProgressMeter
 import Tables
 import Random
+using ScientficTypes
 
 # convenience packages
 using DocStringExtensions: SIGNATURES, TYPEDEF

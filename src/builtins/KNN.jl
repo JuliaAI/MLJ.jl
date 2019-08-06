@@ -5,7 +5,7 @@ module KNN
 export KNNRegressor
 
 import MLJBase
-
+using ScientificTypes
 using LinearAlgebra
 
 # to be extended:
@@ -94,8 +94,8 @@ MLJBase.load_path(::Type{<:KNNRegressor}) = "MLJ.KNNRegressor"
 MLJBase.package_name(::Type{<:KNNRegressor}) = "MLJ"
 MLJBase.package_uuid(::Type{<:KNNRegressor}) = ""
 MLJBase.is_pure_julia(::Type{<:KNNRegressor}) = true
-MLJBase.input_scitype_union(::Type{<:KNNRegressor}) = MLJBase.Continuous
-MLJBase.target_scitype_union(::Type{<:KNNRegressor}) = MLJBase.Continuous
+MLJBase.input_scitype(::Type{<:KNNRegressor}) = Table(Continuous)
+MLJBase.target_scitype(::Type{<:KNNRegressor}) = AbstractVector{Continuous}
 
 
 end # module
