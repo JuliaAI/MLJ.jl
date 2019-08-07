@@ -78,7 +78,8 @@ Unsupervised case: `transform(mach, rows=:)` or `inverse_transform(mach, rows)`,
 
 #### Performance estimation
 
-`evaluate!(mach, resampling=CV(), measure=…, operation=predict, verbosity=1)`
+`evaluate(model, X, y, resampling=CV(), measure=..., operation=predict, weights=..., verbosity=1)`
+`evaluate!(mach, resampling=Holdout(), measure=..., operation=predict, weights=..., verbosity=1)`
 
 #### Ranges for tuning
 
@@ -86,6 +87,7 @@ If `r = range(KNNRegressor(), :K, lower=1, upper = 20, scale=:log)` then `iterat
 
 For non-numeric ranges use `r = range(model, :parameter, values=…)`.
 
+For nested ranges, do like `r - range(EnsembleModel(atom=tree), :(atom.max_depth), ...)`
 
 #### Tuning strategies
 
@@ -94,14 +96,14 @@ For non-numeric ranges use `r = range(model, :parameter, values=…)`.
 
 #### Tuning model wrapper
 
-`tuned_model = TunedModel(model=…, tuning=Grid(), resampling=Holdout(), measure=…, operation=predict, nested_ranges=…, minimize=true, full_report=true)`
+`tuned_model = TunedModel(model=…, tuning=Grid(), resampling=Holdout(), measure=…, operation=predict, ranges=…, minimize=true, full_report=true)`
 
 Use `params(model)` to get pattern to match in specifying `nested_ranges`.
 
 
 #### Learning curves
 
-`curve = learning_curve!(mach, resolution=30, resampling=Holdout(), measure=…, operation=predict, nested_range=…,, n=1)`
+`curve = learning_curve!(mach, resolution=30, resampling=Holdout(), measure=…, operation=predict, range=…,, n=1)`
  
 
 If using Plots.jl:
@@ -117,7 +119,7 @@ If using Plots.jl:
 
 #### Built-in measures
 
-`export` `mav`, `rms`, `rmsl`, `rmslp1`, `rmsp`, `misclassification_rate`, `cross_entropy`
+`l1`, `l2, `mav`, `rms`, `rmsl`, `rmslp1`, `rmsp`, `misclassification_rate`, `cross_entropy`
 
 
 #### Transformers 

@@ -13,14 +13,14 @@ simple macro invocations. Handcrafting a learning network, as outlined
 below, is an advanced MLJ feature, assuming familiarity with the
 basics outlined in [Getting Started](index.md). The syntax
 for building a learning network is essentially an extension of the
-basic syntax but with data objects replaced with nodes ("dynamic
+basic syntax but with data containers replaced with nodes ("dynamic
 data").
 
 In MLJ, a *learning network* is a graph whose nodes apply an
 operation, such as `predict` or `transform`, using a fixed machine
 (requiring training) - or which, alternatively, applies a regular
 (untrained) mathematical operation to its input(s). In practice, a
-learning network works with *fixed* sources for its
+learning network works with fixed sources for its
 training/evaluation data, but can be built and tested in stages. By
 contrast, an *exported learning network* is a learning network
 exported as a stand-alone, re-usable `Model` object, to which all the
@@ -30,13 +30,13 @@ tuning, etc).
 As we shall see, exporting a learning network as a reusable model, is
 quite simple. While one can entirely skip the build-and-train steps,
 experimenting with raw learning networks may be the best way to
-understand how the stand-alone models work.
+understand how the stand-alone models work under the hood.
 
 In MLJ learning networks treat the flow of information during training
 and predicting separately. For this reason, simpler examples may
-appear more a little more complicated than in other
-approaches. However, in more sophisticated examples, such as _stacking_,
-this separation is essential.
+appear more slighlty more complicated than in other
+approaches. However, in more sophisticated examples, such as
+_stacking_, the separation is essential.
 
 
 ### Building a simple learning network
@@ -197,7 +197,66 @@ rms(y[test], yhat(rows=test))
 
 ### Exporting a learning network as a stand-alone model
 
-To export a learning network:
+Having satisfied that our learning network works on the synthetic
+data, we are ready to export it as a stand-alone model.
+
+
+#### Method I: The @from_network  macro
+
+The following call simultaneously defines a new model subtype
+`WrappedRidgeI <: Supervised` and creates an instance of this type
+`wrapped_modelI`:
+    
+```julia
+wrapped_ridgeI = @from_network WrappedRidgeI(ridge=ridge_model) <= (Xs, ys, yhat)
+```
+
+Any MLJ workflow can be applied to this composite model:
+
+```julia 
+julia> params(wrapped_ridgeI)
+```
+
+```julia
+(ridge = (lambda = 0.01,),)
+```
+
+```julia
+using CSV
+X, y = load_boston()()
+evaluate(wrapped_ridgeI, X, y, resampling=CV(), measure=rms, verbosity=0)
+```
+
+```julia
+6-element Array{Float64,1}:
+ 3.0225867093289347
+ 4.755707358891049 
+ 5.011312664189936 
+ 4.226827668908119 
+ 8.93385968738185  
+ 3.4788524973220545
+```
+
+*Notes:*
+
+- A deep copy of the original learning network `ridge_model` has
+  become the default value for the field `ridge` of the new
+  `WrappedRidgeI` struct.
+  
+- The tuple `(Xs, ys, yhat)` must always follow the pattern (source
+  node for inputs, source node for target, terminal prediction node),
+  unless this is an unsupervised learning network, in which case the
+  pattern is (soruce node for inputs, terminal transform node).
+  
+
+#### Method II: 
+
+In the method I above, only models appearing in the network will
+appear as hyperparamers of the exported composite model. There is a
+second more flexible method for exporting the network, which allows
+finer control over the exported `Model` struct (see the example under
+[Static operations on nodes](@ref) below) and which also avoids
+macros. The two steps required are:
 
 - Define a new `mutable struct` model type.
 
@@ -208,20 +267,21 @@ predictions export as models of subtype `DeterministicNetwork`
 (respectively, `ProbabilisticNetwork`):
 
 ```julia
-mutable struct WrappedRidge <: DeterministicNetwork
+mutable struct WrappedRidgeII <: DeterministicNetwork
     ridge_model
 end
 
 # keyword constructor
-WrappedRidge(; ridge_model=RidgeRegressor) = WrappedRidge(ridge_model); 
+WrappedRidgeII(; ridge=RidgeRegressor) = WrappedRidgeII(ridge); 
 ```
 
-Now satisfied that the learning network we defined above works, we
-simply cut and paste its defining code into a `fit` method:
+We now simply cut and paste its defining code into a model `fit`
+method (as opposed to machine `fit!` methods, which internally
+dispatch model `fit` methods on bound data):
 
 
 ```julia
-function MLJ.fit(model::WrappedRidge, X, y)
+function MLJ.fit(model::WrappedRidgeII, verbosity::Integer, X, y)
     Xs = source(X)
     ys = source(y)
 
@@ -240,22 +300,20 @@ function MLJ.fit(model::WrappedRidge, X, y)
     yhat = inverse_transform(box, zhat)
     fit!(yhat, verbosity=0)
     
-    return yhat
+    return fitresults(Xs, ys, yhat)
 end
 ```
 
-The line marked `###`, where the new exported model's hyperparameter `ridge_model` is spliced into the network, is the only modification.
+The line marked `###`, where the new exported model's hyperparameter `ridge` is spliced into the network, is the only modification.
 
-> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding machine `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the node returned by `fit` on the data supplied: `MLJ.predict(model::SupervisedNetwork, Xnew) = yhat(Xnew)`.
+> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding machine `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the terminating node of the network built in `fit` on the data supplied.
 
-The export process is complete and we can wrap our exported model
-around any data or task we like, and evaluate like any other model:
+The export process is complete:
 
 ```julia
-task = load_boston()
-wrapped_model = WrappedRidge(ridge_model=ridge_model)
-mach = machine(wrapped_model, task)
-evaluate!(mach, resampling=CV(), measure=rms, verbosity=0)
+using CSV
+X, y = load_boston()()
+evaluate(wrapped_ridgeI, X, y, resampling=CV(), measure=rms, verbosity=0)
 ```
 
 ```julia
@@ -289,6 +347,9 @@ Note, in particular, the lines defining `zhat` and `yhat`, which
 combine several static node operations.
 
 ```julia
+
+@load RidgeRegressor
+
 mutable struct KNNRidgeBlend <:DeterministicNetwork
 
     knn_model
@@ -297,7 +358,7 @@ mutable struct KNNRidgeBlend <:DeterministicNetwork
 
 end
 
-function MLJ.fit(model::KNNRidgeBlend, X, y)
+function MLJ.fit(model::KNNRidgeBlend, verbosity::Integer, X, y)
     
     Xs = source(X) 
     ys = source(y)
@@ -323,19 +384,19 @@ function MLJ.fit(model::KNNRidgeBlend, X, y)
 
     fit!(yhat, verbosity=0)
     
-    return yhat
+    return fitresults(Xs, ys, yhat)
 end
 
 ```
 
 ```julia
-task = load_reduced_ames()
+using CSV
+X, y = load_reduced_ames()()
 knn_model = KNNRegressor(K=2)
 ridge_model = RidgeRegressor(lambda=0.1)
 weights = (0.9, 0.1)
 blended_model = KNNRidgeBlend(knn_model, ridge_model, weights)
-mach = machine(blended_model, task)
-evaluate!(mach, resampling=Holdout(fraction_train=0.7), measure=rmsl) 
+evaluate(blended_model, X, y, resampling=Holdout(fraction_train=0.7), measure=rmsl) 
 ```
 
 ```julia
@@ -465,6 +526,10 @@ fit!(N::Node; rows=nothing, verbosity=1, force=false)
 
 ```@docs
 fit!(mach::MLJ.AbstractMachine; rows=nothing, verbosity=1, force=false)
+```
+
+```@docs
+@from_network
 ```
 
 

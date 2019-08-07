@@ -69,9 +69,12 @@ MLJBase.show_as_constructed(::Type{<:ParamRange}) = true
 """
     r = range(model, :hyper; values=nothing)
 
-    Defines a `NominalRange` object for a field `hyper` of `model`,
+Defines a `NominalRange` object for a field `hyper` of `model`,
 assuming the field is a not a subtype of `Real`. Note that `r` is not
 directly iterable but `iterator(r)` iterates over `values`.
+
+A nested hyperparameter is specified using dot notation. For example,
+`:(atom.max_depth)` specifies the `:max_depth` hyperparameter of the hyperparameter `:atom` of `model`.
 
     r = range(model, :hyper; upper=nothing, lower=nothing, scale=:linear)
 

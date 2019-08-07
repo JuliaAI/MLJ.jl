@@ -1,11 +1,17 @@
 [deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+LossFunctions = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
 MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 MLJModels = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
+MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
 RDatasets = "ce6b1742-4840-55fa-b093-852dadbb1d8b"
+TypedTables = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9"
 
 [compat]
 Documenter = "~0.22"

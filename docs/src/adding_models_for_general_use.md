@@ -214,7 +214,7 @@ MLJBase.input_is_multivariate(::Type{<:SomeSupervisedModel}) = false
 ```
 
 The target `y` is always an `AbstractVector` (see the discussion in
-[Getting Started](@ref)). For multivariate or sequence-valued
+[Getting Started](index.md). For multivariate or sequence-valued
 targets, a `target_scitype_union` declaration is required. This is
 discussed under [Trait declarations](@ref) below, which also describes how
 to constrain the element types of data.
@@ -228,7 +228,7 @@ repeated for `Xnew` in `predict`). To assist with common cases, MLJ
 provides the convenience method
 `MLJBase.matrix`. `MLJBase.matrix(Xtable)` has type `Matrix{T}` where
 `T` is the tightest common type of elements of `Xtable`, and `Xtable`
-is any table.
+is any table. 
 
 Other auxiliary methods provided by MLJBase for handling tabular data
 are: `selectrows`, `selectcols`, `select` and `schema` (for extracting
@@ -267,15 +267,15 @@ Note: The `Int` typing of `verbosity` cannot be omitted.
     accessible to MLJ through the `fitted_params` method described below).
 
 3.	The value of `cache` can be `nothing`, unless one is also defining
-      an `update` method (see below). The Julia type of `cache` is not
-      presently restricted.
+    an `update` method (see below). The Julia type of `cache` is not
+    presently restricted.
 
-It is not necessary for `fit` to provide dimension checks or to call
-`clean!` on the model; MLJ will carry out such checks.
+It is not necessary for `fit` to provide type or dimension checks on
+`X` or `y` or to call `clean!` on the model; MLJ will carry out such
+checks.
 
 The method `fit` should never alter hyperparameter values, the sole
 exception being fields of type `<:AbstractRNG`. If the package is able
-
 to suggest better hyperparameters, as a byproduct of training, return
 these in the report field.
 
@@ -393,7 +393,7 @@ this case each element of the training target `y` is a
 
 ```julia
 using CategoricalArrays
-y = identity.(categorical([:yes, :no, :no, :maybe, :maybe]))
+y = Any[categorical([:yes, :no, :no, :maybe, :maybe])...]
 ```
 
 Note that, as in this case, we cannot assume `y` is a
@@ -443,7 +443,7 @@ if they are omitted (and your model is registered) then a general user
 may attempt to use your model with inappropriately typed data.
 
 The trait functions `input_scitype_union` and `target_scitype_union`
-take scientific data types as values (see [Getting Started](@ref) for
+take scientific data types as values (see [Getting Started](index.md) for
 scitype basics). These types are organized in the following hierarchy:
 
 ![](scitypes.png)
@@ -546,7 +546,7 @@ defines a fallback for `update` which just calls `fit`. For context,
 see [MLJ Internals](internals.md).
 
 Learning networks wrapped as models constitute one use-case (see
-[Learning Networks](@ref)): one would like each component model to be
+[Learning Networks](index.md)): one would like each component model to be
 retrained only when hyperparameter changes "upstream" make this
 necessary. In this case MLJ provides a fallback (specifically, the
 fallback is for any subtype of `SupervisedNetwork =
@@ -556,12 +556,15 @@ increase the number of iterations only restarts the iterative
 procedure if other hyperparameters have also changed. For an example,
 see the MLJ [ensemble
 code](https://github.com/alan-turing-institute/MLJ.jl/blob/master/src/ensembles.jl).
+A third use-case is to avoid repeating time-consuming preprocessing of
+`X` and `y` required by some models.
 
 In the event that the argument `fitresult` (returned by a preceding
 call to `fit`) is not sufficient for performing an update, the author
 can arrange for `fit` to output in its `cache` return value any
-additional information required, as this is also passed as an argument
-to the `update` method.
+additional information required (for example, pre-processed versions
+of `X` and `y`), as this is also passed as an argument to the `update`
+method.
 
 
 ### Unsupervised models

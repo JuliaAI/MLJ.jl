@@ -4,9 +4,9 @@ const SupervisedNetwork = Union{DeterministicNetwork,ProbabilisticNetwork}
 MLJBase.is_wrapper(::Type{DeterministicNetwork}) = true
 MLJBase.is_wrapper(::Type{ProbabilisticNetwork}) = true
 
-# fall-back for updating learning networks exported as models:
+# fall-back for updating supervised learning networks exported as models:
 function MLJBase.update(model::Union{SupervisedNetwork,UnsupervisedNetwork},
-                        verbosity, fitresult, cache, args...)
+                        verbosity, yhat, cache, args...)
 
     anonymised = cache isa NamedTuple{(:sources, :data)}
 
@@ -16,14 +16,14 @@ function MLJBase.update(model::Union{SupervisedNetwork,UnsupervisedNetwork},
             rebind!(sources[k], data[k])
         end
     end
-    fit!(fitresult; verbosity=verbosity)
+    fit!(yhat; verbosity=verbosity)
     if anonymised
         for s in sources
             rebind!(s, nothing)
         end
     end
 
-    return fitresult, cache, nothing
+    return yhat, cache, nothing
 end
 
 # fall-back for predicting on supervised learning networks exported as models
@@ -221,6 +221,20 @@ function anonymize!(sources...)
     return (sources=sources, data=data)
 end
 
+# TODO: include recurursive reporting in following
+
+# what is returned by a fit method for an exported learning network:
+function fitresults(Xs, ys, yhat)
+    report = nothing
+    cache = anonymize!(Xs, ys)
+    return yhat, cache, report
+end
+function fitresults(Xs, yhat)
+    report = nothing
+    cache = anonymize!(Xs)
+    return yhat, cache, report
+end
+
 # closures for later:
 function supervised_fit_method(network_Xs, network_ys, network_N,
                                network_models...)
@@ -241,16 +255,11 @@ function supervised_fit_method(network_Xs, network_ys, network_N,
 
         fit!(yhat, verbosity=verbosity)
 
-        # for data anonymity we must move the data from the source
-        # nodes into cache for rebinding in calls to `update`:
-
-        cache = anonymize!(Xs, ys)
-
         # TODO: make report a named tuple keyed on machines in the
         # network, with values the individual reports.
         report = nothing
 
-        return yhat, cache, report
+        return fitresults(Xs, ys, yhat)
     end
 
     return fit
@@ -269,18 +278,14 @@ function unsupervised_fit_method(network_Xs, network_N,
         Xout = replace(network_N, replacements...)
         Set([Xs]) == Set(sources(Xout)) ||
             error("Failed to replace sources in network blueprint. ")
+        
         fit!(Xout, verbosity=verbosity)
-
-        # for data anonymity we must move the data from the source
-        # nodes into cache for rebinding in calls to `update`:
-
-        cache = anonymize!(Xs)
 
         # TODO: make report a named tuple keyed on machines in the
         # network, with values the individual reports.
         report = nothing
 
-        return Xout, cache, report
+        return fitresults(Xs, Xout)
     end
 
     return fit
@@ -288,8 +293,8 @@ end
 
 """
 
-   @from_network NewCompositeModel(fld1=model1, fld2=model2, ...) <= (Xs, N)
-   @from_network NewCompositeModel(fld1=model1, fld2=model2, ...) <= (Xs, ys, N)
+    @from_network NewCompositeModel(fld1=model1, fld2=model2, ...) <= (Xs, N)
+    @from_network NewCompositeModel(fld1=model1, fld2=model2, ...) <= (Xs, ys, N)
 
 Create, respectively, a new stand-alone unsupervised or superivsed
 model type `NewCompositeModel` using a learning network as a
@@ -451,7 +456,8 @@ end
 
 MLJBase.is_wrapper(::Type{<:SimpleDeterministicCompositeModel}) = true
 
-function MLJBase.fit(composite::SimpleDeterministicCompositeModel, verbosity::Int, Xtrain, ytrain)
+function MLJBase.fit(composite::SimpleDeterministicCompositeModel,
+                     verbosity::Integer, Xtrain, ytrain)
     X = source(Xtrain) # instantiates a source node
     y = source(ytrain)
 
@@ -462,10 +468,8 @@ function MLJBase.fit(composite::SimpleDeterministicCompositeModel, verbosity::In
     yhat = predict(l, Xt)
 
     fit!(yhat, verbosity=verbosity)
-    fitresult = yhat
-    report = l.report
-    cache = nothing
-    return fitresult, cache, report
+
+    return fitresults(X, y, yhat)
 end
 
 # MLJBase.predict(composite::SimpleDeterministicCompositeModel, fitresult, Xnew) = fitresult(Xnew)
