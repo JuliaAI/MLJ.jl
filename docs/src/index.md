@@ -73,7 +73,7 @@ of the [Distributions](https://github.com/JuliaStats/Distributions.jl)
 package can be applied to such distributions:
 
 ```@repl doda
-broadcast(pdf, yhat[1:3], "virginica") # predicted probabilities of virginica
+broadcast(pdf, yhat[3:5], "virginica") # predicted probabilities of virginica
 mode.(yhat[3:5])
 ```
 
