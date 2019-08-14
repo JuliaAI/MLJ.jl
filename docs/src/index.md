@@ -63,7 +63,7 @@ Training and testing on a hold-out set:
 train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
 fit!(tree, rows=train);
 yhat = predict(tree, X[test,:]);
-yhat[1:3]
+yhat[3:5]
 cross_entropy(yhat, y[test]) |> mean
 ```
 
@@ -74,13 +74,13 @@ package can be applied to such distributions:
 
 ```@repl doda
 broadcast(pdf, yhat[1:3], "virginica") # predicted probabilities of virginica
-mode.(yhat[1:3])
+mode.(yhat[3:5])
 ```
 
 One can explicitly get modes by using `predict_mode` instead of `predict`:
 
 ```@repl doda
-predict_mode(tree, rows=test[1:3])     
+predict_mode(tree, rows=test[3:5])
 ```
 
 Machines have an internal state which allows them to avoid redundant
@@ -103,7 +103,7 @@ Changing a hyperparameter and re-evaluating:
 tree_model.max_depth = 3
 evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
           measure=cross_entropy,
-          veerbosity=0)
+          verbosity=0)
 ```
 
 ### Next steps
