@@ -3,9 +3,7 @@ module TestTuning
 # using Revise
 using Test
 using MLJ
-# using UnicodePlots
 using MLJBase
-using CSV
 import Random.seed!
 seed!(1234)
 
@@ -51,13 +49,17 @@ measurements = tuned.report.measurements
 @test length(b.transformer.features) == 3
 @test abs(b.model.lambda - 0.027825) < 1e-6
 
-
 # get the training error of the tuned_model:
 e = rms(y, predict(tuned, X))
 
 # check this error has same order of magnitude as best measurement during tuning:
 r = e/tuned.report.best_measurement
 @test r < 10 && r > 0.1
+
+# test weights:
+tuned_model.weights = rand(length(y))
+fit!(tuned)
+@test tuned.report.measurements[1] != measurements[1]
 
 # test single range:
 ridge = FooBarRegressor()
@@ -69,13 +71,12 @@ report(tuned)
 
 ## LEARNING CURVE
 
-X, y = datanow()
+#X, y = datanow()
 atom = FooBarRegressor()
 ensemble = EnsembleModel(atom=atom, n=500)
 mach = machine(ensemble, X, y)
-r_lambda = range(ensemble, :(atom.lambda), lower=0.01, upper=0.3, scale=:log10)
+r_lambda = range(ensemble, :(atom.lambda), lower=0.0001, upper=0.1, scale=:log10)
 curve = MLJ.learning_curve!(mach; range=r_lambda)
-
 atom.lambda=0.3
 r_n = range(ensemble, :n, lower=10, upper=100)
 curve2 = MLJ.learning_curve!(mach; range=r_n)

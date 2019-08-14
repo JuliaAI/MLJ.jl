@@ -4,18 +4,20 @@ module TestComposites
 using Test
 using MLJ
 using CategoricalArrays
-using CSV
 
-Xin, yin = datanow(); # boston
+N = 50 
+Xin = (a=rand(N), b=rand(N), c=rand(N))
+yin = rand(N)
 
 train, test = partition(eachindex(yin), 0.7);
-Xtrain = Xin[train,:];
-ytrain = yin[train];
+Xtrain = MLJ.selectrows(Xin, train)
+ytrain = yin[train]
 
 ridge_model = FooBarRegressor(lambda=0.1)
 selector_model = FeatureSelector()
 
-composite = MLJ.SimpleDeterministicCompositeModel(model=ridge_model, transformer=selector_model)
+composite = MLJ.SimpleDeterministicCompositeModel(model=ridge_model,
+                                                  transformer=selector_model)
 
 fitresult, cache, report = MLJ.fit(composite, 3, Xtrain, ytrain)
 
@@ -35,7 +37,7 @@ fitresult, cache, report =
 @test selector.fitresult == selector_old.fitresult
 
 # this should trigger update of selector and training of ridge:
-selector_model.features = [:Crim, :Rm] 
+selector_model.features = [:a, :b] 
 fitresult, cache, report =
     @test_logs(
         (:info, r"^Updating"),
@@ -56,18 +58,18 @@ fitresult, cache, report =
 @test ridge.fitresult != ridge_old.fitresult
 @test selector.fitresult == selector_old.fitresult
 
-predict(composite, fitresult, Xin[test,:]);
+predict(composite, fitresult, MLJ.selectrows(Xin, test))
 
-XXX = source(Xin[train,:])
-yyy = source(yin[train])
+Xs = source(Xtrain)
+ys = source(ytrain)
 
-mach = machine(composite, XXX, yyy)
-yhat = predict(mach, XXX)
+mach = machine(composite, Xs, ys)
+yhat = predict(mach, Xs)
 fit!(yhat, verbosity=3)
-composite.transformer.features = [:NOx, :Zn]
+composite.transformer.features = [:b, :c]
 fit!(yhat, verbosity=3)
 fit!(yhat, rows=1:20, verbosity=3)
-yhat(Xin[test,:])
+yhat(MLJ.selectrows(Xin, test))
 
 
 ## EXPORTING A NETWORK BY HAND
@@ -76,7 +78,7 @@ mutable struct WrappedRidge <: DeterministicNetwork
     ridge
 end
 
-function MLJ.fit(model::WrappedRidge, X, y)
+function MLJ.fit(model::WrappedRidge, verbosity::Integer, X, y)
     Xs = source(X)
     ys = source(y)
 
@@ -93,19 +95,17 @@ function MLJ.fit(model::WrappedRidge, X, y)
     yhat = inverse_transform(boxcoxM, zhat)
 
     fit!(yhat)
-    return yhat
+    return fitresults(Xs, ys, yhat)
 end
-
-X, y = datanow()
 
 ridge = FooBarRegressor(lambda=0.1)
 model = WrappedRidge(ridge)
-mach = machine(model, X, y)
+mach = machine(model, Xin, yin)
 fit!(mach)
-yhat=predict(mach, X)
+yhat=predict(mach, Xin)
 ridge.lambda = 1.0
 fit!(mach)
-@test predict(mach, X) != yhat
+@test predict(mach, Xin) != yhat
 
 
 ## EXPORTING THE LEARNING NETWORK DEFINED BY A NODE

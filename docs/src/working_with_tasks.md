@@ -37,6 +37,7 @@ Load a built-in task:
 
 ```@example 1
 using MLJ
+using CSV
 MLJ.color_off() # hide
 task = load_iris()
 ```
@@ -128,9 +129,9 @@ unsupervised
 ```
 
 ```@docs
-models()
+models
 ```
 
 ```@docs
-localmodels()
+localmodels
 ```

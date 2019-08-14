@@ -14,8 +14,12 @@ using Test
   @test include("utilities.jl")
 end
 
-@testset "metrics" begin
-  @test include("metrics.jl")
+@testset "measures" begin
+  @test include("measures.jl")
+end
+
+@testset "interface for LossFunctions" begin
+  @test include("loss_functions_interface.jl")
 end
 
 @testset "KNN" begin

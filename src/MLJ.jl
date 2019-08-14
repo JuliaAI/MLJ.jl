@@ -2,9 +2,9 @@ module MLJ
 
 # defined in include files:
 export @curve, @pcurve,                               # utilities.jl
-        mav, mae, rms, rmsl, rmslp1, rmsp,            # metrics.jl
-        misclassification_rate, cross_entropy,        # metrics.jl
-        default_measure,                              # metrics.jl
+        mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,     # measures.jl
+        misclassification_rate, cross_entropy,        # measures.jl
+        default_measure,                              # measures.jl
         coerce, supervised, unsupervised,             # tasks.jl
         report,                                       # machines.jl
         Holdout, CV, evaluate!, Resampler,            # resampling.jl
@@ -15,7 +15,8 @@ export @curve, @pcurve,                               # utilities.jl
         ConstantRegressor, ConstantClassifier,        # builtins/Constant.jl
         models, localmodels, @load,                   # loading.jl
         KNNRegressor,                                 # builtins/KNN.jl
-        @from_network, machines, sources, anonymize!  # composites.jl
+        @from_network, machines, sources, anonymize!, # composites.jl
+        fitresults                                    # composites.jl
 
 # defined in include files "machines.jl and "networks.jl":
 export Machine, NodalMachine, machine, AbstractNode,
@@ -30,7 +31,7 @@ export FeatureSelector,
         # UnivariateDiscretizer, Discretizer
 
 # rexport from Random, Statistics, Distributions, CategoricalArrays:
-export pdf, mode, median, mean, shuffle!, categorical, shuffle
+export pdf, mode, median, mean, shuffle!, categorical, shuffle, levels, levels!
 
 # reexport from MLJBase:
 export nrows, nfeatures, info,
@@ -56,7 +57,7 @@ import MLJBase: fit, update, clean!,
                 transform, inverse_transform, se, evaluate, fitted_params,
                 show_as_constructed, params
 
-using RemoteFiles
+using Requires
 import Pkg.TOML
 using  CategoricalArrays
 import Distributions: pdf, mode
@@ -64,6 +65,7 @@ import Distributions
 import StatsBase
 using ProgressMeter
 import Tables
+import PrettyTables
 import Random
 
 # convenience packages
@@ -88,7 +90,7 @@ const srcdir = dirname(@__FILE__) # the directory containing this file:
 const CategoricalElement = Union{CategoricalString,CategoricalValue}
 
 include("utilities.jl")     # general purpose utilities
-include("metrics.jl")       # loss functions
+include("measures.jl")       # loss functions
 include("machines.jl")      # machine API
 include("networks.jl")      # for building learning networks
 include("composites.jl")    # composite models, incl. learning networks exported as models
@@ -110,13 +112,14 @@ include("builtins/ridge.jl") # defines a model for testing only
 
 include("loading.jl") # model metadata processing
 
-
 ## GET THE EXTERNAL MODEL METADATA
 
 function __init__()
     @info "Loading model metadata"
     global metadata_file = joinpath(srcdir, "registry", "Metadata.toml")
     global METADATA = TOML.parsefile(metadata_file)
+    @require(LossFunctions="30fc2ffe-d236-52d8-8643-a9d8f7c094a7",
+             include("loss_functions_interface.jl"))
 end
 
 
