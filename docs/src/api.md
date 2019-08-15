@@ -2,9 +2,9 @@
 
 ### Functions
 
-```@autodocs
-Modules = [MLJ,MLJBase,MLJModels]
-```
+<!-- ```@autodocs -->
+<!-- Modules = [MLJ,MLJBase,MLJModels] -->
+<!-- ``` -->
 
 ### Index
 

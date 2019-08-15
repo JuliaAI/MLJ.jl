@@ -202,3 +202,24 @@ macro pcurve(var1, range, code)
         collect(map(first,pairs)), collect(map(last, pairs))
     end
 end
+
+
+## FOR PRETTY PRINTING COLUMN TABLES
+
+function pretty_table(X; showtypes=true, alignment=:l, kwargs...)
+    names = schema(X).names |> collect
+    if showtypes
+        types = schema(X).types |> collect
+#        scitypes = schema(X).scitypes |> collect
+        header = hcat(names, types) |> permutedims
+    else
+        header  = names
+    end
+    try
+        PrettyTables.pretty_table(MLJBase.matrix(X),
+                                  header; alignment=alignment, kwargs...)
+    catch
+        println("Trouble displaying evaluation results.")
+    end
+end
+

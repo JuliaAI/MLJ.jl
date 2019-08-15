@@ -1,94 +1,163 @@
 module TestResampling
 
-# using Revise
+#  using Revise
 using Test
 using MLJ
 using MLJBase
-using CSV
-using DataFrames
-
-x1 = ones(4)
-x2 = ones(4)
-X = DataFrame(x1=x1, x2=x2)
-y = [1.0, 1.0, 2.0, 2.0]
+import Random.seed!
+seed!(1234)
 
 @test CV(nfolds=6) == CV(nfolds=6)
 @test CV(nfolds=5) != CV(nfolds=6)
 
-# holdout:
-@test MLJBase.show_as_constructed(Holdout)
-holdout = Holdout(fraction_train=0.75)
-model = ConstantRegressor()
-resampler = Resampler(resampling=holdout, model=model, measure=rms)
-fitresult, cache, report = MLJ.fit(resampler, 1, X, y)
-@test fitresult ≈ 2/3
-
-holdout = Holdout(shuffle=true)
-
-mach = machine(model, X, y)
-result = @test_logs((:info, r"^Evaluating using a holdout set"),
-                    evaluate!(mach, resampling=holdout, measure=[rms, rmslp1]))
-@test result isa NamedTuple
-@test @test_logs((:info, r"^Evaluating using a holdout set"),
-                 evaluate!(mach, resampling=holdout)) ≈ 2/3
-
-x1 = ones(10)
-x2 = ones(10)
-X = DataFrame(x1=x1, x2=x2)
-y = [1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0]
-
-# cv:
-@test MLJBase.show_as_constructed(CV)
-cv=CV(nfolds=5)
-model = ConstantRegressor()
-mach = machine(model, X, y)
-result = @test_logs((:info, r"^Evaluating using cross-validation"),
-                    evaluate!(mach, resampling=cv, measure=[rms, rmslp1]))
-@test result isa NamedTuple
-errs = @test_logs((:info, r"^Evaluating using cross-validation"),
-                  evaluate!(mach, resampling=cv))
-for e in errs
-    @test e ≈ 1/2 || e ≈ 3/4
+@testset "checking measure/model compatibility" begin
+    model = ConstantRegressor()
+    y = rand(4)
+    override=false
+    @test MLJ._check_measure(:junk, :junk, :junk, :junk, true) == nothing
+    @test_throws ArgumentError MLJ._check_measure(model, rms, y, predict, override)
+    @test MLJ._check_measure(model, rms, y, predict_mean, override) == nothing
+    @test MLJ._check_measure(model, rms, y, predict_median, override) == nothing
+    y=categorical(collect("abc"))
+    @test_throws(ArgumentError,
+                 MLJ._check_measure(model, rms, y, predict_median, override))
+    model = ConstantClassifier()
+    @test_throws(ArgumentError,
+                 MLJ._check_measure(model, misclassification_rate, y, predict, override))
+    @test MLJ._check_measure(model, misclassification_rate, y,
+                            predict_mode, override) == nothing
+    model = MLJ.DeterministicConstantClassifier()
+    @test_throws ArgumentError MLJ._check_measure(model, cross_entropy, y,
+                            predict, override)
 end
-@test scitype_union(@test_logs((:info, r"^Evaluating using cross-validation"),
-                               evaluate!(mach, resampling=CV(shuffle=true)))) == Continuous
 
-## RESAMPLER AS MACHINE
+@testset "folds specified" begin
+    x1 = ones(10)
+    x2 = ones(10)
+    X = (x1=x1, x2=x2)
+    y = [1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0]
 
-# holdout:
-X, y = datanow()
-ridge_model = FooBarRegressor(lambda=20.0)
-resampler = Resampler(resampling=holdout, model=ridge_model)
-resampling_machine = machine(resampler, X, y)
-@test_logs((:info, r"^Training"), fit!(resampling_machine))
-e1=evaluate(resampling_machine)
-mach = machine(ridge_model, X, y)
-e1 ≈ @test_logs((:info, r"^Evaluating using a holdout set"),
-                evaluate!(mach, holdout))
-ridge_model.lambda=1.0
-@test_logs((:info, r"^Updating"), (:info, r"^Evaluating using a holdout set"),
-           fit!(resampling_machine, verbosity=2))
-e2=evaluate(resampling_machine)
-@test e1 != e2
+    my_rms(yhat, y) = sqrt(mean((yhat -y).^2))
+    my_mav(yhat, y) = abs.(yhat - y)
+    MLJ.reports_each_observation(::typeof(my_mav)) = true
 
-# cv:
-resampler = Resampler(resampling=cv, model=ridge_model)
-resampling_machine = machine(resampler, X, y)
-@test_logs (:info, r"^Training") fit!(resampling_machine)
-e1=evaluate(resampling_machine)
-mach = machine(ridge_model, X, y)
-e1 ≈ @test_logs((:info, r"^Evaluating using cross-validation"),
-                evaluate!(mach, cv))
-ridge_model.lambda=10.0
-@test_logs((:info, r"^Updating"), (:info, r"^Evaluating using cross-validation"),
-           fit!(resampling_machine, verbosity=2))
-e2=evaluate(resampling_machine)
-@test mean(e1) != mean(e2)
+    resampling = [(3:10, 1:2),
+                  ([1, 2, 5, 6, 7, 8, 9, 10], 3:4),
+                  ([1, 2, 3, 4, 7, 8, 9, 10], 5:6),
+                  ([1, 2, 3, 4, 5, 6, 9, 10], 7:8),
+                  (1:8, 9:10)]
 
-@test MLJBase.package_name(Resampler) == "MLJ"
-@test MLJBase.is_wrapper(Resampler)
-rnd = randn(5)
-@test evaluate(resampler, rnd) === rnd
+    model = MLJ.DeterministicConstantRegressor()
+    mach = machine(model, X, y)
+
+    # check detection of incompatible measure (cross_entropy):
+    @test_throws ArgumentError evaluate!(mach, resampling=resampling,
+                                         measure=[cross_entropy, rmslp1])
+    result = evaluate!(mach, resampling=resampling,
+                       measure=[my_rms, my_mav, rmslp1])
+    v = [1/2, 3/4, 1/2, 3/4, 1/2]
+    @test result.per_fold[1] ≈ v
+    @test result.per_fold[2] ≈ v
+    @test result.per_fold[3][1] ≈ abs(log(2) - log(2.5))
+    @test ismissing(result.per_observation[1])
+    @test result.per_observation[2][1] ≈ [1/2, 1/2]
+    @test result.per_observation[2][2] ≈ [3/4, 3/4]
+    @test result.measurement[1] ≈ mean(v)
+    @test result.measurement[2] ≈ mean(v)
+end
+
+@testset "holdout" begin
+    x1 = ones(4)
+    x2 = ones(4)
+    X = (x1=x1, x2=x2)
+    y = [1.0, 1.0, 2.0, 2.0]
+
+    @test MLJBase.show_as_constructed(Holdout)
+    holdout = Holdout(fraction_train=0.75)
+    model = MLJ.DeterministicConstantRegressor()
+    mach = machine(model, X, y)
+    result = evaluate!(mach, resampling=holdout,
+                       measure=[rms, rmslp1])
+    result = evaluate!(mach, verbosity=0, resampling=holdout)  
+    result.measurement[1] ≈ 2/3
+
+    # test direct evaluation of a model + data:
+    result = evaluate(model, X, y, verbosity=0, resampling=holdout, measure=rms)
+    @test result.measurement[1] ≈ 2/3
+
+    X = (x=rand(100),)
+    y = rand(100)
+    mach = machine(model, X, y)
+    evaluate!(mach, verbosity=0, Holdout(shuffle=true, rng=123))
+    e1 = evaluate!(mach, verbosity=0, Holdout(shuffle=true)).measurement[1]
+    @test e1 != evaluate!(mach, verbosity=0, Holdout()).measurement[1]
+
+             
+end
+
+@testset "cv" begin
+    x1 = ones(10)
+    x2 = ones(10)
+    X = (x1=x1, x2=x2)
+    y = [1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0]
+    
+    @test MLJBase.show_as_constructed(CV)
+    cv=CV(nfolds=5)
+    model = MLJ.DeterministicConstantRegressor()
+    mach = machine(model, X, y)
+    result = evaluate!(mach, resampling=cv, measure=[rms, rmslp1])
+    @test result.per_fold[1] ≈ [1/2, 3/4, 1/2, 3/4, 1/2]
+
+    shuffled =  evaluate!(mach, resampling=CV(shuffle=true)) # using rms default
+    @test shuffled.measurement[1] != result.measurement[1]
+end
+
+@testset "weights" begin
+
+    # cv:
+    x1 = ones(4)
+    x2 = ones(4)
+    X = (x1=x1, x2=x2)
+    y = [1.0, 2.0, 3.0, 1.0]
+    w = 1:4
+    cv=CV(nfolds=2)
+    model = MLJ.DeterministicConstantRegressor()
+    mach = machine(model, X, y)
+    e = evaluate!(mach, resampling=cv, measure=l1,
+                  weights=w, verbosity=0).measurement[1]
+    @test e ≈ (1/3 + 13/14)/2
+
+end
+
+@testset "resampler as machine" begin
+    N = 50
+    X = (x1=rand(N), x2=rand(N), x3=rand(N))
+    y = X.x1 -2X.x2 + 0.05*rand(N)
+    
+    ridge_model = FooBarRegressor(lambda=20.0)
+    holdout = Holdout(fraction_train=0.75)
+    resampler = Resampler(resampling=holdout, model=ridge_model, measure=mav)
+    resampling_machine = machine(resampler, X, y)
+    @test_logs((:info, r"^Training"), fit!(resampling_machine))
+    e1=evaluate(resampling_machine).measurement[1]
+    mach = machine(ridge_model, X, y)
+    @test e1 ≈  evaluate!(mach, resampling=holdout,
+                          measure=mav, verbosity=0).measurement[1]
+    ridge_model.lambda=1.0
+    fit!(resampling_machine, verbosity=2)
+    e2=evaluate(resampling_machine).measurement[1]
+    @test e1 != e2
+    resampler.weights = rand(N)
+    fit!(resampling_machine, verbosity=0)
+    e3=evaluate(resampling_machine).measurement[1]
+    @test e3 != e2        
+
+    @test MLJBase.package_name(Resampler) == "MLJ"
+    @test MLJBase.is_wrapper(Resampler)
+    rnd = randn(5)
+    @test evaluate(resampler, rnd) === rnd
+end
+
 
 end
 true

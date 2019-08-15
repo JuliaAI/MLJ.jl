@@ -25,9 +25,9 @@ mutable struct DeterministicTunedModel{T,M<:Deterministic} <: MLJ.Deterministic
     tuning::T  # tuning strategy
     resampling # resampling strategy
     measure
+    weights::Union{Nothing,AbstractVector{<:Real}}
     operation
-    ranges::Union{Vector,ParamRange}
-    minimize::Bool
+    ranges::Union{AbstractVector{<:ParamRange},ParamRange}
     full_report::Bool
     train_best::Bool
 end
@@ -42,14 +42,15 @@ mutable struct ProbabilisticTunedModel{T,M<:Probabilistic} <: MLJ.Probabilistic
     tuning::T  # tuning strategy
     resampling # resampling strategy
     measure
+    weights::Union{Nothing,AbstractVector{<:Real}}
     operation
-    ranges::Union{Vector,ParamRange}
-    minimize::Bool
+    ranges::Union{AbstractVector{<:ParamRange},ParamRange}
     full_report::Bool
     train_best::Bool
 end
 
-const EitherTunedModel{T,M} = Union{DeterministicTunedModel{T,M},ProbabilisticTunedModel{T,M}}
+const EitherTunedModel{T,M} =
+    Union{DeterministicTunedModel{T,M},ProbabilisticTunedModel{T,M}}
 
 MLJBase.is_wrapper(::Type{<:EitherTunedModel}) = true
 
@@ -58,26 +59,35 @@ MLJBase.is_wrapper(::Type{<:EitherTunedModel}) = true
                              tuning=Grid(),
                              resampling=Holdout(),
                              measure=nothing,
+                             weights=nothing,
                              operation=predict,
                              ranges=ParamRange[],
-                             minimize=true,
                              full_report=true)
 
 Construct a model wrapper for hyperparameter optimization of a
 supervised learner.
 
 Calling `fit!(mach)` on a machine `mach=machine(tuned_model, X, y)` or
-`mach=machine(tuned_model, task)` will: (i) Instigate a search, over
-clones of `model` with the hyperparameter mutations specified by
-`ranges`, for that model optimizing the specified `measure`,
-according to evaluations carried out using the specified `tuning`
-strategy and `resampling` strategy; and (ii) Fit a machine,
-`mach_optimal = fitted_params(mach).best_model`, wrapping the optimal
-`model` object in *all* the provided data `X, y` (or in `task`). Calling
-`predict(mach, Xnew)` then returns predictions on `Xnew` of the
-machine `mach_optimal`.
+`mach=machine(tuned_model, task)` will: 
 
-If `measure` is a score, rather than a loss, specify `minimize=false`.
+- Instigate a search, over clones of `model` with the hyperparameter
+  mutations specified by `ranges`, for a model optimizing the specified
+  `measure`, using performance evaluations carried out using the specified
+  `tuning` strategy and `resampling` strategy.
+
+- Fit a machine, `mach_optimal = fitted_params(mach).best_model`,
+  wrapping the optimal `model` object in *all* the provided data `X, y`
+  (or in `task`). Calling `predict(mach, Xnew)` then returns predictions
+  on `Xnew` of the machine `mach_optimal`.
+
+If a custom measure `measure` is used, and the measure is a score,
+rather than a loss, be sure to check that `MLJ.orientation(measure) ==
+:score` to ensure maximization of the measure, rather than
+minimization. Overide an incorrect value with
+`MLJ.orientation(::typeof(measure)) = :score`. 
+
+If `measure` supports sample weights (`MLJ.supports_weights(measure)
+== true`) then these can be passed to the measure as `weights`.
 
 In the case of two-parameter tuning, a Plots.jl plot of performance
 estimates is returned by `plot(mach)` or `heatmap(mach)`.
@@ -87,6 +97,7 @@ function TunedModel(;model=nothing,
                     tuning=Grid(),
                     resampling=Holdout(),
                     measure=nothing,
+                    weights=nothing,
                     operation=predict,
                     ranges=ParamRange[],
                     minimize=true,
@@ -102,10 +113,10 @@ function TunedModel(;model=nothing,
 
     if model isa Deterministic
         return DeterministicTunedModel(model, tuning, resampling,
-           measure, operation, ranges, minimize, full_report, train_best)
+           measure, weights, operation, ranges, full_report, train_best)
     elseif model isa Probabilistic
         return ProbabilisticTunedModel(model, tuning, resampling,
-           measure, operation, ranges, minimize, full_report, train_best)
+           measure, weights, operation, ranges, full_report, train_best)
     end
     error("$model does not appear to be a Supervised model.")
 end
@@ -119,18 +130,38 @@ function MLJBase.clean!(model::EitherTunedModel)
     return message
 end
 
+
+## GRID SEARCH
+
 function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y) where M
 
-    if tuned_model.ranges isa Vector
+    if tuned_model.ranges isa AbstractVector
         ranges = tuned_model.ranges
     else
         ranges = [tuned_model.ranges,]
     end
 
-    ranges isa Vector{<:ParamRange} ||
+    ranges isa AbstractVector{<:ParamRange} ||
         error("ranges must be a ParamRange object or a vector of " *
               "ParamRange objects. ")
 
+    if tuned_model.measure isa AbstractVector
+        measure = tuned_model.measure[1]
+        verbosity >=0 &&
+            @warn "Provided `meausure` is a vector. Using first element only. "
+    else
+        measure = tuned_model.measure
+    end
+    
+    minimize = ifelse(orientation(measure) == :loss, true, false)
+
+    if verbosity > 0 && tuned_model.train_best
+        if minimize
+            @info "Mimimizing $measure. "
+        else
+            @info "Maximizing $measure. "
+        end
+    end
 
     parameter_names = [string(r.field) for r in ranges]
     scales = [scale(r) for r in ranges]
@@ -138,11 +169,10 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     # the mutating model:
     clone = deepcopy(tuned_model.model)
 
-    measure = tuned_model.measure
-
     resampler = Resampler(model=clone,
                           resampling=tuned_model.resampling,
                           measure=measure,
+                          weights=tuned_model.weights, 
                           operation=tuned_model.operation)
 
     resampling_machine = machine(resampler, X, y)
@@ -165,14 +195,13 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     N = size(A, 1)
 
     if tuned_model.full_report
-#        models = Vector{M}(undef, N)
         measurements = Vector{Float64}(undef, N)
     end
 
     # initialize search for best model:
     best_model = deepcopy(tuned_model.model)
-    best_measurement = ifelse(tuned_model.minimize, Inf, -Inf)
-    s = ifelse(tuned_model.minimize, 1, -1)
+    best_measurement = ifelse(minimize, Inf, -Inf)
+    s = ifelse(minimize, 1, -1)
 
     # evaluate all the models using specified resampling:
     # TODO: parallelize!
@@ -199,7 +228,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
         else
             fit!(resampling_machine, verbosity=verbosity-1)
         end
-        e = mean(evaluate(resampling_machine))
+        e = evaluate(resampling_machine).measurement[1]
 
         if verbosity > 1
             text = prod("$(parameter_names[j])=$(A_row[j]) \t" for j in 1:length(A_row))

@@ -70,15 +70,15 @@ called on `mach.model`. Otherwise, `MLJBase.update` is called.
 When called for the first time, attempt to call `MLJBase.fit` on
 `fit.model`. This will fail if an argument of the machine depends
 ultimately on some other untrained machine for successful calling, but
-this is resolved by instead fitting any node `N` for which `N.machine
-= N`, which trains all necessary machines in an appropriate
-order. Subsequent `fit!` calls do nothing unless: (i) `force=true`, or
-(ii) some machine on which `mach` depends has computed a new
-fit-result since `mach` last computed its fit-result, or (iii) the
-specified `rows` have changed since the last time a fit-result was
-last computed, or (iv) `mach` is stale (see below). In cases (i), (ii)
-or (iii), `MLJBase.fit` is called. Otherwise `MLJBase.update` is
-called.
+this is resolved by instead calling `fit!` on fitting any node `N` for
+which `mach in machines(N)` is true, which trains all necessary
+machines in an appropriate order. Subsequent `fit!` calls do nothing
+unless: (i) `force=true`, or (ii) some machine on which `mach` depends
+has computed a new fit-result since `mach` last computed its
+fit-result, or (iii) the specified `rows` have changed since the last
+time a fit-result was last computed, or (iv) `mach` is stale (see
+below). In cases (i), (ii) or (iii), `MLJBase.fit` is
+called. Otherwise `MLJBase.update` is called.
 
 A machine `mach` is *stale* if `mach.model` has changed since the last
 time a fit-result was computed, or if if one of its training arguments
@@ -109,7 +109,8 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
     if mach isa NodalMachine
         # determine if concrete data to be used in training may have changed:
         upstream_state = Tuple([state(arg) for arg in mach.args])
-        data_has_changed = rows_have_changed || (upstream_state != mach.upstream_state)
+        data_has_changed =
+            rows_have_changed || (upstream_state != mach.upstream_state)
         previously_fit = (mach.state > 0)
     else
         data_has_changed = rows_have_changed

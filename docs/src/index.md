@@ -4,83 +4,106 @@
 
 ### [Glossary](glossary.md)
 
+### Plug-and-play model evaluation
 
-### Basic supervised training and testing
+To load some data install the
+[RDatasets](https://github.com/JuliaStats/RDatasets.jl) in your load
+path and enter
 
+```@repl doda
+using RDatasets
+iris = dataset("datasets", "iris"); # a DataFrame
+```
+and then split the data into input and target parts:
 
-```julia
-julia> using MLJ
-julia> using RDatasets
-julia> iris = dataset("datasets", "iris"); # a DataFrame
+```@repl doda
+X = iris[:, 1:4];
+y = iris[:, 5];
 ```
 
-In MLJ one can either wrap data for supervised learning in a formal
-*task* (see [Working with Tasks](working_with_tasks.md)), or work
-directly with the data, split into its input and target parts:
+In MLJ a *model* is a struct storing the hyperparameters of the learning
+algorithm indicated by the struct name.  Assuming the DecisionTree
+package is in your load path, we can instantiate a
+DecisionTreeClassifier model like this:
 
-
-```julia
-julia> const X = iris[:, 1:4];
-julia> const y = iris[:, 5];
+```@repl doda
+using MLJ
+@load DecisionTreeClassifier verbosity=1
+tree_model = DecisionTreeClassifier(max_depth=2)
 ```
 
-A *model* is a container for hyperparameters. Assuming the
-DecisionTree package is in your installation load path, we can
-instantiate a DecisionTreeClassifier model like this:
+*Important:* DecisionTree and most other packages implementing machine
+learning algorithms for use in MLJ are not MLJ dependencies. If such a
+package is not in your load path you will receive an error explaining
+how to add the package to your current environment.
 
-```julia
-julia> @load DecisionTreeClassifier
-import MLJModels ✔
-import DecisionTree ✔
-import MLJModels.DecisionTree_.DecisionTreeClassifier ✔
+Once loaded, a model is evaluated with the `evaluate` method:
 
-julia> tree_model = DecisionTreeClassifier(max_depth=2)
-DecisionTreeClassifier(pruning_purity = 1.0,
-                       max_depth = 2,
-                       min_samples_leaf = 1,
-                       min_samples_split = 2,
-                       min_purity_increase = 0.0,
-                       n_subfeatures = 0.0,
-                       display_depth = 5,
-                       post_prune = false,
-                       merge_purity_threshold = 0.9,) @ 1…85
+```@repl doda
+evaluate(tree_model, X, y, 
+         resampling=CV(shuffle=true), measure=cross_entropy, verbosity=0)
 ```
-    
+
+Evaluating against multiple performance measures is also possible. See
+[Evaluating model performance](evaluating_model_performance.md) for details.
+
+
+### Training and testing by hand
+
 Wrapping the model in data creates a *machine* which will store
 training outcomes:
 
-```julia
-julia> tree = machine(tree_model, X, y)
-Machine{DecisionTreeClassifier} @ 9…45
+```@repl doda
+tree = machine(tree_model, X, y)
 ```
 
 Training and testing on a hold-out set:
 
-```julia
-julia> train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
-julia> fit!(tree, rows=train)
-julia> yhat = predict(tree, X[test,:]);
-julia> misclassification_rate(yhat, y[test])
-
-[ Info: Training Machine{DecisionTreeClassifier} @ 9…45.
-Machine{DecisionTreeClassifier} @ 9…45
-
-0.044444444444444446
+```@repl doda
+train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
+fit!(tree, rows=train);
+yhat = predict(tree, X[test,:]);
+yhat[3:5]
+cross_entropy(yhat, y[test]) |> mean
 ```
 
-Or, in one line:
+Notice that `yhat` is a vector of `Distribution` objects (because
+DecisionTreeClassifier makes probabilistic predictions). The methods
+of the [Distributions](https://github.com/JuliaStats/Distributions.jl)
+package can be applied to such distributions:
 
-```julia
-julia> evaluate!(tree, resampling=Holdout(fraction_train=0.7, shuffle=true), measure=misclassification_rate)
-0.08888888888888889
+```@repl doda
+broadcast(pdf, yhat[3:5], "virginica") # predicted probabilities of virginica
+mode.(yhat[3:5])
 ```
 
+One can explicitly get modes by using `predict_mode` instead of `predict`:
+
+```@repl doda
+predict_mode(tree, rows=test[3:5])
+```
+
+Machines have an internal state which allows them to avoid redundant
+calculations when retrained, in certain conditions - for example when
+increasing the number of trees in a random forest, or the number of
+epochs in a neural network. The machine building syntax also
+anticaptes a more general syntax for composing multiple models, as
+explained in [Learning Networks](learning_networks.md).
+
+There is a version of `evaluate` for machines as well as models:
+
+```@repl doda
+evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
+                measure=cross_entropy,
+                verbosity=0)
+```
 Changing a hyperparameter and re-evaluating:
 
-```julia
-julia> tree_model.max_depth = 3
-julia> evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true), measure=misclassification_rate)
-0.06666666666666667
+```@repl doda
+tree_model.max_depth = 3
+evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
+          measure=cross_entropy,
+          verbosity=0)
 ```
 
 ### Next steps
@@ -123,9 +146,6 @@ In particular, `DataFrame`, `JuliaDB.IndexedTable` and
 formats: *column tables* (named tuples of equal length vectors) and
 *row tables* (vectors of named tuples sharing the same
 keys).
-
-> Certain `JuliaDB.NDSparse` tables can be used for sparse data, but
-> this is experimental and undocumented.
 
 **Univariate input.** For models which handle only univariate inputs
 (`input_is_multivariate(model)=false`) `X` cannot be a table but is

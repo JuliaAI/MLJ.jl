@@ -69,7 +69,7 @@ generalization error, feature importances); and they cache information
 allowing the fit-result to be updated without repeating unnecessary
 information.
 
-Trainable models are trained by calls to a `fit` method which may be
+Machines are trained by calls to a `fit` method which may be
 passed an optional argument specifying the rows of data to be used in
 training.
 
