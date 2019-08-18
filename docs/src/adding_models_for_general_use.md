@@ -417,7 +417,7 @@ follows:
 
 ```julia
 julia> d = MLJBase.UnivariateFinite([yes, no], [0.2, 0.8])
-UnivariateFinite{CategoricalValue{Symbol,UInt32},Float64}(Dict(:yes=>0.2,:maybe=>0.0,:no=>0.8))
+UnivariateFinite(yes=>0.2, :maybe=>0.0, :no=>0.8)
 
 julia> pdf(d, yes)
 0.2

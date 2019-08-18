@@ -456,7 +456,7 @@ W()
     
 ### The learning network API
 
-Three types are part of learning networks: `Source`, `Node` and
+Three julia types are part of learning networks: `Source`, `Node` and
 `NodalMachine`. A `NodalMachine` is returned by the `machine`
 constructor when given nodal arguments instead of concrete data.
 
@@ -465,6 +465,17 @@ The definitions of `Node` and `NodalMachine` are coupled because every
 arguments* specified in the constructor) and every `Node` must specify
 a `NodalMachine`, unless it is static (see below).
 
+Formally, a learning network defines *two* labeled directed acyclic
+graphs (DAG's) whose nodes are `Node` or `Source` objects, and whose
+labels are `NodalMachine` objects. We obtain the first DAG from
+directed edges of the form $N1 -> N2$ whenever $N1$ is an *argument*
+of $N2$ (see below). Only this DAG is relevant when calling a node, as
+discussed in examples above and below. To form the second DAG
+(relevant when calling or calling `fit!` on a node) one adds edges for
+which $N1$ is *training argument* of the the machine which labels
+$N1$. We call the second, larger DAG, the *complete learning network*
+below (but note only edges of the smaller network are explicitly drawn
+in diagrams, for simplicity).
 
 ### Source nodes
 
@@ -473,7 +484,9 @@ single field, `data`.
 
 ```@docs
 source(X)
+rebind!
 sources
+origins
 ```
 
 ### Nodal machines
