@@ -38,7 +38,7 @@ wens = MLJ.WrappedEnsemble(atom, ensemble)
 
 # target is :probabilistic :multiclass false:
 atom = ConstantClassifier()
-L = ['a', 'b', 'j']
+L = categorical(['a', 'b', 'j'])
 d1 = UnivariateFinite(L, [0.1, 0.2, 0.7])
 d2 = UnivariateFinite(L, [0.2, 0.3, 0.5])
 ensemble = [d2,  d1, d2, d2]

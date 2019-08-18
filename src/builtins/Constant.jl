@@ -42,7 +42,7 @@ end
 
 function MLJBase.fit(model::ConstantRegressor{D}, verbosity::Int, X, y) where D
     fitresult = Distributions.fit(D, y)
-    verbosity < 1 || @info "Fitted a constant probability distribution, $fitresult."
+
     cache = nothing
     report = NamedTuple()
     return fitresult, cache, report
@@ -71,7 +71,6 @@ struct DeterministicConstantRegressor <: MLJBase.Deterministic end
 
 function MLJBase.fit(model::DeterministicConstantRegressor, verbosity::Int, X, y)
     fitresult = mean(y)
-    verbosity < 1 || @info "mean = $fitresult."
     cache = nothing
     report = NamedTuple
     return fitresult, cache, report
@@ -108,7 +107,6 @@ function MLJBase.fit(model::ConstantClassifier,
 
     fitresult = Distributions.fit(MLJBase.UnivariateFinite, y)
 
-    verbosity < 1 || @info "probabilities: \n$(fitresult.prob_given_level)"
     cache = nothing
     report = NamedTuple
 
@@ -121,17 +119,6 @@ MLJBase.fitted_params(::ConstantClassifier, fitresult) = (target_distribution=fi
 function MLJBase.predict(model::ConstantClassifier, fitresult, Xnew)
     return fill(fitresult, nrows(Xnew))
 end
-
-# function MLJBase.predict_mode(model::ConstantClassifier, fitresult, Xnew)
-#     m = mode(fitresult)
-#     levels = fitresult.prob_given_level |> keys |> collect
-#     N = nrows(Xnew)    
-    
-#     # to get a categorical array with all the original levels we append the 
-#     # distribution levels to the prediction vector and truncate afterwards:
-#     yhat = vcat(fill(m, N), levels) |> categorical
-#     return yhat[1:N]
-# end
 
 # metadata:
 MLJBase.load_path(::Type{<:ConstantClassifier}) = "MLJ.ConstantClassifier"
@@ -154,7 +141,6 @@ function MLJBase.fit(model::DeterministicConstantClassifier,
 
     fitresult = mode(skipmissing(y)|>collect) # a CategoricalValue or CategoricalString
 
-    verbosity < 1 || @info "mode = $fitresult"
     cache = nothing
     report = NamedTuple()
 

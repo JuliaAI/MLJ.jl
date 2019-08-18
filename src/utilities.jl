@@ -210,8 +210,8 @@ function pretty_table(X; showtypes=true, alignment=:l, kwargs...)
     names = schema(X).names |> collect
     if showtypes
         types = schema(X).types |> collect
-#        scitypes = schema(X).scitypes |> collect
-        header = hcat(names, types) |> permutedims
+        scitypes = schema(X).scitypes |> collect
+        header = hcat(names, types, scitypes) |> permutedims
     else
         header  = names
     end

@@ -4,12 +4,9 @@ module TestTasks
 using Test
 using MLJ
 using Random
-using CategoricalArrays
 
-# shuffle!(::SupervisedTask):
 X=(x=10:10:44, y=1:4, z=collect("abcd"))
-task = @test_logs((:warn, r"An Unknown"), (:info, r"is_probabilistic = true"),
-                  SupervisedTask(data=X, target=:y, is_probabilistic=true))
+task = SupervisedTask(data=X, target=:y, is_probabilistic=true)
 
 @testset "Shuffling" begin
     task0=deepcopy(task)
@@ -55,7 +52,8 @@ end
     df = (x=10:10:44, y=1:4, z=collect("abcd"), w=[1.0, 3.0, missing])
     types = Dict(:x => Continuous, :z => Multiclass, :w => Count)
     task = @test_logs((:warn, r"Missing values encountered"), (:info, r"\n"),
-                       supervised(data=df, types=types, target=:y, ignore=:y, is_probabilistic=false))
+                      supervised(data=df, types=types,
+                                 target=:y, ignore=:y, is_probabilistic=false))
     @test scitype_union(task.X.x) <: Continuous
     @test scitype_union(task.X.w) === Union{Count, Missing}
     @test scitype_union(task.y) <: Count

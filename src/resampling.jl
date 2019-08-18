@@ -182,7 +182,7 @@ function _check_measure(model, measure, y, operation, override)
 
     override && (return nothing)
 
-    T = scitype_union(y) #-# scitype(y)
+    T = scitype(y)
 
     T == Unknown && (return nothing)
     target_scitype(measure) == Unknown && (return nothing)
@@ -459,4 +459,11 @@ function MLJBase.update(resampler::Resampler{Holdout},
 
 end
 
+MLJBase.input_scitype(::Type{<:Resampler{S,M}}) where {S,M} = MLJBase.input_scitype(M)
+MLJBase.target_scitype(::Type{<:Resampler{S,M}}) where {S,M} = MLJBase.target_scitype(M)
+
+
+## EVALUATE FOR MODEL + DATA
+
 MLJBase.evaluate(model::Resampler, fitresult) = fitresult
+

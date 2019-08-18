@@ -73,7 +73,7 @@ MLJBase.package_name(::Type{<:FeatureSelector}) = "MLJ"
 MLJBase.package_uuid(::Type{<:FeatureSelector}) = ""
 MLJBase.is_pure_julia(::Type{<:FeatureSelector}) = true
 MLJBase.input_scitype(::Type{<:FeatureSelector}) = Table(Scientific) # anything goes
-MLJBase.ouput_scitype(::Type{<:FeatureSelector}) = Table(Scientific) 
+MLJBase.output_scitype(::Type{<:FeatureSelector}) = Table(Scientific) 
 
 
 ## UNIVARIATE STANDARDIZATION
@@ -421,10 +421,12 @@ function fit(transformer::OneHotEncoder, verbosity::Int, X)
     allowed_scitypes =
         transformer.ordered_factor == true ? Finite : Multiclass
 
+    col_scitypes = schema(X).scitypes
+
     for j in eachindex(all_features)
         ftr = all_features[j]
         col = MLJBase.selectcols(X,j)
-        T = scitype_union(col)
+        T = col_scitypes[j]
         if T <: allowed_scitypes && ftr in specified_features
             ref_name_pairs_given_feature[ftr] = Pair{<:Unsigned,Symbol}[]
             shift = transformer.drop_last ? 1 : 0

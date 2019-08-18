@@ -30,11 +30,11 @@ function machine(model::M, args...) where M <: Model
             error("Use machine(model, X, y) for a supervised model. ")
         X, y = args
         scitype(X) <: input_scitype(model) ||
-            @warn "The scitype of of X, in machine(model, X, y), " *
-                  "should be a subtype of input_scitype(model)=$(input_scitype(model)). "
+            @warn "The scitype of X, in machine(model, X, y), " *
+            "should be a subtype of input_scitype(model)=$(input_scitype(model)). "
         scitype(y) <: target_scitype(model) ||
             @warn "The scitype of y, in machine(model, X, y), " *
-                  "should be a subtype of target_scitype(model)=$(target_scitype(model)). "
+            "should be a subtype of target_scitype(model)=$(target_scitype(model)). "
     else # M <: Unsupervised
         length(args) == 1 ||
             error("Wrong number of arguments. " *
@@ -42,7 +42,7 @@ function machine(model::M, args...) where M <: Model
         X = args[1]
         scitype(X) <: input_scitype(model) ||
             @warn "The scitype of X, in machine(model, X), should be a " *
-                  "subtype of input_scitype(model)=$(input_scitype(model)). "
+            "subtype of input_scitype(model)=$(input_scitype(model)). "
     end
     return Machine(model, args...)
 end

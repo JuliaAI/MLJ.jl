@@ -2,12 +2,12 @@
 
 function Base.getindex(task::SupervisedTask, r)
     X = selectrows(task.X, r)
-    y = task.y[r]
+    y = selectrows(task.y, r)
     is_probabilistic = task.is_probabilistic
-    input_scitypes = schema(X).scitypes
+    input_scitypes =  NamedTuple{schema(X).names}(schema(X).scitypes)
     target = task.target
-    input_scitype = Union{input_scitypes...}
-    target_scitype = scitype_union(y)
+    input_scitype = scitype(X)
+    target_scitype = scitype(y)
     return SupervisedTask(X,
                           y,
                           is_probabilistic,

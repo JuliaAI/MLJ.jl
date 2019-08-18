@@ -35,20 +35,21 @@ export pdf, mode, median, mean, shuffle!, categorical, shuffle, levels, levels!
 
 # reexport from MLJBase and ScientificTypes:
 export nrows, nfeatures, info,
-        SupervisedTask, UnsupervisedTask, MLJTask,
-        Deterministic, Probabilistic, Unsupervised, Supervised,
-        DeterministicNetwork, ProbabilisticNetwork,
-        Found, Continuous, Finite, Infinite,
-        OrderedFactor, Unknown,
-        Count, Multiclass, Binary, Scientific,
-        scitype, scitype_union, schema,
-        predict, predict_mean, predict_median, predict_mode,
-        transform, inverse_transform, se, evaluate, fitted_params,
-        @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
-        partition, X_and_y,
-        load_boston, load_ames, load_iris, load_reduced_ames,
-        load_crabs, datanow,
-        features, X_and_y
+    selectrows, selectcols,
+    SupervisedTask, UnsupervisedTask, MLJTask,
+    Deterministic, Probabilistic, Unsupervised, Supervised,
+    DeterministicNetwork, ProbabilisticNetwork,
+    Found, Continuous, Finite, Infinite,
+    OrderedFactor, Unknown,
+    Count, Multiclass, Binary, Scientific,
+    scitype, scitype_union, schema,
+    predict, predict_mean, predict_median, predict_mode,
+    transform, inverse_transform, se, evaluate, fitted_params,
+    @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
+    partition, X_and_y,
+    load_boston, load_ames, load_iris, load_reduced_ames,
+    load_crabs, datanow,
+    features, X_and_y
 
 using MLJBase
 # to be extended:
@@ -67,7 +68,8 @@ using ProgressMeter
 import Tables
 import PrettyTables
 import Random
-using ScientficTypes
+using ScientificTypes
+import ScientificTypes
 
 # convenience packages
 using DocStringExtensions: SIGNATURES, TYPEDEF
