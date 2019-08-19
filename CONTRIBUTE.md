@@ -6,7 +6,7 @@ channel](https://slackinvite.julialang.org), #MLJ.
 
 
 - [List of presently implemented
-  models](Models.toml)
+  models](src/Registry/Models.toml)
   excluding built-in models. For full list, do `models()` in MLJ.
 
 - [Enhancement requests](https://github.com/alan-turing-institute/MLJ.jl/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3A%22enhancement%22)

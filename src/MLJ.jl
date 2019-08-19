@@ -60,6 +60,7 @@ import MLJBase: fit, update, clean!,
 
 using Requires
 import Pkg.TOML
+using OrderedCollections
 using  CategoricalArrays
 import Distributions: pdf, mode
 import Distributions
@@ -121,7 +122,7 @@ include("loading.jl") # model metadata processing
 function __init__()
     @info "Loading model metadata"
     global metadata_file = joinpath(srcdir, "registry", "Metadata.toml")
-    global METADATA = TOML.parsefile(metadata_file)
+    global METADATA = LittleDict(TOML.parsefile(metadata_file))
     @require(LossFunctions="30fc2ffe-d236-52d8-8643-a9d8f7c094a7",
              include("loss_functions_interface.jl"))
 end

@@ -13,8 +13,8 @@ ScikitLearn = "3646fa90-6ef7-5e7e-9f22-8aca16db6324"
 XGBoost = "009559a3-9522-5dbb-924b-0b6ed2b22bb9"
 
 [compat]
-MLJBase = "0.2.0"
-MLJModels = "0.2.0"
+MLJBase = "0.4.0"
+MLJModels = "0.3.0"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

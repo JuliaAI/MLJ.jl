@@ -38,7 +38,7 @@ scientific programming language, [Julia](https://julialang.org).
 The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html).
 
 A list of models in external packages that can be used with MLJ:
-[MLJRegistry](https://github.com/alan-turing-institute/MLJ.jl/blob/master/src/registry/Models.toml)
+[Models.toml](src/Registry/Models.toml)
 
 [MLJ Cheatsheet](docs/src/mlj_cheatsheet.md)
 
