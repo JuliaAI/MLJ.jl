@@ -456,7 +456,7 @@ W()
     
 ### The learning network API
 
-Three juliia types are part of learning networks: `Source`, `Node` and
+Three julia types are part of learning networks: `Source`, `Node` and
 `NodalMachine`. A `NodalMachine` is returned by the `machine`
 constructor when given nodal arguments instead of concrete data.
 
@@ -484,6 +484,7 @@ single field, `data`.
 
 ```@docs
 source(X)
+rebind!
 sources
 origins
 rebind!
