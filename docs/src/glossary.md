@@ -43,10 +43,10 @@ or the rotation and projection matrices of PCA reduction scheme.
 Data-manipulating operations (methods) parameterized by some
 fit-result. For supervised learners, the `predict`, `predict_mean`,
 `predict_median`, or `predict_mode` methods; for transformers, the
-`transform` or `inverse_transform` method. In some contexts, such an
-operation might be replaced by an ordinary operation (method) that
-does *not* depend on an fit-result, which are then then called
-*static* operations for clarity. An operation that is not static is
+`transform` or `inverse_transform` method. An operation may also
+refert to an ordinary data-manipulating method that does *not* depend
+on a fit-result (e.g., a broadcasted logarithm) which is then called
+*static* operation for clarity. An operation that is not static is
 *dynamic*.
 
 
@@ -110,7 +110,7 @@ Essentially a nodal machine wrapped in an associated operation
    
 (4) Metadata recording the dependencies of the object's machine, and
 the dependecies on other nodal machines implied by its
-arguments.
+arguments, and the training arguments of its nodel machine.
 
 
 #### learning network 

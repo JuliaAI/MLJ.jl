@@ -1,8 +1,11 @@
 # Getting Started
 
-### [Installation instructions](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md)
+#### [Installation instructions](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md)
 
-### [Glossary](glossary.md)
+#### [Cheatsheet](mlj_cheatsheet.md)
+
+#### [Glossary](glossary.md)
+
 
 ### Plug-and-play model evaluation
 
@@ -87,7 +90,7 @@ Machines have an internal state which allows them to avoid redundant
 calculations when retrained, in certain conditions - for example when
 increasing the number of trees in a random forest, or the number of
 epochs in a neural network. The machine building syntax also
-anticaptes a more general syntax for composing multiple models, as
+anticipates a more general syntax for composing multiple models, as
 explained in [Learning Networks](learning_networks.md).
 
 There is a version of `evaluate` for machines as well as models:
@@ -136,108 +139,116 @@ machine(model::Supervised, X, y)
 machine(model::Unsupervised, X)
 ```
 
-**Multivariate input.** The input `X` in the above machine
-constructors can be any table, where *table* means any data type
-supporting the [Tables.jl](https://github.com/JuliaData/Tables.jl)
-interface.
+Each supervised model in MLJ declares the permitted *scientific type*
+of the inputs `X` and targets `y` that can be bound to it in the first
+constructor above, rather than specifying specific machine types (such
+as `Array{Float32, 2}`). Similar remarks apply to the input `X` of an
+unsupervised model. Scientific types are julia types defined in the
+package
+[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl),
+which also defines the convention used here (and there called *mlj*)
+for assigning a specific scientific type (interpretation) to each
+julia object (see the `scitype` examples below).
 
-In particular, `DataFrame`, `JuliaDB.IndexedTable` and
-`TypedTables.Table` objects are supported, as are two Julia native
-formats: *column tables* (named tuples of equal length vectors) and
-*row tables* (vectors of named tuples sharing the same
-keys).
+The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
+`OrderedFactor{N}` and `Count`. However, containers also have a
+scientific type.
 
-**Univariate input.** For models which handle only univariate inputs
-(`input_is_multivariate(model)=false`) `X` cannot be a table but is
-expected to be some `AbstractVector` type.
 
-**Targets.** The target `y` in the first constructor above must be an
-`AbstractVector`. A multivariate target `y` will be a vector of
+![](scitypes.png)
+
+```@repl doda
+scitype(4.6)
+scitype(42)
+x1 = categorical(["yes", "no", "yes", "maybe"]);
+scitype(x1)
+X = (x1=x1, x2=rand(4), x3=rand(4))  # a "column table"
+scitype(X)
+```
+
+#### Tabular data
+
+All data containers compatible with the
+[Tables.jl](https://github.com/JuliaData/Tables.jl) interface (which
+includes all source formats listed
+[here](https://github.com/queryverse/IterableTables.jl)) have the
+scientific type `Table{K}`, where `K` depends on the scientific types
+of the columns, which can be individually inspected using `schema`:
+
+```@repl doda
+schema(X)
+```
+
+*Figure 1. Part of the scientific type heirarchy in* ScientificTypes.jl.
+
+
+#### Inputs
+
+Since an MLJ model only specifies the scientific type of data, if that
+type is `Table` - which is the case for the majority of MLJ models -
+then any Tables.jl format is permitted. However, the Tables.jl API
+excludes matrices. If `Xmatrix` is a matrix, convert it to a column
+table using `X = MLJ.table(Xmatrix)`.
+
+Specifically, the requirement for an arbitrary model's input is `scitype(X)
+<: input_scitype(model)`.
+
+
+#### Targets
+
+The target `y` expected by MLJ models is generally an
+`AbstractVector`. A multivariate target `y` will generally be a vector of
 *tuples*. The tuples need not have uniform length, so some forms of
 sequence prediction are supported. Only the element types of `y`
-matter (the types of `y[j]` for each `j`). Indeed if a machine accepts
-`y` as an argument it will be just as happy with `identity.(y)`.
+matter (the types of `y[j]` for each `j`). 
 
-**Element types.** The types of input and target *elements* has strict
-consequences for MLJ's behaviour. 
+Specifically, the type requirement for a model target is `scitype(y) <:
+target_scitype(model)`.
 
-To articulate MLJ's conventions about data representation, MLJ
-distinguishes between *machine* data types on the one hand (`Float64`,
-`Bool`, `String`, etc) and *scientific data types* on the other,
-represented by new Julia types: `Continuous`, `Count`,
-`Multiclass{N}`, `OrderedFactor{N}` and `Unknown`, with obvious
-interpretations.  These types are organized in a type
-[hierarchy](scitypes.png) rooted in a new abstract type `Found`.
+#### Querying a model for data types 
 
-A *scientific type* is any subtype of
-`Union{Missing,Found}`. Scientific types have no instances. (They are
-used behind the scenes is values for model trait functions.) Such
-types appear, for example, when querying model metadata:
+One can inspect the admissible scientific types of a model's input
+and target. If one has a `Model` instance `model`, one can use
+`scitype(model)`:
 
-```julia
-julia> info("DecisionTreeClassifier")[:target_scitype_union]
+```@repl doda
+tree = DecisionTreeClassifier();
+scitype(tree)
 ```
 
-```julia
-Finite
+If, however, the relevant model code has not been loaded, one can nevertheless extract the scitypes from the model type's MLJ registry entry:
+
+```@repl doda
+info("DecisionTreeClassifier")
 ```
 
-```julia
-subtypes(Finite)
-```
-
-```julia
-2-element Array{Any,1}:
- Multiclass   
- OrderedFactor
-```
-
-This means that the scitype of all elements of `DecisionTreeClassier`
-target must be `Multiclass` or `OrderedFactor`.
-
-To see how MLJ will interpret an object `x` appearing in table or
-vector input `X`, or target vector `y`, call `scitype(x)`. The fallback
-this function is `scitype(::Any) = Unknown`. 
-
-```julia
-julia> (scitype(42), scitype(float(π)), scitype("Julia"))
-```
-
-```julia
-(Count, Continuous, Unknown)
-```
-    
-The table below shows machine types that have scientific types
-different from `Unknown`:
-
-`T`                         |     `scitype(x)` for `x::T`
-----------------------------|:--------------------------------
-`AbstractFloat`             |      `Continuous`
-`Integer`                   |        `Count`
-`CategoricalValue`          | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false` 
-`CategoricalString`         | `Multiclass{N}` where `N = nlevels(x)`, provided `x.pool.ordered == false`
-`CategoricalValue`          | `OrderedFactor{N}` where `N = nlevels(x)`, provided `x.pool.ordered == true` 
-`CategoricalString`         | `OrderedFactor{N}` where `N = nlevels(x)` provided `x.pool.ordered == true`
-`Missing`                   | `Missing`
-
-Here `nlevels(x) = length(levels(x.pool))`.
-
-**Special note on using integers.** According to the above, integers
-cannot be used to represent `Multiclass` or `OrderedFactor` data. These can be represented by an unordered or ordered `CategoricalValue`
-or `CategoricalString` (automatic if they are elements of a
-`CategoricalArray`).
-
-Methods exist to coerce the scientific type of a vector or table (see
-below). [Task](working_with_tasks.md) constructors also allow one to
-force the data being wrapped to have the desired scientific type.
-
-For more about scientific types and their role, see [Adding Models for
-General Use](adding_models_for_general_use.md)
+See also [Working with tasks](working_with_tasks.md) on searching for
+models solving a specified task.
 
 
-```@docs
-coerce
-```
+#### Container element types
+
+Models in MLJ will always apply the *mlj* convention described
+[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
+to decide how to interpret the elements of your container types. Here
+are the key aspects of that convention:
+
+- Any `AbstractFloat` is interpreted as `Continuous`.
+
+- Any `Integer` is interpreted as `Count`. 
+
+- Any `CategoricalValue` or `CategoricalString`, `x`, is interpreted
+  as `Multiclass` or `OrderedFactor`, depending on the value of
+  `x.pool.ordered`.
+  
+- In particular, *integers* (including `Bool`s) *cannot be used to
+  represent categorical data.*
+  
+
+To coerce the scientific type of a vector or table, use the `coerce`
+method (re-exported from [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)).
+
+
 
 
 

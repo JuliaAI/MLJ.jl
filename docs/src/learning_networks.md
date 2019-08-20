@@ -243,10 +243,10 @@ evaluate(wrapped_ridgeI, X, y, resampling=CV(), measure=rms, verbosity=0)
   become the default value for the field `ridge` of the new
   `WrappedRidgeI` struct.
   
-- The tuple `(Xs, ys, yhat)` must always follow the pattern (source
-  node for inputs, source node for target, terminal prediction node),
+- The tuple `(Xs, ys, yhat)` must always follow the pattern (*source
+  node for inputs, source node for target, terminal prediction node*),
   unless this is an unsupervised learning network, in which case the
-  pattern is (soruce node for inputs, terminal transform node).
+  pattern is (*soruce node for inputs, terminal transform node*).
   
 
 #### Method II: 

@@ -12,12 +12,13 @@ using MLJBase
 using MLJ.Transformers
 using MLJ.Constant
 using MLJModels
+using ScientificTypes
 
 #prettyurls to be changed
 makedocs(
     sitename = "MLJ",
     format = Documenter.HTML(),
-    modules = [MLJ, MLJBase, MLJModels, MLJ.Transformers],
+    modules = [MLJ, MLJBase, MLJModels, MLJ.Transformers, ScientificTypes],
     pages = Any["Getting Started"=>"index.md",
                 "Evaluating model performance"=>"evaluating_model_performance.md",
                 "Measures"=> "measures.md",

@@ -113,9 +113,17 @@ include("builtins/Constant.jl")
 include("builtins/KNN.jl")
 include("builtins/ridge.jl") # defines a model for testing only
 
-
 include("loading.jl") # model metadata processing
 
+
+## DEFINE A SCITYPE FOR MODELS AND MEASURES
+
+ScientificTypes.scitype(model::Supervised, ::Val{:mlj}) =
+    (input=input_scitype(model), target=target_scitype(model))
+ScientificTypes.scitype(model::Unsupervised, ::Val{:mlj}) =
+    (input=input_scitype(model), )    
+# ScientificTypes.scitype(measure::Measure) = info(measure)
+    
 
 ## GET THE EXTERNAL MODEL METADATA AND CODE FOR OPTIONAL DEPENDENCIES
 

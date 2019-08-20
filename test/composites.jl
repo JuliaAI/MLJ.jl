@@ -98,6 +98,11 @@ function MLJ.fit(model::WrappedRidge, verbosity::Integer, X, y)
     return fitresults(Xs, ys, yhat)
 end
 
+import MLJBase
+using ScientificTypes
+MLJBase.input_scitype(::Type{<:WrappedRidge}) = Table(Continuous)
+MLJBase.target_scitype(::Type{<:WrappedRidge}) = AbstractVector{<:Continuous}
+
 ridge = FooBarRegressor(lambda=0.1)
 model = WrappedRidge(ridge)
 mach = machine(model, Xin, yin)

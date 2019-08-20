@@ -28,7 +28,7 @@
 
 `scitype(x)` is the scientific type of `x`
  
-`scitypes(X)` is the scitype schema of table `X`
+Use `schema(X)` to get the column scitypes of a table `X`
  
 `coerce(Multiclass, y)` attempts coercion of all elements of `y` into scientific type `Multiclass`
 
@@ -75,6 +75,10 @@ Unsupervised case: `transform(mach, rows=:)` or `inverse_transform(mach, rows)`,
  
 `CV(nfolds=6, parallel=true, shuffle=false)` for cross-validation
 
+or a list of pairs of row indices:
+
+`[(train1, eval1), (train2, eval2), ... (traink, evalk)]` 
+
 
 #### Performance estimation
 
@@ -85,9 +89,9 @@ Unsupervised case: `transform(mach, rows=:)` or `inverse_transform(mach, rows)`,
 
 If `r = range(KNNRegressor(), :K, lower=1, upper = 20, scale=:log)` then `iterator(r, 6) = [1, 2, 3, 6, 11, 20]`
 
-For non-numeric ranges use `r = range(model, :parameter, values=…)`.
+Non-numeric ranges: `r = range(model, :parameter, values=…)`.
 
-For nested ranges, do like `r - range(EnsembleModel(atom=tree), :(atom.max_depth), ...)`
+Nested ranges: Use dot syntax, as in `r = range(EnsembleModel(atom=tree), :(atom.max_depth), ...)`
 
 #### Tuning strategies
 
@@ -119,7 +123,7 @@ If using Plots.jl:
 
 #### Built-in measures
 
-`l1`, `l2, `mav`, `rms`, `rmsl`, `rmslp1`, `rmsp`, `misclassification_rate`, `cross_entropy`
+`l1`, `l2`, `mav`, `rms`, `rmsl`, `rmslp1`, `rmsp`, `misclassification_rate`, `cross_entropy`
 
 
 #### Transformers 
