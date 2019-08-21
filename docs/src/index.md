@@ -151,8 +151,10 @@ for assigning a specific scientific type (interpretation) to each
 julia object (see the `scitype` examples below).
 
 The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
-`OrderedFactor{N}` and `Count`. However, containers also have a
-scientific type.
+`OrderedFactor{N}` and `Count`. Be sure you read [Container element
+types](@ref) below to be guarantee your scalar data is interpreted
+correctly. Most containers also have a scientific
+type.
 
 
 ![](scitypes.png)
@@ -240,6 +242,12 @@ are the key aspects of that convention:
 - Any `CategoricalValue` or `CategoricalString`, `x`, is interpreted
   as `Multiclass` or `OrderedFactor`, depending on the value of
   `x.pool.ordered`.
+  
+- `String`s and `Char`s are *not* interpreted as `Finite`; they have
+  `Unknown` scitype. Coerce vectors of strings or characters to
+  `CategoricalVector`s if they represent `Multiclass` or
+  `OrderedFactor` data.
+  
   
 - In particular, *integers* (including `Bool`s) *cannot be used to
   represent categorical data.*
