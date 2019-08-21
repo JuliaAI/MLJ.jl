@@ -243,10 +243,10 @@ evaluate(wrapped_ridgeI, X, y, resampling=CV(), measure=rms, verbosity=0)
   become the default value for the field `ridge` of the new
   `WrappedRidgeI` struct.
   
-- The tuple `(Xs, ys, yhat)` must always follow the pattern (source
-  node for inputs, source node for target, terminal prediction node),
+- The tuple `(Xs, ys, yhat)` must always follow the pattern (*source
+  node for inputs, source node for target, terminal prediction node*),
   unless this is an unsupervised learning network, in which case the
-  pattern is (soruce node for inputs, terminal transform node).
+  pattern is (*soruce node for inputs, terminal transform node*).
   
 
 #### Method II: 
@@ -456,7 +456,7 @@ W()
     
 ### The learning network API
 
-Three types are part of learning networks: `Source`, `Node` and
+Three julia types are part of learning networks: `Source`, `Node` and
 `NodalMachine`. A `NodalMachine` is returned by the `machine`
 constructor when given nodal arguments instead of concrete data.
 
@@ -465,6 +465,17 @@ The definitions of `Node` and `NodalMachine` are coupled because every
 arguments* specified in the constructor) and every `Node` must specify
 a `NodalMachine`, unless it is static (see below).
 
+Formally, a learning network defines *two* labeled directed acyclic
+graphs (DAG's) whose nodes are `Node` or `Source` objects, and whose
+labels are `NodalMachine` objects. We obtain the first DAG from
+directed edges of the form $N1 -> N2$ whenever $N1$ is an *argument*
+of $N2$ (see below). Only this DAG is relevant when calling a node, as
+discussed in examples above and below. To form the second DAG
+(relevant when calling or calling `fit!` on a node) one adds edges for
+which $N1$ is *training argument* of the the machine which labels
+$N1$. We call the second, larger DAG, the *complete learning network*
+below (but note only edges of the smaller network are explicitly drawn
+in diagrams, for simplicity).
 
 ### Source nodes
 
@@ -473,7 +484,9 @@ single field, `data`.
 
 ```@docs
 source(X)
+rebind!
 sources
+origins
 ```
 
 ### Nodal machines
@@ -486,10 +499,6 @@ The key components of a `NodalMachine` object are:
   training data on calls to `fit!`.
 
 - A *fit-result*, for storing the outcomes of calls to `fit!`.
-
-- A dependency *tape* (a vector or DAG) containing elements of type
-  `NodalMachine`, obtained by merging the tapes of all training
-  arguments.
 
 A nodal machine is trained in the same way as a regular machine with
 one difference: Instead of training the model on the wrapped data
@@ -512,9 +521,9 @@ The key components of a `Node` are:
 - Upstream connections to other nodes (including source nodes)
   specified by *arguments* (one for each argument of the operation).
    
-- A dependency *tape*, obtained by merging the the tapes of all
-  arguments (nodal machines) and adding the present node's nodal
-  machine.
+- A dependency *tape*, listing of all upstream nodes in the complete
+  learning network, with an order consistent with the learning network
+  as a DAG. 
 
 ```@docs
 node

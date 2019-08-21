@@ -20,7 +20,7 @@ MLJBase.info(measure::SupervisedLoss) =
 ## DISTANCE BASED LOSS FUNCTION
 
 prediction_type(measure::DistanceLoss) = :deterministic
-target_scitype(measure::DistanceLoss) = Continuous
+target_scitype(measure::DistanceLoss) = AbstractArray{<:Continuous}
 
 value(measure::DistanceLoss, yhat, X, y, ::Nothing, ::Val{false}, ::Val{true}) =
     measure(yhat, y)
@@ -31,7 +31,7 @@ value(measure::DistanceLoss, yhat, X, y, w, ::Val{false}, ::Val{true}) =
 ## MARGIN BASED LOSS FUNCTIONS
 
 prediction_type(measure::MarginLoss) = :probabilistic
-target_scitype(measure::MarginLoss) = Binary
+target_scitype(measure::MarginLoss) = AbstractArray{<:Binary}
 
 # convert a Binary vector into vector of +1 or -1 values (for testing
 # only):

@@ -1,15 +1,14 @@
-## TRAITS FOR SCORES AND LOSS FUNCTIONS
+## TRAITS FOR MEASURES
 
-target_scitype(measure) = Unknown
-prediction_type(measure) = :unkown # other options are :probabilistic, :deterministic, or :interval
+# to be extended from MLJBase:
+import MLJBase.target_scitype    # fallback value = Unknown
+import MLJBase.supports_weights  # fallback value = false
+
+# new:
+prediction_type(measure) = :unknown # other options are :probabilistic, :deterministic, or :interval
 orientation(measure) = :loss  # other options are :score, :other
 reports_each_observation(measure) = false
 is_feature_dependent(measure) = false
-supports_weights(measure) = false
-
-
-# Note: target_scitype and supports_weights already defined in
-# MLJBase, but only for <:Model
 
 
 ## EVALUATION 
@@ -57,7 +56,7 @@ function check_dimensions(ŷ::AbstractVector, y::AbstractVector)
 end
 
 function check_pools(ŷ, y)
-              y[1].pool.index == levels(ŷ[1])[1].pool.index ||
+              y[1].pool.index == classes(ŷ[1])[1].pool.index ||
               error("Conflicting categorical pools found "*
                     "in observations and predictions. ")
     return nothing
@@ -96,11 +95,13 @@ Mean absolute error (also known as MAE).
 
 ``\\text{MAV} =  n^{-1}∑ᵢ|yᵢ-ŷᵢ|`` or ``\\text{MAV} =  ∑ᵢwᵢ|yᵢ-ŷᵢ|/∑ᵢwᵢ``
 
+For more information, run `info(mav)`.
+
 """
 mav = MAV()
 measurename(::MAV) = "mav"
 
-target_scitype(::MAV) = Continuous
+target_scitype(::MAV) = Union{AbstractVector{Continuous},AbstractVector{Count}}
 prediction_type(::MAV) = :deterministic
 orientation(::MAV) = :loss
 reports_each_observation(::MAV) = false
@@ -145,11 +146,14 @@ struct RMS <: Measure end
 Root mean squared error:
 
 ``\\text{RMS} = \\sqrt{n^{-1}∑ᵢ|yᵢ-ŷᵢ|^2}`` or ``\\text{RMS} = \\sqrt{\\frac{∑ᵢwᵢ|yᵢ-ŷᵢ|^2}{∑ᵢwᵢ}}``
+
+For more information, run `info(rms)`.
+
 """
 rms = RMS()
 measurename(::RMS) = "rms"
 
-target_scitype(::RMS) = Continuous #AbstractVector{Continuous}
+target_scitype(::RMS) = Union{AbstractVector{Continuous},AbstractVector{Count}}
 prediction_type(::RMS) = :deterministic
 orientation(::RMS) = :loss
 reports_each_observation(::RMS) = false
@@ -183,11 +187,13 @@ struct L2 <: Measure end
 
 L2 per-observation loss.
 
+For more information, run `info(l2)`.
+
 """
 l2 = L2()
 measurename(::L2) = "l2"
 
-target_scitype(::L2) = Continuous # AbstractVector{Continuous}
+target_scitype(::L2) = Union{AbstractVector{Continuous},AbstractVector{Count}}
 prediction_type(::L2) = :deterministic
 orientation(::L2) = :loss
 reports_each_observation(::L2) = true
@@ -209,11 +215,13 @@ struct L1 <: Measure end
 
 L1 per-observation loss.
 
+For more information, run `info(l1)`.
+
 """
 l1 = L1()
 measurename(::L1) = "l1"
 
-target_scitype(::L1) = Continuous # AbstractVector{Continuous}
+target_scitype(::L1) = Union{AbstractVector{Continuous},AbstractVector{Count}}
 prediction_type(::L1) = :deterministic
 orientation(::L1) = :loss
 reports_each_observation(::L1) = true
@@ -236,12 +244,15 @@ Root mean squared logarithmic error:
 
 ``\\text{RMSL} = n^{-1}∑ᵢ\\log\\left({yᵢ \\over ŷᵢ}\\right)``
 
+For more information, run `info(rmsl)`.
+
 See also [`rmslp1`](@ref).
+
 """
 rmsl = RMSL()
 measurename(::RMSL) = "rmsl"
 
-target_scitype(::RMSL) = Continuous # AbstractVector{Continuous}
+target_scitype(::RMSL) = Union{AbstractVector{Continuous},AbstractVector{Count}}
 prediction_type(::RMSL) = :deterministic
 orientation(::RMSL) = :loss
 reports_each_observation(::RMSL) = false
@@ -267,12 +278,14 @@ Root mean squared logarithmic error with an offset of 1:
 
 ``\\text{RMSLP1} = n^{-1}∑ᵢ\\log\\left({yᵢ + 1 \\over ŷᵢ + 1}\\right)``
 
+For more information, run `info(rmslp1)`.
+
 See also [`rmsl`](@ref).
 """
 rmslp1 = RMSLP1()
 measurename(::RMSLP1) = "rmslp1"
 
-target_scitype(::RMSLP1) = Continuous # AbstractVector{Continuous}
+target_scitype(::RMSLP1) = Union{AbstractVector{Continuous},AbstractVector{Count}}
 prediction_type(::RMSLP1) = :deterministic
 orientation(::RMSLP1) = :loss
 reports_each_observation(::RMSLP1) = false
@@ -297,12 +310,16 @@ Root mean squared percentage loss:
 
 ``\\text{RMSP} = m^{-1}∑ᵢ \\left({yᵢ-ŷᵢ \\over yᵢ}\\right)^2``
 
-where the sum is over indices such that `yᵢ≂̸0` and `m` is the number of such indices.
+where the sum is over indices such that `yᵢ≂̸0` and `m` is the number
+of such indices.
+
+For more information, run `info(rmsp)`.
+
 """
 rmsp = RMSP()
 measurename(::RMSP) = "rmsp"
 
-target_scitype(::RMSP) = Continuous #AbstractVector{Continuous}
+target_scitype(::RMSP) = Union{AbstractVector{Continuous},AbstractVector{Count}}
 prediction_type(::RMSP) = :deterministic
 orientation(::RMSP) = :loss
 reports_each_observation(::RMSP) = false
@@ -327,10 +344,22 @@ end
 ## CLASSIFICATION METRICS (FOR DETERMINISTIC PREDICTIONS)
 
 struct MisclassificationRate <: Measure end
+
+"""
+    misclassification_rate(ŷ, y)
+    misclassification_rate(ŷ, y, w)
+
+Returns the rate of misclassification of the (point) predictions `ŷ`,
+given true observations `y`, optionally weighted by the weights
+`w`. All three arguments must be abstract vectors of the same length.
+
+For more information, run `info(misclassification_rate)`.
+
+"""
 misclassification_rate = MisclassificationRate()
 measurename(::MisclassificationRate) = "misclassification_rate"
 
-target_scitype(::MisclassificationRate) = Finite # AbstractVector{<:Finite}
+target_scitype(::MisclassificationRate) = AbstractVector{<:Finite}
 prediction_type(::MisclassificationRate) = :deterministic
 orientation(::MisclassificationRate) = :loss
 reports_each_observation(::MisclassificationRate) = false
@@ -344,18 +373,30 @@ supports_weights(::MisclassificationRate) = true
 ## CLASSIFICATION METRICS (FOR PROBABILISTIC PREDICTIONS)
 
 struct CrossEntropy <: Measure end
+
+"""
+    cross_entropy(ŷ, y::AbstractVector{<:Finite})
+
+Given an abstract vector of `UnivariateFinite` distributions `ŷ` (ie, of 
+probabilistic predictions) and an abstract vector of true observations
+`y`, return the negative log-probability that each observation would
+occur, according to the corresponding probabilistic prediction.
+
+For more information, run `info(cross_entropy)`.
+
+"""
 cross_entropy = CrossEntropy()
 measurename(::CrossEntropy) = "cross_entropy"
 
-target_scitype(::CrossEntropy) = Finite # AbstractVector{<:Finite}
+target_scitype(::CrossEntropy) = AbstractVector{<:Finite}
 prediction_type(::CrossEntropy) = :probabilistic
 orientation(::CrossEntropy) = :loss
 reports_each_observation(::CrossEntropy) = true
 is_feature_dependent(::CrossEntropy) = false
 supports_weights(::CrossEntropy) = false
 
-# for single pattern:
-_cross_entropy(d::UnivariateFinite, y) = -log(d.prob_given_level[y])
+# for single observation:
+_cross_entropy(d::UnivariateFinite, y) = -log(pdf(d, y))
 
 function (::CrossEntropy)(ŷ, y)
     check_dimensions(ŷ, y)
@@ -367,12 +408,19 @@ end
 ## DEFAULT MEASURES
 
 default_measure(model::M) where M<:Supervised =
-    default_measure(model, target_scitype_union(M))
+    default_measure(model, target_scitype(M))
 default_measure(model, ::Any) = nothing
-default_measure(model::Deterministic, ::Type{<:Union{Continuous,Count}}) = rms
-# default_measure(model::Probabilistic, ::Type{<:Union{Continuous,Count}}) =
-default_measure(model::Deterministic, ::Type{<:Finite}) =
-    misclassification_rate
-default_measure(model::Probabilistic, ::Type{<:Finite}) = cross_entropy
+default_measure(model::Deterministic,
+                ::Type{<:Union{AbstractVector{Continuous},
+                               AbstractVector{Count}}}) = rms
+# default_measure(model::Probabilistic,
+#                 ::Type{<:Union{AbstractVector{Continuous},
+#                                AbstractVector{Count}}}) = rms
+default_measure(model::Deterministic,
+                ::Type{<:AbstractVector{<:Finite}}) =
+                    misclassification_rate
+default_measure(model::Probabilistic,
+                ::Type{<:AbstractVector{<:Finite}}) =
+                    cross_entropy
 
 

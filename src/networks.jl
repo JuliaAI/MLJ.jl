@@ -21,7 +21,7 @@ end
 (s::Source)(Xnew) = Xnew
 
 """
-$SIGNATURES
+    rebind!(s)
 
 Attach new data `X` to an existing source node `s`.
 """

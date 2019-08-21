@@ -3,6 +3,7 @@
 
 import MLJBase
 using LinearAlgebra
+using ScientificTypes
 
 export FooBarRegressor
 
@@ -52,5 +53,5 @@ MLJBase.load_path(::Type{<:FooBarRegressor}) = "MLJ.FooBarRegressor"
 MLJBase.package_name(::Type{<:FooBarRegressor}) = "MLJ"
 MLJBase.package_uuid(::Type{<:FooBarRegressor}) = ""
 MLJBase.is_pure_julia(::Type{<:FooBarRegressor}) = true
-MLJBase.input_scitype_union(::Type{<:FooBarRegressor}) = MLJBase.Continuous
-MLJBase.target_scitype_union(::Type{<:FooBarRegressor}) = MLJBase.Continuous
+MLJBase.input_scitype(::Type{<:FooBarRegressor}) = Table(Continuous)
+MLJBase.target_scitype(::Type{<:FooBarRegressor}) = AbstractVector{Continuous}

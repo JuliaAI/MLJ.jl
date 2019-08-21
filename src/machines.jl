@@ -26,31 +26,39 @@ Machine(model::M, args...) where M <: Model = Machine{M}(model, args...)
 function machine(model::M, args...) where M <: Model
     # checks on args:
     if M <: Supervised
+
         (length(args) == 2) ||
             error("Use machine(model, X, y) for a supervised model. ")
         X, y = args
-        T = input_is_multivariate(model) ? Union{scitypes(X)...} : scitype_union(X)
-        T <: input_scitype_union(model) ||
-            @warn "The scitypes of elements of X, in machine(model, X, y), " *
-                  "should be a subtype of $(input_scitype_union(model)). "
-        y isa AbstractVector ||
-            @warn "The y, in machine(model, X, y), should be an AbstractVector " *
-                  "(possibly of tuples). "
-        scitype_union(y) <: target_scitype_union(model) ||
-            @warn "The scitype of elements of y, in machine(model, X, y), " *
-                  "should be a subtype of $(target_scitype_union(model)). "
+
+        input_scitype(model) <: Unknown ||
+            scitype(X) <: input_scitype(model) ||
+            @warn "The scitype of `X`, in `machine(model, X, y)` is "*
+        "incompatible with `model`:\n"*
+        "scitype(X) = $(scitype(X))\n"*
+        "input_scitype(model) = $(input_scitype(model)). "
+
+        target_scitype(model) <: Unknown ||
+            scitype(y) <: target_scitype(model) ||
+            @warn "The scitype of `y`, in `machine(model, X, y)` is "*
+        "incompatible with `model`:\n"*
+        "scitype(y) = $(scitype(y))\n"*
+        "target_scitype(model) = $(target_scitype(model)). "
+
     else # M <: Unsupervised
+
         length(args) == 1 ||
             error("Wrong number of arguments. " *
                   "Use machine(model, X) for an unsupervised model.")
         X = args[1]
-        container_type(X) in [:table, :sparse] || args[1] isa AbstractVector ||
-            @warn "The X, in machine(model, X), should be a table, sparse table or AbstractVector. "*
-        "Use MLJ.table(X) to wrap an AbstractMatrix X as a table. "
-        U = input_is_multivariate(model) ? Union{scitypes(X)...} : scitype_union(X)
-        U <: input_scitype_union(model) ||
-            @warn "The scitype of elements of X, in machine(model, X), should be a " *
-                  "subtype of $(input_scitype_union(model)). "
+
+        input_scitype(model) <: Unknown ||
+            scitype(X) <: input_scitype(model) ||
+            @warn "The scitype of `X`, in `machine(model, X)` is "*
+        "incompatible with `model`:\n"*
+        "scitype(X) = $(scitype(X))\n"*
+        "input_scitype(model) = $(input_scitype(model)). "
+        
     end
     return Machine(model, args...)
 end

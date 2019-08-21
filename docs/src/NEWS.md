@@ -6,6 +6,11 @@ Development news for MLJ and its satellite packages,
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
+## MLJBase v0.4.0
+
+[Release notes](https://github.com/alan-turing-institute/MLJBase.jl/releases/tag/v0.4.0)
+
+
 ## MLJBase v0.2.4
 
 - Add ColorImage and GreyImage scitypes

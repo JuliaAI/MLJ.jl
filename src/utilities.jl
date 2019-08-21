@@ -26,19 +26,24 @@ end
 
 ## FOR ENCODING AND DECODING MODEL METADATA
 
+
+# This method needs revisiting when new scitypes are introduced:
 function encode_dic(s)
     if s isa Symbol
         return string(":", s)
     elseif s isa AbstractString
         return string(s)
-    else
-        return string("`", s, "`")
+    else # we have some more complicated object
+        prestring = string("`", s, "`")
+        # hack for objects with gensyms in their string representation:
+        str = replace(prestring, '#'=>'_')
+        return str
     end
 end
 
 encode_dic(v::Vector) = encode_dic.(v)
-function encode_dic(d::Dict)
-    ret = Dict{}()
+function encode_dic(d::AbstractDict)
+    ret = LittleDict{}()
     for (k, v) in d
         ret[encode_dic(k)] = encode_dic(v)
     end
@@ -60,8 +65,8 @@ function decode_dic(s::String)
 end
 
 decode_dic(v::Vector) = decode_dic.(v)
-function decode_dic(d::Dict)
-    ret = Dict()
+function decode_dic(d::AbstractDict)
+    ret = LittleDict()
     for (k, v) in d
         ret[decode_dic(k)] = decode_dic(v)
     end
@@ -70,6 +75,19 @@ end
 
 # the inverse of a multivalued dictionary is a multivalued
 # dictionary:
+function inverse(d::LittleDict{S,Set{T}}) where {S,T}
+    dinv = LittleDict{T,Set{S}}()
+    for key in keys(d)
+        for val in d[key]
+            if val in keys(dinv)
+                push!(dinv[val], key)
+            else
+                dinv[val] = Set([key,])
+            end
+        end
+    end
+    return dinv
+end
 function inverse(d::Dict{S,Set{T}}) where {S,T}
     dinv = Dict{T,Set{S}}()
     for key in keys(d)
@@ -210,8 +228,8 @@ function pretty_table(X; showtypes=true, alignment=:l, kwargs...)
     names = schema(X).names |> collect
     if showtypes
         types = schema(X).types |> collect
-#        scitypes = schema(X).scitypes |> collect
-        header = hcat(names, types) |> permutedims
+        scitypes = schema(X).scitypes |> collect
+        header = hcat(names, types, scitypes) |> permutedims
     else
         header  = names
     end

@@ -16,7 +16,7 @@ export @curve, @pcurve,                               # utilities.jl
         models, localmodels, @load,                   # loading.jl
         KNNRegressor,                                 # builtins/KNN.jl
         @from_network, machines, sources, anonymize!, # composites.jl
-        fitresults                                    # composites.jl
+        rebind!, fitresults                           # composites.jl
 
 # defined in include files "machines.jl and "networks.jl":
 export Machine, NodalMachine, machine, AbstractNode,
@@ -33,22 +33,25 @@ export FeatureSelector,
 # rexport from Random, Statistics, Distributions, CategoricalArrays:
 export pdf, mode, median, mean, shuffle!, categorical, shuffle, levels, levels!
 
-# reexport from MLJBase:
+# reexport from MLJBase and ScientificTypes:
 export nrows, nfeatures, info,
-        SupervisedTask, UnsupervisedTask, MLJTask,
-        Deterministic, Probabilistic, Unsupervised, Supervised,
-        DeterministicNetwork, ProbabilisticNetwork,
-        Found, Continuous, Finite, Infinite,
-        OrderedFactor, Unknown,
-        Count, Multiclass, Binary,
-        scitype, scitype_union, scitypes,
-        predict, predict_mean, predict_median, predict_mode,
-        transform, inverse_transform, se, evaluate, fitted_params,
-        @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
-        partition, X_and_y,
-        load_boston, load_ames, load_iris, load_reduced_ames,
-        load_crabs, datanow,
-        features, X_and_y
+    selectrows, selectcols,
+    SupervisedTask, UnsupervisedTask, MLJTask,
+    Deterministic, Probabilistic, Unsupervised, Supervised,
+    DeterministicNetwork, ProbabilisticNetwork,
+    GrayImage, ColorImage, Image,
+    Found, Continuous, Finite, Infinite,
+    OrderedFactor, Unknown,
+    Count, Multiclass, Binary, Scientific,
+    scitype, scitype_union, schema,
+    target_scitype, input_scitype,
+    predict, predict_mean, predict_median, predict_mode,
+    transform, inverse_transform, se, evaluate, fitted_params,
+    @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
+    partition, X_and_y,
+    load_boston, load_ames, load_iris, load_reduced_ames,
+    load_crabs, datanow,
+    features, X_and_y
 
 using MLJBase
 # to be extended:
@@ -59,6 +62,7 @@ import MLJBase: fit, update, clean!,
 
 using Requires
 import Pkg.TOML
+using OrderedCollections
 using  CategoricalArrays
 import Distributions: pdf, mode
 import Distributions
@@ -67,6 +71,8 @@ using ProgressMeter
 import Tables
 import PrettyTables
 import Random
+using ScientificTypes
+import ScientificTypes
 
 # convenience packages
 using DocStringExtensions: SIGNATURES, TYPEDEF
@@ -109,15 +115,24 @@ include("builtins/Constant.jl")
 include("builtins/KNN.jl")
 include("builtins/ridge.jl") # defines a model for testing only
 
-
 include("loading.jl") # model metadata processing
 
-## GET THE EXTERNAL MODEL METADATA
+
+## DEFINE A SCITYPE FOR MODELS AND MEASURES
+
+ScientificTypes.scitype(model::Supervised, ::Val{:mlj}) =
+    (input=input_scitype(model), target=target_scitype(model))
+ScientificTypes.scitype(model::Unsupervised, ::Val{:mlj}) =
+    (input=input_scitype(model), )    
+# ScientificTypes.scitype(measure::Measure) = info(measure)
+    
+
+## GET THE EXTERNAL MODEL METADATA AND CODE FOR OPTIONAL DEPENDENCIES
 
 function __init__()
     @info "Loading model metadata"
     global metadata_file = joinpath(srcdir, "registry", "Metadata.toml")
-    global METADATA = TOML.parsefile(metadata_file)
+    global METADATA = LittleDict(TOML.parsefile(metadata_file))
     @require(LossFunctions="30fc2ffe-d236-52d8-8643-a9d8f7c094a7",
              include("loss_functions_interface.jl"))
 end

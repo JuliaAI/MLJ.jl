@@ -1,5 +1,8 @@
 # Working with Tasks
 
+*Warning.* The task API described here is likely change soon, with the notion of
+task being not bound to any particular data set.
+
 In MLJ a *task* is a synthesis of three elements: *data*, an
 *interpretation* of that data, and a *learning objective*. Once one has a
 task one is ready to choose learning models.
@@ -11,12 +14,7 @@ quantities. However, the nature of a quantity is not always clear from
 the representation. For example, we might count phone calls using the
 `UInt32` type but also use `UInt32` to represent a categorical
 feature, such as the species of conifers. MLJ mitigates such ambiguity
-by: (i) distinguishing between the machine and *[scientific
-type](index.md)* of scalar data; (ii) disallowing the
-representation of multiple scientific types by the same machine type
-during learning; and (iii) establishing a convention for what
-scientific types a given machine type may represent (see the
-table at the end of [Getting Started](index.md)).
+with the use of scientific types. See [Getting Started](index.md)) for details
 
 Explicitly specifying scientific types during the construction of a
 MLJ task is the user's opportunity to articulate how the supplied data
@@ -60,14 +58,14 @@ first(df, 4)
 ...we can check MLJ's interpretation of that data:
 
 ```@example 1
-scitypes(df)
+schema(df)
 ```
 
 And construct a task by wrapping the data in a learning objective, and
 coercing the data into a form MLJ will correctly interpret. (The middle three
 fields of `df` refer to ages, in months, the last is a flag.):
 
-```julia
+```@example 1
 task = supervised(data=df,
                   target=:Exit,
                   ignore=:Time,
@@ -75,13 +73,7 @@ task = supervised(data=df,
                   types=Dict(:Entry=>Continuous,
                              :Exit=>Continuous,
                              :Cens=>Multiclass))
-scitypes(task.X)
-```
-
-```julia
-(Sex = Multiclass{2},
- Entry = Continuous,
- Cens = Multiclass{2},)
+schema(task.X)
 ```
 
 Shuffle the rows of a task:

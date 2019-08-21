@@ -91,8 +91,6 @@ f(xn)]`, where `x1, x2, ..., xn` are linearly spaced between `lower`
 and `upper`.
 
 
-See also: [`iterator`](@ref).
-
 """
 function Base.range(model, field::Union{Symbol,Expr}; values=nothing,
                     lower=nothing, upper=nothing, scale::D=:linear) where D

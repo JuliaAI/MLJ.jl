@@ -38,7 +38,7 @@ wens = MLJ.WrappedEnsemble(atom, ensemble)
 
 # target is :probabilistic :multiclass false:
 atom = ConstantClassifier()
-L = ['a', 'b', 'j']
+L = categorical(['a', 'b', 'j'])
 d1 = UnivariateFinite(L, [0.1, 0.2, 0.7])
 d2 = UnivariateFinite(L, [0.2, 0.3, 0.5])
 ensemble = [d2,  d1, d2, d2]
@@ -78,7 +78,7 @@ ensemble_model.weights = weights
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 info(ensemble_model)
-@test MLJBase.target_scitype_union(ensemble_model) == MLJBase.target_scitype_union(atom)
+@test MLJBase.target_scitype(ensemble_model) == MLJBase.target_scitype(atom)
 
 # target is :deterministic :continuous false:
 atom = MLJ.DeterministicConstantRegressor()

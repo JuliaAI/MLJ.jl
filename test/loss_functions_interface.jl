@@ -24,7 +24,7 @@ seed!(1234)
     y = categorical(rand(["yes", "no"], N), ordered=true)
     levels!(y, ["no", "yes"])
     no, yes = MLJ.classes(y[1])
-    @test MLJ.pm1([yes, no]) == [+1, -1]
+    @test MLJ.pm1([yes, no]) in [[+1, -1], [-1, +1]]
     ym = MLJ.pm1(y) # observations for raw LossFunctions measure
     p_vec = rand(N) # probabilities of yes
     yhat  = map(p_vec) do p

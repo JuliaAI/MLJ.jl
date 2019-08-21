@@ -3,12 +3,13 @@ module TestMachines
 # using Revise
 using MLJ
 using MLJBase
-using CSV
 using Test
 using Statistics
 
-task = load_boston()
-X, y = task();
+N=50
+X = (a=rand(N), b=rand(N), c=rand(N))
+y = 2*X.a - X.c + 0.05*rand(N)
+
 train, test = partition(eachindex(y), 0.7);
 
 t = Machine(KNNRegressor(K=4), X, y)
@@ -19,11 +20,11 @@ t = Machine(KNNRegressor(K=4), X, y)
 setproperty!(t, :(model.K),  5)
 @test_logs (:info, r"Updating") fit!(t)
 
-predict(t, X[test,:])
-@test rms(predict(t, X[test,:]), y[test]) < std(y)
+predict(t, selectrows(X,test))
+@test rms(predict(t, selectrows(X, test)), y[test]) < std(y)
 
-mach = machine(ConstantRegressor(), task)
-@test_logs (:info, r"Training") (:info, r"Fitted") fit!(mach)
+mach = machine(ConstantRegressor(), X, y)
+@test_logs (:info, r"Training") fit!(mach)
 yhat = predict_mean(mach, X)
 
 n = nrows(X)
