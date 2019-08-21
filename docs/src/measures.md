@@ -94,7 +94,7 @@ dipatched.
 
 The [LossFunctions](https://github.com/JuliaML/LossFunctions.jl)
 package includes "distance loss" functions for `Continuous` targets,
-and "marginal loss" functins for `Binary` target. While the
+and "marginal loss" functins for `Binary` targets. While the
 LossFunctions interface differs from the present one (for, example
 `Binary` observations must be +1 or -1), one can safely pass the loss
 functions defined there to any MLJ algorithm, which re-interprets it

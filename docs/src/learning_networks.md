@@ -487,7 +487,6 @@ source(X)
 rebind!
 sources
 origins
-rebind!
 ```
 
 ### Nodal machines

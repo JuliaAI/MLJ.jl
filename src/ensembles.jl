@@ -44,7 +44,7 @@ function predict(wens::WrappedEnsemble,
     return prediction
 end
 
-function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Deterministic}, ::Type{<:AbstractVector{Continuous}})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Deterministic}, ::Type{<:AbstractVector{<:Continuous}})
     ensemble = wens.ensemble
 
     atom = wens.atom
@@ -83,7 +83,7 @@ function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Probabilistic}, ::
     return predictions
 end
 
-function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Probabilistic}, ::Type{<:AbstractVector{Continuous}})
+function predict(wens::WrappedEnsemble, weights, Xnew, ::Type{Probabilistic}, ::Type{<:AbstractVector{<:Continuous}})
 
     ensemble = wens.ensemble
 
@@ -173,7 +173,7 @@ end
 
 function clean!(model::DeterministicEnsembleModel)
 
-    target_scitype(model.atom) <: Union{AbstractVector{<:Finite}, AbstractVector{Continuous}} ||
+    target_scitype(model.atom) <: Union{AbstractVector{<:Finite}, AbstractVector{<:Continuous}} ||
         error("atom has unsupported scitype $scitype(model.atom). ")
 
     message = ""
@@ -299,7 +299,7 @@ set to a value less than 1.0, or both. The constructor fails if no
 
 Only atomic models supporting targets with scitype
 `AbstractVector{<:Finite}` (univariate classifiers) or
-`AbstractVector{Continuous}` (univariate regressors) are supported.
+`AbstractVector{<:Continuous}` (univariate regressors) are supported.
 
 If `rng` is an integer, then `MersenneTwister(rng)` is the random
 number generator used for bagging. Otherwise some `AbstractRNG` object
@@ -314,7 +314,7 @@ The ensemble model is `Deterministic` or `Probabilistic`, according to
 the corresponding supertype of `atom`. In the case of deterministic
 classifiers (`target_scitype(atom) <: Abstract{<:Finite}`), the
 predictions are majority votes, and for regressors
-(`target_scitype(atom)<: AbstractVector{Continuous}`) they are
+(`target_scitype(atom)<: AbstractVector{<:Continuous}`) they are
 ordinary averages.  Probabilistic predictions are obtained by
 averaging the atomic probability distribution/mass functions; in
 particular, for regressors, the ensemble prediction on each input

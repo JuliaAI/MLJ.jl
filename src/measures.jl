@@ -95,6 +95,8 @@ Mean absolute error (also known as MAE).
 
 ``\\text{MAV} =  n^{-1}∑ᵢ|yᵢ-ŷᵢ|`` or ``\\text{MAV} =  ∑ᵢwᵢ|yᵢ-ŷᵢ|/∑ᵢwᵢ``
 
+For more information, run `info(mav)`.
+
 """
 mav = MAV()
 measurename(::MAV) = "mav"
@@ -144,6 +146,9 @@ struct RMS <: Measure end
 Root mean squared error:
 
 ``\\text{RMS} = \\sqrt{n^{-1}∑ᵢ|yᵢ-ŷᵢ|^2}`` or ``\\text{RMS} = \\sqrt{\\frac{∑ᵢwᵢ|yᵢ-ŷᵢ|^2}{∑ᵢwᵢ}}``
+
+For more information, run `info(rms)`.
+
 """
 rms = RMS()
 measurename(::RMS) = "rms"
@@ -182,6 +187,8 @@ struct L2 <: Measure end
 
 L2 per-observation loss.
 
+For more information, run `info(l2)`.
+
 """
 l2 = L2()
 measurename(::L2) = "l2"
@@ -207,6 +214,8 @@ struct L1 <: Measure end
     l1(ŷ, y, w)
 
 L1 per-observation loss.
+
+For more information, run `info(l1)`.
 
 """
 l1 = L1()
@@ -235,7 +244,10 @@ Root mean squared logarithmic error:
 
 ``\\text{RMSL} = n^{-1}∑ᵢ\\log\\left({yᵢ \\over ŷᵢ}\\right)``
 
+For more information, run `info(rmsl)`.
+
 See also [`rmslp1`](@ref).
+
 """
 rmsl = RMSL()
 measurename(::RMSL) = "rmsl"
@@ -265,6 +277,8 @@ struct RMSLP1 <: Measure end
 Root mean squared logarithmic error with an offset of 1:
 
 ``\\text{RMSLP1} = n^{-1}∑ᵢ\\log\\left({yᵢ + 1 \\over ŷᵢ + 1}\\right)``
+
+For more information, run `info(rmslp1)`.
 
 See also [`rmsl`](@ref).
 """
@@ -296,7 +310,11 @@ Root mean squared percentage loss:
 
 ``\\text{RMSP} = m^{-1}∑ᵢ \\left({yᵢ-ŷᵢ \\over yᵢ}\\right)^2``
 
-where the sum is over indices such that `yᵢ≂̸0` and `m` is the number of such indices.
+where the sum is over indices such that `yᵢ≂̸0` and `m` is the number
+of such indices.
+
+For more information, run `info(rmsp)`.
+
 """
 rmsp = RMSP()
 measurename(::RMSP) = "rmsp"
@@ -326,6 +344,18 @@ end
 ## CLASSIFICATION METRICS (FOR DETERMINISTIC PREDICTIONS)
 
 struct MisclassificationRate <: Measure end
+
+"""
+    misclassification_rate(ŷ, y)
+    misclassification_rate(ŷ, y, w)
+
+Returns the rate of misclassification of the (point) predictions `ŷ`,
+given true observations `y`, optionally weighted by the weights
+`w`. All three arguments must be abstract vectors of the same length.
+
+For more information, run `info(misclassification_rate)`.
+
+"""
 misclassification_rate = MisclassificationRate()
 measurename(::MisclassificationRate) = "misclassification_rate"
 
@@ -343,6 +373,18 @@ supports_weights(::MisclassificationRate) = true
 ## CLASSIFICATION METRICS (FOR PROBABILISTIC PREDICTIONS)
 
 struct CrossEntropy <: Measure end
+
+"""
+    cross_entropy(ŷ, y::AbstractVector{<:Finite})
+
+Given an abstract vector of `UnivariateFinite` distributions `ŷ` (ie, of 
+probabilistic predictions) and an abstract vector of true observations
+`y`, return the negative log-probability that each observation would
+occur, according to the corresponding probabilistic prediction.
+
+For more information, run `info(cross_entropy)`.
+
+"""
 cross_entropy = CrossEntropy()
 measurename(::CrossEntropy) = "cross_entropy"
 

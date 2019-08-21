@@ -150,7 +150,8 @@ ys2 = source(nothing)
 
 # duplicate a network:
 ############################
-yhat2 = replace(yhat, hot=>hot2, knn=>knn2, ys=>source(ys.data))
+yhat2 = @test_logs((:warn, r"^No replacement"),
+           replace(yhat, hot=>hot2, knn=>knn2, ys=>source(ys.data)))
 
 @test_logs((:info, r"^Train.*OneHot"),
            (:info, r"^Spawn"),

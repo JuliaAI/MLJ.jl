@@ -16,7 +16,7 @@ export @curve, @pcurve,                               # utilities.jl
         models, localmodels, @load,                   # loading.jl
         KNNRegressor,                                 # builtins/KNN.jl
         @from_network, machines, sources, anonymize!, # composites.jl
-        fitresults                                    # composites.jl
+        rebind!, fitresults                           # composites.jl
 
 # defined in include files "machines.jl and "networks.jl":
 export Machine, NodalMachine, machine, AbstractNode,
@@ -43,6 +43,7 @@ export nrows, nfeatures, info,
     OrderedFactor, Unknown,
     Count, Multiclass, Binary, Scientific,
     scitype, scitype_union, schema,
+    target_scitype, input_scitype,
     predict, predict_mean, predict_median, predict_mode,
     transform, inverse_transform, se, evaluate, fitted_params,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
