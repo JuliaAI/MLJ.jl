@@ -49,7 +49,7 @@ method, and elsewhere in MLJ, provided it is a function or callable
 object conforming to the above syntactic conventions. By default, a
 custom measure is understood to:
 
-- be a loss function (rather than a score or interval) 
+- be a loss function (rather than a score) 
 
 - report an aggregated value (rather than per-sample evaluations)
 
