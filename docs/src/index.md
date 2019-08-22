@@ -4,8 +4,10 @@
 
 #### [Cheatsheet](mlj_cheatsheet.md)
 
-#### [Glossary](glossary.md)
-
+```@repl doda
+import Random.seed! # hide
+seed!(1234) # hide
+```
 
 ### Plug-and-play model evaluation
 
