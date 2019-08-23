@@ -6,6 +6,7 @@ julia&gt; iris = dataset(&quot;datasets&quot;, &quot;iris&quot;); # a DataFrame<
 julia&gt; y = iris[:, 5];</code></pre><p>In MLJ a <em>model</em> is a struct storing the hyperparameters of the learning algorithm indicated by the struct name.  Assuming the DecisionTree package is in your load path, we can instantiate a DecisionTreeClassifier model like this:</p><pre><code class="language-julia-repl">julia&gt; using MLJ
 
 julia&gt; @load DecisionTreeClassifier verbosity=1
+[ Info: Loading into module &quot;Main.ex-doda&quot;: 
 import MLJModels ✔
 import DecisionTree ✔
 import MLJModels.DecisionTree_.DecisionTreeClassifier ✔
@@ -20,16 +21,16 @@ MLJModels.DecisionTree_.DecisionTreeClassifier(pruning_purity = 1.0,
                                                display_depth = 5,
                                                post_prune = false,
                                                merge_purity_threshold = 0.9,
-                                               pdf_smoothing = 0.05,) @ 8…68</code></pre><p><em>Important:</em> DecisionTree and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model is evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
+                                               pdf_smoothing = 0.05,) @ 6…41</code></pre><p><em>Important:</em> DecisionTree and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model is evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
                 resampling=CV(shuffle=true), measure=cross_entropy, verbosity=0)
 (measure = MLJ.CrossEntropy[cross_entropy],
  measurement = [0.317715],
  per_fold = Array{Float64,1}[[0.0327898, 0.0327898, 0.355982, 0.54328, 0.38746, 0.553985]],
  per_observation = Array{Array{Float64,1},1}[[[0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898  …  0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898], [0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898  …  0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898], [0.198851, 0.198851, 0.198851, 0.198851, 0.198851, 0.198851, 0.198851, 0.198851, 0.198851, 0.198851  …  0.198851, 0.198851, 0.198851, 0.198851, 0.198851, 4.12713, 0.198851, 0.198851, 0.198851, 0.198851], [0.231641, 0.231641, 4.12713, 0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 4.12713, 0.231641  …  0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 0.231641], [0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 4.12713, 0.231641, 0.231641, 0.231641  …  0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 0.231641, 0.231641], [0.096572, 0.096572, 0.096572, 0.096572, 3.90835, 0.096572, 0.096572, 0.096572, 3.90835, 3.90835  …  0.096572, 0.096572, 0.096572, 0.096572, 0.096572, 0.096572, 0.096572, 0.096572, 0.096572, 0.096572]]],)</code></pre><p>Evaluating against multiple performance measures is also possible. See <a href="evaluating_model_performance/">Evaluating model performance</a> for details.</p><h3><a class="nav-anchor" id="Training-and-testing-by-hand-1" href="#Training-and-testing-by-hand-1">Training and testing by hand</a></h3><p>Wrapping the model in data creates a <em>machine</em> which will store training outcomes:</p><pre><code class="language-julia-repl">julia&gt; tree = machine(tree_model, X, y)
-Machine{DecisionTreeClassifier} @ 1…94</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
+Machine{DecisionTreeClassifier} @ 1…14</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
 
 julia&gt; fit!(tree, rows=train);
-[ Info: Training Machine{DecisionTreeClassifier} @ 1…94.
+[ Info: Training Machine{DecisionTreeClassifier} @ 1…14.
 
 julia&gt; yhat = predict(tree, X[test,:]);
 
@@ -94,8 +95,9 @@ Table{Union{AbstractArray{Continuous,1}, AbstractArray{Multiclass{3},1}}}</code>
  nrows = 4,)</code></pre><p><em>Figure 1. Part of the scientific type heirarchy in</em> ScientificTypes.jl.</p><h4><a class="nav-anchor" id="Inputs-1" href="#Inputs-1">Inputs</a></h4><p>Since an MLJ model only specifies the scientific type of data, if that type is <code>Table</code> - which is the case for the majority of MLJ models - then any Tables.jl format is permitted. However, the Tables.jl API excludes matrices. If <code>Xmatrix</code> is a matrix, convert it to a column table using <code>X = MLJ.table(Xmatrix)</code>.</p><p>Specifically, the requirement for an arbitrary model&#39;s input is <code>scitype(X) &lt;: input_scitype(model)</code>.</p><h4><a class="nav-anchor" id="Targets-1" href="#Targets-1">Targets</a></h4><p>The target <code>y</code> expected by MLJ models is generally an <code>AbstractVector</code>. A multivariate target <code>y</code> will generally be a vector of <em>tuples</em>. The tuples need not have uniform length, so some forms of sequence prediction are supported. Only the element types of <code>y</code> matter (the types of <code>y[j]</code> for each <code>j</code>). </p><p>Specifically, the type requirement for a model target is <code>scitype(y) &lt;: target_scitype(model)</code>.</p><h4><a class="nav-anchor" id="Querying-a-model-for-data-types-1" href="#Querying-a-model-for-data-types-1">Querying a model for data types</a></h4><p>One can inspect the admissible scientific types of a model&#39;s input and target. If one has a <code>Model</code> instance <code>model</code>, one can use <code>scitype(model)</code>:</p><pre><code class="language-julia-repl">julia&gt; tree = DecisionTreeClassifier();
 
 julia&gt; scitype(tree)
-(input = Table{#s13} where #s13&lt;:(AbstractArray{#s12,1} where #s12&lt;:Continuous),
- target = AbstractArray{#s30,1} where #s30&lt;:Finite,)</code></pre><p>If, however, the relevant model code has not been loaded, one can nevertheless extract the scitypes from the model type&#39;s MLJ registry entry:</p><pre><code class="language-julia-repl">julia&gt; info(&quot;DecisionTreeClassifier&quot;)
+(input_scitype = Table{#s13} where #s13&lt;:(AbstractArray{#s12,1} where #s12&lt;:Continuous),
+ target_scitype = AbstractArray{#s30,1} where #s30&lt;:Finite,
+ is_probabilistic = true,)</code></pre><p>If, however, the relevant model code has not been loaded, one can nevertheless extract the scitypes from the model type&#39;s MLJ registry entry:</p><pre><code class="language-julia-repl">julia&gt; info(&quot;DecisionTreeClassifier&quot;)
 OrderedCollections.LittleDict{Any,Any,Array{Any,1},Array{Any,1}} with 13 entries:
   :package_uuid     =&gt; &quot;7806a523-6efd-50cb-b5f6-3fa6f1930dbb&quot;
   :package_license  =&gt; &quot;unkown&quot;
