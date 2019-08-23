@@ -14,7 +14,9 @@
 
 function model(name::String; pkg=nothing)
     name in NAMES ||
-        throw(ArgumentError("There is no model named \"$name\" in the registry. "))
+        throw(ArgumentError("There is no model named \"$name\" in "*
+                            "the registry. \n Run `models()` to view all "*
+                            "registered models."))
     if pkg == nothing
         handle  = Handle(name)
         if ismissing(handle.pkg)
