@@ -325,6 +325,7 @@ useful in the case of models with indeterminate fit-results, such as a
 random forest.
 
 ````julia
+using CSV
 X, y = datanow()
 atom = RidgeRegressor()
 ensemble = EnsembleModel(atom=atom)

@@ -11,7 +11,6 @@ using Test
 using Random
 using MLJ
 using MLJBase
-using CSV
 using CategoricalArrays
 using Distributions
 
@@ -178,7 +177,10 @@ info(ensemble_model)
 
 ## MACHINE TEST
 
-X, y = datanow() # boston
+N =100
+X = (x1=rand(N), x2=rand(N), x3=rand(N))
+y = 2X.x1  - X.x2 + 0.05*rand(N)
+
 atom = KNNRegressor(K=7)
 ensemble_model = EnsembleModel(atom=atom)
 ensemble = machine(ensemble_model, X, y)

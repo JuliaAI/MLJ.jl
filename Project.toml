@@ -32,8 +32,6 @@ MLJModels = "0.3"
 julia = "1"
 
 [extras]
-CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
-DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 LossFunctions = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
 MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
@@ -42,4 +40,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [targets]
-test = ["CSV", "DataFrames", "DecisionTree", "LossFunctions", "MLJBase", "RDatasets", "Test", "UnicodePlots"]
+test = ["DecisionTree", "LossFunctions", "MLJBase", "RDatasets", "Test", "UnicodePlots"]

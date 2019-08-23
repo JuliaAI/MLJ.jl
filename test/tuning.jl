@@ -71,7 +71,6 @@ report(tuned)
 
 ## LEARNING CURVE
 
-#X, y = datanow()
 atom = FooBarRegressor()
 ensemble = EnsembleModel(atom=atom, n=500)
 mach = machine(ensemble, X, y)

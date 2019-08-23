@@ -45,7 +45,7 @@ export nrows, nfeatures, info,
     OrderedFactor, Unknown,
     Count, Multiclass, Binary, Scientific,
     scitype, scitype_union, schema,
-    target_scitype, input_scitype,
+    target_scitype, input_scitype, output_scitype,
     predict, predict_mean, predict_median, predict_mode,
     transform, inverse_transform, se, evaluate, fitted_params,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
@@ -55,6 +55,7 @@ export nrows, nfeatures, info,
     features, X_and_y
 
 using MLJBase
+
 # to be extended:
 import MLJBase: fit, update, clean!,
                 predict, predict_mean, predict_median, predict_mode,
@@ -96,19 +97,6 @@ import .Registry
 const srcdir = dirname(@__FILE__) # the directory containing this file:
 const CategoricalElement = Union{CategoricalString,CategoricalValue}
 
-include("utilities.jl")     # general purpose utilities
-include("measures.jl")       # loss functions
-include("machines.jl")      # machine API
-include("networks.jl")      # for building learning networks
-include("composites.jl")    # composite models, incl. learning networks exported as models
-include("operations.jl")    # syntactic sugar for operations (predict, transform, etc)
-include("resampling.jl")    # evaluating models by assorted resampling strategies
-include("parameters.jl")    # hyper-parameter range constructors and nested hyper-parameter API
-include("tuning.jl")
-include("ensembles.jl")     # homogeneous ensembles
-include("tasks.jl")         # enhancements to task interface defined in MLJBase
-
-
 ## LOAD BUILT-IN MODELS
 
 include("builtins/Transformers.jl")
@@ -116,16 +104,25 @@ include("builtins/Constant.jl")
 include("builtins/KNN.jl")
 include("builtins/ridge.jl") # defines a model for testing only
 
-include("loading.jl") # model metadata processing
 
+## LOAD CORE CODE
 
-## DEFINE A SCITYPE FOR MODELS AND MEASURES
+include("utilities.jl")     # general purpose utilities
+include("measures.jl")      # API for loss functions & defs of built-ins
+include("machines.jl")    
+include("networks.jl")      # for building learning networks
+include("composites.jl")    # composite models & exporting learning networks
+include("operations.jl")    # syntactic sugar for operations (predict, etc)
+include("resampling.jl")    # resampling strategies and model evaluation
+include("parameters.jl")    # hyperparameter ranges and grid generation
+include("tuning.jl")
+include("ensembles.jl")     # homogeneous ensembles
+include("tasks.jl")         # enhancements to MLJBase task interface 
+include("metadata.jl")      # tools to initialize metadata resources
+include("model_search.jl")  # tools to inspect metadata and find models
+include("loading.jl")       # fuctions to load model implementation code
+include("scitypes.jl")      # extensions to ScientificTypes.sictype
 
-ScientificTypes.scitype(model::Supervised, ::Val{:mlj}) =
-    (input=input_scitype(model), target=target_scitype(model))
-ScientificTypes.scitype(model::Unsupervised, ::Val{:mlj}) =
-    (input=input_scitype(model), )    
-# ScientificTypes.scitype(measure::Measure) = info(measure)
     
 
 ## GET THE EXTERNAL MODEL METADATA AND CODE FOR OPTIONAL DEPENDENCIES
