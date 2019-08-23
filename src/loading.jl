@@ -4,6 +4,15 @@
 
 # - see top of src/model_search.jl for notes on "handles".
 
+"""
+    
+    load_implementation(name::String; pkg=nothing, mod=Main, verbosity=1)
+            
+Load the model implementation code for the model with specified `name` into the module `mod`, specifying `pkg` in the case of duplicate names. 
+
+See also [`@load`](@ref)
+
+"""
 function load_implementation(handle::Handle; mod=Main, verbosity=1)
     # get name, package and load path:
     info = INFO_GIVEN_HANDLE[handle]
@@ -52,6 +61,24 @@ end
 load_implementation(name::String; pkg=nothing, kwargs...) =
     load_implementation(model(name, pkg=pkg); kwargs...)
 
+
+"""
+    @load name pkg=nothing verbosity=0
+
+
+Load the model implementation code for the model with specified `name`
+into the module `mod`, specifying `pkg` in the case of duplicate
+names. 
+
+### Examples
+
+    @load DecisionTreeeRegressor
+    @load PCA verbosity=1
+    @load SVC pkg=LIBSVM 
+
+See also [`load_implementation`](@ref)
+
+"""
 macro load(name_ex, kw_exs...)
     name_ = string(name_ex)
 
