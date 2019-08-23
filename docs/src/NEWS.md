@@ -2,13 +2,78 @@
 
 Development news for MLJ and its satellite packages, 
 [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl),
-[MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl)
+[MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl) (now defunct)
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
+[ScientificTypes](https://github.com/alan-turing-institute/ScientificTypes.jl)
+
+
+## MLJ 0.4.0 
+
+- Introduction of traits for measures (loss functions, etc); see top
+  of /src/measures.jl for definitions. This
+    - allows user to use loss functions from LossFunctions.jl,
+    - enables improved measure checks and error message reporting with measures
+    - allows `evaluate!` to report per-observation measures when
+      available (for later use by Bayesian optimisers, for example)
+    - allows support for sample-weighted measures playing nicely
+      with rest of API
+
+- Improvements to resampling: 
+    - `evaluate!` method now reports per-observation measures when
+      available
+    - sample weights can be passed to `evaluate!` for use by measures
+      that support weights
+    - user can pass a list of train/evaluation pairs of row indices
+      directly to `evaluate!`, in place of a `ResamplingStrategy`
+      object
+    - implementing a new `ResamplingStrategy` is now straightforward (see docs)
+    - one can call `evaluate` (no exclamation mark) directly on
+      model + data without first constructing a machine, if desired
+
+- Doc strings and the
+  [manual](https://alan-turing-institute.github.io/MLJ.jl/dev/) have
+  been revised and updated. The manual includes a new section "Tuning
+  models", and extra material under "Learning networks" explaining how
+  to export learning networks as stand-alone models using the
+  `@from_network` macro.
+
+- Improved checks and error-reporting for binding models to data in
+  machines.
+
+- (Breaking) CSV is now an optional dependency, which means you now
+  need to import CSV before you can load tasks with `load_boston()`,
+  `load_iris()`, `load_crabs()`, `load_ames()`, `load_reduced_ames()`
+
+- Added `schema` method for tables (re-exported from
+  ScientificTypes.jl). Returns a named tuple with keys `:names`,
+  `:types`, `:scitypes` and `:nrows`.
+
+- (Breaking) Eliminate `scitypes` method. The scientific types of a
+  table are returned as part of ScientificTypes `schema` method (see
+  above)
+
+
+## MLJModels 0.3.0
+
+[Release notes](https://github.com/alan-turing-institute/MLJModels.jl/releases)
 
 
 ## MLJBase v0.4.0
 
 [Release notes](https://github.com/alan-turing-institute/MLJBase.jl/releases/tag/v0.4.0)
+
+
+## ScientificTypes 0.1.2
+
+- New
+  [package](https://github.com/alan-turing-institute/ScientificTypes.jl)
+  to which the scientific types API has been moved (from MLJBase).
+
+
+## MLJBase v0.3.0
+
+- Make CSV an optional dependency (breaking). To use `load_iris()`,
+  `load_ames()`, etc, need first to import CSV.
 
 
 ## MLJBase v0.2.4

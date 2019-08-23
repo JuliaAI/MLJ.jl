@@ -2,7 +2,7 @@
 
 A pure Julia machine learning framework.
 
-[MLJ News](https://alan-turing-institute.github.io/MLJ.jl/dev/NEWS/)
+[MLJ News](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/NEWS.md)
 
 
 ## `join!(MLJ, YourModel)`
