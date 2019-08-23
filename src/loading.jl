@@ -1,153 +1,248 @@
-# to be depreciated:
-const FiniteOrderedFactor = OrderedFactor
+## AN UNIQUE IDENTIFIER FOR REGISTERED MODELS
 
-"""
-   info(model, pkg=nothing)
+# struct Handle
+#     name::String
+#     pkg::Union{String,Missing}
+# end
+# Base.show(stream::IO,  h::Handle) =
+#     print(stream, "\"$(h.name)\"\t (from \"$(h.pkg)\")")
 
-Return the dictionary of metadata associated with `model::String`. If
-more than one package implements `model` then `pkg::String` will need
-to be specified.
+Handle = NamedTuple{(:name, :pkg), Tuple{String,String}}
+(::Type{Handle})(name,string) = Handle((name, string))
 
-"""
-function MLJBase.info(model::String; pkg=nothing)
-    if pkg === nothing
-        if model in string.(MLJBase.finaltypes(Model))
-            pkg = "MLJ"
-        else
-            pkg, success = try_to_get_package(model)
-            if !success
-                error(pkg*"Use info($model, pkg=...)")
-            end
-        end
+function Base.isless(h1::Handle, h2::Handle)
+    if isless(h1.name, h2.name)
+        return true
+    elseif h1.name == h2.name
+        return isless(h1.pkg, h2.pkg)
+    else
+        return false
     end
-    return metadata()[pkg][model]
 end
+ 
 
+## FUNCTIONS TO BUILD GLOBAL METADATA CONSTANTS IN MLJ INITIALIZATION
 
-## FUNCTIONS TO RETRIEVE MODELS AND METADATA
+# for use in __init__ to define INFO_GIVEN_HANDLE
+function info_given_handle(metadata_file)
 
-function metadata()
-    modeltypes = MLJBase.finaltypes(Model)
+    # get the metadata for MLJ models:
+    metadata = LittleDict(TOML.parsefile(metadata_file))
+    localmodels = MLJBase.finaltypes(Model)
     info_given_model = Dict()
-    for M in modeltypes
+    for M in localmodels
         _info = MLJBase.info(M)
-        modelname = string(M) #_info[:name]
+        modelname = _info[:name]
         info_given_model[modelname] = _info
     end
-    ret = decode_dic(METADATA)
-    ret["MLJ"] = info_given_model
+
+    # merge with the decoded external metadata:
+    metadata_given_pkg = decode_dic(metadata)
+    metadata_given_pkg["MLJ"] = info_given_model
+
+    # build info_given_handle dictionary:
+    ret = Dict{Handle}{Any}()
+    packages = keys(metadata_given_pkg)
+    for pkg in packages
+        info_given_name = metadata_given_pkg[pkg]
+        for name in keys(info_given_name)
+            handle = Handle(name, pkg)
+            ret[handle] = info_given_name[name]
+        end
+    end
+    return ret
+    
+end
+
+# for use in __init__ to define AMBIGUOUS_NAMES
+function ambiguous_names(info_given_handle)
+    names_with_duplicates = map(keys(info_given_handle) |> collect) do handle
+        handle.name
+    end
+    frequency_given_name = countmap(names_with_duplicates)
+    return filter(keys(frequency_given_name) |> collect) do name
+        frequency_given_name[name] > 1
+    end
+end
+
+# for use in __init__ to define PKGS_GIVEN_NAME
+function pkgs_given_name(info_given_handle)
+    handles = keys(info_given_handle) |> collect
+    ret = Dict{String,Vector{String}}()
+    for handle in handles
+        if haskey(ret, handle.name)
+           push!(ret[handle.name], handle.pkg)
+        else
+            ret[handle.name] =[handle.pkg, ]
+        end
+    end
     return ret
 end
 
+# for use in __init__ to define NAMES
+function model_names(info_given_handle)
+    names_with_duplicates = map(keys(info_given_handle) |> collect) do handle
+        handle.name
+    end
+    return unique(names_with_duplicates)
+end
+
+function (::Type{Handle})(name::String)
+    if name in AMBIGUOUS_NAMES
+        return Handle(name, missing)
+    else
+        return Handle(name, first(PKGS_GIVEN_NAME[name]))
+    end
+end
+
+function model(name::String; pkg=nothing)
+    name in NAMES ||
+        throw(ArgumentError("There is no model named \"$name\" in the registry. "))
+    if pkg == nothing
+        handle  = Handle(name)
+        if ismissing(handle.pkg)
+            pkgs = PKGS_GIVEN_NAME[name]
+            message = "Ambiguous model name. Use pkg=...\n"*
+            "The model $model is provided by these packages: $pkgs.\n"
+            throw(ArgumentError(message))
+        end
+    else
+        handle = Handle(name, pkg)
+        handle in keys(INFO_GIVEN_HANDLE) ||
+            throw(ArgumentError("$handle does not exist in the registry. \n"*
+                  "Use models() to list all models. "))
+    end
+    return handle
+end
+
+"""
+   info(model::Model)
+
+Return the dictionary of metadata associated with the specified
+`model`.
+
+   info(name::String, pkg=nothing)
+   info((name=name, pkg=pkg))
+
+In the first instance, return the same dictionary given only the
+`name` of the model type (which does not need to be loaded). If more
+than one package implements a model with that name then some
+`pkg::String` will need to be specified, or the second form used.
+
+"""
+MLJBase.info(handle::Handle) = INFO_GIVEN_HANDLE[handle]
+MLJBase.info(name::String; pkg=nothing) = info(model(name, pkg=pkg))
+    
 """
     models()
 
-List all model as a dictionary indexed on package name`. Models
-available for immediate use appear under the key "MLJ".
-
-    models(conditional)
-
-Restrict results to package model pairs `(m, p)` satisfying
-`conditional(info(m, pkg=p)) == true`.
+List all models in the MLJ registry. Here and below, a *model* is any
+named tuple of strings of the form `(name=..., pkg=...)`.
 
     models(task::MLJTask)
 
-List all models matching the specified `task`.
+List all models matching the specified `task`. 
+
+    models(condition)
+
+List all models matching a given condition. A *condition* is any
+`Bool`-valued function on models.
 
 ### Example
 
-To retrieve all proababilistic classifiers:
+If
 
-    models(x -> x[:is_supervised] && x[:is_probabilistic]==true)
+    task(model) = info(model)[:is_supervised] && info(model)[:is_probabilistic]
+
+then `models(task)` lists all supervised models making probabilistic
+predictions.
 
 See also: [`localmodels`](@ref).
 
 """
-function models(conditional)
-    _models_given_pkg = Dict()
-    meta = metadata()
-    packages = keys(meta) |> collect
-    for pkg in packages
-        _models = filter(keys(meta[pkg]) |> collect) do model
-            conditional(info(model, pkg=pkg))
-        end
-        isempty(_models) || (_models_given_pkg[pkg] = _models)
-    end
-    return _models_given_pkg
-end
+models(condition) =
+    sort!(filter(condition, keys(INFO_GIVEN_HANDLE) |> collect))
 
 models() = models(x->true)
 
-function models(task::SupervisedTask; kwargs...)
+function models(task::SupervisedTask)
     ret = Dict{String, Any}()
-    conditional(x) =
-        x[:is_supervised] &&
-        x[:is_wrapper] == false &&
-        task.target_scitype <: x[:target_scitype] &&
-        task.input_scitype <: x[:input_scitype] &&
-        task.is_probabilistic == x[:is_probabilistic]
-    return models(conditional, kwargs...)
+    function condition(handle)
+        i = info(handle)
+        return i[:is_supervised] &&
+            i[:is_wrapper] == false &&
+            task.target_scitype <: i[:target_scitype] &&
+            task.input_scitype <: i[:input_scitype] &&
+            task.is_probabilistic == i[:is_probabilistic]
+    end
+    return models(condition)
 end
 
-function models(task::UnsupervisedTask; kwargs...)
+function models(task::UnsupervisedTask)
     ret = Dict{String, Any}()
-    conditional(x) =
-        x[:is_wrapper] == false &&
-        task.input_scitype <: x[:input_scitype] 
-    return models(conditional, kwargs...)
+    function condition(handle)
+        i  = info(handle)
+        return i[:is_wrapper] == false &&
+            task.input_scitype <: i[:input_scitype]
+    end
+    return models(condition)
 end
 
 """
-    localmodels()
+    localmodels(; mod=Main)
+    localmodels(task::MLJTask; mod=Main)
+    localmodels(condition; mod=Main)
+ 
 
-List all models available for immediate use. Equivalent to
-`models()["MLJ"]`. Can also be given a condition function or task as
-argument. See `models`.
+List all models whose names are in the namespace of the specified
+module `mod`, additionally solving the `task`, or meeting the
+`condition`, if specified.
+
+See also [models](@ref)
 
 """
-localmodels(; kwargs...) = models(; kwargs...)["MLJ"]
-localmodels(arg; kwargs...) = models(arg; kwargs...)["MLJ"]
+function localmodels(args...; mod=Main)
+    localmodels = filter(MLJBase.finaltypes(Model)) do model
+        name = info(model)[:name]
+        isdefined(mod, Symbol(name))
+    end
+    localnames = map(localmodels) do model
+        info(model)[:name]
+    end
+    return filter(models(args...)) do handle
+        handle.name in localnames
+    end
+end
 
 
 ## MACROS TO LOAD MODELS
 
-# returns (package, true) if model is in exaclty one package,
-# otherwise (message, false):
-function try_to_get_package(model::String)
-    _models_given_pkg = models()
-
-    # set-valued version (needed to compute inverse dictionary):
-    models_given_pkg = Dict{String, Set{String}}()
-    for pkg in keys(_models_given_pkg)
-        models_given_pkg[pkg] = Set(_models_given_pkg[pkg])
-    end
-
-    # get inverse:
-    pkgs_given_model = inverse(models_given_pkg)
-
-    pkgs = pkgs_given_model[model]
-    if length(pkgs) > 1
-        message = "Ambiguous model specification. \n"*
-        "The model $model is provided by these packages: $pkgs.\n"
-        return (message, false)
-    end
-    return (pop!(pkgs), true)
-end
-
-function _load(model, pkg, mdl, verbosity)
-    # get load path:
-    info = decode_dic(METADATA)[pkg][model]
+function load_implementation(handle::Handle; mod=Main, verbosity=1)
+    # get name, package and load path:
+    info = INFO_GIVEN_HANDLE[handle]
     path = info[:load_path]
     path_components = split(path, '.')
+    name = handle.name
+    pkg = handle.pkg
 
     # decide what to print
     toprint = verbosity > 0
 
+    # return if model is already loaded
+    localnames = map(handle->handle.name, localmodels(mod=mod))
+    if name ∈ localnames
+        @info "A model named \"$name\" is already loaded. \n"*
+        "Nothing new loaded. "
+        return
+    end
+
+    toprint && @info "Loading into module \"$mod\": "
+    
     # if needed, put MLJModels in the calling module's namespace (it
     # is already loaded into MLJ's namespace):
     if path_components[1] == "MLJModels"
         toprint && print("import MLJModels ")
-        mdl.eval(:(import MLJModels))
+        mod.eval(:(import MLJModels))
         toprint && println('\u2714')
     end
 
@@ -155,51 +250,46 @@ function _load(model, pkg, mdl, verbosity)
     # this is in MLJModels):
     pkg_ex = Symbol(pkg)
     toprint && print("import $pkg_ex ")
-    mdl.eval(:(import $pkg_ex))
+    mod.eval(:(import $pkg_ex))
     toprint && println('\u2714')
 
     # load the model:
     load_ex = Meta.parse("import $path")
     toprint && print(string(load_ex, " "))
-    mdl.eval(load_ex)
+    mod.eval(load_ex)
     toprint && println('\u2714')
 
     nothing
 end
 
-macro load(model_ex, verbosity_ex)
-    model_ = string(model_ex)
+load_implementation(name::String; pkg=nothing, kwargs...) =
+    load_implementation(model(name, pkg=pkg); kwargs...)
 
-    # find out verbosity level
-    verbosity = verbosity_ex.args[2]
+macro load(name_ex, kw_exs...)
+    name_ = string(name_ex)
 
-    # get rid brackets, as in "(MLJModels.Clustering).KMedoids":
-    model = filter(model_) do c !(c in ['(',')']) end
-
-    # return if model is already loaded
-    model ∈ string.(MLJBase.finaltypes(Model)) && return
-
-    pkg, success = try_to_get_package(model)
-    if !success # pkg is then a message
-        error(pkg*"Use @load $model pkg=\"PackageName\". ")
+    # parse kwargs:
+    message = "Invalid @load syntax.\n "*
+    "Sample usage: @load PCA pkg=\"MultivariateStats\" verbosity=1"
+    for ex in kw_exs
+        ex.head == :(=) || throw(ArgumentError(warning))
+        variable_ex = ex.args[1]
+        value_ex = ex.args[2]
+        if variable_ex == :pkg
+            pkg = string(value_ex)
+        elseif variable_ex == :verbosity
+            verbosity = value_ex
+        else
+            throw(ArgumentError(warning))
+        end
     end
+    (@isdefined pkg) || (pkg = nothing)
+    (@isdefined verbosity) || (verbosity = 0)
+                
+    # get rid brackets in name_, as in
+    # "(MLJModels.Clustering).KMedoids":
+    name = filter(name_) do c !(c in ['(',')']) end
 
-    _load(model, pkg, __module__, verbosity)
+    load_implementation(name, mod=__module__, pkg=pkg, verbosity=verbosity)
 end
 
-macro load(model_ex, pkg_ex, verbosity_ex)
-    model = string(model_ex)
-    pkg = string(pkg_ex.args[2])
-
-    # find out verbosity level
-    verbosity = verbosity_ex.args[2]
-
-    _load(model, pkg, __module__, verbosity)
-end
-
-# default verbosity is zero
-macro load(model_ex)
-    esc(quote
-        MLJ.@load $model_ex verbosity=0
-    end)
-end

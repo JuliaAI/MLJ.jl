@@ -13,7 +13,8 @@ export @curve, @pcurve,                               # utilities.jl
         Grid, TunedModel, learning_curve!,            # tuning.jl
         EnsembleModel,                                # ensembles.jl
         ConstantRegressor, ConstantClassifier,        # builtins/Constant.jl
-        models, localmodels, @load,                   # loading.jl
+        models, localmodels, @load, model,            # loading.jl
+        load_implementation,                          # loading.jl
         KNNRegressor,                                 # builtins/KNN.jl
         @from_network, machines, sources, anonymize!, # composites.jl
         rebind!, fitresults                           # composites.jl
@@ -130,9 +131,12 @@ ScientificTypes.scitype(model::Unsupervised, ::Val{:mlj}) =
 ## GET THE EXTERNAL MODEL METADATA AND CODE FOR OPTIONAL DEPENDENCIES
 
 function __init__()
-    @info "Loading model metadata"
+    @info "Loading model metadata from registry. "
     global metadata_file = joinpath(srcdir, "registry", "Metadata.toml")
-    global METADATA = LittleDict(TOML.parsefile(metadata_file))
+    global INFO_GIVEN_HANDLE = info_given_handle(metadata_file)
+    global AMBIGUOUS_NAMES = ambiguous_names(INFO_GIVEN_HANDLE)
+    global PKGS_GIVEN_NAME = pkgs_given_name(INFO_GIVEN_HANDLE)
+    global NAMES = model_names(INFO_GIVEN_HANDLE)
     @require(LossFunctions="30fc2ffe-d236-52d8-8643-a9d8f7c094a7",
              include("loss_functions_interface.jl"))
 end
