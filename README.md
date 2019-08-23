@@ -34,7 +34,6 @@ MLJ aims to be a flexible framework for combining and tuning machine
 learning models, written in the high performance, rapid development,
 scientific programming language, [Julia](https://julialang.org). 
 
-
 The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html).
 
 A list of models in external packages that can be used with MLJ:
