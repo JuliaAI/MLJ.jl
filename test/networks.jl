@@ -4,12 +4,13 @@ module TestLearningNetworks
 using Test
 using MLJ
 using MLJBase
-using CSV
 using CategoricalArrays
+import Random.seed!
+seed!(1234)
 
-# TRAINABLE MODELS
-
-X_frame, y = datanow();  # boston data
+N =100
+X = (x1=rand(N), x2=rand(N), x3=rand(N))
+y = 2X.x1  - X.x2 + 0.05*rand(N)
 
 knn_ = KNNRegressor(K=7)
 
@@ -18,7 +19,7 @@ allrows = eachindex(y);
 train, valid, test = partition(allrows, 0.7, 0.15);
 @test vcat(train, valid, test) == allrows
 
-Xtrain = X_frame[train,:]
+Xtrain = selectrows(X, train)
 ytrain = y[train]
 
 Xs = source(Xtrain)
@@ -30,18 +31,23 @@ knn_.K = 5
 @test_logs (:info, r"Training") fit!(knn1, rows=train[1:end-10], verbosity=2)
 @test_logs (:info, r"Training") fit!(knn1, verbosity=2)
 yhat = predict(knn1, Xs)
-yhat(X_frame[test,:])
-rms(yhat(X_frame[test,:]), y[test])
-
+yhat(selectrows(X, test))
+@test rms(yhat(selectrows(X, test)), y[test]) < 0.3
 @test MLJ.is_stale(knn1) == false
-
 
 
 # FIRST TEST OF NETWORK TRAINING
 
-task = load_reduced_ames()
-X = source(task.X)
-y = source(task.y)
+N =100
+X = (x1=rand(N),
+     x2=rand(N),
+     x3=categorical(rand("yn",N)),
+     x4=categorical(rand("yn",N)))
+
+y = 2X.x1  - X.x2 + 0.05*rand(N)
+X = source(X)
+y = source(y)
+
 hot = OneHotEncoder()
 hotM = machine(hot, X)
 W = transform(hotM, X)
@@ -89,9 +95,11 @@ forest.n = 6
 
 ## THIRD TEST OF NETWORK TRAINING
 
-X_frame, y = datanow();  # boston data
+N =100
+X = (x1=rand(N), x2=rand(N), x3=rand(N))
+y = 2X.x1  - X.x2 + 0.05*rand(N)
 
-XX = source(X_frame[train,:])
+XX = source(selectrows(X, train))
 yy = source(y[train])
 
 # construct a transformer to standardize the target:
@@ -124,18 +132,9 @@ yhat = inverse_transform(uscale, zhat)
 # fit-through training:
 @test_logs((:info, r"Training"),
            (:info, r"Features standarized: "),
-           (:info, r" *:Crim"),
-           (:info, r" *:Zn"),
-           (:info, r" *:Indus"),
-           (:info, r" *:NOx"),
-           (:info, r" *:Rm"),
-           (:info, r" *:Age"),
-           (:info, r" *:Dis"),
-           (:info, r" *:Rad"),
-           (:info, r" *:Tax"),
-           (:info, r" *:PTRatio"),
-           (:info, r" *:Black"),
-           (:info, r" *:LStat"),
+           (:info, r" *:x1"),
+           (:info, r" *:x2"),
+           (:info, r" *:x3"),
            (:info, r"Training"),
            (:info, r"Training"),
            fit!(yhat, rows=1:50, verbosity=2))

@@ -5,7 +5,6 @@
 
 using MLJ
 using MLJBase
-using CSV
 using Test
 
 @constant junk=KNNRegressor()
@@ -58,6 +57,14 @@ end
     @test include("ensembles.jl")
 end
 
+@testset "metadata build" begin
+    @test include("metadata.jl")
+end
+
+@testset "model search" begin
+    @test include("model_search.jl")
+end
+
 @testset "loading" begin
     @test include("loading.jl")
 end
@@ -72,6 +79,10 @@ end
 
 @testset "tasks" begin
   @test include("tasks.jl")
+end
+
+@testset "scitypes" begin
+    @test include("scitypes.jl")
 end
 
 # @testset "registry environment compatibility" begin

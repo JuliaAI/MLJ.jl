@@ -2,7 +2,7 @@
 
 A pure Julia machine learning framework.
 
-[MLJ News](https://alan-turing-institute.github.io/MLJ.jl/dev/NEWS/)
+[MLJ News](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/NEWS.md)
 
 
 ## `join!(MLJ, YourModel)`
@@ -33,7 +33,6 @@ MLJ is presently supported by a small Alan Turing Institute grant and is looking
 MLJ aims to be a flexible framework for combining and tuning machine
 learning models, written in the high performance, rapid development,
 scientific programming language, [Julia](https://julialang.org). 
-
 
 The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html).
 

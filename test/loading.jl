@@ -4,18 +4,13 @@ module TestLoading
 using Test
 using MLJ
 
-pkgs = keys(MLJ.metadata())
-@test "MLJ" in pkgs
-@test "DecisionTree" in pkgs
-
-@test "DecisionTreeClassifier" in models()["DecisionTree"]
-@test "ConstantClassifier" in models()["MLJ"]
-
-@load DecisionTreeClassifier
-@load DecisionTreeClassifier verbosity=1
-@test @isdefined DecisionTreeClassifier
-@load DecisionTreeRegressor pkg=DecisionTree verbosity=1
-@test @isdefined DecisionTreeRegressor
+@testset "loading of model implementations" begin
+    @load DecisionTreeClassifier pkg=DecisionTree verbosity=1
+    @test (@isdefined DecisionTreeClassifier)
+    @test_logs((:info, r"^A model named"),
+               load_implementation("DecisionTreeClassifier", mod=TestLoading))
+end
 
 end # module
+
 true
