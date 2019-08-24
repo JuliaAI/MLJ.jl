@@ -6,14 +6,27 @@
 
 """
     
-    load_implementation(name::String; pkg=nothing, mod=Main, verbosity=1)
+    load(name::String; pkg=nothing, mod=Main, verbosity=1)
             
-Load the model implementation code for the model with specified `name` into the module `mod`, specifying `pkg` in the case of duplicate names. 
+Load the model implementation code for the model type with specified
+`name` into the module `mod`, specifying `pkg` if necesssary, to
+resolve duplicate names. 
+
+    load(proxy; pkg=nothing, mod=Main, verbosity=1)
+
+In the case that `proxy` is a return value of `model` (ie, has the
+form `(name = ..., package_name = ..., etc)`) this is equivalent to
+the previous call.  See the second example below.
+
+### Examples
+
+    load("ConstantClassifier")
+    load(localmodels()[1])     # same thing
 
 See also [`@load`](@ref)
 
 """
-function load_implementation(proxy::ModelProxy; mod=Main, verbosity=1)
+function load(proxy::ModelProxy; mod=Main, verbosity=0)
     # get name, package and load path:
     name = proxy.name
     pkg = proxy.package_name
@@ -58,8 +71,8 @@ function load_implementation(proxy::ModelProxy; mod=Main, verbosity=1)
     nothing
 end
 
-load_implementation(name::String; pkg=nothing, kwargs...) =
-    load_implementation(model(name, pkg=pkg); kwargs...)
+load(name::String; pkg=nothing, kwargs...) =
+    load(model(name, pkg=pkg); kwargs...)
 
 
 """
@@ -67,8 +80,8 @@ load_implementation(name::String; pkg=nothing, kwargs...) =
 
 
 Load the model implementation code for the model with specified `name`
-into the module `mod`, specifying `pkg` in the case of duplicate
-names. 
+into the calling module, provided `pkg` is specified in the case of
+duplicate names.
 
 ### Examples
 
@@ -76,7 +89,7 @@ names.
     @load PCA verbosity=1
     @load SVC pkg=LIBSVM 
 
-See also [`load_implementation`](@ref)
+See also [`load`](@ref)
 
 """
 macro load(name_ex, kw_exs...)
@@ -104,5 +117,5 @@ macro load(name_ex, kw_exs...)
     # "(MLJModels.Clustering).KMedoids":
     name = filter(name_) do c !(c in ['(',')']) end
 
-    load_implementation(name, mod=__module__, pkg=pkg, verbosity=verbosity)
+    load(name, mod=__module__, pkg=pkg, verbosity=verbosity)
 end
