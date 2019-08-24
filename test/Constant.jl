@@ -3,6 +3,7 @@ module TestConstant
 # using Revise
 using Test
 using MLJ
+import MLJBase
 using CategoricalArrays
 import Distributions
 
@@ -21,8 +22,8 @@ d=Distributions.Normal(1.5, 0.5)
 @test predict(model, fitresult, X) == fill(d, 10)
 @test predict_mean(model, fitresult, X) == fill(1.5, 10)
 
-info(model)
-info(MLJ.DeterministicConstantRegressor)
+MLJBase.info(model)
+MLJBase.info(MLJ.DeterministicConstantRegressor)
 
 
 ## CLASSIFIER
@@ -43,8 +44,8 @@ yhat = predict_mode(model, fitresult, X)
 yhat = predict(model, fitresult, X)
 @test yhat == fill(d, 10)
 
-info(model)
-info(MLJ.DeterministicConstantClassifier)
+MLJBase.info(model)
+MLJBase.info(MLJ.DeterministicConstantClassifier)
 
 end # module
 true

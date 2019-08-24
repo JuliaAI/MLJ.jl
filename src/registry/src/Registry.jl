@@ -83,11 +83,11 @@ function _update(mod, test_env_only)
             meta_given_package[pkg] = Dict()
         end
         for M in modeltypes
-            _info = MLJBase.info(M)
-            pkg = _info[:package_name]
+            _MLJBase.info = MLJBase.info(M)
+            pkg = _MLJBase.info[:package_name]
             if !(pkg in ["unknown", "MLJ"]) 
-                modelname = _info[:name]
-                meta_given_package[pkg][modelname] = _info
+                modelname = _MLJBase.info[:name]
+                meta_given_package[pkg][modelname] = _MLJBase.info
             end
         end
         open(joinpath(MLJ.Registry.srcdir, "../Metadata.toml"), "w") do file

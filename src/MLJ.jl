@@ -35,7 +35,7 @@ export FeatureSelector,
 export pdf, mode, median, mean, shuffle!, categorical, shuffle, levels, levels!
 
 # reexport from MLJBase and ScientificTypes:
-export nrows, nfeatures, info,
+export nrows, nfeatures, traits,
     selectrows, selectcols,
     SupervisedTask, UnsupervisedTask, MLJTask,
     Deterministic, Probabilistic, Unsupervised, Supervised,

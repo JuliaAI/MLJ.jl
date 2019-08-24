@@ -3,15 +3,35 @@ module TestMetadata
 # using Revise
 using Test
 using MLJ
+import MLJBase
 
 metadata_file = joinpath(@__DIR__, "..", "src", "registry", "Metadata.toml")
 pca = MLJ.Handle("PCA", "MultivariateStats")
 cnst = MLJ.Handle("ConstantRegressor", "MLJ")
 i = MLJ.info_given_handle(metadata_file)[cnst]
 
+
 @testset "building INFO_GIVEN_HANDLE" begin
+    @test isempty(MLJ.localmodeltypes(MLJBase))
+    @test issubset(Set([MLJ.SimpleDeterministicCompositeModel,
+                        FooBarRegressor,
+                        KNNRegressor,                                
+                        MLJ.Constant.DeterministicConstantClassifier,
+                        MLJ.Constant.DeterministicConstantRegressor, 
+                        MLJ.DeterministicEnsembleModel,              
+                        MLJ.DeterministicTunedModel,                 
+                        ConstantClassifier,                          
+                        ConstantRegressor,                           
+                        MLJ.ProbabilisticEnsembleModel,              
+                        MLJ.ProbabilisticTunedModel,                 
+                        Resampler,                                   
+                        FeatureSelector,                             
+                        OneHotEncoder,                               
+                        Standardizer,                                
+                        UnivariateBoxCoxTransformer,
+                        UnivariateStandardizer]), MLJ.localmodeltypes(MLJ))
     @test MLJ.info_given_handle(metadata_file)[pca][:name] == "PCA"
-    @test MLJ.info_given_handle(metadata_file)[cnst] == info(ConstantRegressor)
+    @test MLJ.info_given_handle(metadata_file)[cnst] == MLJBase.info(ConstantRegressor)
 end
 
 h = Vector{Any}(undef, 7)

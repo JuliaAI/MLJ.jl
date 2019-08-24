@@ -12,6 +12,21 @@
 #    pkg=missing in the case of duplicate names. See also `model`
 #    below, exported for use by user.
 
+#
+
+# The following checks the model/pkg combination is registered and
+# throws an error if `pkg` is not specified and `name` is a
+# duplicate. Intended for the user, in place of the `Handle`
+# constructors which do no checks and throw no errors.
+"""
+    model(name::String; pkg=nothing)
+
+Converts the specified `name` of a model into a named tuple
+`(name=name, pkg=pkg)` where the tuple value `pkg` is the package
+containing model with name `name` if the key-word argument `pkg` is 
+unspecified. 
+
+"""
 function model(name::String; pkg=nothing)
     name in NAMES ||
         throw(ArgumentError("There is no model named \"$name\" in "*
@@ -27,31 +42,112 @@ function model(name::String; pkg=nothing)
         end
     else
         handle = Handle(name, pkg)
-        handle in keys(INFO_GIVEN_HANDLE) ||
+        haskey(INFO_GIVEN_HANDLE, handle) ||
             throw(ArgumentError("$handle does not exist in the registry. \n"*
                   "Use models() to list all models. "))
     end
     return handle
 end
 
+model(handle::Handle; args...) = handle
+
+# convert the dictionary obtained from an MLJBase.info call into a
+# named tuple:
+function _astuple(i)
+    name = i[:name]
+    package_name = i[:package_name]
+    package_uuid = i[:package_uuid]
+    package_url = i[:package_url]
+    load_path = i[:load_path]
+    is_wrapper = i[:is_wrapper]
+    is_pure_julia = i[:is_pure_julia]
+    input_scitype = i[:input_scitype]
+    if i[:is_supervised]
+        package_license = i[:package_license]
+        supports_weights = i[:supports_weights]
+        is_supervised = true
+        is_probabilistic = i[:is_probabilistic]
+        target_scitype = i[:target_scitype]
+        return NamedTuple{(:name,
+                           :package_name,
+                           :package_uuid,
+                           :package_url,
+                           :package_license,
+                           :load_path,
+                           :is_wrapper,
+                           :is_pure_julia,
+                           :is_supervised,
+                           :supports_weights,
+                           :input_scitype,
+                           :target_scitype,
+                           :is_probabilistic)}((
+                               name,
+                               package_name,
+                               package_uuid,
+                               package_url,
+                               package_license,
+                               load_path,
+                               is_wrapper,
+                               is_pure_julia,
+                               is_supervised,
+                               supports_weights,
+                               input_scitype,
+                               target_scitype,
+                               is_probabilistic))
+    else
+        is_supervised = false
+        output_scitype = i[:output_scitype]
+        return NamedTuple{(:name,
+                           :package_name,
+                           :package_uuid,
+                           :package_url,
+#                           :package_license,
+                           :load_path,
+                           :is_wrapper,
+                           :is_pure_julia,
+                           :is_supervised,
+                           :input_scitype,
+                           :output_scitype)}((
+                               name,
+                               package_name,
+                               package_uuid,
+                               package_url,
+#                               package_license,
+                               load_path,
+                               is_wrapper,
+                               is_pure_julia,
+                               is_supervised,
+                               input_scitype,
+                               output_scitype))
+    end
+end    
+
+
 """
-   info(model::Model)
+   traits(model::Model)
 
-Return the dictionary of metadata associated with the specified
-`model`.
+Return the traits associated with the specified `model`.
 
-   info(name::String, pkg=nothing)
-   info((name=name, pkg=pkg))
+   traits(name::String, pkg=nothing)
+   traits((name=name, pkg=pkg))
 
-In the first instance, return the same dictionary given only the
-`name` of the model type (which does not need to be loaded). If more
-than one package implements a model with that name then some
-`pkg::String` will need to be specified, or the second form used.
+In the first instance, return model traits, given only the `name` of
+the model type, even it is not in scope, but assuming it is
+registered. If more than one package implements a model type with that
+name, then the keyword argument `pkg::String` is required, or the
+second form of the method used.
 
 """
-MLJBase.info(handle::Handle) = INFO_GIVEN_HANDLE[handle]
-MLJBase.info(name::String; pkg=nothing) = info(model(name, pkg=pkg))
-    
+function traits(handle::Handle)
+    haskey(INFO_GIVEN_HANDLE, handle) ||
+        throw(ArgumentError("$handle does not exist in the registry. \n"*
+                            "Use models() to list all models. "))
+    return _astuple(INFO_GIVEN_HANDLE[handle])
+end
+traits(name::String; pkg=nothing) = traits(model(name, pkg=pkg))
+traits(M::Type{<:Model}) = _astuple(MLJBase.info(M))
+traits(model::Model) = traits(typeof(model))
+
 """
     models()
 
@@ -74,7 +170,7 @@ Excluded in the listings are the built-in model-wraps `EnsembleModel`,
 
 If
 
-    task(model) = info(model)[:is_supervised] && info(model)[:is_probabilistic]
+    task(model) = traits(model).is_supervised && traits(model).is_probabilistic
 
 then `models(task)` lists all supervised models making probabilistic
 predictions.
@@ -90,12 +186,12 @@ models() = models(x->true)
 function models(task::SupervisedTask)
     ret = Dict{String, Any}()
     function condition(handle)
-        i = info(handle)
-        return i[:is_supervised] &&
-            i[:is_wrapper] == false &&
-            task.target_scitype <: i[:target_scitype] &&
-            task.input_scitype <: i[:input_scitype] &&
-            task.is_probabilistic == i[:is_probabilistic]
+        t = traits(handle)
+        return t.is_supervised &&
+            t.is_wrapper == false &&
+            task.target_scitype <: t.target_scitype &&
+            task.input_scitype <: t.input_scitype &&
+            task.is_probabilistic == t.is_probabilistic
     end
     return models(condition)
 end
@@ -103,9 +199,9 @@ end
 function models(task::UnsupervisedTask)
     ret = Dict{String, Any}()
     function condition(handle)
-        i  = info(handle)
-        return i[:is_wrapper] == false &&
-            task.input_scitype <: i[:input_scitype]
+        t = traits(handle)
+        return t.is_wrapper == false &&
+            task.input_scitype <: t.input_scitype
     end
     return models(condition)
 end
@@ -124,14 +220,11 @@ See also [models](@ref)
 
 """
 function localmodels(args...; mod=Main)
-    localmodels = filter(MLJBase.finaltypes(Model)) do model
-        name = info(model)[:name]
-        isdefined(mod, Symbol(name))
-    end
-    localnames = map(localmodels) do model
-        info(model)[:name]
+    modeltypes = localmodeltypes(mod)
+    names = map(modeltypes) do M
+        traits(M).name
     end
     return filter(models(args...)) do handle
-        handle.name in localnames
+        handle.name in names
     end
 end

@@ -4,10 +4,14 @@ module TestModelSearch
 using Test
 using MLJ
 
-metadata_file = joinpath(@__DIR__, "..", "src", "registry", "Metadata.toml")
 pca = MLJ.Handle("PCA", "MultivariateStats")
 cnst = MLJ.Handle("ConstantRegressor", "MLJ")
-i = MLJ.info_given_handle(metadata_file)[cnst]
+
+@test traits(model("ConstantRegressor")) == traits(cnst)
+@test traits(ConstantRegressor) == traits(cnst)
+traits(ConstantRegressor()) == traits(cnst)
+@test traits(model("PCA")) == traits(pca)
+
 
 @testset "localmodels" begin
     tree = model("DecisionTreeRegressor")
@@ -20,7 +24,7 @@ i = MLJ.info_given_handle(metadata_file)[cnst]
 end
 
 @testset "models() and localmodels" begin
-    t(handle) = info(handle)[:is_pure_julia]
+    t(handle) = traits(handle).is_pure_julia
     mods = models(t)
     @test pca in mods
     @test cnst in mods

@@ -15,8 +15,7 @@ See also [`@load`](@ref)
 """
 function load_implementation(handle::Handle; mod=Main, verbosity=1)
     # get name, package and load path:
-    info = INFO_GIVEN_HANDLE[handle]
-    path = info[:load_path]
+    path = INFO_GIVEN_HANDLE[handle][:load_path]
     path_components = split(path, '.')
     name = handle.name
     pkg = handle.pkg
@@ -106,4 +105,3 @@ macro load(name_ex, kw_exs...)
 
     load_implementation(name, mod=__module__, pkg=pkg, verbosity=verbosity)
 end
-
