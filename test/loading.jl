@@ -9,6 +9,7 @@ using MLJ
     @test (@isdefined DecisionTreeClassifier)
     @test_logs((:info, r"^A model named"),
                load_implementation("DecisionTreeClassifier", mod=TestLoading))
+    @test model("DecisionTreeClassifier") in localmodels(mod=TestLoading)
 end
 
 end # module

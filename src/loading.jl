@@ -13,18 +13,19 @@ Load the model implementation code for the model with specified `name` into the 
 See also [`@load`](@ref)
 
 """
-function load_implementation(handle::Handle; mod=Main, verbosity=1)
+function load_implementation(proxy::ModelProxy; mod=Main, verbosity=1)
     # get name, package and load path:
+    name = proxy.name
+    pkg = proxy.package_name
+    handle = (name=name, pkg=pkg)
     path = INFO_GIVEN_HANDLE[handle][:load_path]
     path_components = split(path, '.')
-    name = handle.name
-    pkg = handle.pkg
 
     # decide what to print
     toprint = verbosity > 0
 
     # return if model is already loaded
-    localnames = map(handle->handle.name, localmodels(mod=mod))
+    localnames = map(p->p.name, localmodels(mod=mod))
     if name ∈ localnames
         @info "A model named \"$name\" is already loaded. \n"*
         "Nothing new loaded. "

@@ -64,8 +64,6 @@ end
 
 @testset "Handle constructors" begin
     @test MLJ.Handle("PCA") == MLJ.Handle("PCA", "MultivariateStats")
-    @test MLJ.model("PCA") == MLJ.Handle("PCA", "MultivariateStats")
-    @test_throws ArgumentError MLJ.model("Julia")
     # TODO: add tests here when duplicate model names enter registry
 end
 

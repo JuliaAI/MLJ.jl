@@ -4,14 +4,13 @@ module TestModelSearch
 using Test
 using MLJ
 
-pca = MLJ.Handle("PCA", "MultivariateStats")
-cnst = MLJ.Handle("ConstantRegressor", "MLJ")
+pca = model("PCA", pkg="MultivariateStats")
+cnst = model("ConstantRegressor", pkg="MLJ")
 
-@test traits(model("ConstantRegressor")) == traits(cnst)
-@test traits(ConstantRegressor) == traits(cnst)
-traits(ConstantRegressor()) == traits(cnst)
-@test traits(model("PCA")) == traits(pca)
+@test_throws ArgumentError MLJ.model("Julia")
 
+@test traits(ConstantRegressor) == cnst
+@test traits(Standardizer()) == model("Standardizer", pkg="MLJ")
 
 @testset "localmodels" begin
     tree = model("DecisionTreeRegressor")
@@ -24,7 +23,7 @@ traits(ConstantRegressor()) == traits(cnst)
 end
 
 @testset "models() and localmodels" begin
-    t(handle) = traits(handle).is_pure_julia
+    t(model) = model.is_pure_julia
     mods = models(t)
     @test pca in mods
     @test cnst in mods
