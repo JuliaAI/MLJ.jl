@@ -71,12 +71,12 @@ Base.show(stream::IO, ::MIME"text/plain", m::Measure) = print(stream, "$(measure
 Base.show(stream::IO, m::Measure) = print(stream, measurename(m))
 
 """
-    MLJBase.info(measure::Measure)
+    traits(measure::Measure)
 
 Return a named tuple summarizing the traits defined for `measure`. 
 
 """
-MLJBase.info(measure::Measure) = (target_scitype=target_scitype(measure),
+traits(measure::Measure) = (target_scitype=target_scitype(measure),
                             prediction_type=prediction_type(measure),
                             orientation=orientation(measure),
                             reports_each_observation=reports_each_observation(measure),
