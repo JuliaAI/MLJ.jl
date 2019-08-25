@@ -31,6 +31,9 @@ end
     mods = localmodels(t, mod=TestModelSearch)
     @test cnst in mods
     @test !(pca in mods)
+    u(model) = !(model.is_supervised)
+    @test pca in models(u, t)
+    @test !(cnst in models(u, t))
 end
 
 end

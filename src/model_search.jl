@@ -108,10 +108,10 @@ that may not be loaded).
 
 List all models matching the specified `task`. 
 
-    models(condition)
+    models(conditions...)
 
-List all models matching a given condition. A *condition* is any
-`Bool`-valued function on models.
+List all models satisifying the specified `conditions`. A *condition*
+is any `Bool`-valued function on models.
 
 Excluded in the listings are the built-in model-wraps `EnsembleModel`,
 `TunedModel`, and `IteratedModel`.
@@ -128,8 +128,12 @@ predictions.
 See also: [`localmodels`](@ref).
 
 """
-models(condition) =
-    sort!(filter(condition, model.(keys(INFO_GIVEN_HANDLE))))
+function models(conditions...)
+    unsorted = filter(model.(keys(INFO_GIVEN_HANDLE))) do model
+        all(c(model) for c in conditions)
+    end
+    return sort!(unsorted)
+end
 
 models() = models(x->true)
 
@@ -159,12 +163,13 @@ end
 """
     localmodels(; mod=Main)
     localmodels(task::MLJTask; mod=Main)
-    localmodels(condition; mod=Main)
+    localmodels(conditions...; mod=Main)
  
 
 List all models whose names are in the namespace of the specified
 module `mod`, additionally solving the `task`, or meeting the
-`condition`, if specified.
+`conditions`, if specified. A *condition* is a `Bool`-valued function
+on models.
 
 See also [models](@ref)
 
