@@ -60,23 +60,23 @@ d["j"] = :post
 
 @test MLJ.decode_dic(MLJ.encode_dic(d)) == d
 
-@testset "recursive getproperty, setproperty!" begin
+mutable struct M
+    a1
+    a2
+end
+mutable struct A1
+    a11
+    a12
+end
+mutable struct A2
+    a21
+end
+mutable struct A21
+    a211
+    a212
+end
 
-    mutable struct M
-        a1
-        a2
-    end
-    mutable struct A1
-        a11
-        a12
-    end
-    mutable struct A2
-        a21
-    end
-    mutable struct A21
-        a211
-        a212
-    end
+@testset "recursive getproperty, setproperty!" begin
 
     m = (a1 = (a11 = 10, a12 = 20), a2 = (a21 = (a211 = 30, a212 = 40),)) 
 
