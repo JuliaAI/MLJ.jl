@@ -29,6 +29,7 @@ function localmodeltypes(mod)
         i = MLJBase.info(M)
         name = i[:name]
         isdefined(mod, Symbol(name)) &&
+            !i[:is_wrapper] && 
             !(M in [Supervised, Unsupervised, Deterministic,
                     Probabilistic, DeterministicNetwork,
                     ProbabilisticNetwork, UnsupervisedNetwork])

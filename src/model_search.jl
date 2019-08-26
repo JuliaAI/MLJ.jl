@@ -142,7 +142,6 @@ function models(task::SupervisedTask)
     function condition(handle)
         t = traits(handle)
         return t.is_supervised &&
-            t.is_wrapper == false &&
             task.target_scitype <: t.target_scitype &&
             task.input_scitype <: t.input_scitype &&
             task.is_probabilistic == t.is_probabilistic
@@ -154,8 +153,7 @@ function models(task::UnsupervisedTask)
     ret = Dict{String, Any}()
     function condition(handle)
         t = traits(handle)
-        return t.is_wrapper == false &&
-            task.input_scitype <: t.input_scitype
+        return task.input_scitype <: t.input_scitype
     end
     return models(condition)
 end
