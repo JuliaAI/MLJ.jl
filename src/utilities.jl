@@ -241,3 +241,68 @@ function pretty_table(X; showtypes=true, alignment=:l, kwargs...)
     end
 end
 
+
+## RECURSIVE VERSIONS OF getproperty and setproperty!
+
+# applying the following to `:(a.b.c)` returns `(:(a.b), :c)`
+function reduce_nested_field(ex)
+    ex.head == :. || throw(ArgumentError)
+    tail = ex.args[2]
+    tail isa QuoteNode || throw(ArgumentError)
+    field = tail.value
+    field isa Symbol || throw(ArgmentError)
+    subex = ex.args[1]
+    return (subex, field)
+end
+
+"""
+    recursive_getproperty(object, nested_name::Expr)
+
+Call getproperty recursively on `object` to extract the value of some
+nested property, as in the following example:
+
+    julia> object = (X = (x = 1, y = 2), Y = 3)
+    julia> recursive_getproperty(object, :(X.y))
+    2
+
+"""
+recursive_getproperty(obj, property::Symbol) = getproperty(obj, property)
+function recursive_getproperty(obj, ex::Expr)
+    subex, field = reduce_nested_field(ex)
+    return recursive_getproperty(getproperty(obj, subex), field)
+end
+
+"""
+    recursively_setproperty!(object, nested_name::Expr, value)
+
+Set a nested property of an `object` to `value`, as in the following example:
+
+```
+julia> mutable struct Foo
+           X
+           Y
+       end
+
+julia> mutable struct Bar
+           x
+           y
+       end
+
+julia> object = Foo(Bar(1, 2), 3)
+Foo(Bar(1, 2), 3)
+
+julia> recursively_setproperty!(object, :(X.y), 42)
+42
+
+julia> object
+Foo(Bar(1, 42), 3)
+```
+
+"""
+recursive_setproperty!(obj, property::Symbol, value) =
+    setproperty!(obj, property, value)
+function recursive_setproperty!(obj, ex::Expr, value)
+    subex, field = reduce_nested_field(ex)
+    last_obj = getproperty(obj, subex)
+    return recursive_setproperty!(last_obj, field, value)
+end
