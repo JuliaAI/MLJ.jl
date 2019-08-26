@@ -30,7 +30,7 @@ tuned_model = TunedModel(model=composite, tuning=grid,
                          resampling=holdout, measure=rms,
                          ranges=ranges, full_report=false)
 
-info(tuned_model)
+MLJBase.info(tuned_model)
 
 tuned = machine(tuned_model, X, y)
 

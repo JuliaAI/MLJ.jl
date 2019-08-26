@@ -18,7 +18,7 @@ X = (Zn=rand(N),
 
 namesX = schema(X).names |> collect
 selector = FeatureSelector()
-info(selector)
+MLJBase.info(selector)
 fitresult, cache, report = MLJBase.fit(selector, 1, X)
 @test fitresult == namesX
 transform(selector, fitresult, selectrows(X, 1:2))
@@ -29,7 +29,7 @@ fitresult, cache, report = MLJBase.fit(selector, 1, X)
 
 # `UnivariateStandardizer`:
 stand = UnivariateStandardizer()
-info(stand)
+MLJBase.info(stand)
 #fit!(stand, 1:3)
 fitresult, cache, report = MLJBase.fit(stand, 1, [0, 2, 4])
 @test round.(Int, transform(stand, fitresult, [0,4,8])) == [-1.0,1.0,3.0]
@@ -52,7 +52,7 @@ x4 = [round(Int, x) for x in X.x1stFlrSF]
 X = (x1=x1, x2=X[2], x3=X[3], x4=x4, x5=X[5])
 
 stand = Standardizer()
-info(stand)
+MLJBase.info(stand)
 fitresult, cache, report = MLJBase.fit(stand, 1, X)
 Xnew = transform(stand, fitresult, X)
 @test Xnew[1] == X[1]
@@ -82,7 +82,7 @@ v = v .- minimum(v)
 MLJ.Transformers.normality(v)
 
 t = UnivariateBoxCoxTransformer(shift=true)
-info(t)
+MLJBase.info(t)
 fitresult, cache, report = MLJBase.fit(t, 2, v)
 @test sum(abs.(v - MLJBase.inverse_transform(t, fitresult, MLJBase.transform(t, fitresult, v)))) <= 5000*eps()
 
@@ -95,7 +95,7 @@ X = (name=categorical(["Ben", "John", "Mary", "John"], ordered=true),
      age=[23, 23, 14, 23])
 
 t = OneHotEncoder()
-info(t)
+MLJBase.info(t)
 fitresult, cache, _ =
     @test_logs((:info, r"Spawning 3"),
                (:info, r"Spawning 3"),

@@ -23,25 +23,34 @@ end
 
 ## FUNCTIONS TO BUILD GLOBAL METADATA CONSTANTS IN MLJ INITIALIZATION
 
+# get the model types in top-level of given module's namespace:
+function localmodeltypes(mod)
+    return filter(MLJBase.finaltypes(Model)) do M
+        i = MLJBase.info(M)
+        name = i[:name]
+        isdefined(mod, Symbol(name)) &&
+            !i[:is_wrapper] && 
+            !(M in [Supervised, Unsupervised, Deterministic,
+                    Probabilistic, DeterministicNetwork,
+                    ProbabilisticNetwork, UnsupervisedNetwork])
+    end
+end
+
 # for use in __init__ to define INFO_GIVEN_HANDLE
 function info_given_handle(metadata_file)
 
-    # get the metadata for MLJ models:
-    metadata = LittleDict(TOML.parsefile(metadata_file))
-    localmodels = MLJBase.finaltypes(Model)
-    info_given_model = Dict()
-    for M in localmodels
-        _info = MLJBase.info(M)
-        if !(_info[:is_wrapper]) &&
-            !(M in [DeterministicNetwork, ProbabilisticNetwork])
-            modelname = _info[:name]
-            info_given_model[modelname] = _info
-        end
+    # build the metadata for built-in models:
+    modeltypes = localmodeltypes(MLJ)
+    info_given_name = Dict()
+    for M in modeltypes
+        i = MLJBase.info(M)
+        info_given_name[i[:name]] = i
     end
         
     # merge with the decoded external metadata:
+    metadata = LittleDict(TOML.parsefile(metadata_file))
     metadata_given_pkg = decode_dic(metadata)
-    metadata_given_pkg["MLJ"] = info_given_model
+    metadata_given_pkg["MLJ"] = info_given_name
 
     # build info_given_handle dictionary:
     ret = Dict{Handle}{Any}()

@@ -14,7 +14,7 @@ export @curve, @pcurve,                               # utilities.jl
         EnsembleModel,                                # ensembles.jl
         ConstantRegressor, ConstantClassifier,        # builtins/Constant.jl
         models, localmodels, @load, model,            # loading.jl
-        load_implementation,                          # loading.jl
+        load,                          # loading.jl
         KNNRegressor,                                 # builtins/KNN.jl
         @from_network, machines, sources, anonymize!, # composites.jl
         rebind!, fitresults                           # composites.jl
@@ -35,7 +35,7 @@ export FeatureSelector,
 export pdf, mode, median, mean, shuffle!, categorical, shuffle, levels, levels!
 
 # reexport from MLJBase and ScientificTypes:
-export nrows, nfeatures, info,
+export nrows, nfeatures, traits,
     selectrows, selectcols,
     SupervisedTask, UnsupervisedTask, MLJTask,
     Deterministic, Probabilistic, Unsupervised, Supervised,

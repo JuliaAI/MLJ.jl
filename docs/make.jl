@@ -45,4 +45,4 @@ deploydocs(
 #    modules = [MLJ]
 # Documenter can also automatically deploy documentation to gh-pages.
 # See "Hosting Documentation" and deploydocs() in the Documenter manual
-# for more information.
+# for more MLJBase.information.
