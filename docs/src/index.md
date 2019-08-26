@@ -220,10 +220,12 @@ tree = DecisionTreeClassifier();
 scitype(tree)
 ```
 
-If, however, the relevant model code has not been loaded, one can nevertheless extract the scitypes from the model type's MLJ registry entry:
+If, however, the relevant model code has not been loaded, one can
+nevertheless extract the scitypes from the model type's MLJ registry
+entry:
 
 ```@repl doda
-info("DecisionTreeClassifier")
+traits("DecisionTreeClassifier")
 ```
 
 See also [Working with tasks](working_with_tasks.md) on searching for

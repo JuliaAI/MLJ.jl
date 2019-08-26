@@ -61,7 +61,7 @@ d = predict(wens, weights, X)[1]
 
 
 ## ENSEMBLE MODEL
-;;;;
+
 # target is :deterministic :multiclass false:
 atom=MLJ.DeterministicConstantClassifier()
 X = MLJ.table(ones(5,3))
@@ -76,7 +76,7 @@ weights = weights/sum(weights)
 ensemble_model.weights = weights
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-info(ensemble_model)
+MLJBase.info(ensemble_model)
 @test MLJBase.target_scitype(ensemble_model) == MLJBase.target_scitype(atom)
 
 # target is :deterministic :continuous false:
@@ -97,7 +97,7 @@ weights = rand(10)
 weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-info(ensemble_model)
+MLJBase.info(ensemble_model)
 
 # target is :deterministic :continuous false:
 atom = MLJ.DeterministicConstantRegressor()
@@ -139,7 +139,7 @@ weights = rand(10)
 weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-info(ensemble_model)
+MLJBase.info(ensemble_model)
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # target is :probabilistic :continuous false:
@@ -167,7 +167,7 @@ weights = rand(10)
 weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-info(ensemble_model)
+MLJBase.info(ensemble_model)
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # test generic constructor:
