@@ -144,12 +144,17 @@ yhat = exp(zhat)
 fit!(yhat)
 @test sum(MLJ.state(W) |> MLJ.flat_values) == 1
 
+# test nested reporting:
+r = MLJ.report(yhat)
+@test r isa NamedTuple
+@test length(r.reports) == 4
+@test r.reports[1] == NamedTuple()
+
 hot2 = deepcopy(hot)
 knn2 = deepcopy(knn)
 ys2 = source(nothing)
 
 # duplicate a network:
-############################
 yhat2 = @test_logs((:warn, r"^No replacement"),
            replace(yhat, hot=>hot2, knn=>knn2, ys=>source(ys.data)))
 
@@ -175,20 +180,22 @@ hot2.drop_last = true
            (:info, r"^Train.*Dec"), fit!(yhat2))
 
 # export a supervised network:
-model = @from_network Composite(knn_rgs=knn, one_hot_enc=hot) <= (Xs, ys, yhat)
-mach = machine(model, X, y)
+model_ = @from_network(Composite(knn_rgs=knn, one_hot_enc=hot) <=
+                      (Xs, ys, yhat))
+mach = machine(model_, X, y)
 @test_logs((:info, r"^Train.*Composite"),
            (:info, r"^Train.*OneHot"),
            (:info, r"^Spawn"),
            (:info, r"^Train.*Univ"),
            (:info, r"^Train.*KNN"),
            (:info, r"^Train.*Dec"), fit!(mach))
-model.knn_rgs.K = 5
+model_.knn_rgs.K = 5
 @test_logs((:info, r"^Updat.*Composite"),
            (:info, r"^Not.*OneHot"),
            (:info, r"^Not.*Univ"),
            (:info, r"^Updat.*KNN"),
            (:info, r"^Not.*Dec"), fit!(mach))
+
 
 # check data anomynity:
 @test all(x->(x===nothing), [s.data for s in sources(mach.fitresult)])
@@ -197,17 +204,19 @@ model.knn_rgs.K = 5
 multistand = Standardizer()
 multistandM = machine(multistand, W)
 W2 = transform(multistandM, W)
-model = @from_network Transf(one_hot=hot) <= (Xs, W2)
-mach = machine(model, X)
+model_ = @from_network Transf(one_hot=hot) <= (Xs, W2)
+mach = machine(model_, X)
 @test_logs((:info, r"^Training.*Transf"),
            (:info, r"^Train.*OneHot"),
            (:info, r"^Spawn"),
            (:info, r"Train.*Stand"), fit!(mach))
-model.one_hot.drop_last=true
+model_.one_hot.drop_last=true
 @test_logs((:info, r"^Updating.*Transf"),
            (:info, r"^Updating.*OneHot"),
            (:info, r"^Spawn"),
            (:info, r"Train.*Stand"), fit!(mach))
+@test(fitted_params(mach).fitted_params[1] isa
+      NamedTuple{(:mean_and_std_given_feature,)})
 
 # check data anomynity:
 @test all(x->(x===nothing), [s.data for s in sources(mach.fitresult)])

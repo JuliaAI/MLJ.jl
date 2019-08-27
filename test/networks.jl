@@ -155,6 +155,15 @@ knn_.K =67
            (:info, r"Updating"),
            fit!(yhat, verbosity=1))
 
+A  = rand(2,3)
+As = source(A)
+@test MLJ.matrix(MLJ.table(As))() == A
+
+y = rand(4)
+ys = source(y)
+@test vcat(ys, ys)() == vcat(y, y)
+@test hcat(ys, ys)() == hcat(y, y)
+
 end
 
 true

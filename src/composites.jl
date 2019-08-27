@@ -4,7 +4,9 @@ const SupervisedNetwork = Union{DeterministicNetwork,ProbabilisticNetwork}
 MLJBase.is_wrapper(::Type{DeterministicNetwork}) = true
 MLJBase.is_wrapper(::Type{ProbabilisticNetwork}) = true
 
-# fall-back for updating supervised learning networks exported as models:
+
+## FALL-BACKS FOR LEARNING NETWORKS EXPORTED AS MODELS
+
 function MLJBase.update(model::Union{SupervisedNetwork,UnsupervisedNetwork},
                         verbosity, yhat, cache, args...)
 
@@ -26,14 +28,23 @@ function MLJBase.update(model::Union{SupervisedNetwork,UnsupervisedNetwork},
     return yhat, cache, nothing
 end
 
-# fall-back for predicting on supervised learning networks exported as models
 MLJBase.predict(composite::SupervisedNetwork, fitresult, Xnew) =
     fitresult(Xnew)
 
-# fall-back for transforming on learning networks exported as models
 MLJBase.transform(composite::UnsupervisedNetwork, fitresult, Xnew) =
     fitresult(Xnew)
 
+function fitted_params(yhat::Node)
+    machs = machines(yhat)
+    fitted = [fitted_params(m) for m in machs]
+    return (machines=machs, fitted_params=fitted)
+end
+
+fitted_params(composite::Union{SupervisedNetwork,UnsupervisedNetwork}, yhat) =
+    fitted_params(yhat)
+
+
+## INSPECTING LEARNING NETWORKS
 
 """
 $SIGNATURES
@@ -113,14 +124,71 @@ List all machines in the learning network terminating at a given node.
 """
 function machines(W::MLJ.Node)
     if W.machine === nothing
-        return vcat((machines(arg) for arg in W.args) |> collect) |> unique
+        return vcat((machines(arg) for arg in W.args)...) |> unique
     else
         return vcat(Any[W.machine, ],
-                   (machines(arg) for arg in W.args)...,
-                   (machines(arg) for arg in W.machine.args)...) |> unique
+                    (machines(arg) for arg in W.args)...,
+                    (machines(arg) for arg in W.machine.args)...) |> unique
     end
 end
 machines(W::MLJ.Source) = Any[]
+
+
+## MANIPULATING LEARNING NETWORKS
+
+"""
+    reset!(N::Node)
+
+Place the learning network terminating at node `N` into a state in
+which `fit!(N)` will retrain from scratch all machines in its
+dependency tape. Does not actually train any machine or alter
+fit-results. (The method simply resets `m.state` to zero, for every
+machine `m` in the network.)
+
+"""
+function reset!(W::Node)
+    for mach in machines(W)
+        mach.state = 0 # to do: replace with dagger object
+    end
+end
+
+
+## FOR EXPORTING LEARNING NETWORKS BY HAND
+
+"""
+    anonymize!(sources...)
+
+Returns a named tuple `(sources=..., data=....)` whose values are the
+provided source nodes and their contents respectively, and clears the
+contents of those source nodes.
+
+"""
+function anonymize!(sources...)
+    data = Tuple(s.data for s in sources)
+    [MLJ.rebind!(s, nothing) for s in sources]
+    return (sources=sources, data=data)
+end
+
+function report(yhat::Node)
+    machs = machines(yhat)
+    reports = [report(m) for m in machs]
+    return (machines=machs, reports=reports)
+end
+
+# what is returned by a fit method for an exported learning network:
+function fitresults(Xs, ys, yhat)
+    r = report(yhat)
+    cache = anonymize!(Xs, ys)
+    return yhat, cache, r
+end
+function fitresults(Xs, yhat)
+    r = report(yhat)
+    cache = anonymize!(Xs)
+    return yhat, cache, r
+end
+
+
+## EXPORTING LEARNING NETWORKS AS MODELS WITH MACROS
 
 """
     replace(W::MLJ.Node, a1=>b1, a2=>b2, ...)
@@ -190,51 +258,6 @@ function Base.replace(W::Node, pairs::Pair...)
 
  end
 
-# TODO: Do we actually need this?
-"""
-    reset!(N::Node)
-
-Place the learning network terminating at node `N` into a state in
-which `fit!(N)` will retrain from scratch all machines in its
-dependency tape. Does not actually train any machine or alter
-fit-results. (The method simply resets `m.state` to zero, for every
-machine `m` in the network.)
-
-"""
-function reset!(W::Node)
-    for mach in machines(W)
-        mach.state = 0 # to do: replace with dagger object
-    end
-end
-
-"""
-    anonymize!(sources...)
-
-Returns a named tuple `(sources=..., data=....)` whose values are the
-provided source nodes and their contents respectively, and clears the
-contents of those source nodes.
-
-"""
-function anonymize!(sources...)
-    data = Tuple(s.data for s in sources)
-    [MLJ.rebind!(s, nothing) for s in sources]
-    return (sources=sources, data=data)
-end
-
-# TODO: include recurursive reporting in following
-
-# what is returned by a fit method for an exported learning network:
-function fitresults(Xs, ys, yhat)
-    report = nothing
-    cache = anonymize!(Xs, ys)
-    return yhat, cache, report
-end
-function fitresults(Xs, yhat)
-    report = nothing
-    cache = anonymize!(Xs)
-    return yhat, cache, report
-end
-
 # closures for later:
 function supervised_fit_method(network_Xs, network_ys, network_N,
                                network_models...)
@@ -291,12 +314,13 @@ function unsupervised_fit_method(network_Xs, network_N,
     return fit
 end
 
+
 """
 
     @from_network NewCompositeModel(fld1=model1, fld2=model2, ...) <= (Xs, N)
     @from_network NewCompositeModel(fld1=model1, fld2=model2, ...) <= (Xs, ys, N)
 
-Create, respectively, a new stand-alone unsupervised or superivsed
+Create, respectively, a new stand-alone unsupervised and superivsed
 model type `NewCompositeModel` using a learning network as a
 blueprint. Here `Xs`, `ys` and `N` refer to the input source, node,
 target source node and terminating source node of the network. The
