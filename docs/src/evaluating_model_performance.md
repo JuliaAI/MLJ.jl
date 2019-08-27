@@ -19,8 +19,7 @@ using MLJ
 MLJ.color_off() # hide
 X = (a=rand(12), b=rand(12), c=rand(12));
 y = X.a + 2X.b + 0.05*rand(12);
-@load RidgeRegressor
-model = RidgeRegressor()
+model = @load RidgeRegressor
 cv=CV(nfolds=3)
 evaluate(model, X, y, resampling=cv, measure=l2)
 ```

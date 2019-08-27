@@ -40,8 +40,8 @@ function load(proxy::ModelProxy; mod=Main, verbosity=0)
     # return if model is already loaded
     localnames = map(p->p.name, localmodels(mod=mod))
     if name ∈ localnames
-        @info "A model named \"$name\" is already loaded. \n"*
-        "Nothing new loaded. "
+        @info "A model type \"$name\" is already loaded. \n"*
+        "No new code loaded. "
         return
     end
 
@@ -118,4 +118,14 @@ macro load(name_ex, kw_exs...)
     name = filter(name_) do c !(c in ['(',')']) end
 
     load(name, mod=__module__, pkg=pkg, verbosity=verbosity)
+
+    esc(quote
+        try
+            $name_ex()
+        catch
+            @warn "Code is loaded but no instance returned. "
+            nothing
+        end
+    end)
+    
 end
