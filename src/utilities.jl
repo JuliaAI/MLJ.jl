@@ -269,7 +269,7 @@ nested property, as in the following example:
 recursive_getproperty(obj, property::Symbol) = getproperty(obj, property)
 function recursive_getproperty(obj, ex::Expr)
     subex, field = reduce_nested_field(ex)
-    return recursive_getproperty(getproperty(obj, subex), field)
+    return recursive_getproperty(recursive_getproperty(obj, subex), field)
 end
 
 """
@@ -303,6 +303,6 @@ recursive_setproperty!(obj, property::Symbol, value) =
     setproperty!(obj, property, value)
 function recursive_setproperty!(obj, ex::Expr, value)
     subex, field = reduce_nested_field(ex)
-    last_obj = getproperty(obj, subex)
+    last_obj = recursive_getproperty(obj, subex)
     return recursive_setproperty!(last_obj, field, value)
 end

@@ -220,7 +220,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
         # mutate `clone` (the model to which `resampler` points):
         for k in 1:n_iterators
             field = ranges[k].field
-            setproperty!(clone, field, A_row[k])
+            recursive_setproperty!(clone, field, A_row[k])
         end
 
         if verbosity == 2
