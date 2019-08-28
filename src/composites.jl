@@ -79,7 +79,7 @@ function fitresults(Xs, yhat)
 end
 
 
-## EXPORTING LEARNING NETWORKS AS MODELS WITH MACROS
+## EXPORTING LEARNING NETWORKS AS MODELS WITH @from_network
 
 """
     replace(W::MLJ.Node, a1=>b1, a2=>b2, ...)
