@@ -17,8 +17,7 @@ way the wrapped model may be viewed as a "self-tuning" version of the
 using MLJ
 X = (x1=rand(100), x2=rand(100), x3=rand(100))
 y = 2X.x1 - X.x2 + 0.05*rand(100)
-@load DecisionTreeRegressor
-tree_model = DecisionTreeRegressor()
+tree_model = @load DecisionTreeRegressor
 ```
     
 Let's tune `min_purity_increase` in the model

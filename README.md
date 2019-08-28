@@ -53,7 +53,7 @@ Pkg.add("MLJ")
 Pkg.add("MLJModels")
 ```
 
-To obtain a dictionary of all registered models, keyed on package name:
+To obtain a list of all registered models, keyed on package name:
 
 ```julia
 using MLJ
@@ -63,23 +63,19 @@ models()
 To add a package - for example,  DecisionTree - to your load path:
 
 ```julia
-julia> models()["DecisionTree"]
-2-element Array{Any,1}:
- "DecisionTreeRegressor" 
- "DecisionTreeClassifier"
 using Pkg
 Pkg.add("DecisionTree")
 ```
 
-To load all code needed to use a model - for example, DecisionTreeClassifier:
+To load all code needed to use a model - for example, DecisionTreeClassifier,
 
 ```julia
 @load DecisionTreeClassifier
 ```
 
-Refer to the
+which also returns a default instance. Refer to the
 [documentation](https://alan-turing-institute.github.io/MLJ.jl/stable/)
-for for instantiating and running loaded models.
+for more on instantiating and running loaded models.
 
 
 **Package conflicts.** If you encounter package conflicts during
