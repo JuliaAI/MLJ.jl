@@ -139,8 +139,7 @@ models() = models(x->true)
 
 function models(task::SupervisedTask)
     ret = Dict{String, Any}()
-    function condition(handle)
-        t = traits(handle)
+    function condition(t)
         return t.is_supervised &&
             task.target_scitype <: t.target_scitype &&
             task.input_scitype <: t.input_scitype &&

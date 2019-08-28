@@ -26,15 +26,21 @@ X = iris[:, 1:4];
 y = iris[:, 5];
 ```
 
-In MLJ a *model* is a struct storing the hyperparameters of the learning
-algorithm indicated by the struct name.  Assuming the DecisionTree
-package is in your load path, we can instantiate a
-DecisionTreeClassifier model like this:
+In MLJ a *model* is a struct storing the hyperparameters of the
+learning algorithm indicated by the struct name.  Assuming the
+DecisionTree package is in your load path, we can use `@load` to load
+the code defining the `DecisionTreeClassifier` model type. This macro
+also returns an instance, with default hyperparameters:
 
 ```@repl doda
 using MLJ
-@load DecisionTreeClassifier verbosity=1
-tree_model = DecisionTreeClassifier(max_depth=2)
+tree_model = @load DecisionTreeClassifier verbosity=1
+```
+
+```julia 
+julia> tree_model.max_depth = 2
+julia> tree_model == DecisionTreeClassfier(max_depth=2)
+true
 ```
 
 *Important:* DecisionTree and most other packages implementing machine
@@ -160,6 +166,7 @@ type.
 
 
 ![](scitypes.png)
+*Figure 1. Part of the scientific type heirarchy in* ScientificTypes.jl.
 
 ```@repl doda
 scitype(4.6)
@@ -182,8 +189,6 @@ of the columns, which can be individually inspected using `schema`:
 ```@repl doda
 schema(X)
 ```
-
-*Figure 1. Part of the scientific type heirarchy in* ScientificTypes.jl.
 
 
 #### Inputs
