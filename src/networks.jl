@@ -424,6 +424,9 @@ machine(model::Model, X, y::AbstractNode) = NodalMachine(model, source(X), y)
 machine(model::Model, X::AbstractNode, y) = NodalMachine(model, X, source(y))
 
 MLJBase.matrix(X::AbstractNode) = node(MLJBase.matrix, X)
+MLJBase.table(X::AbstractNode) = node(MLJBase.table, X)
+Base.vcat(args::AbstractNode...) = node(vcat, args...)
+Base.hcat(args::AbstractNode...) = node(hcat, args...)
 
 Base.log(X::AbstractNode) = node(v->log.(v), X)
 Base.exp(X::AbstractNode) = node(v->exp.(v), X)

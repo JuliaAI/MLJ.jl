@@ -233,12 +233,15 @@ function pretty_table(X; showtypes=true, alignment=:l, kwargs...)
     else
         header  = names
     end
+    show_color = MLJBase.SHOW_COLOR
+    color_off()
     try
         PrettyTables.pretty_table(MLJBase.matrix(X),
                                   header; alignment=alignment, kwargs...)
     catch
         println("Trouble displaying evaluation results.")
     end
+    ifelse(show_color, color_on(), color_off())
 end
 
 
