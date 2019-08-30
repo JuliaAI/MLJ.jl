@@ -13,11 +13,12 @@ export @curve, @pcurve,                               # utilities.jl
         Grid, TunedModel, learning_curve!,            # tuning.jl
         EnsembleModel,                                # ensembles.jl
         ConstantRegressor, ConstantClassifier,        # builtins/Constant.jl
-        models, localmodels, @load, model,            # loading.jl
-        load,                          # loading.jl
+        models, localmodels, @load, model, load,      # loading.jl
         KNNRegressor,                                 # builtins/KNN.jl
-        @from_network, machines, sources, anonymize!, # composites.jl
-        rebind!, fitresults                           # composites.jl
+        rebind!,                                      # networks.jl
+        machines, sources, anonymize!,                # composites.jl
+        @from_network,                                # composites.jl
+        fitresults                                    # composites.jl
 
 # defined in include files "machines.jl and "networks.jl":
 export Machine, NodalMachine, machine, AbstractNode,

@@ -354,15 +354,15 @@ function _recursive_show(stream::IO, X::AbstractNode)
     end
 end
 
-function Base.show(stream::IO, ::MIME"text/plain", X::AbstractNode)
+function Base.show(stream::IO, ::MIME"text/plain", X::Node)
     id = objectid(X)
     description = string(typeof(X).name.name)
     str = "$description @ $(MLJBase.handle(X))"
     printstyled(IOContext(stream, :color=>MLJBase.SHOW_COLOR), str, color=:blue)
-    if !(X isa Source)
+#    if !(X isa Source)
         print(stream, " = ")
         _recursive_show(stream, X)
-    end
+#    end
 end
 
 function Base.show(stream::IO, ::MIME"text/plain", machine::NodalMachine)
@@ -518,7 +518,7 @@ corresponding to training arguments deleted.
 
 See also: [`origins`](@ref), [`source`](@ref).
 """
-function sources(W::MLJ.AbstractNode, kind=:any)
+function sources(W::MLJ.AbstractNode; kind=:any)
     if kind == :any
         sources_ = filter(MLJ.flat_values(tree(W)) |> collect) do value
             value isa MLJ.Source
