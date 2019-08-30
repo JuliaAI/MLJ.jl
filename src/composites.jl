@@ -86,8 +86,7 @@ end
 
 Create a deep copy of a node `W`, and thereby replicate the learning
 network terminating at `W`, but replacing any specified sources and
-models `a1, a2, ...` of the original network with the specified targets
-`b1, b2, ...`.
+models `a1, a2, ...` of the original network with `b1, b2, ...`.
 """
 function Base.replace(W::Node, pairs::Pair...)
 
@@ -169,10 +168,6 @@ function supervised_fit_method(network_Xs, network_ys, network_N,
 
         fit!(yhat, verbosity=verbosity)
 
-        # TODO: make report a named tuple keyed on machines in the
-        # network, with values the individual reports.
-        report = nothing
-
         return fitresults(Xs, ys, yhat)
     end
 
@@ -194,10 +189,6 @@ function unsupervised_fit_method(network_Xs, network_N,
             error("Failed to replace sources in network blueprint. ")
         
         fit!(Xout, verbosity=verbosity)
-
-        # TODO: make report a named tuple keyed on machines in the
-        # network, with values the individual reports.
-        report = nothing
 
         return fitresults(Xs, Xout)
     end

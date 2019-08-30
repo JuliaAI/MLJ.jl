@@ -2,14 +2,40 @@
 
 abstract type AbstractNode <: MLJType end
 
-"""
-$TYPEDEF
-
-A Source node wraps training data in a format such as a table or a categorical vector.
-"""
-mutable struct Source <: AbstractNode
+# K is :target, :input, :weight or :unknown
+mutable struct Source{K} <: AbstractNode 
     data  # training data
 end
+
+"""
+    Xs = source(X) 
+    ys = source(y, kind=:target)
+    ws = source(w, kind=:weight)
+
+Defines, respectively, learning network `Source` objects for wrapping
+some input data `X` (`kind=:input`), some target data `y`, or some
+sample weights `w`.  The values of each variable `X, y, w` can be
+anything, even `nothing`, if the network is for exporting as a
+stand-alone model only. For traing and testing the unexported network,
+appropriate vectors, tables, or other data containers are expected.
+
+The calling behaviour of a `Source` object is this:
+
+    Xs() = X
+    Xs(rows=r) = selectrows(X, r)  # eg, X[r,:] for a DataFrame
+    Xs(Xnew) = Xnew
+
+See also: [`@from_network`](@ref], [`sources`](@ref),
+[`origins`](@ref), [`node`](@ref).
+
+"""
+function source(X; kind=:input)
+    kind in [:input, :target, :weight] ||
+        @warn "`Source` kind is neither :input, :target, or :weight. "
+    return Source{kind}(X)
+end
+
+source(X::Source) = X
 
 is_stale(s::Source) = false
 
@@ -359,22 +385,6 @@ end
 ## SYNTACTIC SUGAR FOR LEARNING NETWORKS
 
 """
-    Xs = source(X)
-
-Defines a `Source` object out of data `X`. The data can be a vector,
-categorical vector, or table. The calling behaviour of a source node is this:
-
-    Xs() = X
-    Xs(rows=r) = selectrows(X, r)  # eg, X[r,:] for a DataFrame
-    Xs(Xnew) = Xnew
-
-See also: [`origins`](@ref), [`node`](@ref).
-
-"""
-source(X) = Source(X) # here `X` is data
-source(X::Source) = X
-
-"""
     N = node(f::Function, args...)
 
 Defines a `Node` object `N` wrapping a static operation `f` and arguments
@@ -495,23 +505,32 @@ function models(W::MLJ.AbstractNode)
 end
 
 """
-$SIGNATURES
+    sources(W::AbstractNode; kind=:any)
 
 A vector of all sources referenced by calls `N()` and `fit!(N)`. These
 are the sources of the directed acyclic graph associated with the
-learning network terminating at `N`.
+learning network terminating at `N`. The return value can be
+restricted further by specifying `kind=:input`, `kind=:target`,
+`kind=:weight`, etc.
 
 Not to be confused with `origins(N)` which refers to the same graph with edges
 corresponding to training arguments deleted.
 
 See also: [`origins`](@ref), [`source`](@ref).
 """
-function sources(W::MLJ.AbstractNode)
-    sources_ = filter(MLJ.flat_values(tree(W)) |> collect) do model
-        model isa MLJ.Source
+function sources(W::MLJ.AbstractNode, kind=:any)
+    if kind == :any
+        sources_ = filter(MLJ.flat_values(tree(W)) |> collect) do value
+            value isa MLJ.Source
+        end
+    else
+        sources_ = filter(MLJ.flat_values(tree(W)) |> collect) do value
+            value isa MLJ.Source{kind}
+        end
     end
     return unique(sources_)
 end
+
 
 """
 $SIGNATURES
