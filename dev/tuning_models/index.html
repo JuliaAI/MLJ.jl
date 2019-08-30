@@ -8,20 +8,20 @@ tree_model = @load DecisionTreeRegressor</code></pre><pre><code class="language-
                                               min_samples_split = 2,
                                               min_purity_increase = 0.0,
                                               n_subfeatures = 0,
-                                              post_prune = false,) @ 9…87</code></pre><p>Let&#39;s tune <code>min_purity_increase</code> in the model above, using a grid-search. Defining hyperparameter ranges and wrapping the model:</p><pre><code class="language-julia">r = range(tree_model, :min_purity_increase, lower=0.001, upper=1.0, scale=:log)
+                                              post_prune = false,) @ 7…26</code></pre><p>Let&#39;s tune <code>min_purity_increase</code> in the model above, using a grid-search. Defining hyperparameter ranges and wrapping the model:</p><pre><code class="language-julia">r = range(tree_model, :min_purity_increase, lower=0.001, upper=1.0, scale=:log)
 self_tuning_tree_model = TunedModel(model=tree_model,
                                     resampling = CV(nfolds=3),
                                     tuning = Grid(resolution=10),
                                     ranges = r,
-                                    measure = rms);</code></pre><pre><code class="language-none">MLJ.DeterministicTunedModel(model = DecisionTreeRegressor @ 9…87,
-                            tuning = Grid @ 1…72,
-                            resampling = CV @ 7…99,
+                                    measure = rms);</code></pre><pre><code class="language-none">MLJ.DeterministicTunedModel(model = DecisionTreeRegressor @ 7…26,
+                            tuning = Grid @ 4…26,
+                            resampling = CV @ 7…09,
                             measure = rms,
                             weights = nothing,
                             operation = StatsBase.predict,
-                            ranges = NumericRange @ 4…28,
+                            ranges = NumericRange @ 5…03,
                             full_report = true,
-                            train_best = true,) @ 2…66</code></pre><p>Incidentally, for a numeric hyperparameter, the object returned by <code>range</code> can be iterated after specifying a resolution:</p><pre><code class="language-julia">iterator(r, 5)</code></pre><pre><code class="language-none">5-element Array{Float64,1}:
+                            train_best = true,) @ 1…77</code></pre><p>Incidentally, for a numeric hyperparameter, the object returned by <code>range</code> can be iterated after specifying a resolution:</p><pre><code class="language-julia">iterator(r, 5)</code></pre><pre><code class="language-none">5-element Array{Float64,1}:
  0.0010000000000000002
  0.005623413251903492 
  0.0316227766016838   
@@ -31,24 +31,24 @@ r2 = range(selector_model, :features, values = [[:x1,], [:x1, :x2]])
 iterator(r2)</code></pre><pre><code class="language-none">2-element Array{Array{Symbol,1},1}:
  [:x1]     
  [:x1, :x2]</code></pre><p>Returning to the wrapped tree model:</p><pre><code class="language-julia">self_tuning_tree = machine(self_tuning_tree_model, X, y)
-fit!(self_tuning_tree)</code></pre><pre><code class="language-none">Machine{DeterministicTunedModel} @ 5…17
+fit!(self_tuning_tree)</code></pre><pre><code class="language-none">Machine{DeterministicTunedModel} @ 2…07
 </code></pre><p>We can inspect the detailed results of the grid search with <code>report(self_tuning_model)</code> or just retrieve the optimal model, as here:</p><pre><code class="language-julia">fitted_params(self_tuning_tree).best_model</code></pre><pre><code class="language-none">MLJModels.DecisionTree_.DecisionTreeRegressor(pruning_purity_threshold = 0.0,
                                               max_depth = -1,
                                               min_samples_leaf = 5,
                                               min_samples_split = 2,
                                               min_purity_increase = 0.0010000000000000002,
                                               n_subfeatures = 0,
-                                              post_prune = false,) @ 1…94</code></pre><p>Predicting on new input observations using the optimal model:</p><pre><code class="language-julia">predict(self_tuning_tree, (x1=rand(3), x2=rand(3), x3=rand(3)))</code></pre><pre><code class="language-none">3-element Array{Float64,1}:
-  0.7876405591156155  
-  1.2112331416912812  
- -0.042628327881467275</code></pre><h3><a class="nav-anchor" id="Tuning-multiple-nested-hyperparameters-1" href="#Tuning-multiple-nested-hyperparameters-1">Tuning multiple nested hyperparameters</a></h3><p>The following model has another model, namely a <code>DecisionTreeRegressor</code>, as a hyperparameter:</p><pre><code class="language-julia">tree_model = DecisionTreeRegressor()
-forest_model = EnsembleModel(atom=tree_model)</code></pre><pre><code class="language-none">MLJ.DeterministicEnsembleModel(atom = DecisionTreeRegressor @ 1…98,
+                                              post_prune = false,) @ 3…02</code></pre><p>Predicting on new input observations using the optimal model:</p><pre><code class="language-julia">predict(self_tuning_tree, (x1=rand(3), x2=rand(3), x3=rand(3)))</code></pre><pre><code class="language-none">3-element Array{Float64,1}:
+ 1.2658807084482377
+ 1.0125577038651112
+ 0.9208816055402117</code></pre><h3><a class="nav-anchor" id="Tuning-multiple-nested-hyperparameters-1" href="#Tuning-multiple-nested-hyperparameters-1">Tuning multiple nested hyperparameters</a></h3><p>The following model has another model, namely a <code>DecisionTreeRegressor</code>, as a hyperparameter:</p><pre><code class="language-julia">tree_model = DecisionTreeRegressor()
+forest_model = EnsembleModel(atom=tree_model)</code></pre><pre><code class="language-none">MLJ.DeterministicEnsembleModel(atom = DecisionTreeRegressor @ 2…44,
                                weights = Float64[],
                                bagging_fraction = 0.8,
-                               rng = MersenneTwister(UInt32[0x256a8329, 0xd6053c18, 0xab41a88d, 0x37336846]),
+                               rng = MersenneTwister(UInt32[0x3d48ae9d, 0x01649086, 0xaafa7627, 0x744fb4b8]),
                                n = 100,
                                parallel = true,
-                               out_of_bag_measure = Any[],) @ 3…65</code></pre><p>Nested hyperparameters are conveniently inspected using <code>params</code>:</p><pre><code class="language-julia">params(forest_model)</code></pre><pre><code class="language-none">(atom = (pruning_purity_threshold = 0.0,
+                               out_of_bag_measure = Any[],) @ 6…09</code></pre><p>Nested hyperparameters are conveniently inspected using <code>params</code>:</p><pre><code class="language-julia">params(forest_model)</code></pre><pre><code class="language-none">(atom = (pruning_purity_threshold = 0.0,
          max_depth = -1,
          min_samples_leaf = 5,
          min_samples_split = 2,
@@ -57,7 +57,7 @@ forest_model = EnsembleModel(atom=tree_model)</code></pre><pre><code class="lang
          post_prune = false,),
  weights = Float64[],
  bagging_fraction = 0.8,
- rng = MersenneTwister(UInt32[0x256a8329, 0xd6053c18, 0xab41a88d, 0x37336846]),
+ rng = MersenneTwister(UInt32[0x3d48ae9d, 0x01649086, 0xaafa7627, 0x744fb4b8]),
  n = 100,
  parallel = true,
  out_of_bag_measure = Any[],)</code></pre><p>Ranges for nested hyperparameters are specified using dot syntax:</p><pre><code class="language-julia">r1 = range(forest_model, :(atom.n_subfeatures), lower=1, upper=3)
@@ -72,8 +72,8 @@ fit!(self_tuning_forest, verbosity=0)
 report(self_tuning_forest)</code></pre><pre><code class="language-none">(parameter_names = [&quot;atom.n_subfeatures&quot; &quot;bagging_fraction&quot;],
  parameter_scales = Symbol[:linear :linear],
  parameter_values = Any[1 0.4; 2 0.4; … ; 2 1.0; 3 1.0],
- measurements = [0.353054, 0.215878, 0.197589, 0.337582, 0.20264, 0.187288, 0.323524, 0.185917, 0.171041, 0.311696  …  0.151232, 0.273995, 0.148811, 0.157246, 0.26577, 0.142676, 0.166792, 0.257689, 0.142471, 0.182613],
- best_measurement = 0.14247095175772315,)</code></pre><p>In this two-parameter case, a plot of the grid search results is also available:</p><pre><code class="language-julia">using Plots
+ measurements = [0.336731, 0.209921, 0.209746, 0.310177, 0.197522, 0.187734, 0.313062, 0.191674, 0.177104, 0.28952  …  0.159765, 0.244291, 0.163032, 0.161762, 0.247135, 0.158456, 0.16952, 0.253651, 0.165831, 0.186915],
+ best_measurement = 0.156558730188834,)</code></pre><p>In this two-parameter case, a plot of the grid search results is also available:</p><pre><code class="language-julia">using Plots
 plot(self_tuning_forest)</code></pre><p><img src="../tuning_plot.png" alt/></p><h3><a class="nav-anchor" id="API-1" href="#API-1">API</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.range" href="#Base.range"><code>Base.range</code></a> — <span class="docstring-category">Function</span>.</div><div><div><pre><code class="language-julia">r = range(model, :hyper; values=nothing)</code></pre><p>Defines a <code>NominalRange</code> object for a field <code>hyper</code> of <code>model</code>, assuming the field is a not a subtype of <code>Real</code>. Note that <code>r</code> is not directly iterable but <code>iterator(r)</code> iterates over <code>values</code>.</p><p>A nested hyperparameter is specified using dot notation. For example, <code>:(atom.max_depth)</code> specifies the <code>:max_depth</code> hyperparameter of the hyperparameter <code>:atom</code> of <code>model</code>.</p><pre><code class="language-none">r = range(model, :hyper; upper=nothing, lower=nothing, scale=:linear)</code></pre><p>Defines a <code>NumericRange</code> object for a <code>Real</code> field <code>hyper</code> of <code>model</code>. Note that <code>r</code> is not directly iteratable but <code>iterator(r, n)</code> iterates over <code>n</code> values between <code>lower</code> and <code>upper</code> values, according to the specified <code>scale</code>. The supported scales are <code>:linear, :log, :log10, :log2</code>. Values for <code>Integer</code> types are rounded (with duplicate values removed, resulting in possibly less than <code>n</code> values).</p><p>Alternatively, if a function <code>f</code> is provided as <code>scale</code>, then <code>iterator(r, n)</code> iterates over the values <code>[f(x1), f(x2), ... , f(xn)]</code>, where <code>x1, x2, ..., xn</code> are linearly spaced between <code>lower</code> and <code>upper</code>.</p></div></div><a class="source-link" target="_blank" href="https://github.com/alan-turing-institute/MLJ.jl/blob/d53bc1d0805678e150199e8be76efaceda1a4b6d/src/parameters.jl#L63-L88">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJ.TunedModel" href="#MLJ.TunedModel"><code>MLJ.TunedModel</code></a> — <span class="docstring-category">Function</span>.</div><div><div><pre><code class="language-julia">tuned_model = TunedModel(; model=nothing,
                          tuning=Grid(),
                          resampling=Holdout(),
