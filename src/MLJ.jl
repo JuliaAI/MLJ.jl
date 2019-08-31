@@ -1,8 +1,8 @@
 module MLJ
 
 # defined in include files:
-export @curve, @pcurve,                               # utilities.jl
-        mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,     # measures.jl
+export @curve, @pcurve, pretty,                       # utilities.jl
+        mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,    # measures.jl
         misclassification_rate, cross_entropy,        # measures.jl
         default_measure,                              # measures.jl
         coerce, supervised, unsupervised,             # tasks.jl
@@ -45,7 +45,7 @@ export nrows, nfeatures, traits,
     Found, Continuous, Finite, Infinite,
     OrderedFactor, Unknown,
     Count, Multiclass, Binary, Scientific,
-    scitype, scitype_union, schema,
+    scitype, scitype_union, schema, scitypes,
     target_scitype, input_scitype, output_scitype,
     predict, predict_mean, predict_median, predict_mode,
     transform, inverse_transform, se, evaluate, fitted_params,
