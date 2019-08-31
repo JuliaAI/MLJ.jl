@@ -19,7 +19,7 @@ MLJModels.DecisionTree_.DecisionTreeClassifier(pruning_purity = 1.0,
                                                display_depth = 5,
                                                post_prune = false,
                                                merge_purity_threshold = 0.9,
-                                               pdf_smoothing = 0.05,) @ 5…65</code></pre><pre><code class="language-julia">julia&gt; tree_model.max_depth = 2
+                                               pdf_smoothing = 0.05,) @ 1…13</code></pre><pre><code class="language-julia">julia&gt; tree_model.max_depth = 2
 julia&gt; tree_model == DecisionTreeClassfier(max_depth=2)
 true</code></pre><p><em>Important:</em> DecisionTree and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model is evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
                 resampling=CV(shuffle=true), measure=cross_entropy, verbosity=0)
@@ -27,10 +27,10 @@ true</code></pre><p><em>Important:</em> DecisionTree and most other packages imp
  measurement = [0.360337],
  per_fold = Array{Float64,1}[[0.0327898, 0.0327898, 0.524111, 0.360337, 0.360337, 0.851659]],
  per_observation = Array{Array{Float64,1},1}[[[0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898  …  0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898], [0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898  …  0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898], [0.0327898, 0.0327898, 4.12713, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898  …  0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 4.12713, 0.0327898, 4.12713, 0.0327898, 0.0327898], [0.0327898, 0.0327898, 4.12713, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 4.12713, 0.0327898  …  0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898], [0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 4.12713, 0.0327898, 0.0327898, 0.0327898  …  0.0327898, 0.0327898, 0.0327898, 0.0327898, 4.12713, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898], [0.0327898, 0.0327898, 4.12713, 0.0327898, 4.12713, 0.0327898, 0.0327898, 0.0327898, 4.12713, 4.12713  …  0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898, 0.0327898]]],)</code></pre><p>Evaluating against multiple performance measures is also possible. See <a href="evaluating_model_performance/">Evaluating model performance</a> for details.</p><h3><a class="nav-anchor" id="Training-and-testing-by-hand-1" href="#Training-and-testing-by-hand-1">Training and testing by hand</a></h3><p>Wrapping the model in data creates a <em>machine</em> which will store training outcomes:</p><pre><code class="language-julia-repl">julia&gt; tree = machine(tree_model, X, y)
-Machine{DecisionTreeClassifier} @ 1…10</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
+Machine{DecisionTreeClassifier} @ 6…48</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
 
 julia&gt; fit!(tree, rows=train);
-[ Info: Training Machine{DecisionTreeClassifier} @ 1…10.
+[ Info: Training Machine{DecisionTreeClassifier} @ 6…48.
 
 julia&gt; yhat = predict(tree, X[test,:]);
 
