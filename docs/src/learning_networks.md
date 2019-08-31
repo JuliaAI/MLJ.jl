@@ -267,10 +267,9 @@ langs_composite = @from_network LangsComposite(pca=network_pca) <= Xout
 petes_composite = @from_network PetesComposite(tree_classifier=network_tree) probabilistic=true
 ```
 
+#### Method II: Finer control 
 
-#### Method II: 
-
-In the method I above, only models appearing in the network will
+In Method I above, only models appearing in the network will
 appear as hyperparamers of the exported composite model. There is a
 second more flexible method for exporting the network, which allows
 finer control over the exported `Model` struct (see the example under
@@ -282,7 +281,7 @@ macros. The two steps required are:
 - Wrap the learning network code in a model `fit` method.
 
 All learning networks that make determinisic (respectively,
-probabilistic) predictions export as models of subtype
+probabilistic) predictions export to models of subtype
 `DeterministicNetwork` (respectively, `ProbabilisticNetwork`),
 Unsupervised learning networks export to `UnsupervisedNetwork` model
 subtypes.
@@ -322,15 +321,17 @@ function MLJ.fit(model::WrappedRidgeII, verbosity::Integer, X, y)
     yhat = inverse_transform(box, zhat)
     fit!(yhat, verbosity=0)
     
-    return fitresults(Xs, ys, yhat)
+    return fitresults(yhat)
 end
 ```
 
-The line marked `###`, where the new exported model's hyperparameter `ridge` is spliced into the network, is the only modification.
+The line marked `###`, where the new exported model's hyperparameter
+`ridge` is spliced into the network, is the only modification. This
+completes the export process.
 
-> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding machine `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the terminating node of the network built in `fit` on the data supplied. 
+> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding *machine* `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the terminating node of the network built in `fit` on the data supplied. The expression `fitresults(yhat)` bundles the terminal node `yhat` with reports (one for each machine in the network) and moves training data out to a bundled cache object. This ensures machines wrapping exported model instances do not contain actual training data in their `fitresult` fields.  
 
-The export process is complete:
+
 
 ```julia
 using CSV
@@ -356,14 +357,19 @@ subsection.
 
 Continuing to view nodes as "dynamic data", we can, in addition to
 applying "dynamic" operations like `predict` and `transform` to nodes,
-overload ordinary "static" operations as well. Common operations, like
-addition, scalar multiplication, `exp` and `log` work out-of-the
-box. To demonstrate this, consider the code below defining a composite
-model that: (i) One-hot encodes the input table `X`; (ii) Log
-transforms the continuous target `y`; (iii) Fits specified K-nearest
-neighbour and ridge regressor models to the data; (iv) Computes a
-weighted average of individual model predictions; and (v) Inverse
-transforms (exponentiates) the blended predictions.
+overload ordinary "static" (unlearned) operations as well. Common
+operations, like addition, scalar multiplication, `exp`, `log`,
+`vcat`, `hcat`, tabularization (`MLJ.table`) and matrixification
+(`MLJ.matrix`) work out-of-the box. 
+
+As a demonstration, consider the code below defining a composite model
+`blended_model` (subtype of `KNNRidgeBlend`) that: (i) One-hot encodes
+the input table `X`; (ii) Log transforms the continuous target `y`;
+(iii) Fits specified K-nearest neighbour and ridge regressor models to
+the data; (iv) Computes a weighted average of individual model
+predictions; and (v) Inverse transforms (exponentiates) the blended
+predictions. We include the weighting as a hyperparameter of the new
+model, which would not be possible using the `@from_network` macro.
 
 Note, in particular, the lines defining `zhat` and `yhat`, which
 combine several static node operations.
@@ -520,7 +526,7 @@ The key components of a `NodalMachine` object are:
 - Training *arguments*, which specify the nodes acting as proxies for
   training data on calls to `fit!`.
 
-- A *fit-result*, for storing the outcomes of calls to `fit!`.
+- A *fitresult*, for storing the outcomes of calls to `fit!`.
 
 A nodal machine is trained in the same way as a regular machine with
 one difference: Instead of training the model on the wrapped data

@@ -101,7 +101,7 @@ end
         yhat = inverse_transform(boxcoxM, zhat)
         
         fit!(yhat)
-        return fitresults(Xs, ys, yhat)
+        return fitresults(yhat)
     end
     
     MLJBase.input_scitype(::Type{<:WrappedRidge}) = Table(Continuous)

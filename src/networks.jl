@@ -16,7 +16,7 @@ Defines, respectively, learning network `Source` objects for wrapping
 some input data `X` (`kind=:input`), some target data `y`, or some
 sample weights `w`.  The values of each variable `X, y, w` can be
 anything, even `nothing`, if the network is for exporting as a
-stand-alone model only. For traing and testing the unexported network,
+stand-alone model only. For training and testing the unexported network,
 appropriate vectors, tables, or other data containers are expected.
 
 The calling behaviour of a `Source` object is this:

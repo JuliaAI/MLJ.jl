@@ -67,14 +67,20 @@ function report(yhat::Node)
 end
 
 # what is returned by a fit method for an exported learning network:
-function fitresults(Xs, ys, yhat)
+function fitresults(yhat)
+    inputs = sources(yhat, kind=:input)
+    targets = sources(yhat, kind=:target)
+    length(inputs) == 1 ||
+        error("Improperly exported supervised network does "*
+              "not have a unique input source. ")
+    if length(targets) == 1
+        cache = anonymize!(inputs[1], targets[1])
+    elseif length(targets) == 0
+        cache = anonymize!(inputs[1])
+    else
+        error("Improperly exported network has multiple target sources. ")
+    end
     r = report(yhat)
-    cache = anonymize!(Xs, ys)
-    return yhat, cache, r
-end
-function fitresults(Xs, yhat)
-    r = report(yhat)
-    cache = anonymize!(Xs)
     return yhat, cache, r
 end
 
@@ -160,7 +166,7 @@ function fit_method(network, models...)
                           for j in eachindex(models)]
         network_ys = sources(network, kind=:target)[1]
         Xs = source(X)
-        ys = source(y)
+        ys = source(y, kind=:target)
         source_replacements = [network_Xs => Xs, network_ys => ys]
         replacements = vcat(model_replacements, source_replacements)
         yhat = replace(network, replacements...)
@@ -170,7 +176,7 @@ function fit_method(network, models...)
 
         fit!(yhat, verbosity=verbosity)
 
-        return fitresults(Xs, ys, yhat)
+        return fitresults(yhat)
     end
 
     function fit(model::M, verbosity, X) where M <:Unsupervised
@@ -187,7 +193,7 @@ function fit_method(network, models...)
         
         fit!(Xout, verbosity=verbosity)
 
-        return fitresults(Xs, Xout)
+        return fitresults(Xout)
     end
 
     return fit
@@ -392,7 +398,7 @@ MLJBase.is_wrapper(::Type{<:SimpleDeterministicCompositeModel}) = true
 function MLJBase.fit(composite::SimpleDeterministicCompositeModel,
                      verbosity::Integer, Xtrain, ytrain)
     X = source(Xtrain) # instantiates a source node
-    y = source(ytrain)
+    y = source(ytrain, kind=:target)
 
     t = machine(composite.transformer, X)
     Xt = transform(t, X)
@@ -402,7 +408,7 @@ function MLJBase.fit(composite::SimpleDeterministicCompositeModel,
 
     fit!(yhat, verbosity=verbosity)
 
-    return fitresults(X, y, yhat)
+    return fitresults(yhat)
 end
 
 # MLJBase.predict(composite::SimpleDeterministicCompositeModel, fitresult, Xnew) = fitresult(Xnew)
