@@ -224,7 +224,7 @@ end
 
 ## FOR PRETTY PRINTING COLUMN TABLES
 
-function pretty_table(X; showtypes=true, alignment=:l, kwargs...)
+function pretty(X; showtypes=true, alignment=:l, kwargs...)
     names = schema(X).names |> collect
     if showtypes
         types = schema(X).types |> collect

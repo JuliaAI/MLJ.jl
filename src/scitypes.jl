@@ -1,3 +1,9 @@
+function scitypes(X)
+    s = schema(X)
+    return (names=collect(s.names), scitypes=collect(s.scitypes))
+end
+
+
 ## SUPERVISED
 
 struct SupervisedModel{input_scitype, target_scitype, is_probabilistic} end

@@ -343,7 +343,7 @@ function evaluate!(mach::Machine, resampling;
            per_observation=per_observation)
 
     verbosity < 1 || nmeasures < 2 ||
-        pretty_table(selectcols(ret, 1:2), showtypes=false)
+        pretty(selectcols(ret, 1:2), showtypes=false)
 
     return ret
 
