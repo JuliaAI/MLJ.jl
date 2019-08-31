@@ -238,9 +238,10 @@ function pretty(X; showtypes=true, alignment=:l, kwargs...)
         PrettyTables.pretty_table(MLJBase.matrix(X),
                                   header; alignment=alignment, kwargs...)
     catch
-        println("Trouble displaying evaluation results.")
+        println("Trouble displaying table.")
     end
-    ifelse(show_color, color_on(), color_off())
+    show_color ? color_on() : color_off()
+    return nothing
 end
 
 
