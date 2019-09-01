@@ -18,7 +18,8 @@ export @curve, @pcurve, pretty,                       # utilities.jl
         rebind!,                                      # networks.jl
         machines, sources, anonymize!,                # composites.jl
         @from_network,                                # composites.jl
-        fitresults                                    # composites.jl
+        fitresults,                                   # composites.jl
+        @pipeline                                      # pipelines.jl
 
 # defined in include files "machines.jl and "networks.jl":
 export Machine, NodalMachine, machine, AbstractNode,
@@ -113,6 +114,7 @@ include("measures.jl")      # API for loss functions & defs of built-ins
 include("machines.jl")    
 include("networks.jl")      # for building learning networks
 include("composites.jl")    # composite models & exporting learning networks
+include("pipelines.jl")     # pipelines (exported linear learning networks)
 include("operations.jl")    # syntactic sugar for operations (predict, etc)
 include("resampling.jl")    # resampling strategies and model evaluation
 include("parameters.jl")    # hyperparameter ranges and grid generation

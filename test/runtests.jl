@@ -45,6 +45,18 @@ end
   @test include("machines.jl")
 end
 
+@testset "networks" begin
+  @test include("networks.jl")
+end
+
+@testset "composites" begin
+  @test include("composites.jl")
+end
+
+@testset "pipelines" begin
+  @test include("pipelines.jl")
+end
+
 @testset "resampling" begin
     @test include("resampling.jl")
 end
@@ -67,14 +79,6 @@ end
 
 @testset "loading" begin
     @test include("loading.jl")
-end
-
-@testset "networks" begin
-  @test include("networks.jl")
-end
-
-@testset "composites" begin
-  @test include("composites.jl")
 end
 
 @testset "tasks" begin

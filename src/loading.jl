@@ -71,8 +71,9 @@ function load(proxy::ModelProxy; mod=Main, verbosity=0)
     nothing
 end
 
+# model() defined in model_search.jl
 load(name::String; pkg=nothing, kwargs...) =
-    load(model(name, pkg=pkg); kwargs...)
+    load(model(name, pkg=pkg); kwargs...) 
 
 
 """

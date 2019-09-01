@@ -204,6 +204,23 @@ net_alert(message) = throw(ArgumentError("Learning network export error.\n"*
                                      string(message)))
 net_alert(k::Int) = throw(ArgumentError("Learning network export error $k. "))
 
+# returns Model supertype - or `missing` if arguments are incompatible
+function kind_(is_supervised, is_probabilistic)
+    if is_supervised
+        if ismissing(is_probabilistic) || !is_probabilistic
+            return :DeterministicNetwork
+        else
+            return :ProbabilisticNetwork
+        end
+    else
+        if ismissing(is_probabilistic) || !is_probabilistic
+            return :UnsupervisedNetwork
+        else
+            return missing
+        end
+    end
+end
+
 function from_network_preprocess(modl, ex,
                                  is_probabilistic::Union{Missing,Bool})
 
@@ -250,21 +267,11 @@ function from_network_preprocess(modl, ex,
 
     is_supervised = length(targets) == 1
 
-    if is_supervised
-        if ismissing(is_probabilistic) || !is_probabilistic
-            kind = :DeterministicNetwork
-        else
-            kind = :ProbabilisticNetwork
-        end
-    else
-        if ismissing(is_probabilistic) || !is_probabilistic
-            kind = :UnsupervisedNetwork
-        else
-            net_alert("Network appears unsupervised (has no source with "*
+    kind = kind_(is_supervised, is_probabilistic)
+    ismissing(kind) &&
+        net_alert("Network appears unsupervised (has no source with "*
                   "`kind=:target`) and so `is_probabilistic=true` "*
                   "declaration is not allowed. ")
-        end
-    end
 
     models_ = [modl.eval(e) for e in model_exs]
     issubset(models_, models(N)) ||
