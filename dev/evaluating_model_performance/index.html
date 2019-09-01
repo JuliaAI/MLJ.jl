@@ -7,20 +7,20 @@ julia&gt; X = (a=rand(12), b=rand(12), c=rand(12));
 julia&gt; y = X.a + 2X.b + 0.05*rand(12);
 
 julia&gt; model = @load RidgeRegressor
-MLJModels.MultivariateStats_.RidgeRegressor(lambda = 0.0,) @ 1…92
+MLJModels.MultivariateStats_.RidgeRegressor(lambda = 0.0,) @ 8…46
 
 julia&gt; cv=CV(nfolds=3)
 CV(nfolds = 3,
    shuffle = false,
-   rng = MersenneTwister(UInt32[0x000004d2]),) @ 8…63
+   rng = MersenneTwister(UInt32[0x000004d2]),) @ 1…83
 
 julia&gt; evaluate(model, X, y, resampling=cv, measure=l2)
-Evaluating over 3 folds:  25%[======&gt;                  ]  ETA: 0:00:00[KEvaluating over 3 folds:  50%[============&gt;            ]  ETA: 0:00:03[KEvaluating over 3 folds:  75%[==================&gt;      ]  ETA: 0:00:01[KEvaluating over 3 folds: 100%[=========================] Time: 0:00:03[K
+Evaluating over 3 folds:  25%[======&gt;                  ]  ETA: 0:00:00[KEvaluating over 3 folds:  50%[============&gt;            ]  ETA: 0:00:03[KEvaluating over 3 folds:  75%[==================&gt;      ]  ETA: 0:00:01[KEvaluating over 3 folds: 100%[=========================] Time: 0:00:02[K
 (measure = MLJ.L2[l2],
  measurement = [0.000194231],
  per_fold = Array{Float64,1}[[0.000299116, 1.20939e-5, 0.000271481]],
  per_observation = Array{Array{Float64,1},1}[[[0.000199628, 4.6102e-5, 0.000478725, 0.00047201], [7.98802e-6, 3.14728e-6, 1.70059e-5, 2.02343e-5], [1.75352e-6, 0.000648431, 0.000433657, 2.08456e-6]]],)</code></pre><p>Alternatively, instead of applying <code>evaluate</code> to a model + data, one may call <code>evaluate!</code> on an existing machine wrapping the model in data:</p><pre><code class="language-julia-repl">julia&gt; mach = machine(model, X, y)
-Machine{RidgeRegressor} @ 6…42
+Machine{RidgeRegressor} @ 2…14
 
 julia&gt; evaluate!(mach, resampling=cv, measure=l2)
 Evaluating over 3 folds:  25%[======&gt;                  ]  ETA: 0:00:00[KEvaluating over 3 folds:  50%[============&gt;            ]  ETA: 0:00:00[KEvaluating over 3 folds:  75%[==================&gt;      ]  ETA: 0:00:00[KEvaluating over 3 folds: 100%[=========================] Time: 0:00:00[K
@@ -58,7 +58,7 @@ julia&gt; MLJ.orientation(::typeof(my_weighted_score)) = :score;
 julia&gt; holdout = Holdout(fraction_train=0.8)
 Holdout(fraction_train = 0.8,
         shuffle = false,
-        rng = MersenneTwister(UInt32[0x000004d2]),) @ 1…77
+        rng = MersenneTwister(UInt32[0x000004d2]),) @ 9…76
 
 julia&gt; weights = [1, 1, 2, 1, 1, 2, 3, 1, 1, 2, 3, 1];
 
@@ -69,7 +69,7 @@ julia&gt; evaluate!(mach,
 ┌ Warning: weights ignored in evaluations of the following measures, as unsupported: 
 │ Main.ex-evaluation_of_supervised_models.my_loss, Main.ex-evaluation_of_supervised_models.my_per_observation_loss 
 └ @ MLJ ~/build/alan-turing-institute/MLJ.jl/src/resampling.jl:265
-Evaluating over 3 folds:  25%[======&gt;                  ]  ETA: 0:00:00[KEvaluating over 3 folds:  50%[============&gt;            ]  ETA: 0:00:01[KEvaluating over 3 folds:  75%[==================&gt;      ]  ETA: 0:00:00[KEvaluating over 3 folds: 100%[=========================] Time: 0:00:00[K
+Evaluating over 3 folds:  25%[======&gt;                  ]  ETA: 0:00:00[KEvaluating over 3 folds:  50%[============&gt;            ]  ETA: 0:00:00[KEvaluating over 3 folds:  75%[==================&gt;      ]  ETA: 0:00:00[KEvaluating over 3 folds: 100%[=========================] Time: 0:00:00[K
 ┌─────────────────────────────────────────────────────────────────┬────────────────────────┐
 │ measure                                                         │ measurement            │
 ├─────────────────────────────────────────────────────────────────┼────────────────────────┤
