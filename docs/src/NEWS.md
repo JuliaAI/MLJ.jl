@@ -1,10 +1,16 @@
 # MLJ News 
 
-Development news for MLJ and its satellite packages, 
+News for MLJ and its satellite packages, 
 [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl),
 [MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl) (now defunct)
 and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 [ScientificTypes](https://github.com/alan-turing-institute/ScientificTypes.jl)
+
+
+
+## ScientficTypes 0.1.3
+
+[Release notes](https://github.com/alan-turing-institute/ScientificTypes.jl/releases/tag/v0.1.3)
 
 
 ## MLJ 0.4.0 
