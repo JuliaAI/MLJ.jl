@@ -260,6 +260,9 @@ ex = pipe(f, m, t, h)
 @test_throws ArgumentError MLJ.pipeline_preprocess(TestPipelines, ex,
                                                    :(is_probabilistic=true))
 
+
+## SIMPLE SUPERVISED PIPELINE WITH TARGET TRANSFORM
+
 # test a simple pipeline prediction agrees with prediction of
 # hand-built learning network built earlier:
 p = @pipeline(Pipe(sel=FeatureSelector(), knn=KNNRegressor(),
@@ -271,15 +274,61 @@ fit!(mach)
 MLJ.tree(mach.fitresult).arg1.arg1.model.features == [:x3, ]
 @test predict(mach) ≈ hand_built
 
+# test a simple probabilistic classifier pipeline:
 X = MLJ.table(rand(7,3))
 y = categorical(collect("ffmmfmf"))
 Xs = source(X)
 ys = source(y, kind=:target)
-p = @pipeline(Piper(hot=OneHotEncoder(), cnst=ConstantClassifier(),
+p = @pipeline(Pipe21(hot=OneHotEncoder(),
+                    cnst=ConstantClassifier()),
+              is_probabilistic=true)
+mach = machine(p, X, y)
+fit!(mach)
+@test p isa ProbabilisticNetwork
+pdf(predict(mach)[1], 'f') ≈ 4/7
+
+# test a simple deterministic classifier pipeline:
+X = MLJ.table(rand(7,3))
+y = categorical(collect("ffmmfmf"))
+Xs = source(X)
+ys = source(y, kind=:target)
+p = @pipeline(Piper3(hot=OneHotEncoder(), cnst=ConstantClassifier(),
                     broadcast_mode))
 mach = machine(p, X, y)
 fit!(mach)
-@test predict(mach) == fill('f', 7) 
+@test predict(mach) == fill('f', 7)
+
+# test a pipeline with static transformation of target:
+NN = 100 
+X = (x1=rand(NN), x2=rand(NN), x3=categorical(rand("abc", NN)));
+y = 1000*abs.(2X.x1 - X.x2 + 0.05*rand(NN))
+# by hand:
+Xs =source(X); ys = source(y, kind=:target);
+hot = OneHotEncoder()
+hot_=machine(hot, Xs)
+W = transform(hot_, Xs)
+sel = FeatureSelector(features=[:x1,:x3__a])
+sel_ = machine(sel, W)
+Wsmall = transform(sel_, W)
+z = log(ys)
+knn = KNNRegressor(K=4)
+knn_ = machine(knn, Wsmall, z)
+zhat = predict(knn_, Wsmall)
+yhat = exp(zhat)
+fit!(yhat)
+pred1 = yhat()
+# with pipeline:
+p = @pipeline Pipe4(hot=OneHotEncoder(),
+                    sel=FeatureSelector(),
+                    knn=KNNRegressor(),
+                    target=v->log.(v),
+                    inverse=v->exp.(v))
+p.sel.features = [:x1, :x3__a]
+p.knn.K = 4
+p_ = machine(p, X, y)
+fit!(p_)
+pred2 = predict(p_)
+@test pred1 ≈ pred2
 
 end
 true
