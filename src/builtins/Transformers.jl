@@ -7,6 +7,7 @@ export FeatureSelector
 export UnivariateStandardizer, Standardizer
 export UnivariateBoxCoxTransformer
 export OneHotEncoder
+export StaticTransformer
 
 import MLJBase: MLJType, Unsupervised
 import MLJBase: selectcols, table
@@ -25,6 +26,30 @@ import MLJBase: fit, transform, inverse_transform
 
 const N_VALUES_THRESH = 16 # for BoxCoxTransformation
 const CategoricalElement = Union{CategoricalValue,CategoricalString}
+
+
+## STATIC TRANSFORMERS
+
+mutable struct StaticTransformer <: Unsupervised
+    f  # callable object or function
+end
+
+StaticTransformer(; f=identity) = StaticTransformer(f)
+
+MLJBase.fitted_params(::StaticTransformer) = NamedTuple()
+
+MLJBase.fit(::StaticTransformer, verbosity::Integer, X) =
+    nothing, nothing, NamedTuple()
+MLJBase.transform(model::StaticTransformer, fitresult, Xnew) = (model.f)(Xnew)
+
+MLJBase.load_path(::Type{<:StaticTransformer}) = "MLJ.StaticTransformer"
+MLJBase.package_url(::Type{<:StaticTransformer}) = "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.package_name(::Type{<:StaticTransformer}) = "MLJ"
+MLJBase.package_uuid(::Type{<:StaticTransformer}) = ""
+MLJBase.is_pure_julia(::Type{<:StaticTransformer}) = true
+# MLJBase.input_scitype(::Type{<:StaticTransformer}) = Table(Scientific) # anything goes
+# MLJBase.output_scitype(::Type{<:StaticTransformer}) = Table(Scientific) 
+
 
 ## FOR FEATURE (COLUMN) SELECTION
 

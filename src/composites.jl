@@ -10,16 +10,16 @@ MLJBase.is_wrapper(::Type{ProbabilisticNetwork}) = true
 function MLJBase.update(model::Union{SupervisedNetwork,UnsupervisedNetwork},
                         verbosity, yhat, cache, args...)
 
-    anonymised = cache isa NamedTuple{(:sources, :data)}
+    is_anonymised = cache isa NamedTuple{(:sources, :data)}
 
-    if anonymised
+    if is_anonymised
         sources, data = cache.sources, cache.data
         for k in eachindex(sources)
             rebind!(sources[k], data[k])
         end
     end
     fit!(yhat; verbosity=verbosity)
-    if anonymised
+    if is_anonymised
         for s in sources
             rebind!(s, nothing)
         end
@@ -66,7 +66,8 @@ function report(yhat::Node)
     return (machines=machs, reports=reports)
 end
 
-# what is returned by a fit method for an exported learning network:
+# what should be returned by a fit method for an exported learning
+# network:
 function fitresults(yhat)
     inputs = sources(yhat, kind=:input)
     targets = sources(yhat, kind=:target)
@@ -314,6 +315,7 @@ function from_network_(modl, modeltype_ex, fieldname_exs, model_exs,
         MLJ.fit(model::$modeltype_ex, verbosity::Integer, $args...) =
             MLJ.fit_method(
                 $N_ex, $(model_exs...))(model, verbosity, $args...)
+
     end
 
     program2 = quote

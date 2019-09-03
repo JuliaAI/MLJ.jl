@@ -26,12 +26,10 @@ export Machine, NodalMachine, machine, AbstractNode,
         source, node, fit!, freeze!, thaw!, Node, sources, origins
 
 # defined in include file "builtins/Transformers.jl":
-export FeatureSelector,
-        UnivariateStandardizer, Standardizer,
-        UnivariateBoxCoxTransformer,
-        OneHotEncoder
-        # IntegerToInt64Transformer,
-        # UnivariateDiscretizer, Discretizer
+export StaticTransformer, FeatureSelector,
+    UnivariateStandardizer, Standardizer,
+    UnivariateBoxCoxTransformer,
+    OneHotEncoder
 
 # rexport from Random, Statistics, Distributions, CategoricalArrays:
 export pdf, mode, median, mean, shuffle!, categorical, shuffle, levels, levels!

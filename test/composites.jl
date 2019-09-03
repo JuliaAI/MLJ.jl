@@ -321,7 +321,9 @@ model_.knn_rgs.K = 5
            (:info, r"^Not.*OneHot"),
            (:info, r"^Not.*Univ"),
            (:info, r"^Updat.*KNN"),
-           (:info, r"^Not.*Dec"), fit!(mach))                               
+           (:info, r"^Not.*Dec"), fit!(mach))
+
+@test MLJ.tree(mach.fitresult).arg1.arg1.arg1.arg1.model.K == 5
 
 # check data anomynity:
 @test all(x->(x===nothing), [s.data for s in sources(mach.fitresult)])
