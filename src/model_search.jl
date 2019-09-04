@@ -158,21 +158,21 @@ function models(task::UnsupervisedTask)
 end
 
 """
-    localmodels(; mod=Main)
-    localmodels(task::MLJTask; mod=Main)
-    localmodels(conditions...; mod=Main)
+    localmodels(; modl=Main)
+    localmodels(task::MLJTask; modl=Main)
+    localmodels(conditions...; modl=Main)
  
 
 List all models whose names are in the namespace of the specified
-module `mod`, additionally solving the `task`, or meeting the
+module `modl`, additionally solving the `task`, or meeting the
 `conditions`, if specified. A *condition* is a `Bool`-valued function
 on models.
 
 See also [models](@ref)
 
 """
-function localmodels(args...; mod=Main)
-    modeltypes = localmodeltypes(mod)
+function localmodels(args...; modl=Main)
+    modeltypes = localmodeltypes(modl)
     names = map(modeltypes) do M
         traits(M).name
     end

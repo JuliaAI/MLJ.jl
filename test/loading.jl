@@ -9,8 +9,8 @@ using MLJ
     @test (@isdefined DecisionTreeClassifier)
     @test tree == DecisionTreeClassifier()
     @test_logs((:info, r"^A model"),
-               load("DecisionTreeClassifier", mod=TestLoading))
-    @test model("DecisionTreeClassifier") in localmodels(mod=TestLoading)
+               load("DecisionTreeClassifier", modl=TestLoading))
+    @test model("DecisionTreeClassifier") in localmodels(modl=TestLoading)
 end
 
 end # module
