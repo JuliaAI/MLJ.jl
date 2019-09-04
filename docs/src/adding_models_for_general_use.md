@@ -1,4 +1,4 @@
-# Adding Models for General Use
+gg# Adding Models for General Use
 
 This guide outlines in detail the specification of the MLJ model interface and
 provides guidelines for implementing the interface for models intended
@@ -564,7 +564,7 @@ defines a fallback for `update` which just calls `fit`. For context,
 see [MLJ Internals](internals.md).
 
 Learning networks wrapped as models constitute one use-case (see
-[Learning Networks](index.md)): one would like each component model to be
+[Composing Models](index.md)): one would like each component model to be
 retrained only when hyperparameter changes "upstream" make this
 necessary. In this case MLJ provides a fallback (specifically, the
 fallback is for any subtype of `SupervisedNetwork =

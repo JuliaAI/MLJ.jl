@@ -4,17 +4,17 @@
 
 #### [Cheatsheet](mlj_cheatsheet.md)
 
-```@repl doda
-import Random.seed! # hide
-seed!(1234) # hide
+```@setup doda
+import Base.eval # hack b/s auto docs put's code in baremodule
+import Random.seed! 
+seed!(1234) 
 ```
 
 ### Plug-and-play model evaluation
 
-To load some data install the
-[RDatasets](https://github.com/JuliaStats/RDatasets.jl) in your load
+To load some data add
+[RDatasets](https://github.com/JuliaStats/RDatasets.jl) to your load
 path and enter
-
 ```@repl doda
 using RDatasets
 iris = dataset("datasets", "iris"); # a DataFrame
@@ -27,20 +27,18 @@ y = iris[:, 5];
 ```
 
 In MLJ a *model* is a struct storing the hyperparameters of the
-learning algorithm indicated by the struct name.  Assuming the
-DecisionTree package is in your load path, we can use `@load` to load
-the code defining the `DecisionTreeClassifier` model type. This macro
-also returns an instance, with default hyperparameters:
+learning algorithm indicated by the struct name.  
+
+Assuming the DecisionTree package is in your load path, we can use
+`@load` to load the code defining the `DecisionTreeClassifier` model
+type. This macro also returns an instance, with default
+hyperparameters. 
+
+Drop the `verbosity=1` declaration for silent loading:
 
 ```@repl doda
 using MLJ
 tree_model = @load DecisionTreeClassifier verbosity=1
-```
-
-```julia 
-julia> tree_model.max_depth = 2
-julia> tree_model == DecisionTreeClassfier(max_depth=2)
-true
 ```
 
 *Important:* DecisionTree and most other packages implementing machine
@@ -48,7 +46,7 @@ learning algorithms for use in MLJ are not MLJ dependencies. If such a
 package is not in your load path you will receive an error explaining
 how to add the package to your current environment.
 
-Once loaded, a model is evaluated with the `evaluate` method:
+Once loaded, a model can be evaluated with the `evaluate` method:
 
 ```@repl doda
 evaluate(tree_model, X, y, 
@@ -99,7 +97,7 @@ calculations when retrained, in certain conditions - for example when
 increasing the number of trees in a random forest, or the number of
 epochs in a neural network. The machine building syntax also
 anticipates a more general syntax for composing multiple models, as
-explained in [Learning Networks](learning_networks.md).
+explained in [Composing Models](composing_models.md).
 
 There is a version of `evaluate` for machines as well as models:
 
@@ -121,8 +119,8 @@ evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
 
 To learn a little more about what MLJ can do, take the MLJ
 [tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/examples/tour/tour.ipynb),
-and then return to the manual as needed. Read at least the remainder
-of this page before considering serious use of MLJ.
+and then return to the manual as needed. *Read at least the remainder
+of this page before considering serious use of MLJ.*
 
 
 ### Prerequisites
@@ -166,6 +164,7 @@ type.
 
 
 ![](scitypes.png)
+
 *Figure 1. Part of the scientific type heirarchy in* ScientificTypes.jl.
 
 ```@repl doda
@@ -195,9 +194,10 @@ schema(X)
 
 Since an MLJ model only specifies the scientific type of data, if that
 type is `Table` - which is the case for the majority of MLJ models -
-then any Tables.jl format is permitted. However, the Tables.jl API
-excludes matrices. If `Xmatrix` is a matrix, convert it to a column
-table using `X = MLJ.table(Xmatrix)`.
+then any [Tables.jl](https://github.com/JuliaData/Tables.jl) format is
+permitted. However, the Tables.jl API excludes matrices. If `Xmatrix`
+is a matrix, convert it to a column table using `X =
+MLJ.table(Xmatrix)`.
 
 Specifically, the requirement for an arbitrary model's input is `scitype(X)
 <: input_scitype(model)`.
@@ -214,23 +214,30 @@ matter (the types of `y[j]` for each `j`).
 Specifically, the type requirement for a model target is `scitype(y) <:
 target_scitype(model)`.
 
-#### Querying a model for data types 
+#### Querying a model for acceptable data types 
 
-One can inspect the admissible scientific types of a model's input
-and target. If one has a `Model` instance `model`, one can use
-`scitype(model)`:
-
-```@repl doda
-tree = DecisionTreeClassifier();
-scitype(tree)
+Given a model instance, one can inspect the admissible scientific
+types of its input and target by querying the scientific type of
+the model itself:
+ 
+```@setup doda
+tree = @load DecisionTreeClassifier
 ```
 
-If, however, the relevant model code has not been loaded, one can
-nevertheless extract the scitypes from the model type's MLJ registry
-entry:
+```@julia doda
+julia> tree = DecisionTreeClassifier();
+julia> scitype(tree)
+(input_scitype = ScientificTypes.Table{#s13} where #s13<:(AbstractArray{#s12,1} where #s12<:Continuous),
+ target_scitype = AbstractArray{#s21,1} where #s21<:Finite,
+ is_probabilistic = true,)
+```
+
+This does not work if relevant model code has not been loaded. In that
+case one can extract this information from the model type's registry
+entry, using `model`:
 
 ```@repl doda
-traits("DecisionTreeClassifier")
+model("DecisionTreeClassifier")
 ```
 
 See also [Working with tasks](working_with_tasks.md) on searching for
@@ -239,7 +246,7 @@ models solving a specified task.
 
 #### Container element types
 
-Models in MLJ will always apply the *mlj* convention described
+Models in MLJ will always apply the *mlj* convention described in
 [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
 to decide how to interpret the elements of your container types. Here
 are the key aspects of that convention:
@@ -257,13 +264,12 @@ are the key aspects of that convention:
   `CategoricalVector`s if they represent `Multiclass` or
   `OrderedFactor` data.
   
-  
 - In particular, *integers* (including `Bool`s) *cannot be used to
   represent categorical data.*
   
-
 To coerce the scientific type of a vector or table, use the `coerce`
-method (re-exported from [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)).
+method (re-exported from
+[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)).
 
 
 

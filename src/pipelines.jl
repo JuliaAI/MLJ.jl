@@ -228,7 +228,7 @@ pipeline_(modl, ex) = pipeline_(modl, ex, :(is_probabilistic=missing))
     @pipeline NewPipeType(fld1=model1, fld2=model2, ...)
     @pipeline NewPipeType(fld1=model1, fld2=model2, ...) is_probabilistic=false
 
-Create a new "pipeline" type `NewPipeType` that composes the types of
+Create a new pipeline model type `NewPipeType` that composes the types of
 the specified models `model1`, `model2`, ... . The models are composed
 in the specified order, meaning the input(s) of the pipeline goes to
 `model1`, whose output is sent to `model2`, and so forth. 
@@ -241,10 +241,9 @@ The new model type `NewPipeType` has hyperparameters (fields) named
 generated keyword constructor are deep copies of `model1`, `model2`,
 ... .
 
-**Important.** If the learning network is supervised and makes
-probabilistic predictions, then one must declare
-`is_probabilistic=true`. In the deterministic case the keyword
-argument can be omitted.
+*Important.* If the overall pipeline is supervised and makes probabilistic
+predictions, then one must declare `is_probabilistic=true`. In the
+deterministic case the keyword argument can be omitted.
 
 Static (unlearned) transformations - that is, ordinary functions - may
 also be inserted in the pipeline as shown in the following example

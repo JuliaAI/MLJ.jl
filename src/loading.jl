@@ -45,7 +45,7 @@ function load(proxy::ModelProxy; modl=Main, verbosity=0)
         return
     end
 
-    toprint && @info "Loading into module \"$modl\": "
+    verbosity > 1 && @info "Loading into module \"$modl\": "
 
     # if needed, put MLJModels in the calling module's namespace (it
     # is already loaded into MLJ's namespace):
@@ -114,20 +114,24 @@ macro load(name_ex, kw_exs...)
     end
     (@isdefined pkg) || (pkg = nothing)
     (@isdefined verbosity) || (verbosity = 0)
-                
+    
     # get rid brackets in name_, as in
     # "(MLJModels.Clustering).KMedoids":
     name = filter(name_) do c !(c in ['(',')']) end
-
-    load(name, modl=__module__, pkg=pkg, verbosity=verbosity)
-
-    esc(quote
-        try
-            $name_ex()
-        catch
-            @warn "Code is loaded but no instance returned. "
-            nothing
-        end
-    end)
     
+    load(name, modl=__module__, pkg=pkg, verbosity=verbosity)
+    
+    esc(quote
+            try
+                $name_ex()
+            catch
+                try # hack for baremodules that have imported Base.eval:
+                    $name_ex = Base.$name_ex
+                    $name_ex()
+                catch
+                    @warn "Code is loaded but no instance returned. "
+                    nothing
+                end
+            end
+        end)
 end

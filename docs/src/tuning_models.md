@@ -13,58 +13,62 @@ way the wrapped model may be viewed as a "self-tuning" version of the
 
 ### Tuning a single hyperparameter
 
-```@example goof
+```@setup goof
+import Base.eval
+```
+
+```@repl goof
 using MLJ
-X = (x1=rand(100), x2=rand(100), x3=rand(100))
-y = 2X.x1 - X.x2 + 0.05*rand(100)
-tree_model = @load DecisionTreeRegressor
+X = (x1=rand(100), x2=rand(100), x3=rand(100));
+y = 2X.x1 - X.x2 + 0.05*rand(100); 
+tree_model = @load DecisionTreeRegressor; 
 ```
     
 Let's tune `min_purity_increase` in the model
 above, using a grid-search. Defining hyperparameter ranges and
 wrapping the model:
 
-```@example goof
-r = range(tree_model, :min_purity_increase, lower=0.001, upper=1.0, scale=:log)
+```@repl goof
+r = range(tree_model, :min_purity_increase, lower=0.001, upper=1.0, scale=:log);
 self_tuning_tree_model = TunedModel(model=tree_model,
                                     resampling = CV(nfolds=3),
                                     tuning = Grid(resolution=10),
                                     ranges = r,
-                                    measure = rms);
+                                    measure = rms); 
 ```
 
 Incidentally, for a numeric hyperparameter, the object returned by
 `range` can be iterated after specifying a resolution:
 
-```@example goof
+```@repl goof
 iterator(r, 5)
 ```
 
 Non-numeric hyperparameters are handled a little differently:
 
-```@example goof
-selector_model = FeatureSelector()
-r2 = range(selector_model, :features, values = [[:x1,], [:x1, :x2]])
+```@repl goof
+selector_model = FeatureSelector(); 
+r2 = range(selector_model, :features, values = [[:x1,], [:x1, :x2]]); 
 iterator(r2)
 ```
     
 Returning to the wrapped tree model:
 
-```@example goof
-self_tuning_tree = machine(self_tuning_tree_model, X, y)
-fit!(self_tuning_tree)
+```@repl goof
+self_tuning_tree = machine(self_tuning_tree_model, X, y); 
+fit!(self_tuning_tree, verbosity=0);
 ```
 
 We can inspect the detailed results of the grid search with
 `report(self_tuning_model)` or just retrieve the optimal model, as here:
 
-```@example goof
+```@repl goof
 fitted_params(self_tuning_tree).best_model
 ```
 
 Predicting on new input observations using the optimal model:
 
-```@example goof
+```@repl goof
 predict(self_tuning_tree, (x1=rand(3), x2=rand(3), x3=rand(3)))
 ```
 
@@ -74,28 +78,33 @@ predict(self_tuning_tree, (x1=rand(3), x2=rand(3), x3=rand(3)))
 The following model has another model, namely a `DecisionTreeRegressor`, as a
 hyperparameter:
 
-```@example goof
-tree_model = DecisionTreeRegressor()
-forest_model = EnsembleModel(atom=tree_model)
+```@setup goof
+tree_model = @load DecisionTreeRegressor
+forest_model = EnsembleModel(atom=tree_model); 
 ```
 
-Nested hyperparameters are conveniently inspected using `params`:
+```julia
+julia> tree_model = DecisionTreeRegressor()
+julia> forest_model = EnsembleModel(atom=tree_model); 
+```
 
-```@example goof
+Nested hyperparameters can be inspected using `params`:
+
+```@repl goof
 params(forest_model)
 ```
 
 Ranges for nested hyperparameters are specified using dot syntax:
 
-```@example goof
-r1 = range(forest_model, :(atom.n_subfeatures), lower=1, upper=3)
-r2 = range(forest_model, :bagging_fraction, lower=0.4, upper=1.0);
+```@repl goof
+r1 = range(forest_model, :(atom.n_subfeatures), lower=1, upper=3); 
+r2 = range(forest_model, :bagging_fraction, lower=0.4, upper=1.0); 
 self_tuning_forest_model = TunedModel(model=forest_model, 
                                       tuning=Grid(resolution=12),
                                       resampling=CV(nfolds=6),
                                       ranges=[r1, r2],
-                                      measure=rms)
-self_tuning_forest = machine(self_tuning_forest_model, X, y)
+                                      measure=rms); 
+self_tuning_forest = machine(self_tuning_forest_model, X, y); 
 fit!(self_tuning_forest, verbosity=0)
 report(self_tuning_forest)
 ```

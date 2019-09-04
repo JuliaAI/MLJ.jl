@@ -120,11 +120,6 @@ If using Plots.jl:
 `plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)` 
 
 
-#### Ensemble model wrapper
-
-`EnsembleModel(atom=…, weights=Float64[], bagging_fraction=0.8, rng=GLOBAL_RNG, n=100, parallel=true, out_of_bag_measure=[])`
-
-
 #### Built-in measures
 
 `l1`, `l2`, `mav`, `rms`, `rmsl`, `rmslp1`, `rmsp`, `misclassification_rate`, `cross_entropy`
@@ -138,6 +133,18 @@ Externals include: `PCA` (in MultivariateStats), `KMeans`, `KMedoids` (in Cluste
 
 Full list: do `models(m -> !m[:is_supervised])`
 
+#### Ensemble model wrapper
+
+`EnsembleModel(atom=…, weights=Float64[], bagging_fraction=0.8, rng=GLOBAL_RNG, n=100, parallel=true, out_of_bag_measure=[])`
+
+#### Define a linear pipeline with point-predictions:
+
+`pipe = @pipeline MyPipe(hot = OneHotEncoder(), knn = KNNRegressor(K=3), target = UnivariateStandardizer())`
+						 
+#### Define a linear pipeline with probabilistic-predictions:
+
+`pipe = @pipeline MyPipe(hot = OneHotEncoder(), knn = KNNRegressor(K=3), target = UnivariateStandardizer()) is_probabilistic=true`
+						 
 #### Start a supervised learning network:
 
 `Xs = source(X)`

@@ -338,7 +338,7 @@ a learning network as a blueprint. Here `N` refers to the terminal
 node of the learning network (from which final predictions or
 transformations are fetched). 
 
-**Important.** If the learning network is supervised (has a source with
+*Important.* If the learning network is supervised (has a source with
 `kind=:target`) and makes probabilistic predictions, then one must
 declare `is_probabilistic=true`. In the deterministic case the keyword
 argument can be omitted.

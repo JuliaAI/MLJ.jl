@@ -91,7 +91,6 @@ end
     evaluate!(mach, verbosity=0, Holdout(shuffle=true, rng=123))
     e1 = evaluate!(mach, verbosity=0, Holdout(shuffle=true)).measurement[1]
     @test e1 != evaluate!(mach, verbosity=0, Holdout()).measurement[1]
-
              
 end
 

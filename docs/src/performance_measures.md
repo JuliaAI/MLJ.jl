@@ -1,4 +1,4 @@
-# Measures
+# Performance Measures
 
 In MLJ loss functions, scoring rules, sensitivities, and so on, are collectively referred
 to as *measures*. Presently, MLJ includes a few built-in measures,
@@ -21,13 +21,13 @@ provided when the measure supports this.
 
 ```@repl losses_and_scores
 using MLJ
-y = [1, 2, 3, 4]
-ŷ = [2, 3, 3, 3]
-w = [1, 2, 2, 1]
+y = [1, 2, 3, 4];
+ŷ = [2, 3, 3, 3];
+w = [1, 2, 2, 1];
 rms(ŷ, y) # reports an aggregrate loss
 l1(ŷ, y, w) # reports per observation losses
 y = categorical(["male", "female", "female"])
-male = y[1]; female = y[2];
+male = y[1]; female = y[2]; 
 d = UnivariateFinite([male, female], [0.55, 0.45]);
 ŷ = [d, d, d];
 cross_entropy(ŷ, y)
@@ -59,7 +59,9 @@ To override this behavior one simply overloads the appropriate trait,
 as shown in the following examples:
 
 ```@repl losses_and_scores
-y = [1, 2, 3, 4]; ŷ = [2, 3, 3, 3]; w = [1, 2, 2, 1];
+y = [1, 2, 3, 4]; 
+ŷ = [2, 3, 3, 3]; 
+w = [1, 2, 2, 1]; 
 my_loss(ŷ, y) = maximum((ŷ - y).^2); 
 my_loss(ŷ, y)
 my_per_sample_loss(ŷ, y) = abs.(ŷ - y);
@@ -90,7 +92,7 @@ MLJ.value(measure, ŷ, X, y, w)
 and the traits determine what can be ignored and how `measure` is actually called. If `w=nothing` then the non-weighted form of `measure` is
 dipatched. 
 
-### Using LossFunctions
+### Using LossFunctions.jl
 
 The [LossFunctions](https://github.com/JuliaML/LossFunctions.jl)
 package includes "distance loss" functions for `Continuous` targets,
@@ -120,7 +122,7 @@ vectors, applying `MLJ.value` as discussed above has the expected
 behaviour:
 
 ```@repl losses_and_scores
-ŷ = predict(mach, X);
+ŷ = predict(mach, X); 
 MLJ.value(ZeroOneLoss(), ŷ, X, y, w) # X ignored here
 mean(MLJ.value(ZeroOneLoss(), ŷ, X, y, w)) ≈ misclassification_rate(ŷ, y, w)
 ```
@@ -163,5 +165,4 @@ rmslp1
 rmsp
 ```
 
-*This page was generated using [Literate.jl](https://github.com/fredrikekre/Literate.jl).*
 
