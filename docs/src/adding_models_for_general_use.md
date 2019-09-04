@@ -186,13 +186,13 @@ Strongly recommended, to constrain the form of input data passed to
 fit and predict:
 
 ```julia
-MLJBase.input_scitype_union(::Type{<:SomeSupervisedModel}) = Unknown
+MLJBase.input_scitype(::Type{<:SomeSupervisedModel}) = Unknown
 ```
 
 Strongly recommended, to constrain the form of target data passed to fit:
 
 ```julia
-MLJBase.target_scitype_union(::Type{<:SomeSupervisedModel}) = Unknown
+MLJBase.target_scitype(::Type{<:SomeSupervisedModel}) = Unknown
 ```
 
 Optional but recommended:
@@ -514,8 +514,8 @@ The trait functions controlling the form of data are summarized as follows:
 
 method                   | return type       | declarable return values     | fallback value
 -------------------------|-------------------|------------------------------|---------------
-`input_scitype_union`    | `Type`            | some scientfic type          | `Unknown`
-`target_scitype_union`   | `Type`            | some scientific type         | `Unknown`
+`input_scitype`          | `Type`            | some scientfic type          | `Unknown`
+`target_scitype`         | `Type`            | some scientific type         | `Unknown`
 
 
 Additional trait functions tell MLJ's `@load` macro how to find your
@@ -536,7 +536,7 @@ Here is the complete list of trait function declarations for `DecisionTreeClassi
 
 ```julia
 MLJBase.input_scitype(::Type{<:DecisionTreeClassifier}) = MLJBase.Table(MLJBase.Continuous)
-MLJBase.target_scitype_union(::Type{<:DecisionTreeClassifier}) = AbstractVector{<:MLJBase.Finite}
+MLJBase.target_scitype(::Type{<:DecisionTreeClassifier}) = AbstractVector{<:MLJBase.Finite}
 MLJBase.load_path(::Type{<:DecisionTreeClassifier}) = "MLJModels.DecisionTree_.DecisionTreeClassifier"
 MLJBase.package_name(::Type{<:DecisionTreeClassifier}) = "DecisionTree"
 MLJBase.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
