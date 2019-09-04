@@ -338,14 +338,14 @@ a learning network as a blueprint. Here `N` refers to the terminal
 node of the learning network (from which final predictions or
 transformations are fetched). 
 
-**Important** If the learning network is supervised (has a source with
+**Important.** If the learning network is supervised (has a source with
 `kind=:target`) and makes probabilistic predictions, then one must
 declare `is_probabilistic=true`. In the deterministic case the keyword
 argument can be omitted.
 
 The model type `NewCompositeModel` is equipped with fields named
 `:fld1`, `:fld2`, ..., which correspond to component models `model1`,
-`model2` appearing in the network (which must therefore be elements of
+`model2`, ...,  appearing in the network (which must therefore be elements of
 `models(N)`).  Deep copies of the specified component models are used
 as default values in an automatically generated keyword constructor
 for `NewCompositeModel`.

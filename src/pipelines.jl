@@ -1,4 +1,3 @@
-
 ## LINEAR LEARNING NETWORKS (FOR INTERNAL USE ONLY)
 
 # constructs and returns an unsupervised node, and its machine, for a
@@ -106,7 +105,10 @@ function pipeline_preprocess(modl, ex, is_probabilistic::Union{Missing,Bool})
                             eval_and_reassign(modl,
                                               :(MLJ.StaticTransformer($value)))
                     end
-                    value isa Unsupervised || pipe_alert(9)
+                    value isa Unsupervised ||
+                        pipe_alert("Got $value where a function or "*
+                                   "Unsupervised model instance was "*
+                                   "expected. ")
                     target_ = value_
                     target = value
                     push!(fieldnames_, :target)
@@ -201,21 +203,17 @@ function pipeline_(modl, ex, kw_ex)
      target_, inverse_, kind) =
          pipeline_preprocess(modl, ex, kw_ex)
 
-    Xs = source(nothing)
-    
     if kind === :UnsupervisedNetwork
-        ys = source(nothing, kind=:target)
+        ys_ = :nothing
     else
-        ys = nothing
+        ys_ = :(source(nothing, kind=:target))
     end
-
-    ms = gensym(:ms)
-
+    
     N_ex = quote
-        $ms = $target_
         
-        MLJ.linear_learning_network(Xs, ys,  $target_, $inverse_,
-                                $(models_and_functions_...))
+        MLJ.linear_learning_network(source(nothing), $ys_,
+                                    $target_, $inverse_,
+                                    $(models_and_functions_...))
     end
                                                
     from_network_(modl, pipetype_, fieldnames_, models_, N_ex, kind)
@@ -226,6 +224,70 @@ end
 
 pipeline_(modl, ex) = pipeline_(modl, ex, :(is_probabilistic=missing)) 
 
+"""
+    @pipeline NewPipeType(fld1=model1, fld2=model2, ...)
+    @pipeline NewPipeType(fld1=model1, fld2=model2, ...) is_probabilistic=false
+
+Create a new "pipeline" type `NewPipeType` that composes the types of
+the specified models `model1`, `model2`, ... . The models are composed
+in the specified order, meaning the input(s) of the pipeline goes to
+`model1`, whose output is sent to `model2`, and so forth. 
+
+At most one of the models may be a supervised model, in which case
+`NewPipeType` is supervised. Otherwise it is unsupervised.
+
+The new model type `NewPipeType` has hyperparameters (fields) named
+`:fld1`, `:fld2`, ..., whose default values for an automatically
+generated keyword constructor are deep copies of `model1`, `model2`,
+... .
+
+**Important.** If the learning network is supervised and makes
+probabilistic predictions, then one must declare
+`is_probabilistic=true`. In the deterministic case the keyword
+argument can be omitted.
+
+Static (unlearned) transformations - that is, ordinary functions - may
+also be inserted in the pipeline as shown in the following example
+(the classifier is probabilistic but the pipeline is deterministic):
+
+    fix = Dict(:age=>Continuous)
+    @pipeline MyPipe(X -> coerce(fix, X), 
+                     hot=OneHotEncoder(),
+                     cnst=ConstantClassifier(),
+                     yhat -> mode.(yhat))
+
+### Return value
+
+An instance of the new type, with default
+hyperparameters (see above), is returned.
+
+### Target transformation and inverse transformation
+
+A learned target transformation (such as standardization) can also be
+specified, using the keyword `target`, provided the transformer
+provides an `inverse_transform` method:
+
+    @pipeline MyPipe(hot=OneHotEncoder(), 
+                     knn=KNNRegressor(),
+                     target=UnivariateTransformer())
+                     
+A static transformation can be specified instead, but then
+an `inverse` must also be given:
+
+    @pipeline MyPipe(hot=OneHotEncoder(),
+                     knn=KNNRegressor(),
+                     target = v -> log.(v),
+                     inverse = v -> exp.(v))
+
+*Important.* While the supervised model in a pipeline providing a
+ target transformation can appear anywhere in the pipeline (as in
+ `ConstantClassifier` example above), the inverse operation is always
+ performed on the output of the *final* model or static
+ transformation in the pipeline.
+
+See also: [@from_network](@ref)
+
+"""
 macro pipeline(exs...)
     pipetype_ = pipeline_(__module__, exs...)
 

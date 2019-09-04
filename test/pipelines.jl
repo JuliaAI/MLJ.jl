@@ -330,6 +330,32 @@ fit!(p_)
 pred2 = predict(p_)
 @test pred1 ≈ pred2
 
+# and another:
+X = (age =    [23, 45, 34, 25, 67],
+     gender = categorical(['m', 'm', 'f', 'm', 'f']))
+height = [67.0, 81.5, 55.6, 90.0, 61.1]
+p = @pipeline Pipe9(X -> coerce(Dict(:age=>Continuous), X),
+                    hot = OneHotEncoder(),
+                    knn = KNNRegressor(K=3),
+                    target = UnivariateStandardizer())
+fit!(machine(p, X, height))
+
+# ex = :(Pipe8(X -> coerce(Dict(:age=>Continuous), X),
+#           hot = OneHotEncoder(),
+#           knn = KNNRegressor(K=3),
+#           target = UnivariateStandardizer()))
+
+# MLJ.pipeline_preprocess(Main, ex, missing)
+# eval.(lin[3])
+# eval(eval.(lin[4])[1])
+# eval(lin[5])
+# eval(lin[6])
+# lin[7]
+
+# MLJ.pipeline_(Main, ex, :(is_probabilistic=missing))
+# lin = fit!(machine(p, X, height))
+
+
 end
 true
 
