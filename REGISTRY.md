@@ -7,7 +7,8 @@ To register all the models in GreatNewPackage with MLJ:
   
 - Add `GreatNewPackage` to the environment.
 
-- Execute `using MLJ; MLJ.Registry.@update`. This updates
+- Activate a new environment in which your MLJ clone has been
+  `dev`ed. Execute `using MLJ; MLJ.Registry.@update`. This updates
   `/Metadata.toml` and `/Models.toml` (the latter is generated for
   convenience and not used by MLJ).
 
