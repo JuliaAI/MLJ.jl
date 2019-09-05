@@ -2,7 +2,7 @@
 
 MLJ allows quick evaluation of a model's performance against a battery
 of selected losses or scores. For more on available performance
-measures, see [Measures](measures.md).
+measures, see [Performance Measures](performance_measures.md).
 
 In addition to hold-out and cross-validation, the user can specify
 their own list of train/evaluation pairs of row indices for
@@ -14,14 +14,19 @@ sets, see [Benchmarking](benchmarking.md).
 
 ### Evaluating against a single measure
 
+```@setup evaluation_of_supervised_models
+import Base.eval
+using MLJ
+MLJ.color_off() 
+```
+
 ```@repl evaluation_of_supervised_models
 using MLJ
-MLJ.color_off() # hide
 X = (a=rand(12), b=rand(12), c=rand(12));
 y = X.a + 2X.b + 0.05*rand(12);
 model = @load RidgeRegressor
 cv=CV(nfolds=3)
-evaluate(model, X, y, resampling=cv, measure=l2)
+evaluate(model, X, y, resampling=cv, measure=l2, verbosity=0)
 ```
 
 Alternatively, instead of applying `evaluate` to a model + data, one
@@ -30,7 +35,7 @@ data:
 
 ```@repl evaluation_of_supervised_models
 mach = machine(model, X, y)
-evaluate!(mach, resampling=cv, measure=l2)
+evaluate!(mach, resampling=cv, measure=l2, verbosity=0)
 ```
 
 (The latter call is a mutating call as the learned parameters stored in the
@@ -41,7 +46,7 @@ machine potentially change. )
 ```@repl evaluation_of_supervised_models
 evaluate!(mach,
           resampling=cv,
-          measure=[l1, rms, rmslp1])
+          measure=[l1, rms, rmslp1], verbosity=0)
 ```
 
 ### Custom measures and weighted measures
@@ -62,7 +67,7 @@ weights = [1, 1, 2, 1, 1, 2, 3, 1, 1, 2, 3, 1];
 evaluate!(mach,
           resampling=CV(nfolds=3),
           measure=[my_loss, my_per_observation_loss, my_weighted_score, l1],
-          weights=weights)
+          weights=weights, verbosity=0)
 ```
 
 ### User-specified train/evaluation sets
@@ -73,7 +78,7 @@ Users can either provide their own list of train/evaluation pairs of row indices
 fold1 = 1:6; fold2 = 7:12;
 evaluate!(mach,
           resampling = [(fold1, fold2), (fold2, fold1)],
-          measure=[l1, l2])
+          measure=[l1, l2], verbosity=0)
 ```
 
 Or define their own re-usable `ResamplingStrategy` objects, - see

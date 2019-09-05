@@ -49,6 +49,10 @@ Unsupervised case:
 
 `params(model)`
 
+#### Get detail on last object in REPL:
+
+`@more`
+
 #### Fitting
 
 `fit!(mach, rows=:, verbosity=1, force=false)`
@@ -116,11 +120,6 @@ If using Plots.jl:
 `plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)` 
 
 
-#### Ensemble model wrapper
-
-`EnsembleModel(atom=…, weights=Float64[], bagging_fraction=0.8, rng=GLOBAL_RNG, n=100, parallel=true, out_of_bag_measure=[])`
-
-
 #### Built-in measures
 
 `l1`, `l2`, `mav`, `rms`, `rmsl`, `rmslp1`, `rmsp`, `misclassification_rate`, `cross_entropy`
@@ -133,3 +132,35 @@ Built-ins include: `Standardizer`, `OneHotEncoder`, `UnivariateBoxCoxTransformer
 Externals include: `PCA` (in MultivariateStats), `KMeans`, `KMedoids` (in Clustering).
 
 Full list: do `models(m -> !m[:is_supervised])`
+
+#### Ensemble model wrapper
+
+`EnsembleModel(atom=…, weights=Float64[], bagging_fraction=0.8, rng=GLOBAL_RNG, n=100, parallel=true, out_of_bag_measure=[])`
+
+#### Define a linear pipeline with point-predictions:
+
+`pipe = @pipeline MyPipe(hot = OneHotEncoder(), knn = KNNRegressor(K=3), target = UnivariateStandardizer())`
+						 
+#### Define a linear pipeline with probabilistic-predictions:
+
+`pipe = @pipeline MyPipe(hot = OneHotEncoder(), knn = KNNRegressor(K=3), target = UnivariateStandardizer()) is_probabilistic=true`
+						 
+#### Start a supervised learning network:
+
+`Xs = source(X)`
+`ys = source(y, kind=:target)`
+ ...
+ `yhat = predict(knn_machine, W, ys)` (`yhat` terminal node)
+
+#### Export a supervised learning network with point-predictions:
+
+`@from_network Composite(pca=network_pca, knn=network_knn) <= yhat`
+
+#### Export a supervised learning network with probabilistic predictions:
+
+`@from_network Composite(knn=network_knn) <= yhat is_probabistic=true`
+
+#### Export an unsupervised learning network:
+
+`@from_network Composite(pca=network_pca) <= Xout` (`Xout` terminal node)
+    

@@ -12,7 +12,7 @@ i = MLJ.info_given_handle(metadata_file)[cnst]
 
 
 @testset "building INFO_GIVEN_HANDLE" begin
-    @test isempty(MLJ.localmodeltypes(MLJBase))
+#    @test isempty(MLJ.localmodeltypes(MLJBase))
     @test issubset(Set([KNNRegressor,                                
                         MLJ.Constant.DeterministicConstantClassifier,
                         MLJ.Constant.DeterministicConstantRegressor, 

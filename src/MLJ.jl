@@ -13,23 +13,23 @@ export @curve, @pcurve, pretty,                       # utilities.jl
         Grid, TunedModel, learning_curve!,            # tuning.jl
         EnsembleModel,                                # ensembles.jl
         ConstantRegressor, ConstantClassifier,        # builtins/Constant.jl
-        models, localmodels, @load, model,            # loading.jl
-        load,                          # loading.jl
+        models, localmodels, @load, model, load,      # loading.jl
         KNNRegressor,                                 # builtins/KNN.jl
-        @from_network, machines, sources, anonymize!, # composites.jl
-        rebind!, fitresults                           # composites.jl
+        rebind!,                                      # networks.jl
+        machines, sources, anonymize!,                # composites.jl
+        @from_network,                                # composites.jl
+        fitresults,                                   # composites.jl
+        @pipeline                                      # pipelines.jl
 
 # defined in include files "machines.jl and "networks.jl":
 export Machine, NodalMachine, machine, AbstractNode,
         source, node, fit!, freeze!, thaw!, Node, sources, origins
 
 # defined in include file "builtins/Transformers.jl":
-export FeatureSelector,
-        UnivariateStandardizer, Standardizer,
-        UnivariateBoxCoxTransformer,
-        OneHotEncoder
-        # IntegerToInt64Transformer,
-        # UnivariateDiscretizer, Discretizer
+export StaticTransformer, FeatureSelector,
+    UnivariateStandardizer, Standardizer,
+    UnivariateBoxCoxTransformer,
+    OneHotEncoder
 
 # rexport from Random, Statistics, Distributions, CategoricalArrays:
 export pdf, mode, median, mean, shuffle!, categorical, shuffle, levels, levels!
@@ -112,6 +112,7 @@ include("measures.jl")      # API for loss functions & defs of built-ins
 include("machines.jl")    
 include("networks.jl")      # for building learning networks
 include("composites.jl")    # composite models & exporting learning networks
+include("pipelines.jl")     # pipelines (exported linear learning networks)
 include("operations.jl")    # syntactic sugar for operations (predict, etc)
 include("resampling.jl")    # resampling strategies and model evaluation
 include("parameters.jl")    # hyperparameter ranges and grid generation

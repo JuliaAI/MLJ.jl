@@ -6,13 +6,13 @@
 
 """
     
-    load(name::String; pkg=nothing, mod=Main, verbosity=1)
+    load(name::String; pkg=nothing, modl=Main, verbosity=1)
             
 Load the model implementation code for the model type with specified
-`name` into the module `mod`, specifying `pkg` if necesssary, to
+`name` into the module `modl`, specifying `pkg` if necesssary, to
 resolve duplicate names. 
 
-    load(proxy; pkg=nothing, mod=Main, verbosity=1)
+    load(proxy; pkg=nothing, modl=Main, verbosity=1)
 
 In the case that `proxy` is a return value of `model` (ie, has the
 form `(name = ..., package_name = ..., etc)`) this is equivalent to
@@ -26,7 +26,7 @@ the previous call.  See the second example below.
 See also [`@load`](@ref)
 
 """
-function load(proxy::ModelProxy; mod=Main, verbosity=0)
+function load(proxy::ModelProxy; modl=Main, verbosity=0)
     # get name, package and load path:
     name = proxy.name
     pkg = proxy.package_name
@@ -38,20 +38,20 @@ function load(proxy::ModelProxy; mod=Main, verbosity=0)
     toprint = verbosity > 0
 
     # return if model is already loaded
-    localnames = map(p->p.name, localmodels(mod=mod))
+    localnames = map(p->p.name, localmodels(modl=modl))
     if name ∈ localnames
         @info "A model type \"$name\" is already loaded. \n"*
         "No new code loaded. "
         return
     end
 
-    toprint && @info "Loading into module \"$mod\": "
-    
+    verbosity > 1 && @info "Loading into module \"$modl\": "
+
     # if needed, put MLJModels in the calling module's namespace (it
     # is already loaded into MLJ's namespace):
     if path_components[1] == "MLJModels"
         toprint && print("import MLJModels ")
-        mod.eval(:(import MLJModels))
+        modl.eval(:(import MLJModels))
         toprint && println('\u2714')
     end
 
@@ -59,20 +59,22 @@ function load(proxy::ModelProxy; mod=Main, verbosity=0)
     # this is in MLJModels):
     pkg_ex = Symbol(pkg)
     toprint && print("import $pkg_ex ")
-    mod.eval(:(import $pkg_ex))
+    modl.eval(:(import $pkg_ex))
+    
     toprint && println('\u2714')
 
     # load the model:
     load_ex = Meta.parse("import $path")
     toprint && print(string(load_ex, " "))
-    mod.eval(load_ex)
+    modl.eval(load_ex)
     toprint && println('\u2714')
 
     nothing
 end
 
+# model() defined in model_search.jl
 load(name::String; pkg=nothing, kwargs...) =
-    load(model(name, pkg=pkg); kwargs...)
+    load(model(name, pkg=pkg); kwargs...) 
 
 
 """
@@ -112,20 +114,24 @@ macro load(name_ex, kw_exs...)
     end
     (@isdefined pkg) || (pkg = nothing)
     (@isdefined verbosity) || (verbosity = 0)
-                
+    
     # get rid brackets in name_, as in
     # "(MLJModels.Clustering).KMedoids":
     name = filter(name_) do c !(c in ['(',')']) end
-
-    load(name, mod=__module__, pkg=pkg, verbosity=verbosity)
-
-    esc(quote
-        try
-            $name_ex()
-        catch
-            @warn "Code is loaded but no instance returned. "
-            nothing
-        end
-    end)
     
+    load(name, modl=__module__, pkg=pkg, verbosity=verbosity)
+    
+    esc(quote
+            try
+                $name_ex()
+            catch
+                try # hack for baremodules that have imported Base.eval:
+                    $name_ex = Base.$name_ex
+                    $name_ex()
+                catch
+                    @warn "Code is loaded but no instance returned. "
+                    nothing
+                end
+            end
+        end)
 end

@@ -127,6 +127,6 @@ Any model with one or more other models as hyperparameters.
 
 #### composite model
 
-Any wrapper, or any learning network "exported" as a model (see
-[Learning Networks](learning_networks.md)).
+Any wrapper, or any learning network, "exported" as a model (see
+[Composing Models](composing_models.md)).
 

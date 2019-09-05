@@ -24,11 +24,11 @@ end
 ## FUNCTIONS TO BUILD GLOBAL METADATA CONSTANTS IN MLJ INITIALIZATION
 
 # get the model types in top-level of given module's namespace:
-function localmodeltypes(mod)
+function localmodeltypes(modl)
     return filter(MLJBase.finaltypes(Model)) do M
         i = MLJBase.info(M)
         name = i[:name]
-        isdefined(mod, Symbol(name)) &&
+        isdefined(modl, Symbol(name)) &&
             !i[:is_wrapper] && 
             !(M in [Supervised, Unsupervised, Deterministic,
                     Probabilistic, DeterministicNetwork,

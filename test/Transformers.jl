@@ -9,7 +9,12 @@ using Statistics
 using CategoricalArrays
 using Tables
 
-# selecting features
+# static transformers:
+t = StaticTransformer(f=log)
+fitresult, cache, report = MLJBase.fit(t, 1, nothing)
+@test transform(t, fitresult, 5) ≈ log(5)
+
+# selecting features:
 N =100
 X = (Zn=rand(N),
      Crim=rand(N),

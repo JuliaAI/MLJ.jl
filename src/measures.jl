@@ -108,7 +108,7 @@ reports_each_observation(::MAV) = false
 is_feature_dependent(::MAV) = false
 supports_weights(::MAV) = true
 
-function (::MAV)(ŷ, y)
+function (::MAV)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
@@ -118,7 +118,7 @@ function (::MAV)(ŷ, y)
     return ret / length(y)
 end
 
-function (::MAV)(ŷ, y, w)
+function (::MAV)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real}, w::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
     check_dimensions(y, w)
     ret = 0.0
@@ -160,7 +160,7 @@ reports_each_observation(::RMS) = false
 is_feature_dependent(::RMS) = false
 supports_weights(::RMS) = true
 
-function (::RMS)(ŷ, y)
+function (::RMS)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
@@ -170,7 +170,7 @@ function (::RMS)(ŷ, y)
     return sqrt(ret / length(y))
 end
 
-function (::RMS)(ŷ, y, w)
+function (::RMS)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real}, w::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
@@ -200,9 +200,12 @@ reports_each_observation(::L2) = true
 is_feature_dependent(::L2) = false
 supports_weights(::L2) = true
 
-(::L2)(ŷ, y) = (check_dimensions(ŷ, y); (y - ŷ).^2)
+function (::L2)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
+    (check_dimensions(ŷ, y); (y - ŷ).^2)
+end
 
-function (::L2)(ŷ, y, w)
+
+function (::L2)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real}, w::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
     check_dimensions(w, y)
     return (y - ŷ).^2 .* w ./ (sum(w)/length(y)) 
@@ -228,9 +231,11 @@ reports_each_observation(::L1) = true
 is_feature_dependent(::L1) = false
 supports_weights(::L1) = true
 
-(::L1)(ŷ, y) = (check_dimensions(ŷ, y); abs.(y - ŷ))
+function (::L1)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
+    (check_dimensions(ŷ, y); abs.(y - ŷ))
+end
 
-function (::L1)(ŷ, y, w)
+function (::L1)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real}, w::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
     check_dimensions(w, y)
     return abs.(y - ŷ) .* w ./ (sum(w)/length(y))
@@ -259,7 +264,7 @@ reports_each_observation(::RMSL) = false
 is_feature_dependent(::RMSL) = false
 supports_weights(::RMSL) = false
 
-function (::RMSL)(ŷ, y)
+function (::RMSL)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
@@ -292,7 +297,7 @@ reports_each_observation(::RMSLP1) = false
 is_feature_dependent(::RMSLP1) = false
 supports_weights(::RMSLP1) = false
 
-function (::RMSLP1)(ŷ, y)
+function (::RMSLP1)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
     ret = 0.0
     for i in eachindex(y)
@@ -326,7 +331,7 @@ reports_each_observation(::RMSP) = false
 is_feature_dependent(::RMSP) = false
 supports_weights(::RMSP) = false
 
-function (::RMSP)(ŷ, y)
+function (::RMSP)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
     ret = 0.0
     count = 0
@@ -366,8 +371,13 @@ reports_each_observation(::MisclassificationRate) = false
 is_feature_dependent(::MisclassificationRate) = false
 supports_weights(::MisclassificationRate) = true
 
-(::MisclassificationRate)(ŷ, y) = mean(y .!= ŷ)
-(::MisclassificationRate)(ŷ, y, w) = sum((y .!= ŷ) .*w) / sum(w)
+(::MisclassificationRate)(ŷ::AbstractVector{<:CategoricalElement},
+                          y::AbstractVector{<:CategoricalElement}) =
+                              mean(y .!= ŷ)
+(::MisclassificationRate)(ŷ::AbstractVector{<:CategoricalElement},
+                          y::AbstractVector{<:CategoricalElement},
+                          w::AbstractVector{<:Real}) =
+                              sum((y .!= ŷ) .*w) / sum(w)
 
 
 ## CLASSIFICATION METRICS (FOR PROBABILISTIC PREDICTIONS)
@@ -396,9 +406,10 @@ is_feature_dependent(::CrossEntropy) = false
 supports_weights(::CrossEntropy) = false
 
 # for single observation:
-_cross_entropy(d::UnivariateFinite, y) = -log(pdf(d, y))
+_cross_entropy(d, y) = -log(pdf(d, y))
 
-function (::CrossEntropy)(ŷ, y)
+function (::CrossEntropy)(ŷ::AbstractVector{<:UnivariateFinite},
+                          y::AbstractVector{<:CategoricalElement})
     check_dimensions(ŷ, y)
     check_pools(ŷ, y)          
     return broadcast(_cross_entropy, Any[ŷ...], y)

@@ -108,7 +108,7 @@ ignored.
 
 Return the input data in form to be used in models.
 
-See also [`scitype`](@ref), [`scitype_union`](@ref), [`scitypes`](@ref).
+See also [`scitype`](@ref), [`scitype_union`](@ref) 
 
 """
 unsupervised(; data=nothing, types=Dict(), kwargs...) =

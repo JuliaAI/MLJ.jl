@@ -1,4 +1,4 @@
-# Adding Models for General Use
+gg# Adding Models for General Use
 
 This guide outlines in detail the specification of the MLJ model interface and
 provides guidelines for implementing the interface for models intended
@@ -186,13 +186,13 @@ Strongly recommended, to constrain the form of input data passed to
 fit and predict:
 
 ```julia
-MLJBase.input_scitype_union(::Type{<:SomeSupervisedModel}) = Unknown
+MLJBase.input_scitype(::Type{<:SomeSupervisedModel}) = Unknown
 ```
 
 Strongly recommended, to constrain the form of target data passed to fit:
 
 ```julia
-MLJBase.target_scitype_union(::Type{<:SomeSupervisedModel}) = Unknown
+MLJBase.target_scitype(::Type{<:SomeSupervisedModel}) = Unknown
 ```
 
 Optional but recommended:
@@ -514,8 +514,8 @@ The trait functions controlling the form of data are summarized as follows:
 
 method                   | return type       | declarable return values     | fallback value
 -------------------------|-------------------|------------------------------|---------------
-`input_scitype_union`    | `Type`            | some scientfic type          | `Unknown`
-`target_scitype_union`   | `Type`            | some scientific type         | `Unknown`
+`input_scitype`          | `Type`            | some scientfic type          | `Unknown`
+`target_scitype`         | `Type`            | some scientific type         | `Unknown`
 
 
 Additional trait functions tell MLJ's `@load` macro how to find your
@@ -536,7 +536,7 @@ Here is the complete list of trait function declarations for `DecisionTreeClassi
 
 ```julia
 MLJBase.input_scitype(::Type{<:DecisionTreeClassifier}) = MLJBase.Table(MLJBase.Continuous)
-MLJBase.target_scitype_union(::Type{<:DecisionTreeClassifier}) = AbstractVector{<:MLJBase.Finite}
+MLJBase.target_scitype(::Type{<:DecisionTreeClassifier}) = AbstractVector{<:MLJBase.Finite}
 MLJBase.load_path(::Type{<:DecisionTreeClassifier}) = "MLJModels.DecisionTree_.DecisionTreeClassifier"
 MLJBase.package_name(::Type{<:DecisionTreeClassifier}) = "DecisionTree"
 MLJBase.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
@@ -544,7 +544,7 @@ MLJBase.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bens
 MLJBase.is_pure_julia(::Type{<:DecisionTreeClassifier}) = true
 ```
 
-You can test all your declarations of traits by calling `info(SomeModel)`.
+You can test all your declarations of traits by calling `MLJBase.info(SomeModel)`.
 
 
 #### Iterative models and the update! method
@@ -564,7 +564,7 @@ defines a fallback for `update` which just calls `fit`. For context,
 see [MLJ Internals](internals.md).
 
 Learning networks wrapped as models constitute one use-case (see
-[Learning Networks](index.md)): one would like each component model to be
+[Composing Models](index.md)): one would like each component model to be
 retrained only when hyperparameter changes "upstream" make this
 necessary. In this case MLJ provides a fallback (specifically, the
 fallback is for any subtype of `SupervisedNetwork =

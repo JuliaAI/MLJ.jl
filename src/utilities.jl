@@ -26,7 +26,6 @@ end
 
 ## FOR ENCODING AND DECODING MODEL METADATA
 
-
 # This method needs revisiting when new scitypes are introduced:
 function encode_dic(s)
     if s isa Symbol

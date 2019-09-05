@@ -10,16 +10,16 @@ MLJBase.is_wrapper(::Type{ProbabilisticNetwork}) = true
 function MLJBase.update(model::Union{SupervisedNetwork,UnsupervisedNetwork},
                         verbosity, yhat, cache, args...)
 
-    anonymised = cache isa NamedTuple{(:sources, :data)}
+    is_anonymised = cache isa NamedTuple{(:sources, :data)}
 
-    if anonymised
+    if is_anonymised
         sources, data = cache.sources, cache.data
         for k in eachindex(sources)
             rebind!(sources[k], data[k])
         end
     end
     fit!(yhat; verbosity=verbosity)
-    if anonymised
+    if is_anonymised
         for s in sources
             rebind!(s, nothing)
         end
@@ -66,15 +66,22 @@ function report(yhat::Node)
     return (machines=machs, reports=reports)
 end
 
-# what is returned by a fit method for an exported learning network:
-function fitresults(Xs, ys, yhat)
+# what should be returned by a fit method for an exported learning
+# network:
+function fitresults(yhat)
+    inputs = sources(yhat, kind=:input)
+    targets = sources(yhat, kind=:target)
+    length(inputs) == 1 ||
+        error("Improperly exported supervised network does "*
+              "not have a unique input source. ")
+    if length(targets) == 1
+        cache = anonymize!(inputs[1], targets[1])
+    elseif length(targets) == 0
+        cache = anonymize!(inputs[1])
+    else
+        error("Improperly exported network has multiple target sources. ")
+    end
     r = report(yhat)
-    cache = anonymize!(Xs, ys)
-    return yhat, cache, r
-end
-function fitresults(Xs, yhat)
-    r = report(yhat)
-    cache = anonymize!(Xs)
     return yhat, cache, r
 end
 
@@ -86,8 +93,7 @@ end
 
 Create a deep copy of a node `W`, and thereby replicate the learning
 network terminating at `W`, but replacing any specified sources and
-models `a1, a2, ...` of the original network with the specified targets
-`b1, b2, ...`.
+models `a1, a2, ...` of the original network with `b1, b2, ...`.
 """
 function Base.replace(W::Node, pairs::Pair...)
 
@@ -149,150 +155,167 @@ function Base.replace(W::Node, pairs::Pair...)
 
  end
 
-# closures for later:
-function supervised_fit_method(network_Xs, network_ys, network_N,
-                               network_models...)
+# closure for later:
+function fit_method(network, models...)
 
+    network_Xs = sources(network, kind=:input)[1]
+    
     function fit(model::M, verbosity, X, y) where M <: Supervised
-        Xs = source(X)
-        ys = source(y)
         replacement_models = [getproperty(model, fld)
                               for fld in fieldnames(M)]
-        model_replacements = [network_models[j] => replacement_models[j]
-                              for j in eachindex(network_models)]
+        model_replacements = [models[j] => replacement_models[j]
+                          for j in eachindex(models)]
+        network_ys = sources(network, kind=:target)[1]
+        Xs = source(X)
+        ys = source(y, kind=:target)
         source_replacements = [network_Xs => Xs, network_ys => ys]
         replacements = vcat(model_replacements, source_replacements)
-        yhat = replace(network_N, replacements...)
+        yhat = replace(network, replacements...)
 
         Set([Xs, ys]) == Set(sources(yhat)) ||
             error("Failed to replace sources in network blueprint. ")
 
         fit!(yhat, verbosity=verbosity)
 
-        # TODO: make report a named tuple keyed on machines in the
-        # network, with values the individual reports.
-        report = nothing
-
-        return fitresults(Xs, ys, yhat)
+        return fitresults(yhat)
     end
 
-    return fit
-end
-function unsupervised_fit_method(network_Xs, network_N,
-                               network_models...)
-
     function fit(model::M, verbosity, X) where M <:Unsupervised
-        Xs = source(X)
         replacement_models = [getproperty(model, fld)
                               for fld in fieldnames(M)]
-        model_replacements = [network_models[j] => replacement_models[j]
-                              for j in eachindex(network_models)]
+        model_replacements = [models[j] => replacement_models[j]
+                          for j in eachindex(models)]
+        Xs = source(X)
         source_replacements = [network_Xs => Xs,]
         replacements = vcat(model_replacements, source_replacements)
-        Xout = replace(network_N, replacements...)
+        Xout = replace(network, replacements...)
         Set([Xs]) == Set(sources(Xout)) ||
             error("Failed to replace sources in network blueprint. ")
         
         fit!(Xout, verbosity=verbosity)
 
-        # TODO: make report a named tuple keyed on machines in the
-        # network, with values the individual reports.
-        report = nothing
-
-        return fitresults(Xs, Xout)
+        return fitresults(Xout)
     end
 
     return fit
+
 end
 
+net_alert(message) = throw(ArgumentError("Learning network export error.\n"*
+                                     string(message)))
+net_alert(k::Int) = throw(ArgumentError("Learning network export error $k. "))
 
-"""
+# returns Model supertype - or `missing` if arguments are incompatible
+function kind_(is_supervised, is_probabilistic)
+    if is_supervised
+        if ismissing(is_probabilistic) || !is_probabilistic
+            return :DeterministicNetwork
+        else
+            return :ProbabilisticNetwork
+        end
+    else
+        if ismissing(is_probabilistic) || !is_probabilistic
+            return :UnsupervisedNetwork
+        else
+            return missing
+        end
+    end
+end
 
-    @from_network NewCompositeModel(fld1=model1, fld2=model2, ...) <= (Xs, N)
-    @from_network NewCompositeModel(fld1=model1, fld2=model2, ...) <= (Xs, ys, N)
+function from_network_preprocess(modl, ex,
+                                 is_probabilistic::Union{Missing,Bool})
 
-Create, respectively, a new stand-alone unsupervised and superivsed
-model type `NewCompositeModel` using a learning network as a
-blueprint. Here `Xs`, `ys` and `N` refer to the input source, node,
-target source node and terminating source node of the network. The
-model type `NewCompositeModel` is equipped with fields named `:fld1`,
-`:fld2`, ..., which correspond to component models `model1`, `model2`
-appearing in the network (which must therefore be elements of
-`models(N)`).  Deep copies of the specified component models are used
-as default values in an automatically generated keyword constructor
-for `NewCompositeModel`.
-
-Return value: A new `NewCompositeModel` instance, with default
-field values.
-
-For details and examples refer to the "Learning Networks" section of
-the documentation.
-
-"""
-macro from_network(ex)
+    ex isa Expr || net_alert(1)
+    ex.head == :call || net_alert(2)
+    ex.args[1] == :(<=) || net_alert(3)
+    ex.args[2] isa Expr || net_alert(4)
+    ex.args[2].head == :call || net_alert(5)
     modeltype_ex = ex.args[2].args[1]
-    kw_exs = ex.args[2].args[2:end]
-    fieldname_exs = [k.args[1] for k in kw_exs]
-    model_exs = [k.args[2] for k in kw_exs]
-    Xs_ex = ex.args[3].args[1]   # input node
-    N_ex = ex.args[3].args[end]  # output node
+    modeltype_ex isa Symbol || net_alert(6)
+    if length(ex.args[2].args) == 1
+        kw_exs = []
+    else
+        kw_exs = ex.args[2].args[2:end]
+    end
+    fieldname_exs = []
+    model_exs = []
+    for ex in kw_exs
+        ex isa Expr || net_alert(7)
+        ex.head == :kw || net_alert(8)
+        variable_ex = ex.args[1]
+        value_ex = ex.args[2]
+        variable_ex isa Symbol || net_alert(9)
+        push!(fieldname_exs, variable_ex)
+        value = modl.eval(value_ex)
+        value isa Model ||
+            net_alert("Got $value but expected something of type `Model`.")
+        push!(model_exs, value_ex)
+    end
+    N_ex = ex.args[3]
+    N = modl.eval(N_ex)
+    N isa AbstractNode ||
+        net_alert("Got $N but expected something of type `AbstractNode`. ")
 
-    # TODO: add more type and syntax checks here:
+    inputs = sources(N, kind=:input)
+    targets = sources(N, kind=:target)
 
-    N = __module__.eval(N_ex)
-    N isa Node ||
-        error("$(typeof(N)) given where Node was expected. ")
+    length(inputs) == 0 &&
+        net_alert("Network has no source with `kind=:input`.")
+    length(inputs) > 1  &&
+        net_alert("Network has multiple sources with `kind=:input`.")
+    length(targets) > 1 &&
+        net_alert("Network has multiple sources with `kind=:target`.")
 
-    models_ = [__module__.eval(e) for e in model_exs]
+    is_supervised = length(targets) == 1
+
+    kind = kind_(is_supervised, is_probabilistic)
+    ismissing(kind) &&
+        net_alert("Network appears unsupervised (has no source with "*
+                  "`kind=:target`) and so `is_probabilistic=true` "*
+                  "declaration is not allowed. ")
+
+    models_ = [modl.eval(e) for e in model_exs]
     issubset(models_, models(N)) ||
-        error("One or more specified models not in the learning network "*
+        net_alert("One or more specified models are not in the learning network "*
               "terminating at $N_ex.\n Use models($N_ex) to inspect models. ")
 
     nodes_  = nodes(N)
-    Xs = __module__.eval(Xs_ex)
-    Xs in nodes_ ||
-        error("Specified input source $Xs_ex is not a source of $N_ex.")
 
-    if length(ex.args[3].args) == 3
-        ys_ex = ex.args[3].args[2] # target node
-        ys = __module__.eval(ys_ex)
-        ys in nodes_ ||
-        error("Specified target source $ys_ex is not a source of $N_ex.")
-        from_network_(__module__, modeltype_ex, fieldname_exs, model_exs,
-                   Xs_ex, ys_ex, N_ex)
-    else
-        from_network_(__module__, modeltype_ex, fieldname_exs, model_exs,
-                   Xs_ex, N_ex)
-    end
-    esc(quote
-        $modeltype_ex()
-        end)
+    return modeltype_ex, fieldname_exs, model_exs, N_ex, kind
+
 end
 
-# supervised case:
-function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
-                    Xs_ex, ys_ex, N_ex)
+from_network_preprocess(modl, ex) = from_network_preprocess(modl, ex, missing)
 
-    N = mod.eval(N_ex)
-    if MLJBase.is_probabilistic(typeof(models(N)[1]))
-        subtype_ex = :ProbabilisticNetwork
+function from_network_preprocess(modl, ex, kw_ex)
+    kw_ex isa Expr || net_alert(10)
+    kw_ex.head == :(=) || net_alert(11)
+    kw_ex.args[1] == :is_probabilistic ||
+        net_alert("Unrecognized keywork `$(kw_ex.args[1])`.")
+    value = kw_ex.args[2]
+    if value isa Bool
+        return from_network_preprocess(modl, ex, value)
     else
-        subtype_ex = :DeterministicNetwork
+        net_alert("`is_probabilistic` can only be `true` or `false`.")
     end
+end
 
-    XX = gensym(:X)
-    yy = gensym(:y)
+function from_network_(modl, modeltype_ex, fieldname_exs, model_exs,
+                          N_ex, kind)
+
+    args = gensym(:args)
 
     # code defining the composite model struct and fit method:
     program1 = quote
 
-        struct $modeltype_ex <: MLJ.$subtype_ex
+        struct $modeltype_ex <: MLJ.$kind
             $(fieldname_exs...)
         end
 
-        MLJ.fit(model::$modeltype_ex, verbosity::Integer, $XX, $yy) =
-            MLJ.supervised_fit_method($Xs_ex, $ys_ex, $N_ex,
-                            $(model_exs...))(model, verbosity, $XX, $yy)
+        MLJ.fit(model::$modeltype_ex, verbosity::Integer, $args...) =
+            MLJ.fit_method(
+                $N_ex, $(model_exs...))(model, verbosity, $args...)
+
     end
 
     program2 = quote
@@ -301,42 +324,52 @@ function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
 
     end
 
-    mod.eval(program1)
-    mod.eval(program2)
+    modl.eval(program1)
+    modl.eval(program2)
 
 end
 
-# unsupervised case:
-function from_network_(mod, modeltype_ex, fieldname_exs, model_exs,
-                    Xs_ex, N_ex)
+"""
+    @from_network(NewCompositeModel(fld1=model1, fld2=model2, ...) <= N
+    @from_network(NewCompositeModel(fld1=model1, fld2=model2, ...) <= N is_probabilistic=false
+    
+Create a new stand-alone model type called `NewCompositeModel`, using
+a learning network as a blueprint. Here `N` refers to the terminal
+node of the learning network (from which final predictions or
+transformations are fetched). 
 
-    subtype_ex = :UnsupervisedNetwork
+*Important.* If the learning network is supervised (has a source with
+`kind=:target`) and makes probabilistic predictions, then one must
+declare `is_probabilistic=true`. In the deterministic case the keyword
+argument can be omitted.
 
-    XX = gensym(:X)
+The model type `NewCompositeModel` is equipped with fields named
+`:fld1`, `:fld2`, ..., which correspond to component models `model1`,
+`model2`, ...,  appearing in the network (which must therefore be elements of
+`models(N)`).  Deep copies of the specified component models are used
+as default values in an automatically generated keyword constructor
+for `NewCompositeModel`.
 
-    # code defining the composite model struct and fit method:
-    program1 = quote
+### Return value
 
-        mutable struct $modeltype_ex <: MLJ.$subtype_ex
-            $(fieldname_exs...)
-        end
+ A new `NewCompositeModel` instance, with default field values.
 
-        MLJ.fit(model::$modeltype_ex, verbosity::Integer, $XX) =
-            MLJ.unsupervised_fit_method($Xs_ex, $N_ex,
-                                      $(model_exs...))(model, verbosity, $XX)
-    end
+For details and examples refer to the "Learning Networks" section of
+the documentation.
 
-    program2 = quote
-        defaults =
-        MLJ.@set_defaults $modeltype_ex deepcopy.([$(model_exs...)])
-    end
+"""
+macro from_network(exs...)
 
-    mod.eval(program1)
-    mod.eval(program2)
+    args = from_network_preprocess(__module__, exs...)
+    modeltype_ex = args[1]
+
+    from_network_(__module__, args...)
+
+    esc(quote
+        $modeltype_ex()
+        end)
 
 end
-
-
 
 
 ## A COMPOSITE FOR TESTING PURPOSES
@@ -374,7 +407,7 @@ MLJBase.is_wrapper(::Type{<:SimpleDeterministicCompositeModel}) = true
 function MLJBase.fit(composite::SimpleDeterministicCompositeModel,
                      verbosity::Integer, Xtrain, ytrain)
     X = source(Xtrain) # instantiates a source node
-    y = source(ytrain)
+    y = source(ytrain, kind=:target)
 
     t = machine(composite.transformer, X)
     Xt = transform(t, X)
@@ -384,7 +417,7 @@ function MLJBase.fit(composite::SimpleDeterministicCompositeModel,
 
     fit!(yhat, verbosity=verbosity)
 
-    return fitresults(X, y, yhat)
+    return fitresults(yhat)
 end
 
 # MLJBase.predict(composite::SimpleDeterministicCompositeModel, fitresult, Xnew) = fitresult(Xnew)

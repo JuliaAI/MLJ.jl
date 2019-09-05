@@ -14,12 +14,12 @@ cnst = model("ConstantRegressor", pkg="MLJ")
 
 @testset "localmodels" begin
     tree = model("DecisionTreeRegressor")
-    @test cnst in localmodels(mod=TestModelSearch)
-    @test !(tree in localmodels(mod=TestModelSearch))
+    @test cnst in localmodels(modl=TestModelSearch)
+    @test !(tree in localmodels(modl=TestModelSearch))
     import MLJModels
     import DecisionTree
     import MLJModels.DecisionTree_.DecisionTreeRegressor
-    @test tree in localmodels(mod=TestModelSearch)
+    @test tree in localmodels(modl=TestModelSearch)
 end
 
 @testset "models() and localmodels" begin
@@ -28,7 +28,7 @@ end
     @test pca in mods
     @test cnst in mods
     @test !(model("SVC") in mods)
-    mods = localmodels(t, mod=TestModelSearch)
+    mods = localmodels(t, modl=TestModelSearch)
     @test cnst in mods
     @test !(pca in mods)
     u(model) = !(model.is_supervised)

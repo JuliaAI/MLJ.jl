@@ -70,21 +70,21 @@ supervised learner.
 Calling `fit!(mach)` on a machine `mach=machine(tuned_model, X, y)` or
 `mach=machine(tuned_model, task)` will: 
 
-- Instigate a search, over clones of `model` with the hyperparameter
+- Instigate a search, over clones of `model`, with the hyperparameter
   mutations specified by `ranges`, for a model optimizing the specified
   `measure`, using performance evaluations carried out using the specified
   `tuning` strategy and `resampling` strategy.
 
-- Fit a machine, `mach_optimal = fitted_params(mach).best_model`,
+- Fit an internal machine, based on the optimal model `fitted_params(mach).best_model`,
   wrapping the optimal `model` object in *all* the provided data `X, y`
   (or in `task`). Calling `predict(mach, Xnew)` then returns predictions
-  on `Xnew` of the machine `mach_optimal`.
+  on `Xnew` of this internal machine.
 
-If a custom measure `measure` is used, and the measure is a score,
-rather than a loss, be sure to check that `MLJ.orientation(measure) ==
-:score` to ensure maximization of the measure, rather than
-minimization. Overide an incorrect value with
-`MLJ.orientation(::typeof(measure)) = :score`. 
+*Important.* If a custom measure `measure` is used, and the measure is
+a score, rather than a loss, be sure to check that
+`MLJ.orientation(measure) == :score` to ensure maximization of the
+measure, rather than minimization. Overide an incorrect value with
+`MLJ.orientation(::typeof(measure)) = :score`.
 
 If `measure` supports sample weights (`MLJ.supports_weights(measure)
 == true`) then these can be passed to the measure as `weights`.

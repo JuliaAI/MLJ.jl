@@ -33,10 +33,15 @@ part of the data is relevant and what role is each part to play.
 
 Load a built-in task:
 
+```@setup 1
+import Base.eval
+using MLJ
+MLJ.color_off()
+```
+
 ```@example 1
 using MLJ
 using CSV
-MLJ.color_off() # hide
 task = load_iris()
 ```
 
@@ -104,9 +109,9 @@ models(task)
 
 Binding a model to a task and evaluating performance:
 
-```@example 1
-@load DecisionTreeClassifier;
-mach = machine(DecisionTreeClassifier(), task)
+```@repl 1
+tree = @load DecisionTreeClassifier verbosity=1
+mach = machine(tree, task)
 evaluate!(mach, operation=predict_mode, resampling=Holdout(), measure=misclassification_rate, verbosity=0)
 ```
 

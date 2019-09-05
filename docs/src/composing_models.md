@@ -1,31 +1,96 @@
-# Learning Networks
+# Composing Models
 
-MLJ has a flexible interface for building networks from multiple
-machine learning elements, whose complexity extend beyond the
-"pipelines" of other machine learning toolboxes. 
+MLJ has a flexible interface for composing multiple machine learning
+elements to form a *learning network*, whose complexity can extend
+beyond the "pipelines" of other machine learning toolboxes. However,
+MLJ does provide special syntax for common use cases, which are
+described first below. A description of the general framework begins
+at [Learning Networks](@ref).
 
 
-### Overview
+## Linear pipelines
 
-In the future the casual MLJ user will be able to build common
-pipeline architetures, such as linear compositites and stacks, with
-simple macro invocations. Handcrafting a learning network, as outlined
-below, is an advanced MLJ feature, assuming familiarity with the
-basics outlined in [Getting Started](index.md). The syntax
-for building a learning network is essentially an extension of the
-basic syntax but with data containers replaced with nodes ("dynamic
-data").
+In MLJ a *pipeline* is a composite model in which models are chained
+together in a linear (non-branching) chain. Pipelines can include
+learned or static target transformations, if one of the models is
+supervised. 
+
+To illustrate basic construction of a pipeline, consider the following
+toy data:
+
+```@example 7
+using MLJ
+X = (age    = [23, 45, 34, 25, 67],
+     gender = categorical(['m', 'm', 'f', 'm', 'f']));
+height = [67.0, 81.5, 55.6, 90.0, 61.1]; nothing # hide
+```
+
+The code below creates a new pipeline model type called `MyPipe` for
+performing the following operations:
+  
+- standardize the target variable `:height` to have mean zero and
+  standard deviation one
+- coerce the `:age` field to have `Continuous` scitype
+- one-hot encode the categorical feature `:gender`
+- train a K-nearest neighbor model on the transformed inputs and
+  transformed target
+- restore the predictions of the KNN model to the original `:height`
+  scale (i.e., invert the standardization)
+  
+The code also creates an instance of the new pipeline model type,
+called `pipe`, whose hyperparameters `hot`, `knn`, and `stand` are the
+component model instances specified in the macro expression:
+
+```@example 7
+pipe = @pipeline MyPipe(X -> coerce(Dict(:age=>Continuous), X),
+                        hot = OneHotEncoder(),
+                        knn = KNNRegressor(K=3),
+                        target = UnivariateStandardizer())
+params(pipe)
+```
+
+We can, for example, evaluate the pipeline like we would any other model:
+
+```@example 7
+pipe.knn.K = 2
+pipe.hot.drop_last = true
+evaluate(pipe, X, height, resampling=Holdout(), measure=rms, verbosity=0)
+```
+
+For important details on including target transformations, see below.
+
+```@docs
+@pipeline
+```
+
+
+## Homogeneous Ensembles
+
+For performance reasons, creating a large ensemble of models sharing a
+common set of hyperparameters is achieved in MLJ through a model
+wrapper, rather than through the learning networks API. See the
+separate [Homogeneous Ensembles](homogeneous_ensembles.md) section for
+details.
+
+
+## Learning Networks
+
+Hand-crafting a learning network, as outlined below, is a relatively
+advanced MLJ feature, assuming familiarity with the basics outlined in
+[Getting Started](index.md). The syntax for building a learning
+network is essentially an extension of the basic syntax but with data
+containers replaced with nodes ("dynamic data").
 
 In MLJ, a *learning network* is a graph whose nodes apply an
 operation, such as `predict` or `transform`, using a fixed machine
 (requiring training) - or which, alternatively, applies a regular
-(untrained) mathematical operation to its input(s). In practice, a
-learning network works with fixed sources for its
-training/evaluation data, but can be built and tested in stages. By
-contrast, an *exported learning network* is a learning network
-exported as a stand-alone, re-usable `Model` object, to which all the
-MLJ `Model` meta-algorithms can be applied (ensembling, systematic
-tuning, etc).
+(untrained) mathematical operation, such as `+`, `log` or `vcat`, to its
+input(s). In practice, a learning network works with fixed sources for
+its training/evaluation data, but can be built and tested in
+stages. By contrast, an *exported learning network* is a learning
+network exported as a stand-alone, re-usable `Model` object, to which
+all the MLJ `Model` meta-algorithms can be applied (ensembling,
+systematic tuning, etc).
 
 As we shall see, exporting a learning network as a reusable model, is
 quite simple. While one can entirely skip the build-and-train steps,
@@ -34,20 +99,20 @@ understand how the stand-alone models work under the hood.
 
 In MLJ learning networks treat the flow of information during training
 and predicting separately. For this reason, simpler examples may
-appear more slighlty more complicated than in other
-approaches. However, in more sophisticated examples, such as
-_stacking_, the separation is essential.
+appear more slightly more complicated than in other
+frameworks. However, in more sophisticated examples, such as
+_stacking_, this separation is essential.
 
 
 ### Building a simple learning network
 
 ![](wrapped_ridge.png)
 
-The diagram above depicts a learning network which standardises the
+The diagram above depicts a learning network which standardizes the
 input data `X`, learns an optimal Box-Cox transformation for the
 target `y`, predicts new target values using ridge regression, and
 then inverse-transforms those predictions, for later comparison with
-the original test data. The machines are labelled in yellow. We first
+the original test data. The machines are labeled in yellow. We first
 need to import the RidgeRegressor model (you will need `MLJModels` in
 your load path):
 
@@ -66,13 +131,19 @@ x2 = rand(300)
 x3 = rand(300)
 y = exp.(x1 - x2 -2x3 + 0.1*rand(300))
 X = DataFrame(x1=x1, x2=x2, x3=x3) 
-ys = source(y)
+
 Xs = source(X)
+ys = source(y, kind=:target)
 ```
 
 ```julia
 Source @ 3…40
 ```
+
+*Note.* Once can wrap the source nodes around `nothing` instead of
+actual data. One can still export the resulting network as a
+stand-alone model (see later) but will be unable to fit or call on
+network nodes as described below.
 
 We label nodes we will construct according to their outputs in the
 diagram. Notice that the nodes `z` and `yhat` use the same machine,
@@ -192,26 +263,26 @@ rms(y[test], yhat(rows=test))
 0.039410306910269116
 ```
 
-> **Notable feature.** The machine, `ridge::NodalMachine{RidgeRegressor}`, is retrained, because its underlying model has been mutated. However, since the outcome of this training has no effect on the training inputs of the machines `stand` and `box`, these transformers are left untouched. (During construction, each node and machine in a learning network determines and records all machines on which it depends.) This behaviour, which extends to exported learning networks, means we can tune our wrapped regressor (using a holdout set) without re-computing transformations each time the hyperparameter is changed. 
+> **Notable feature.** The machine, `ridge::NodalMachine{RidgeRegressor}`, is retrained, because its underlying model has been mutated. However, since the outcome of this training has no effect on the training inputs of the machines `stand` and `box`, these transformers are left untouched. (During construction, each node and machine in a learning network determines and records all machines on which it depends.) This behavior, which extends to exported learning networks, means we can tune our wrapped regressor (using a holdout set) without re-computing transformations each time the hyperparameter is changed. 
 
 
-### Exporting a learning network as a stand-alone model
+## Exporting a learning network as a stand-alone model
 
 Having satisfied that our learning network works on the synthetic
 data, we are ready to export it as a stand-alone model.
 
 
-#### Method I: The @from_network  macro
+### Method I: The @from_network  macro
 
 The following call simultaneously defines a new model subtype
 `WrappedRidgeI <: Supervised` and creates an instance of this type
 `wrapped_modelI`:
     
 ```julia
-wrapped_ridgeI = @from_network WrappedRidgeI(ridge=ridge_model) <= (Xs, ys, yhat)
+wrapped_ridgeI = @from_network WrappedRidgeI(ridge=ridge_model) <= yhat
 ```
 
-Any MLJ workflow can be applied to this composite model:
+Any MLJ work-flow can be applied to this composite model:
 
 ```julia 
 julia> params(wrapped_ridgeI)
@@ -243,16 +314,28 @@ evaluate(wrapped_ridgeI, X, y, resampling=CV(), measure=rms, verbosity=0)
   become the default value for the field `ridge` of the new
   `WrappedRidgeI` struct.
   
-- The tuple `(Xs, ys, yhat)` must always follow the pattern (*source
-  node for inputs, source node for target, terminal prediction node*),
-  unless this is an unsupervised learning network, in which case the
-  pattern is (*soruce node for inputs, terminal transform node*).
+- It is important to have labeled the target source, as in `ys = source(y,
+  kind=:target)`, to ensure the network is exported as a *supervised*
+  model.
   
+- One can can also use the `@from_network` to export unsupervised
+  learning networks and the syntax is the same. For example:
+  
+```julia
+langs_composite = @from_network LangsComposite(pca=network_pca) <= Xout
+```
 
-#### Method II: 
+- For a supervised network making *probabilistic* predictions, one must add
+`is_probabilistic=true` to the end of the `@from network` call. For example: 
 
-In the method I above, only models appearing in the network will
-appear as hyperparamers of the exported composite model. There is a
+```julia
+petes_composite = @from_network PetesComposite(tree_classifier=network_tree) probabilistic=true
+```
+
+### Method II: Finer control 
+
+In Method I above, only models appearing in the network will
+appear as hyperparameters of the exported composite model. There is a
 second more flexible method for exporting the network, which allows
 finer control over the exported `Model` struct (see the example under
 [Static operations on nodes](@ref) below) and which also avoids
@@ -262,9 +345,11 @@ macros. The two steps required are:
 
 - Wrap the learning network code in a model `fit` method.
 
-All learning networks that make determinisic (respectively, probabilistic)
-predictions export as models of subtype `DeterministicNetwork`
-(respectively, `ProbabilisticNetwork`):
+All learning networks that make deterministic (respectively,
+probabilistic) predictions export to models of subtype
+`DeterministicNetwork` (respectively, `ProbabilisticNetwork`),
+Unsupervised learning networks export to `UnsupervisedNetwork` model
+subtypes.
 
 ```julia
 mutable struct WrappedRidgeII <: DeterministicNetwork
@@ -275,15 +360,16 @@ end
 WrappedRidgeII(; ridge=RidgeRegressor) = WrappedRidgeII(ridge); 
 ```
 
-We now simply cut and paste its defining code into a model `fit`
-method (as opposed to machine `fit!` methods, which internally
-dispatch model `fit` methods on bound data):
+We now simply cut and paste the code defining the learning network
+into a model `fit` method (as opposed to machine `fit!` methods, which
+internally dispatch model `fit` methods on the data bound to the
+machine):
 
 
 ```julia
 function MLJ.fit(model::WrappedRidgeII, verbosity::Integer, X, y)
     Xs = source(X)
-    ys = source(y)
+    ys = source(y, kind=:target)
 
     stand_model = Standardizer()
     stand = machine(stand_model, Xs)
@@ -300,15 +386,17 @@ function MLJ.fit(model::WrappedRidgeII, verbosity::Integer, X, y)
     yhat = inverse_transform(box, zhat)
     fit!(yhat, verbosity=0)
     
-    return fitresults(Xs, ys, yhat)
+    return fitresults(yhat)
 end
 ```
 
-The line marked `###`, where the new exported model's hyperparameter `ridge` is spliced into the network, is the only modification.
+The line marked `###`, where the new exported model's hyperparameter
+`ridge` is spliced into the network, is the only modification. This
+completes the export process.
 
-> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding machine `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the terminating node of the network built in `fit` on the data supplied.
+> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding *machine* `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the terminating node of the network built in `fit` on the data supplied. The expression `fitresults(yhat)` bundles the terminal node `yhat` with reports (one for each machine in the network) and moves training data out to a bundled cache object. This ensures machines wrapping exported model instances do not contain actual training data in their `fitresult` fields.  
 
-The export process is complete:
+
 
 ```julia
 using CSV
@@ -330,18 +418,23 @@ Another example of an exported learning network is given in the next
 subsection.
 
 
-### Static operations on nodes
+## Static operations on nodes
 
 Continuing to view nodes as "dynamic data", we can, in addition to
 applying "dynamic" operations like `predict` and `transform` to nodes,
-overload ordinary "static" operations as well. Common operations, like
-addition, scalar multiplication, `exp` and `log` work out-of-the
-box. To demonstrate this, consider the code below defining a composite
-model that: (i) One-hot encodes the input table `X`; (ii) Log
-transforms the continuous target `y`; (iii) Fits specified K-nearest
-neighbour and ridge regressor models to the data; (iv) Computes a
-weighted average of individual model predictions; and (v) Inverse
-transforms (exponentiates) the blended predictions.
+overload ordinary "static" (unlearned) operations as well. Common
+operations, like addition, scalar multiplication, `exp`, `log`,
+`vcat`, `hcat`, tabularization (`MLJ.table`) and matrixification
+(`MLJ.matrix`) work out-of-the box. 
+
+As a demonstration, consider the code below defining a composite model
+`blended_model` (subtype of `KNNRidgeBlend`) that: (i) One-hot encodes
+the input table `X`; (ii) Log transforms the continuous target `y`;
+(iii) Fits specified K-nearest neighbour and ridge regressor models to
+the data; (iv) Computes a weighted average of individual model
+predictions; and (v) Inverse transforms (exponentiates) the blended
+predictions. We include the weighting as a hyperparameter of the new
+model, which would not be possible using the `@from_network` macro.
 
 Note, in particular, the lines defining `zhat` and `yhat`, which
 combine several static node operations.
@@ -361,7 +454,7 @@ end
 function MLJ.fit(model::KNNRidgeBlend, verbosity::Integer, X, y)
     
     Xs = source(X) 
-    ys = source(y)
+    ys = source(y, kind=:target)
 
     hot = machine(OneHotEncoder(), Xs)
 
@@ -413,7 +506,7 @@ mach = NodalMachine{KNNRegressor} @ 1…02
 0.13108966715886725
 ```
 
-A `node` method allows us to overerload a given function to
+A `node` method allows us to overload a given function to
 node arguments.  Here are some examples taken from MLJ source
 (at work in the example above):
 
@@ -454,7 +547,7 @@ W()
 ```
     
     
-### The learning network API
+## The learning network API
 
 Three julia types are part of learning networks: `Source`, `Node` and
 `NodalMachine`. A `NodalMachine` is returned by the `machine`
@@ -498,7 +591,7 @@ The key components of a `NodalMachine` object are:
 - Training *arguments*, which specify the nodes acting as proxies for
   training data on calls to `fit!`.
 
-- A *fit-result*, for storing the outcomes of calls to `fit!`.
+- A *fitresult*, for storing the outcomes of calls to `fit!`.
 
 A nodal machine is trained in the same way as a regular machine with
 one difference: Instead of training the model on the wrapped data
