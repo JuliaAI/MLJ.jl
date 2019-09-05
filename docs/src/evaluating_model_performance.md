@@ -2,7 +2,7 @@
 
 MLJ allows quick evaluation of a model's performance against a battery
 of selected losses or scores. For more on available performance
-measures, see [Measures](performance_measures.md).
+measures, see [Performance Measures](performance_measures.md).
 
 In addition to hold-out and cross-validation, the user can specify
 their own list of train/evaluation pairs of row indices for

@@ -285,7 +285,8 @@ end
     EnsembleModel(atom=nothing,
                   weights=Float64[],
                   bagging_fraction=0.8,
-                  rng=GLOBAL_RNG, n=100,
+                  n=100,
+                  rng=GLOBAL_RNG, 
                   parallel=true,
                   out_of_bag_measure=[])
 
@@ -305,7 +306,7 @@ If `rng` is an integer, then `MersenneTwister(rng)` is the random
 number generator used for bagging. Otherwise some `AbstractRNG` object
 is expected.
 
-Predictions are weighted according to the vector `weights` (to allow
+The atomic predictions are weighted according to the vector `weights` (to allow
 for external optimization) except in the case that `atom` is a
 `Deterministic` classifier. Uniform weights are used if `weight` has
 zero length.

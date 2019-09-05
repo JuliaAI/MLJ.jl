@@ -88,7 +88,8 @@ julia> tree_model = DecisionTreeRegressor()
 julia> forest_model = EnsembleModel(atom=tree_model); 
 ```
 
-Nested hyperparameters can be inspected using `params`:
+Nested hyperparameters can be inspected using `params` (or just type
+`@more` in the REPL after instantiating `forest_model`):
 
 ```@repl goof
 params(forest_model)

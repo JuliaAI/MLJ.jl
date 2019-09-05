@@ -7,17 +7,28 @@ provides support for the loss functions in the
 and allows for users to define their own custom measures. 
 
 Providing further measures for probabilistic predictors, such as
-proper scoring rules, is a work in progress.
+proper scoring rules, and for constructing multi-target product
+measures, is a work in progress.
 
 
 ### Built-in measures
 
-These measures all have the common calling syntax `measure(ŷ, y)` or
-`measure(ŷ, y, w)`, where `y` iterates over observations of some
-target variable, and `ŷ` iterates over predictions
-(`Distribution` or `Sampler` objects in the probabilistic
-case). Here `w` is an optional vector of sample weights, which can be
-provided when the measure supports this.
+These measures all have the common calling syntax
+
+```julia
+measure(ŷ, y)
+```
+
+or
+
+```julia
+measure(ŷ, y, w)
+```
+
+where `y` iterates over observations of some target variable, and `ŷ`
+iterates over predictions (`Distribution` or `Sampler` objects in the
+probabilistic case). Here `w` is an optional vector of sample weights,
+which can be provided when the measure supports this.
 
 ```@repl losses_and_scores
 using MLJ
@@ -117,14 +128,14 @@ evaluate!(mach,
           verbosity=0) 
 ```
 
-*Note:* Although one cannot directly call `ZeroOneLoss()` on categorical
-vectors, applying `MLJ.value` as discussed above has the expected
-behaviour:
+*Note:* Although `ZeroOneLoss(ŷ, y)` makes no sense (neither `ŷ` nor
+`y` have a type expected by LossFunctions.jl), one can instead use the
+adaptor `MLJ.value` as discussed above:
 
 ```@repl losses_and_scores
 ŷ = predict(mach, X); 
-MLJ.value(ZeroOneLoss(), ŷ, X, y, w) # X ignored here
-mean(MLJ.value(ZeroOneLoss(), ŷ, X, y, w)) ≈ misclassification_rate(mean.(ŷ), y, w)
+loss = MLJ.value(ZeroOneLoss(), ŷ, X, y, w) # X is ignored here
+mean(loss) ≈ misclassification_rate(mode.(ŷ), y, w)
 ```
 
 ### API for built-in loss functions

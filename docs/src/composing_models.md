@@ -4,14 +4,15 @@ MLJ has a flexible interface for composing multiple machine learning
 elements to form a *learning network*, whose complexity can extend
 beyond the "pipelines" of other machine learning toolboxes. However,
 MLJ does provide special syntax for common use cases, which are
-described first below. A description of the general framework begins at [Learning Networks](@ref)
+described first below. A description of the general framework begins
+at [Learning Networks](@ref).
 
 
 ## Linear pipelines
 
 In MLJ a *pipeline* is a composite model in which models are chained
 together in a linear (non-branching) chain. Pipelines can include
-learned or static target transformations when one of the models is
+learned or static target transformations, if one of the models is
 supervised. 
 
 To illustrate basic construction of a pipeline, consider the following
@@ -19,12 +20,12 @@ toy data:
 
 ```@example 7
 using MLJ
-X = (age = [23, 45, 34, 25, 67],
+X = (age    = [23, 45, 34, 25, 67],
      gender = categorical(['m', 'm', 'f', 'm', 'f']));
 height = [67.0, 81.5, 55.6, 90.0, 61.1]; nothing # hide
 ```
 
-The code below creates a new "pipeline" model type called `MyPipe` for
+The code below creates a new pipeline model type called `MyPipe` for
 performing the following operations:
   
 - standardize the target variable `:height` to have mean zero and
@@ -38,7 +39,7 @@ performing the following operations:
   
 The code also creates an instance of the new pipeline model type,
 called `pipe`, whose hyperparameters `hot`, `knn`, and `stand` are the
-component model instances provided in macro expression:
+component model instances specified in the macro expression:
 
 ```@example 7
 pipe = @pipeline MyPipe(X -> coerce(Dict(:age=>Continuous), X),

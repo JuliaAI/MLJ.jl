@@ -57,7 +57,10 @@ Evaluating against multiple performance measures is also possible. See
 [Evaluating model performance](evaluating_model_performance.md) for details.
 
 
-### Training and testing by hand
+### Fit and predict
+
+To illustrate MLJ's fit and predict interface, let's perform the above
+evaluations by hand.
 
 Wrapping the model in data creates a *machine* which will store
 training outcomes:
