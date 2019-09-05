@@ -174,7 +174,8 @@ end
 function clean!(model::DeterministicEnsembleModel)
 
     target_scitype(model.atom) <: Union{AbstractVector{<:Finite}, AbstractVector{<:Continuous}} ||
-        error("atom has unsupported target scitype $scitype(model.atom). ")
+        error("`atom` has unsupported target_scitype "*
+              "`$(target_scitype(model.atom))`. ")
 
     message = ""
 
