@@ -3,7 +3,7 @@
 In MLJ loss functions, scoring rules, sensitivities, and so on, are collectively referred
 to as *measures*. Presently, MLJ includes a few built-in measures,
 provides support for the loss functions in the
-[LossFunctions](https://github.com/JuliaML/LossFunctions.jl) library,
+[LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl) library,
 and allows for users to define their own custom measures. 
 
 Providing further measures for probabilistic predictors, such as
@@ -94,14 +94,14 @@ dipatched.
 
 ### Using LossFunctions.jl
 
-The [LossFunctions](https://github.com/JuliaML/LossFunctions.jl)
+The [LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl)
 package includes "distance loss" functions for `Continuous` targets,
 and "marginal loss" functins for `Binary` targets. While the
-LossFunctions interface differs from the present one (for, example
+LossFunctions,jl interface differs from the present one (for, example
 `Binary` observations must be +1 or -1), one can safely pass the loss
 functions defined there to any MLJ algorithm, which re-interprets it
-under the hood. Note that the distance loss functions apply to
-deterministic predictions, while the marginal losses apply to
+under the hood. Note that the "distance losses" in the package
+apply to deterministic predictions, while the "marginal losses" apply to
 probabilistic predictions.
 
 ```@repl losses_and_scores
@@ -124,7 +124,7 @@ behaviour:
 ```@repl losses_and_scores
 ŷ = predict(mach, X); 
 MLJ.value(ZeroOneLoss(), ŷ, X, y, w) # X ignored here
-mean(MLJ.value(ZeroOneLoss(), ŷ, X, y, w)) ≈ misclassification_rate(ŷ, y, w)
+mean(MLJ.value(ZeroOneLoss(), ŷ, X, y, w)) ≈ misclassification_rate(mean.(ŷ), y, w)
 ```
 
 ### API for built-in loss functions
