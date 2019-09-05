@@ -6,19 +6,19 @@ julia&gt; X = (a=rand(12), b=rand(12), c=rand(12));
 julia&gt; y = X.a + 2X.b + 0.05*rand(12);
 
 julia&gt; model = @load RidgeRegressor
-MLJModels.MultivariateStats_.RidgeRegressor(lambda = 0.0,) @ 1…52
+MLJModels.MultivariateStats_.RidgeRegressor(lambda = 0.0,) @ 6…63
 
 julia&gt; cv=CV(nfolds=3)
 CV(nfolds = 3,
    shuffle = false,
-   rng = MersenneTwister(UInt32[0x000004d2]),) @ 5…40
+   rng = MersenneTwister(UInt32[0x000004d2]),) @ 6…71
 
 julia&gt; evaluate(model, X, y, resampling=cv, measure=l2, verbosity=0)
 (measure = MLJ.L2[l2],
  measurement = [0.000194231],
  per_fold = Array{Float64,1}[[0.000299116, 1.20939e-5, 0.000271481]],
  per_observation = Array{Array{Float64,1},1}[[[0.000199628, 4.6102e-5, 0.000478725, 0.00047201], [7.98802e-6, 3.14728e-6, 1.70059e-5, 2.02343e-5], [1.75352e-6, 0.000648431, 0.000433657, 2.08456e-6]]],)</code></pre><p>Alternatively, instead of applying <code>evaluate</code> to a model + data, one may call <code>evaluate!</code> on an existing machine wrapping the model in data:</p><pre><code class="language-julia-repl">julia&gt; mach = machine(model, X, y)
-Machine{RidgeRegressor} @ 6…40
+Machine{RidgeRegressor} @ 2…23
 
 julia&gt; evaluate!(mach, resampling=cv, measure=l2, verbosity=0)
 (measure = MLJ.L2[l2],
@@ -47,7 +47,7 @@ julia&gt; MLJ.orientation(::typeof(my_weighted_score)) = :score;
 julia&gt; holdout = Holdout(fraction_train=0.8)
 Holdout(fraction_train = 0.8,
         shuffle = false,
-        rng = MersenneTwister(UInt32[0x000004d2]),) @ 6…32
+        rng = MersenneTwister(UInt32[0x000004d2]),) @ 6…64
 
 julia&gt; weights = [1, 1, 2, 1, 1, 2, 3, 1, 1, 2, 3, 1];
 
