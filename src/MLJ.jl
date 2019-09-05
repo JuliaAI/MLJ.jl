@@ -33,6 +33,7 @@ export StaticTransformer, FeatureSelector,
 
 # rexport from Random, Statistics, Distributions, CategoricalArrays:
 export pdf, mode, median, mean, shuffle!, categorical, shuffle, levels, levels!
+export std
 
 # reexport from MLJBase and ScientificTypes:
 export nrows, nfeatures, traits,
