@@ -1,0 +1,5 @@
+# Homegeneous Ensembles
+
+```@docs
+EnsembleModel
+```
