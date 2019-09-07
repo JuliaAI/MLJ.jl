@@ -130,14 +130,23 @@ include("scitypes.jl")      # extensions to ScientificTypes.sictype
 ## GET THE EXTERNAL MODEL METADATA AND CODE FOR OPTIONAL DEPENDENCIES
 
 function __init__()
-    @info "Loading model metadata from registry. "
-    global metadata_file = joinpath(srcdir, "registry", "Metadata.toml")
-    global INFO_GIVEN_HANDLE = info_given_handle(metadata_file)
-    global AMBIGUOUS_NAMES = ambiguous_names(INFO_GIVEN_HANDLE)
-    global PKGS_GIVEN_NAME = pkgs_given_name(INFO_GIVEN_HANDLE)
-    global NAMES = model_names(INFO_GIVEN_HANDLE)
+    fail = false
     @require(LossFunctions="30fc2ffe-d236-52d8-8643-a9d8f7c094a7",
              include("loss_functions_interface.jl"))
+    try
+        global metadata_file = joinpath(srcdir, "registry", "Metadata.toml")
+        global INFO_GIVEN_HANDLE = info_given_handle(metadata_file)
+        global AMBIGUOUS_NAMES = ambiguous_names(INFO_GIVEN_HANDLE)
+        global PKGS_GIVEN_NAME = pkgs_given_name(INFO_GIVEN_HANDLE)
+        global NAMES = model_names(INFO_GIVEN_HANDLE)
+    catch
+        @warn "Problem loading registry from $metadata_file. "*
+        "Model searching disabled. "
+        fail = true
+    end
+    if !fail
+        @info "Model metadata loaded from registry. "
+    end
 end
 
 
