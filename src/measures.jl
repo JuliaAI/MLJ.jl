@@ -8,7 +8,7 @@ const MEASURE_TRAITS =
      :reports_each_observation, :is_feature_dependent]
 
 # already defined for models:
-import MLJBase.name              # fallback for non-MLJType is `missing`
+import MLJBase.name              # fallback for non-MLJType is string(M) where M is arg
 import MLJBase.target_scitype    # fallback value = Unknown
 import MLJBase.supports_weights  # fallback value = false
 import MLJBase.prediction_type   # fallback value = :unknown
@@ -176,8 +176,7 @@ For more MLJBase.information, run `MLJBase.info(rms)`.
 
 """
 rms = RMS()
-name(::Type{<:RMS) = "rms"
-
+name(::Type{<:RMS}) = "rms"
 target_scitype(::Type{<:RMS}) = Union{AbstractVector{Continuous},AbstractVector{Count}}
 prediction_type(::Type{<:RMS}) = :deterministic
 orientation(::Type{<:RMS}) = :loss
