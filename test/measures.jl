@@ -62,16 +62,16 @@ end
     @test MLJ.value(spooky, yhat, nothing, y, nothing) ≈ mav(yhat, y)
     
     cool(yhat, y, w) = abs.(yhat - y) .* w ./ (sum(w)/length(y)) |> mean
-    MLJ.supports_weights(::typeof(cool)) = true
+    MLJ.supports_weights(::Type{typeof(cool)}) = true
     @test MLJ.value(cool, yhat, nothing, y, w) ≈ mav(yhat, y, w)
     
     funky(yhat, X, y) = X.weight .* abs.(yhat - y) ./ (sum(X.weight)/length(y)) |> mean
-    MLJ.is_feature_dependent(::typeof(funky)) = true
+    MLJ.is_feature_dependent(::Type{typeof(funky)}) = true
     @test MLJ.value(funky, yhat, X, y, nothing) ≈ mav(yhat, y, X.weight)
 
     weird(yhat, X, y, w) = w .* X.weight .* abs.(yhat - y) ./ sum(w .* X.weight) |> sum
-    MLJ.is_feature_dependent(::typeof(weird)) = true
-    MLJ.supports_weights(::typeof(weird)) = true
+    MLJ.is_feature_dependent(::Type{typeof(weird)}) = true
+    MLJ.supports_weights(::Type{typeof(weird)}) = true
     @test MLJ.value(weird, yhat, X, y, w) ≈ mav(yhat, y, X.weight .* w)
 
 end

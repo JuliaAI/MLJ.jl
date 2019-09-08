@@ -6,35 +6,40 @@ end
 
 ## SUPERVISED
 
-struct SupervisedModel{input_scitype, target_scitype, is_probabilistic} end
+struct SupervisedModel{input_scitype, target_scitype, prediction_type} end
 
 ScientificTypes.scitype(model::Deterministic, ::Val{:mlj}) =
     SupervisedModel{input_scitype(model),
                     target_scitype(model),
-                    false}
+                    :deterministic}
                     
 ScientificTypes.scitype(model::Probabilistic, ::Val{:mlj}) =
     SupervisedModel{input_scitype(model),
                     target_scitype(model),
-                    true}
+                    :probabilistic}
                     
-function Base.getproperty(::SupervisedModel{input_scitype, target_scitype, is_probabilistic},
-                          field::Symbol) where {input_scitype, target_scitype, is_probabilistic}
+ScientificTypes.scitype(model::Interval, ::Val{:mlj}) =
+    SupervisedModel{input_scitype(model),
+                    target_scitype(model),
+                    :interval}
+                    
+function Base.getproperty(::SupervisedModel{input_scitype, target_scitype, prediction_type},
+                          field::Symbol) where {input_scitype, target_scitype, prediction_type}
     if field === :input_scitype
         return input_scitype
     elseif field === :target_scitype
         return target_scitype
-    elseif field === :is_probabilistic
-        return is_probabilistic
+    elseif field === :prediction_type
+        return prediction_type
     else
         throw(ArgumentError("Unsupported property. "))
     end
 end
 
-Base.propertynames(::SupervisedModel) = (:input_scitype, :target_scitype, :is_probabilistic)
+Base.propertynames(::SupervisedModel) = (:input_scitype, :target_scitype, :prediction_type)
 
 _as_named_tuple(s::SupervisedModel) =
-    NamedTuple{(:input_scitype, :target_scitype, :is_probabilistic)}((s.input_scitype, s.target_scitype, s.is_probabilistic))
+    NamedTuple{(:input_scitype, :target_scitype, :prediction_type)}((s.input_scitype, s.target_scitype, s.prediction_type))
 
 function Base.show(io::IO, ::MIME"text/plain", S::Type{<:SupervisedModel})
     show(io, MIME("text/plain"), _as_named_tuple(S()))
