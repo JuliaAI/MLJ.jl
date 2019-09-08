@@ -3,35 +3,31 @@
 import .LossFunctions: DistanceLoss, MarginLoss, SupervisedLoss
 # import LossFunctions: DistanceLoss, MarginLoss, SupervisedLoss
 
-orientation(measure::SupervisedLoss) = :loss 
-reports_each_observation(measure::SupervisedLoss) = true
-is_feature_dependent(measure::SupervisedLoss) = false
-supports_weights(measure::SupervisedLoss) = true
 
-MLJBase.info(measure::SupervisedLoss) =
-    (target_scitype=target_scitype(measure),
-     prediction_type=prediction_type(measure),
-     orientation=orientation(measure),
-     reports_each_observation=reports_each_observation(measure),
-     is_feature_dependent=is_feature_dependent(measure),
-     supports_weights=supports_weights(measure))
+is_measure(::SuprvisedLoss) = true
+
+orientation(::Type{<:SupervisedLoss}) = :loss 
+reports_each_observation(::Type{<:SupervisedLoss}) = true
+is_feature_dependent(::Type{<:SupervisedLoss}) = false
+supports_weights(::Type{<:SupervisedLoss}) = true
 
 
 ## DISTANCE BASED LOSS FUNCTION
 
-prediction_type(measure::DistanceLoss) = :deterministic
-target_scitype(measure::DistanceLoss) = AbstractArray{<:Continuous}
+prediction_type(::Type{<:DistanceLoss}) = :deterministic
+target_scitype(::Type{<:DistanceLoss}) = AbstractArray{<:Continuous}
 
 value(measure::DistanceLoss, yhat, X, y, ::Nothing, ::Val{false}, ::Val{true}) =
     measure(yhat, y)
+
 value(measure::DistanceLoss, yhat, X, y, w, ::Val{false}, ::Val{true}) =
     w .* measure(yhat, y) ./ (sum(w)/length(y))
 
 
 ## MARGIN BASED LOSS FUNCTIONS
 
-prediction_type(measure::MarginLoss) = :probabilistic
-target_scitype(measure::MarginLoss) = AbstractArray{<:Binary}
+prediction_type(::Type{<:MarginLoss}) = :probabilistic
+target_scitype(::Type{<:MarginLoss}) = AbstractArray{<:Binary}
 
 # convert a Binary vector into vector of +1 or -1 values (for testing
 # only):

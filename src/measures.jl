@@ -1,29 +1,46 @@
 ## TRAITS FOR MEASURES
 
-# to be extended from MLJBase:
+is_measure(::Any) = false
+ScientificTypes.TRAIT_FUNCTION_GIVEN_NAME[:measure] =  is_measure
+ 
+const MEASURE_TRAITS =
+    [:name, :target_scitype, :supports_weights, :prediction_type, :orientation,
+     :reports_each_observation, :is_feature_dependent]
+
+# already defined for models:
+import MLJBase.name              # fallback for non-MLJType is `missing`
 import MLJBase.target_scitype    # fallback value = Unknown
 import MLJBase.supports_weights  # fallback value = false
+import MLJBase.prediction_type   # fallback value = :unknown
+# also can be :deterministic, :probabilistic, :interval
 
-# new:
-prediction_type(measure) = :unknown # other options are :probabilistic, :deterministic, or :interval
-orientation(measure) = :loss  # other options are :score, :other
-reports_each_observation(measure) = false
-is_feature_dependent(measure) = false
+# specfic to measures:
+orientation(::Type) = :loss  # other options are :score, :other
+reports_each_observation(::Type) = false
+is_feature_dependent(::Type) = false
+
+# extend to instances:
+orientation(m) = orientation(typeof(m))
+reports_each_observation(m) = reports_each_observation(typeof(m))
+is_feature_dependent(m) = reports_each_observation(typeof(m))
+
+# specific to probabilistic measures:
+distribution_type(::Type) = missing
 
 
-## EVALUATION 
+## DISPATCH FOR EVALUATION
 
 # yhat - predictions (point or probabilisitic)
 # X - features
 # y - target observations
 # w - per-observation weights
 
-# Note that the following methods are unspecialized to any particular
-# measure. They can be overloaded; see eg. src/loss_functions_extension.jl
-
 value(measure, yhat, X, y, w) = value(measure, yhat, X, y, w,
                                       Val(is_feature_dependent(measure)),
                                       Val(supports_weights(measure)))
+
+
+## DEFAULT EVALUATION INTERFACE
 
 #  is feature independent, weights not supported:
 value(measure, yhat, X, y, w, ::Val{false}, ::Val{false}) = measure(yhat, y)
@@ -65,23 +82,31 @@ end
               
 ## FOR BUILT-IN MEASURES
 
-abstract type Measure end
+abstract type Measure <: MLJType end
+is_measure(::Measure) = true
 
-Base.show(stream::IO, ::MIME"text/plain", m::Measure) = print(stream, "$(measurename(m)) (callable Measure)")
-Base.show(stream::IO, m::Measure) = print(stream, measurename(m))
 
-"""
-    traits(measure::Measure)
+Base.show(stream::IO, ::MIME"text/plain", m::Measure) = print(stream, "$(name(m)) (callable Measure)")
+Base.show(stream::IO, m::Measure) = print(stream, name(m))
 
-Return a named tuple summarizing the traits defined for `measure`. 
+traits(measure, ::Val{:nonprobabilistic_measure}) = 
+    (name=name(measure),
+     target_scitype=target_scitype(measure),
+     prediction_type=prediction_type(measure),
+     orientation=orientation(measure),
+     reports_each_observation=reports_each_observation(measure),
+     is_feature_dependent=is_feature_dependent(measure),
+     supports_weights=supports_weights(measure))
 
-"""
-traits(measure::Measure) = (target_scitype=target_scitype(measure),
-                            prediction_type=prediction_type(measure),
-                            orientation=orientation(measure),
-                            reports_each_observation=reports_each_observation(measure),
-                            is_feature_dependent=is_feature_dependent(measure),
-                            supports_weights=supports_weights(measure))
+traits(measure, ::Val{:probabilistic_measure}) = 
+    (name=name(measure),
+     target_scitype=target_scitype(measure),
+     prediction_type=prediction_type(measure),
+     distribution_type=distribution_type(measure),
+     orientation=orientation(measure),
+     reports_each_observation=reports_each_observation(measure),
+     is_feature_dependent=is_feature_dependent(measure),
+     supports_weights=supports_weights(measure))
 
 
 ## REGRESSOR METRICS (FOR DETERMINISTIC PREDICTIONS)
@@ -99,14 +124,14 @@ For more MLJBase.information, run `MLJBase.info(mav)`.
 
 """
 mav = MAV()
-measurename(::MAV) = "mav"
+name(::Type{<:MAV}) = "mav"
 
-target_scitype(::MAV) = Union{AbstractVector{Continuous},AbstractVector{Count}}
-prediction_type(::MAV) = :deterministic
-orientation(::MAV) = :loss
-reports_each_observation(::MAV) = false
-is_feature_dependent(::MAV) = false
-supports_weights(::MAV) = true
+target_scitype(::Type{<:MAV}) = Union{AbstractVector{Continuous},AbstractVector{Count}}
+prediction_type(::Type{<:MAV}) = :deterministic
+orientation(::Type{<:MAV}) = :loss
+reports_each_observation(::Type{<:MAV}) = false
+is_feature_dependent(::Type{<:MAV}) = false
+supports_weights(::Type{<:MAV}) = true
 
 function (::MAV)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
@@ -151,14 +176,14 @@ For more MLJBase.information, run `MLJBase.info(rms)`.
 
 """
 rms = RMS()
-measurename(::RMS) = "rms"
+name(::Type{<:RMS) = "rms"
 
-target_scitype(::RMS) = Union{AbstractVector{Continuous},AbstractVector{Count}}
-prediction_type(::RMS) = :deterministic
-orientation(::RMS) = :loss
-reports_each_observation(::RMS) = false
-is_feature_dependent(::RMS) = false
-supports_weights(::RMS) = true
+target_scitype(::Type{<:RMS}) = Union{AbstractVector{Continuous},AbstractVector{Count}}
+prediction_type(::Type{<:RMS}) = :deterministic
+orientation(::Type{<:RMS}) = :loss
+reports_each_observation(::Type{<:RMS}) = false
+is_feature_dependent(::Type{<:RMS}) = false
+supports_weights(::Type{<:RMS}) = true
 
 function (::RMS)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
@@ -191,19 +216,17 @@ For more MLJBase.information, run `MLJBase.info(l2)`.
 
 """
 l2 = L2()
-measurename(::L2) = "l2"
-
-target_scitype(::L2) = Union{AbstractVector{Continuous},AbstractVector{Count}}
-prediction_type(::L2) = :deterministic
-orientation(::L2) = :loss
-reports_each_observation(::L2) = true
-is_feature_dependent(::L2) = false
-supports_weights(::L2) = true
+name(::Type{<:L2}) = "l2"
+target_scitype(::Type{<:L2}) = Union{AbstractVector{Continuous},AbstractVector{Count}}
+prediction_type(::Type{<:L2}) = :deterministic
+orientation(::Type{<:L2}) = :loss
+reports_each_observation(::Type{<:L2}) = true
+is_feature_dependent(::Type{<:L2}) = false
+supports_weights(::Type{<:L2}) = true
 
 function (::L2)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
     (check_dimensions(ŷ, y); (y - ŷ).^2)
 end
-
 
 function (::L2)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real}, w::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
@@ -222,14 +245,13 @@ For more MLJBase.information, run `MLJBase.info(l1)`.
 
 """
 l1 = L1()
-measurename(::L1) = "l1"
-
-target_scitype(::L1) = Union{AbstractVector{Continuous},AbstractVector{Count}}
-prediction_type(::L1) = :deterministic
-orientation(::L1) = :loss
-reports_each_observation(::L1) = true
-is_feature_dependent(::L1) = false
-supports_weights(::L1) = true
+name(::Type{<:L1}) = "l1"
+target_scitype(::Type{<:L1}) = Union{AbstractVector{Continuous},AbstractVector{Count}}
+prediction_type(::Type{<:L1}) = :deterministic
+orientation(::Type{<:L1}) = :loss
+reports_each_observation(::Type{<:L1}) = true
+is_feature_dependent(::Type{<:L1}) = false
+supports_weights(::Type{<:L1}) = true
 
 function (::L1)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
     (check_dimensions(ŷ, y); abs.(y - ŷ))
@@ -255,14 +277,13 @@ See also [`rmslp1`](@ref).
 
 """
 rmsl = RMSL()
-measurename(::RMSL) = "rmsl"
-
-target_scitype(::RMSL) = Union{AbstractVector{Continuous},AbstractVector{Count}}
-prediction_type(::RMSL) = :deterministic
-orientation(::RMSL) = :loss
-reports_each_observation(::RMSL) = false
-is_feature_dependent(::RMSL) = false
-supports_weights(::RMSL) = false
+name(::Type{<:RMSL}) = "rmsl"
+target_scitype(::Type{<:RMSL}) = Union{AbstractVector{Continuous},AbstractVector{Count}}
+prediction_type(::Type{<:RMSL}) = :deterministic
+orientation(::Type{<:RMSL}) = :loss
+reports_each_observation(::Type{<:RMSL}) = false
+is_feature_dependent(::Type{<:RMSL}) = false
+supports_weights(::Type{<:RMSL}) = false
 
 function (::RMSL)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
@@ -288,14 +309,13 @@ For more MLJBase.information, run `MLJBase.info(rmslp1)`.
 See also [`rmsl`](@ref).
 """
 rmslp1 = RMSLP1()
-measurename(::RMSLP1) = "rmslp1"
-
-target_scitype(::RMSLP1) = Union{AbstractVector{Continuous},AbstractVector{Count}}
-prediction_type(::RMSLP1) = :deterministic
-orientation(::RMSLP1) = :loss
-reports_each_observation(::RMSLP1) = false
-is_feature_dependent(::RMSLP1) = false
-supports_weights(::RMSLP1) = false
+name(::Type{<:RMSLP1}) = "rmslp1"
+target_scitype(::Type{<:RMSLP1}) = Union{AbstractVector{Continuous},AbstractVector{Count}}
+prediction_type(::Type{<:RMSLP1}) = :deterministic
+orientation(::Type{<:RMSLP1}) = :loss
+reports_each_observation(::Type{<:RMSLP1}) = false
+is_feature_dependent(::Type{<:RMSLP1}) = false
+supports_weights(::Type{<:RMSLP1}) = false
 
 function (::RMSLP1)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
@@ -322,14 +342,13 @@ For more MLJBase.information, run `MLJBase.info(rmsp)`.
 
 """
 rmsp = RMSP()
-measurename(::RMSP) = "rmsp"
-
-target_scitype(::RMSP) = Union{AbstractVector{Continuous},AbstractVector{Count}}
-prediction_type(::RMSP) = :deterministic
-orientation(::RMSP) = :loss
-reports_each_observation(::RMSP) = false
-is_feature_dependent(::RMSP) = false
-supports_weights(::RMSP) = false
+name(::Type{<:RMSP}) = "rmsp"
+target_scitype(::Type{<:RMSP}) = Union{AbstractVector{Continuous},AbstractVector{Count}}
+prediction_type(::Type{<:RMSP}) = :deterministic
+orientation(::Type{<:RMSP}) = :loss
+reports_each_observation(::Type{<:RMSP}) = false
+is_feature_dependent(::Type{<:RMSP}) = false
+supports_weights(::Type{<:RMSP}) = false
 
 function (::RMSP)(ŷ::AbstractVector{<:Real}, y::AbstractVector{<:Real})
     check_dimensions(ŷ, y)
@@ -362,14 +381,13 @@ For more MLJBase.information, run `MLJBase.info(misclassification_rate)`.
 
 """
 misclassification_rate = MisclassificationRate()
-measurename(::MisclassificationRate) = "misclassification_rate"
-
-target_scitype(::MisclassificationRate) = AbstractVector{<:Finite}
-prediction_type(::MisclassificationRate) = :deterministic
-orientation(::MisclassificationRate) = :loss
-reports_each_observation(::MisclassificationRate) = false
-is_feature_dependent(::MisclassificationRate) = false
-supports_weights(::MisclassificationRate) = true
+name(::Type{<:MisclassificationRate}) = "misclassification_rate"
+target_scitype(::Type{<:MisclassificationRate}) = AbstractVector{<:Finite}
+prediction_type(::Type{<:MisclassificationRate}) = :deterministic
+orientation(::Type{<:MisclassificationRate}) = :loss
+reports_each_observation(::Type{<:MisclassificationRate}) = false
+is_feature_dependent(::Type{<:MisclassificationRate}) = false
+supports_weights(::Type{<:MisclassificationRate}) = true
 
 (::MisclassificationRate)(ŷ::AbstractVector{<:CategoricalElement},
                           y::AbstractVector{<:CategoricalElement}) =
@@ -396,14 +414,13 @@ For more MLJBase.information, run `MLJBase.info(cross_entropy)`.
 
 """
 cross_entropy = CrossEntropy()
-measurename(::CrossEntropy) = "cross_entropy"
-
-target_scitype(::CrossEntropy) = AbstractVector{<:Finite}
-prediction_type(::CrossEntropy) = :probabilistic
-orientation(::CrossEntropy) = :loss
-reports_each_observation(::CrossEntropy) = true
-is_feature_dependent(::CrossEntropy) = false
-supports_weights(::CrossEntropy) = false
+name(::Type{<:CrossEntropy}) = "cross_entropy"
+target_scitype(::Type{<:CrossEntropy}) = AbstractVector{<:Finite}
+prediction_type(::Type{<:CrossEntropy}) = :probabilistic
+orientation(::Type{<:CrossEntropy}) = :loss
+reports_each_observation(::Type{<:CrossEntropy}) = true
+is_feature_dependent(::Type{<:CrossEntropy}) = false
+supports_weights(::Type{<:CrossEntropy}) = false
 
 # for single observation:
 _cross_entropy(d, y) = -log(pdf(d, y))
