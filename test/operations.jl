@@ -1,3 +1,4 @@
+if VERSION ≥ v"1.3"
 @testset "|> syntax for pipelines" begin
     Random.seed!(142)
     @load RidgeRegressor
@@ -26,3 +27,4 @@
 
     @test isapprox(rms(ŷ(rows=test), ys(rows=test)), 0.627126, rtol=1e-4)
 end
+end # version
