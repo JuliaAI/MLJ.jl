@@ -81,16 +81,16 @@ advanced MLJ feature, assuming familiarity with the basics outlined in
 network is essentially an extension of the basic syntax but with data
 containers replaced with nodes ("dynamic data").
 
-In MLJ, a *learning network* is a graph whose nodes apply an
-operation, such as `predict` or `transform`, using a fixed machine
-(requiring training) - or which, alternatively, applies a regular
-(untrained) mathematical operation, such as `+`, `log` or `vcat`, to its
-input(s). In practice, a learning network works with fixed sources for
-its training/evaluation data, but can be built and tested in
-stages. By contrast, an *exported learning network* is a learning
-network exported as a stand-alone, re-usable `Model` object, to which
-all the MLJ `Model` meta-algorithms can be applied (ensembling,
-systematic tuning, etc).
+In MLJ, a *learning network* is a directed acyclic graph whose nodes
+apply an operation, such as `predict` or `transform`, using a fixed
+machine (requiring training) - or which, alternatively, applies a
+regular (untrained) mathematical operation, such as `+`, `log` or
+`vcat`, to its input(s). In practice, a learning network works with
+fixed sources for its training/evaluation data, but can be built and
+tested in stages. By contrast, an *exported learning network* is a
+learning network exported as a stand-alone, re-usable `Model` object,
+to which all the MLJ `Model` meta-algorithms can be applied
+(ensembling, systematic tuning, etc).
 
 As we shall see, exporting a learning network as a reusable model, is
 quite simple. While one can entirely skip the build-and-train steps,
@@ -98,10 +98,12 @@ experimenting with raw learning networks may be the best way to
 understand how the stand-alone models work under the hood.
 
 In MLJ learning networks treat the flow of information during training
-and predicting separately. For this reason, simpler examples may
-appear more slightly more complicated than in other
-frameworks. However, in more sophisticated examples, such as
-_stacking_, this separation is essential.
+and predicting separately. Also, different nodes may use the same
+paramaters (fitresult) learned during the training of some model (that
+is, point to a common *nodal machine*; see below). For these reasons,
+simple examples may appear more slightly more complicated than in
+other frameworks. However, in more sophisticated applications, the
+extra flexibility is essential.
 
 
 ### Building a simple learning network
@@ -117,7 +119,7 @@ need to import the RidgeRegressor model (you will need `MLJModels` in
 your load path):
 
 ```julia
-@load RidgeRegressor
+@load RidgeRegressor pkg=MultivariateStats
 ```
 
 To implement the network, we begin by loading data needed for training
@@ -441,7 +443,7 @@ combine several static node operations.
 
 ```julia
 
-@load RidgeRegressor
+@load RidgeRegressor pkg=MultivariateStats
 
 mutable struct KNNRidgeBlend <:DeterministicNetwork
 

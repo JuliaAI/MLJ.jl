@@ -7,8 +7,11 @@
 ```@setup doda
 import Base.eval # hack b/s auto docs put's code in baremodule
 import Random.seed! 
+using MLJ
+MLJ.color_off()
 seed!(1234) 
 ```
+
 
 ### Plug-and-play model evaluation
 
@@ -22,8 +25,9 @@ iris = dataset("datasets", "iris"); # a DataFrame
 and then split the data into input and target parts:
 
 ```@repl doda
-X = iris[:, 1:4];
-y = iris[:, 5];
+using MLJ
+y, X = unpack(iris, ==(:Species), colname -> true);
+first(X, 3)
 ```
 
 In MLJ a *model* is a struct storing the hyperparameters of the
@@ -37,7 +41,6 @@ hyperparameters.
 Drop the `verbosity=1` declaration for silent loading:
 
 ```@repl doda
-using MLJ
 tree_model = @load DecisionTreeClassifier verbosity=1
 ```
 
@@ -162,8 +165,8 @@ julia object (see the `scitype` examples below).
 The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
 `OrderedFactor{N}` and `Count`. Be sure you read [Container element
 types](@ref) below to be guarantee your scalar data is interpreted
-correctly. Most containers also have a scientific
-type.
+correctly. Additionally, most data containers - such as tuples,
+vectors, matrices and tables - have a scientific type.
 
 
 ![](scitypes.png)
@@ -237,7 +240,7 @@ julia> scitype(tree)
 
 This does not work if relevant model code has not been loaded. In that
 case one can extract this information from the model type's registry
-entry, using `model`:
+entry, using `info`:
 
 ```@repl doda
 info("DecisionTreeClassifier")
@@ -265,7 +268,7 @@ are the key aspects of that convention:
 - `String`s and `Char`s are *not* interpreted as `Finite`; they have
   `Unknown` scitype. Coerce vectors of strings or characters to
   `CategoricalVector`s if they represent `Multiclass` or
-  `OrderedFactor` data.
+  `OrderedFactor` data. Do `?coerce` and `?unpack` to learn how. 
   
 - In particular, *integers* (including `Bool`s) *cannot be used to
   represent categorical data.*

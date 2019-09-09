@@ -29,7 +29,7 @@ export pdf, mode, median, mean, shuffle!, categorical, shuffle, levels, levels!
 export std
 
 # re-export from MLJBase and ScientificTypes:
-export nrows, nfeatures, traits,
+export nrows, nfeatures, 
     selectrows, selectcols,
     SupervisedTask, UnsupervisedTask, MLJTask,
     Deterministic, Probabilistic, Unsupervised, Supervised,
@@ -43,16 +43,15 @@ export nrows, nfeatures, traits,
     predict, predict_mean, predict_median, predict_mode,
     transform, inverse_transform, se, evaluate, fitted_params,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
-    partition, X_and_y,
+    partition, unpack,
     mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,  
     misclassification_rate, cross_entropy,      
     default_measure,                            
     @load_boston, @load_ames, @load_iris, @load_reduced_ames,
-    @load_crabs,
-    features, X_and_y 
+    @load_crabs
 
 # re-export from MLJModels:
-export models, localmodels, @load, load,            
+export models, localmodels, @load, load, info,
     ConstantRegressor, ConstantClassifier,     # builtins/Constant.jl
     KNNRegressor,                              # builtins/KNN.jl  
     StaticTransformer, FeatureSelector,        # builtins/Transformers.jl
