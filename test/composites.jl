@@ -5,6 +5,8 @@ using Test
 using MLJ
 using CategoricalArrays
 
+include("foobarmodel.jl")
+
 N = 50 
 Xin = (a=rand(N), b=rand(N), c=rand(N))
 yin = rand(N)

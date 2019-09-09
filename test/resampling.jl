@@ -4,8 +4,11 @@ module TestResampling
 using Test
 using MLJ
 using MLJBase
+import MLJModels
 import Random.seed!
 seed!(1234)
+
+include("foobarmodel.jl")
 
 @test CV(nfolds=6) == CV(nfolds=6)
 @test CV(nfolds=5) != CV(nfolds=6)
@@ -26,7 +29,7 @@ seed!(1234)
                  MLJ._check_measure(model, misclassification_rate, y, predict, override))
     @test MLJ._check_measure(model, misclassification_rate, y,
                             predict_mode, override) == nothing
-    model = MLJ.DeterministicConstantClassifier()
+    model = MLJModels.DeterministicConstantClassifier()
     @test_throws ArgumentError MLJ._check_measure(model, cross_entropy, y,
                             predict, override)
 end
@@ -47,7 +50,7 @@ end
                   ([1, 2, 3, 4, 5, 6, 9, 10], 7:8),
                   (1:8, 9:10)]
 
-    model = MLJ.DeterministicConstantRegressor()
+    model = MLJModels.DeterministicConstantRegressor()
     mach = machine(model, X, y)
 
     # check detection of incompatible measure (cross_entropy):
@@ -74,7 +77,7 @@ end
 
     @test MLJBase.show_as_constructed(Holdout)
     holdout = Holdout(fraction_train=0.75)
-    model = MLJ.DeterministicConstantRegressor()
+    model = MLJModels.DeterministicConstantRegressor()
     mach = machine(model, X, y)
     result = evaluate!(mach, resampling=holdout,
                        measure=[rms, rmslp1])
@@ -102,7 +105,7 @@ end
     
     @test MLJBase.show_as_constructed(CV)
     cv=CV(nfolds=5)
-    model = MLJ.DeterministicConstantRegressor()
+    model = MLJModels.DeterministicConstantRegressor()
     mach = machine(model, X, y)
     result = evaluate!(mach, resampling=cv, measure=[rms, rmslp1])
     @test result.per_fold[1] ≈ [1/2, 3/4, 1/2, 3/4, 1/2]
@@ -120,7 +123,7 @@ end
     y = [1.0, 2.0, 3.0, 1.0]
     w = 1:4
     cv=CV(nfolds=2)
-    model = MLJ.DeterministicConstantRegressor()
+    model = MLJModels.DeterministicConstantRegressor()
     mach = machine(model, X, y)
     e = evaluate!(mach, resampling=cv, measure=l1,
                   weights=w, verbosity=0).measurement[1]

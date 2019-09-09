@@ -22,7 +22,7 @@ is_feature_dependent(::Type) = false
 # extend to instances:
 orientation(m) = orientation(typeof(m))
 reports_each_observation(m) = reports_each_observation(typeof(m))
-is_feature_dependent(m) = reports_each_observation(typeof(m))
+is_feature_dependent(m) = is_feature_dependent(typeof(m))
 
 # specific to probabilistic measures:
 distribution_type(::Type) = missing
@@ -89,20 +89,10 @@ is_measure(::Measure) = true
 Base.show(stream::IO, ::MIME"text/plain", m::Measure) = print(stream, "$(name(m)) (callable Measure)")
 Base.show(stream::IO, m::Measure) = print(stream, name(m))
 
-traits(measure, ::Val{:nonprobabilistic_measure}) = 
+MLJBase.traits(measure, ::Val{:measure}) = 
     (name=name(measure),
      target_scitype=target_scitype(measure),
      prediction_type=prediction_type(measure),
-     orientation=orientation(measure),
-     reports_each_observation=reports_each_observation(measure),
-     is_feature_dependent=is_feature_dependent(measure),
-     supports_weights=supports_weights(measure))
-
-traits(measure, ::Val{:probabilistic_measure}) = 
-    (name=name(measure),
-     target_scitype=target_scitype(measure),
-     prediction_type=prediction_type(measure),
-     distribution_type=distribution_type(measure),
      orientation=orientation(measure),
      reports_each_observation=reports_each_observation(measure),
      is_feature_dependent=is_feature_dependent(measure),

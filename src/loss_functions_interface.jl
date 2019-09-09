@@ -4,7 +4,7 @@ import .LossFunctions: DistanceLoss, MarginLoss, SupervisedLoss
 # import LossFunctions: DistanceLoss, MarginLoss, SupervisedLoss
 
 
-is_measure(::SuprvisedLoss) = true
+is_measure(::SupervisedLoss) = true
 
 orientation(::Type{<:SupervisedLoss}) = :loss 
 reports_each_observation(::Type{<:SupervisedLoss}) = true

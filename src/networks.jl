@@ -497,7 +497,7 @@ $SIGNATURES
 
 A vector of all models referenced by a node, each model appearing exactly once.
 """
-function models(W::MLJ.AbstractNode)
+function MLJModels.models(W::MLJ.AbstractNode)
     models_ = filter(flat_values(tree(W)) |> collect) do model
         model isa MLJ.Model
     end

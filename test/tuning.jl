@@ -7,6 +7,8 @@ using MLJBase
 import Random.seed!
 seed!(1234)
 
+include("foobarmodel.jl")
+
 x1 = rand(100);
 x2 = rand(100);
 x3 = rand(100);

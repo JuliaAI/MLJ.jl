@@ -1,5 +1,7 @@
 module MLJ
 
+## EXPORTS
+
 # defined in include files:
 export @curve, @pcurve, pretty,                       # utilities.jl
         mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,    # measures.jl
@@ -12,9 +14,6 @@ export @curve, @pcurve, pretty,                       # utilities.jl
         strange, iterator,                            # parameters.jl
         Grid, TunedModel, learning_curve!,            # tuning.jl
         EnsembleModel,                                # ensembles.jl
-        ConstantRegressor, ConstantClassifier,        # builtins/Constant.jl
-        models, localmodels, @load, model, load,      # loading.jl
-        KNNRegressor,                                 # builtins/KNN.jl
         rebind!,                                      # networks.jl
         machines, sources, anonymize!,                # composites.jl
         @from_network,                                # composites.jl
@@ -26,16 +25,13 @@ export Machine, NodalMachine, machine, AbstractNode,
         source, node, fit!, freeze!, thaw!, Node, sources, origins
 
 # defined in include file "builtins/Transformers.jl":
-export StaticTransformer, FeatureSelector,
-    UnivariateStandardizer, Standardizer,
-    UnivariateBoxCoxTransformer,
-    OneHotEncoder
+#-#
 
 # rexport from Random, Statistics, Distributions, CategoricalArrays:
 export pdf, mode, median, mean, shuffle!, categorical, shuffle, levels, levels!
 export std
 
-# reexport from MLJBase and ScientificTypes:
+# re-export from MLJBase and ScientificTypes:
 export nrows, nfeatures, traits,
     selectrows, selectcols,
     SupervisedTask, UnsupervisedTask, MLJTask,
@@ -55,13 +51,27 @@ export nrows, nfeatures, traits,
     load_crabs, datanow,
     features, X_and_y
 
+# re-export from MLJModels:
+export models, localmodels, @load, load,            
+    ConstantRegressor, ConstantClassifier,     # builtins/Constant.jl
+    KNNRegressor,                              # builtins/KNN.jl  
+    StaticTransformer, FeatureSelector,        # builtins/Transformers.jl
+    UnivariateStandardizer, Standardizer,
+    UnivariateBoxCoxTransformer,
+    OneHotEncoder
+
+
+## IMPORTS
+
 using MLJBase
+using MLJModels
 
 # to be extended:
 import MLJBase: fit, update, clean!,
-                predict, predict_mean, predict_median, predict_mode,
-                transform, inverse_transform, se, evaluate, fitted_params,
-                show_as_constructed, params
+    predict, predict_mean, predict_median, predict_mode,
+    transform, inverse_transform, se, evaluate, fitted_params,
+    show_as_constructed, params
+import MLJModels: models
 
 using Requires
 import Pkg.TOML
@@ -91,22 +101,11 @@ using Random
 import Distributed: @distributed, nworkers, pmap
 using RecipesBase # for plotting
 
-# submodules of this module:
-include("registry/src/Registry.jl")
-import .Registry
-
 const srcdir = dirname(@__FILE__) # the directory containing this file:
 const CategoricalElement = Union{CategoricalString,CategoricalValue}
 
-## LOAD BUILT-IN MODELS
 
-include("builtins/Transformers.jl")
-include("builtins/Constant.jl")
-include("builtins/KNN.jl")
-include("builtins/ridge.jl") # defines a model for testing only
-
-
-## LOAD CORE CODE
+## INCLUDES
 
 include("utilities.jl")     # general purpose utilities
 include("measures.jl")      # API for loss functions & defs of built-ins
@@ -120,38 +119,17 @@ include("parameters.jl")    # hyperparameter ranges and grid generation
 include("tuning.jl")
 include("ensembles.jl")     # homogeneous ensembles
 include("tasks.jl")         # enhancements to MLJBase task interface 
-include("metadata.jl")      # tools to initialize metadata resources
-include("model_search.jl")  # tools to inspect metadata and find models
-include("loading.jl")       # fuctions to load model implementation code
 include("scitypes.jl")      # extensions to ScientificTypes.sictype
+include("plotrecipes.jl")
 
     
 
-## GET THE EXTERNAL MODEL METADATA AND CODE FOR OPTIONAL DEPENDENCIES
+## INCLUDES FOR OPTIONAL DEPENDENCIES
 
 function __init__()
-    fail = false
     @require(LossFunctions="30fc2ffe-d236-52d8-8643-a9d8f7c094a7",
              include("loss_functions_interface.jl"))
-    try
-        global metadata_file = joinpath(srcdir, "registry", "Metadata.toml")
-        global INFO_GIVEN_HANDLE = info_given_handle(metadata_file)
-        global AMBIGUOUS_NAMES = ambiguous_names(INFO_GIVEN_HANDLE)
-        global PKGS_GIVEN_NAME = pkgs_given_name(INFO_GIVEN_HANDLE)
-        global NAMES = model_names(INFO_GIVEN_HANDLE)
-    catch
-        @warn "Problem loading registry from $metadata_file. "*
-        "Model searching disabled. "
-        fail = true
-    end
-    if !fail
-        @info "Model metadata loaded from registry. "
-    end
 end
 
-
-## SIMPLE PLOTTING RECIPE
-
-include("plotrecipes.jl")
 
 end # module

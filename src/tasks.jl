@@ -84,7 +84,7 @@ Returns the input `X` and target `y` of the task, also available as
 
 """
 supervised(; data=nothing, types=Dict(), kwargs...) =
-	    SupervisedTask(; data = coerce(types, data), kwargs...)
+	    SupervisedTask(; data = coerce(data, types), kwargs...)
 supervised(X, y; kwargs...) = SupervisedTask(X, y; kwargs...)
 """
     task = unsupervised(data=nothing, types=Dict(), ignore=Symbol[], verbosity=1)
