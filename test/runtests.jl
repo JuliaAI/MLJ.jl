@@ -6,6 +6,7 @@
 using MLJ
 using MLJBase
 using Test
+using Random
 
 @constant junk=KNNRegressor()
 
@@ -104,5 +105,3 @@ const exdir = joinpath(MLJ.srcdir, "..", "examples")
 #     @test include(joinpath(exdir, "random_forest.jl"))
 #     @test include(joinpath(exdir, "two_parameter_tune.jl"))
 # end
-
-       
