@@ -13,14 +13,6 @@ using Test
   @test include("utilities.jl")
 end
 
-@testset "measures" begin
-  @test include("measures.jl")
-end
-
-@testset "interface for LossFunctions" begin
-  @test include("loss_functions_interface.jl")
-end
-
 @testset "parameters" begin
   @test include("parameters.jl")
 end

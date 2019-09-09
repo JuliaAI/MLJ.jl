@@ -4,9 +4,6 @@ module MLJ
 
 # defined in include files:
 export @curve, @pcurve, pretty,                       # utilities.jl
-        mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,    # measures.jl
-        misclassification_rate, cross_entropy,        # measures.jl
-        default_measure,                              # measures.jl
         coerce, supervised, unsupervised,             # tasks.jl
         report,                                       # machines.jl
         Holdout, CV, evaluate!, Resampler,            # resampling.jl
@@ -47,9 +44,12 @@ export nrows, nfeatures, traits,
     transform, inverse_transform, se, evaluate, fitted_params,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
     partition, X_and_y,
-    load_boston, load_ames, load_iris, load_reduced_ames,
-    load_crabs, datanow,
-    features, X_and_y
+    mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,  
+    misclassification_rate, cross_entropy,      
+    default_measure,                            
+    @load_boston, @load_ames, @load_iris, @load_reduced_ames,
+    @load_crabs,
+    features, X_and_y 
 
 # re-export from MLJModels:
 export models, localmodels, @load, load,            
@@ -108,7 +108,6 @@ const CategoricalElement = Union{CategoricalString,CategoricalValue}
 ## INCLUDES
 
 include("utilities.jl")     # general purpose utilities
-include("measures.jl")      # API for loss functions & defs of built-ins
 include("machines.jl")    
 include("networks.jl")      # for building learning networks
 include("composites.jl")    # composite models & exporting learning networks
@@ -122,13 +121,12 @@ include("tasks.jl")         # enhancements to MLJBase task interface
 include("scitypes.jl")      # extensions to ScientificTypes.sictype
 include("plotrecipes.jl")
 
-    
 
 ## INCLUDES FOR OPTIONAL DEPENDENCIES
 
 function __init__()
-    @require(LossFunctions="30fc2ffe-d236-52d8-8643-a9d8f7c094a7",
-             include("loss_functions_interface.jl"))
+    @require(CSV="336ed68f-0bac-5ca0-87d4-7b16caf5d00b",
+             include("datasets_requires.jl"))
 end
 
 

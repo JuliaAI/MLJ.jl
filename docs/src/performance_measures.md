@@ -10,6 +10,9 @@ Providing further measures for probabilistic predictors, such as
 proper scoring rules, and for constructing multi-target product
 measures, is a work in progress.
 
+*Note for developers:* The measures interface and the built-in measures
+ described here are defined in MLJBase.
+
 
 ### Built-in measures
 
