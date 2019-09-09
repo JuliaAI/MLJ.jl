@@ -42,7 +42,7 @@ called `pipe`, whose hyperparameters `hot`, `knn`, and `stand` are the
 component model instances specified in the macro expression:
 
 ```@example 7
-pipe = @pipeline MyPipe(X -> coerce(Dict(:age=>Continuous), X),
+pipe = @pipeline MyPipe(X -> coerce(X, :age=>Continuous),
                         hot = OneHotEncoder(),
                         knn = KNNRegressor(K=3),
                         target = UnivariateStandardizer())

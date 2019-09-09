@@ -51,11 +51,11 @@ cross_entropy(ŷ, y)
 
 Notice that `l1` reports per-sample evaluations, while `rms`
 only reports an aggregated result. This and other behavior can be
-gleaned from measure *traits* which are summarized by the `traits`
+gleaned from measure *traits* which are summarized by the `info`
 method:
 
 ```@repl losses_and_scores
-traits(l1)
+info(l1)
 ```
 
 A user-defined measure in MLJ can be passed to the `evaluate!`

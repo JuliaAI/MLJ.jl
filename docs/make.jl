@@ -5,8 +5,9 @@ using Pkg
 using Documenter
 using MLJ
 using MLJBase
-using MLJ.Transformers
-using MLJ.Constant
+using MLJModels.Transformers
+using MLJModels.Constant
+using MLJModels.KNN
 using MLJModels
 using ScientificTypes
 
@@ -14,7 +15,8 @@ using ScientificTypes
 makedocs(
     sitename = "MLJ",
     format = Documenter.HTML(),
-    modules = [MLJ, MLJBase, MLJModels, MLJ.Transformers, ScientificTypes],
+    modules = [MLJ, MLJBase, MLJModels, MLJModels.Transformers, MLJModels.Constant,
+               MLJModels.KNN, ScientificTypes],
     pages = Any["Getting Started"=>"index.md",
                 "Evaluating model performance"=>"evaluating_model_performance.md",
                 "Performance Measures"=> "performance_measures.md",
@@ -24,7 +26,7 @@ makedocs(
                 "Homogeneous Ensembles" => "homogeneous_ensembles.md",
                 "Simple User Defined Models" => "simple_user_defined_models.md",
                 "Adding Models for General Use" => "adding_models_for_general_use.md",
-                "Working with Tasks" => "working_with_tasks.md",
+#                "Working with Tasks" => "working_with_tasks.md",
                 "Benchmarking" => "benchmarking.md",
                 "Internals"=>"internals.md",
                 "Glossary"=>"glossary.md",

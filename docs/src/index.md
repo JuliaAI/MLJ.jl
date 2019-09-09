@@ -240,7 +240,7 @@ case one can extract this information from the model type's registry
 entry, using `model`:
 
 ```@repl doda
-model("DecisionTreeClassifier")
+info("DecisionTreeClassifier")
 ```
 
 See also [Working with tasks](working_with_tasks.md) on searching for

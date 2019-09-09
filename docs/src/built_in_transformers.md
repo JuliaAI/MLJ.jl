@@ -2,9 +2,9 @@
 
 
 ```@docs
-MLJ.Transformers.UnivariateStandardizer
-MLJ.Transformers.Standardizer
-MLJ.Transformers.OneHotEncoder
-MLJ.Transformers.FeatureSelector
-MLJ.Transformers.UnivariateBoxCoxTransformer
+MLJModels.Transformers.UnivariateStandardizer
+MLJModels.Transformers.Standardizer
+MLJModels.Transformers.OneHotEncoder
+MLJModels.Transformers.FeatureSelector
+MLJModels.Transformers.UnivariateBoxCoxTransformer
 ```

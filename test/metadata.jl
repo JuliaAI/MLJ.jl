@@ -24,7 +24,7 @@ i = MLJ.info_given_handle(metadata_file)[cnst]
                         UnivariateBoxCoxTransformer,
                         UnivariateStandardizer]), MLJ.localmodeltypes(MLJ))
     @test MLJ.info_given_handle(metadata_file)[pca][:name] == "PCA"
-    @test MLJ.info_given_handle(metadata_file)[cnst] == MLJBase.info(ConstantRegressor)
+    @test MLJ.info_given_handle(metadata_file)[cnst] == MLJBase.info_dict(ConstantRegressor)
 end
 
 h = Vector{Any}(undef, 7)

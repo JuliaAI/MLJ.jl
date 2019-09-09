@@ -34,7 +34,7 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
                              resampling=holdout, measure=rms,
                              ranges=ranges, full_report=false)
     
-    MLJBase.info(tuned_model)
+    MLJBase.info_dict(tuned_model)
 
     tuned = machine(tuned_model, X, y)
 

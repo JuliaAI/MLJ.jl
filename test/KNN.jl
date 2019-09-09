@@ -27,7 +27,7 @@ knn.K = 2
 fitresult, cache, report = MLJ.update(knn, 0, fitresult, cache, X, y); 
 @test predict(knn, fitresult, Xtest)[1] !=  ypred
 
-MLJBase.info(knn)
+MLJBase.info_dict(knn)
 
 N =100
 X = (x1=rand(N), x2=rand(N), x3=rand(N))

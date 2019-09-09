@@ -544,7 +544,7 @@ MLJBase.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bens
 MLJBase.is_pure_julia(::Type{<:DecisionTreeClassifier}) = true
 ```
 
-You can test all your declarations of traits by calling `MLJBase.info(SomeModel)`.
+You can test all your declarations of traits by calling `MLJBase.info_dict(SomeModel)`.
 
 
 #### Iterative models and the update! method
