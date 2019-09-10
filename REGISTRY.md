@@ -1,3 +1,5 @@
+# Instructions for updating the MLJ Model Registry
+
 To register all the models in GreatNewPackage with MLJ:
 
 - In a clone of the master branch of
