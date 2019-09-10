@@ -18,6 +18,12 @@ supervised.
 To illustrate basic construction of a pipeline, consider the following
 toy data:
 
+```@setup 7
+import Base.eval
+using MLJ
+MLJ.color_off()
+```
+
 ```@example 7
 using MLJ
 X = (age    = [23, 45, 34, 25, 67],
@@ -295,19 +301,8 @@ julia> params(wrapped_ridgeI)
 ```
 
 ```julia
-using CSV
-X, y = load_boston()()
+X, y = @load_boston
 evaluate(wrapped_ridgeI, X, y, resampling=CV(), measure=rms, verbosity=0)
-```
-
-```julia
-6-element Array{Float64,1}:
- 3.0225867093289347
- 4.755707358891049 
- 5.011312664189936 
- 4.226827668908119 
- 8.93385968738185  
- 3.4788524973220545
 ```
 
 *Notes:*
