@@ -1,21 +1,23 @@
+# Instructions for updating the MLJ Model Registry
+
 To register all the models in GreatNewPackage with MLJ:
 
-- In a clone of the master branch of MLJ, change to the
-  `/src/registry/` directory and, in Julia, activate the environment
-  specified by the Project.toml there, after checking the [compat]
-  conditions thre are up to date.
+- In a clone of the master branch of
+  [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl),
+  change to the `/src/registry/` directory and, in Julia, activate the
+  environment specified by the Project.toml there, after checking the
+  [compat] conditions there are up to date.
   
 - Add `GreatNewPackage` to the environment.
 
-- Activate a new environment in which your MLJ clone has been
-  `dev`ed. Execute `using MLJ; MLJ.Registry.@update`. This updates
-  `/Metadata.toml` and `/Models.toml` (the latter is generated for
-  convenience and not used by MLJ).
+- In some environment in which your MLJModels clone has been added
+  using `Pkg.dev`, execute `using MLJmodels; @update`. This updates
+  `src/registry/Metadata.toml` and `src/registry/Models.toml` (the
+  latter is generated for convenience and not used by MLJ).
 
 -  Quit your REPL session, whose namespace is now polluted.
 
-- Commit and make a PR request to merge your clone with master. Once
-  merged, the new metadata is available to users of MLJ#master.
+- Push your changes to an appropriate branch of MLJModels to make
+  the updated metadata available to users of the next MLJModels tagged
+  release.
   
-- Consider registering an new tagged version of MLJ. 
-
