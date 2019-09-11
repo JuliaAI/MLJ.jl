@@ -34,7 +34,7 @@ jobs:
         - |
           julia --color=yes --project=docs/ -e'
             using Pkg
-            Pkg.add(PackageSpec(name="MLJBase", rev="master"));Pkg.add(PackageSpec(name="MLJModels", rev="master"));Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.pin(PackageSpec(name="Missings", version="0.4.1"));Pkg.add(PackageSpec(name="MLJBase", rev="master"));Pkg.add(PackageSpec(name="MLJModels", rev="master"));Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
             include("docs/make.jl")
           '

@@ -11,6 +11,7 @@ using Test
 using Random
 using MLJ
 using MLJBase
+import MLJModels
 using CategoricalArrays
 using Distributions
 
@@ -18,7 +19,7 @@ using Distributions
 ## WRAPPED ENSEMBLES OF FITRESULTS
 
 # target is :deterministic :multiclass false:
-atom = MLJ.DeterministicConstantClassifier()
+atom = MLJModels.DeterministicConstantClassifier()
 L = ['a', 'b', 'j']
 L2 = categorical(L)
 ensemble = [L2[1], L2[3], L2[3], L2[2]]
@@ -29,7 +30,7 @@ X = MLJ.table(rand(3,5))
 @test predict(wens, weights, X) == categorical(vcat(['j','j','j'],L))[1:3]
 
 # target is :deterministic :continuous false:
-atom = MLJ.DeterministicConstantRegressor()
+atom = MLJModels.DeterministicConstantRegressor()
 ensemble = Float64[4, 7, 4, 4]
 weights = [0.1, 0.5, 0.2, 0.2]
 wens = MLJ.WrappedEnsemble(atom, ensemble)
@@ -63,7 +64,7 @@ d = predict(wens, weights, X)[1]
 ## ENSEMBLE MODEL
 
 # target is :deterministic :multiclass false:
-atom=MLJ.DeterministicConstantClassifier()
+atom=MLJModels.DeterministicConstantClassifier()
 X = MLJ.table(ones(5,3))
 y = categorical(collect("asdfa"))
 train, test = partition(1:length(y), 0.8);
@@ -76,11 +77,11 @@ weights = weights/sum(weights)
 ensemble_model.weights = weights
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-MLJBase.info(ensemble_model)
+MLJBase.info_dict(ensemble_model)
 @test MLJBase.target_scitype(ensemble_model) == MLJBase.target_scitype(atom)
 
 # target is :deterministic :continuous false:
-atom = MLJ.DeterministicConstantRegressor()
+atom = MLJModels.DeterministicConstantRegressor()
 X = MLJ.table(ones(5,3))
 y = Float64[1.0, 2.0, 1.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
@@ -97,10 +98,10 @@ weights = rand(10)
 weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-MLJBase.info(ensemble_model)
+MLJBase.info_dict(ensemble_model)
 
 # target is :deterministic :continuous false:
-atom = MLJ.DeterministicConstantRegressor()
+atom = MLJModels.DeterministicConstantRegressor()
 Random.seed!(1234) 
 X = MLJ.table(randn(10,3))
 y = randn(10)
@@ -139,7 +140,7 @@ weights = rand(10)
 weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-MLJBase.info(ensemble_model)
+MLJBase.info_dict(ensemble_model)
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # target is :probabilistic :continuous false:
@@ -167,12 +168,12 @@ weights = rand(10)
 weights = weights/sum(weights)
 ensemble_model.weights = weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-MLJBase.info(ensemble_model)
+MLJBase.info_dict(ensemble_model)
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # test generic constructor:
 @test EnsembleModel(atom=ConstantRegressor()) isa Probabilistic
-@test EnsembleModel(atom=MLJ.DeterministicConstantRegressor()) isa Deterministic
+@test EnsembleModel(atom=MLJModels.DeterministicConstantRegressor()) isa Deterministic
 
 
 ## MACHINE TEST

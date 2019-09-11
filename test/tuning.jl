@@ -7,6 +7,8 @@ using MLJBase
 import Random.seed!
 seed!(1234)
 
+include("foobarmodel.jl")
+
 x1 = rand(100);
 x2 = rand(100);
 x3 = rand(100);
@@ -32,7 +34,7 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
                              resampling=holdout, measure=rms,
                              ranges=ranges, full_report=false)
     
-    MLJBase.info(tuned_model)
+    MLJBase.info_dict(tuned_model)
 
     tuned = machine(tuned_model, X, y)
 

@@ -84,7 +84,7 @@ Returns the input `X` and target `y` of the task, also available as
 
 """
 supervised(; data=nothing, types=Dict(), kwargs...) =
-	    SupervisedTask(; data = coerce(types, data), kwargs...)
+	    SupervisedTask(; data = coerce(data, types), kwargs...)
 supervised(X, y; kwargs...) = SupervisedTask(X, y; kwargs...)
 """
     task = unsupervised(data=nothing, types=Dict(), ignore=Symbol[], verbosity=1)
@@ -113,3 +113,22 @@ See also [`scitype`](@ref), [`scitype_union`](@ref)
 """
 unsupervised(; data=nothing, types=Dict(), kwargs...) =
 	    UnsupervisedTask(; data = coerce(types, data), kwargs...)
+
+
+## MODEL MATCHING
+
+models(task::SupervisedTask) = models() do model
+    model.is_supervised &&
+        task.target_scitype <: model.target_scitype &&
+        task.input_scitype <: model.input_scitype &&
+        ((task.is_probabilistic &&
+          model.prediction_type == :probabilistic) ||
+         (!(task.is_probabilistic) &&
+          model.prediction_type == :deterministic))
+end
+
+models(task::UnsupervisedTask) = models() do model
+    !(model.is_supervised) &&
+        task.input_scitype <: model.input_scitype
+end
+

@@ -250,8 +250,7 @@ also be inserted in the pipeline as shown in the following example
 (the classifier is probabilistic but the pipeline itself is
 deterministic):
 
-    fix = Dict(:age=>Continuous)
-    @pipeline MyPipe(X -> coerce(fix, X), 
+    @pipeline MyPipe(X -> coerce(X, :age=>Continuous), 
                      hot=OneHotEncoder(),
                      cnst=ConstantClassifier(),
                      yhat -> mode.(yhat))

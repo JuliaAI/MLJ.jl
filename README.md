@@ -2,7 +2,7 @@
 
 A pure Julia machine learning framework.
 
-[MLJ News](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/NEWS.md)
+[MLJ News](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/NEWS.md) | [MLJ Cheatsheet](docs/src/mlj_cheatsheet.md)
 
 
 ## `join!(MLJ, YourModel)`
@@ -20,7 +20,7 @@ and the core team is happy to respond to [issue requests](https://github.com/ala
 assistance. Please click [here](CONTRIBUTE.md) for more details on
 contributing.
 
-MLJ is presently supported by a small Alan Turing Institute grant and is looking for new funding sources to grow the project.
+MLJ is presently supported by a small Alan Turing Institute grant and is looking for new funding sources to grow and maintain the project.
 
 [![Build Status](https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master)](https://travis-ci.com/alan-turing-institute/MLJ.jl)
 [![Slack Channel mlj](https://img.shields.io/badge/chat-on%20slack-yellow.svg)](https://slackinvite.julialang.org/)
@@ -36,12 +36,8 @@ scientific programming language, [Julia](https://julialang.org).
 
 The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html).
 
-A list of models in external packages that can be used with MLJ:
-[Models.toml](src/registry/Models.toml)
-
-[MLJ Cheatsheet](docs/src/mlj_cheatsheet.md)
-
-
+[List of presently implemented models](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src/registry/Models.toml)
+  
 
 ### Installation
 
@@ -53,7 +49,7 @@ Pkg.add("MLJ")
 Pkg.add("MLJModels")
 ```
 
-To obtain a list of all registered models, keyed on package name:
+To obtain a list of all registered models:
 
 ```julia
 using MLJ
@@ -106,6 +102,8 @@ available.
 
 - Option to tune hyperparameters using gradient descent and **automatic
 	differentiation** (for learning algorithms written in Julia).
+	
+- Option to tune hyperaparameters using **Bayesian optimisation**
 
 - **Data agnostic**: Train models on any data supported by the Tables.jl 
 [interface](https://github.com/JuliaData/Tables.jl). &#10004;
@@ -114,16 +112,19 @@ available.
   **learning networks** .&#10004;
   
 - Learning networks can be exported as self-contained **composite models** &#10004;, but
-  common networks (e.g., linear pipelines, stacks) come ready to plug-and-play.
+  common networks (e.g., linear **pipelines** &#10004;, **stacks**) come ready to plug-and-play.
 
 - Performant parallel implementation of large homogeneous **ensembles**
   of arbitrary models (e.g., random forests). &#10004;
 
-- **Task** interface matches machine learning problem to available models. &#10004; 
+- Model **registry** and facility to **match models** to machine learning
+  tasks. &#10004;
 
 - **Benchmarking** a battery of assorted models for a given task.
 
 - Automated estimates of cpu and memory requirements for given task/model.
+
+- Friendly interface for handling **probabilistic** prediction. &#10004;
 
 
 ### Frequently Asked Questions
@@ -131,30 +132,23 @@ available.
 See [here](docs/src/frequently_asked_questions.md).
 
 
-### Known issues
-
-- The ScikitLearn SVM models will not work under Julia 1.0.3 but do work under Julia 1.1 due to [Issue #29208](https://github.com/JuliaLang/julia/issues/29208)
-
-- When MLJRegistry is updated with new models you may need to force a new
-  precompilation of MLJ to make new models available.
-  
-
 ### Getting started
 
 Get started
-[here](https://alan-turing-institute.github.io/MLJ.jl/dev/),
+[here](https://alan-turing-institute.github.io/MLJ.jl/stable/),
 or take the MLJ [tour](/examples/tour/tour.ipynb).
 
 
 ### History
 
-Predecessors of the current package are
-[AnalyticalEngine.jl](https://github.com/tlienart/AnalyticalEngine.jl)
-and [Orchestra.jl](https://github.com/svs14/Orchestra.jl), and
-[Koala.jl](https://github.com/ablaom/Koala.jl). Work
-continued as a research study group at the University of Warwick,
+Antecedents for the current package are
+[AnalyticalEngine.jl](https://github.com/tlienart/AnalyticalEngine.jl),
+[Orchestra.jl](https://github.com/svs14/Orchestra.jl), and
+[Koala.jl](https://github.com/ablaom/Koala.jl). Development was also
+guided by a research study group at the University of Warwick,
 beginning with a review of existing ML Modules that were available in
-Julia at the time ([in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational),
+Julia at the time
+([in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational),
 [overview](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Package%20Review)).
 
 ![alt text](material/packages.jpg)
@@ -162,4 +156,4 @@ Julia at the time ([in-depth](https://github.com/dominusmi/Julia-Machine-Learnin
 Further work culminated in the first MLJ
 [proof-of-concept](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
 
-For administrators: [Applying requests to register new models](REGISTRY.md).
+For administrators: [Implementing requests to register new models](REGISTRY.md).

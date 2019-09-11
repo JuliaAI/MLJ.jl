@@ -1,6 +1,7 @@
 # Working with Tasks
 
-*Warning.* The task API may be depreciated in the future. 
+*Warning.* The task API described here is likely change soon, with the notion of
+task being not bound to any particular data set.
 
 In MLJ a *task* is a synthesis of three elements: *data*, an
 *interpretation* of that data, and a *learning objective*. Once one has a
@@ -30,27 +31,42 @@ part of the data is relevant and what role is each part to play.
 
 ### Sample usage
 
+Load a built-in task:
+
 ```@setup 1
-import Base.eval # hack because documenter puts code in baremodules
+import Base.eval
 using MLJ
 MLJ.color_off()
 ```
 
-Given some data, 
-    
+```@example 1
+using MLJ
+using CSV
+task = load_iris()
+```
+
+Extract input and target:
+
+```@example 1 
+X, y = task()
+X[1:3, :]
+```
+
+Now, starting with some tabular data...
+
 ```@example 1
 using RDatasets
 df = dataset("boot", "channing");
 first(df, 4)
 ```
 
-we can check MLJ's interpretation of that data:
+...we can check MLJ's interpretation of that data:
 
 ```@example 1
 schema(df)
 ```
 
-We construct a task by wrapping the data in a learning objective, and
+And construct a task by wrapping the data in a learning objective, and
 coercing the data into a form MLJ will correctly interpret. (The middle three
 fields of `df` refer to ages, in months, the last is a flag.):
 
@@ -65,23 +81,24 @@ task = supervised(data=df,
 schema(task.X)
 ```
 
-Row selection and shuffling:
+Shuffle the rows of a task:
 
 ```@example 1
-task[1:3].y
-```
-
-```@example 1
+task = load_iris()
 using Random
 rng = MersenneTwister(1234)
 shuffle!(rng, task) # rng is optional
-task[1:3].y
+task[1:4].y
 ```
 
-Counting rows:
+Counting and selecting rows of a task:
 
 ```@example 1
 nrows(task)
+```
+
+```@example 1
+task[1:2].y
 ```
 
 Listing the models available to complete a task:
@@ -90,16 +107,12 @@ Listing the models available to complete a task:
 models(task)
 ```
 
-Choosing a model and evaluating on the task:
+Binding a model to a task and evaluating performance:
 
 ```@repl 1
-using RDatasets
-iris = dataset("datasets", "iris"); # a DataFrame
-task = supervised(data=iris, target=:Species, is_probabilistic=true)
 tree = @load DecisionTreeClassifier verbosity=1
 mach = machine(tree, task)
-evaluate!(mach, operation=predict_mode, 
-          resampling=Holdout(), measure=misclassification_rate, verbosity=0)
+evaluate!(mach, operation=predict_mode, resampling=Holdout(), measure=misclassification_rate, verbosity=0)
 ```
 
 ### API Reference

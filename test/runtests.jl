@@ -13,32 +13,8 @@ using Test
   @test include("utilities.jl")
 end
 
-@testset "measures" begin
-  @test include("measures.jl")
-end
-
-@testset "interface for LossFunctions" begin
-  @test include("loss_functions_interface.jl")
-end
-
-@testset "KNN" begin
-  @test include("KNN.jl")
-end
-
-@testset "ridge" begin
-  @test include("ridge.jl")
-end
-
-@testset "Constant" begin
-    @test include("Constant.jl")
-end
-
 @testset "parameters" begin
   @test include("parameters.jl")
-end
-
-@testset "Transformers" begin
-  @test include("Transformers.jl")
 end
 
 @testset "Machines" begin
@@ -67,18 +43,6 @@ end
 
 @testset "ensembles" begin
     @test include("ensembles.jl")
-end
-
-@testset "metadata build" begin
-    @test include("metadata.jl")
-end
-
-@testset "model search" begin
-    @test include("model_search.jl")
-end
-
-@testset "loading" begin
-    @test include("loading.jl")
 end
 
 @testset "tasks" begin

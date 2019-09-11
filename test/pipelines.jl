@@ -334,7 +334,7 @@ pred2 = predict(p_)
 X = (age =    [23, 45, 34, 25, 67],
      gender = categorical(['m', 'm', 'f', 'm', 'f']))
 height = [67.0, 81.5, 55.6, 90.0, 61.1]
-p = @pipeline Pipe9(X -> coerce(Dict(:age=>Continuous), X),
+p = @pipeline Pipe9(X -> coerce(X, :age=>Continuous),
                     hot = OneHotEncoder(),
                     knn = KNNRegressor(K=3),
                     target = UnivariateStandardizer())

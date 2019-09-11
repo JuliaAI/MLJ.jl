@@ -23,7 +23,7 @@ function flat_values(params::NamedTuple)
     return Tuple(values)
 end
 
-
+#-#
 ## FOR ENCODING AND DECODING MODEL METADATA
 
 # This method needs revisiting when new scitypes are introduced:
@@ -100,7 +100,7 @@ function inverse(d::Dict{S,Set{T}}) where {S,T}
     end
     return dinv
 end
-
+#-#
 
 ## SOME GENERAL PURPOSE MACROS
 

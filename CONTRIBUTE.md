@@ -6,8 +6,7 @@ channel](https://slackinvite.julialang.org), #MLJ.
 
 
 - [List of presently implemented
-  models](src/Registry/Models.toml)
-  excluding built-in models. For full list, do `models()` in MLJ.
+  models](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src/registry/Models.toml). Or, do `using MLJ; models()`.
 
 - [Enhancement requests](https://github.com/alan-turing-institute/MLJ.jl/issues?utf8=✓&q=is%3Aissue+is%3Aopen+label%3A%22enhancement%22)
 
@@ -17,7 +16,7 @@ While new model implementations are a priority at present, help adding
 core functionality to MLJ is also welcome. If you are interested in
 contributing, please read the this rest of this document. A guide to
 implementing the MLJ interface for new models is
-[here](docs/src/adding_models_for_general_use.md).
+[here](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/).
 
 
 ### Brief design overview
