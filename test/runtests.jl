@@ -3,16 +3,9 @@
 # this test code be wrapped in a module. Any new module name will do -
 # eg, `module TestDatasets` for code testing `datasets.jl`.
 
-using Distributed
-addprocs(2)
-
-@everywhere begin
 using MLJ
 using MLJBase
 using Test
-end
-
-@constant junk=KNNRegressor()
 
 @testset "utilities" begin
   @test include("utilities.jl")
@@ -73,3 +66,5 @@ const exdir = joinpath(MLJ.srcdir, "..", "examples")
 #     @test include(joinpath(exdir, "random_forest.jl"))
 #     @test include(joinpath(exdir, "two_parameter_tune.jl"))
 # end
+
+       
