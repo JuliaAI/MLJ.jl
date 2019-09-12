@@ -53,7 +53,6 @@ export nrows, nfeatures,
 # re-export from MLJModels:
 export models, localmodels, @load, load, info,
     ConstantRegressor, ConstantClassifier,     # builtins/Constant.jl
-    KNNRegressor,                              # builtins/KNN.jl  
     StaticTransformer, FeatureSelector,        # builtins/Transformers.jl
     UnivariateStandardizer, Standardizer,
     UnivariateBoxCoxTransformer,

@@ -5,6 +5,8 @@ using Test
 using MLJ
 using CategoricalArrays
 
+@load KNNRegressor
+
 include("foobarmodel.jl")
 
 N = 50 

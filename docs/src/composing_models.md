@@ -48,6 +48,7 @@ called `pipe`, whose hyperparameters `hot`, `knn`, and `stand` are the
 component model instances specified in the macro expression:
 
 ```@example 7
+@load KNNRegressor
 pipe = @pipeline MyPipe(X -> coerce(X, :age=>Continuous),
                         hot = OneHotEncoder(),
                         knn = KNNRegressor(K=3),
@@ -438,6 +439,7 @@ combine several static node operations.
 
 ```julia
 
+@load KNNRegressor
 @load RidgeRegressor pkg=MultivariateStats
 
 mutable struct KNNRidgeBlend <:DeterministicNetwork
@@ -497,9 +499,6 @@ julia> evaluate!(mach, resampling=Holdout(fraction_train=0.7), measure=rmsl)
 │ measure=MLJ.rmsl 
 │ operation=StatsBase.predict 
 └ Resampling from all rows. 
-mach = NodalMachine{OneHotEncoder} @ 1…14
-mach = NodalMachine{RidgeRegressor} @ 1…87
-mach = NodalMachine{KNNRegressor} @ 1…02
 0.13108966715886725
 ```
 

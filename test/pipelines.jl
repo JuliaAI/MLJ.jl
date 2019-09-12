@@ -6,6 +6,8 @@ using Statistics
 import Random.seed!
 seed!(1234)
 
+@load KNNRegressor
+
 NN = 7
 X = MLJ.table(rand(NN, 3));
 y = 2X.x1 - X.x2 + 0.05*rand(NN);
