@@ -1,5 +1,5 @@
-# Note. `ModelProxy` is the type of a model type's metadata entry (a
-# named tuple). So, `info("PCA")` has this type, for example. 
+# Note. `ModelProxy` is the type of a model's metadata entry (a named
+# tuple). So, `info("PCA")` has this type, for example.
 
 
 ## BASIC IDEA
@@ -22,8 +22,8 @@ if false
 
 end
 
-## IMPLEMENTATION
 
+## IMPLEMENTATION
 
 
 struct ModelChecker{is_supervised,
