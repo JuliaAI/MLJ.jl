@@ -86,7 +86,7 @@ function fitted_params(machine::AbstractMachine)
 end
 
 
-# Syntactic sugar for pipeline operations
+# Syntactic sugar for pipe syntax
 # we need version ≥ 1.3 in order to make use of multiple dispatch
 # over abstract types
 if VERSION ≥ v"1.3"
