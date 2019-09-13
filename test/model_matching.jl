@@ -1,4 +1,4 @@
-module TestMatching
+module TestModelMatching
 
 using MLJ
 using Test
@@ -23,8 +23,8 @@ m1 = models(matching(X))
 @test !(info("PCA") in m1)
 
 m2 = models(matching(X, y))
-matching(X, y)("ConstantRegressor")
-matching(X,y)
+@test info("ConstantRegressor") in m2
+@test !(info("DecisionTreeRegressor") in m2)
 
 end
 true

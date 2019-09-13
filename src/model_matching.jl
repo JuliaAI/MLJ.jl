@@ -29,13 +29,46 @@ end
 struct ModelChecker{is_supervised,
                   supports_weights,
                   input_scitype,
-                  target_scitype} end
+                    target_scitype} end
+
+function Base.getproperty(::ModelChecker{is_supervised,
+                                         supports_weights,
+                                         input_scitype,
+                                         target_scitype},
+                          field::Symbol) where {is_supervised,
+                                                supports_weights,
+                                                input_scitype,
+                                                target_scitype}
+    if field === :is_supervised
+        return is_supervised
+    elseif field === :supports_weights
+        return supports_weights
+    elseif field === :input_scitype
+        return input_scitype
+    elseif field === :target_scitype
+        return target_scitype
+    else
+        throw(ArgumentError("Unsupported property. "))
+    end
+end
+
+Base.propertynames(::ModelChecker) =
+    (:is_supervised, :supports_weights, :input_scitype, :target_scitype)
+
+function _as_named_tuple(s::ModelChecker)
+    names = propertynames(s)
+    NamedTuple{names}(Tuple(getproperty(s, p) for p in names))
+end
+
+# function Base.show(io::IO, ::MIME"text/plain", S::ModelChecker)
+#     show(io, MIME("text/plain"), _as_named_tuple(S))
+# end
 
 matching(X)       = ModelChecker{false,false,scitype(X),missing}()
 matching(X, y)    = ModelChecker{true,false,scitype(X),scitype(y)}()
 matching(X, y, w) = ModelChecker{true,true,scitype(X),scitype(y)}()
 
-(f::ModelChecker{false,false,XS})(model::MLJModels.ModelProxy) where XS =
+(f::ModelChecker{false,false,XS,missing})(model::MLJModels.ModelProxy) where XS =
     !(model.is_supervised) &&
     XS <: model.input_scitype
 
@@ -51,6 +84,7 @@ matching(X, y, w) = ModelChecker{true,true,scitype(X),scitype(y)}()
     yS <: model.target_scitype
 
 (f::ModelChecker)(name::String; pkg=nothing) = f(info(name, pkg=pkg))
+(f::ModelChecker)(realmodel::Model) = f(info(realmodel))
 
 matching(model::MLJModels.ModelProxy, args...) = matching(args...)(model)
 matching(name::String, args...; pkg=nothing) =
