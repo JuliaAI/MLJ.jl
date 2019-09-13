@@ -44,7 +44,7 @@ matching(X, y, w) = ModelChecker{true,true,scitype(X),scitype(y)}()
     XS <: model.input_scitype &&
     yS <: model.target_scitype
 
-(f::ModelChecker{true,false,XS,yS})(model::MLJModels.ModelProxy) where {XS,yS} =
+(f::ModelChecker{true,true,XS,yS})(model::MLJModels.ModelProxy) where {XS,yS} =
     model.is_supervised &&
     model.supports_weights &&
     XS <: model.input_scitype &&
