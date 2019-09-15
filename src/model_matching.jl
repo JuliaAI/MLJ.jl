@@ -64,6 +64,41 @@ end
 #     show(io, MIME("text/plain"), _as_named_tuple(S))
 # end
 
+"""
+   matching(model, X, y)
+
+Returns `true` exactly when the registry metadata entry `model` is
+supervised and admits inputs and targets with the scientific types of
+`X` and `y`, respectively.
+
+   matching(model, X)
+
+Returns `true` exactly when `model` is unsupervised and admits inputs
+with the scientific types of `X`.
+
+    matching(model), matching(X, y), matching(X)
+
+Curried versions of the preceding methods, i.e., `Bool`-valued
+callable objects satisfying `matching(X, y)(model) = matching(model,
+X, y)`, etc.
+
+### Example
+
+    models(matching(X))
+
+Finds all unsupervised models compatible with input data `X`.
+
+    models() do model
+        matching(model, X, y) && model.prediction_type == :probabilistic
+    end
+
+Finds all supervised models compatible with input data `X` and target
+data `y` and making probabilistic predictions.
+
+
+See also [`models`](@ref)
+
+"""
 matching(X)       = ModelChecker{false,false,scitype(X),missing}()
 matching(X, y)    = ModelChecker{true,false,scitype(X),scitype(y)}()
 matching(X, y, w) = ModelChecker{true,true,scitype(X),scitype(y)}()

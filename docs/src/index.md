@@ -27,7 +27,7 @@ and then split the data into input and target parts:
 ```@repl doda
 using MLJ
 y, X = unpack(iris, ==(:Species), colname -> true);
-first(X, 3)
+first(X, 3) |> pretty
 ```
 
 In MLJ a *model* is a struct storing the hyperparameters of the

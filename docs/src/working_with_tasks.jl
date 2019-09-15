@@ -125,10 +125,4 @@ supervised
 unsupervised
 ```
 
-```@docs
-models
-```
 
-```@docs
-localmodels
-```
