@@ -180,7 +180,7 @@ mutable struct DeterministicEnsembleModel{Atom<:Deterministic} <: Deterministic
     bagging_fraction::Float64
     rng::Union{Int,AbstractRNG}
     n::Int
-    parallel::Bool
+    acceleration::AbstractResource
     out_of_bag_measure # TODO: type this
 end
 
@@ -214,9 +214,9 @@ end
 
 # constructor to infer type automatically:
 DeterministicEnsembleModel(atom::Atom, weights,
-                           bagging_fraction, rng, n, parallel, out_of_bag_measure) where Atom<:Deterministic =
+                           bagging_fraction, rng, n, acceleration, out_of_bag_measure) where Atom<:Deterministic =
                                DeterministicEnsembleModel{Atom}(atom, weights,
-                                                                   bagging_fraction, rng, n, parallel, out_of_bag_measure)
+                                                                   bagging_fraction, rng, n, acceleration, out_of_bag_measure)
 
 # lazy keyword constructors:
 function DeterministicEnsembleModel(;atom=DeterministicConstantClassifier(),
@@ -224,11 +224,11 @@ function DeterministicEnsembleModel(;atom=DeterministicConstantClassifier(),
                                     bagging_fraction=0.8,
                                     rng=Random.GLOBAL_RNG,
                                     n::Int=100,
-                                    parallel=true,
+                                    acceleration=DEFAULT_RESOURCE[],
                                     out_of_bag_measure=[])
 
     model = DeterministicEnsembleModel(atom, weights, bagging_fraction, rng,
-                                       n, parallel, out_of_bag_measure)
+                                       n, acceleration, out_of_bag_measure)
 
     message = clean!(model)
     isempty(message) || @warn message
@@ -245,7 +245,7 @@ mutable struct ProbabilisticEnsembleModel{Atom<:Probabilistic} <: Probabilistic
     bagging_fraction::Float64
     rng::Union{Int, AbstractRNG}
     n::Int
-    parallel::Bool
+    acceleration::AbstractResource
     out_of_bag_measure
 end
 
@@ -272,8 +272,8 @@ function clean!(model::ProbabilisticEnsembleModel)
 end
 
 # constructor to infer type automatically:
-ProbabilisticEnsembleModel(atom::Atom, weights, bagging_fraction, rng, n, parallel, out_of_bag_measure) where Atom<:Probabilistic =
-                               ProbabilisticEnsembleModel{Atom}(atom, weights, bagging_fraction, rng, n, parallel, out_of_bag_measure)
+ProbabilisticEnsembleModel(atom::Atom, weights, bagging_fraction, rng, n, acceleration, out_of_bag_measure) where Atom<:Probabilistic =
+                               ProbabilisticEnsembleModel{Atom}(atom, weights, bagging_fraction, rng, n, acceleration, out_of_bag_measure)
 
 # lazy keyword constructor:
 function ProbabilisticEnsembleModel(;atom=ConstantProbabilisticClassifier(),
@@ -281,10 +281,10 @@ function ProbabilisticEnsembleModel(;atom=ConstantProbabilisticClassifier(),
                                     bagging_fraction=0.8,
                                     rng=Random.GLOBAL_RNG,
                                     n::Int=100,
-                                    parallel=true,
+                                    acceleration=DEFAULT_RESOURCE[],
                                     out_of_bag_measure=[])
 
-    model = ProbabilisticEnsembleModel(atom, weights, bagging_fraction, rng, n, parallel,out_of_bag_measure)
+    model = ProbabilisticEnsembleModel(atom, weights, bagging_fraction, rng, n, acceleration, out_of_bag_measure)
 
     message = clean!(model)
     isempty(message) || @warn message
@@ -300,8 +300,8 @@ end
                   weights=Float64[],
                   bagging_fraction=0.8,
                   n=100,
-                  rng=GLOBAL_RNG, 
-                  parallel=true,
+                  rng=GLOBAL_RNG,
+                  acceleration=DEFAULT_RESOURCE[],
                   out_of_bag_measure=[])
 
 Create a model for training an ensemble of `n` learners, with optional
@@ -340,6 +340,10 @@ If a single measure or non-empty vector of measures is specified by
 `out_of_bag_measure`, then out-of-bag estimates of performance are
 reported.
 
+The `acceleration` keyword argument is used to specify the compute resource (a
+subtype of `ComputationalResources.AbstractResource`) that will be used to
+accelerate/parallelize ensemble fitting.
+
 """
 function EnsembleModel(; args...)
     d = Dict(args)
@@ -359,9 +363,59 @@ const EitherEnsembleModel{Atom} = Union{DeterministicEnsembleModel{Atom}, Probab
 
 MLJBase.is_wrapper(::Type{<:EitherEnsembleModel}) = true
 
+function _fit(res::CPU1, func, verbosity, args)
+    atom, X, y, n, n_patterns, n_train, rng, progress_meter = args
+    verbosity < 2 ||  @info "One hash per new atom trained: "
+    return func(atom, verbosity, X, y,
+                                    n, n_patterns, n_train, rng,
+                                    progress_meter)
+end
+function _fit(res::CPUProcesses, func, verbosity, args)
+    atom, X, y, n, n_patterns, n_train, rng, progress_meter = args
+    if verbosity > 0
+        println("Ensemble-building in parallel on $(nworkers()) processors.")
+    end
+    chunk_size = div(n, nworkers())
+    left_over = mod(n, nworkers())
+    return @distributed (pair_vcat) for i = 1:nworkers()
+        if i != nworkers()
+            func(atom, 0, X, y, chunk_size, n_patterns, n_train,
+                         rng, progress_meter)
+        else
+            func(atom, 0, X, y, chunk_size + left_over, n_patterns, n_train,
+                         rng, progress_meter)
+        end
+    end
+end
+@static if VERSION >= v"1.3.0-DEV.573"
+    function _fit(res::CPUThreads, func, verbosity, args)
+        atom, X, y, n, n_patterns, n_train, rng, progress_meter = args
+        if verbosity > 0
+            println("Ensemble-building in parallel on $(Threads.nthreads()) threads.")
+        end
+        nthreads = Threads.nthreads()
+        chunk_size = div(n, nthreads)
+        left_over = mod(n, nthreads)
+        resvec = Vector(undef, nthreads) # FIXME: Make this type-stable?
+        Threads.@threads for i = 1:nthreads
+            resvec[i] = if i != nworkers()
+                func(atom, 0, X, y, chunk_size, n_patterns, n_train,
+                             rng, progress_meter)
+            else
+                func(atom, 0, X, y, chunk_size + left_over, n_patterns, n_train,
+                             rng, progress_meter)
+            end
+        end
+        return reduce(pair_vcat, resvec)
+    end
+end
+
 function fit(model::EitherEnsembleModel{Atom}, verbosity::Int, X, y) where Atom<:Supervised
 
-    parallel = model.parallel
+    acceleration = model.acceleration
+    if acceleration isa CPUProcesses && nworkers() == 1
+        acceleration = DEFAULT_RESOURCE[]
+    end
 
     if model.out_of_bag_measure isa Vector
         out_of_bag_measure = model.out_of_bag_measure
@@ -385,49 +439,14 @@ function fit(model::EitherEnsembleModel{Atom}, verbosity::Int, X, y) where Atom<
 
     if !isempty(out_of_bag_measure)
 
-        if !parallel || nworkers() == 1 # build in serial
-            verbosity < 2 ||  @info "One hash per new atom trained: "
-            ensemble, ensemble_indices = get_ensemble_and_indices(atom, verbosity, X, y,
-                                                   n, n_patterns, n_train, rng, progress_meter)
-        else # build in parallel
-            if verbosity > 0
-                println("Ensemble-building in parallel on $(nworkers()) processors.")
-            end
-            chunk_size = div(n, nworkers())
-            left_over = mod(n, nworkers())
-            ensemble, ensemble_indices =  @distributed (pair_vcat) for i = 1:nworkers()
-                if i != nworkers()
-                    get_ensemble_and_indices(atom, 0, X, y, chunk_size, n_patterns, n_train,
-                                 rng, progress_meter)
-                else
-                    get_ensemble_and_indices(atom, 0, X, y, chunk_size + left_over, n_patterns, n_train,
-                                 rng, progress_meter)
-                end
-            end
-        end
+        args = atom, X, y, n, n_patterns, n_train, rng, progress_meter
+        ensemble, ensemble_indices = _fit(acceleration, get_ensemble_and_indices, verbosity, args)
 
     else
 
-        if !parallel || nworkers() == 1 # build in serial
-            verbosity < 2 ||  @info "One hash per new atom trained: "
-            ensemble = get_ensemble(atom, verbosity, X, y,
-                                    n, n_patterns, n_train, rng, progress_meter)
-        else # build in parallel
-            if verbosity > 0
-                println("Ensemble-building in parallel on $(nworkers()) processors.")
-            end
-            chunk_size = div(n, nworkers())
-            left_over = mod(n, nworkers())
-            ensemble =  @distributed (vcat) for i = 1:nworkers()
-                if i != nworkers()
-                    get_ensemble(atom, 0, X, y, chunk_size, n_patterns, n_train,
-                                 rng, progress_meter)
-                else
-                    get_ensemble(atom, 0, X, y, chunk_size + left_over, n_patterns, n_train,
-                                 rng, progress_meter)
-                end
-            end
-        end
+        args = atom, X, y, n, n_patterns, n_train, rng, progress_meter
+        ensemble = _fit(acceleration, get_ensemble, verbosity, args)
+
     end
 
     fitresult = WrappedEnsemble(model.atom, ensemble)

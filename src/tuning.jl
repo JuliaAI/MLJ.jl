@@ -19,11 +19,12 @@ See also [TunedModel](@ref), [range](@ref).
 """
 mutable struct Grid <: TuningStrategy
     resolution::Union{Int,Vector{<:Pair{<:ParameterName,Int}}}
-    parallel::Bool
+    acceleration::AbstractResource
 end
 
 # Constructor with keywords
-Grid(; resolution=10, parallel::Bool=true) = Grid(resolution, parallel)
+Grid(; resolution=10, acceleration::AbstractResource=DEFAULT_RESOURCE[]) =
+    Grid(resolution, acceleration)
 
 MLJBase.show_as_constructed(::Type{<:Grid}) = true
 

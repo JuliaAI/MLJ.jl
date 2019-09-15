@@ -34,7 +34,8 @@ pages = Any["Getting Started"=>"index.md",
             "MLJ Cheatsheet" => "mlj_cheatsheet.md",
             "MLJ News"=>"NEWS.md",
             "FAQ" => "frequently_asked_questions.md",
-            "Julia BlogPost"=>"julia_blogpost.md"]
+            "Julia BlogPost"=>"julia_blogpost.md",
+            "Acceleration and Parallelism"=>"acceleration_and_parallelism.md"]
 
 for p in pages
     println(first(p))
