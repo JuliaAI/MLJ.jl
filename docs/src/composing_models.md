@@ -47,21 +47,37 @@ The code also creates an instance of the new pipeline model type,
 called `pipe`, whose hyperparameters `hot`, `knn`, and `stand` are the
 component model instances specified in the macro expression:
 
-```@example 7
-@load KNNRegressor
-pipe = @pipeline MyPipe(X -> coerce(X, :age=>Continuous),
-                        hot = OneHotEncoder(),
-                        knn = KNNRegressor(K=3),
-                        target = UnivariateStandardizer())
-params(pipe)
+```julia
+julia> pipe = @pipeline MyPipe(X -> coerce(X, :age=>Continuous),
+                               hot = OneHotEncoder(),
+                               knn = KNNRegressor(K=3),
+                               target = UnivariateStandardizer())
+							   
+MyPipe(hot = OneHotEncoder(features = Symbol[],
+                           drop_last = false,
+                           ordered_factor = true,),
+       knn = KNNRegressor(K = 3,
+                          metric = MLJModels.KNN.euclidean,
+                          kernel = MLJModels.KNN.reciprocal,),
+       target = UnivariateStandardizer(),) @ 1…39
 ```
 
 We can, for example, evaluate the pipeline like we would any other model:
 
-```@example 7
-pipe.knn.K = 2
-pipe.hot.drop_last = true
-evaluate(pipe, X, height, resampling=Holdout(), measure=rms, verbosity=0)
+```julia
+julia> pipe.knn.K = 2
+julia> pipe.hot.drop_last = true
+julia> evaluate(pipe, X, height, resampling=Holdout(), measure=rms, verbosity=2)
+
+[ Info: Training Machine{MyPipe} @ 4…44.
+[ Info: Training NodalMachine{OneHotEncoder} @ 1…16.
+[ Info: Spawning 1 sub-features to one-hot encode feature :gender.
+[ Info: Training NodalMachine{UnivariateStandardizer} @ 5…65.
+[ Info: Training NodalMachine{KNNRegressor} @ 1…49.
+(measure = MLJBase.RMS[rms],
+ measurement = [10.0336],
+ per_fold = Array{Float64,1}[[10.0336]],
+ per_observation = Missing[missing],)
 ```
 
 For important details on including target transformations, see below.
@@ -121,20 +137,15 @@ The diagram above depicts a learning network which standardizes the
 input data `X`, learns an optimal Box-Cox transformation for the
 target `y`, predicts new target values using ridge regression, and
 then inverse-transforms those predictions, for later comparison with
-the original test data. The machines are labeled in yellow. We first
-need to import the RidgeRegressor model (you will need `MLJModels` in
-your load path):
+the original test data. The machines are labeled in yellow. 
 
-```julia
-@load RidgeRegressor pkg=MultivariateStats
-```
-
-To implement the network, we begin by loading data needed for training
-and evaluation into *source nodes*. For testing purposes, we'll use a
-small synthetic data set:
+For testing purposes, we'll use a small synthetic data set:
 
 ```julia
 using Statistics, DataFrames
+
+@load RidgeRegressor pkg=MultivariateStats
+
 x1 = rand(300)
 x2 = rand(300)
 x3 = rand(300)
@@ -439,7 +450,6 @@ combine several static node operations.
 
 ```julia
 
-@load KNNRegressor
 @load RidgeRegressor pkg=MultivariateStats
 
 mutable struct KNNRidgeBlend <:DeterministicNetwork
@@ -499,6 +509,9 @@ julia> evaluate!(mach, resampling=Holdout(fraction_train=0.7), measure=rmsl)
 │ measure=MLJ.rmsl 
 │ operation=StatsBase.predict 
 └ Resampling from all rows. 
+mach = NodalMachine{OneHotEncoder} @ 1…14
+mach = NodalMachine{RidgeRegressor} @ 1…87
+mach = NodalMachine{KNNRegressor} @ 1…02
 0.13108966715886725
 ```
 
