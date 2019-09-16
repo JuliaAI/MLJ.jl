@@ -67,7 +67,7 @@ We can, for example, evaluate the pipeline like we would any other model:
 ```julia
 julia> pipe.knn.K = 2
 julia> pipe.hot.drop_last = true
-julia> evaluate(pipe, X, height, resampling=Holdout(), measure=rms, verbosity=0)
+julia> evaluate(pipe, X, height, resampling=Holdout(), measure=rms, verbosity=2)
 
 [ Info: Training Machine{MyPipe} @ 4…44.
 [ Info: Training NodalMachine{OneHotEncoder} @ 1…16.
