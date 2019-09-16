@@ -7,6 +7,8 @@ using MLJBase
 import Random.seed!
 seed!(1234)
 
+@load KNNRegressor
+
 include("foobarmodel.jl")
 
 x1 = rand(100);

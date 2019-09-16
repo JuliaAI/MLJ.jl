@@ -81,7 +81,7 @@ Splitting row indices into train/evaluate/test:
 #### Machine construction
 
 Supervised case:
- 
+
 `model = KNNRegressor(K=1)` and `mach = machine(model, X, y)` 
  
 Unsupervised case:
@@ -109,7 +109,7 @@ Unsupervised case: `transform(mach, rows=1:100)` or `inverse_transform(mach, row
 
 `params(model)` gets nested-tuple of all hyperparameters, even nested ones
 
-`info(KNNRegresssor())`, `info("PCA")`, `info("RidgeRegressor",
+`info(ConstantRegresssor())`, `info("PCA")`, `info("RidgeRegressor",
 pkg="MultivariateStats")` gets all properties (aka traits) of registered models
 
 `info(rms)` gets all properties of a performance measure
