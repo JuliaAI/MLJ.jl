@@ -320,14 +320,14 @@ mach = machine(model_, X, y)
            (:info, r"^Train.*Univ"),
            (:info, r"^Train.*KNN"),
            (:info, r"^Train.*Dec"), fit!(mach))
-model_.knn_rgs.K = 5
+model_.knn_rgs.K = 55
 @test_logs((:info, r"^Updat.*Composite"),
            (:info, r"^Not.*OneHot"),
            (:info, r"^Not.*Univ"),
            (:info, r"^Updat.*KNN"),
            (:info, r"^Not.*Dec"), fit!(mach))
 
-@test MLJ.tree(mach.fitresult).arg1.arg1.arg1.arg1.model.K == 5
+@test MLJ.tree(mach.fitresult).arg1.arg1.arg1.arg1.model.K == 55
 
 # check data anomynity:
 @test all(x->(x===nothing), [s.data for s in sources(mach.fitresult)])
