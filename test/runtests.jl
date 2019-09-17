@@ -8,7 +8,7 @@ using MLJBase
 using Test
 using Random
 
-@constant junk=KNNRegressor()
+@constant junk=ConstantRegressor()
 
 @testset "utilities" begin
   @test include("utilities.jl")

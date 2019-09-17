@@ -266,6 +266,7 @@ A learned target transformation (such as standardization) can also be
 specified, using the keyword `target`, provided the transformer
 provides an `inverse_transform` method:
 
+    @load KNNRegressor
     @pipeline MyPipe(hot=OneHotEncoder(), 
                      knn=KNNRegressor(),
                      target=UnivariateTransformer())
@@ -273,6 +274,7 @@ provides an `inverse_transform` method:
 A static transformation can be specified instead, but then
 an `inverse` must also be given:
 
+    @load KNNRegressor
     @pipeline MyPipe(hot=OneHotEncoder(),
                      knn=KNNRegressor(),
                      target = v -> log.(v),

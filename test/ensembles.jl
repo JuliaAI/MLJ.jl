@@ -15,6 +15,8 @@ import MLJModels
 using CategoricalArrays
 using Distributions
 
+@load KNNRegressor
+
 
 ## WRAPPED ENSEMBLES OF FITRESULTS
 

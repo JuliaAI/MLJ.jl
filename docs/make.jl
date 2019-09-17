@@ -7,7 +7,6 @@ using MLJ
 using MLJBase
 using MLJModels.Transformers
 using MLJModels.Constant
-using MLJModels.KNN
 using MLJModels
 using ScientificTypes
 
@@ -37,8 +36,7 @@ end
 makedocs(
     sitename = "MLJ",
     format = Documenter.HTML(),
-    modules = [MLJ, MLJBase, MLJModels, MLJModels.Transformers, MLJModels.Constant,
-               MLJModels.KNN, ScientificTypes],
+    modules = [MLJ, MLJBase, MLJModels, MLJModels.Transformers, MLJModels.Constant, ScientificTypes],
     pages=pages)
 
 deploydocs(
