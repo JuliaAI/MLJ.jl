@@ -9,7 +9,7 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
     cache
     args::Tuple
     report
-    rows # remember last rows used for convenience
+    previous_rows 
 
     function Machine{M}(model, args...) where M
         machine = new{M}(model)
@@ -120,7 +120,8 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
         rows = (:)
     end
 
-    rows_have_changed = !isdefined(mach, :rows) || rows != mach.rows
+    rows_have_changed = !isdefined(mach, :previous_rows) ||
+        rows != mach.previous_rows
 
     if mach isa NodalMachine
         # determine if concrete data to be used in training may have changed:
@@ -157,7 +158,7 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
     end
 
     if rows_have_changed
-        mach.rows = deepcopy(rows)
+        mach.previous_rows = deepcopy(rows)
     end
 
     mach.previous_model = deepcopy(mach.model)

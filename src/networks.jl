@@ -99,13 +99,13 @@ A NodalMachine wraps a model as part of a learning network.
 mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
 
     model::M
-    previous_model::M
+    previous_model::M # for remembering the model used in last call to `fit!`
     fitresult
     cache
     args::Tuple{Vararg{AbstractNode}}
     report
     frozen::Bool
-    rows            # for remembering the rows used in last call to `fit!`
+    previous_rows   # for remembering the rows used in last call to `fit!`
     state::Int      # number of times fit! has been called on machine
     upstream_state  # for remembering the upstream state in last call to `fit!`
 
