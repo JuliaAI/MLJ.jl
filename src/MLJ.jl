@@ -30,7 +30,7 @@ export pdf, mode, median, mean, shuffle!, categorical, shuffle, levels, levels!
 export std
 
 # re-export from MLJBase and ScientificTypes:
-export nrows, nfeatures, 
+export nrows, nfeatures, color_off, color_on,
     selectrows, selectcols,
     SupervisedTask, UnsupervisedTask, MLJTask,
     Deterministic, Probabilistic, Unsupervised, Supervised,

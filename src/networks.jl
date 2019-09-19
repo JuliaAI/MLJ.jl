@@ -296,15 +296,14 @@ MLJBase.selectrows(X::AbstractNode, r) = X(rows=r)
 (y::Node{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
 
 """
-$SIGNATURES
+    fit!(N::Node; rows=nothing, verbosity::Int=1, force::Bool=false)
 
-Train the machines of all dynamic nodes in the learning network terminating at
-`N` in an appropriate order.
+Train all machines in the learning network terminating at node `N`, in an
+appropriate order. These machines are those returned by `machines(N)`.
+
 """
-function fit!(y::Node; rows=nothing, verbosity::Int=1, force::Bool=false)
-    if rows === nothing
-        rows = (:)
-    end
+function fit!(y::Node; rows=nothing, verbosity::Int=1,
+force::Bool=false) if rows === nothing rows = (:) end
 
     # get non-source nodes:
     nodes_ = filter(nodes(y)) do n

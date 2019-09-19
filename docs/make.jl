@@ -2,7 +2,7 @@ if Base.HOME_PROJECT[] !== nothing
     Base.HOME_PROJECT[] = abspath(Base.HOME_PROJECT[])
 end
 using Pkg
-using Documenter
+# using Documenter
 using MLJ
 using MLJBase
 using MLJModels.Transformers
@@ -10,8 +10,14 @@ using MLJModels.Constant
 using MLJModels
 using ScientificTypes
 
+# using Literate
+# Literate.markdown("common_mlj_workflows.jl", ".",
+#                   codefence = "```@example workflows" => "```")
+
 pages = Any["Getting Started"=>"index.md",
+            "Common MLJ Workflows" => "common_mlj_workflows.md",
             "Model Search" => "model_search.md",
+            "Machines" => "machines.md",
             "Evaluating Model Performance"=>"evaluating_model_performance.md",
             "Performance Measures"=> "performance_measures.md",
             "Tuning Models"=>"tuning_models.md",

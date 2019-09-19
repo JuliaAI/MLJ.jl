@@ -1,8 +1,8 @@
+### [Installation](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md) | [Cheatsheet](mlj_cheatsheet.md) | [Workflows](common_mlj_workflows.md) | [Workflows](common_mlj_workflows.md)
+
+
 # Getting Started
 
-#### [Installation instructions](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md)
-
-#### [Cheatsheet](mlj_cheatsheet.md)
 
 ```@setup doda
 import Base.eval # hack b/s auto docs put's code in baremodule
@@ -12,10 +12,9 @@ MLJ.color_off()
 seed!(1234) 
 ```
 
+### Choosing and evaluating a model
 
-### Plug-and-play model evaluation
-
-To load some data add
+To load some demonstration data, add
 [RDatasets](https://github.com/JuliaStats/RDatasets.jl) to your load
 path and enter
 ```@repl doda
@@ -30,10 +29,17 @@ y, X = unpack(iris, ==(:Species), colname -> true);
 first(X, 3) |> pretty
 ```
 
+To seach MJL's [model registry](model_search.md) for models that can
+be immediately trained on the data, we run
+
+```@repl doda
+models(matching(X, y))
+```
+
 In MLJ a *model* is a struct storing the hyperparameters of the
 learning algorithm indicated by the struct name.  
 
-Assuming the DecisionTree package is in your load path, we can use
+Assuming the DecisionTree.jl package is in your load path, we can use
 `@load` to load the code defining the `DecisionTreeClassifier` model
 type. This macro also returns an instance, with default
 hyperparameters. 
@@ -44,7 +50,7 @@ Drop the `verbosity=1` declaration for silent loading:
 tree_model = @load DecisionTreeClassifier verbosity=1
 ```
 
-*Important:* DecisionTree and most other packages implementing machine
+*Important:* DecisionTree.jl and most other packages implementing machine
 learning algorithms for use in MLJ are not MLJ dependencies. If such a
 package is not in your load path you will receive an error explaining
 how to add the package to your current environment.
@@ -57,7 +63,7 @@ evaluate(tree_model, X, y,
 ```
 
 Evaluating against multiple performance measures is also possible. See
-[Evaluating model performance](evaluating_model_performance.md) for details.
+[Evaluating Model Performance](evaluating_model_performance.md) for details.
 
 
 ### Fit and predict
@@ -92,20 +98,35 @@ broadcast(pdf, yhat[3:5], "virginica") # predicted probabilities of virginica
 mode.(yhat[3:5])
 ```
 
-One can explicitly get modes by using `predict_mode` instead of `predict`:
+Or, one can explicitly get modes by using `predict_mode` instead of
+`predict`:
 
 ```@repl doda
 predict_mode(tree, rows=test[3:5])
 ```
 
-Machines have an internal state which allows them to avoid redundant
-calculations when retrained, in certain conditions - for example when
-increasing the number of trees in a random forest, or the number of
-epochs in a neural network. The machine building syntax also
-anticipates a more general syntax for composing multiple models, as
-explained in [Composing Models](composing_models.md).
+Unsupervised models have a `transform` method instead of `predict`,
+and may optionally implement an `inverse_transform` method:
 
-There is a version of `evaluate` for machines as well as models:
+```@repl doda
+v = [1, 2, 3, 4]
+stand_model = UnivariateStandardizer()
+stand = machine(stand_model, v)
+fit!(stand)
+w = transform(stand, v)
+inverse_transform(stand, w)
+```
+
+[Machines](machines.md) have an internal state which allows them to
+avoid redundant calculations when retrained, in certain conditions -
+for example when increasing the number of trees in a random forest, or
+the number of epochs in a neural network. The machine building syntax
+also anticipates a more general syntax for composing multiple models,
+as explained in [Composing Models](composing_models.md).
+
+There is a version of `evaluate` for machines as well as models. An
+exclamation point is added to the method name because machines are
+generally mutated when trained:
 
 ```@repl doda
 evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
@@ -124,9 +145,10 @@ evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
 ### Next steps
 
 To learn a little more about what MLJ can do, take the MLJ
-[tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/examples/tour/tour.ipynb),
-and then return to the manual as needed. *Read at least the remainder
-of this page before considering serious use of MLJ.*
+[tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/examples/tour/tour.ipynb)
+or browse [Common MLJ Workflows](common_mlj_workflows), returning to
+the manual as needed. *Read at least the remainder of this page before
+considering serious use of MLJ.*
 
 
 ### Prerequisites
@@ -155,9 +177,11 @@ Each supervised model in MLJ declares the permitted *scientific type*
 of the inputs `X` and targets `y` that can be bound to it in the first
 constructor above, rather than specifying specific machine types (such
 as `Array{Float32, 2}`). Similar remarks apply to the input `X` of an
-unsupervised model. Scientific types are julia types defined in the
+unsupervised model.
+
+Scientific types are julia types defined in the
 package
-[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl),
+rows=nothing, verbosity::Int=1, force::Bool=false),
 which also defines the convention used here (and there called *mlj*)
 for assigning a specific scientific type (interpretation) to each
 julia object (see the `scitype` examples below).
@@ -165,7 +189,12 @@ julia object (see the `scitype` examples below).
 The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
 `OrderedFactor{N}` and `Count`. Be sure you read [Container element
 types](@ref) below to be guarantee your scalar data is interpreted
-correctly. Additionally, most data containers - such as tuples,
+correctly. Tools exist to coerce the data to have the appropriate
+scientfic type; see
+[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
+or run `?coerce` for details.
+ 
+Additionally, most data containers - such as tuples,
 vectors, matrices and tables - have a scientific type.
 
 
@@ -246,9 +275,6 @@ entry, using `info`:
 info("DecisionTreeClassifier")
 ```
 
-See also [Working with tasks](working_with_tasks.md) on searching for
-models solving a specified task.
-
 
 #### Container element types
 
@@ -273,9 +299,6 @@ are the key aspects of that convention:
 - In particular, *integers* (including `Bool`s) *cannot be used to
   represent categorical data.*
   
-To coerce the scientific type of a vector or table, use the `coerce`
-method (re-exported from
-[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)).
 
 
 

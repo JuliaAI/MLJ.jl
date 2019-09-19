@@ -9,10 +9,10 @@ methods, as detailed below.
 
 ### Model metadata
 
-In this section the word "model" actually refers to its metadata entry
-in the registry, as distinct from instances of model `struct`s
-discussed elsewhere in the manual. One can obtain such an entry with
-the `info` command:
+*Terminology.* In this section the word "model" refers to the metadata
+entry in the registry of an actual model `struct`, as appearing
+elsewhere in the manual. One can obtain such an entry with the `info`
+command:
 
 ```@setup tokai
 using MLJ

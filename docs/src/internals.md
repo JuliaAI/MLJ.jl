@@ -1,4 +1,4 @@
-# Internals
+G# Internals
 
 ### The machine interface, simplified
 
@@ -15,7 +15,7 @@ mutable struct Machine{M<Model}
     cache
     args::Tuple    # e.g., (X, y) for supervised models
     report
-    rows # remember last rows used 
+    previous_rows # remember last rows used 
     
     function Machine{M}(model::M, args...) where M<:Model
         machine = new{M}(model)
@@ -45,7 +45,8 @@ function fit!(machine::Machine; rows=nothing, force=false, verbosity=1)
         rows = (:) 
     end
 
-    rows_have_changed  = (!isdefined(mach, :rows) || rows != mach.rows)
+    rows_have_changed  = (!isdefined(mach, :previous_rows) || 
+	    rows != mach.previous_rows)
 
     args = [MLJ.selectrows(arg, rows) for arg in mach.args]
 	
@@ -58,7 +59,7 @@ function fit!(machine::Machine; rows=nothing, force=false, verbosity=1)
     end
 
     if rows_have_changed
-        mach.rows = deepcopy(rows)
+        mach.previous_rows = deepcopy(rows)
     end
 
     if report !== nothing
