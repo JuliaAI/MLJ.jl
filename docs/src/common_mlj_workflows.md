@@ -116,7 +116,7 @@ evaluate(model, X, y, resampling=CV(nfolds=5), measure=[rms, mav])
 ```@example workflows
 using RDatasets
 vaso = dataset("robustbase", "vaso"); # a DataFrame
-first(vasso, 3)
+first(vaso, 3)
 ```
 
 ```@example workflows
