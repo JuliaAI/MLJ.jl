@@ -1,9 +1,12 @@
 # MLJ Cheatsheet
 
+
 #### Starting an interactive MLJ session
 
-`using MLJ`
-
+```@repl cheat
+using MLJ
+MLJ_VERSION # version of MLJ for this cheatsheet
+```
 
 #### Model search and code loading
  

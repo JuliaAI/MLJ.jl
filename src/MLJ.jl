@@ -2,6 +2,8 @@ module MLJ
 
 ## EXPORTS
 
+export MLJ_VERSION
+
 # defined in include files:
 export @curve, @pcurve, pretty,                       # utilities.jl
         coerce, supervised, unsupervised,             # tasks.jl
@@ -71,6 +73,7 @@ import MLJModels: models
 
 using Requires
 import Pkg.TOML
+import Pkg
 using OrderedCollections
 using  CategoricalArrays
 import Distributions: pdf, mode
@@ -99,7 +102,7 @@ using RecipesBase # for plotting
 
 const srcdir = dirname(@__FILE__) # the directory containing this file:
 const CategoricalElement = Union{CategoricalString,CategoricalValue}
-
+const MLJ_VERSION = Pkg.installed()["MLJ"]
 
 ## INCLUDES
 
