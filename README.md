@@ -85,7 +85,7 @@ using Pkg
 Pkg.activate("my_mlj_env", shared=true)
 ```
 
-In future REPL sessions, you can activate your (now populuted)
+In future REPL sessions, you can activate your (now populated)
 environment with the same command.
 
 
