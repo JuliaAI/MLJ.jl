@@ -62,7 +62,7 @@ For a supervised machine the `predict` method calls a lower-level
 `MLJBase.predict` method, dispatched on the underlying model and the
 `fitresult` (see below). To see `predict` in action, as well as its
 unsupervised cousins `transform` and `inverse_transform`, see
-[Getting Started](getting_started.md).
+[Getting Started](index.md).
 
 Here is a complete list of the fields of a machine:
 

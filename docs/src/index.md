@@ -1,4 +1,4 @@
-### [Installation](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md) | [Cheatsheet](mlj_cheatsheet.md) | [Workflows](common_mlj_workflows.md) | [Workflows](common_mlj_workflows.md)
+### [Installation](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md) | [Cheatsheet](mlj_cheatsheet.md) | [Workflows](common_mlj_workflows.md)
 
 
 # Getting Started
@@ -146,7 +146,7 @@ evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
 
 To learn a little more about what MLJ can do, take the MLJ
 [tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/examples/tour/tour.ipynb)
-or browse [Common MLJ Workflows](common_mlj_workflows), returning to
+or browse [Common MLJ Workflows](common_mlj_workflows.md), returning to
 the manual as needed. *Read at least the remainder of this page before
 considering serious use of MLJ.*
 
