@@ -1,4 +1,4 @@
-# MLJ Cheatsheet
+# MLJ (v0.4.0+) Cheatsheet
 
 #### Starting an interactive MLJ session
 
