@@ -2,7 +2,7 @@
 
 A pure Julia machine learning framework.
 
-[MLJ News](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/NEWS.md) | [MLJ Cheatsheet](docs/src/mlj_cheatsheet.md)
+[MLJ News](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/NEWS.md) | [MLJ Cheatsheet](https://alan-turing-institute.github.io/MLJ.jl/stable/)
 
 
 ## `join!(MLJ, YourModel)`
@@ -85,7 +85,7 @@ using Pkg
 Pkg.activate("my_mlj_env", shared=true)
 ```
 
-In future REPL sessions, you can activate your (now populuted)
+In future REPL sessions, you can activate your (now populated)
 environment with the same command.
 
 
