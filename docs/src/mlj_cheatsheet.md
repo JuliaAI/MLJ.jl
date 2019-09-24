@@ -76,9 +76,9 @@ y, X =  unpack(channing,
                :Cens=>Multiclass)
 ```
 
-Splitting row indices into train/evaluate/test:
+Splitting row indices into train/validation/test:
 
-`train, evaluate, test = partition(eachindex(y), 0.7, 0.2, shuffle=true, rng=1234)` for 70:20:10 ratio
+`train, valid, test = partition(eachindex(y), 0.7, 0.2, shuffle=true, rng=1234)` for 70:20:10 ratio
 
 
 #### Machine construction
