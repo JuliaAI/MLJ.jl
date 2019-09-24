@@ -27,7 +27,7 @@ after_success:
 jobs:
   include:
     - stage: "Documentation"
-      julia: 1.1
+      julia: 1.2
       os: linux
       # disable global before_script in order not to install Compose twice
       before_script:

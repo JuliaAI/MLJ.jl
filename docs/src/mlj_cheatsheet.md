@@ -10,22 +10,34 @@ MLJ_VERSION # version of MLJ for this cheatsheet
 
 #### Model search and code loading
  
-`models()` to list all registered models.
- 
-`models(x -> x.is_supervised && x.is_pure_julia)` to find all supervised models written in pure julia. 
-
-
-`info("PCA")` retrieves registry metadata on the model called "PCA"
+`info("PCA")` retrieves registry metadata for the model called "PCA"
 
 `info("RidgeRegressor", pkg="MultivariateStats")` retrieves metadata
 for "RidgeRegresssor", which is provided by multiple packages
 
+`models()` lists metadata of every registered model.
+ 
+`models(x -> x.is_supervised && x.is_pure_julia)` lists all supervised models written in pure julia. 
+
+`models(matching(X))` lists all unsupervised models compatible with input `X`. 
+
+`models(matching(X, y))` lists all supervised modesl compatible with input/target `X/y`.
+
+With additional conditions:
+
+```julia
+models(matching(X, y)) do model
+    model.prediction_type == :probabilistic &&
+	model.is_pure_julia
+end
+```	
 
 `tree = @load DecisionTreeClassifier` to load code and instantiate "DecisionTreeClassifier" model
 
 `tree2  = DecisionTreeClassifier(max_depth=2)` instantiates a model type already in scope
 
-`ridge = @load RidgeRegressor pkg=MultivariateStats` load and instantiate a "RidgeRegressor" model
+`ridge = @load RidgeRegressor pkg=MultivariateStats` loads and
+instantiates a model provided by multiple packages
 
 
 #### Scitypes and coercion
@@ -51,10 +63,11 @@ Use `schema(X)` to get the column scitypes of a table `X`
 
 ### Ingesting data
 
-Splitting any table into target and input:
+Splitting any table into target and input (note semicolon):
 
 ```julia
-using RDatasets; channing = dataset("boot", "channing")
+using RDatasets
+channing = dataset("boot", "channing")
 y, X =  unpack(channing,
                ==(:Exit),            # y is the :Exit column
                !=(:Time);            # X is the rest, except :Time
@@ -128,6 +141,7 @@ or a list of pairs of row indices:
 
 `evaluate(model, X, y, resampling=CV(), measure=rms, operation=predict, weights=..., verbosity=1)`
 `evaluate!(mach, resampling=Holdout(), measure=[rms, mav], operation=predict, weights=..., verbosity=1)`
+`evaluate!(mach, resampling=[(fold1, fold2), (fold2, fold1)], measure=rms)` 
 
 
 #### Ranges for tuning
@@ -216,7 +230,7 @@ Supervised, with final node `yhat` returning point-predictions:
 
 Supervised, with `yhat` final node returning probabilistic predictions:
 
-`@from_network Composite(knn=network_knn) <= yhat is_probabistic=true`
+`@from_network Composite(knn=network_knn) <= yhat is_probabilistic=true`
 
 
 Unsupervised, with final node `Xout`:
