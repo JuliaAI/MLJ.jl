@@ -308,7 +308,7 @@ function from_network_(modl, modeltype_ex, fieldname_exs, model_exs,
     # code defining the composite model struct and fit method:
     program1 = quote
 
-        struct $modeltype_ex <: MLJ.$kind
+        mutable struct $modeltype_ex <: MLJ.$kind
             $(fieldname_exs...)
         end
 
