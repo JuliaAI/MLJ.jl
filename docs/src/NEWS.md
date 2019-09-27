@@ -1,13 +1,29 @@
 # MLJ News 
 
-News for MLJ and its satellite packages, 
-[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl),
-[MLJRegistry](https://github.com/alan-turing-institute/MLJRegistry.jl) (now defunct)
-and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
-[ScientificTypes](https://github.com/alan-turing-institute/ScientificTypes.jl)
+News for MLJ and its satellite packages: [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl),
+[MLJModels](https://github.com/alan-turing-institute/MLJModels.jl), and
+[ScientificTypes](https://github.com/alan-turing-institute/ScientificTypes.jl).
 
 
-## MLJ 0.4.0
+## Latest release notes
+
+[MLJ](https://github.com/alan-turing-institute/MLJ.jl/releases) (general users)
+
+[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl/releases) | 
+[MLJModels](https://github.com/alan-turing-institute/MLJModels.jl/releases) | 
+[ScientificTypes](https://github.com/alan-turing-institute/ScientificTypes.jl/releases) (mainly for developers)
+
+## News
+
+### 26 Sep 2019
+
+MLJBase 0.6 released.
+
+
+## Older release notes
+
+
+### MLJ 0.4.0
 
 -  (Enhancment) Update to MLJBase 0.5.0 and MLJModels 0.4.0. In
    particular, this updates considerably the list of wrapped
@@ -71,8 +87,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   model.is_pure_julia end` finds all pure julia supervised models.
   
 - (Bug fix) Introduce new private methods to avoid relying on MLJBase
-  type piracy [MLJBase
-  #30](https://github.com/alan-turing-institute/MLJBase.jl/issues/30).
+  type piracy [MLJBase #30](https://github.com/alan-turing-institute/MLJBase.jl/issues/30).
   
 - (Enhancement) If `composite` is a a learning network exported as a
   model, and `m = machine(composite, args...)` then `report(m)`
@@ -91,8 +106,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   
 - (Enhancement) `std` is re-exported from `Statistics`
 
-- (Enhancement) The [manual and MLJ
-  cheatsheet](https://alan-turing-institute.github.io/MLJ.jl/stable/)
+- (Enhancement) The [manual and MLJ cheatsheet](https://alan-turing-institute.github.io/MLJ.jl/stable/)
   have been updated.
   
 - Performance measures have been migrated to MLJBase, while the model
@@ -101,7 +115,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   unlikely to effect many users.
 
 
-## MLJModels 0.4.0
+### MLJModels 0.4.0
 
 - (Enhancement) Add a number of
   [scikit-learn](https://scikit-learn.org/stable/supervised_learning.html#supervised-learning)
@@ -123,8 +137,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 	
 	- The `info` command for returning the metadata entry of a model
 	
-- (Breaking) MLJBase v0.5.0, which introduces [some changes and
-  additions](https://github.com/alan-turing-institute/MLJBase.jl/pull/39)
+- (Breaking) MLJBase v0.5.0, which introduces [some changes and additions](https://github.com/alan-turing-institute/MLJBase.jl/pull/39)
   to model traits, is a requirement, meaning the format of metadata as
   changed.
   
@@ -134,7 +147,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   metadata, is now called `MLJBase.info_dic`).
 
 
-## MLJBase 0.5.0
+### MLJBase 0.5.0
 
 - Bump ScientificTypes requirement to v0.2.0
 
@@ -179,8 +192,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   [#224](https://github.com/alan-turing-institute/MLJ.jl/issues/224))
   
 - (Enhancement) `selectrows` now works for matrices. Needed to allow
-  matrices as "node type" in MLJ learning networks; see [MLJ
-  #209](https://github.com/alan-turing-institute/MLJ.jl/issues/209).
+  matrices as "node type" in MLJ learning networks; see [MLJ #209](https://github.com/alan-turing-institute/MLJ.jl/issues/209).
 
 - (Bug) Fix problem with `==` for `MLJType` objects
   ([#35](https://github.com/alan-turing-institute/MLJBase.jl/issues/35))
@@ -194,7 +206,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 - (Bug fix) Remove type piracy in get/setproperty! ([#30](https://github.com/alan-turing-institute/MLJBase.jl/issues/30))
 
 
-## ScientificTypes 0.2.0
+### ScientificTypes 0.2.0
 
 - (Breaking) The argument order is switched in `coerce` methods. So
   now use `coerce(v, T)` for a vector `v` and scientific type `T` and
@@ -205,12 +217,12 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   :ncalls => Count)`.
 
 
-## ScientficTypes 0.1.3
+### ScientficTypes 0.1.3
 
 [Release notes](https://github.com/alan-turing-institute/ScientificTypes.jl/releases/tag/v0.1.3)
 
 
-## MLJ 0.4.0 
+### MLJ 0.4.0 
 
 - Introduction of traits for measures (loss functions, etc); see top
   of /src/measures.jl for definitions. This
@@ -256,30 +268,30 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   above)
 
 
-## MLJModels 0.3.0
+### MLJModels 0.3.0
 
 [Release notes](https://github.com/alan-turing-institute/MLJModels.jl/releases)
 
 
-## MLJBase v0.4.0
+### MLJBase v0.4.0
 
 [Release notes](https://github.com/alan-turing-institute/MLJBase.jl/releases/tag/v0.4.0)
 
 
-## ScientificTypes 0.1.2
+### ScientificTypes 0.1.2
 
 - New
   [package](https://github.com/alan-turing-institute/ScientificTypes.jl)
   to which the scientific types API has been moved (from MLJBase).
 
 
-## MLJBase v0.3.0
+### MLJBase v0.3.0
 
 - Make CSV an optional dependency (breaking). To use `load_iris()`,
   `load_ames()`, etc, need first to import CSV.
 
 
-## MLJBase v0.2.4
+### MLJBase v0.2.4
 
 - Add ColorImage and GreyImage scitypes
 
@@ -288,7 +300,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   ambiguity, now resolved).
 
 
-## MLJ v0.2.5
+### MLJ v0.2.5
 
 - Add MLJ [cheatsheet](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/mlj_cheatsheet.md)
 
@@ -297,12 +309,12 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 - add `@from_networks` macro for exporting learning networks as models (experimental). 
 
 
-## MLJModels v0.2.4
+### MLJModels v0.2.4
 
 - Add compatibility requirement MLJBase="0.2.3" 
 
 
-## MLJBase v0.2.3
+### MLJBase v0.2.3
 
 - Small changes on definitions of `==` and `isequal` for `MLJType`
   objects. In particular, fields that are random number generators may
@@ -314,7 +326,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 - Add abstract type `UnsupervisedNetwork <: Unsupervised`.
 
 
-## MLJ v0.2.3
+### MLJ v0.2.3
 
 - Fixed bug in models(::MLJTask) method which excluded some relevant
   models. [(#153)](https://github.com/alan-turing-institute/MLJ.jl/issues/153)
@@ -323,7 +335,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 
 
 
-## MLJ v0.2.2
+### MLJ v0.2.2
 
 - Resolved these isssues: 
 
@@ -349,7 +361,7 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
 - Minor changes to OneHotEncoder, in line with scitype philosophy.
 	
 
-## MLJBase v0.2.2
+### MLJBase v0.2.2
 
 - Fix some minor bugs. 
 
@@ -357,39 +369,39 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   of `allowmissing` keyword in `CSV.read`, which is to be depreciated.
 
 
-## Announcement: MLJ tutorial and development sprint
+### Announcement: MLJ tutorial and development sprint
 
  - Details
    [here](https://github.com/alan-turing-institute/MLJ.jl/wiki/2019-MLJ---sktime-tutorial-and-development-sprint)
    Applications close **May 29th** 5pm (GMTT + 1 = London)
 
 
-## MLJModels v0.2.3
+### MLJModels v0.2.3
 
 - The following support vector machine models from LIBSVM.jl have been
   added: EpsilonSVR, LinearSVC, NuSVR, NuSVC, SVC, OneClassSVM.
 
-## MLJModels v0.2.2
+### MLJModels v0.2.2
 
 - MulitivariateStats models RidgeRegressor and PCA migrated here from
   MLJ. Addresses: MLJ
   [#125](https://github.com/alan-turing-institute/MLJ.jl/issues/125).
 
 
-## MLJModels v0.2.1
+### MLJModels v0.2.1
 
 - ScikitLearn wraps ElasticNet and ElasticNetCV now available (and
   registered at MLJRegistry). Resolves: MLJ
   [#112](https://github.com/alan-turing-institute/MLJ.jl/issues/112)
 
 
-## MLJ v0.2.1 
+### MLJ v0.2.1 
 
 - Fix a bug and related problem in "Getting Started" docs:
   [#126](https://github.com/alan-turing-institute/MLJ.jl/issues/126 .
 
 
-### MLJBase 0.2.0, MLJModels 0.2.0, MLJ 0.2.0
+#### MLJBase 0.2.0, MLJModels 0.2.0, MLJ 0.2.0
 
 - Model API refactored to resolve
   [#93](https://github.com/alan-turing-institute/MLJ.jl/issues/93) and
@@ -409,32 +421,32 @@ and [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl)
   [#119](https://github.com/alan-turing-institute/MLJ.jl/issues/119)
 
 
-### Official registered versions of MLJBase 0.1.1, MLJModels 0.1.1, MLJ 0.1.1 released
+#### Official registered versions of MLJBase 0.1.1, MLJModels 0.1.1, MLJ 0.1.1 released
 
 - Minor revisions to the repos, doc updates, and a small breaking
   change around scitype method names and associated traits. Resolves:
   [#119](https://github.com/alan-turing-institute/MLJ.jl/issues/119)
 
-### unversioned commits 12 April 2019 (around 00:10, GMT)
+#### unversioned commits 12 April 2019 (around 00:10, GMT)
 
 - Added out-of-bag estimates for performance in homogeneous
   ensembles. Resolves:
   [#77](https://github.com/alan-turing-institute/MLJ.jl/issues/77)
 
 
-### unversioned commits 11 April 2019 (before noon, GMT)
+#### unversioned commits 11 April 2019 (before noon, GMT)
 
 - Removed dependency on unregistered package TOML.jl (using, Pkg.TOML
   instead). Resolves
-  [#113](https://github.com/alan-turing-institute/MLJ.jl/issues/113)
+  [#113](https://github.com/alan-turing-institute/MLJjl/issues/113)
 
-### unversioned commits 8 April 2019 (some time after 20:00 GMT)
+#### unversioned commits 8 April 2019 (some time after 20:00 GMT)
 
 - Addition of XGBoost models XGBoostRegressor, XGBoostClassifier and XGBoostCount. Resolves [#65](https://github.com/alan-turing-institute/MLJ.jl/issues/65).
 
 - Documentation reorganized as [GitHub pages](https://alan-turing-institute.github.io/MLJ.jl/dev/). Includes some additions but still a work in progress.
 
-### unversioned commits 1 March 2019 (some time after 03:50 GMT)
+#### unversioned commits 1 March 2019 (some time after 03:50 GMT)
 
 - Addition of "scientific type" hierarchy, including `Continuous`,
   `Discrete`, `Multiclass`, and `Other` subtypes of `Found` (to

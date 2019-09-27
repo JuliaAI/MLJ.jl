@@ -2,8 +2,7 @@
 
 A pure Julia machine learning framework.
 
-[MLJ News](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/NEWS.md) | [MLJ Cheatsheet](https://alan-turing-institute.github.io/MLJ.jl/stable/)
-
+[MLJ News](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/NEWS.md) for  MLJ and its satellite packages, [MLJBase](https://github.com/alan-turing-institute/MLJModels.jl), [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl) and [ScientificTypes](https://github.com/alan-turing-institute/ScientificTypes.jl) | [MLJ Cheatsheet](docs/src/mlj_cheatsheet.md)
 
 ## `join!(MLJ, YourModel)`
 
