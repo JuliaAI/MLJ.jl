@@ -1,4 +1,4 @@
-# Model Search
+# Model Search 
 
 MLJ has a model registry, allowing the user to search models and their
 properties, without loading all the packages containing model code. In
@@ -48,10 +48,15 @@ test(model) = model.is_supervised &&
 models(test)
 ```
 
-Multiple test arguments may be passed to `models`, which are applied conjunctively.
+Multiple test arguments may be passed to `models`, which are applied
+conjunctively.
 
 
 ### Matching models to data 
+
+!!! note
+    The `matching` method described below is experimental and may
+    break in subsequent MLJ releases.
 
 Common searches are streamlined with the help of the `matching`
 command, defined as follows:

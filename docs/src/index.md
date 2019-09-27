@@ -29,11 +29,11 @@ y, X = unpack(iris, ==(:Species), colname -> true);
 first(X, 3) |> pretty
 ```
 
-To seach MJL's [model registry](model_search.md) for models that can
-be immediately trained on the data, we run
+To list all models available in MLJ's [model
+registry](model_search.md):
 
 ```@repl doda
-models(matching(X, y))
+models()
 ```
 
 In MLJ a *model* is a struct storing the hyperparameters of the

@@ -42,7 +42,7 @@ first(X, 4)
 y[1:4]
 ```
 
-## Model search
+## Model search (**experimental**)
 
 *Reference:*   [Model Search](model_search.md) 
 
