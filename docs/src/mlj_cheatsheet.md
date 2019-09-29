@@ -1,28 +1,45 @@
 # MLJ Cheatsheet
 
+
 #### Starting an interactive MLJ session
 
-`using MLJ`
-
+```@repl cheat
+using MLJ
+MLJ_VERSION # version of MLJ for this cheatsheet
+```
 
 #### Model search and code loading
  
-`models()` to list all registered models.
- 
-`models(x -> x.is_supervised && x.is_pure_julia)` to find all supervised models written in pure julia. 
-
-
-`info("PCA")` retrieves registry metadata on the model called "PCA"
+`info("PCA")` retrieves registry metadata for the model called "PCA"
 
 `info("RidgeRegressor", pkg="MultivariateStats")` retrieves metadata
 for "RidgeRegresssor", which is provided by multiple packages
 
+`models()` lists metadata of every registered model.
+ 
+`models(x -> x.is_supervised && x.is_pure_julia)` lists all supervised models written in pure julia. 
+
+**experimental:**
+`models(matching(X))` lists all unsupervised models compatible with input `X`. 
+
+**experimental!**
+`models(matching(X, y))` lists all supervised modesl compatible with input/target `X/y`.
+
+**experimetnal!** With additional conditions:
+
+```julia
+models(matching(X, y)) do model
+    model.prediction_type == :probabilistic &&
+	model.is_pure_julia
+end
+```	
 
 `tree = @load DecisionTreeClassifier` to load code and instantiate "DecisionTreeClassifier" model
 
 `tree2  = DecisionTreeClassifier(max_depth=2)` instantiates a model type already in scope
 
-`ridge = @load RidgeRegressor pkg=MultivariateStats` load and instantiate a "RidgeRegressor" model
+`ridge = @load RidgeRegressor pkg=MultivariateStats` loads and
+instantiates a model provided by multiple packages
 
 
 #### Scitypes and coercion
@@ -48,10 +65,11 @@ Use `schema(X)` to get the column scitypes of a table `X`
 
 ### Ingesting data
 
-Splitting any table into target and input:
+Splitting any table into target and input (note semicolon):
 
 ```julia
-using RDatasets; channing = dataset("boot", "channing")
+using RDatasets
+channing = dataset("boot", "channing")
 y, X =  unpack(channing,
                ==(:Exit),            # y is the :Exit column
                !=(:Time);            # X is the rest, except :Time
@@ -60,15 +78,15 @@ y, X =  unpack(channing,
                :Cens=>Multiclass)
 ```
 
-Splitting row indices into train/evaluate/test:
+Splitting row indices into train/validation/test:
 
-`train, evaluate, test = partition(eachindex(y), 0.7, 0.2, shuffle=true, rng=1234)` for 70:20:10 ratio
+`train, valid, test = partition(eachindex(y), 0.7, 0.2, shuffle=true, rng=1234)` for 70:20:10 ratio
 
 
 #### Machine construction
 
 Supervised case:
- 
+
 `model = KNNRegressor(K=1)` and `mach = machine(model, X, y)` 
  
 Unsupervised case:
@@ -96,7 +114,7 @@ Unsupervised case: `transform(mach, rows=1:100)` or `inverse_transform(mach, row
 
 `params(model)` gets nested-tuple of all hyperparameters, even nested ones
 
-`info(KNNRegresssor())`, `info("PCA")`, `info("RidgeRegressor",
+`info(ConstantRegresssor())`, `info("PCA")`, `info("RidgeRegressor",
 pkg="MultivariateStats")` gets all properties (aka traits) of registered models
 
 `info(rms)` gets all properties of a performance measure
@@ -125,6 +143,7 @@ or a list of pairs of row indices:
 
 `evaluate(model, X, y, resampling=CV(), measure=rms, operation=predict, weights=..., verbosity=1)`
 `evaluate!(mach, resampling=Holdout(), measure=[rms, mav], operation=predict, weights=..., verbosity=1)`
+`evaluate!(mach, resampling=[(fold1, fold2), (fold2, fold1)], measure=rms)` 
 
 
 #### Ranges for tuning
@@ -213,7 +232,7 @@ Supervised, with final node `yhat` returning point-predictions:
 
 Supervised, with `yhat` final node returning probabilistic predictions:
 
-`@from_network Composite(knn=network_knn) <= yhat is_probabistic=true`
+`@from_network Composite(knn=network_knn) <= yhat is_probabilistic=true`
 
 
 Unsupervised, with final node `Xout`:

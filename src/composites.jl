@@ -10,6 +10,20 @@ MLJBase.is_wrapper(::Type{ProbabilisticNetwork}) = true
 function MLJBase.update(model::Union{SupervisedNetwork,UnsupervisedNetwork},
                         verbosity, yhat, cache, args...)
 
+    # If any `model` field has been replaced (and not just mutated)
+    # then we actually need to fit rather than update (which will
+    # force build of a new learning network). If `model` has been
+    # created using a learning network export macro, the test used
+    # below is perfect. In any other case it is at least conservative:
+    network_model_ids = objectid.(models(yhat))
+    fields = [getproperty(model, name) for
+        name in fieldnames(typeof(model))]
+    submodels = filter(f->f isa Model, fields)
+    submodel_ids = objectid.(submodels)
+    if !issubset(submodel_ids, network_model_ids)
+        return fit(model, verbosity, args...)
+    end
+
     is_anonymised = cache isa NamedTuple{(:sources, :data)}
 
     if is_anonymised
@@ -18,6 +32,7 @@ function MLJBase.update(model::Union{SupervisedNetwork,UnsupervisedNetwork},
             rebind!(sources[k], data[k])
         end
     end
+
     fit!(yhat; verbosity=verbosity)
     if is_anonymised
         for s in sources
@@ -159,7 +174,7 @@ function Base.replace(W::Node, pairs::Pair...)
 function fit_method(network, models...)
 
     network_Xs = sources(network, kind=:input)[1]
-    
+
     function fit(model::M, verbosity, X, y) where M <: Supervised
         replacement_models = [getproperty(model, fld)
                               for fld in fieldnames(M)]
@@ -191,7 +206,7 @@ function fit_method(network, models...)
         Xout = replace(network, replacements...)
         Set([Xs]) == Set(sources(Xout)) ||
             error("Failed to replace sources in network blueprint. ")
-        
+
         fit!(Xout, verbosity=verbosity)
 
         return fitresults(Xout)
@@ -308,7 +323,7 @@ function from_network_(modl, modeltype_ex, fieldname_exs, model_exs,
     # code defining the composite model struct and fit method:
     program1 = quote
 
-        struct $modeltype_ex <: MLJ.$kind
+        mutable struct $modeltype_ex <: MLJ.$kind
             $(fieldname_exs...)
         end
 

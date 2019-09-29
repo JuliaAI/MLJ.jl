@@ -1,7 +1,13 @@
 # Working with Tasks
 
-*Warning.* The task API described here is likely change soon, with the notion of
-task being not bound to any particular data set.
+
+*Warning.* The formal task API described here may be depreciated in
+the future. It is now recommended that the user use the `matching`
+method desribed in [Model Search](model_search.md) to match models to
+machine learning tasks (which can be understood there as simply
+`Bool`-valued functions on models).
+
+---
 
 In MLJ a *task* is a synthesis of three elements: *data*, an
 *interpretation* of that data, and a *learning objective*. Once one has a
@@ -125,10 +131,4 @@ supervised
 unsupervised
 ```
 
-```@docs
-models
-```
 
-```@docs
-localmodels
-```

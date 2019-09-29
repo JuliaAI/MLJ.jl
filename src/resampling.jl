@@ -40,15 +40,15 @@ function Holdout(; fraction_train::Float64=0.7,
     Holdout(fraction_train, shuffle, rng)
 end
 
-function train_eval_pairs(holdout::Holdout, rows)
+function train_test_pairs(holdout::Holdout, rows)
     if holdout.rng isa Integer
         rng = MersenneTwister(holdout.rng)
     else
         rng = holdout.rng
     end
-    train, evalu = partition(rows, holdout.fraction_train,
+    train, test = partition(rows, holdout.fraction_train,
                              shuffle=holdout.shuffle, rng=rng)
-    return [(train, evalu),]
+    return [(train, test),]
 end
 
 
@@ -84,7 +84,7 @@ CV(; nfolds::Int=6,  shuffle::Bool=false,
    rng::Union{Int,AbstractRNG}=Random.GLOBAL_RNG) = 
        CV(nfolds, shuffle, rng)
 
-function train_eval_pairs(cv::CV, rows)
+function train_test_pairs(cv::CV, rows)
     if cv.rng isa Integer
         rng = MersenneTwister(cv.rng)
     else
@@ -137,7 +137,7 @@ measure or vector.
 Do `subtypes(MLJ.ResamplingStrategy)` to obtain a list of available resampling
 strategies. If `resampling` is not an object of type
 `MLJ.ResamplingStrategy`, then a vector of pairs (of the form
-`(train_rows, eval_rows)` is expected. For example, setting
+`(train_rows, test_rows)` is expected. For example, setting
 
     resampling = [(1:100), (101:200)), 
                    (101:200), (1:100)]
@@ -175,8 +175,8 @@ evaluate(model::Supervised, args...; kwargs...) =
     evaluate!(machine(model, args...); kwargs...)
 
 const AbstractRow = Union{AbstractVector{<:Integer}, Colon}
-const TrainEvalPair = Tuple{AbstractRow,AbstractRow}
-const TrainEvalPairs = AbstractVector{<:TrainEvalPair}
+const TrainTestPair = Tuple{AbstractRow,AbstractRow}
+const TrainTestPairs = AbstractVector{<:TrainTestPair}
 
 function _check_measure(model, measure, y, operation, override)
 
@@ -230,10 +230,10 @@ function evaluate!(mach::Machine, resampling;
                    rows=nothing, force=false,
                    check_measure=true, verbosity=1)
 
-    resampling isa TrainEvalPairs ||
+    resampling isa TrainTestPairs ||
         error("`resampling` must be an "*
               "MLJ.ResamplingStrategy or tuple of pairs "*
-              "of the form `(train_rows, eval_rows)`")
+              "of the form `(train_rows, test_rows)`")
 
     rows === nothing ||
         error("You cannot specify `rows` unless `resampling "*
@@ -361,7 +361,7 @@ function actual_rows_and_weights(rows, weights, N, verbosity)
     return _rows, _weights
 end
     
-# evaluation when ResamplingStrategy is passed (instead of train/eval rows):
+# evaluation when ResamplingStrategy is passed (instead of train/test rows):
 function evaluate!(mach::Machine, resampling::ResamplingStrategy;
                    weights=nothing, rows=nothing, verbosity=1, kwargs...)
 
@@ -369,7 +369,7 @@ function evaluate!(mach::Machine, resampling::ResamplingStrategy;
     _rows, _weights =
         actual_rows_and_weights(rows, weights, length(y), verbosity)
 
-    return evaluate!(mach::Machine, train_eval_pairs(resampling, _rows);
+    return evaluate!(mach::Machine, train_test_pairs(resampling, _rows);
                      weights=_weights, verbosity=verbosity, kwargs...)
 
 end

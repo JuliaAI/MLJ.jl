@@ -6,6 +6,8 @@ using MLJBase
 using Test
 using Statistics
 
+@load KNNRegressor
+
 N=50
 X = (a=rand(N), b=rand(N), c=rand(N))
 y = 2*X.a - X.c + 0.05*rand(N)

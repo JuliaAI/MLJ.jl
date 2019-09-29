@@ -8,6 +8,7 @@ using CategoricalArrays
 import Random.seed!
 seed!(1234)
 
+@load KNNRegressor
 
 @testset "network #1" begin
 

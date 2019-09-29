@@ -1,12 +1,13 @@
-# Evaluation of supervised models
+# Evaluating Model Performance
 
-MLJ allows quick evaluation of a model's performance against a battery
-of selected losses or scores. For more on available performance
-measures, see [Performance Measures](performance_measures.md).
+MLJ allows quick evaluation of a supervised model's performance
+against a battery of selected losses or scores. For more on available
+performance measures, see [Performance
+Measures](performance_measures.md).
 
 In addition to hold-out and cross-validation, the user can specify
-their own list of train/evaluation pairs of row indices for
-resampling, or define their own re-usable resampling strategies.
+their own list of train/test pairs of row indices for resampling, or
+define their own re-usable resampling strategies.
 
 For simultaneously evaluating *multiple* models and/or data
 sets, see [Benchmarking](benchmarking.md).
@@ -70,9 +71,9 @@ evaluate!(mach,
           weights=weights, verbosity=0)
 ```
 
-### User-specified train/evaluation sets
+### User-specified train/test sets
 
-Users can either provide their own list of train/evaluation pairs of row indices for resampling, as in this example:
+Users can either provide their own list of train/test pairs of row indices for resampling, as in this example:
 
 ```@repl evaluation_of_supervised_models
 fold1 = 1:6; fold2 = 7:12;
@@ -105,9 +106,9 @@ CV
 To define your own resampling strategy, make relevant parameters of
 your strategy the fields of a new type `MyResamplingStrategy <:
 MLJ.ResamplingStrategy`, and implement
-`MLJ.train_eval_pairs(my_strategy::MyStragegy, rows)`, a method which will take
+`MLJ.train_test_pairs(my_strategy::MyStragegy, rows)`, a method which will take
 a vector of indices `rows` and return a vector `[(t1, e1), (t2, e2),
-... (tk, ek)]` of train/evaluation pairs of row indices selected from
+... (tk, ek)]` of train/test pairs of row indices selected from
 `rows`. Here is the code for the `Holdout` strategy as an example:
 
 ```julia
@@ -130,7 +131,7 @@ function Holdout(; fraction_train::Float64=0.7,
     Holdout(fraction_train, shuffle, rng)
 end
 
-function train_eval_pairs(holdout::Holdout, rows)
+function train_test_pairs(holdout::Holdout, rows)
     if holdout.rng isa Integer
         rng = MersenneTwister(holdout.rng)
     else
