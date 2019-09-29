@@ -1,6 +1,6 @@
 module MLJ
 
-## EXPORTS 
+## EXPORTS
 
 export MLJ_VERSION
 
@@ -45,9 +45,9 @@ export nrows, nfeatures, color_off, color_on,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
     classes,
     partition, unpack,
-    mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,  
-    misclassification_rate, cross_entropy,      
-    default_measure,                            
+    mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,
+    misclassification_rate, cross_entropy,
+    default_measure,
     @load_boston, @load_ames, @load_iris, @load_reduced_ames,
     @load_crabs
 
@@ -103,12 +103,28 @@ using RecipesBase # for plotting
 
 const srcdir = dirname(@__FILE__) # the directory containing this file:
 const CategoricalElement = Union{CategoricalString,CategoricalValue}
-const MLJ_VERSION = Pkg.installed()["MLJ"]
+
+if VERSION ≤ v"1.4"
+    version = Pkg.installed()["MLJ"]
+else
+    # FIXME this is currently messy because it's been enacted then reverted
+    # see https://github.com/JuliaLang/julia/pull/33410
+    # and https://github.com/JuliaLang/Pkg.jl/pull/1086/commits/996c6b9b69ef0c058e0105427983622b7cc8cb1d
+    # → once it's stable, remove the try-catch and just use what's in the catch.
+    try
+        version = Pkg.installed()["MLJ"]
+    catch
+        uuid = Pkg.project().dependencies["MLJ"]
+        version = Pkg.dependencies()[uuid].version
+    end
+end
+
+const MLJ_VERSION = version
 
 ## INCLUDES
 
 include("utilities.jl")     # general purpose utilities
-include("machines.jl")    
+include("machines.jl")
 include("networks.jl")      # for building learning networks
 include("composites.jl")    # composite models & exporting learning networks
 include("pipelines.jl")     # pipelines (exported linear learning networks)
@@ -118,7 +134,7 @@ include("parameters.jl")    # hyperparameter ranges and grid generation
 include("tuning.jl")
 include("ensembles.jl")     # homogeneous ensembles
 include("model_matching.jl")# inferring model search criterion from data
-include("tasks.jl")         # enhancements to MLJBase task interface 
+include("tasks.jl")         # enhancements to MLJBase task interface
 include("scitypes.jl")      # extensions to ScientificTypes.sictype
 include("plotrecipes.jl")
 
