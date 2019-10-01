@@ -181,7 +181,7 @@ unsupervised model.
 
 Scientific types are julia types defined in the
 package
-rows=nothing, verbosity::Int=1, force::Bool=false),
+[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl),
 which also defines the convention used here (and there called *mlj*)
 for assigning a specific scientific type (interpretation) to each
 julia object (see the `scitype` examples below).
