@@ -553,7 +553,7 @@ MLJBase.metadata_pkg(DecisionTreeClassifier,name="DecisionTree",
 MLJBase.metadata_model(DecisionTreeClassifier,
                         input=MLJBase.Table(MLJBase.Continuous),
                         target=AbstractVector{<:MLJBase.Finite},
-                        output=Unknown,path="MLJModels.DecisionTree_.DecisionTreeClassifier")
+                        path="MLJModels.DecisionTree_.DecisionTreeClassifier")
  ```
 You can test all your declarations of traits by calling `MLJBase.info_dict(SomeModel)`.
 
