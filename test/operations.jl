@@ -1,5 +1,10 @@
 module TestOperations
 
+using MLJ
+using MLJBase
+using Test
+using Random
+
 if VERSION ≥ v"1.3.0-"
     @testset "|> syntax for pipelines" begin
         Random.seed!(142)
