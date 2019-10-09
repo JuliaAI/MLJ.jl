@@ -48,39 +48,41 @@ MLJModels.DecisionTree_.DecisionTreeClassifier(pruning_purity = 1.0,
                                                display_depth = 5,
                                                post_prune = false,
                                                merge_purity_threshold = 0.9,
-                                               pdf_smoothing = 0.05,) @ 8…00</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model can be evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
+                                               pdf_smoothing = 0.05,) @ 3…63</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model can be evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
                 resampling=CV(shuffle=true), measure=cross_entropy, verbosity=0)
-ERROR: MethodError: no method matching apply_tree_proba(::DecisionTree.Node{Float64,CategoricalArrays.CategoricalString{UInt8}}, ::SubArray{Float64,1,Array{Float64,2},Tuple{Int64,Base.Slice{Base.OneTo{Int64}}},true}, ::Array{CategoricalArrays.CategoricalString{UInt8},1})
-Closest candidates are:
-  apply_tree_proba(::DecisionTree.Node{S,T}, !Matched::Array{S,1}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:175
-  apply_tree_proba(::Union{DecisionTree.Leaf{T}, DecisionTree.Node{S,T}}, !Matched::Array{S,2}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:184
-  apply_tree_proba(!Matched::DecisionTree.Leaf{T}, !Matched::Array{S,1}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:171</code></pre><p>Evaluating against multiple performance measures is also possible. See <a href="evaluating_model_performance/">Evaluating Model Performance</a> for details.</p><h3><a class="nav-anchor" id="Fit-and-predict-1" href="#Fit-and-predict-1">Fit and predict</a></h3><p>To illustrate MLJ&#39;s fit and predict interface, let&#39;s perform the above evaluations by hand.</p><p>Wrapping the model in data creates a <em>machine</em> which will store training outcomes:</p><pre><code class="language-julia-repl">julia&gt; tree = machine(tree_model, X, y)
-Machine{DecisionTreeClassifier} @ 7…06</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
+(measure = MLJBase.CrossEntropy[cross_entropy],
+ measurement = [0.36033738780075897],
+ per_fold = Array{Float64,1}[[0.03278982282299072, 0.03278982282299072, 0.5241111702896428, 0.3603373878007589, 0.3603373878007591, 0.8516587352674112]],
+ per_observation = Array{Array{Float64,1},1}[[[0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073  …  0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073], [0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073  …  0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073], [0.03278982282299073, 0.03278982282299073, 4.127134385045092, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073  …  0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 4.127134385045092, 0.03278982282299073, 4.127134385045092, 0.03278982282299073, 0.03278982282299073], [0.03278982282299073, 0.03278982282299073, 4.127134385045092, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 4.127134385045092, 0.03278982282299073  …  0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073], [0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 4.127134385045092, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956  …  0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 4.127134385045092, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956], [0.032789822822990956, 0.032789822822990956, 4.127134385045092, 0.032789822822990956, 4.127134385045092, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 4.127134385045092, 4.127134385045092  …  0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956]]],)</code></pre><p>Evaluating against multiple performance measures is also possible. See <a href="evaluating_model_performance/">Evaluating Model Performance</a> for details.</p><h3><a class="nav-anchor" id="Fit-and-predict-1" href="#Fit-and-predict-1">Fit and predict</a></h3><p>To illustrate MLJ&#39;s fit and predict interface, let&#39;s perform the above evaluations by hand.</p><p>Wrapping the model in data creates a <em>machine</em> which will store training outcomes:</p><pre><code class="language-julia-repl">julia&gt; tree = machine(tree_model, X, y)
+Machine{DecisionTreeClassifier} @ 5…36</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
 
 julia&gt; fit!(tree, rows=train);
-[ Info: Training Machine{DecisionTreeClassifier} @ 7…06.
+[ Info: Training Machine{DecisionTreeClassifier} @ 5…36.
 
 julia&gt; yhat = predict(tree, X[test,:]);
-ERROR: MethodError: no method matching apply_tree_proba(::DecisionTree.Node{Float64,CategoricalArrays.CategoricalString{UInt8}}, ::SubArray{Float64,1,Array{Float64,2},Tuple{Int64,Base.Slice{Base.OneTo{Int64}}},true}, ::Array{CategoricalArrays.CategoricalString{UInt8},1})
-Closest candidates are:
-  apply_tree_proba(::DecisionTree.Node{S,T}, !Matched::Array{S,1}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:175
-  apply_tree_proba(::Union{DecisionTree.Leaf{T}, DecisionTree.Node{S,T}}, !Matched::Array{S,2}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:184
-  apply_tree_proba(!Matched::DecisionTree.Leaf{T}, !Matched::Array{S,1}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:171
 
 julia&gt; yhat[3:5]
-ERROR: UndefVarError: yhat not defined
+3-element Array{UnivariateFinite{String,UInt8,Float64},1}:
+ UnivariateFinite(setosa=&gt;0.9677419354838711, versicolor=&gt;0.01612903225806452, virginica=&gt;0.01612903225806452)
+ UnivariateFinite(setosa=&gt;0.9677419354838711, versicolor=&gt;0.01612903225806452, virginica=&gt;0.01612903225806452)
+ UnivariateFinite(setosa=&gt;0.016129032258064516, versicolor=&gt;0.016129032258064516, virginica=&gt;0.9677419354838709)
 
 julia&gt; cross_entropy(yhat, y[test]) |&gt; mean
-ERROR: UndefVarError: yhat not defined</code></pre><p>Notice that <code>yhat</code> is a vector of <code>Distribution</code> objects (because DecisionTreeClassifier makes probabilistic predictions). The methods of the <a href="https://github.com/JuliaStats/Distributions.jl">Distributions</a> package can be applied to such distributions:</p><pre><code class="language-julia-repl">julia&gt; broadcast(pdf, yhat[3:5], &quot;virginica&quot;) # predicted probabilities of virginica
-ERROR: UndefVarError: yhat not defined
+0.39673156168717766</code></pre><p>Notice that <code>yhat</code> is a vector of <code>Distribution</code> objects (because DecisionTreeClassifier makes probabilistic predictions). The methods of the <a href="https://github.com/JuliaStats/Distributions.jl">Distributions</a> package can be applied to such distributions:</p><pre><code class="language-julia-repl">julia&gt; broadcast(pdf, yhat[3:5], &quot;virginica&quot;) # predicted probabilities of virginica
+3-element Array{Float64,1}:
+ 0.01612903225806452
+ 0.01612903225806452
+ 0.9677419354838709
 
 julia&gt; mode.(yhat[3:5])
-ERROR: UndefVarError: yhat not defined</code></pre><p>Or, one can explicitly get modes by using <code>predict_mode</code> instead of <code>predict</code>:</p><pre><code class="language-julia-repl">julia&gt; predict_mode(tree, rows=test[3:5])
-ERROR: MethodError: no method matching apply_tree_proba(::DecisionTree.Node{Float64,CategoricalArrays.CategoricalString{UInt8}}, ::SubArray{Float64,1,Array{Float64,2},Tuple{Int64,Base.Slice{Base.OneTo{Int64}}},true}, ::Array{CategoricalArrays.CategoricalString{UInt8},1})
-Closest candidates are:
-  apply_tree_proba(::DecisionTree.Node{S,T}, !Matched::Array{S,1}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:175
-  apply_tree_proba(::Union{DecisionTree.Leaf{T}, DecisionTree.Node{S,T}}, !Matched::Array{S,2}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:184
-  apply_tree_proba(!Matched::DecisionTree.Leaf{T}, !Matched::Array{S,1}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:171</code></pre><p>Unsupervised models have a <code>transform</code> method instead of <code>predict</code>, and may optionally implement an <code>inverse_transform</code> method:</p><pre><code class="language-julia-repl">julia&gt; v = [1, 2, 3, 4]
+3-element Array{CategoricalArrays.CategoricalString{UInt8},1}:
+ &quot;setosa&quot;
+ &quot;setosa&quot;
+ &quot;virginica&quot;</code></pre><p>Or, one can explicitly get modes by using <code>predict_mode</code> instead of <code>predict</code>:</p><pre><code class="language-julia-repl">julia&gt; predict_mode(tree, rows=test[3:5])
+3-element Array{CategoricalArrays.CategoricalString{UInt8},1}:
+ &quot;setosa&quot;
+ &quot;setosa&quot;
+ &quot;virginica&quot;</code></pre><p>Unsupervised models have a <code>transform</code> method instead of <code>predict</code>, and may optionally implement an <code>inverse_transform</code> method:</p><pre><code class="language-julia-repl">julia&gt; v = [1, 2, 3, 4]
 4-element Array{Int64,1}:
  1
  2
@@ -88,14 +90,14 @@ Closest candidates are:
  4
 
 julia&gt; stand_model = UnivariateStandardizer()
-UnivariateStandardizer() @ 2…76
+UnivariateStandardizer() @ 2…16
 
 julia&gt; stand = machine(stand_model, v)
-Machine{UnivariateStandardizer} @ 9…49
+Machine{UnivariateStandardizer} @ 3…32
 
 julia&gt; fit!(stand)
-[ Info: Training Machine{UnivariateStandardizer} @ 9…49.
-Machine{UnivariateStandardizer} @ 9…49
+[ Info: Training Machine{UnivariateStandardizer} @ 3…32.
+Machine{UnivariateStandardizer} @ 3…32
 
 julia&gt; w = transform(stand, v)
 4-element Array{Float64,1}:
@@ -112,21 +114,19 @@ julia&gt; inverse_transform(stand, w)
  4.0</code></pre><p><a href="machines/">Machines</a> have an internal state which allows them to avoid redundant calculations when retrained, in certain conditions - for example when increasing the number of trees in a random forest, or the number of epochs in a neural network. The machine building syntax also anticipates a more general syntax for composing multiple models, as explained in <a href="composing_models/">Composing Models</a>.</p><p>There is a version of <code>evaluate</code> for machines as well as models. An exclamation point is added to the method name because machines are generally mutated when trained:</p><pre><code class="language-julia-repl">julia&gt; evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
                        measure=cross_entropy,
                        verbosity=0)
-ERROR: MethodError: no method matching apply_tree_proba(::DecisionTree.Node{Float64,CategoricalArrays.CategoricalString{UInt8}}, ::SubArray{Float64,1,Array{Float64,2},Tuple{Int64,Base.Slice{Base.OneTo{Int64}}},true}, ::Array{CategoricalArrays.CategoricalString{UInt8},1})
-Closest candidates are:
-  apply_tree_proba(::DecisionTree.Node{S,T}, !Matched::Array{S,1}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:175
-  apply_tree_proba(::Union{DecisionTree.Leaf{T}, DecisionTree.Node{S,T}}, !Matched::Array{S,2}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:184
-  apply_tree_proba(!Matched::DecisionTree.Leaf{T}, !Matched::Array{S,1}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:171</code></pre><p>Changing a hyperparameter and re-evaluating:</p><pre><code class="language-julia-repl">julia&gt; tree_model.max_depth = 3
+(measure = MLJBase.CrossEntropy[cross_entropy],
+ measurement = [0.1419723444822469],
+ per_fold = Array{Float64,1}[[0.1419723444822469]],
+ per_observation = Array{Array{Float64,1},1}[[[0.03278982282299073, 0.032789822822990956, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 4.127134385045092, 0.03278982282299073, 0.032789822822990956, 0.032789822822990956  …  0.032789822822990956, 0.03278982282299073, 0.032789822822990956, 0.032789822822990956, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073]]],)</code></pre><p>Changing a hyperparameter and re-evaluating:</p><pre><code class="language-julia-repl">julia&gt; tree_model.max_depth = 3
 3
 
 julia&gt; evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
                  measure=cross_entropy,
                  verbosity=0)
-ERROR: MethodError: no method matching apply_tree_proba(::DecisionTree.Node{Float64,CategoricalArrays.CategoricalString{UInt8}}, ::SubArray{Float64,1,Array{Float64,2},Tuple{Int64,Base.Slice{Base.OneTo{Int64}}},true}, ::Array{CategoricalArrays.CategoricalString{UInt8},1})
-Closest candidates are:
-  apply_tree_proba(::DecisionTree.Node{S,T}, !Matched::Array{S,1}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:175
-  apply_tree_proba(::Union{DecisionTree.Leaf{T}, DecisionTree.Node{S,T}}, !Matched::Array{S,2}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:184
-  apply_tree_proba(!Matched::DecisionTree.Leaf{T}, !Matched::Array{S,1}, ::Any) where {S, T} at /home/travis/.julia/packages/DecisionTree/efcVJ/src/classification/main.jl:171</code></pre><h3><a class="nav-anchor" id="Next-steps-1" href="#Next-steps-1">Next steps</a></h3><p>To learn a little more about what MLJ can do, take the MLJ <a href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/examples/tour/tour.ipynb">tour</a> or browse <a href="common_mlj_workflows/">Common MLJ Workflows</a>, returning to the manual as needed. <em>Read at least the remainder of this page before considering serious use of MLJ.</em></p><h3><a class="nav-anchor" id="Prerequisites-1" href="#Prerequisites-1">Prerequisites</a></h3><p>MLJ assumes some familiarity with the <code>CategoricalValue</code> and <code>CategoricalString</code> types from <a href="https://github.com/JuliaData/CategoricalArrays.jl">CategoricalArrays.jl</a>, used here for representing categorical data. For probabilistic predictors, a basic acquaintance with <a href="https://github.com/JuliaStats/Distributions.jl">Distributions.jl</a> is also assumed.</p><h3><a class="nav-anchor" id="Data-containers-and-scientific-types-1" href="#Data-containers-and-scientific-types-1">Data containers and scientific types</a></h3><p>The MLJ user should acquaint themselves with some basic assumptions about the form of data expected by MLJ, as outlined below. </p><pre><code class="language-none">machine(model::Supervised, X, y) 
+(measure = MLJBase.CrossEntropy[cross_entropy],
+ measurement = [0.18526641519410006],
+ per_fold = Array{Float64,1}[[0.18526641519410006]],
+ per_observation = Array{Array{Float64,1},1}[[[0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 1.1151415906193203, 0.03278982282299073  …  0.032789822822990956, 0.032789822822990956, 0.03278982282299073, 1.1151415906193203, 0.032789822822990956, 0.03278982282299073, 0.032789822822990956, 0.032789822822990956, 0.03278982282299073, 0.032789822822990956]]],)</code></pre><h3><a class="nav-anchor" id="Next-steps-1" href="#Next-steps-1">Next steps</a></h3><p>To learn a little more about what MLJ can do, take the MLJ <a href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/examples/tour/tour.ipynb">tour</a> or browse <a href="common_mlj_workflows/">Common MLJ Workflows</a>, returning to the manual as needed. <em>Read at least the remainder of this page before considering serious use of MLJ.</em></p><h3><a class="nav-anchor" id="Prerequisites-1" href="#Prerequisites-1">Prerequisites</a></h3><p>MLJ assumes some familiarity with the <code>CategoricalValue</code> and <code>CategoricalString</code> types from <a href="https://github.com/JuliaData/CategoricalArrays.jl">CategoricalArrays.jl</a>, used here for representing categorical data. For probabilistic predictors, a basic acquaintance with <a href="https://github.com/JuliaStats/Distributions.jl">Distributions.jl</a> is also assumed.</p><h3><a class="nav-anchor" id="Data-containers-and-scientific-types-1" href="#Data-containers-and-scientific-types-1">Data containers and scientific types</a></h3><p>The MLJ user should acquaint themselves with some basic assumptions about the form of data expected by MLJ, as outlined below. </p><pre><code class="language-none">machine(model::Supervised, X, y) 
 machine(model::Unsupervised, X)</code></pre><p>Each supervised model in MLJ declares the permitted <em>scientific type</em> of the inputs <code>X</code> and targets <code>y</code> that can be bound to it in the first constructor above, rather than specifying specific machine types (such as <code>Array{Float32, 2}</code>). Similar remarks apply to the input <code>X</code> of an unsupervised model.</p><p>Scientific types are julia types defined in the package <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes.jl</a>, which also defines the convention used here (and there called <em>mlj</em>) for assigning a specific scientific type (interpretation) to each julia object (see the <code>scitype</code> examples below).</p><p>The basic &quot;scalar&quot; scientific types are <code>Continuous</code>, <code>Multiclass{N}</code>, <code>OrderedFactor{N}</code> and <code>Count</code>. Be sure you read <a href="#Container-element-types-1">Container element types</a> below to be guarantee your scalar data is interpreted correctly. Tools exist to coerce the data to have the appropriate scientfic type; see <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes.jl</a> or run <code>?coerce</code> for details.</p><p>Additionally, most data containers - such as tuples, vectors, matrices and tables - have a scientific type.</p><p><img src="scitypes.png" alt/></p><p><em>Figure 1. Part of the scientific type heirarchy in</em> ScientificTypes.jl.</p><pre><code class="language-julia-repl">julia&gt; scitype(4.6)
 Continuous
 
@@ -140,8 +140,8 @@ AbstractArray{Multiclass{3},1}
 
 julia&gt; X = (x1=x1, x2=rand(4), x3=rand(4))  # a &quot;column table&quot;
 (x1 = CategoricalArrays.CategoricalString{UInt32}[&quot;yes&quot;, &quot;no&quot;, &quot;yes&quot;, &quot;maybe&quot;],
- x2 = [0.5649737076274397, 0.48834014229240696, 0.2745200424509471, 0.31230755490013196],
- x3 = [0.30065512885625667, 0.4039700620085598, 0.7696457505243357, 0.9238381746211899],)
+ x2 = [0.8215513659665108, 0.35095971076015475, 0.3693395490980471, 0.2034044910786288],
+ x3 = [0.20629639310130443, 0.8804610492047296, 0.5342469059503165, 0.11965800173553998],)
 
 julia&gt; scitype(X)
 Table{Union{AbstractArray{Continuous,1}, AbstractArray{Multiclass{3},1}}}</code></pre><h4><a class="nav-anchor" id="Tabular-data-1" href="#Tabular-data-1">Tabular data</a></h4><p>All data containers compatible with the <a href="https://github.com/JuliaData/Tables.jl">Tables.jl</a> interface (which includes all source formats listed <a href="https://github.com/queryverse/IterableTables.jl">here</a>) have the scientific type <code>Table{K}</code>, where <code>K</code> depends on the scientific types of the columns, which can be individually inspected using <code>schema</code>:</p><pre><code class="language-julia-repl">julia&gt; schema(X)
@@ -171,4 +171,4 @@ DecisionTreeClassifier from DecisionTree.jl.
  prediction_type = :probabilistic,
  supports_weights = false,
  input_scitype = Table{_s13} where _s13&lt;:(AbstractArray{_s12,1} where _s12&lt;:Continuous),
- target_scitype = AbstractArray{_s656,1} where _s656&lt;:Finite,)</code></pre><h4><a class="nav-anchor" id="Container-element-types-1" href="#Container-element-types-1">Container element types</a></h4><p>Models in MLJ will always apply the <em>mlj</em> convention described in <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes.jl</a> to decide how to interpret the elements of your container types. Here are the key aspects of that convention:</p><ul><li><p>Any <code>AbstractFloat</code> is interpreted as <code>Continuous</code>.</p></li><li><p>Any <code>Integer</code> is interpreted as <code>Count</code>. </p></li><li><p>Any <code>CategoricalValue</code> or <code>CategoricalString</code>, <code>x</code>, is interpreted as <code>Multiclass</code> or <code>OrderedFactor</code>, depending on the value of <code>x.pool.ordered</code>.</p></li><li><p><code>String</code>s and <code>Char</code>s are <em>not</em> interpreted as <code>Finite</code>; they have <code>Unknown</code> scitype. Coerce vectors of strings or characters to <code>CategoricalVector</code>s if they represent <code>Multiclass</code> or <code>OrderedFactor</code> data. Do <code>?coerce</code> and <code>?unpack</code> to learn how. </p></li><li><p>In particular, <em>integers</em> (including <code>Bool</code>s) <em>cannot be used to represent categorical data.</em></p></li></ul><footer><hr/><a class="next" href="common_mlj_workflows/"><span class="direction">Next</span><span class="title">Common MLJ Workflows</span></a></footer></article></body></html>
+ target_scitype = AbstractArray{_s673,1} where _s673&lt;:Finite,)</code></pre><h4><a class="nav-anchor" id="Container-element-types-1" href="#Container-element-types-1">Container element types</a></h4><p>Models in MLJ will always apply the <em>mlj</em> convention described in <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes.jl</a> to decide how to interpret the elements of your container types. Here are the key aspects of that convention:</p><ul><li><p>Any <code>AbstractFloat</code> is interpreted as <code>Continuous</code>.</p></li><li><p>Any <code>Integer</code> is interpreted as <code>Count</code>. </p></li><li><p>Any <code>CategoricalValue</code> or <code>CategoricalString</code>, <code>x</code>, is interpreted as <code>Multiclass</code> or <code>OrderedFactor</code>, depending on the value of <code>x.pool.ordered</code>.</p></li><li><p><code>String</code>s and <code>Char</code>s are <em>not</em> interpreted as <code>Finite</code>; they have <code>Unknown</code> scitype. Coerce vectors of strings or characters to <code>CategoricalVector</code>s if they represent <code>Multiclass</code> or <code>OrderedFactor</code> data. Do <code>?coerce</code> and <code>?unpack</code> to learn how. </p></li><li><p>In particular, <em>integers</em> (including <code>Bool</code>s) <em>cannot be used to represent categorical data.</em></p></li></ul><footer><hr/><a class="next" href="common_mlj_workflows/"><span class="direction">Next</span><span class="title">Common MLJ Workflows</span></a></footer></article></body></html>
