@@ -34,6 +34,10 @@ end
   @test include("pipelines.jl")
 end
 
+@testset "operations" begin
+  @test include("operations.jl")
+end
+
 @testset "resampling" begin
     @test include("resampling.jl")
 end

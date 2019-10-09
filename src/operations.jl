@@ -89,7 +89,7 @@ end
 # Syntactic sugar for pipe syntax
 # we need version ≥ 1.3 in order to make use of multiple dispatch
 # over abstract types
-if VERSION ≥ v"1.3"
+if VERSION ≥ v"1.3.0-"
 
     (mach::AbstractMachine{<:Unsupervised})(data) = transform(mach, data)
     (mach::AbstractMachine{<:Supervised})(data)   = predict(mach, data)
