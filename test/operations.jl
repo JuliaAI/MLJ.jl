@@ -1,3 +1,5 @@
+module TestOperations
+
 if VERSION ≥ v"1.3.0-"
     @testset "|> syntax for pipelines" begin
         Random.seed!(142)
@@ -28,3 +30,6 @@ if VERSION ≥ v"1.3.0-"
         @test isapprox(rms(ŷ(rows=test), ys(rows=test)), 0.627123, rtol=1e-4)
     end
 end # version
+
+end
+true
