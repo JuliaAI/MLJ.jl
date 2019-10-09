@@ -35,7 +35,7 @@ end
 end
 
 @testset "operations" begin
-  @test include("operations.jl")
+  include("operations.jl")
 end
 
 @testset "resampling" begin

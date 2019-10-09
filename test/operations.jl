@@ -1,7 +1,7 @@
 if VERSION ≥ v"1.3.0-"
     @testset "|> syntax for pipelines" begin
         Random.seed!(142)
-        @load RidgeRegressor pkg="ScikitLearn"
+        @load RidgeRegressor pkg="MultivariateStats"
         @load KNNRegressor pkg="NearestNeighbors"
         X = MLJBase.table(randn(500, 5))
         y = abs.(randn(500))
@@ -19,12 +19,12 @@ if VERSION ≥ v"1.3.0-"
         W = Xs |> Standardizer()
         z = ys |> UnivariateBoxCoxTransformer()
         # "second layer"
-        ẑ = (W, z) |> RidgeRegressor(alpha=0.1)
+        ẑ = (W, z) |> RidgeRegressor(lambda=0.1)
         # "output layer"
         ŷ = ẑ |> inverse_transform(z)
 
         fit!(ŷ, rows=train)
 
-        @test isapprox(rms(ŷ(rows=test), ys(rows=test)), 0.627126, rtol=1e-4)
+        @test isapprox(rms(ŷ(rows=test), ys(rows=test)), 0.627123, rtol=1e-4)
     end
 end # version
