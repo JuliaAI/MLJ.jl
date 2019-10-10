@@ -241,10 +241,7 @@ Specifically, the requirement for an arbitrary model's input is `scitype(X)
 #### Targets
 
 The target `y` expected by MLJ models is generally an
-`AbstractVector`. A multivariate target `y` will generally be a vector of
-*tuples*. The tuples need not have uniform length, so some forms of
-sequence prediction are supported. Only the element types of `y`
-matter (the types of `y[j]` for each `j`). 
+`AbstractVector`. A multivariate target `y` will generally be table. 
 
 Specifically, the type requirement for a model target is `scitype(y) <:
 target_scitype(model)`.
