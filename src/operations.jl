@@ -103,3 +103,7 @@ if VERSION ≥ v"1.3.0-"
     inverse_transform(node::Node{<:NodalMachine{<:Unsupervised}}) =
         data->inverse_transform(node.machine, data)
 end # version ≥ 1.3
+
+# Syntactic sugar to directly access hyperparameters
+getindex(n::Node{<:NodalMachine{<:Model}}, s::Symbol) = getproperty(n.machine.model, s)
+setindex!(n::Node{<:NodalMachine{<:Model}}, v, s::Symbol) = setproperty!(n.machine.model, s, v)
