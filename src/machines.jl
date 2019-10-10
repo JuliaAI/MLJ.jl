@@ -102,7 +102,7 @@ is `stale`. A node `N` is stale if `N.machine` is stale or one of its
 arguments is stale. Source nodes are never stale.
 
 Note that a nodal machine obtains its training data by *calling* its
-node arguments on the specified `rows` (rather *indexing* its arguments
+node arguments on the specified `rows` (rather than *indexing* its arguments
 on those rows) and that this calling is a recursive operation on nodes
 upstream of those arguments.
 """
