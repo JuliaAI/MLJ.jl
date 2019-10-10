@@ -34,10 +34,11 @@ julia = "1"
 DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 LossFunctions = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
 MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
+MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
 NearestNeighbors = "b8a86587-4115-5ab1-83bc-aa920d37bbce"
 RDatasets = "ce6b1742-4840-55fa-b093-852dadbb1d8b"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [targets]
-test = ["DecisionTree", "LossFunctions", "MLJBase", "NearestNeighbors", "RDatasets", "Test", "UnicodePlots"]
+test = ["DecisionTree", "LossFunctions", "MLJBase", "MultivariateStats", "NearestNeighbors", "RDatasets", "Test", "UnicodePlots"]

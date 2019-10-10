@@ -104,22 +104,15 @@ using RecipesBase # for plotting
 const srcdir = dirname(@__FILE__) # the directory containing this file:
 const CategoricalElement = Union{CategoricalString,CategoricalValue}
 
-if VERSION ≤ v"1.4"
-    version = Pkg.installed()["MLJ"]
-else
-    # FIXME this is currently messy because it's been enacted then reverted
-    # see https://github.com/JuliaLang/julia/pull/33410
-    # and https://github.com/JuliaLang/Pkg.jl/pull/1086/commits/996c6b9b69ef0c058e0105427983622b7cc8cb1d
-    # → once it's stable, remove the try-catch and just use what's in the catch.
-    try
-        version = Pkg.installed()["MLJ"]
-    catch
-        uuid = Pkg.project().dependencies["MLJ"]
-        version = Pkg.dependencies()[uuid].version
-    end
-end
-
-const MLJ_VERSION = version
+# FIXME replace with either Pkg.installed()["MLJ"] or
+# uuid = Pkg.project().dependencies["MLJ"]
+# version = Pkg.dependencies()[uuid].version
+# ---
+# this is currently messy because it's been enacted then reverted
+# see https://github.com/JuliaLang/julia/pull/33410
+# and https://github.com/JuliaLang/Pkg.jl/pull/1086/commits/996c6b9b69ef0c058e0105427983622b7cc8cb1d
+toml = Pkg.TOML.parsefile(joinpath(dirname(dirname(pathof(MLJ))), "Project.toml"))
+const MLJ_VERSION = toml["version"]
 
 ## INCLUDES
 
