@@ -15,7 +15,7 @@ the simplified code excerpt in [Internals](internals.md).
 
 ```@example machines
 using MLJ; color_off() # hide
-forest = EnsembleModel(atom=(@load DecisionTreeClassifier), n=20);
+forest = EnsembleModel(atom=(@load DecisionTreeClassifier), n=10);
 X, y = @load_iris;
 mach = machine(forest, X, y)
 fit!(mach, verbosity=2);
