@@ -21,9 +21,6 @@ ScientificTypes = "321657f4-b219-11e9-178b-2701a2544e81"
 TypedTables = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9"
 
 [compat]
-DecisionTree = "0.8"
+DecisionTree = "0.8, 0.9.1"
 Documenter = "~0.22"
-Missings = "<0.4.2"
 julia = "1.2"
-MLJBase = "0.6"
-MLJModels = "0.5"
