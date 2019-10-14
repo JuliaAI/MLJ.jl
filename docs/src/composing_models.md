@@ -366,7 +366,7 @@ mutable struct WrappedRidgeII <: DeterministicNetwork
 end
 
 # keyword constructor
-WrappedRidgeII(; ridge=RidgeRegressor) = WrappedRidgeII(ridge);
+WrappedRidgeII(; ridge=RidgeRegressor()) = WrappedRidgeII(ridge); 
 ```
 
 We now simply cut and paste the code defining the learning network

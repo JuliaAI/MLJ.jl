@@ -114,6 +114,7 @@ const CategoricalElement = Union{CategoricalString,CategoricalValue}
 toml = Pkg.TOML.parsefile(joinpath(dirname(dirname(pathof(MLJ))), "Project.toml"))
 const MLJ_VERSION = toml["version"]
 
+
 ## INCLUDES
 
 include("utilities.jl")     # general purpose utilities
