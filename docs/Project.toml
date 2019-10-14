@@ -27,5 +27,3 @@ Missings = "<0.4.2"
 julia = "1.2"
 MLJBase = "0.6"
 MLJModels = "0.5"
-DecisionTree = "0.8"
-
