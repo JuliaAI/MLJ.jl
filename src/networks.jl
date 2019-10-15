@@ -19,6 +19,14 @@ anything, even `nothing`, if the network is for exporting as a
 stand-alone model only. For training and testing the unexported network,
 appropriate vectors, tables, or other data containers are expected.
 
+    Xs = source()
+    ys = source(kind=:target)
+    ws = source(kind=:weight)
+
+Define source nodes wrapping `nothing` instead of concrete data. Such
+definitions suffice if a learning network is to be exported without
+testing.
+
 The calling behaviour of a `Source` object is this:
 
     Xs() = X
@@ -35,7 +43,8 @@ function source(X; kind=:input)
     return Source{kind}(X)
 end
 
-source(X::Source) = X
+source(X::Source; args...) = X
+source(; args...) = source(nothing; args...)
 
 is_stale(s::Source) = false
 
