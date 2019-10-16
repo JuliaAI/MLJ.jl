@@ -91,7 +91,7 @@ import ScientificTypes
 using DocStringExtensions: SIGNATURES, TYPEDEF
 
 # to be extended:
-import Base.==
+import Base: ==, getindex, setindex!
 import StatsBase.fit!
 
 # from Standard Library:

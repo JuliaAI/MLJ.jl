@@ -33,6 +33,11 @@ if VERSION ≥ v"1.3.0-"
         fit!(ŷ, rows=train)
 
         @test isapprox(rms(ŷ(rows=test), ys(rows=test)), 0.627123, rtol=1e-4)
+
+        # shortcut to get and set hyperparameters of a node
+        ẑ[:lambda] = 5.0
+        fit!(ŷ, rows=train)
+        @test isapprox(rms(ŷ(rows=test), ys(rows=test)), 0.62699, rtol=1e-4)
     end
 end # version
 
