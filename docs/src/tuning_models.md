@@ -8,7 +8,7 @@ supplied data to train the best model. Making predictions using this
 fitted machine then amounts to predicting using a machine based on the
 unwrapped model with the specified hyperparameters optimized. In this
 way the wrapped model may be viewed as a "self-tuning" version of the
-    unwrapped model.
+unwrapped model.
 
 
 ### Tuning a single hyperparameter
@@ -120,10 +120,14 @@ plot(self_tuning_forest)
 
 ![](tuning_plot.png)
 
+It is also possible to specify different resolutions for each
+dimension of the grid. See [Grid](@ref) below for details.
+
 
 ### API
 
 ```@docs
 MLJ.range
+MLJ.Grid
 MLJ.TunedModel
 ```

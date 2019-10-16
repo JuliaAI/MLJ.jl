@@ -26,16 +26,16 @@ end
   @test include("networks.jl")
 end
 
+@testset "operations" begin
+  @test include("operations.jl")
+end
+
 @testset "composites" begin
   @test include("composites.jl")
 end
 
 @testset "pipelines" begin
   @test include("pipelines.jl")
-end
-
-@testset "operations" begin
-  @test include("operations.jl")
 end
 
 @testset "resampling" begin

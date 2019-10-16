@@ -1,17 +1,29 @@
 abstract type TuningStrategy <: MLJ.MLJType end
+const ParameterName=Union{Symbol,Expr}
 
 """
-$TYPEDEF
+    Grid(resolution=10, parallel=true)
 
-Grid object for a grid search tuning strategy.
+Define a grid-based hyperparameter tuning strategy, using the
+specified `resolution` for numeric hyperparameters. For use with a
+`TunedModel` object.
+
+Individual hyperparameter resolutions can also be specified, as in
+
+    Grid(resolution=[:n => r1, :(atom.max_depth) => r2])
+
+where `r1` and `r2` are `NumericRange` objects.
+
+See also [TunedModel](@ref), [range](@ref).
+
 """
 mutable struct Grid <: TuningStrategy
-    resolution::Int
+    resolution::Union{Int,Vector{<:Pair{<:ParameterName,Int}}}
     parallel::Bool
 end
 
 # Constructor with keywords
-Grid(; resolution::Int=10, parallel::Bool=true) = Grid(resolution, parallel)
+Grid(; resolution=10, parallel::Bool=true) = Grid(resolution, parallel)
 
 MLJBase.show_as_constructed(::Type{<:Grid}) = true
 
@@ -25,9 +37,9 @@ mutable struct DeterministicTunedModel{T,M<:Deterministic} <: MLJ.Deterministic
     tuning::T  # tuning strategy
     resampling # resampling strategy
     measure
-    weights::Union{Nothing,AbstractVector{<:Real}}
+    weights::Union{Nothing,Vector{<:Real}}
     operation
-    ranges::Union{AbstractVector{<:ParamRange},ParamRange}
+    ranges::Union{Vector{<:ParamRange},ParamRange}
     full_report::Bool
     train_best::Bool
 end
@@ -44,7 +56,7 @@ mutable struct ProbabilisticTunedModel{T,M<:Probabilistic} <: MLJ.Probabilistic
     measure
     weights::Union{Nothing,AbstractVector{<:Real}}
     operation
-    ranges::Union{AbstractVector{<:ParamRange},ParamRange}
+    ranges::Union{Vector{<:ParamRange},ParamRange}
     full_report::Bool
     train_best::Bool
 end
@@ -68,7 +80,7 @@ Construct a model wrapper for hyperparameter optimization of a
 supervised learner.
 
 Calling `fit!(mach)` on a machine `mach=machine(tuned_model, X, y)` or
-`mach=machine(tuned_model, task)` will: 
+`mach=machine(tuned_model, task)` will:
 
 - Instigate a search, over clones of `model`, with the hyperparameter
   mutations specified by `ranges`, for a model optimizing the specified
@@ -145,6 +157,28 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
         error("ranges must be a ParamRange object or a vector of " *
               "ParamRange objects. ")
 
+    # Build a vector of resolutions, one element per range. In case of
+    # OrdinalRange provide a dummy value of 5. In case of a dictionary
+    # with missing keys for the NumericRange`s, use fallback of 5.
+    resolution = tuned_model.tuning.resolution
+    if resolution isa Vector
+        val_given_field = Dict(resolution...)
+        fields = keys(val_given_field)
+        resolutions = map(ranges) do range
+            if range.field in fields
+                return val_given_field[range.field]
+            else
+                if range isa MLJ.NumericRange && verbosity > 0
+                    @warn "No resolution specified for "*
+                    "$(range.field). Will use a value of 5. "
+                end
+                return 5
+            end
+        end
+    else
+        resolutions = fill(resolution, length(ranges))
+    end
+
     if tuned_model.measure isa AbstractVector
         measure = tuned_model.measure[1]
         verbosity >=0 &&
@@ -152,7 +186,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     else
         measure = tuned_model.measure
     end
-    
+
     minimize = ifelse(orientation(measure) == :loss, true, false)
 
     if verbosity > 0 && tuned_model.train_best
@@ -172,17 +206,18 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
     resampler = Resampler(model=clone,
                           resampling=tuned_model.resampling,
                           measure=measure,
-                          weights=tuned_model.weights, 
+                          weights=tuned_model.weights,
                           operation=tuned_model.operation)
 
     resampling_machine = machine(resampler, X, y)
 
     # tuple of iterators over hyper-parameter values:
-    iterators = map(ranges) do range
+    iterators = map(eachindex(ranges)) do j
+        range = ranges[j]
         if range isa MLJ.NominalRange
             MLJ.iterator(range)
         elseif range isa MLJ.NumericRange
-            MLJ.iterator(range, tuned_model.tuning.resolution)
+            MLJ.iterator(range, resolutions[j])
         else
             throw(TypeError(:iterator, "", MLJ.ParamRange, rrange))
         end
