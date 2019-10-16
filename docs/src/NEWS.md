@@ -15,6 +15,10 @@ News for MLJ and its satellite packages: [MLJBase](https://github.com/alan-turin
 
 ## News
 
+### 17 Oct 2019
+
+MLJBase 0.7 released.
+
 ### 11 Oct 2019
 
 MLJ 0.5.1 released.
