@@ -21,7 +21,7 @@ matrix:
   - julia: nightly
 
 after_success:
- - julia -e 'import Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
+ - julia -e 'import Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
 
 ## uncomment following lines to deploy documentation
 jobs:
