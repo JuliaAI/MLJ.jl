@@ -408,9 +408,9 @@ completes the export process.
 
 
 ```julia
-using CSV
-X, y = load_boston()()
-evaluate(wrapped_ridgeI, X, y, resampling=CV(), measure=rms, verbosity=0)
+X, y = @load_boston
+wrapped_ridgeII = WrappedRidgeII()
+evaluate(wrapped_ridgeII, X, y, resampling=CV(), measure=rms, verbosity=0)
 ```
 
 ```julia
