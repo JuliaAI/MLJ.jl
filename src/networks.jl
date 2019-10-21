@@ -3,12 +3,12 @@
 abstract type AbstractNode <: MLJType end
 
 # K is :target, :input, :weight or :unknown
-mutable struct Source{K} <: AbstractNode 
+mutable struct Source{K} <: AbstractNode
     data  # training data
 end
 
 """
-    Xs = source(X) 
+    Xs = source(X)
     ys = source(y, kind=:target)
     ws = source(w, kind=:weight)
 
@@ -292,14 +292,6 @@ function (y::Node)(Xnew)
     return (y.operation)(y.machine, [arg(Xnew) for arg in y.args]...)
 end
 
-"""
-$SIGNATURES
-
-Allow nodes to share the `selectrows(X, r)` syntax of concrete tabular data (needed for
-`fit(::AbstractMachine, ...)` in machines.jl).
-"""
-MLJBase.selectrows(X::AbstractNode, r) = X(rows=r)
-
 # and for the special case of static operations:
 (y::Node{Nothing})(; rows=:) = (y.operation)([arg(rows=rows) for arg in y.args]...)
 (y::Node{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
@@ -456,6 +448,25 @@ import Base.+
 
 import Base.*
 *(lambda::Real, y::AbstractNode) = node(y->lambda*y, y)
+
+"""
+    selectcols(X::AbstractNode, c)
+
+Returns `Node` object `N` such that `N() = selectcols(X(), c)`.
+
+"""
+MLJBase.selectcols(X::AbstractNode, r) = node(XX->selectcols(XX, r),
+X)
+
+"""
+    selectrows(X::AbstractNode, r)
+
+Returns a `Node` object `N` such that `N() = selectrows(X(), r)` (and
+`N(rows=s) = selectrows(X(rows=s), r)`).
+
+"""
+MLJBase.selectrows(X::AbstractNode, r) = node(XX->selectrows(XX, r),
+X)
 
 
 ## INSPECTING LEARNING NETWORKS
