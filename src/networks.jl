@@ -3,12 +3,12 @@
 abstract type AbstractNode <: MLJType end
 
 # K is :target, :input, :weight or :unknown
-mutable struct Source{K} <: AbstractNode 
+mutable struct Source{K} <: AbstractNode
     data  # training data
 end
 
 """
-    Xs = source(X) 
+    Xs = source(X)
     ys = source(y, kind=:target)
     ws = source(w, kind=:weight)
 
@@ -18,6 +18,14 @@ sample weights `w`.  The values of each variable `X, y, w` can be
 anything, even `nothing`, if the network is for exporting as a
 stand-alone model only. For training and testing the unexported network,
 appropriate vectors, tables, or other data containers are expected.
+
+    Xs = source()
+    ys = source(kind=:target)
+    ws = source(kind=:weight)
+
+Define source nodes wrapping `nothing` instead of concrete data. Such
+definitions suffice if a learning network is to be exported without
+testing.
 
 The calling behaviour of a `Source` object is this:
 
@@ -35,7 +43,8 @@ function source(X; kind=:input)
     return Source{kind}(X)
 end
 
-source(X::Source) = X
+source(X::Source; args...) = X
+source(; args...) = source(nothing; args...)
 
 is_stale(s::Source) = false
 
@@ -283,14 +292,6 @@ function (y::Node)(Xnew)
     return (y.operation)(y.machine, [arg(Xnew) for arg in y.args]...)
 end
 
-"""
-$SIGNATURES
-
-Allow nodes to share the `selectrows(X, r)` syntax of concrete tabular data (needed for
-`fit(::AbstractMachine, ...)` in machines.jl).
-"""
-MLJBase.selectrows(X::AbstractNode, r) = X(rows=r)
-
 # and for the special case of static operations:
 (y::Node{Nothing})(; rows=:) = (y.operation)([arg(rows=rows) for arg in y.args]...)
 (y::Node{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
@@ -447,6 +448,25 @@ import Base.+
 
 import Base.*
 *(lambda::Real, y::AbstractNode) = node(y->lambda*y, y)
+
+"""
+    selectcols(X::AbstractNode, c)
+
+Returns `Node` object `N` such that `N() = selectcols(X(), c)`.
+
+"""
+MLJBase.selectcols(X::AbstractNode, r) = node(XX->selectcols(XX, r),
+X)
+
+"""
+    selectrows(X::AbstractNode, r)
+
+Returns a `Node` object `N` such that `N() = selectrows(X(), r)` (and
+`N(rows=s) = selectrows(X(rows=s), r)`).
+
+"""
+MLJBase.selectrows(X::AbstractNode, r) = node(XX->selectrows(XX, r),
+X)
 
 
 ## INSPECTING LEARNING NETWORKS
