@@ -129,7 +129,7 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
         data_has_changed =
             rows_have_changed || (upstream_state != mach.upstream_state)
         previously_fit = (mach.state > 0)
-        args = [arg(rows=rows) g in mach.args]
+        args = [arg(rows=rows) for arg in mach.args]
     else
         data_has_changed = rows_have_changed
         previously_fit = isdefined(mach, :fitresult)
