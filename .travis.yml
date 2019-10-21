@@ -1,4 +1,4 @@
-## Documentation: http://docs.travis-ci.com/user/languages/julia/
+### Documentation: http://docs.travis-ci.com/user/languages/julia/
 language: julia
 os:
   - linux
@@ -21,7 +21,7 @@ matrix:
   - julia: nightly
 
 after_success:
- - julia -e 'import Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder()); Codecov.submit(process_folder())'
+ - julia -e 'import Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
 
 ## uncomment following lines to deploy documentation
 jobs:
@@ -35,7 +35,7 @@ jobs:
         - |
           julia --color=yes --project=docs/ -e'
             using Pkg
-            Pkg.pin(PackageSpec(name="Missings", version="0.4.1"));Pkg.add(PackageSpec(name="MLJBase", rev="master"));Pkg.add(PackageSpec(name="MLJModels", rev="master"));Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.add(PackageSpec(name="MLJBase", rev="master"));Pkg.add(PackageSpec(name="MLJModels", rev="master"));Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
             include("docs/make.jl")
           '

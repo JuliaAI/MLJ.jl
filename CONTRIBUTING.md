@@ -120,9 +120,3 @@ Julia Computing and New Zealand eScience Infrastructure.
     Valentin Churavy, Harvey Devereux, Mosè Giordano, Thibaut Lienart,
     Mohammed Nook, Piotr Oleśkiewicz, Julian Samaroo, Ayush Shridar,
     Yiannis Simillides, Annika Stechemesser
-
-
-
-
-
-

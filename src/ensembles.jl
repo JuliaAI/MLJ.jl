@@ -13,6 +13,19 @@ mutable struct WrappedEnsemble{R,Atom <: Supervised} <: MLJType
     ensemble::Vector{R}
 end
 
+# Corner case: To address very special case of wrapped ensembles of
+# categorical elements (eg, ensembles of fitresults for
+# ConstantClassifier). These appear because doing comprehension with
+# categorical elements gives CategoricalVector instead of Vector, but
+# Vector is required in above struct definition.
+function WrappedEnsemble(atom, ensemble::AbstractVector{L}) where L
+    ensemble_vec = Vector{L}(undef, length(ensemble))
+    for k in eachindex(ensemble)
+        ensemble_vec[k] = ensemble[k]
+    end
+    return WrappedEnsemble(atom, ensemble_vec)
+end
+
 # to enable trait-based dispatch of predict:
 predict(wens::WrappedEnsemble{R,Atom}, weights, Xnew) where {R,Atom<:Deterministic} =
     predict(wens, weights, Xnew, Deterministic, target_scitype(Atom))
