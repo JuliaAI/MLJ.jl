@@ -12,6 +12,10 @@ include("foobarmodel.jl")
 
 @test CV(nfolds=6) == CV(nfolds=6)
 @test CV(nfolds=5) != CV(nfolds=6)
+@test MLJ.train_test_pairs(CV(), 1:10) !=
+     MLJ.train_test_pairs(CV(shuffle=true), 1:10)
+@test MLJ.train_test_pairs(Holdout(), 1:10) !=
+     MLJ.train_test_pairs(Holdout(shuffle=true), 1:10)
 
 @testset "checking measure/model compatibility" begin
     model = ConstantRegressor()

@@ -95,7 +95,7 @@ function train_test_pairs(cv::CV, rows)
     nfolds = cv.nfolds
 
     if cv.shuffle
-        shuffle!(rng, collect(rows))
+        rows=shuffle!(rng, collect(rows))
     end
 
     # number of observations per fold
