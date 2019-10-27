@@ -1,4 +1,4 @@
-rabstract type TuningStrategy <: MLJ.MLJType end
+abstract type TuningStrategy <: MLJ.MLJType end
 const ParameterName=Union{Symbol,Expr}
 
 """
