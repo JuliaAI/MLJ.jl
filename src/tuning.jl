@@ -1,4 +1,4 @@
-abstract type TuningStrategy <: MLJ.MLJType end
+rabstract type TuningStrategy <: MLJ.MLJType end
 const ParameterName=Union{Symbol,Expr}
 
 """
@@ -219,7 +219,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
         elseif range isa MLJ.NumericRange
             MLJ.iterator(range, resolutions[j])
         else
-            throw(TypeError(:iterator, "", MLJ.ParamRange, rrange))
+            throw(TypeError(:iterator, "", MLJ.ParamRange, range))
         end
     end
 
