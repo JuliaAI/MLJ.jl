@@ -32,15 +32,8 @@ term:
   available models, as well as model metadata (whether a model handles
   categorical inputs, whether is can make probabilistic predictions,
   etc) must be gleaned from documentation. In MLJ, this information is
-  more structured and is accessible to MLJ via an external model
-  registry (without the models needing to be loaded). This forms the
-  basis of a "task" interface and facilitates model composition (see
-  below).
-  
-- **Task interface.** Once the MLJ user specifies a "task" (e.g., "make
-  probabilistic predictions of home value, based on features x, y, z")
-  then MLJ can automatically search for models matching that task,
-  assisting in systematic benchmarking and model selection.
+  more structured and is accessible to MLJ via a searchable model
+  registry (without the models needing to be loaded).
   
 - **Flexible API for model composition.** Pipelines in scikit-learn are
   more of an afterthought than an integral part of the original
@@ -79,6 +72,6 @@ term:
   whose support includes the missing class, but which is appropriately
   weighted with probability zero.
   
-Finally, we note that there is a project underway to implement (some
-of) the ScikitLearn.jl models as MLJ models, as an temporary expedient.
+Finally, we note that a large number of ScikitLearn.jl models are now
+wrapped for use in MLJ.
   
