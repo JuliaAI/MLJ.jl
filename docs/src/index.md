@@ -179,9 +179,8 @@ constructor above, rather than specifying specific machine types (such
 as `Array{Float32, 2}`). Similar remarks apply to the input `X` of an
 unsupervised model.
 
-Scientific types are julia types defined in the
-package
-rows=nothing, verbosity::Int=1, force::Bool=false),
+Scientific types are julia types defined in the package
+[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl),
 which also defines the convention used here (and there called *mlj*)
 for assigning a specific scientific type (interpretation) to each
 julia object (see the `scitype` examples below).
