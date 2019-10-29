@@ -125,7 +125,7 @@ end
               measure=nothing, 
               weights=nothing,
               operation=predict,  
-              parallel=true,
+              acceleration=DEFAULT_RESOURCE[],
               force=false, 
               verbosity=1)
 
@@ -155,6 +155,10 @@ User-defined measures are supported; see the manual for details.
 
 If no measure is specified, then `default_measure(mach.model)` is
 used, unless this default is `nothing` and an error is thrown.
+
+The `acceleration` keyword argument is used to specify the compute resource (a
+subtype of `ComputationalResources.AbstractResource`) that will be used to
+accelerate/parallelize the resampling operation.
 
 Although evaluate! is mutating, `mach.model` and `mach.args` are
 untouched.
@@ -223,10 +227,29 @@ function _check_measure(model, measure, y, operation, override)
 
 end
 
+function _evaluate!(func::Function, res::CPU1, nfolds, verbosity)
+    p = Progress(nfolds + 1, dt=0, desc="Evaluating over $nfolds folds: ",
+                 barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
+    verbosity > 0 && next!(p)
+    return reduce(vcat, (func(k, p, verbosity) for k in 1:nfolds))
+end
+function _evaluate!(func::Function, res::CPUProcesses, nfolds, verbosity)
+    # TODO: use pmap here ?:
+    return @distributed vcat for k in 1:nfolds
+        func(k)
+    end
+end
+@static if VERSION >= v"1.3.0-DEV.573"
+    function _evaluate!(func::Function, res::CPUThreads, nfolds, verbosity)
+        task_vec = [Threads.@spawn func(k) for k in 1:nfolds]
+        return fetch.(task_vec)
+    end
+end
+
 # if `resampling` is not a ResamplingStrategy object:
 function evaluate!(mach::Machine, resampling;
                    measure=nothing, weights=nothing,
-                   operation=predict, parallel=true,
+                   operation=predict, acceleration=DEFAULT_RESOURCE[],
                    rows=nothing, force=false,
                    check_measure=true, verbosity=1)
 
@@ -253,7 +276,7 @@ function evaluate!(mach::Machine, resampling;
     y = mach.args[2]
 
     [_check_measure(mach.model, m, y, operation, !check_measure) for m in measures]
-    
+
     if verbosity >= 0 && weights !== nothing
         unsupported = filter(measures) do m
             !supports_weights(m)
@@ -290,27 +313,14 @@ function evaluate!(mach::Machine, resampling;
         return ret
     end
 
-    if parallel && nworkers() > 1
-
+    measurements_flat = if acceleration isa CPUProcesses
         ## TODO: progress meter for distributed case
         if verbosity > 0
             @info "Distributing cross-validation computation " *
                   "among $(nworkers()) workers."
         end
-        # TODO: use pmap here ?:
-        measurements_flat = @distributed vcat for k in 1:nfolds
-            get_measurements(k)
-        end
-
-    else
-
-        p = Progress(nfolds + 1, dt=0, desc="Evaluating over $nfolds folds: ",
-                     barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
-        verbosity > 0 && next!(p)
-        measurements_flat =
-            reduce(vcat, (get_measurements(k, p, verbosity) for k in 1:nfolds))
-
     end
+    measurements_flat = _evaluate!(get_measurements, acceleration, nfolds, verbosity)
 
     # in the following rows=folds, columns=measures:
     measurements_matrix = permutedims(
@@ -324,7 +334,7 @@ function evaluate!(mach::Machine, resampling;
             missing
         end
     end
-    
+
     # measurements for each fold: 
     per_fold = map(1:nmeasures) do m
         if reports_each_observation(measures[m])
@@ -388,6 +398,7 @@ mutable struct Resampler{S,M<:Supervised} <: Supervised
     measure
     weights::Union{Nothing,AbstractVector{<:Real}}
     operation
+    acceleration::AbstractResource
 end
 
 MLJBase.package_name(::Type{<:Resampler}) = "MLJ"
@@ -395,8 +406,10 @@ MLJBase.is_wrapper(::Type{<:Resampler}) = true
 
 
 Resampler(; model=ConstantRegressor(), resampling=Holdout(),
-            measure=nothing, weights=nothing, operation=predict) =
-                Resampler(model, resampling, measure, weights, operation)
+            measure=nothing, weights=nothing, operation=predict,
+            acceleration=DEFAULT_RESOURCE[]) =
+                Resampler(model, resampling, measure, weights, operation,
+                          acceleration)
 
 
 function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
@@ -415,7 +428,8 @@ function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
     fitresult = evaluate!(mach, resampler.resampling;
                           measure=measure, weights=resampler.weights,
                           operation=resampler.operation,
-                          verbosity=verbosity-1)
+                          verbosity=verbosity-1,
+                          acceleration=resampler.acceleration)
     
     cache = (mach, deepcopy(resampler.resampling))
     report = NamedTuple()

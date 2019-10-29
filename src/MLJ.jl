@@ -86,6 +86,9 @@ import PrettyTables
 import Random
 using ScientificTypes
 import ScientificTypes
+using ComputationalResources
+import ComputationalResources: CPUProcesses
+const DEFAULT_RESOURCE = Ref{AbstractResource}(CPU1())
 
 # convenience packages
 using DocStringExtensions: SIGNATURES, TYPEDEF
