@@ -544,6 +544,7 @@ MLJBase.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bens
 MLJBase.is_pure_julia(::Type{<:DecisionTreeClassifier}) = true
 ```
 Alternatively these traits can also be declared using `MLJBase.metadata_pkg` and `MLJBase.metadata_model` helper functions as:
+
 ```julia
 MLJBase.metadata_pkg(DecisionTreeClassifier,name="DecisionTree",
                      uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
@@ -554,7 +555,8 @@ MLJBase.metadata_model(DecisionTreeClassifier,
                         input=MLJBase.Table(MLJBase.Continuous),
                         target=AbstractVector{<:MLJBase.Finite},
                         path="MLJModels.DecisionTree_.DecisionTreeClassifier")
- ```
+```
+ 
 You can test all your declarations of traits by calling `MLJBase.info_dict(SomeModel)`.
 
 
