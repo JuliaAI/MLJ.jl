@@ -7,4 +7,6 @@ MLJModels.Standardizer
 MLJModels.OneHotEncoder
 MLJModels.FeatureSelector
 MLJModels.UnivariateBoxCoxTransformer
+MLJModels.UnivariateDiscretizer
+MLJModels.FillImputer
 ```
