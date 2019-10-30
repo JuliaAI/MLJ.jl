@@ -5,8 +5,6 @@ using Pkg
 using Documenter
 using MLJ
 using MLJBase
-using MLJModels.Transformers
-using MLJModels.Constant
 using MLJModels
 using ScientificTypes
 
@@ -34,7 +32,8 @@ pages = Any["Getting Started"=>"index.md",
             "MLJ Cheatsheet" => "mlj_cheatsheet.md",
             "MLJ News"=>"NEWS.md",
             "FAQ" => "frequently_asked_questions.md",
-            "Julia BlogPost"=>"julia_blogpost.md"]
+            "Julia BlogPost"=>"julia_blogpost.md",
+            "Acceleration and Parallelism"=>"acceleration_and_parallelism.md"]
 
 for p in pages
     println(first(p))
@@ -43,11 +42,9 @@ end
 makedocs(
     sitename = "MLJ",
     format = Documenter.HTML(),
-    modules = [MLJ, MLJBase, MLJModels, MLJModels.Transformers, MLJModels.Constant, ScientificTypes],
+    modules = [MLJ, MLJBase, MLJModels, ScientificTypes],
     pages=pages)
 
 deploydocs(
     repo = "github.com/alan-turing-institute/MLJ.jl.git"
 )
-
-

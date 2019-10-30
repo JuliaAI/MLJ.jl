@@ -177,6 +177,19 @@ end
     ys = source(y)
     @test vcat(ys, ys)() == vcat(y, y)
     @test hcat(ys, ys)() == hcat(y, y)
+    @test log(ys)() == log.(y)
+    @test exp(ys)() == exp.(y)
+
+    Z = (rand(4), rand(4), rand(4))
+    Zs = source(Z)
+    @test mean(Zs)() == mean.(Z)
+    @test mode(Zs)() == mode.(Z)
+    @test median(Zs)() == median.(Z)
+
+    a, b, λ = rand(4), rand(4), rand()
+    as, bs = source(a), source(b)
+    @test (as + bs)() == a + b
+    @test (λ * bs)() == λ * b
 end
 
 end
