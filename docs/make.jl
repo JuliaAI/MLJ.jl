@@ -5,8 +5,6 @@ using Pkg
 using Documenter
 using MLJ
 using MLJBase
-using MLJModels.Transformers
-using MLJModels.Constant
 using MLJModels
 using ScientificTypes
 
@@ -44,11 +42,9 @@ end
 makedocs(
     sitename = "MLJ",
     format = Documenter.HTML(),
-    modules = [MLJ, MLJBase, MLJModels, MLJModels.Transformers, MLJModels.Constant, ScientificTypes],
+    modules = [MLJ, MLJBase, MLJModels, ScientificTypes],
     pages=pages)
 
 deploydocs(
     repo = "github.com/alan-turing-institute/MLJ.jl.git"
 )
-
-
