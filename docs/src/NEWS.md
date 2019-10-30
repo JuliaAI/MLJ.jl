@@ -16,15 +16,23 @@ News for MLJ and its satellite packages: [MLJBase](https://github.com/alan-turin
 
 ## News
 
+### 30 Oct 2019
+
+- MLJModels 0.5.3 released.
+
+- MLJBase 0.7.2 released.
+
 ### 22 Oct 2019
 
 MLJ 0.5.1 released.
 
 ### 21 Oct 2019
 
+- MLJBase 0.7.1 released.
+
 - ScientificTypes 0.2.2 released.
 
-- MLJModels  0.5.2 released
+- MLJModels  0.5.2 released.
 
 ### 17 Oct 2019
 

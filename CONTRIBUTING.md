@@ -18,6 +18,9 @@ contributing, please read the this rest of this document. A guide to
 implementing the MLJ interface for new models is
 [here](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/).
 
+### Git workflow
+
+**Important**: please make any contribution a PR to the `dev` branch (**not** `master`).
 
 ### Brief design overview
 
