@@ -57,7 +57,8 @@ export models, localmodels, @load, load, info,
     StaticTransformer, FeatureSelector,        # builtins/Transformers.jl
     UnivariateStandardizer, Standardizer,
     UnivariateBoxCoxTransformer,
-    OneHotEncoder
+    OneHotEncoder, UnivariateDiscretizer,
+    FillImputer
 
 
 ## IMPORTS
