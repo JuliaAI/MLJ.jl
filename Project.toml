@@ -30,8 +30,8 @@ Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 CategoricalArrays = "<0.5.3, 0.7"
 Distributions = "0.21.3"
 DocStringExtensions = "0.8.1"
-MLJBase = "0.7.1"
-MLJModels = "0.5.2"
+MLJBase = "0.7.3"
+MLJModels = "0.5.4"
 OrderedCollections = "1.1"
 PrettyTables = "0.6"
 ProgressMeter = "1.1.0"
@@ -54,4 +54,3 @@ UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [targets]
 test = ["DecisionTree", "LossFunctions", "MLJBase", "MultivariateStats", "NearestNeighbors", "RDatasets", "Test", "UnicodePlots"]
-
