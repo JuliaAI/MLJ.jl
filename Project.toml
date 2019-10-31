@@ -28,6 +28,7 @@ Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 
 [compat]
 CategoricalArrays = "<0.5.3, 0.7"
+ComputationalResources = "0.3"
 Distributions = "0.21.3"
 DocStringExtensions = "0.8.1"
 MLJBase = "0.7.3"
