@@ -118,7 +118,7 @@ model = DecisionTreeClassifier(min_samples_split=5, max_depth=4)</code></pre><pr
                                                display_depth = 5,
                                                post_prune = false,
                                                merge_purity_threshold = 0.9,
-                                               pdf_smoothing = 0.05,) @ 1…67</code></pre><p>or</p><pre><code class="language-">model = @load DecisionTreeClassifier
+                                               pdf_smoothing = 0.05,) @ 1…70</code></pre><p>or</p><pre><code class="language-">model = @load DecisionTreeClassifier
 model.min_samples_split = 5
 model.max_depth = 4</code></pre><h2><a class="nav-anchor" id="Evaluating-a-model-1" href="#Evaluating-a-model-1">Evaluating a model</a></h2><p><em>Reference:</em>   <a href="../evaluating_model_performance/">Evaluating Model Performance</a></p><pre><code class="language-julia">X, y = @load_boston
 model = @load KNNRegressor
@@ -130,13 +130,13 @@ vaso = dataset(&quot;robustbase&quot;, &quot;vaso&quot;); # a DataFrame
 first(vaso, 3)</code></pre><table class="data-frame"><thead><tr><th></th><th>Volume</th><th>Rate</th><th>Y</th></tr><tr><th></th><th>Float64</th><th>Float64</th><th>Int64</th></tr></thead><tbody><p>3 rows × 3 columns</p><tr><th>1</th><td>3.7</td><td>0.825</td><td>1</td></tr><tr><th>2</th><td>3.5</td><td>1.09</td><td>1</td></tr><tr><th>3</th><td>1.25</td><td>2.5</td><td>1</td></tr></tbody></table><pre><code class="language-julia">y, X = unpack(vaso, ==(:Y), c -&gt; true; :Y =&gt; Multiclass)
 
 tree_model = @load DecisionTreeClassifier</code></pre><pre><code class="language-none">┌ Info: A model type &quot;DecisionTreeClassifier&quot; is already loaded.
-└ No new code loaded.</code></pre><p>Bind the model and data together in a <em>machine</em> , which will additionally store the learned parameters (<em>fitresults</em>) when fit:</p><pre><code class="language-julia">tree = machine(tree_model, X, y)</code></pre><pre><code class="language-none">Machine{DecisionTreeClassifier} @ 1…57
+└ No new code loaded.</code></pre><p>Bind the model and data together in a <em>machine</em> , which will additionally store the learned parameters (<em>fitresults</em>) when fit:</p><pre><code class="language-julia">tree = machine(tree_model, X, y)</code></pre><pre><code class="language-none">Machine{DecisionTreeClassifier} @ 4…12
 </code></pre><p>Split row indices into training and evaluation rows:</p><pre><code class="language-julia">train, test = partition(eachindex(y), 0.7, shuffle=true, rng=1234); # 70:30 split</code></pre><pre><code class="language-none">([27, 28, 30, 31, 32, 18, 21, 9, 26, 14  …  7, 39, 2, 37, 1, 8, 19, 25, 35, 34], [22, 13, 11, 4, 10, 16, 3, 20, 29, 23, 12, 24])</code></pre><p>Fit on train and evaluate on test:</p><pre><code class="language-julia">fit!(tree, rows=train)
 yhat = predict(tree, rows=test);
 mean(cross_entropy(yhat, y[test]))</code></pre><pre><code class="language-none">1.2759024584294054</code></pre><p>Predict on new data:</p><pre><code class="language-julia">Xnew = (Volume=3*rand(3), Rate=3*rand(3))
 predict(tree, Xnew)      # a vector of distributions</code></pre><pre><code class="language-none">3-element Array{UnivariateFinite{Int64,UInt8,Float64},1}:
  UnivariateFinite(0=&gt;0.727, 1=&gt;0.273) 
- UnivariateFinite(0=&gt;0.976, 1=&gt;0.0244)
+ UnivariateFinite(0=&gt;0.727, 1=&gt;0.273) 
  UnivariateFinite(0=&gt;0.976, 1=&gt;0.0244)</code></pre><pre><code class="language-julia">predict_mode(tree, Xnew) # a vector of point-predictions</code></pre><pre><code class="language-none">3-element CategoricalArrays.CategoricalArray{Int64,1,UInt8}:
  0
  0
@@ -152,9 +152,9 @@ predict(tree, Xnew)      # a vector of distributions</code></pre><pre><code clas
  per_fold = Array{Float64,1}[[1.2759024584294054], [0.5833333333333334]],
  per_observation = Array{Array{Float64,1},1}[[[2.3025850929940455, 0.02469261259037141, 2.3025850929940455, 0.10536051565782628, 2.3025850929940455, 1.2992829841302609, 3.7135720667043075, 1.2992829841302609, 1.2992829841302609, 0.3184537311185346, 0.02469261259037141, 0.3184537311185346]], [[1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0]]],)</code></pre><p>Using cross-validation:</p><pre><code class="language-julia">evaluate!(tree, resampling=CV(nfolds=5, shuffle=true, rng=1234),
           measure=[cross_entropy, ZeroOneLoss()])</code></pre><pre><code class="language-none">(measure = Any[cross_entropy, LossFunctions.ZeroOneLoss()],
- measurement = [1.1944511560043334, 0.5428571428571428],
- per_fold = Array{Float64,1}[[1.3414493126944902, 1.2063606527796276, 1.5561257194583344, 0.8352932497947786, 1.0330268452944358], [0.5714285714285714, 0.5714285714285714, 0.2857142857142857, 0.5714285714285714, 0.7142857142857143]],
- per_observation = Array{Array{Float64,1},1}[[[0.02469261259037141, 0.9444616088408514, 0.02469261259037141, 0.02469261259037141, 3.7135720667043075, 3.7135720667043075, 0.9444616088408514], [0.3448404862917295, 3.7135720667043075, 1.2321436812926323, 0.3448404862917295, 1.2321436812926323, 0.3448404862917295, 1.2321436812926323], [0.6931471805599453, 0.6931471805599453, 0.6931471805599453, 3.7135720667043075, 0.6931471805599453, 3.7135720667043075, 0.6931471805599453], [1.1895840668738362, 0.3629054936893685, 0.3629054936893685, 1.1895840668738362, 1.1895840668738362, 1.1895840668738362, 0.3629054936893685], [0.02469261259037141, 1.8718021769015913, 0.1670540846631662, 1.8718021769015913, 1.0986122886681098, 1.0986122886681098, 1.0986122886681098]], [[0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0], [0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0], [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0], [0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0]]],)</code></pre><p>With user-specified train/test pairs of row indices:</p><pre><code class="language-julia">f1, f2, f3 = 1:13, 14:26, 27:36
+ measurement = [1.2964339931737114, 0.5142857142857142],
+ per_fold = Array{Float64,1}[[1.3414493126944902, 1.2063606527796276, 1.5561257194583344, 0.8352932497947786, 1.5429410311413272], [0.5714285714285714, 0.5714285714285714, 0.2857142857142857, 0.5714285714285714, 0.5714285714285714]],
+ per_observation = Array{Array{Float64,1},1}[[[0.02469261259037141, 0.9444616088408514, 0.02469261259037141, 0.02469261259037141, 3.7135720667043075, 3.7135720667043075, 0.9444616088408514], [0.3448404862917295, 3.7135720667043075, 1.2321436812926323, 0.3448404862917295, 1.2321436812926323, 0.3448404862917295, 1.2321436812926323], [0.6931471805599453, 0.6931471805599453, 0.6931471805599453, 3.7135720667043075, 0.6931471805599453, 3.7135720667043075, 0.6931471805599453], [1.1895840668738362, 0.3629054936893685, 0.3629054936893685, 1.1895840668738362, 1.1895840668738362, 1.1895840668738362, 0.3629054936893685], [3.7135720667043075, 0.8472978603872037, 0.5596157879354228, 0.8472978603872037, 0.5596157879354228, 3.7135720667043075, 0.5596157879354228]], [[0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0], [0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0], [1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0], [1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]]],)</code></pre><p>With user-specified train/test pairs of row indices:</p><pre><code class="language-julia">f1, f2, f3 = 1:13, 14:26, 27:36
 pairs = [(f1, vcat(f2, f3)), (f2, vcat(f3, f1)), (f3, vcat(f1, f2))];
 evaluate!(tree,
           resampling=pairs,
@@ -175,25 +175,25 @@ y = x1 - 2x2 + 0.1*rand(100);
 
 ols_model = @load LinearRegressor pkg=GLM
 ols =  machine(ols_model, X, y)
-fit!(ols)</code></pre><pre><code class="language-none">Machine{LinearRegressor} @ 1…92
-</code></pre><p>Get a named tuple representing the learned parameters, human-readable if appropriate:</p><pre><code class="language-julia">fitted_params(ols)</code></pre><pre><code class="language-none">(coef = [1.027515659111793, -2.0063294576597555],
- intercept = 0.03983083845609663,)</code></pre><p>Get other training-related information:</p><pre><code class="language-julia">report(ols)</code></pre><pre><code class="language-none">(deviance = 0.0762798453916869,
+fit!(ols)</code></pre><pre><code class="language-none">Machine{LinearRegressor} @ 3…72
+</code></pre><p>Get a named tuple representing the learned parameters, human-readable if appropriate:</p><pre><code class="language-julia">fitted_params(ols)</code></pre><pre><code class="language-none">(coef = [0.9798445037679628, -1.9875572621922286],
+ intercept = 0.055523968019662105,)</code></pre><p>Get other training-related information:</p><pre><code class="language-julia">report(ols)</code></pre><pre><code class="language-none">(deviance = 0.07136609860967717,
  dof_residual = 97.0,
- stderror = [0.009868561214089813, 0.008859619602126794, 0.007174733144887107],
- vcov = [9.73885004362378e-5 -6.319282819311156e-6 -4.626632647686913e-5; -6.319282819311156e-6 7.849285949438934e-5 -3.8097515693945986e-5; -4.626632647686913e-5 -3.8097515693945986e-5 5.147679570034163e-5],)</code></pre><h2><a class="nav-anchor" id="Basic-fit/transform-for-unsupervised-models-1" href="#Basic-fit/transform-for-unsupervised-models-1">Basic fit/transform for unsupervised models</a></h2><p>Load data:</p><pre><code class="language-julia">X, y = @load_iris
+ stderror = [0.00952438288100863, 0.009105243619676393, 0.007107919903715279],
+ vcov = [9.071386926405026e-5 -4.199165318050389e-6 -4.181973516128669e-5; -4.199165318050389e-6 8.290546137365766e-5 -4.251229394509715e-5; -4.181973516128669e-5 -4.251229394509715e-5 5.0522525357631816e-5],)</code></pre><h2><a class="nav-anchor" id="Basic-fit/transform-for-unsupervised-models-1" href="#Basic-fit/transform-for-unsupervised-models-1">Basic fit/transform for unsupervised models</a></h2><p>Load data:</p><pre><code class="language-julia">X, y = @load_iris
 train, test = partition(eachindex(y), 0.97, shuffle=true, rng=123)</code></pre><pre><code class="language-none">([125, 100, 130, 9, 70, 148, 39, 64, 6, 107  …  110, 59, 139, 21, 112, 144, 140, 72, 109, 41], [106, 147, 47, 5])</code></pre><p>Instantiate and fit the model/machine:</p><pre><code class="language-julia">@load PCA
 pca_model = PCA(maxoutdim=2)
 pca = machine(pca_model, X)
-fit!(pca, rows=train)</code></pre><pre><code class="language-none">Machine{PCA} @ 1…92
+fit!(pca, rows=train)</code></pre><pre><code class="language-none">Machine{PCA} @ 5…23
 </code></pre><p>Transform selected data bound to the machine:</p><pre><code class="language-julia">transform(pca, rows=test);</code></pre><table class="data-frame"><thead><tr><th></th><th>x1</th><th>x2</th></tr><tr><th></th><th>Float64</th><th>Float64</th></tr></thead><tbody><p>4 rows × 2 columns</p><tr><th>1</th><td>-3.39428</td><td>0.547245</td></tr><tr><th>2</th><td>-1.52198</td><td>-0.368424</td></tr><tr><th>3</th><td>2.53825</td><td>0.51993</td></tr><tr><th>4</th><td>2.72996</td><td>0.344847</td></tr></tbody></table><p>Transform new data:</p><pre><code class="language-julia">Xnew = (sepal_length=rand(3), sepal_width=rand(3),
         petal_length=rand(3), petal_width=rand(3));
-transform(pca, Xnew)</code></pre><pre><code class="language-none">(x1 = [4.765197146329952, 4.548247795963879, 4.332235219693271],
- x2 = [-4.520504352676869, -5.103838311926989, -5.078106476169337],)</code></pre><h2><a class="nav-anchor" id="Inverting-learned-transformations-1" href="#Inverting-learned-transformations-1">Inverting learned transformations</a></h2><pre><code class="language-julia">y = rand(100);
+transform(pca, Xnew)</code></pre><pre><code class="language-none">(x1 = [4.496941424497091, 4.87030519127617, 4.816675301873212],
+ x2 = [-5.0254549394200785, -4.466297946050602, -4.767854511521468],)</code></pre><h2><a class="nav-anchor" id="Inverting-learned-transformations-1" href="#Inverting-learned-transformations-1">Inverting learned transformations</a></h2><pre><code class="language-julia">y = rand(100);
 stand_model = UnivariateStandardizer()
 stand = machine(stand_model, y)
 fit!(stand)
 z = transform(stand, y);
-@assert inverse_transform(stand, z) ≈ y # true</code></pre><pre><code class="language-none">[ Info: Training Machine{UnivariateStandardizer} @ 8…07.</code></pre><h2><a class="nav-anchor" id="Nested-hyperparameter-tuning-1" href="#Nested-hyperparameter-tuning-1">Nested hyperparameter tuning</a></h2><p><em>Reference:</em>   <a href="../tuning_models/">Tuning Models</a></p><p>Define a model with nested hyperparameters:</p><pre><code class="language-julia">tree_model = @load DecisionTreeClassifier
+@assert inverse_transform(stand, z) ≈ y # true</code></pre><pre><code class="language-none">[ Info: Training Machine{UnivariateStandardizer} @ 1…14.</code></pre><h2><a class="nav-anchor" id="Nested-hyperparameter-tuning-1" href="#Nested-hyperparameter-tuning-1">Nested hyperparameter tuning</a></h2><p><em>Reference:</em>   <a href="../tuning_models/">Tuning Models</a></p><p>Define a model with nested hyperparameters:</p><pre><code class="language-julia">tree_model = @load DecisionTreeClassifier
 forest_model = EnsembleModel(atom=tree_model, n=300)</code></pre><pre><code class="language-none">MLJ.ProbabilisticEnsembleModel(atom = MLJModels.DecisionTree_.DecisionTreeClassifier(pruning_purity = 1.0,
                                                                                      max_depth = -1,
                                                                                      min_samples_leaf = 1,
@@ -206,10 +206,10 @@ forest_model = EnsembleModel(atom=tree_model, n=300)</code></pre><pre><code clas
                                                                                      pdf_smoothing = 0.05,),
                                weights = Float64[],
                                bagging_fraction = 0.8,
-                               rng = MersenneTwister(UInt32[0xde72cc56, 0x72b50022, 0x698f1085, 0x1db4651e]),
+                               rng = MersenneTwister(UInt32[0xa6cb423e, 0xadeb9593, 0x24e4f75e, 0xfef0decc]),
                                n = 300,
                                acceleration = ComputationalResources.CPU1{Nothing}(nothing),
-                               out_of_bag_measure = Any[],) @ 9…02</code></pre><p>Inspect all hyperparameters, even nested ones (returns nested named tuple):</p><pre><code class="language-julia">params(forest_model)</code></pre><pre><code class="language-none">(atom = (pruning_purity = 1.0,
+                               out_of_bag_measure = Any[],) @ 1…43</code></pre><p>Inspect all hyperparameters, even nested ones (returns nested named tuple):</p><pre><code class="language-julia">params(forest_model)</code></pre><pre><code class="language-none">(atom = (pruning_purity = 1.0,
          max_depth = -1,
          min_samples_leaf = 1,
          min_samples_split = 2,
@@ -221,23 +221,23 @@ forest_model = EnsembleModel(atom=tree_model, n=300)</code></pre><pre><code clas
          pdf_smoothing = 0.05,),
  weights = Float64[],
  bagging_fraction = 0.8,
- rng = MersenneTwister(UInt32[0xde72cc56, 0x72b50022, 0x698f1085, 0x1db4651e]),
+ rng = MersenneTwister(UInt32[0xa6cb423e, 0xadeb9593, 0x24e4f75e, 0xfef0decc]),
  n = 300,
  acceleration = ComputationalResources.CPU1{Nothing}(nothing),
  out_of_bag_measure = Any[],)</code></pre><p>Define ranges for hyperparameters to be tuned:</p><pre><code class="language-julia">r1 = range(forest_model, :bagging_fraction, lower=0.5, upper=1.0, scale=:log10)</code></pre><pre><code class="language-none">MLJ.NumericRange(field = :bagging_fraction,
                  lower = 0.5,
                  upper = 1.0,
-                 scale = :log10,) @ 1…58</code></pre><pre><code class="language-julia">r2 = range(forest_model, :(atom.n_subfeatures), lower=1, upper=4) # nested</code></pre><pre><code class="language-none">MLJ.NumericRange(field = :(atom.n_subfeatures),
+                 scale = :log10,) @ 3…71</code></pre><pre><code class="language-julia">r2 = range(forest_model, :(atom.n_subfeatures), lower=1, upper=4) # nested</code></pre><pre><code class="language-none">MLJ.NumericRange(field = :(atom.n_subfeatures),
                  lower = 1,
                  upper = 4,
-                 scale = :linear,) @ 3…07</code></pre><p>Wrap the model in a tuning strategy:</p><pre><code class="language-julia">tuned_forest = TunedModel(model=forest_model,
+                 scale = :linear,) @ 7…35</code></pre><p>Wrap the model in a tuning strategy:</p><pre><code class="language-julia">tuned_forest = TunedModel(model=forest_model,
                           tuning=Grid(resolution=12),
                           resampling=CV(nfolds=6),
                           ranges=[r1, r2],
-                          measure=cross_entropy)</code></pre><pre><code class="language-none">MLJ.ProbabilisticTunedModel(model = MLJ.ProbabilisticEnsembleModel(atom = DecisionTreeClassifier @ 9…66,
+                          measure=cross_entropy)</code></pre><pre><code class="language-none">MLJ.ProbabilisticTunedModel(model = MLJ.ProbabilisticEnsembleModel(atom = DecisionTreeClassifier @ 8…37,
                                                                    weights = Float64[],
                                                                    bagging_fraction = 0.8,
-                                                                   rng = MersenneTwister(UInt32[0xde72cc56, 0x72b50022, 0x698f1085, 0x1db4651e]),
+                                                                   rng = MersenneTwister(UInt32[0xa6cb423e, 0xadeb9593, 0x24e4f75e, 0xfef0decc]),
                                                                    n = 300,
                                                                    acceleration = ComputationalResources.CPU1{Nothing}(nothing),
                                                                    out_of_bag_measure = Any[],),
@@ -245,15 +245,15 @@ forest_model = EnsembleModel(atom=tree_model, n=300)</code></pre><pre><code clas
                                           acceleration = ComputationalResources.CPU1{Nothing}(nothing),),
                             resampling = CV(nfolds = 6,
                                             shuffle = false,
-                                            rng = MersenneTwister(UInt32[0xde72cc56, 0x72b50022, 0x698f1085, 0x1db4651e]),),
+                                            rng = MersenneTwister(UInt32[0xa6cb423e, 0xadeb9593, 0x24e4f75e, 0xfef0decc]),),
                             measure = MLJBase.CrossEntropy(),
                             weights = nothing,
                             operation = StatsBase.predict,
-                            ranges = MLJ.NumericRange{T,Symbol} where T[NumericRange @ 1…58, NumericRange @ 3…07],
+                            ranges = MLJ.NumericRange{T,Symbol} where T[NumericRange @ 3…71, NumericRange @ 7…35],
                             full_report = true,
-                            train_best = true,) @ 1…27</code></pre><p>Bound the wrapped model to data:</p><pre><code class="language-julia">tuned = machine(tuned_forest, X, y)</code></pre><pre><code class="language-none">Machine{ProbabilisticTunedModel} @ 8…32
-</code></pre><p>Fitting the resultant machine optimizes the hyperaparameters specified in <code>range</code>, using the specified <code>tuning</code> and <code>resampling</code> strategies and performance <code>measure</code> (possibly a vector of measures), and retrains on all data bound to the machine:</p><pre><code class="language-julia">fit!(tuned)</code></pre><pre><code class="language-none">Machine{ProbabilisticTunedModel} @ 8…32
-</code></pre><p>Inspecting the optimal model:</p><pre><code class="language-julia">F = fitted_params(tuned)</code></pre><pre><code class="language-none">(best_model = ProbabilisticEnsembleModel{DecisionTreeClassifier} @ 3…05,)</code></pre><pre><code class="language-julia">F.best_model</code></pre><pre><code class="language-none">MLJ.ProbabilisticEnsembleModel(atom = MLJModels.DecisionTree_.DecisionTreeClassifier(pruning_purity = 1.0,
+                            train_best = true,) @ 4…66</code></pre><p>Bound the wrapped model to data:</p><pre><code class="language-julia">tuned = machine(tuned_forest, X, y)</code></pre><pre><code class="language-none">Machine{ProbabilisticTunedModel} @ 1…64
+</code></pre><p>Fitting the resultant machine optimizes the hyperaparameters specified in <code>range</code>, using the specified <code>tuning</code> and <code>resampling</code> strategies and performance <code>measure</code> (possibly a vector of measures), and retrains on all data bound to the machine:</p><pre><code class="language-julia">fit!(tuned)</code></pre><pre><code class="language-none">Machine{ProbabilisticTunedModel} @ 1…64
+</code></pre><p>Inspecting the optimal model:</p><pre><code class="language-julia">F = fitted_params(tuned)</code></pre><pre><code class="language-none">(best_model = ProbabilisticEnsembleModel{DecisionTreeClassifier} @ 6…09,)</code></pre><pre><code class="language-julia">F.best_model</code></pre><pre><code class="language-none">MLJ.ProbabilisticEnsembleModel(atom = MLJModels.DecisionTree_.DecisionTreeClassifier(pruning_purity = 1.0,
                                                                                      max_depth = -1,
                                                                                      min_samples_leaf = 1,
                                                                                      min_samples_split = 2,
@@ -264,19 +264,19 @@ forest_model = EnsembleModel(atom=tree_model, n=300)</code></pre><pre><code clas
                                                                                      merge_purity_threshold = 0.9,
                                                                                      pdf_smoothing = 0.05,),
                                weights = Float64[],
-                               bagging_fraction = 0.6851754923600618,
-                               rng = MersenneTwister(UInt32[0xde72cc56, 0x72b50022, 0x698f1085, 0x1db4651e]),
+                               bagging_fraction = 0.5,
+                               rng = MersenneTwister(UInt32[0xa6cb423e, 0xadeb9593, 0x24e4f75e, 0xfef0decc]),
                                n = 300,
                                acceleration = ComputationalResources.CPU1{Nothing}(nothing),
-                               out_of_bag_measure = Any[],) @ 3…05</code></pre><p>Inspecting details of tuning procedure:</p><pre><code class="language-julia">report(tuned)</code></pre><pre><code class="language-none">(parameter_names = [&quot;bagging_fraction&quot; &quot;atom.n_subfeatures&quot;],
+                               out_of_bag_measure = Any[],) @ 6…09</code></pre><p>Inspecting details of tuning procedure:</p><pre><code class="language-julia">report(tuned)</code></pre><pre><code class="language-none">(parameter_names = [&quot;bagging_fraction&quot; &quot;atom.n_subfeatures&quot;],
  parameter_scales = Symbol[:log10 :linear],
  parameter_values = Any[0.5 1; 0.5325205447199813 1; … ; 0.9389309106617063 4; 1.0 4],
- measurements = [1.1464096933380088, 1.15777018197235, 1.203371306590882, 1.168974762706484, 1.227660858206422, 1.2179005539465642, 1.2106050645441877, 1.1408920763099866, 1.182284027979855, 1.192607254135509  …  1.221903345153428, 1.1917789865687627, 1.2201869477877465, 1.2150052021997488, 1.2249722086744514, 1.1869614615036086, 1.190188306399562, 1.1815098118555423, 1.21135496827741, 1.2433484274139446],
- best_measurement = 1.1302725982965314,)</code></pre><p>Visualizing these results:</p><pre><code class="language-julia">using Plots
+ measurements = [1.1407127901122782, 1.2191592620027232, 1.2270041334543313, 1.236688883318554, 1.2397271956909055, 1.173290698321182, 1.2155646363097776, 1.1819233448454922, 1.1645792060453928, 1.215491210158702  …  1.1925333708511034, 1.178425837396756, 1.2303358840519982, 1.1908154318789732, 1.2114879285435354, 1.1823196768391149, 1.2093624067625535, 1.2278535126050782, 1.1746225678137538, 1.2760389145648958],
+ best_measurement = 1.131843144761744,)</code></pre><p>Visualizing these results:</p><pre><code class="language-julia">using Plots
 plot(tuned)</code></pre><p><img src="../workflows_tuning_plot.png" alt/></p><p>Predicting on new data using the optimized model:</p><pre><code class="language-julia">predict(tuned, Xnew)</code></pre><pre><code class="language-none">3-element Array{UnivariateFinite{String,UInt32,Float64},1}:
- UnivariateFinite(setosa=&gt;0.314, versicolor=&gt;0.359, virginica=&gt;0.327)
- UnivariateFinite(setosa=&gt;0.302, versicolor=&gt;0.39, virginica=&gt;0.308) 
- UnivariateFinite(setosa=&gt;0.314, versicolor=&gt;0.359, virginica=&gt;0.327)</code></pre><h1><a class="nav-anchor" id="Constructing-a-linear-pipeline-1" href="#Constructing-a-linear-pipeline-1">Constructing a linear pipeline</a></h1><p><em>Reference:</em>   <a href="../composing_models/">Composing Models</a></p><p>Constructing a linear (unbranching) pipeline with a learned target transformation/inverse transformation:</p><pre><code class="language-julia">X, y = @load_reduced_ames
+ UnivariateFinite(setosa=&gt;0.321, versicolor=&gt;0.321, virginica=&gt;0.359)
+ UnivariateFinite(setosa=&gt;0.324, versicolor=&gt;0.321, virginica=&gt;0.356)
+ UnivariateFinite(setosa=&gt;0.321, versicolor=&gt;0.324, virginica=&gt;0.356)</code></pre><h1><a class="nav-anchor" id="Constructing-a-linear-pipeline-1" href="#Constructing-a-linear-pipeline-1">Constructing a linear pipeline</a></h1><p><em>Reference:</em>   <a href="../composing_models/">Composing Models</a></p><p>Constructing a linear (unbranching) pipeline with a learned target transformation/inverse transformation:</p><pre><code class="language-julia">X, y = @load_reduced_ames
 @load KNNRegressor
 pipe = @pipeline MyPipe(X -&gt; coerce(X, :age=&gt;Continuous),
                                hot = OneHotEncoder(),
@@ -290,7 +290,7 @@ pipe = @pipeline MyPipe(X -&gt; coerce(X, :age=&gt;Continuous),
                                                                         leafsize = 10,
                                                                         reorder = true,
                                                                         weights = :uniform,),
-                         target = UnivariateStandardizer(),) @ 1…75</code></pre><p>Evaluating the pipeline (just as you would any other model):</p><pre><code class="language-julia">pipe.knn.K = 2
+                         target = UnivariateStandardizer(),) @ 1…69</code></pre><p>Evaluating the pipeline (just as you would any other model):</p><pre><code class="language-julia">pipe.knn.K = 2
 pipe.hot.drop_last = true
 evaluate(pipe, X, y, resampling=Holdout(), measure=rms, verbosity=2)</code></pre><pre><code class="language-none">(measure = MLJBase.RMS[rms],
  measurement = [53136.24281527115],
@@ -311,14 +311,14 @@ pipe2 = @pipeline MyPipe2(X -&gt; coerce(X, :age=&gt;Continuous),
                                                                                n_subfeatures = 0,
                                                                                post_prune = false,),
                           target = StaticTransformer(f = getfield(Main.ex-workflows, Symbol(&quot;##24#25&quot;))(),),
-                          inverse = StaticTransformer(f = getfield(Main.ex-workflows, Symbol(&quot;##26#27&quot;))(),),) @ 1…70</code></pre><h1><a class="nav-anchor" id="Creating-a-homogeneous-ensemble-of-models-1" href="#Creating-a-homogeneous-ensemble-of-models-1">Creating a homogeneous ensemble of models</a></h1><p><em>Reference:</em> <a href="../homogeneous_ensembles/">Homogeneous Ensembles</a></p><pre><code class="language-julia">X, y = @load_iris
+                          inverse = StaticTransformer(f = getfield(Main.ex-workflows, Symbol(&quot;##26#27&quot;))(),),) @ 2…65</code></pre><h1><a class="nav-anchor" id="Creating-a-homogeneous-ensemble-of-models-1" href="#Creating-a-homogeneous-ensemble-of-models-1">Creating a homogeneous ensemble of models</a></h1><p><em>Reference:</em> <a href="../homogeneous_ensembles/">Homogeneous Ensembles</a></p><pre><code class="language-julia">X, y = @load_iris
 tree_model = @load DecisionTreeClassifier
 forest_model = EnsembleModel(atom=tree_model, bagging_fraction=0.8, n=300)
 forest = machine(forest_model, X, y)
 evaluate!(forest, measure=cross_entropy)</code></pre><pre><code class="language-none">(measure = MLJBase.CrossEntropy[cross_entropy],
- measurement = [1.2047578418303078],
- per_fold = Array{Float64,1}[[1.593173055810354, 1.5776892141195136, 1.2629479567385788, 1.3695860119125205, 0.6985597369195083, 0.7265910754813725]],
- per_observation = Array{Array{Float64,1},1}[[[1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354  …  1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354, 1.593173055810354], [1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513  …  1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513, 1.577689214119513], [1.2864976820314584, 1.3097316470155125, 1.1275761066575662, 1.3097316470155125, 1.2750800446928456, 1.2864976820314584, 1.3097316470155125, 1.2864976820314582, 1.3097316470155125, 1.3097316470155125  …  1.3097316470155125, 1.3215542474002382, 1.3097316470155125, 1.1777951510608058, 1.3097316470155125, 0.948663974811925, 1.3097316470155125, 0.9651817075765071, 1.263791299536841, 1.3097316470155125], [1.4084740048308595, 1.3215542474002377, 0.948663974811925, 1.4084740048308595, 1.4084740048308595, 1.4084740048308595, 1.4084740048308595, 1.4084740048308595, 0.9568887371449528, 1.4084740048308595  …  1.4084740048308595, 1.4084740048308595, 1.4084740048308595, 1.421531620919354, 1.4084740048308595, 1.4084740048308595, 1.4084740048308595, 1.4084740048308595, 1.421531620919354, 1.4084740048308595], [0.6229793723414193, 0.6348782724359681, 0.6229793723414193, 0.6229793723414193, 0.6229793723414193, 0.6229793723414193, 1.4215316209193551, 0.6289111245151666, 0.6408812410654726, 0.6229793723414193  …  0.6229793723414193, 0.6229793723414193, 0.6229793723414193, 0.6289111245151666, 1.3456272172980586, 0.6229793723414193, 0.7029803139799221, 0.6229793723414193, 0.6408812410654726, 0.6229793723414193], [0.6112203928010844, 0.7555946994031943, 1.0077106391485469, 0.5995980813399183, 1.3335182956132294, 0.5995980813399183, 0.5995980813399183, 0.5995980813399183, 1.1574039140300965, 1.167547558127449  …  0.5995980813399183, 0.5995980813399183, 0.5938371905354884, 0.5995980813399183, 0.5995980813399183, 0.5995980813399183, 0.6112203928010844, 0.5995980813399183, 0.5995980813399183, 0.6289111245151666]]],)</code></pre><h1><a class="nav-anchor" id="Performance-curves-1" href="#Performance-curves-1">Performance curves</a></h1><p>Generate a plot of performance, as a function of some hyperparameter (building on the preceding example):</p><pre><code class="language-julia">r = range(forest_model, :n, lower=1, upper=1000, scale=:log10)
+ measurement = [1.1473554954082055],
+ per_fold = Array{Float64,1}[[1.4347619966621048, 1.448169764837971, 1.283153528322125, 1.179550287992342, 0.7841907804111763, 0.7543066142235136]],
+ per_observation = Array{Array{Float64,1},1}[[[1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105  …  1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105, 1.434761996662105], [1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712  …  1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712, 1.4481697648379712], [1.321554247400238, 1.309731647015512, 1.209183489011126, 1.321554247400238, 1.286497682031458, 1.321554247400238, 1.309731647015512, 1.209183489011126, 1.321554247400238, 1.321554247400238  …  1.321554247400238, 1.309731647015512, 1.321554247400238, 1.2198690928134253, 1.321554247400238, 1.0077106391485458, 1.321554247400238, 1.0704638133860156, 1.2980471889000418, 1.321554247400238], [1.1986108611845447, 1.0891411527765857, 0.9990589245033827, 1.1986108611845447, 1.1986108611845447, 1.1986108611845447, 1.1986108611845447, 1.1986108611845447, 0.9990589245033827, 1.1986108611845447  …  1.1986108611845447, 1.1986108611845447, 1.1986108611845447, 1.1986108611845447, 1.1986108611845447, 1.1986108611845447, 1.1986108611845447, 1.1986108611845447, 1.1986108611845447, 1.1986108611845447], [0.7289415124032315, 0.735538506194788, 0.7289415124032315, 0.7289415124032315, 0.7289415124032315, 0.7289415124032315, 1.3456272172980581, 0.7289415124032315, 0.735538506194788, 0.7289415124032315  …  0.7289415124032315, 0.7289415124032315, 0.7289415124032315, 0.735538506194788, 1.263791299536841, 0.7289415124032315, 0.8040186721877639, 0.7289415124032315, 0.735538506194788, 0.7289415124032315], [0.6591094374418912, 0.8182959866991575, 0.973544026875516, 0.6529963789812189, 1.2306701131497646, 0.6529963789812189, 0.6529963789812189, 0.6529963789812189, 1.0986122886681053, 1.0797588783392578  …  0.6529963789812189, 0.6591094374418912, 0.6529963789812189, 0.6529963789812189, 0.6529963789812189, 0.6529963789812189, 0.690248160974426, 0.6529963789812189, 0.6529963789812189, 0.6591094374418912]]],)</code></pre><h1><a class="nav-anchor" id="Performance-curves-1" href="#Performance-curves-1">Performance curves</a></h1><p>Generate a plot of performance, as a function of some hyperparameter (building on the preceding example):</p><pre><code class="language-julia">r = range(forest_model, :n, lower=1, upper=1000, scale=:log10)
 curve = MLJ.learning_curve!(forest,
                             range=r,
                             resampling=Holdout(),
@@ -327,5 +327,5 @@ curve = MLJ.learning_curve!(forest,
                             verbosity=0)</code></pre><pre><code class="language-none">(parameter_name = &quot;n&quot;,
  parameter_scale = :log10,
  parameter_values = [1, 2, 3, 4, 5, 7, 9, 11, 14, 17  …  117, 149, 189, 240, 304, 386, 489, 621, 788, 1000],
- measurements = [4.12713438504509 1.1246150394155512 4.12713438504509 0.4877169964032245; 1.3929530381543995 0.9727160756994017 1.4689025200124746 0.7094077014317257; … ; 0.5728365664194212 0.5821697010918149 0.590693291424042 0.5821650525503954; 0.5827753427904732 0.5825476859502979 0.5849438157401937 0.5808021786995405],)</code></pre><pre><code class="language-julia">using Plots
+ measurements = [1.3975713435636912 2.3984111254402056 1.1246150394155512 0.9426441699834579; 0.7591338654149338 0.5748538432781942 1.1246150394155512 0.6388462425511587; … ; 0.577156195618296 0.5588824512440856 0.5545730571010792 0.5464528465861115; 0.571302282493846 0.5614602680132603 0.5673089294438871 0.5560403835479634],)</code></pre><pre><code class="language-julia">using Plots
 plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)</code></pre><p><img src="../workflows_learning_curves.png" alt/></p><footer><hr/><a class="previous" href="../"><span class="direction">Previous</span><span class="title">Getting Started</span></a><a class="next" href="../model_search/"><span class="direction">Next</span><span class="title">Model Search</span></a></footer></article></body></html>
