@@ -9,6 +9,11 @@ function ==(s1::S, s2::S) where S <: ResamplingStrategy
     return all(getfield(s1, fld) == getfield(s2, fld) for fld in fieldnames(S))
 end
 
+train_test_pairs(s::ResamplingStrategy, rows, X, y, w) =
+    train_test_pairs(s, rows, X, y)
+train_test_pairs(s::ResamplingStrategy, rows, X, y) =
+    train_test_pairs(s, rows)
+
 """
     Holdout(; fraction_train=0.7,
               shuffle=false,
@@ -28,7 +33,8 @@ struct Holdout <: ResamplingStrategy
     rng::Union{Int,AbstractRNG}
 
     function Holdout(fraction_train, shuffle, rng)
-        0 < fraction_train < 1 || error("`fraction_train` must be between 0 and 1.")
+        0 < fraction_train < 1 ||
+            error("`fraction_train` must be between 0 and 1.")
         return new(fraction_train, shuffle, rng)
     end
 end
@@ -39,6 +45,7 @@ function Holdout(; fraction_train::Float64=0.7,
                    rng::Union{Int,AbstractRNG}=Random.GLOBAL_RNG)
     Holdout(fraction_train, shuffle, rng)
 end
+
 
 function train_test_pairs(holdout::Holdout, rows)
     if holdout.rng isa Integer
@@ -57,7 +64,7 @@ end
 
 Cross validation resampling where the data is (randomly) partitioned
 in `nfolds` folds and the model is evaluated `nfolds` times, each time
-taking one fold for testing and the remaining folds for training.  
+taking one fold for testing and the remaining folds for training.
 
 For instance, if `nfolds=3` then the data will be partitioned in three
 folds A, B and C and the model will be trained three times, first with
@@ -81,7 +88,7 @@ end
 
 # Constructor with keywords
 CV(; nfolds::Int=6,  shuffle::Bool=false,
-   rng::Union{Int,AbstractRNG}=Random.GLOBAL_RNG) = 
+   rng::Union{Int,AbstractRNG}=Random.GLOBAL_RNG) =
        CV(nfolds, shuffle, rng)
 
 function train_test_pairs(cv::CV, rows)
@@ -95,7 +102,7 @@ function train_test_pairs(cv::CV, rows)
     nfolds = cv.nfolds
 
     if cv.shuffle
-        shuffle!(rng, collect(rows))
+        rows=shuffle!(rng, collect(rows))
     end
 
     # number of observations per fold
@@ -120,12 +127,12 @@ end
 ## DIRECT EVALUATION METHODS
 
 """
-    evaluate!(mach,    
-              resampling=CV(), 
-              measure=nothing, 
+    evaluate!(mach,
+              resampling=CV(),
+              measure=nothing,
               weights=nothing,
               operation=predict,  
-              parallel=true,
+              acceleration=DEFAULT_RESOURCE[],
               force=false, 
               verbosity=1)
 
@@ -139,22 +146,26 @@ strategies. If `resampling` is not an object of type
 `MLJ.ResamplingStrategy`, then a vector of pairs (of the form
 `(train_rows, test_rows)` is expected. For example, setting
 
-    resampling = [(1:100), (101:200)), 
+    resampling = [(1:100), (101:200)),
                    (101:200), (1:100)]
 
 gives two-fold cross-validation using the first 200 rows of data.
 
 If `resampling isa MLJ.ResamplingStrategy` then one may optionally
-restrict the data used in evaluation by specifying `rows`. 
+restrict the data used in evaluation by specifying `rows`.
 
 An optional `weights` vector may be passed for measures that support
 sample weights (`MLJ.supports_weights(measure) == true`), which
-is ignored by those that don't. 
+is ignored by those that don't.
 
 User-defined measures are supported; see the manual for details.
 
 If no measure is specified, then `default_measure(mach.model)` is
 used, unless this default is `nothing` and an error is thrown.
+
+The `acceleration` keyword argument is used to specify the compute resource (a
+subtype of `ComputationalResources.AbstractResource`) that will be used to
+accelerate/parallelize the resampling operation.
 
 Although evaluate! is mutating, `mach.model` and `mach.args` are
 untouched.
@@ -188,7 +199,7 @@ function _check_measure(model, measure, y, operation, override)
     target_scitype(measure) == Unknown && (return nothing)
     prediction_type(measure) == :unknown && (return nothing)
 
-    avoid = "\nTo override measure checks, set check_measure=false. "    
+    avoid = "\nTo override measure checks, set check_measure=false. "
 
     T <: target_scitype(measure) ||
         throw(ArgumentError(
@@ -223,10 +234,29 @@ function _check_measure(model, measure, y, operation, override)
 
 end
 
+function _evaluate!(func::Function, res::CPU1, nfolds, verbosity)
+    p = Progress(nfolds + 1, dt=0, desc="Evaluating over $nfolds folds: ",
+                 barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
+    verbosity > 0 && next!(p)
+    return reduce(vcat, (func(k, p, verbosity) for k in 1:nfolds))
+end
+function _evaluate!(func::Function, res::CPUProcesses, nfolds, verbosity)
+    # TODO: use pmap here ?:
+    return @distributed vcat for k in 1:nfolds
+        func(k)
+    end
+end
+@static if VERSION >= v"1.3.0-DEV.573"
+    function _evaluate!(func::Function, res::CPUThreads, nfolds, verbosity)
+        task_vec = [Threads.@spawn func(k) for k in 1:nfolds]
+        return fetch.(task_vec)
+    end
+end
+
 # if `resampling` is not a ResamplingStrategy object:
 function evaluate!(mach::Machine, resampling;
                    measure=nothing, weights=nothing,
-                   operation=predict, parallel=true,
+                   operation=predict, acceleration=DEFAULT_RESOURCE[],
                    rows=nothing, force=false,
                    check_measure=true, verbosity=1)
 
@@ -253,7 +283,7 @@ function evaluate!(mach::Machine, resampling;
     y = mach.args[2]
 
     [_check_measure(mach.model, m, y, operation, !check_measure) for m in measures]
-    
+
     if verbosity >= 0 && weights !== nothing
         unsupported = filter(measures) do m
             !supports_weights(m)
@@ -290,27 +320,14 @@ function evaluate!(mach::Machine, resampling;
         return ret
     end
 
-    if parallel && nworkers() > 1
-
+    measurements_flat = if acceleration isa CPUProcesses
         ## TODO: progress meter for distributed case
         if verbosity > 0
             @info "Distributing cross-validation computation " *
                   "among $(nworkers()) workers."
         end
-        # TODO: use pmap here ?:
-        measurements_flat = @distributed vcat for k in 1:nfolds
-            get_measurements(k)
-        end
-
-    else
-
-        p = Progress(nfolds + 1, dt=0, desc="Evaluating over $nfolds folds: ",
-                     barglyphs=BarGlyphs("[=> ]"), barlen=25, color=:yellow)
-        verbosity > 0 && next!(p)
-        measurements_flat =
-            reduce(vcat, (get_measurements(k, p, verbosity) for k in 1:nfolds))
-
     end
+    measurements_flat = _evaluate!(get_measurements, acceleration, nfolds, verbosity)
 
     # in the following rows=folds, columns=measures:
     measurements_matrix = permutedims(
@@ -324,8 +341,8 @@ function evaluate!(mach::Machine, resampling;
             missing
         end
     end
-    
-    # measurements for each fold: 
+
+    # measurements for each fold:
     per_fold = map(1:nmeasures) do m
         if reports_each_observation(measures[m])
             mean.(per_observation[m])
@@ -360,7 +377,7 @@ function actual_rows_and_weights(rows, weights, N, verbosity)
     unspecified_rows || @info "Creating subsamples from a subset of all rows. "
     return _rows, _weights
 end
-    
+
 # evaluation when ResamplingStrategy is passed (instead of train/test rows):
 function evaluate!(mach::Machine, resampling::ResamplingStrategy;
                    weights=nothing, rows=nothing, verbosity=1, kwargs...)
@@ -369,8 +386,9 @@ function evaluate!(mach::Machine, resampling::ResamplingStrategy;
     _rows, _weights =
         actual_rows_and_weights(rows, weights, length(y), verbosity)
 
-    return evaluate!(mach::Machine, train_test_pairs(resampling, _rows);
-                     weights=_weights, verbosity=verbosity, kwargs...)
+    return evaluate!(mach::Machine,
+               train_test_pairs(resampling, _rows, mach.args...);
+               weights=_weights, verbosity=verbosity, kwargs...)
 
 end
 
@@ -388,6 +406,7 @@ mutable struct Resampler{S,M<:Supervised} <: Supervised
     measure
     weights::Union{Nothing,AbstractVector{<:Real}}
     operation
+    acceleration::AbstractResource
 end
 
 MLJBase.package_name(::Type{<:Resampler}) = "MLJ"
@@ -395,8 +414,10 @@ MLJBase.is_wrapper(::Type{<:Resampler}) = true
 
 
 Resampler(; model=ConstantRegressor(), resampling=Holdout(),
-            measure=nothing, weights=nothing, operation=predict) =
-                Resampler(model, resampling, measure, weights, operation)
+            measure=nothing, weights=nothing, operation=predict,
+            acceleration=DEFAULT_RESOURCE[]) =
+                Resampler(model, resampling, measure, weights, operation,
+                          acceleration)
 
 
 function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
@@ -409,19 +430,20 @@ function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
     else
         measure = resampler.measure
     end
-    
+
     mach = machine(resampler.model, X, y)
-    
+
     fitresult = evaluate!(mach, resampler.resampling;
                           measure=measure, weights=resampler.weights,
                           operation=resampler.operation,
-                          verbosity=verbosity-1)
-    
+                          verbosity=verbosity-1,
+                          acceleration=resampler.acceleration)
+
     cache = (mach, deepcopy(resampler.resampling))
     report = NamedTuple()
-    
+
     return fitresult, cache, report
-    
+
 end
 
 # in special case of holdout, we can reuse the underlying model's
@@ -449,7 +471,7 @@ function MLJBase.update(resampler::Resampler{Holdout},
 
     fitresult = evaluate!(mach, resampler.resampling;
                           measure=resampler.measure,
-                          weights=resampler.weights, 
+                          weights=resampler.weights,
                           operation=resampler.operation,
                           verbosity=verbosity-1)
 
@@ -466,4 +488,3 @@ MLJBase.target_scitype(::Type{<:Resampler{S,M}}) where {S,M} = MLJBase.target_sc
 ## EVALUATE FOR MODEL + DATA
 
 MLJBase.evaluate(model::Resampler, fitresult) = fitresult
-

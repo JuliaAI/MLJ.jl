@@ -57,7 +57,8 @@ export models, localmodels, @load, load, info,
     StaticTransformer, FeatureSelector,        # builtins/Transformers.jl
     UnivariateStandardizer, Standardizer,
     UnivariateBoxCoxTransformer,
-    OneHotEncoder
+    OneHotEncoder, UnivariateDiscretizer,
+    FillImputer
 
 
 ## IMPORTS
@@ -86,6 +87,9 @@ import PrettyTables
 import Random
 using ScientificTypes
 import ScientificTypes
+using ComputationalResources
+import ComputationalResources: CPUProcesses
+const DEFAULT_RESOURCE = Ref{AbstractResource}(CPU1())
 
 # convenience packages
 using DocStringExtensions: SIGNATURES, TYPEDEF

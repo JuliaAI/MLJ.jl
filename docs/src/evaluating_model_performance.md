@@ -106,13 +106,16 @@ CV
 To define your own resampling strategy, make relevant parameters of
 your strategy the fields of a new type `MyResamplingStrategy <:
 MLJ.ResamplingStrategy`, and implement
-`MLJ.train_test_pairs(my_strategy::MyStragegy, rows)`, a method which will take
-a vector of indices `rows` and return a vector `[(t1, e1), (t2, e2),
-... (tk, ek)]` of train/test pairs of row indices selected from
-`rows`. Here is the code for the `Holdout` strategy as an example:
+`MLJ.train_test_pairs(my_strategy::MyStragegy, rows, X, y)`, a method
+which will take a vector of indices `rows` and return a vector `[(t1,
+e1), (t2, e2), ... (tk, ek)]` of train/test pairs of row indices
+selected from `rows`. Here `X`, `y` are the input and target data
+(ignored in simple strategies, such as `Holdout` and `CV`).
+
+Here is the code for the `Holdout` strategy as an example:
 
 ```julia
-struct Holdout <: ResamplingStrategy
+struct Holdout <: MLJ.ResamplingStrategy
     fraction_train::Float64
     shuffle::Bool
     rng::Union{Int,AbstractRNG}
@@ -131,7 +134,7 @@ function Holdout(; fraction_train::Float64=0.7,
     Holdout(fraction_train, shuffle, rng)
 end
 
-function train_test_pairs(holdout::Holdout, rows)
+function MLJ.train_test_pairs(holdout::Holdout, rows, X, y)
     if holdout.rng isa Integer
         rng = MersenneTwister(holdout.rng)
     else

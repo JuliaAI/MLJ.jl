@@ -12,6 +12,10 @@ include("foobarmodel.jl")
 
 @test CV(nfolds=6) == CV(nfolds=6)
 @test CV(nfolds=5) != CV(nfolds=6)
+@test MLJ.train_test_pairs(CV(), 1:10) !=
+     MLJ.train_test_pairs(CV(shuffle=true), 1:10)
+@test MLJ.train_test_pairs(Holdout(), 1:10) !=
+     MLJ.train_test_pairs(Holdout(shuffle=true), 1:10)
 
 @testset "checking measure/model compatibility" begin
     model = ConstantRegressor()
@@ -81,7 +85,7 @@ end
     mach = machine(model, X, y)
     result = evaluate!(mach, resampling=holdout,
                        measure=[rms, rmslp1])
-    result = evaluate!(mach, verbosity=0, resampling=holdout)  
+    result = evaluate!(mach, verbosity=0, resampling=holdout)
     result.measurement[1] ≈ 2/3
 
     # test direct evaluation of a model + data:
@@ -94,7 +98,7 @@ end
     evaluate!(mach, verbosity=0, Holdout(shuffle=true, rng=123))
     e1 = evaluate!(mach, verbosity=0, Holdout(shuffle=true)).measurement[1]
     @test e1 != evaluate!(mach, verbosity=0, Holdout()).measurement[1]
-             
+
 end
 
 @testset "cv" begin
@@ -102,7 +106,7 @@ end
     x2 = ones(10)
     X = (x1=x1, x2=x2)
     y = [1.0, 1.0, 2.0, 2.0, 1.0, 1.0, 2.0, 2.0, 1.0, 1.0]
-    
+
     @test MLJBase.show_as_constructed(CV)
     cv=CV(nfolds=5)
     model = MLJModels.DeterministicConstantRegressor()
@@ -135,7 +139,7 @@ end
     N = 50
     X = (x1=rand(N), x2=rand(N), x3=rand(N))
     y = X.x1 -2X.x2 + 0.05*rand(N)
-    
+
     ridge_model = FooBarRegressor(lambda=20.0)
     holdout = Holdout(fraction_train=0.75)
     resampler = Resampler(resampling=holdout, model=ridge_model, measure=mav)
@@ -152,7 +156,7 @@ end
     resampler.weights = rand(N)
     fit!(resampling_machine, verbosity=0)
     e3=evaluate(resampling_machine).measurement[1]
-    @test e3 != e2        
+    @test e3 != e2
 
     @test MLJBase.package_name(Resampler) == "MLJ"
     @test MLJBase.is_wrapper(Resampler)
@@ -160,6 +164,29 @@ end
     @test evaluate(resampler, rnd) === rnd
 end
 
+struct DummyResamplingStrategy <: MLJ.ResamplingStrategy end
+
+@testset "custom strategy using resampling depending on X, y" begin
+    function MLJ.train_test_pairs(resampling::DummyResamplingStrategy,
+                              rows, X, y)
+        train = filter(rows) do j
+            y[j] == y[1]
+        end
+        test = setdiff(rows, train)
+        return [(train, test),]
+    end
+
+    X = (x = rand(8), )
+    y = categorical([:x, :y, :x, :x, :y, :x, :x, :y])
+    @test MLJ.train_test_pairs(DummyResamplingStrategy(), 2:6, X, y) ==
+        [([3, 4, 6], [2, 5]),]
+
+    e = evaluate(ConstantClassifier(), X, y,
+                 measure=misclassification_rate,
+                 resampling=DummyResamplingStrategy(),
+                 operation=predict_mode)
+    @test e.measurement[1] ≈ 1.0
+end
 
 end
 true

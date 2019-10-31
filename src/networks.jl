@@ -438,6 +438,11 @@ MLJBase.table(X::AbstractNode) = node(MLJBase.table, X)
 Base.vcat(args::AbstractNode...) = node(vcat, args...)
 Base.hcat(args::AbstractNode...) = node(hcat, args...)
 
+Statistics.mean(X::AbstractNode) = node(v->mean.(v), X)
+Statistics.median(X::AbstractNode) = node(v->median.(v), X)
+import StatsBase.mode
+StatsBase.mode(X::AbstractNode) = node(v->mode.(v), X)
+
 Base.log(X::AbstractNode) = node(v->log.(v), X)
 Base.exp(X::AbstractNode) = node(v->exp.(v), X)
 
