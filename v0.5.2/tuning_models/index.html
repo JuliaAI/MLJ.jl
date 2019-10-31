@@ -33,11 +33,11 @@ MLJModels.DecisionTree_.DecisionTreeRegressor(pruning_purity_threshold = 0.0,
                                               min_samples_split = 2,
                                               min_purity_increase = 0.004641588833612781,
                                               n_subfeatures = 0,
-                                              post_prune = false,) @ 2…98</code></pre><p>Predicting on new input observations using the optimal model:</p><pre><code class="language-julia-repl">julia&gt; predict(self_tuning_tree, (x1=rand(3), x2=rand(3), x3=rand(3)))
+                                              post_prune = false,) @ 1…51</code></pre><p>Predicting on new input observations using the optimal model:</p><pre><code class="language-julia-repl">julia&gt; predict(self_tuning_tree, (x1=rand(3), x2=rand(3), x3=rand(3)))
 3-element Array{Float64,1}:
-  1.3782712258987186
- -0.4382475301636681
-  0.27816909572968973</code></pre><h3><a class="nav-anchor" id="Tuning-multiple-nested-hyperparameters-1" href="#Tuning-multiple-nested-hyperparameters-1">Tuning multiple nested hyperparameters</a></h3><p>The following model has another model, namely a <code>DecisionTreeRegressor</code>, as a hyperparameter:</p><div></div><pre><code class="language-julia">julia&gt; tree_model = DecisionTreeRegressor()
+  0.5518859399047024
+  1.305643707047736
+ -0.5374720087195726</code></pre><h3><a class="nav-anchor" id="Tuning-multiple-nested-hyperparameters-1" href="#Tuning-multiple-nested-hyperparameters-1">Tuning multiple nested hyperparameters</a></h3><p>The following model has another model, namely a <code>DecisionTreeRegressor</code>, as a hyperparameter:</p><div></div><pre><code class="language-julia">julia&gt; tree_model = DecisionTreeRegressor()
 julia&gt; forest_model = EnsembleModel(atom=tree_model); </code></pre><p>Nested hyperparameters can be inspected using <code>params</code> (or just type <code>@more</code> in the REPL after instantiating <code>forest_model</code>):</p><pre><code class="language-julia-repl">julia&gt; params(forest_model)
 (atom = (pruning_purity_threshold = 0.0,
          max_depth = -1,
@@ -48,7 +48,7 @@ julia&gt; forest_model = EnsembleModel(atom=tree_model); </code></pre><p>Nested 
          post_prune = false,),
  weights = Float64[],
  bagging_fraction = 0.8,
- rng = MersenneTwister(UInt32[0x0f77f305, 0x860e37ac, 0xdad48c51, 0xc4d7ca78]),
+ rng = MersenneTwister(UInt32[0x764b4087, 0x76da3abd, 0x2f38675f, 0x72a58b1a]),
  n = 100,
  acceleration = ComputationalResources.CPU1{Nothing}(nothing),
  out_of_bag_measure = Any[],)</code></pre><p>Ranges for nested hyperparameters are specified using dot syntax:</p><pre><code class="language-julia-repl">julia&gt; r1 = range(forest_model, :(atom.n_subfeatures), lower=1, upper=3);
@@ -64,14 +64,14 @@ julia&gt; self_tuning_forest_model = TunedModel(model=forest_model,
 julia&gt; self_tuning_forest = machine(self_tuning_forest_model, X, y);
 
 julia&gt; fit!(self_tuning_forest, verbosity=0)
-Machine{DeterministicTunedModel} @ 1…18
+Machine{DeterministicTunedModel} @ 9…17
 
 julia&gt; report(self_tuning_forest)
 (parameter_names = [&quot;atom.n_subfeatures&quot; &quot;bagging_fraction&quot;],
  parameter_scales = Symbol[:linear :linear],
  parameter_values = Any[1 0.4; 2 0.4; … ; 2 1.0; 3 1.0],
- measurements = [0.3322326982731637, 0.21554553910254967, 0.20558157406119684, 0.3161762702436342, 0.20219022562333852, 0.19396737243565118, 0.3038386124772611, 0.18681527132473966, 0.18345304850316357, 0.3087820564408717  …  0.165485459801147, 0.2568522072955482, 0.1530431222889577, 0.16714574283184339, 0.26475547970632773, 0.15501940409122303, 0.17316116015568675, 0.26380626192261547, 0.16890175213751038, 0.20192324309931556],
- best_measurement = 0.1530431222889577,)</code></pre><p>In this two-parameter case, a plot of the grid search results is also available:</p><pre><code class="language-julia">using Plots
+ measurements = [0.34757212535410603, 0.22064856851123457, 0.2288608630306763, 0.3376291842982175, 0.21085539834460207, 0.21756885710107973, 0.32057790736856434, 0.2065425362350757, 0.21070562230288944, 0.3158395695452581  …  0.1848765874245987, 0.2807623756417356, 0.17569661262279723, 0.1860410491391817, 0.2882273819665523, 0.17458932853772244, 0.1888969257791758, 0.28594669419917973, 0.17855207867689812, 0.20696504361677326],
+ best_measurement = 0.16958339081934978,)</code></pre><p>In this two-parameter case, a plot of the grid search results is also available:</p><pre><code class="language-julia">using Plots
 plot(self_tuning_forest)</code></pre><p><img src="../tuning_plot.png" alt/></p><p>It is also possible to specify different resolutions for each dimension of the grid. See <a href="@ref">Grid</a> below for details.</p><h3><a class="nav-anchor" id="API-1" href="#API-1">API</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.range" href="#Base.range"><code>Base.range</code></a> — <span class="docstring-category">Function</span>.</div><div><div><pre><code class="language-julia">r = range(model, :hyper; values=nothing)</code></pre><p>Defines a <code>NominalRange</code> object for a field <code>hyper</code> of <code>model</code>, assuming the field is a not a subtype of <code>Real</code>. Note that <code>r</code> is not directly iterable but <code>iterator(r)</code> iterates over <code>values</code>.</p><p>A nested hyperparameter is specified using dot notation. For example, <code>:(atom.max_depth)</code> specifies the <code>:max_depth</code> hyperparameter of the hyperparameter <code>:atom</code> of <code>model</code>.</p><pre><code class="language-none">r = range(model, :hyper; upper=nothing, lower=nothing, scale=:linear)</code></pre><p>Defines a <code>NumericRange</code> object for a <code>Real</code> field <code>hyper</code> of <code>model</code>. Note that <code>r</code> is not directly iteratable but <code>iterator(r, n)</code> iterates over <code>n</code> values between <code>lower</code> and <code>upper</code> values, according to the specified <code>scale</code>. The supported scales are <code>:linear, :log, :log10, :log2</code>. Values for <code>Integer</code> types are rounded (with duplicate values removed, resulting in possibly less than <code>n</code> values).</p><p>Alternatively, if a function <code>f</code> is provided as <code>scale</code>, then <code>iterator(r, n)</code> iterates over the values <code>[f(x1), f(x2), ... , f(xn)]</code>, where <code>x1, x2, ..., xn</code> are linearly spaced between <code>lower</code> and <code>upper</code>.</p></div></div><a class="source-link" target="_blank" href="https://github.com/alan-turing-institute/MLJ.jl/blob/d03bd36e8be5c32c0b330875a0e67d2e05cc5e58/src/parameters.jl#L63-L88">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJ.Grid" href="#MLJ.Grid"><code>MLJ.Grid</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">Grid(resolution=10, parallel=true)</code></pre><p>Define a grid-based hyperparameter tuning strategy, using the specified <code>resolution</code> for numeric hyperparameters. For use with a <code>TunedModel</code> object.</p><p>Individual hyperparameter resolutions can also be specified, as in</p><pre><code class="language-none">Grid(resolution=[:n =&gt; r1, :(atom.max_depth) =&gt; r2])</code></pre><p>where <code>r1</code> and <code>r2</code> are <code>NumericRange</code> objects.</p><p>See also <a href="@ref">TunedModel</a>, <a href="@ref">range</a>.</p></div></div><a class="source-link" target="_blank" href="https://github.com/alan-turing-institute/MLJ.jl/blob/d03bd36e8be5c32c0b330875a0e67d2e05cc5e58/src/tuning.jl#L4-L19">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJ.TunedModel" href="#MLJ.TunedModel"><code>MLJ.TunedModel</code></a> — <span class="docstring-category">Function</span>.</div><div><div><pre><code class="language-julia">tuned_model = TunedModel(; model=nothing,
                          tuning=Grid(),
                          resampling=Holdout(),
