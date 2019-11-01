@@ -15,7 +15,7 @@
 
 # This allows implicit: data |> Supervised
 (m::Supervised)(data::NTuple{2,AbstractNode}) = data[1] |> machine(m, data...)
-(m::Supervised)(data::Tuple{AbstractNode,Any}) = (@show "hello"; (data[1], source(data[2], kind=:target)) |> m)
+(m::Supervised)(data::Tuple{AbstractNode,Any}) = (data[1], source(data[2], kind=:target)) |> m
 (m::Supervised)(data::Tuple) = (source(data[1]), data[2]) |> m
 (m::Supervised)(data::Tuple{AbstractMatrix,Any}) = (data[1] |> table, data[2]) |> m
 
