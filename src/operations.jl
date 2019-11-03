@@ -85,25 +85,5 @@ function fitted_params(machine::AbstractMachine)
     end
 end
 
-
-# Syntactic sugar for pipe syntax
-# we need version ≥ 1.3 in order to make use of multiple dispatch
-# over abstract types
-if VERSION ≥ v"1.3.0-"
-
-    (mach::AbstractMachine{<:Unsupervised})(data) = transform(mach, data)
-    (mach::AbstractMachine{<:Supervised})(data)   = predict(mach, data)
-
-    (m::Unsupervised)(data::AbstractNode) = data |> machine(m, data)
-    (m::Unsupervised)(data) = source(data) |> m
-
-    (m::Supervised)(data::NTuple{2,AbstractNode}) = data[1] |> machine(m, data...)
-    (m::Supervised)(data::Tuple) = source.(data) |> m
-
-    inverse_transform(node::Node{<:NodalMachine{<:Unsupervised}}) =
-        data->inverse_transform(node.machine, data)
-end # version ≥ 1.3
-
-# Syntactic sugar to directly access hyperparameters
 getindex(n::Node{<:NodalMachine{<:Model}}, s::Symbol) = getproperty(n.machine.model, s)
 setindex!(n::Node{<:NodalMachine{<:Model}}, v, s::Symbol) = setproperty!(n.machine.model, s, v)
