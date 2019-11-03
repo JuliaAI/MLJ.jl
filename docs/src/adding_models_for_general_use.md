@@ -498,13 +498,12 @@ The above remarks continue to hold unchanged for the case multivariate
 targets.  For example, if we declare
 
 ```julia
-target_scitype(SomeSupervisedModel) = AbstractVector{<:Tuple{Continuous,Count}}
+target_scitype(SomeSupervisedModel) = Table(Continuous)
 ```
 
-then each element of `y` will be a tuple of type
-`Tuple{AbstractFloat,Integer}`. For predicting variable length
-sequences of, say, binary values (`CategoricalValue`s or
-`CategoricalString`s with some common size-two pool) we declare
+For predicting variable length sequences of, say, binary values
+(`CategoricalValue`s or `CategoricalString`s with some common size-two
+pool) we declare
 
 ```julia
 target_scitype(SomeSupervisedModel) = AbstractVector{<:NTuple{<:Binary}}
