@@ -42,5 +42,24 @@ stand = machine(Standardizer(), source((x1=rand(10),)))
 freeze!(stand)
 @test_logs (:warn, r"not trained as it is frozen\.$") fit!(stand)
 
+mutable struct Scale <: MLJBase.Static
+    scaling::Float64
+end
+
+@testset "static transformations" begin
+
+    X = rand(5, 3)
+
+    (s::Scale)(X) = s.scaling*X
+    MLJBase.inv(s::Scale, X) = X/s.scaling
+
+    double = Scale(2)
+    double(X)      # <----- crash: method amiguity
+
+    mach = fit!(machine(double, X), X)
+    @test transform(mach) ≈ 2*X
+
+end
+
 end # module
 true
