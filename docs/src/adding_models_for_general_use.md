@@ -604,7 +604,10 @@ method.
 TODO
 
 This is basically the same but with no target `y` appearing in the
-signatures, and no `target_scitype` trait to declare.
+signatures, and no `target_scitype` trait to declare. Instead, one
+declares an `output_scitype` trait. Instead of implementing a
+`predict` methods, one implements a `transform` operation, and an
+optional `inverse_transform` operation.
 
 
 ### Convenience methods
