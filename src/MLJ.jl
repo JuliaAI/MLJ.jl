@@ -81,6 +81,7 @@ using  CategoricalArrays
 import Distributions: pdf, mode
 import Distributions
 import StatsBase
+using Statistics
 using ProgressMeter
 import Tables
 import PrettyTables
@@ -139,10 +140,10 @@ include("plotrecipes.jl")
 
 ## INCLUDES FOR OPTIONAL DEPENDENCIES
 
-function __init__()
-    @require(CSV="336ed68f-0bac-5ca0-87d4-7b16caf5d00b",
-             include("datasets_requires.jl"))
-end
+# function __init__()
+#     @require(CSV="336ed68f-0bac-5ca0-87d4-7b16caf5d00b",
+#              include("datasets_requires.jl"))
+# end
 
 
 end # module
