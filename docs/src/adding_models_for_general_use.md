@@ -498,13 +498,12 @@ The above remarks continue to hold unchanged for the case multivariate
 targets.  For example, if we declare
 
 ```julia
-target_scitype(SomeSupervisedModel) = AbstractVector{<:Tuple{Continuous,Count}}
+target_scitype(SomeSupervisedModel) = Table(Continuous)
 ```
 
-then each element of `y` will be a tuple of type
-`Tuple{AbstractFloat,Integer}`. For predicting variable length
-sequences of, say, binary values (`CategoricalValue`s or
-`CategoricalString`s with some common size-two pool) we declare
+For predicting variable length sequences of, say, binary values
+(`CategoricalValue`s or `CategoricalString`s with some common size-two
+pool) we declare
 
 ```julia
 target_scitype(SomeSupervisedModel) = AbstractVector{<:NTuple{<:Binary}}
@@ -605,7 +604,10 @@ method.
 TODO
 
 This is basically the same but with no target `y` appearing in the
-signatures, and no `target_scitype` trait to declare.
+signatures, and no `target_scitype` trait to declare. Instead, one
+declares an `output_scitype` trait. Instead of implementing a
+`predict` methods, one implements a `transform` operation, and an
+optional `inverse_transform` operation.
 
 
 ### Convenience methods

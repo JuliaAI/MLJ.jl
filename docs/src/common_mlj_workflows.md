@@ -27,6 +27,8 @@ y, X =  unpack(channing,
 first(X, 4) 
 ```
 
+*Note:* Before julia 1.2, replace `!=(:Time)` with `col -> col != :Time`. 
+
 ```@example workflows
 y[1:4]
 ```

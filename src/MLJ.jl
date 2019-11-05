@@ -128,6 +128,11 @@ include("networks.jl")      # for building learning networks
 include("composites.jl")    # composite models & exporting learning networks
 include("pipelines.jl")     # pipelines (exported linear learning networks)
 include("operations.jl")    # syntactic sugar for operations (predict, etc)
+
+if VERSION ≥ v"1.3.0-"
+    include("arrows.jl")
+end
+
 include("resampling.jl")    # resampling strategies and model evaluation
 include("parameters.jl")    # hyperparameter ranges and grid generation
 include("tuning.jl")

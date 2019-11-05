@@ -26,8 +26,10 @@ end
   @test include("networks.jl")
 end
 
-@testset "operations" begin
-  @test include("operations.jl")
+if VERSION ≥ v"1.3.0-"
+  @testset "arrows" begin
+    @test include("arrows.jl")
+  end
 end
 
 @testset "composites" begin
