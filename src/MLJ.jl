@@ -85,7 +85,7 @@ using  CategoricalArrays
 import Distributions
 import Distributions: pdf, mode
 import Statistics, StatsBase, LinearAlgebra, Random
-import Random.AbstractRNG
+import Random: AbstractRNG, MersenneTwister
 
 using ProgressMeter
 

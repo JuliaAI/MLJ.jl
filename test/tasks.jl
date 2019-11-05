@@ -4,6 +4,7 @@ module TestTasks
 using Test
 using MLJ
 using Random
+using Random: MersenneTwister
 
 X=(x=10:10:44, y=1:4, z=collect("abcd"))
 task = SupervisedTask(data=X, target=:y, is_probabilistic=true)

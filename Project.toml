@@ -7,6 +7,7 @@ version = "0.5.2"
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
 ComputationalResources = "ed09eef8-17a6-5b46-8889-db040fac31e3"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
@@ -43,6 +44,7 @@ julia = "1"
 
 [extras]
 DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 LossFunctions = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
 MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
@@ -52,4 +54,4 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 UnicodePlots = "b8865327-cd53-5732-bb35-84acbb429228"
 
 [targets]
-test = ["DecisionTree", "LossFunctions", "MLJBase", "MultivariateStats", "NearestNeighbors", "RDatasets", "Test", "UnicodePlots"]
+test = ["DecisionTree", "DelimitedFiles", "LossFunctions", "MLJBase", "MultivariateStats", "NearestNeighbors", "RDatasets", "Test", "UnicodePlots"]

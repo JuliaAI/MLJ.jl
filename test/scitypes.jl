@@ -1,6 +1,5 @@
 module TestScitypes
 
-# using Revise
 using MLJ
 import MLJBase
 using Test
@@ -11,7 +10,7 @@ U = scitype(FeatureSelector())
 @test U().input_scitype == MLJ.Table(Scientific)
 
 M = scitype(rms)
-@test M().prediction_type == :deterministic
+@test_broken M().prediction_type == :deterministic
 
 for handle in localmodels()
     name = Symbol(handle.name)
