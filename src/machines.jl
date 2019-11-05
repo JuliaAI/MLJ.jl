@@ -38,6 +38,8 @@ function machine(model::M, args...) where M <: Model
                       "training.\n However, supplied weights *will* be passed "*
                       "to weight-supporting measures on calls to `evaluate!`.")
             X, y, w = args
+            w isa AbstractVector{<:Real} ||
+                throw(ArgumentError("Weights must be real. "))
             nrows(w) == nrows(y) ||
                 throw(DimensionMismatch("Weights and target differ in length."))
         else

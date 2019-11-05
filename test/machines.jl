@@ -49,9 +49,33 @@ freeze!(stand)
                machine(tree, X, y, rand(N)))
     @test_throws DimensionMismatch machine(tree, X, y[1:end-1])
     @test_throws DimensionMismatch machine(tree, X, y, rand(N-1))
+    @test_throws ArgumentError machine(tree, X, y, fill('a', N))
     @test_logs((:warn, r"The scitype of `y`"),
                machine(tree, X, categorical(1:N)))
     @test_logs((:warn, r"The scitype of `X`"),
                machine(tree, (x=categorical(1:N),), y))
+end
+
+@testset "weights" begin
+    yraw = ["Perry", "Antonia", "Perry", "Skater"]
+    X = (x=rand(4),)
+    y = categorical(yraw)
+    w = [2, 3, 2, 5]
+
+    # without weights:
+    mach = machine(ConstantClassifier(), X, y)
+    fit!(mach)
+    d1 = predict(mach)[1]
+    d2 = MLJBase.UnivariateFinite([y[1], y[2], y[4]], [0.5, 0.25, 0.25])
+    @test all([pdf(d1, c) ≈ pdf(d2, c) for c in MLJBase.classes(d)])
+
+    # with weights:
+    mach = machine(ConstantClassifier(), X, y, w)
+    fit!(mach)
+    d1 = predict(mach)[1]
+    d2 = MLJBase.UnivariateFinite([y[1], y[2], y[4]], [1/3, 1/4, 5/12])
+    @test all([pdf(d1, c) ≈ pdf(d2, c) for c in MLJBase.classes(d)])
+end
+
 end # module
 true
