@@ -67,14 +67,14 @@ end
     fit!(mach)
     d1 = predict(mach)[1]
     d2 = MLJBase.UnivariateFinite([y[1], y[2], y[4]], [0.5, 0.25, 0.25])
-    @test all([pdf(d1, c) ≈ pdf(d2, c) for c in MLJBase.classes(d)])
+    @test all([pdf(d1, c) ≈ pdf(d2, c) for c in MLJBase.classes(d1)])
 
     # with weights:
     mach = machine(ConstantClassifier(), X, y, w)
     fit!(mach)
     d1 = predict(mach)[1]
     d2 = MLJBase.UnivariateFinite([y[1], y[2], y[4]], [1/3, 1/4, 5/12])
-    @test all([pdf(d1, c) ≈ pdf(d2, c) for c in MLJBase.classes(d)])
+    @test all([pdf(d1, c) ≈ pdf(d2, c) for c in MLJBase.classes(d1)])
 end
 
 end # module
