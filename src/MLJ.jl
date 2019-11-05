@@ -66,6 +66,11 @@ export models, localmodels, @load, load, info,
 using MLJBase
 using MLJModels
 
+# these are defined in MLJBase
+export load_boston, load_ames, load_iris
+export load_reduced_ames
+export load_crabs
+
 # to be extended:
 import MLJBase: fit, update, clean!,
     predict, predict_mean, predict_median, predict_mode,
@@ -73,23 +78,22 @@ import MLJBase: fit, update, clean!,
     show_as_constructed, params
 import MLJModels: models
 
-using Requires
-import Pkg.TOML
-import Pkg
-using OrderedCollections
+import Pkg, Pkg.TOML
+using Tables, OrderedCollections
+
 using  CategoricalArrays
-import Distributions: pdf, mode
 import Distributions
-import StatsBase
-using Statistics
+import Distributions: pdf, mode
+import Statistics, StatsBase, LinearAlgebra
+
 using ProgressMeter
-import Tables
+
 import PrettyTables
-import Random
 using ScientificTypes
-import ScientificTypes
+
 using ComputationalResources
-import ComputationalResources: CPUProcesses
+using ComputationalResources: CPUProcesses
+
 const DEFAULT_RESOURCE = Ref{AbstractResource}(CPU1())
 
 # convenience packages
@@ -100,9 +104,6 @@ import Base: ==, getindex, setindex!
 import StatsBase.fit!
 
 # from Standard Library:
-using Statistics
-using LinearAlgebra
-using Random
 import Distributed: @distributed, nworkers, pmap
 using RecipesBase # for plotting
 
@@ -118,7 +119,6 @@ const CategoricalElement = Union{CategoricalString,CategoricalValue}
 # and https://github.com/JuliaLang/Pkg.jl/pull/1086/commits/996c6b9b69ef0c058e0105427983622b7cc8cb1d
 toml = Pkg.TOML.parsefile(joinpath(dirname(dirname(pathof(MLJ))), "Project.toml"))
 const MLJ_VERSION = toml["version"]
-
 
 ## INCLUDES
 

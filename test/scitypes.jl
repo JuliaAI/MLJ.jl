@@ -11,7 +11,7 @@ U = scitype(FeatureSelector())
 @test U().input_scitype == MLJ.Table(Scientific)
 
 M = scitype(rms)
-@test_broken M().prediction_type == :deterministic
+@test M().prediction_type == :deterministic
 
 for handle in localmodels()
     name = Symbol(handle.name)
