@@ -5,6 +5,7 @@ using Test
 using MLJ
 using MLJBase
 import MLJModels
+import StatsBase
 import Random.seed!
 seed!(1234)
 
@@ -22,7 +23,8 @@ include("foobarmodel.jl")
     y = rand(4)
     override=false
     @test MLJ._check_measure(:junk, :junk, :junk, :junk, true) == nothing
-    @test_throws ArgumentError MLJ._check_measure(model, rms, y, predict, override)
+    @test_throws (ArgumentError,
+                  MLJ._check_measure(model, rms, y, predict, override))
     @test MLJ._check_measure(model, rms, y, predict_mean, override) == nothing
     @test MLJ._check_measure(model, rms, y, predict_median, override) == nothing
     y=categorical(collect("abc"))
@@ -30,7 +32,7 @@ include("foobarmodel.jl")
                  MLJ._check_measure(model, rms, y, predict_median, override))
     model = ConstantClassifier()
     @test_throws(ArgumentError,
-                 MLJ._check_measure(model, misclassification_rate, y, predict, override))
+       MLJ._check_measure(model, misclassification_rate, y, predict, override))
     @test MLJ._check_measure(model, misclassification_rate, y,
                             predict_mode, override) == nothing
     model = MLJModels.DeterministicConstantClassifier()
@@ -226,6 +228,32 @@ end
                            operation=predict_mode,
                            measure=misclassification_rate,
                            weights = fill('a', 5)))
+
+    # TODO: use a non-trivial classifier supporting sample weights
+    # below instead of constant classifier to check X dependence.
+
+    # resampling on a subset of all rows:
+    model = ConstantClassifier()
+    N = 4
+    X = (x = rand(3N), );
+    y = categorical(rand("abcd", 3N));
+    w = rand(3N);
+    rows = StatsBase.sample(1:3N, 2N, replace=false);
+    Xsmall = selectrows(X, rows);
+    ysmall = selectrows(y, rows);
+    wsmall = selectrows(w, rows);
+
+    mach1 = machine(model, Xsmall, ysmall, wsmall)
+    e1 = evaluate!(mach1, resampling=CV(),
+                   measure=misclassification_rate,
+                   operation=predict_mode)
+
+    mach2 = machine(model, X, y, w)
+    e2 = evaluate!(mach2, resampling=CV(),
+                   measure=misclassification_rate,
+                   operation=predict_mode,
+                   rows=rows)
+
 
 end
 
