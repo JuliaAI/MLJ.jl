@@ -1,6 +1,6 @@
 module TestResampling
 
-#  using Revise
+# using Revise
 using Test
 using MLJ
 using MLJBase
@@ -95,9 +95,12 @@ end
     X = (x=rand(100),)
     y = rand(100)
     mach = machine(model, X, y)
-    evaluate!(mach, verbosity=0, Holdout(shuffle=true, rng=123))
-    e1 = evaluate!(mach, verbosity=0, Holdout(shuffle=true)).measurement[1]
-    @test e1 != evaluate!(mach, verbosity=0, Holdout()).measurement[1]
+    evaluate!(mach, verbosity=0,
+              resampling=Holdout(shuffle=true, rng=123))
+    e1 = evaluate!(mach, verbosity=0,
+                   resampling=Holdout(shuffle=true)).measurement[1]
+    @test e1 != evaluate!(mach, verbosity=0,
+                          resampling=Holdout()).measurement[1]
 
 end
 
@@ -211,9 +214,20 @@ end
               operation=predict_mode, measure=misclassification_rate,
                   weights = fill(1, 5))
     @test e.measurement[1] ≈ 1/2
+
+    @test_throws(DimensionMismatch,
+                 evaluate!(mach, resampling=Holdout(fraction_train=0.6),
+                           operation=predict_mode,
+                           measure=misclassification_rate,
+                           weights = fill(1, 100)))
+
+    @test_throws(ArgumentError,
+                 evaluate!(mach, resampling=Holdout(fraction_train=0.6),
+                           operation=predict_mode,
+                           measure=misclassification_rate,
+                           weights = fill('a', 5)))
+
 end
-
-
 
 end
 true

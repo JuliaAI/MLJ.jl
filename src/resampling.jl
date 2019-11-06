@@ -124,16 +124,101 @@ function train_test_pairs(cv::CV, rows)
 end
 
 
-## DIRECT EVALUATION METHODS
+## EVALUATION METHODS
+
+function _check_measure(model, measure, y, operation, override)
+
+    override && (return nothing)
+
+    T = scitype(y)
+
+    T == Unknown && (return nothing)
+    target_scitype(measure) == Unknown && (return nothing)
+    prediction_type(measure) == :unknown && (return nothing)
+
+    avoid = "\nTo override measure checks, set check_measure=false. "
+
+    T <: target_scitype(measure) ||
+        throw(ArgumentError(
+            "\nscitype of target = $T but target_scitype($measure) = "*
+            "$(target_scitype(measure))."*avoid))
+
+    if model isa Probabilistic
+        if operation == predict
+            if prediction_type(measure) != :probabilistic
+                suggestion = ""
+                if target_scitype(measure) <: Finite
+                    suggestion = "\nPerhaps you want to set operation="*
+                    "predict_mode. "
+                elseif target_scitype(measure) <: Continuous
+                    suggestion = "\nPerhaps you want to set operation="*
+                    "predict_mean or operation=predict_median. "
+                else
+                    suggestion = ""
+                end
+                throw(ArgumentError(
+                   "\n$model <: Probabilistic but prediction_type($measure) = "*
+                      ":$(prediction_type(measure)). "*suggestion*avoid))
+            end
+        end
+    end
+
+    model isa Deterministic && prediction_type(measure) != :deterministic &&
+        throw(ArgumentError("$model <: Deterministic but "*
+                            "prediction_type($measure) ="*
+              ":$(prediction_type(measure))."*avoid))
+
+    return nothing
+
+end
+
+function _process_weights_measures(weights, measures, mach,
+                                   operation, verbosity, check_measure)
+
+    if measures === nothing
+        candidate = default_measure(mach.model)
+        candidate ===  nothing && error("You need to specify measure=... ")
+        _measures = [candidate, ]
+    elseif !(measures isa AbstractVector)
+        _measures = [measures, ]
+    else
+        _measures = measures
+    end
+
+    y = mach.args[2]
+
+    [ _check_measure(mach.model, m, y, operation, !check_measure)
+     for m in _measures ]
+
+    if weights != nothing
+        weights isa AbstractVector{<:Real} ||
+            throw(ArgumentError("`weights` must be a `Real` vector."))
+        length(weights) == nrows(y) ||
+            throw(DimensionMismatch("`weights` and target "*
+                                    "have different lengths. "))
+        _weights = weights
+    elseif  length(mach.args) == 3
+        verbosity < 1 ||
+            @info "Passing machine sample weights to any supported measures. "
+        _weights = mach.args[3]
+    else
+        _weights = weights
+    end
+
+    return _weights, _measures
+
+end
+
+
 
 """
     evaluate!(mach,
               resampling=CV(),
               measure=nothing,
               weights=nothing,
-              operation=predict,  
+              operation=predict,
               acceleration=DEFAULT_RESOURCE[],
-              force=false, 
+              force=false,
               verbosity=1)
 
 Estimate the performance of a machine `mach` wrapping a supervised
@@ -174,15 +259,55 @@ Although evaluate! is mutating, `mach.model` and `mach.args` are
 untouched.
 
 """
-evaluate!(mach::Machine{<:Supervised};
-          resampling=CV(), kwargs...) =
-              evaluate!(mach, resampling; kwargs... )
+function evaluate!(mach::Machine{<:Supervised};
+                   resampling=CV(),
+                   measures=nothing, measure=measures, weights=nothing,
+                   operation=predict, acceleration=DEFAULT_RESOURCE[],
+                   rows=nothing, force=false,
+                   check_measure=true, verbosity=1)
+
+    # this method just checks validity of options, preprocess the
+    # weights and measures, and dispatches a strategy-specific
+    # `evaluate!`
+
+    if resampling isa TrainTestPairs && rows !== nothing
+        error("You cannot specify `rows` unless `resampling "*
+              "isa MLJ.ResamplingStrategy`. ")
+    end
+
+    _weights, _measures =
+        _process_weights_measures(weights, measure, mach,
+                                  operation, verbosity, check_measure)
+
+    if verbosity >= 0 && weights !== nothing
+        unsupported = filter(_measures) do m
+            !supports_weights(m)
+        end
+        if !isempty(unsupported)
+            unsupported_as_string = string(unsupported[1])
+            unsupported_as_string *=
+                reduce(*, [string(", ", m) for m in unsupported[2:end]])
+                @warn "Sample weights ignored in evaluations of the following"*
+            " measures, as unsupported: \n$unsupported_as_string "
+        end
+    end
+
+    evaluate!(mach, resampling, _weights, rows, verbosity,
+                   _measures, operation, acceleration, force)
+
+end
 
 """
     evaluate(model, X, y; measure=nothing, options...)
+    evaluate(model, X, y, w; measure=nothing, options...)
 
 Evaluate the performance of a supervised model `model` on input data
-`X` and target `y`. See the machine version `evaluate!` for options.
+`X` and target `y`, optionally specifying sample weights `w` for
+training, where supported. The same weights are passed to measures
+that support sample weights, unless this behaviour is overridden by
+explicitly specifying the option `weights=...`.
+
+See the machine version `evaluate!` for the complete list of options.
 
 """
 evaluate(model::Supervised, args...; kwargs...) =
@@ -191,51 +316,6 @@ evaluate(model::Supervised, args...; kwargs...) =
 const AbstractRow = Union{AbstractVector{<:Integer}, Colon}
 const TrainTestPair = Tuple{AbstractRow,AbstractRow}
 const TrainTestPairs = AbstractVector{<:TrainTestPair}
-
-function _check_measure(model, measure, y, operation, override)
-
-    override && (return nothing)
-
-    T = scitype(y)
-
-    T == Unknown && (return nothing)
-    target_scitype(measure) == Unknown && (return nothing)
-    prediction_type(measure) == :unknown && (return nothing)
-
-    avoid = "\nTo override measure checks, set check_measure=false. "
-
-    T <: target_scitype(measure) ||
-        throw(ArgumentError(
-            "\nscitype of target = $T but target_scitype($measure) = "*
-            "$(target_scitype(measure))."*avoid))
-
-    if model isa Probabilistic
-        if operation == predict
-            if prediction_type(measure) != :probabilistic
-                suggestion = ""
-                if target_scitype(measure) <: Finite
-                    suggestion = "\nPerhaps you want to set operation="*
-                    "predict_mode. "
-                elseif target_scitype(measure) <: Continuous
-                    suggestion = "\nPerhaps you want to set operation="*
-                    "predict_mean or operation=predict_median. "
-                else
-                    suggestion = ""
-                end
-                throw(ArgumentError(
-                    "\n$model <: Probabilistic but prediction_type($measure) = "*
-                      ":$(prediction_type(measure)). "*suggestion*avoid))
-            end
-        end
-    end
-
-    model isa Deterministic && prediction_type(measure) != :deterministic &&
-        throw(ArgumentError("$model <: Deterministic but prediction_type($measure) ="*
-              ":$(prediction_type(measure))."*avoid))
-
-    return nothing
-
-end
 
 function _evaluate!(func::Function, res::CPU1, nfolds, verbosity)
     p = Progress(nfolds + 1, dt=0, desc="Evaluating over $nfolds folds: ",
@@ -256,68 +336,22 @@ end
     end
 end
 
-# If `resampling` is not a ResamplingStrategy object, the following is
-# called directly. Otherwise it is called by another `evaluate!`
-# method specified to the particular strategy:
-function evaluate!(mach::Machine, resampling;
-                   measure=nothing, weights=nothing,
-                   operation=predict, acceleration=DEFAULT_RESOURCE[],
-                   rows=nothing, force=false,
-                   check_measure=true, verbosity=1)
+# Evaluation when resampling is not a ResamplingStrategy (core evaluator):
+function evaluate!(mach::Machine, resampling, weights, rows, verbosity,
+                   measures, operation, acceleration, force)
+
+    # Note: `rows` is ignored here
 
     resampling isa TrainTestPairs ||
         error("`resampling` must be an "*
               "MLJ.ResamplingStrategy or tuple of pairs "*
               "of the form `(train_rows, test_rows)`")
 
-    rows === nothing ||
-        error("You cannot specify `rows` unless `resampling "*
-              "isa MLJ.ResamplingStrategy`. ")
-
-    if measure === nothing
-        candidate = default_measure(mach.model)
-        candidate ===  nothing && error("You need to specify measure=... ")
-        measures = [candidate, ]
-    elseif !(measure isa AbstractVector)
-        measures = [measure, ]
-    else
-        measures = measure
-    end
-
     X = mach.args[1]
     y = mach.args[2]
 
-    [_check_measure(mach.model, m, y, operation, !check_measure)
-                                                for m in measures]
-
-    if weights != nothing
-        weights isa AbstractVector{<:Real} ||
-            throw(ArgumentError("`weights` must be a `Real` vector."))
-        length(weights) == nrows(mach.args[2]) ||
-            throw(DimensionMismatch("`weights` and target "*
-                                    "have different lengths. "))
-    end
-    
-    if weights == nothing && length(mach.args) == 3
-        verbosity < 1 ||
-            @info "Passing machine sample weights to any supported measures. "
-        weights = mach.args[3]
-    end
-
-    if verbosity >= 0 && weights !== nothing
-        unsupported = filter(measures) do m
-            !supports_weights(m)
-        end
-        if !isempty(unsupported)
-            unsupported_as_string = string(unsupported[1])
-            unsupported_as_string *=
-                reduce(*, [string(", ", m) for m in unsupported[2:end]])
-                @warn "Sample weights ignored in evaluations of the following"*
-            " measures, as unsupported: \n$unsupported_as_string "
-        end
-    end
-
     nfolds = length(resampling)
+
     nmeasures = length(measures)
 
     function get_measurements(k)
@@ -347,7 +381,8 @@ function evaluate!(mach::Machine, resampling;
                   "among $(nworkers()) workers."
         end
     end
-    measurements_flat = _evaluate!(get_measurements, acceleration, nfolds, verbosity)
+    measurements_flat =
+        _evaluate!(get_measurements, acceleration, nfolds, verbosity)
 
     # in the following rows=folds, columns=measures:
     measurements_matrix = permutedims(
@@ -398,17 +433,17 @@ function actual_rows_and_weights(rows, weights, N, verbosity)
     return _rows, _weights
 end
 
-# evaluation when ResamplingStrategy is passed (instead of train/test rows):
-function evaluate!(mach::Machine, resampling::ResamplingStrategy;
-                   weights=nothing, rows=nothing, verbosity=1, kwargs...)
+# Evaluation when resampling is a ResamplingStrategy:
+function evaluate!(mach::Machine, resampling::ResamplingStrategy,
+                   weights, rows, verbosity, args...)
 
     y = mach.args[2]
     _rows, _weights =
         actual_rows_and_weights(rows, weights, length(y), verbosity)
 
     return evaluate!(mach::Machine,
-               train_test_pairs(resampling, _rows, mach.args...);
-               weights=_weights, verbosity=verbosity, kwargs...)
+               train_test_pairs(resampling, _rows, mach.args...),
+               _weights, nothing, verbosity, args...)
 
 end
 
@@ -427,6 +462,7 @@ mutable struct Resampler{S,M<:Supervised} <: Supervised
     weights::Union{Nothing,AbstractVector{<:Real}}
     operation
     acceleration::AbstractResource
+    check_measure::Bool
 end
 
 MLJBase.package_name(::Type{<:Resampler}) = "MLJ"
@@ -435,29 +471,38 @@ MLJBase.is_wrapper(::Type{<:Resampler}) = true
 
 Resampler(; model=ConstantRegressor(), resampling=Holdout(),
             measure=nothing, weights=nothing, operation=predict,
-            acceleration=DEFAULT_RESOURCE[]) =
+            acceleration=DEFAULT_RESOURCE[], check_measure=true) =
                 Resampler(model, resampling, measure, weights, operation,
-                          acceleration)
+                          acceleration, check_measure)
 
-
-function MLJBase.fit(resampler::Resampler, verbosity::Int, X, y)
-
+function MLJBase.clean!(resampler::Resampler)
+    warning = ""
     if resampler.measure === nothing
         measure = default_measure(resampler.model)
         if measure === nothing
-            error("You need to specify measure=... ")
+            error("No default measure known for $(resampler.model). "*
+                  "You must specify measure=... ")
+        else
+            warning *= "No `measure` specified. "*
+            "Setting `measure=$measure`. "
         end
-    else
-        measure = resampler.measure
     end
+    return warning
+end
 
-    mach = machine(resampler.model, X, y)
+function MLJBase.fit(resampler::Resampler, verbosity::Int, args...)
 
-    fitresult = evaluate!(mach, resampler.resampling;
-                          measure=measure, weights=resampler.weights,
-                          operation=resampler.operation,
-                          verbosity=verbosity-1,
-                          acceleration=resampler.acceleration)
+    mach = machine(resampler.model, args...)
+
+    weights, measures =
+        _process_weights_measures(resampler.weights, resampler.measure,
+                                  mach, resampler.operation,
+                                  verbosity, resampler.check_measure)
+
+    fitresult = evaluate!(mach, resampler.resampling,
+                          weights, nothing, verbosity - 1,
+                          measures, resampler.operation,
+                          resampler.acceleration, false)
 
     cache = (mach, deepcopy(resampler.resampling))
     report = NamedTuple()
@@ -473,15 +518,6 @@ function MLJBase.update(resampler::Resampler{Holdout},
 
     old_mach, old_resampling = cache
 
-    if resampler.measure === nothing
-        measure = default_measure(resampler.model)
-        if measure === nothing
-            error("You need to specify measure=... ")
-        end
-    else
-        measure = resampler.measure
-    end
-
     if old_resampling.fraction_train == resampler.resampling.fraction_train
         mach = old_mach
     else
@@ -489,11 +525,16 @@ function MLJBase.update(resampler::Resampler{Holdout},
         cache = (mach, deepcopy(resampler.resampling))
     end
 
-    fitresult = evaluate!(mach, resampler.resampling;
-                          measure=resampler.measure,
-                          weights=resampler.weights,
-                          operation=resampler.operation,
-                          verbosity=verbosity-1)
+    weights, measures =
+        _process_weights_measures(resampler.weights, resampler.measure,
+                                  mach, resampler.operation,
+                                  verbosity, resampler.check_measure)
+
+    fitresult = evaluate!(mach, resampler.resampling,
+                          weights, nothing, verbosity - 1,
+                          measures, resampler.operation,
+                          resampler.acceleration, false)
+
 
     report = NamedTuple
 
