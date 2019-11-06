@@ -241,10 +241,13 @@ restrict the data used in evaluation by specifying `rows`.
 
 An optional `weights` vector may be passed for measures that support
 sample weights (`MLJ.supports_weights(measure) == true`), which is
-ignored by those that don't. If `mach` already wraps sample weights `w`
-(as in `mach = machine(model, X, y, w)`) then these are automatically
-passed to the measures. However, `weights` specified as a keyword argument
-will take precedence over `w`.
+ignored by those that don't. 
+
+*Important:* If `mach` already wraps sample weights `w` (as in `mach =
+machine(model, X, y, w)`) then these weights, which are used for
+*training*, are automatically passed to the measures for
+evaluation. However, for evaluation purposes, any `weights` specified
+as a keyword argument will take precedence over `w`.
 
 User-defined measures are supported; see the manual for details.
 
@@ -447,7 +450,17 @@ end
 """
 $TYPEDEF
 
-Resampler structure for the `TunedModel` `fit` defined in `tuning.jl`.
+Resampler structure for the `TunedModel` `fit` defined in
+`tuning.jl`.
+
+The sample `weights` are passed to the specified performance
+measures that support weights for evaluation.
+
+*Important:* If `weights` are left unspecified, then any weight vector
+`w` used in constructing the resampler machine, as in
+`resampler_machine = machine(resampler, X, y, w)` (which are then used
+in *training* the model) will also be used in evaluation.
+
 """
 mutable struct Resampler{S,M<:Supervised} <: Supervised
     model::M
@@ -459,15 +472,11 @@ mutable struct Resampler{S,M<:Supervised} <: Supervised
     check_measure::Bool
 end
 
+
 MLJBase.package_name(::Type{<:Resampler}) = "MLJ"
 MLJBase.is_wrapper(::Type{<:Resampler}) = true
-
-
-Resampler(; model=ConstantRegressor(), resampling=Holdout(),
-            measure=nothing, weights=nothing, operation=predict,
-            acceleration=DEFAULT_RESOURCE[], check_measure=true) =
-                Resampler(model, resampling, measure, weights, operation,
-                          acceleration, check_measure)
+MLJBase.supports_weights(::Type{<:Resampler{<:Any,M}}) where M =
+    supports_weights(M)
 
 function MLJBase.clean!(resampler::Resampler)
     warning = ""
@@ -482,6 +491,19 @@ function MLJBase.clean!(resampler::Resampler)
         end
     end
     return warning
+end
+
+function Resampler(; model=ConstantRegressor(), resampling=CV(),
+            measure=nothing, weights=nothing, operation=predict,
+                   acceleration=DEFAULT_RESOURCE[], check_measure=true)
+
+    resampler = Resampler(model, resampling, measure, weights, operation,
+                          acceleration, check_measure)
+    message = MLJBase.clean!(resampler)
+    isempty(message) || @warn message
+
+    return resampler
+
 end
 
 function MLJBase.fit(resampler::Resampler, verbosity::Int, args...)

@@ -8,7 +8,7 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
     cache
     args::Tuple
     report
-    previous_rows 
+    previous_rows
 
     function Machine{M}(model, args...) where M
         machine = new{M}(model)

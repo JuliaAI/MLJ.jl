@@ -257,7 +257,38 @@ end
 
     @test e1.per_fold ≈ e2.per_fold
 
+    # resampler as machine with evaluation weights not specified:
+    resampler = Resampler(model=model, resampling=CV();
+                          measure=misclassification_rate,
+                          operation=predict_mode)
+    resampling_machine = machine(resampler, X, y, w)
+    fit!(resampling_machine)
+    e1 = evaluate(resampling_machine).measurement[1]
+    mach = machine(model, X, y, w)
+    e2 = evaluate!(mach, resampling=CV();
+                   measure=misclassification_rate,
+                   operation=predict_mode).measurement[1]
+    @test e1 ≈ e2
+
+    # resampler as machine with evaluation weights specified:
+    weval = rand(3N);
+    resampler = Resampler(model=model, resampling=CV();
+                          measure=misclassification_rate,
+                          operation=predict_mode,
+                          weights=weval)
+    resampling_machine = machine(resampler, X, y, w)
+    fit!(resampling_machine)
+    e1 = evaluate(resampling_machine).measurement[1]
+    mach = machine(model, X, y, w)
+    e2 = evaluate!(mach, resampling=CV();
+                   measure=misclassification_rate,
+                   operation=predict_mode,
+                   weights=weval).measurement[1]
+    @test e1 ≈ e2
+
 end
+
+
 
 end
 true
