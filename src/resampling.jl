@@ -421,16 +421,11 @@ function evaluate!(mach::Machine, resampling, weights, rows, verbosity,
 
 end
 
-function actual_rows_and_weights(rows, weights, N, verbosity)
+function actual_rows(rows, N, verbosity)
     unspecified_rows = (rows === nothing)
     _rows = unspecified_rows ? (1:N) : rows
-    if weights == nothing
-        _weights = nothing
-    else
-        _weights = weights[_rows]
-    end
     unspecified_rows || @info "Creating subsamples from a subset of all rows. "
-    return _rows, _weights
+    return _rows
 end
 
 # Evaluation when resampling is a ResamplingStrategy:
@@ -438,12 +433,11 @@ function evaluate!(mach::Machine, resampling::ResamplingStrategy,
                    weights, rows, verbosity, args...)
 
     y = mach.args[2]
-    _rows, _weights =
-        actual_rows_and_weights(rows, weights, length(y), verbosity)
+    _rows = actual_rows(rows, length(y), verbosity)
 
     return evaluate!(mach::Machine,
-               train_test_pairs(resampling, _rows, mach.args...),
-               _weights, nothing, verbosity, args...)
+                     train_test_pairs(resampling, _rows, mach.args...),
+                     weights, nothing, verbosity, args...)
 
 end
 

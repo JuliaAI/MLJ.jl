@@ -23,7 +23,7 @@ include("foobarmodel.jl")
     y = rand(4)
     override=false
     @test MLJ._check_measure(:junk, :junk, :junk, :junk, true) == nothing
-    @test_throws (ArgumentError,
+    @test_throws(ArgumentError,
                   MLJ._check_measure(model, rms, y, predict, override))
     @test MLJ._check_measure(model, rms, y, predict_mean, override) == nothing
     @test MLJ._check_measure(model, rms, y, predict_median, override) == nothing
@@ -91,7 +91,8 @@ end
     result.measurement[1] ≈ 2/3
 
     # test direct evaluation of a model + data:
-    result = evaluate(model, X, y, verbosity=0, resampling=holdout, measure=rms)
+    result = evaluate(model, X, y, verbosity=0,
+                      resampling=holdout, measure=rms)
     @test result.measurement[1] ≈ 2/3
 
     X = (x=rand(100),)
@@ -123,7 +124,7 @@ end
     @test shuffled.measurement[1] != result.measurement[1]
 end
 
-@testset "weights" begin
+@testset "sample weights in evaluation" begin
 
     # cv:
     x1 = ones(4)
@@ -193,7 +194,7 @@ struct DummyResamplingStrategy <: MLJ.ResamplingStrategy end
     @test e.measurement[1] ≈ 1.0
 end
 
-@testset "sample weights" begin
+@testset "sample weights in training  and evaluation" begin
     yraw = ["Perry", "Antonia", "Perry", "Antonia", "Skater"]
     X = (x=rand(5),)
     y = categorical(yraw)
@@ -234,7 +235,7 @@ end
 
     # resampling on a subset of all rows:
     model = ConstantClassifier()
-    N = 4
+    N = 50
     X = (x = rand(3N), );
     y = categorical(rand("abcd", 3N));
     w = rand(3N);
@@ -254,6 +255,7 @@ end
                    operation=predict_mode,
                    rows=rows)
 
+    @test e1.per_fold ≈ e2.per_fold
 
 end
 
