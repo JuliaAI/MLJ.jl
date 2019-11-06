@@ -188,5 +188,32 @@ struct DummyResamplingStrategy <: MLJ.ResamplingStrategy end
     @test e.measurement[1] ≈ 1.0
 end
 
+@testset "sample weights" begin
+    yraw = ["Perry", "Antonia", "Perry", "Antonia", "Skater"]
+    X = (x=rand(5),)
+    y = categorical(yraw)
+    w = [1, 10, 1, 10, 5]
+
+    # without weights:
+    mach = machine(ConstantClassifier(), X, y)
+    e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
+                  operation=predict_mode, measure=misclassification_rate)
+    @test e.measurement[1] ≈ 1.0
+
+    # with weights in training and evaluation:
+    mach = machine(ConstantClassifier(), X, y, w)
+    e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
+              operation=predict_mode, measure=misclassification_rate)
+    @test e.measurement[1] ≈ 1/3
+
+    # with weights in training but overriden in evaluation:
+    e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
+              operation=predict_mode, measure=misclassification_rate,
+                  weights = fill(1, 5))
+    @test e.measurement[1] ≈ 1/2
+end
+
+
+
 end
 true

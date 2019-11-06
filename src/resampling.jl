@@ -155,8 +155,11 @@ If `resampling isa MLJ.ResamplingStrategy` then one may optionally
 restrict the data used in evaluation by specifying `rows`.
 
 An optional `weights` vector may be passed for measures that support
-sample weights (`MLJ.supports_weights(measure) == true`), which
-is ignored by those that don't.
+sample weights (`MLJ.supports_weights(measure) == true`), which is
+ignored by those that don't. If `mach` already wraps sample weights `w`
+(as in `mach = machine(model, X, y, w)`) then these are automatically
+passed to the measures. However, `weights` specified as a keyword argument
+will take precedence over `w`.
 
 User-defined measures are supported; see the manual for details.
 
@@ -253,7 +256,9 @@ end
     end
 end
 
-# if `resampling` is not a ResamplingStrategy object:
+# If `resampling` is not a ResamplingStrategy object, the following is
+# called directly. Otherwise it is called by another `evaluate!`
+# method specified to the particular strategy:
 function evaluate!(mach::Machine, resampling;
                    measure=nothing, weights=nothing,
                    operation=predict, acceleration=DEFAULT_RESOURCE[],
@@ -282,7 +287,22 @@ function evaluate!(mach::Machine, resampling;
     X = mach.args[1]
     y = mach.args[2]
 
-    [_check_measure(mach.model, m, y, operation, !check_measure) for m in measures]
+    [_check_measure(mach.model, m, y, operation, !check_measure)
+                                                for m in measures]
+
+    if weights != nothing
+        weights isa AbstractVector{<:Real} ||
+            throw(ArgumentError("`weights` must be a `Real` vector."))
+        length(weights) == nrows(mach.args[2]) ||
+            throw(DimensionMismatch("`weights` and target "*
+                                    "have different lengths. "))
+    end
+    
+    if weights == nothing && length(mach.args) == 3
+        verbosity < 1 ||
+            @info "Passing machine sample weights to any supported measures. "
+        weights = mach.args[3]
+    end
 
     if verbosity >= 0 && weights !== nothing
         unsupported = filter(measures) do m
@@ -292,8 +312,8 @@ function evaluate!(mach::Machine, resampling;
             unsupported_as_string = string(unsupported[1])
             unsupported_as_string *=
                 reduce(*, [string(", ", m) for m in unsupported[2:end]])
-            @warn "weights ignored in evaluations of the following measures, "*
-            "as unsupported: \n$unsupported_as_string "
+                @warn "Sample weights ignored in evaluations of the following"*
+            " measures, as unsupported: \n$unsupported_as_string "
         end
     end
 
