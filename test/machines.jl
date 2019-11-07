@@ -45,7 +45,7 @@ freeze!(stand)
 @test_logs (:warn, r"not trained as it is frozen\.$") fit!(stand)
 
 @testset "warnings" begin
-    @test_logs((:warn, r"DecisionTreeRegressor does not support"),
+    @test_logs((:info, r"does not support"),
                machine(tree, X, y, rand(N)))
     @test_throws DimensionMismatch machine(tree, X, y[1:end-1])
     @test_throws DimensionMismatch machine(tree, X, y, rand(N-1))
