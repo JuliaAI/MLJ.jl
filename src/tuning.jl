@@ -75,32 +75,40 @@ MLJBase.is_wrapper(::Type{<:EitherTunedModel}) = true
                              weights=nothing,
                              operation=predict,
                              ranges=ParamRange[],
-                             full_report=true)
+                             full_report=true,
+                             train_best=true)
 
 Construct a model wrapper for hyperparameter optimization of a
 supervised learner.
 
 Calling `fit!(mach)` on a machine `mach=machine(tuned_model, X, y)` or
-`mach=machine(tuned_model, task)` will:
+`mach=machine(tuned_model, X, y, w)` will:
 
 - Instigate a search, over clones of `model`, with the hyperparameter
-  mutations specified by `ranges`, for a model optimizing the specified
-  `measure`, using performance evaluations carried out using the specified
-  `tuning` strategy and `resampling` strategy.
+  mutations specified by `ranges`, for a model optimizing the
+  specified `measure`, using performance evaluations carried out using
+  the specified `tuning` strategy and `resampling` strategy. If
+  `measure` supports weights (`supports_weights(measure) == true`)
+  then any `weights` specified will be passed to the measure.
 
-- Fit an internal machine, based on the optimal model `fitted_params(mach).best_model`,
-  wrapping the optimal `model` object in *all* the provided data `X, y`
-  (or in `task`). Calling `predict(mach, Xnew)` then returns predictions
-  on `Xnew` of this internal machine.
+- Fit an internal machine, based on the optimal model
+  `fitted_params(mach).best_model`, wrapping the optimal `model`
+  object in *all* the provided data `X, y` (or in `task`). Calling
+  `predict(mach, Xnew)` then returns predictions on `Xnew` of this
+  internal machine. The final train can be supressed by setting
+  `train_best=false`.
 
 *Important.* If a custom measure `measure` is used, and the measure is
 a score, rather than a loss, be sure to check that
 `MLJ.orientation(measure) == :score` to ensure maximization of the
-measure, rather than minimization. Overide an incorrect value with
+measure, rather than minimization. Override an incorrect value with
 `MLJ.orientation(::typeof(measure)) = :score`.
 
-If `measure` supports sample weights (`MLJ.supports_weights(measure)
-== true`) then these can be passed to the measure as `weights`.
+*Important:* If `weights` are left unspecified, and `measure` supports
+sample weights, then any weight vector `w` used in constructing a
+corresponding tuning machine, as in `tuning_machine =
+machine(tuned_model, X, y, w)` (which is then used in *training* each
+model in the search) will also be passed to `measure` for evaluation.
 
 In the case of two-parameter tuning, a Plots.jl plot of performance
 estimates is returned by `plot(mach)` or `heatmap(mach)`.
@@ -138,7 +146,7 @@ function MLJBase.clean!(model::EitherTunedModel)
     message = ""
     if model.measure === nothing
         model.measure = default_measure(model)
-        message *= "No measure specified. Using measure=$(model.measure). "
+        message *= "No measure specified. Setting measure=$(model.measure). "
     end
     return message
 end
@@ -146,7 +154,8 @@ end
 
 ## GRID SEARCH
 
-function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y) where M
+function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M},
+                     verbosity::Integer, args...) where M
 
     if tuned_model.ranges isa AbstractVector
         ranges = tuned_model.ranges
@@ -210,7 +219,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
                           weights=tuned_model.weights,
                           operation=tuned_model.operation)
 
-    resampling_machine = machine(resampler, X, y)
+    resampling_machine = machine(resampler, args...)
 
     # tuple of iterators over hyper-parameter values:
     iterators = map(eachindex(ranges)) do j
@@ -284,15 +293,17 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
 
     end
 
+    fitresult = machine(best_model, args...)
     if tuned_model.train_best
         verbosity < 1 || @info "Training best model on all supplied data."
 
         # train best model on all the data:
         # TODO: maybe avoid using machines here and use model fit/predict?
-        fitresult = machine(best_model, X, y)
         fit!(fitresult, verbosity=verbosity-1)
     else
-        fitresult = tuned_model.model
+        verbosity < 1 || @info "Training of best model suppressed.\n "*
+        "To train tuning machine `mach` on all supplied data, call "*
+        "`fit!(mach.fitresult)`."
     end
 
     if tuned_model.full_report

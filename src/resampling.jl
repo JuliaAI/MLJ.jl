@@ -209,8 +209,6 @@ function _process_weights_measures(weights, measures, mach,
 
 end
 
-
-
 """
     evaluate!(mach,
               resampling=CV(),
@@ -458,7 +456,7 @@ measures that support weights for evaluation.
 
 *Important:* If `weights` are left unspecified, then any weight vector
 `w` used in constructing the resampler machine, as in
-`resampler_machine = machine(resampler, X, y, w)` (which are then used
+`resampler_machine = machine(resampler, X, y, w)` (which is then used
 in *training* the model) will also be used in evaluation.
 
 """
@@ -530,14 +528,14 @@ end
 # in special case of holdout, we can reuse the underlying model's
 # machine, provided the training_fraction has not changed:
 function MLJBase.update(resampler::Resampler{Holdout},
-                        verbosity::Int, fitresult, cache, X, y)
+                        verbosity::Int, fitresult, cache, args...)
 
     old_mach, old_resampling = cache
 
     if old_resampling.fraction_train == resampler.resampling.fraction_train
         mach = old_mach
     else
-        mach = machine(resampler.model, X, y)
+        mach = machine(resampler.model, args...)
         cache = (mach, deepcopy(resampler.resampling))
     end
 

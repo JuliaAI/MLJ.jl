@@ -131,6 +131,9 @@ end
     @test length(unique(r.measurements)) == 6
 end
 
+@testset "basic tuning with training weights" begin
+end
+
 
 ## LEARNING CURVE
 
