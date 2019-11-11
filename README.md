@@ -16,7 +16,7 @@ crucially on:
 The MLJ model interface is now relatively stable and
 [well-documented](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/),
 and the core team is happy to respond to [issue requests](https://github.com/alan-turing-institute/MLJ.jl/issues) for
-assistance. Please click [here](CONTRIBUTE.md) for more details on
+assistance. Please click [here](CONTRIBUTING.md) for more details on
 contributing.
 
 MLJ is presently supported by a small Alan Turing Institute grant and is looking for new funding sources to grow and maintain the project.
