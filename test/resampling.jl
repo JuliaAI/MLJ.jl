@@ -230,12 +230,10 @@ end
                            measure=misclassification_rate,
                            weights = fill('a', 5)))
 
-    # TODO: use a non-trivial classifier supporting sample weights
-    # below instead of constant classifier to check X dependence.
-
     # resampling on a subset of all rows:
-    model = ConstantClassifier()
-    N = 50
+    model = @load KNNClassifier
+
+    N = 200
     X = (x = rand(3N), );
     y = categorical(rand("abcd", 3N));
     w = rand(3N);
