@@ -35,7 +35,7 @@ function machine(model::M, args...) where M <: Model
             supports_weights(model) ||
                 @info("$(typeof(model)) does not support sample weights and "*
                       "the supplied weights will be ignored in "*
-                      "training.\n However, supplied weights *will* be passed "*
+                      "training.\n However, supplied weights will be passed "*
                       "to weight-supporting measures on calls to `evaluate!` "*
                       "and in tuning. ")
             X, y, w = args

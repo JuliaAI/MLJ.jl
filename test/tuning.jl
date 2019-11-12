@@ -132,6 +132,55 @@ end
 end
 
 @testset "basic tuning with training weights" begin
+
+    N = 100
+    X = (x = rand(3N), );
+    y = categorical(rand("abc", 3N));
+    model = @load KNNClassifier
+    r = range(model, :K, lower=2, upper=N)
+    tuned_model = TunedModel(model=model,
+                             measure=MLJ.BrierScore(),
+                             resampling=Holdout(fraction_train=2/3),
+                             range=r)
+
+    # no weights:
+    tuned = machine(tuned_model, X, y)
+    fit!(tuned)
+    best1 = fitted_params(tuned).best_model
+    posterior1 = average([predict(tuned, X)...])
+
+    # uniform weights:
+    tuned = machine(tuned_model, X, y, fill(1, 3N))
+    fit!(tuned)
+    best2 = fitted_params(tuned).best_model
+    posterior2 = average([predict(tuned, X)...])
+
+    @test best1 == best2
+    @test all([pdf(posterior1, c) ≈ pdf(posterior2, c) for c in levels(y)])
+
+    # skewed weights:
+    w = map(y) do η
+        if η == 'a'
+            return 2
+        elseif η == 'b'
+            return 4
+        else
+            return 1
+        end
+    end
+    tuned = machine(tuned_model, X, y, w)
+    fit!(tuned)
+    best3 = fitted_params(tuned).best_model
+    posterior3 = average([predict(tuned, X)...])
+
+    # different tuning outcome:
+    @test best1.K != best3.K
+
+    # "posterior" is skewed appropriately in weighted case:
+    @test abs(pdf(posterior3, 'b')/(2*pdf(posterior3, 'a'))  - 1) < 0.15
+    @test abs(pdf(posterior3, 'b')/(4*pdf(posterior3, 'c'))  - 1) < 0.15
+
+
 end
 
 

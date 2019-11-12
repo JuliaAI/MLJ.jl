@@ -117,10 +117,12 @@ estimates is returned by `plot(mach)` or `heatmap(mach)`.
 function TunedModel(;model=nothing,
                     tuning=Grid(),
                     resampling=Holdout(),
-                    measure=nothing,
+                    measures=nothing,
+                    measure=measures,
                     weights=nothing,
                     operation=predict,
-                    ranges=ParamRange[],
+                    range=ParamRange[],
+                    ranges=range,
                     minimize=true,
                     full_report=true,
                     train_best=true)
@@ -338,27 +340,45 @@ MLJBase.best(model::EitherTunedModel, fitresult) = fitresult.model
 
 ## METADATA
 
-MLJBase.load_path(::Type{<:DeterministicTunedModel}) = "MLJ.DeterministicTunedModel"
+MLJBase.supports_weights(::Type{<:EitherTunedModel{<:Any,M}}) where M =
+    MLJBase.supports_weights(M)
+
+MLJBase.load_path(::Type{<:DeterministicTunedModel}) =
+    "MLJ.DeterministicTunedModel"
 MLJBase.package_name(::Type{<:DeterministicTunedModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:DeterministicTunedModel}) = ""
-MLJBase.package_url(::Type{<:DeterministicTunedModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
-MLJBase.is_pure_julia(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.is_pure_julia(M)
-MLJBase.input_scitype(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.input_scitype(M)
-MLJBase.target_scitype(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.target_scitype(M)
+MLJBase.package_url(::Type{<:DeterministicTunedModel}) =
+    "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.is_pure_julia(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} =
+    MLJBase.is_pure_julia(M)
+MLJBase.input_scitype(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} =
+    MLJBase.input_scitype(M)
+MLJBase.target_scitype(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} =
+    MLJBase.target_scitype(M)
 
-MLJBase.load_path(::Type{<:ProbabilisticTunedModel}) = "MLJ.ProbabilisticTunedModel"
+MLJBase.load_path(::Type{<:ProbabilisticTunedModel}) =
+    "MLJ.ProbabilisticTunedModel"
 MLJBase.package_name(::Type{<:ProbabilisticTunedModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:ProbabilisticTunedModel}) = ""
-MLJBase.package_url(::Type{<:ProbabilisticTunedModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
-MLJBase.is_pure_julia(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.is_pure_julia(M)
-MLJBase.input_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.input_scitype(M)
-MLJBase.target_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.target_scitype(M)
+MLJBase.package_url(::Type{<:ProbabilisticTunedModel}) =
+    "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.is_pure_julia(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} =
+    MLJBase.is_pure_julia(M)
+MLJBase.input_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} =
+    MLJBase.input_scitype(M)
+MLJBase.target_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} =
+    MLJBase.target_scitype(M)
 
 
 ## LEARNING CURVES
 
 """
-    curve = learning_curve!(mach; resolution=30, resampling=Holdout(), measure=rms, operation=predict, range=nothing, n=1)
+    curve = learning_curve!(mach; resolution=30,
+                                  resampling=Holdout(),
+                                  measure=rms,
+                                  operation=predict,
+                                  range=nothing,
+                                  n=1)
 
 Given a supervised machine `mach`, returns a named tuple of objects
 needed to generate a plot of performance measurements, as a function
