@@ -46,7 +46,7 @@ export nrows, nfeatures, color_off, color_on,
     classes,
     partition, unpack,
     mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,
-    misclassification_rate, cross_entropy,
+    misclassification_rate, cross_entropy, BrierScore,
     default_measure,
     @load_boston, @load_ames, @load_iris, @load_reduced_ames,
     @load_crabs
