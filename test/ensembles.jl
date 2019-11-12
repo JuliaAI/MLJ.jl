@@ -26,17 +26,17 @@ L = ['a', 'b', 'j']
 L2 = categorical(L)
 ensemble = [L2[1], L2[3], L2[3], L2[2]]
 n=length(ensemble)
-weights = fill(1/n, n) # ignored by predict below
+atomic_weights = fill(1/n, n) # ignored by predict below
 wens = MLJ.WrappedEnsemble(atom, ensemble)
 X = MLJ.table(rand(3,5))
-@test predict(wens, weights, X) == categorical(vcat(['j','j','j'],L))[1:3]
+@test predict(wens, atomic_weights, X) == categorical(vcat(['j','j','j'],L))[1:3]
 
 # target is :deterministic :continuous false:
 atom = MLJModels.DeterministicConstantRegressor()
 ensemble = Float64[4, 7, 4, 4]
-weights = [0.1, 0.5, 0.2, 0.2]
+atomic_weights = [0.1, 0.5, 0.2, 0.2]
 wens = MLJ.WrappedEnsemble(atom, ensemble)
-@test predict(wens, weights, X) ≈ [5.5, 5.5, 5.5]
+@test predict(wens, atomic_weights, X) ≈ [5.5, 5.5, 5.5]
 
 # target is :probabilistic :multiclass false:
 atom = ConstantClassifier()
@@ -44,10 +44,10 @@ L = categorical(['a', 'b', 'j'])
 d1 = UnivariateFinite(L, [0.1, 0.2, 0.7])
 d2 = UnivariateFinite(L, [0.2, 0.3, 0.5])
 ensemble = [d2,  d1, d2, d2]
-weights = [0.1, 0.5, 0.2, 0.2]
+atomic_weights = [0.1, 0.5, 0.2, 0.2]
 wens = MLJ.WrappedEnsemble(atom, ensemble)
 X = MLJ.table(rand(2,5))
-d = predict(wens, weights, X)[1]
+d = predict(wens, atomic_weights, X)[1]
 @test pdf(d, 'a') ≈ 0.15
 @test pdf(d, 'b') ≈ 0.25
 @test pdf(d, 'j') ≈ 0.6
@@ -57,10 +57,10 @@ atom = ConstantRegressor()
 d1 = Distributions.Normal(1, 2)
 d2 = Distributions.Normal(3, 4)
 ensemble = [d2,  d1, d2, d2]
-weights = [0.1, 0.5, 0.2, 0.2]
+atomic_weights = [0.1, 0.5, 0.2, 0.2]
 wens = MLJ.WrappedEnsemble(atom, ensemble)
 X = MLJ.table(rand(2,5))
-d = predict(wens, weights, X)[1]
+d = predict(wens, atomic_weights, X)[1]
 
 
 ## ENSEMBLE MODEL
@@ -74,9 +74,9 @@ ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom)
 ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-weights = rand(10)
-weights = weights/sum(weights)
-ensemble_model.weights = weights
+atomic_weights = rand(10)
+atomic_weights = atomic_weights/sum(atomic_weights)
+ensemble_model.atomic_weights = atomic_weights
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 MLJBase.info_dict(ensemble_model)
@@ -96,9 +96,9 @@ ensemble_model.bagging_fraction = 1.0
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 @test unique(fitresult.ensemble) ≈ [1.2]
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-weights = rand(10)
-weights = weights/sum(weights)
-ensemble_model.weights = weights
+atomic_weights = rand(10)
+atomic_weights = atomic_weights/sum(atomic_weights)
+ensemble_model.atomic_weights = atomic_weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 MLJBase.info_dict(ensemble_model)
 
@@ -138,9 +138,9 @@ d = predict(ensemble_model, fitresult, MLJ.selectrows(X, test))[1]
 @test pdf(d, 's') ≈ 1/5
 @test pdf(d, 'd') ≈ 1/5
 @test pdf(d, 'f') ≈ 1/5
-weights = rand(10)
-weights = weights/sum(weights)
-ensemble_model.weights = weights
+atomic_weights = rand(10)
+atomic_weights = atomic_weights/sum(atomic_weights)
+ensemble_model.atomic_weights = atomic_weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 MLJBase.info_dict(ensemble_model)
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
@@ -166,9 +166,9 @@ fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 d = predict(ensemble_model, fitresult, MLJ.selectrows(X, test))[1]
 d3 = fit(Distributions.Normal, y)
 @test pdf(d, 1.52) ≈ pdf(d3, 1.52)
-weights = rand(10)
-weights = weights/sum(weights)
-ensemble_model.weights = weights
+atomic_weights = rand(10)
+atomic_weights = atomic_weights/sum(atomic_weights)
+ensemble_model.atomic_weights = atomic_weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 MLJBase.info_dict(ensemble_model)
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
@@ -178,7 +178,7 @@ MLJBase.info_dict(ensemble_model)
 @test EnsembleModel(atom=MLJModels.DeterministicConstantRegressor()) isa Deterministic
 
 
-## MACHINE TEST
+## MACHINE TEST (INCLUDES TEST OF UPDATE)
 
 N =100
 X = (x1=rand(N), x2=rand(N), x3=rand(N))
@@ -188,40 +188,25 @@ atom = KNNRegressor(K=7)
 ensemble_model = EnsembleModel(atom=atom)
 ensemble = machine(ensemble_model, X, y)
 train, test = partition(eachindex(y), 0.7)
-fit!(ensemble, rows=train); length(ensemble.fitresult.ensemble)
+fit!(ensemble, rows=train)
+@test length(ensemble.fitresult.ensemble) == ensemble_model.n
 ensemble_model.n = 15
-fit!(ensemble);
+@test_logs((:info, r"Training"),
+          fit!(ensemble))
 @test length(ensemble.fitresult.ensemble) == 15
-ensemble_model.n = 10
-fit!(ensemble);
-@test length(ensemble.fitresult.ensemble) == 10
+ensemble_model.n = 20
+@test_logs((:info, r"Updating"),
+           (:info, r"Building"),
+           fit!(ensemble))
+@test length(ensemble.fitresult.ensemble) == 20
+ensemble_model.n = 5
+@test_logs((:info, r"Updating"),
+           (:info, r"Truncating"),
+           fit!(ensemble))
+@test length(ensemble.fitresult.ensemble) == 5
+
 @test !isnan(predict(ensemble, MLJ.selectrows(X, test))[1])
 
-# old Koala tests
-# # check that providing fixed seed gives identical predictions each
-# # time if trees are deterministic:
-# tree.max_features = 0
-# ensemble_model.rng_seed = 1234
-# fit!(ensemble, train);
-# p1 = predict(ensemble, X, test[1:10])
-# fit!(ensemble, train);
-# p2 = predict(ensemble, X, test[1:10])
-# @test p1 == p2
-
-# tree.max_features = 4
-# fit!(ensemble);
-# ensemble_model.weight_regularization = 0.5
-# fit_weights!(ensemble);
-# display(ensemble.report[falsermalized_weights])
-# err(ensemble, test)
-# fit!(ensemble, train, add=true);
-# err(ensemble, test)
-# u,v = weight_regularization_curve(ensemble, test, raw=false,
-#                                   range=range(0, stop=1, length=21))
-# UnicodePlots.lineplot(u,v)
-# ensemble_model.weight_regularization = u[argmin(v)]
-# fit_weights!(ensemble);
-# err(ensemble, test)
 
 end
 true

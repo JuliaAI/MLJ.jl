@@ -381,7 +381,7 @@ MLJBase.target_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} =
                                   n=1)
 
 Given a supervised machine `mach`, returns a named tuple of objects
-needed to generate a plot of performance measurements, as a function
+suitable for generating a plot of  performance measurements, as a function
 of the single hyperparameter specified in `range`. The tuple `curve`
 has the following keys: `:parameter_name`, `:parameter_scale`,
 `:parameter_values`, `:measurements`.
