@@ -2,12 +2,10 @@
 language: julia
 os:
   - linux
-  - osx
 julia:
   - 1.0
   - 1.1
   - 1.2
-  - 1.3
   - nightly
 notifications:
   email: false
@@ -26,7 +24,8 @@ after_success:
 ## uncomment following lines to deploy documentation
 jobs:
   include:
-    - stage: "Documentation"
+    - if: branch = master
+      stage: "Documentation"
       julia: 1.2
       os: linux
       # disable global before_script in order not to install Compose twice

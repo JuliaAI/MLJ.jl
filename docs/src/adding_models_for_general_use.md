@@ -498,13 +498,12 @@ The above remarks continue to hold unchanged for the case multivariate
 targets.  For example, if we declare
 
 ```julia
-target_scitype(SomeSupervisedModel) = AbstractVector{<:Tuple{Continuous,Count}}
+target_scitype(SomeSupervisedModel) = Table(Continuous)
 ```
 
-then each element of `y` will be a tuple of type
-`Tuple{AbstractFloat,Integer}`. For predicting variable length
-sequences of, say, binary values (`CategoricalValue`s or
-`CategoricalString`s with some common size-two pool) we declare
+For predicting variable length sequences of, say, binary values
+(`CategoricalValue`s or `CategoricalString`s with some common size-two
+pool) we declare
 
 ```julia
 target_scitype(SomeSupervisedModel) = AbstractVector{<:NTuple{<:Binary}}
@@ -543,7 +542,9 @@ MLJBase.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f
 MLJBase.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bensadeghi/DecisionTree.jl"
 MLJBase.is_pure_julia(::Type{<:DecisionTreeClassifier}) = true
 ```
+
 Alternatively these traits can also be declared using `MLJBase.metadata_pkg` and `MLJBase.metadata_model` helper functions as:
+
 ```julia
 MLJBase.metadata_pkg(DecisionTreeClassifier,name="DecisionTree",
                      uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
@@ -554,7 +555,8 @@ MLJBase.metadata_model(DecisionTreeClassifier,
                         input=MLJBase.Table(MLJBase.Continuous),
                         target=AbstractVector{<:MLJBase.Finite},
                         path="MLJModels.DecisionTree_.DecisionTreeClassifier")
- ```
+```
+
 You can test all your declarations of traits by calling `MLJBase.info_dict(SomeModel)`.
 
 
@@ -602,7 +604,10 @@ method.
 TODO
 
 This is basically the same but with no target `y` appearing in the
-signatures, and no `target_scitype` trait to declare.
+signatures, and no `target_scitype` trait to declare. Instead, one
+declares an `output_scitype` trait. Instead of implementing a
+`predict` methods, one implements a `transform` operation, and an
+optional `inverse_transform` operation.
 
 
 ### Convenience methods

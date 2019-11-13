@@ -14,7 +14,13 @@ News for MLJ and its satellite packages: [MLJBase](https://github.com/alan-turin
 [ScientificTypes](https://github.com/alan-turing-institute/ScientificTypes.jl/releases) (mainly for developers)
 
 
+
+
 ## News
+
+*Note:* New patch releases are no longer being announced below. Refer to the
+links above for complete release notes.
+
 
 ### 30 Oct 2019
 
