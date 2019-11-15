@@ -26,6 +26,7 @@ MLJ is presently supported by a small Alan Turing Institute grant and is looking
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://alan-turing-institute.github.io/MLJ.jl/dev/)
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://alan-turing-institute.github.io/MLJ.jl/stable/)
 [![Coverage Status](https://coveralls.io/repos/github/alan-turing-institute/MLJ.jl/badge.svg?branch=master)](https://coveralls.io/github/alan-turing-institute/MLJ.jl?branch=master)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3541506.svg)](https://doi.org/10.5281/zenodo.3541506)
 
 ![](docs/src/two_model_stack.png)
 
