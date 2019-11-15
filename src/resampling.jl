@@ -334,25 +334,30 @@ function evaluate!(mach::Machine, resampling;
         reshape(measurements_flat, (nmeasures, nfolds)))
 
     # measurements for each observation:
-    per_observation = map(1:nmeasures) do m
-        if reports_each_observation(measures[m])
-            [measurements_matrix[:,m]...]
+    per_observation = map(1:nmeasures) do k
+        m = measures[k]
+        if reports_each_observation(m)
+            [measurements_matrix[:,k]...]
         else
             missing
         end
     end
 
     # measurements for each fold:
-    per_fold = map(1:nmeasures) do m
-        if reports_each_observation(measures[m])
-            mean.(per_observation[m])
+    per_fold = map(1:nmeasures) do k
+        m = measures[k]
+        if reports_each_observation(m)
+            broadcast(MLJBase.aggregate, per_observation[k], [m,])
         else
-            [measurements_matrix[:,m]...]
+            [measurements_matrix[:,k]...]
         end
     end
 
-    # overall means (one per measure):
-    per_measure = mean.(per_fold)
+    # overall aggregates:
+    per_measure = map(1:nmeasures) do k
+        m = measures[k]
+        MLJBase.aggregate(per_fold[k], m)
+    end
 
     ret = (measure=measures,
            measurement=per_measure,
