@@ -1,7 +1,7 @@
 name = "MLJ"
 uuid = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 authors = ["Anthony D. Blaom <anthony.blaom@gmail.com>"]
-version = "0.5.3"
+version = "0.5.4"
 
 [deps]
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
@@ -31,7 +31,7 @@ CategoricalArrays = "^0.7"
 ComputationalResources = "^0.3"
 Distributions = "^0.21"
 DocStringExtensions = "^0.8"
-MLJBase = "^0.7"
+MLJBase = "^0.8.1"
 MLJModels = "^0.5"
 OrderedCollections = "^1.1"
 PrettyTables = "^0.6"
