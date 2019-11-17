@@ -71,6 +71,11 @@ folds A, B and C and the model will be trained three times, first with
 A and B and tested on C, then on A, C and tested on B and finally on
 B, C and tested on A.
 
+In the typical case that `n_folds` does not divide the number of
+observations, the last test is longer than the other tests sets, which
+are all equal in size. The test sets are always mutually exclusive, and
+each train set is always the complement of the corresponding test set.
+
 If `rng` is an integer, then `MersenneTwister(rng)` is the random
 number generator used for shuffling rows. Otherwise some `AbstractRNG`
 object is expected.
@@ -113,11 +118,13 @@ function train_test_pairs(cv::CV, rows)
     # define the (trainrows, testrows) pairs:
     firsts = 1:k:((nfolds - 1)*k + 1) # itr of first `test` rows index
     seconds = k:k:(nfolds*k)          # itr of last  `test` rows index
+
     ret = map(1:nfolds) do k
         f = firsts[k]
         s = seconds[k]
+        k < nfolds || (s = n_observations)
         return (vcat(rows[1:(f - 1)], rows[(s + 1):end]), # trainrows
-                rows[f:s])                               # testrows
+                rows[f:s])                                # testrows
     end
 
     return ret
