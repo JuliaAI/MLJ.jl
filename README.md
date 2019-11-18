@@ -69,7 +69,14 @@ and maybe most importantly:
 
 ### Using MLJ
 
-If you just want to use MLJ, we recommend you start with mature models from the packages marked as such in the table further below (e.g. _DecisionTree_, _ScikitLearn_, _XGBoost_).
+Installing MLJ is done with the package manager:
+
+```julia
+(v1.x) pkg> add MLJ
+```
+
+it is a good idea to use a [separate environment](https://julialang.github.io/Pkg.jl/v1/environments/) for MLJ in order to avoid version clashes with other packages you may be using.
+We also recommend you start with models from "mature" packages (see the table further below) e.g.: _DecisionTree_, _ScikitLearn_ or _XGBoost_.
 
 The best place to get started with MLJ is to go the [MLJ Tutorials](https://alan-turing-institute.github.io/MLJTutorials/) website.
 Each of the tutorial can be downloaded as a notebook or Julia script to facilitate experimentation with the packages.
@@ -176,10 +183,14 @@ The table below indicates the models that are accessible at present along with a
 - Julio Hoffimann
 - Samuel Okon
 - Julian Samaroo
+- Sebastian Vollmer
 
 *Past collaborators*:
 - Ed Barp
+- Mosè Giordano
+- Franz Kiraly
 - Zac Nugent
+- Yiannis Simillides
 
 #### License
 
