@@ -2,8 +2,7 @@
     <img src="https://alan-turing-institute.github.io/MLJTutorials/assets/infra/MLJLogo2.svg" alt="MLJ" width="200">
 </div>
 
-<h2 align="center">A Machine Learning Toolbox for Julia.</h2>
-
+<h2 align="center">A Machine Learning Toolbox for Julia.
 <p align="center">
   <a href="https://travis-ci.com/alan-turing-institute/MLJ.jl">
     <img src="https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master"
@@ -21,8 +20,7 @@
     <img src="https://img.shields.io/badge/docs-stable-blue.svg"
          alt="Documentation">
   </a>
-</p>
-<br>
+</p></h2>
 
 MLJ is a machine learning framework for Julia aiming to provide a convenient way to use and combine a multitude of tools and models available in the Julia ML/Stats ecosystem.
 MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institute](https://www.turing.ac.uk/).
