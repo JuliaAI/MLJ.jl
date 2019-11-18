@@ -2,7 +2,7 @@
     <img src="https://alan-turing-institute.github.io/MLJTutorials/assets/infra/MLJLogo2.svg" alt="MLJ" width="200">
 </div>
 
-<h4 align="center">A Machine Learning Toolbox for Julia.</h4>
+<h2 align="center">A Machine Learning Toolbox for Julia.</h2>
 
 <p align="center">
   <a href="https://travis-ci.com/alan-turing-institute/MLJ.jl">
