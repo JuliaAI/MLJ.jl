@@ -142,7 +142,7 @@ end
                                                 rows, nothing, y)
 
     # check class distribution is preserved in a larger randomized example:
-    N = 3
+    N = 30
     y = shuffle(vcat(fill(:a, N), fill(:b, 2N),
                         fill(:c, 3N), fill(:d, 4N))) |> categorical;
     d = fit(UnivariateFinite, y)
@@ -150,7 +150,7 @@ end
     folds = vcat(first.(pairs), last.(pairs))
     @test all([fit(UnivariateFinite, y[fold]) ≈ d for fold in folds])
 
-    
+
 end
 
 @testset "weights" begin

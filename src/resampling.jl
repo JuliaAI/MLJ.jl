@@ -9,9 +9,12 @@ function ==(s1::S, s2::S) where S <: ResamplingStrategy
     return all(getfield(s1, fld) == getfield(s2, fld) for fld in fieldnames(S))
 end
 
+# fallbacks:
 train_test_pairs(s::ResamplingStrategy, rows, X, y, w) =
     train_test_pairs(s, rows, X, y)
 train_test_pairs(s::ResamplingStrategy, rows, X, y) =
+    train_test_pairs(s, rows, y)
+train_test_pairs(s::ResamplingStrategy, rows, y) =
     train_test_pairs(s, rows)
 
 """
@@ -137,13 +140,15 @@ function train_test_pairs(cv::CV, rows)
 end
 
 """
-    stratified_cv = StratifiedCV(; nfolds=6,  shuffle=false, rng=Random.GLOBAL_RNG)
+    stratified_cv = StratifiedCV(; nfolds=6,  
+                                   shuffle=false, 
+                                   rng=Random.GLOBAL_RNG)
 
 Stratified cross-validation resampling strategy, for use in
 `evaluate!`, `evaluate` and in tuning. Applies only to classification
 problems (`OrderedFactor` or `Multiclass` targets).
 
-    train_test_pairs(stratified_cv, rows, X, y)        # X is ignored
+    train_test_pairs(stratified_cv, rows, y)
  
 Returns an `nfolds`-length iterator of `(train, test)` pairs of
 vectors (row indices) where each `train` and `test` is a sub-vector of
