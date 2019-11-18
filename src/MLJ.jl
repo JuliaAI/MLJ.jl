@@ -8,7 +8,8 @@ export MLJ_VERSION
 export @curve, @pcurve, pretty,                   # utilities.jl
     coerce, supervised, unsupervised,             # tasks.jl
     report,                                       # machines.jl
-    Holdout, CV, evaluate!, Resampler,            # resampling.jl
+    Holdout, CV, StratifiedCV, evaluate!,         # resampling.jl
+    Resampler,                                    # resampling.jl
     Params, params, set_params!,                  # parameters.jl
     strange, iterator,                            # parameters.jl
     Grid, TunedModel, learning_curve!,            # tuning.jl

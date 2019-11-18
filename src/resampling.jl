@@ -15,12 +15,17 @@ train_test_pairs(s::ResamplingStrategy, rows, X, y) =
     train_test_pairs(s, rows)
 
 """
-    Holdout(; fraction_train=0.7,
-              shuffle=false,
-              rng=Random.GLOBAL_RNG)
+    holdout = Holdout(; fraction_train=0.7,
+                         shuffle=false,
+                         rng=Random.GLOBAL_RNG)
 
-Single train-test split with a (randomly selected) portion of the
-data being selected for training and the rest for testing.
+Holdout resampling strategy, for use in `evaluate!`, `evaluate` and in tuning.
+
+    train_test_pairs(holdout, rows)
+
+Returns the pair `[(train, test)]`, where `train` and `test` are
+vectors such that `rows=vcat(train, test)` and
+`length(train)/length(test) ≈ fraction_train`.
 
 If `rng` is an integer, then `MersenneTwister(rng)` is the random
 number generator used for shuffling rows. Otherwise some `AbstractRNG`
@@ -60,24 +65,25 @@ end
 
 
 """
-    CV(; nfolds=6,  shuffle=false, rng=Random.GLOBAL_RNG)
+    cv = CV(; nfolds=6,  shuffle=false, rng=Random.GLOBAL_RNG)
 
-Cross validation resampling where the data is (randomly) partitioned
-in `nfolds` folds and the model is evaluated `nfolds` times, each time
-taking one fold for testing and the remaining folds for training.
+Cross-validation resampling strategy, for use in `evaluate!`,
+`evaluate` and tuning.
 
-For instance, if `nfolds=3` then the data will be partitioned in three
-folds A, B and C and the model will be trained three times, first with
-A and B and tested on C, then on A, C and tested on B and finally on
-B, C and tested on A.
+    train_test_pairs(cv, rows)
 
-In the typical case that `n_folds` does not divide the number of
-observations, the last test is longer than the other tests sets, which
-are all equal in size. The test sets are always mutually exclusive, and
-each train set is always the complement of the corresponding test set.
+Returns an `nfolds`-length iterator of `(train, test)` pairs of
+vectors (row indices), where each `train` and `test` is a sub-vector
+of `rows`. The `test` vectors are mutually exclusive and exhaust
+`rows`. Each `train` vector is the complement of the
+corresponding `test` vector. With no shuffling, the order of `rows` is
+preserved, in the sense that `rows` coincides precisely with the
+concatenation of the `test` vectors, in the order they are
+generated. All but the last `test` vector have equal length.
 
-If `rng` is an integer, then `MersenneTwister(rng)` is the random
-number generator used for shuffling rows. Otherwise some `AbstractRNG`
+Declaring `shuffle=true` results in `rows` being shuffled first. If
+`rng` is an integer, then `MersenneTwister(rng)` is the random number
+generator used for shuffling `rows`. Otherwise some `AbstractRNG`
 object is expected.
 
 """
@@ -130,6 +136,117 @@ function train_test_pairs(cv::CV, rows)
     return ret
 end
 
+"""
+    stratified_cv = StratifiedCV(; nfolds=6,  shuffle=false, rng=Random.GLOBAL_RNG)
+
+Stratified cross-validation resampling strategy, for use in
+`evaluate!`, `evaluate` and in tuning. Applies only to classification
+problems (`OrderedFactor` or `Multiclass` targets).
+
+    train_test_pairs(stratified_cv, rows, X, y)        # X is ignored
+ 
+Returns an `nfolds`-length iterator of `(train, test)` pairs of
+vectors (row indices) where each `train` and `test` is a sub-vector of
+`rows`. The `test` vectors are mutually exclusive and exhaust
+`rows`. Each `train` vector is the complement of the corresponding
+`test` vector. 
+
+Unlike regular cross-validation, the distribution of the levels of the
+target `y` corresponding to each `train` and `test` is constrained, as
+far as possible, to replicate that of `y[rows]` as a whole.
+
+Specifically, the data is split into a number of groups on which `y`
+is constant, and each individual group is resampled according to the
+ordinary cross-validation strategy `CV(nfolds=nfolds)`. To obtain the
+final `(train, test)` pairs of row indices, the per-group pairs are
+collated in such a way that each collated `train` and `test` respects
+the original order of `rows` (after shuffling, if `shuffle=true`).
+
+If `rng` is an integer, then `MersenneTwister(rng)` is the random
+number generator used for shuffling rows. Otherwise some `AbstractRNG`
+object is expected.
+
+"""
+struct StratifiedCV <: ResamplingStrategy
+    nfolds::Int
+    shuffle::Bool
+    rng::Union{Int,AbstractRNG}
+    function StratifiedCV(nfolds, shuffle, rng)
+        nfolds > 1 || error("Must have nfolds > 1. ")
+        return new(nfolds, shuffle, rng)
+    end
+end
+
+# Constructor with keywords
+StratifiedCV(; nfolds::Int=6,  shuffle::Bool=false,
+   rng::Union{Int,AbstractRNG}=Random.GLOBAL_RNG) =
+       StratifiedCV(nfolds, shuffle, rng)
+
+
+function train_test_pairs(stratified_cv::StratifiedCV, rows, X, y)
+    if stratified_cv.rng isa Integer
+        rng = MersenneTwister(stratified_cv.rng)
+    else
+        rng = stratified_cv.rng
+    end
+
+    n_observations = length(rows)
+    nfolds = stratified_cv.nfolds
+
+    if stratified_cv.shuffle
+        rows=shuffle!(rng, collect(rows))
+    end
+
+    st = scitype(y)
+    st <: AbstractArray{<:Finite} ||
+        error("Supplied target has scitpye $st but stratified "*
+              "cross-validation applies only to classification problems. ")
+
+
+    freq_given_level = countmap(y[rows])
+    minimum(values(freq_given_level)) >= nfolds ||
+        error("The number of observations for which the target takes on a "*
+              "given class must, for each class, exceed `nfolds`. Try "*
+              "reducing `nfolds`. ")
+    
+    levels_seen = keys(freq_given_level) |> collect
+
+    cv = CV(nfolds=nfolds)
+
+    # the target is constant on each stratum, a subset of `rows`:
+    class_rows = [rows[y[rows] .== c] for c in levels_seen]
+
+    # get the cv train/test pairs for each level:
+    train_test_pairs_per_level = (MLJ.train_test_pairs(cv, class_rows[m])
+                              for m in eachindex(levels_seen))
+
+    # just the train rows in each level:
+    trains_per_level = map(x -> first.(x),
+                           train_test_pairs_per_level)
+
+    # just the test rows in each level:
+    tests_per_level  = map(x -> last.(x),
+                                train_test_pairs_per_level)
+    
+    # for each fold, concatenate the train rows over levels: 
+    trains_per_fold = map(x->vcat(x...), zip(trains_per_level...))
+    
+    # for each fold, concatenate the test rows over levels: 
+    tests_per_fold = map(x->vcat(x...), zip(tests_per_level...))
+    
+    # restore ordering specified by rows:
+    trains_per_fold = map(trains_per_fold) do train
+        filter(in(train), rows)
+    end
+    tests_per_fold = map(tests_per_fold) do test
+        filter(in(test), rows)
+    end
+    
+    # re-assemble:
+    return zip(trains_per_fold, tests_per_fold) |> collect
+
+end
+
 
 ## DIRECT EVALUATION METHODS
 
@@ -138,9 +255,9 @@ end
               resampling=CV(),
               measure=nothing,
               weights=nothing,
-              operation=predict,  
+              operation=predict,
               acceleration=DEFAULT_RESOURCE[],
-              force=false, 
+              force=false,
               verbosity=1)
 
 Estimate the performance of a machine `mach` wrapping a supervised
