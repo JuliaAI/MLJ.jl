@@ -59,7 +59,7 @@ The MLJ universe is made out of several repositories some of which can be used i
 * [MLJModels.jl](https://github.com/alan-turing-institute/MLJ.jl) contains interfaces to a number of important model-providing packages such as,  [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl), [ScikitLearn.jl](https://github.com/bensadeghi/DecisionTree.jl) or [XGBoost.jl](https://github.com/dmlc/XGBoost.jl) as well as a few built-in transformations (one hot encoding, standardisation, ...), it also hosts the *model registry* which keeps track of all models accessible via MLJ,
 * (⟂) [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl) a lightweight package to help specify the *interpretation* of data beyond how the data is currently encoded,
 * (⟂) [MLJLinearModels.jl](https://github.com/alan-turing-institute/MLJLinearModels.jl) an experimental package for a wide range of penalised linear models such as Lasso, Elastic-Net, Robust regression, LAD regression, etc.
-* [MLJFlux.jl](https://github.com/alan-turing-institute/MLJFlux.jl) an experimental package to use Flux within MLJ
+* [MLJFlux.jl](https://github.com/alan-turing-institute/MLJFlux.jl) an experimental package to use Flux within MLJ.
 
 and maybe most importantly:
 
@@ -79,8 +79,7 @@ You're also welcome to join the `#mlj` Julia slack channel to ask questions and 
 ### Contributing to MLJ
 
 MLJ is an ambitious project and we need all the help we can get!
-There are multiple ways you can contribute.
-The table below helps indicate where you can help and what are the subjective requirements in terms of Julia and ML expertise.
+There are multiple ways you can contribute; the table below helps indicate where you can help and what are the subjective requirements in terms of Julia and ML expertise.
 
 Julia | ML         | What to do
 ----- | ---------- | ----------
@@ -181,3 +180,7 @@ The table below indicates the models that are accessible at present along with a
 *Past collaborators*:
 - Ed Barp
 - Zac Nugent
+
+#### License
+
+MLJ is supported by the Alan Turing Institute and released under the MIT "Expat" License.
