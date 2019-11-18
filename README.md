@@ -1,159 +1,184 @@
-## MLJ
+<div align="center">
+    <img src="https://alan-turing-institute.github.io/MLJTutorials/assets/infra/MLJLogo2.svg" alt="MLJ" width="200">
+</div>
 
-A pure Julia machine learning framework.
+<h4 align="center">A Machine Learning Toolbox for Julia.</h4>
 
-[MLJ News](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/NEWS.md) for  MLJ and its satellite packages, [MLJBase](https://github.com/alan-turing-institute/MLJBase.jl), [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl) and [ScientificTypes](https://github.com/alan-turing-institute/ScientificTypes.jl) | [MLJ Cheatsheet](docs/src/mlj_cheatsheet.md)
+<p align="center">
+  <a href="https://travis-ci.com/alan-turing-institute/MLJ.jl">
+    <img src="https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master"
+         alt="Build Status">
+  </a>
+  <a href="https://coveralls.io/github/alan-turing-institute/MLJ.jl?branch=master">
+    <img src="https://coveralls.io/repos/github/alan-turing-institute/MLJ.jl/badge.svg?branch=master"
+         alt="Coverage">
+  </a>
+  <a href="https://slackinvite.julialang.org/">
+    <img src="https://img.shields.io/badge/chat-on%20slack-yellow.svg"
+         alt="#mlj">
+  </a>
+  <a href="https://alan-turing-institute.github.io/MLJ.jl/stable/">
+    <img src="https://img.shields.io/badge/docs-stable-blue.svg"
+         alt="Documentation">
+  </a>
+</p>
+<br>
 
-## `join!(MLJ, YourModel)`
+MLJ is a machine learning framework for Julia aiming to provide a convenient way to use and combine a multitude of tools and models available in the Julia ML/Stats ecosystem.
+MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institute](https://www.turing.ac.uk/).
 
-**Call for help.** MLJ needs your help to ensure its success. This depends
-crucially on:
+<p align="center">
+  <a href="#the-mlj-universe">MLJ Universe</a> •
+  <a href="#using-mlj">Using MLJ</a> •
+  <a href="#contributing-to-mlj">Contributing</a> •
+  <a href="#models-available">Available Models</a> •
+  <a href="#citing-mlj">Citing MLJ</a>
+</p>
 
-- Existing and developing ML algorithms implementing the MLJ model interface
 
-- Improvements to existing but poorly maintained Julia ML algorithms 
+### Key goals
 
-The MLJ model interface is now relatively stable and
-[well-documented](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/),
-and the core team is happy to respond to [issue requests](https://github.com/alan-turing-institute/MLJ.jl/issues) for
-assistance. Please click [here](CONTRIBUTING.md) for more details on
-contributing.
+* Offer a consistent way to use, compose and tune machine learning models in Julia,
+* Promote the improvement of the Julia ML/Stats ecosystem by making it easier to use models from a wide range of packages,
+* Unlock performance gains by exploiting Julia's support for parallelism, automatic differentiation, GPU, optimisation etc.
 
-MLJ is presently supported by a small Alan Turing Institute grant and is looking for new funding sources to grow and maintain the project.
+### Key features
 
-[![Build Status](https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master)](https://travis-ci.com/alan-turing-institute/MLJ.jl)
-[![Slack Channel mlj](https://img.shields.io/badge/chat-on%20slack-yellow.svg)](https://slackinvite.julialang.org/)
-[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://alan-turing-institute.github.io/MLJ.jl/dev/)
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://alan-turing-institute.github.io/MLJ.jl/stable/)
-[![Coverage Status](https://coveralls.io/repos/github/alan-turing-institute/MLJ.jl/badge.svg?branch=master)](https://coveralls.io/github/alan-turing-institute/MLJ.jl?branch=master)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3541506.svg)](https://doi.org/10.5281/zenodo.3541506)
+* Data agnostic, train models on any data supported by the [Tables.jl](https://github.com/JuliaData/Tables.jl) interface,
+* Extensive support for model composition (*pipelines* and *learning networks*),
+* Convenient syntax to tune and evaluate (composite) models,
+* Consistent interface to handle probabilistic predictions.
 
-![](docs/src/two_model_stack.png)
+---
 
-MLJ aims to be a flexible framework for combining and tuning machine
-learning models, written in the high performance, rapid development,
-scientific programming language, [Julia](https://julialang.org). 
+### The MLJ Universe
 
-The MLJ project is partly inspired by [MLR](https://mlr.mlr-org.com/index.html).
+The MLJ universe is made out of several repositories some of which can be used independently of MLJ (indicated with a ⟂ symbol):
 
-[List of presently implemented models](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src/registry/Models.toml)
-  
+* (⟂) [MLJBase.jl](https://github.com/alan-turing-institute/MLJBase.jl) offers essential tools to load and interpret data, describe ML models and use metrics; it is the repository you should interface with if you wish to make your package accessible via MLJ,
+* [MLJ.jl](https://github.com/alan-turing-institute/MLJ.jl) offers tools to compose, tune and evaluate models,
+* [MLJModels.jl](https://github.com/alan-turing-institute/MLJ.jl) contains interfaces to a number of important model-providing packages such as,  [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl), [ScikitLearn.jl](https://github.com/bensadeghi/DecisionTree.jl) or [XGBoost.jl](https://github.com/dmlc/XGBoost.jl) as well as a few built-in transformations (one hot encoding, standardisation, ...), it also hosts the *model registry* which keeps track of all models accessible via MLJ,
+* (⟂) [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl) a lightweight package to help specify the *interpretation* of data beyond how the data is currently encoded,
+* (⟂) [MLJLinearModels.jl](https://github.com/alan-turing-institute/MLJLinearModels.jl) an experimental package for a wide range of penalised linear models such as Lasso, Elastic-Net, Robust regression, LAD regression, etc.
+* [MLJFlux.jl](https://github.com/alan-turing-institute/MLJFlux.jl) an experimental package to use Flux within MLJ
 
-### Installation
+and maybe most importantly:
 
-At the julia REPL prompt
+* [MLJTutorials](https://github.com/alan-turing-institute/MLJTutorials) which collects tutorials on how to use MLJ.
 
-```julia
-using Pkg
-Pkg.add("MLJ")
-Pkg.add("MLJModels")
+---
+
+### Using MLJ
+
+If you just want to use MLJ, we recommend you start with mature models from the packages marked as such in the table further below (e.g. _DecisionTree_, _ScikitLearn_, _XGBoost_).
+
+The best place to get started with MLJ is to go the [MLJ Tutorials](https://alan-turing-institute.github.io/MLJTutorials/) website.
+Each of the tutorial can be downloaded as a notebook or Julia script to facilitate experimentation with the packages.
+
+You're also welcome to join the `#mlj` Julia slack channel to ask questions and make suggestions.
+
+### Contributing to MLJ
+
+MLJ is an ambitious project and we need all the help we can get!
+There are multiple ways you can contribute.
+The table below helps indicate where you can help and what are the subjective requirements in terms of Julia and ML expertise.
+
+Julia | ML         | What to do
+----- | ---------- | ----------
+=     | =          | use MLJ and give us feedback, help us write better tutorials, suggest missing features, test the less mature model packages
++     | =          | package to facilitate visualising results in MLJ
++     | +          | add/improve data pre-processing tools
++     | +          | add/improve interfaces to other model-providing packages
++     | +          | functionalities for time series
++     | +          | functionalities for systematic benchmarking of models
+++    | =          | decrease the overhead incurred by MLJ
+++    | +          | add parallelism and/or multithreading to MLJ
++     | ++         | add  interface with probabilistic programming packages (*there is an ongoing effort to interface with [Soss.jl](https://github.com/cscherrer/Soss.jl)*)
+++    | ++         | more sophisticated HP tuning (BO, Bandit, early stopping, ...) possibly as part of a external package(s), possibly integrating with Julia's optimisation and autodiff packages
+
+If you're interested in one of these beyond the first one, please get in touch with either Anthony Blaom or Thibaut Lienart on Slack and we can further guide you.
+Thank you!
+
+---
+
+### Models available
+
+There is a wide range of models accessible via MLJ.
+We are always looking for contributors to add new models or help us test existing ones.
+The table below indicates the models that are accessible at present along with a subjective indication of how mature the underlying package is.
+
+* *experimental*: indicates the package is fairly new and/or is under active development; you can help by testing these packages and making them more robust,
+* *medium*: indicates the package is fairly mature but may benefit from optimisations and/or extra features; you can help by suggesting either,
+* *high*: indicates the package is very mature and functionalities are expected to have been fairly optimised and tested.
+
+| Package | Models | Maturity | Note
+| ------- | ------ | -------- | ----
+[Clustering.jl] | KMeans, KMedoids | high | [note]
+[DecisionTree.jl] | DecisionTreeClassifier, DecisionTreeRegressor | high | [note]
+[GaussianProcesses.jl] | GPClassifier | medium | [note]
+[GLM.jl] | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium | [note]
+[LIBSVM.jl] | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
+[MLJModels.jl] (builtins) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ConstantRegressor, ConstantClassifier, (KNNRegressor) | medium |
+[MLJLinearModels.jl] | LinearRegressor, RidgeRegressor, LassoRegressor, ElasticNetRegressor, QuantileRegressor, HuberRegressor, RobustRegressor, LADRegressor, LogisticClassifier, MultinomialClassifier | experimental |
+[MultivariateStats.jl] | RidgeRegressor, PCA, KernelPCA, ICA, LDA, BayesianLDA, SubspaceLDA, BayesianSubspaceLDA | high | [note]
+[NaiveBayes.jl] | GaussianNBClassifier, MultinomialNBClassifier, HybridNBClassifier | medium |
+[NearestNeighbors.jl] | KNNClassifier, KNNRegressor | high |
+[ScikitLearn.jl] | SVMClassifier, SVMRegressor, SVMNuClassifier, SVMNuRegressor, SVMLClassifier, SVMLRegressor, ARDRegressor, BayesianRidgeRegressor, ElasticNetRegressor, ElasticNetCVRegressor, HuberRegressor, LarsRegressor, LarsCVRegressor, LassoRegressor, LassoCVRegressor, LassoLarsRegressor, LassoLarsCVRegressor, LassoLarsICRegressor, LinearRegressor, OrthogonalMatchingPursuitRegressor, OrthogonalMatchingPursuitCVRegressor, PassiveAggressiveRegressor, RidgeRegressor, RidgeCVRegressor, SGDRegressor, TheilSenRegressor, LogisticClassifier, LogisticCVClassifier, PerceptronClassifier, RidgeClassifier, RidgeCVClassifier, PassiveAggressiveClassifier, SGDClassifier, GaussianProcessRegressor, GaussianProcessClassifier, AdaBoostRegressor, AdaBoostClassifier, BaggingRegressor, BaggingClassifier, GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, RandomForestClassifier, GaussianNB, MultinomialNB, ComplementNB, BayesianLDA, BayesianQDA | high | [note]
+[XGBoost.jl] | XGBoostRegressor, XGBoostClassifier, XGBoostCount | high |
+
+[note]: some models are missing, your help is welcome to complete the interface. Get in touch with Thibaut Lienart on Slack if you want to help.
+
+[Clustering.jl]: https://github.com/JuliaStats/Clustering.jl
+[DecisionTree.jl]: https://github.com/bensadeghi/DecisionTree.jl
+[GaussianProcesses.jl]: https://github.com/STOR-i/GaussianProcesses.jl
+[GLM.jl]: https://github.com/JuliaStats/GLM.jl
+[LIBSVM.jl]: https://github.com/mpastell/LIBSVM.jl
+[MLJLinearModels.jl]: https://github.com/alan-turing-institute/MLJLinearModels.jl
+[MLJModels.jl]: https://github.com/alan-turing-institute/MLJModels.jl
+[MultivariateStats.jl]: https://github.com/mpastell/LIBSVM.jl
+[NaiveBayes.jl]: https://github.com/dfdx/NaiveBayes.jl
+[NearestNeighbors.jl]: https://github.com/KristofferC/NearestNeighbors.jl
+[ScikitLearn.jl]: https://github.com/cstjean/ScikitLearn.jl
+[XGBoost.jl]: https://github.com/dmlc/XGBoost.jl
+
+---
+
+### Citing MLJ
+
+<a href="https://doi.org/10.5281/zenodo.3541506">
+  <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3541506.svg"
+       alt="Cite MLJ">
+</a>
+
+```bibtex
+@software{anthony_blaom_2019_3541506,
+  author       = {Anthony Blaom and
+                  Franz Kiraly and
+                  Thibaut Lienart and
+                  Sebastian Vollmer},
+  title        = {alan-turing-institute/MLJ.jl: v0.5.3},
+  month        = nov,
+  year         = 2019,
+  publisher    = {Zenodo},
+  version      = {v0.5.3},
+  doi          = {10.5281/zenodo.3541506},
+  url          = {https://doi.org/10.5281/zenodo.3541506}
+}
 ```
 
-To obtain a list of all registered models:
+#### Contributors
 
-```julia
-using MLJ
-models()
-```
+*Active maintainers*:
+- Anthony Blaom
+- Thibaut Lienart
 
-To add a package - for example,  DecisionTree - to your load path:
+*Active collaborators*:
+- Diego Arenas
+- David Buchaca
+- Julio Hoffimann
+- Samuel Okon
+- Julian Samaroo
 
-```julia
-using Pkg
-Pkg.add("DecisionTree")
-```
-
-To load all code needed to use a model - for example, DecisionTreeClassifier,
-
-```julia
-@load DecisionTreeClassifier
-```
-
-which also returns a default instance. Refer to the
-[documentation](https://alan-turing-institute.github.io/MLJ.jl/stable/)
-for more on instantiating and running loaded models.
-
-
-**Package conflicts.** If you encounter package conflicts during
-installation, and are not familiar with the Julia package manager,
-then you can try installation in a fresh environment by first entering
-these commmands:
-
-
-```julia
-using Pkg
-Pkg.activate("my_mlj_env", shared=true)
-```
-
-In future REPL sessions, you can activate your (now populated)
-environment with the same command.
-
-
-A docker image with installation
-[instructions](https://github.com/ysimillides/mlj-docker) is also
-available.
-
-
-### Features to include:
-
-- **Automated tuning** of hyperparameters, including
-  composite models with *nested parameters*. Tuning implemented as a
-  wrapper, allowing composition with other meta-algorithms. &#10004;
-
-- Option to tune hyperparameters using gradient descent and **automatic
-	differentiation** (for learning algorithms written in Julia).
-	
-- Option to tune hyperaparameters using **Bayesian optimisation**
-
-- **Data agnostic**: Train models on any data supported by the Tables.jl 
-[interface](https://github.com/JuliaData/Tables.jl). &#10004;
-
-- Intuitive syntax for building arbitrarily complicated
-  **learning networks** .&#10004;
-  
-- Learning networks can be exported as self-contained **composite models** &#10004;, but
-  common networks (e.g., linear **pipelines** &#10004;, **stacks**) come ready to plug-and-play.
-
-- Performant parallel implementation of large homogeneous **ensembles**
-  of arbitrary models (e.g., random forests). &#10004;
-
-- Model **registry** and facility to **match models** to machine learning
-  tasks. &#10004;
-
-- **Benchmarking** a battery of assorted models for a given task.
-
-- Automated estimates of cpu and memory requirements for given task/model.
-
-- Friendly interface for handling **probabilistic** prediction. &#10004;
-
-
-### Frequently Asked Questions
-
-See [here](docs/src/frequently_asked_questions.md).
-
-
-### Getting started
-
-Get started
-[here](https://alan-turing-institute.github.io/MLJ.jl/stable/),
-or take the MLJ [tour](/examples/tour/tour.ipynb).
-
-
-### History
-
-Antecedents for the current package are
-[AnalyticalEngine.jl](https://github.com/tlienart/AnalyticalEngine.jl),
-[Orchestra.jl](https://github.com/svs14/Orchestra.jl), and
-[Koala.jl](https://github.com/ablaom/Koala.jl). Development was also
-guided by a research study group at the University of Warwick,
-beginning with a review of existing ML Modules that were available in
-Julia at the time
-([in-depth](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Educational),
-[overview](https://github.com/dominusmi/Julia-Machine-Learning-Review/tree/master/Package%20Review)).
-
-![alt text](material/packages.jpg)
-
-Further work culminated in the first MLJ
-[proof-of-concept](https://github.com/alan-turing-institute/MLJ.jl/tree/poc)
-
-For administrators: [Implementing requests to register new models](REGISTRY.md).
+*Past collaborators*:
+- Ed Barp
+- Zac Nugent
