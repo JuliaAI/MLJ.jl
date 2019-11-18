@@ -20,11 +20,13 @@
     <img src="https://img.shields.io/badge/docs-stable-blue.svg"
          alt="Documentation">
   </a>
-</p></h2>
+</p>
+</h2>
 
 MLJ is a machine learning framework for Julia aiming to provide a convenient way to use and combine a multitude of tools and models available in the Julia ML/Stats ecosystem.
 MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institute](https://www.turing.ac.uk/).
 
+<br>
 <p align="center">
   <a href="#the-mlj-universe">MLJ Universe</a> •
   <a href="#using-mlj">Using MLJ</a> •
@@ -32,7 +34,6 @@ MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institu
   <a href="#models-available">Available Models</a> •
   <a href="#citing-mlj">Citing MLJ</a>
 </p>
-
 
 ### Key goals
 
@@ -84,15 +85,15 @@ The table below helps indicate where you can help and what are the subjective re
 Julia | ML         | What to do
 ----- | ---------- | ----------
 =     | =          | use MLJ and give us feedback, help us write better tutorials, suggest missing features, test the less mature model packages
-+     | =          | package to facilitate visualising results in MLJ
-+     | +          | add/improve data pre-processing tools
-+     | +          | add/improve interfaces to other model-providing packages
-+     | +          | functionalities for time series
-+     | +          | functionalities for systematic benchmarking of models
-++    | =          | decrease the overhead incurred by MLJ
-++    | +          | add parallelism and/or multithreading to MLJ
-+     | ++         | add  interface with probabilistic programming packages (*there is an ongoing effort to interface with [Soss.jl](https://github.com/cscherrer/Soss.jl)*)
-++    | ++         | more sophisticated HP tuning (BO, Bandit, early stopping, ...) possibly as part of a external package(s), possibly integrating with Julia's optimisation and autodiff packages
+⭒     | =          | package to facilitate visualising results in MLJ
+⭒     | ⭒          | add/improve data pre-processing tools
+⭒     | ⭒          | add/improve interfaces to other model-providing packages
+⭒     | ⭒          | functionalities for time series
+⭒     | ⭒          | functionalities for systematic benchmarking of models
+⭒⭒    | =          | decrease the overhead incurred by MLJ
+⭒⭒    | ⭒          | add parallelism and/or multithreading to MLJ
+⭒     | ⭒⭒         | add  interface with probabilistic programming packages (*there is an ongoing effort to interface with [Soss.jl](https://github.com/cscherrer/Soss.jl)*)
+⭒⭒    | ⭒⭒         | more sophisticated HP tuning (BO, Bandit, early stopping, ...) possibly as part of a external package(s), possibly integrating with Julia's optimisation and autodiff packages
 
 If you're interested in one of these beyond the first one, please get in touch with either Anthony Blaom or Thibaut Lienart on Slack and we can further guide you.
 Thank you!
