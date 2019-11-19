@@ -32,8 +32,8 @@ MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institu
   <a href="#the-mlj-universe">MLJ Universe</a> •
   <a href="#contributing-to-mlj">Contributing</a> •
   <a href="#models-available">Available Models</a> •
-  <a href="">MLJ Cheatsheet</a> •
-  <a href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/mlj_cheatsheet.md">Citing MLJ</a>
+  <a href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/mlj_cheatsheet.md">MLJ Cheatsheet</a> •
+  <a href="#citing-mlj">Citing MLJ</a>
 </p>
 
 ### Key goals
@@ -75,7 +75,14 @@ julia> using MLJ;
 julia> @load DecisionTreeClassifier
 ```
 
-For a list of models and their packages see the [table below](#models-available), we recommend you start with models marked as coming from _mature_ packages such as _DecisionTree_, _ScikitLearn_ or _XGBoost_.
+For a list of models and their packages see the [table below](#models-available), or run
+
+```julia
+using MLJ
+models()
+```
+
+We recommend you start with models marked as coming from _mature_ packages such as _DecisionTree_, _ScikitLearn_ or _XGBoost_.
 
 #### Tutorials
 
@@ -92,7 +99,7 @@ The MLJ universe is made out of several repositories some of which can be used i
 
 * (⟂) [MLJBase.jl](https://github.com/alan-turing-institute/MLJBase.jl) offers essential tools to load and interpret data, describe ML models and use metrics; it is the repository you should interface with if you wish to make your package accessible via MLJ,
 * [MLJ.jl](https://github.com/alan-turing-institute/MLJ.jl) offers tools to compose, tune and evaluate models,
-* [MLJModels.jl](https://github.com/alan-turing-institute/MLJ.jl) contains interfaces to a number of important model-providing packages such as,  [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl), [ScikitLearn.jl](https://github.com/bensadeghi/DecisionTree.jl) or [XGBoost.jl](https://github.com/dmlc/XGBoost.jl) as well as a few built-in transformations (one hot encoding, standardisation, ...), it also hosts the *model registry* which keeps track of all models accessible via MLJ,
+* [MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl) contains interfaces to a number of important model-providing packages such as,  [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl), [ScikitLearn.jl](https://github.com/bensadeghi/ScikitLearn.jl) or [XGBoost.jl](https://github.com/dmlc/XGBoost.jl) as well as a few built-in transformations (one hot encoding, standardisation, ...), it also hosts the *model registry* which keeps track of all models accessible via MLJ,
 * (⟂) [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl) a lightweight package to help specify the *interpretation* of data beyond how the data is currently encoded,
 * (⟂) [MLJLinearModels.jl](https://github.com/alan-turing-institute/MLJLinearModels.jl) an experimental package for a wide range of penalised linear models such as Lasso, Elastic-Net, Robust regression, LAD regression, etc.
 * [MLJFlux.jl](https://github.com/alan-turing-institute/MLJFlux.jl) an experimental package to use Flux within MLJ.
@@ -116,7 +123,9 @@ Julia | ML         | What to do
 ⭒     | ⭒          | add/improve interfaces to other model-providing packages
 ⭒     | ⭒          | functionalities for time series
 ⭒     | ⭒          | functionalities for systematic benchmarking of models
+⭒     | ⭒          | functionalities for natural language processing (NLP)
 ⭒⭒    | =          | decrease the overhead incurred by MLJ
+⭒⭒    | =          | improving support for sparse data
 ⭒⭒    | ⭒          | add parallelism and/or multithreading to MLJ (*there is an ongoing effort to interface with [Dagger.jl](https://github.com/JuliaParallel/Dagger.jl)*)
 ⭒     | ⭒⭒         | add  interface with probabilistic programming packages (*there is an ongoing effort to interface with [Soss.jl](https://github.com/cscherrer/Soss.jl)*)
 ⭒⭒    | ⭒⭒         | more sophisticated HP tuning (BO, Bandit, early stopping, ...) possibly as part of an external package(s), possibly integrating with Julia's optimisation and autodiff packages
@@ -140,20 +149,20 @@ The table below indicates the models that are accessible at present along with a
 
 | Package | Models | Maturity | Note
 | ------- | ------ | -------- | ----
-[Clustering.jl] | KMeans, KMedoids | high | [note]
-[DecisionTree.jl] | DecisionTreeClassifier, DecisionTreeRegressor | high | [note]
-[GaussianProcesses.jl] | GPClassifier | medium | [note]
-[GLM.jl] | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium | [note]
+[Clustering.jl] | KMeans, KMedoids | high | †
+[DecisionTree.jl] | DecisionTreeClassifier, DecisionTreeRegressor | high | †
+[GaussianProcesses.jl] | GPClassifier | medium | †
+[GLM.jl] | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium | †
 [LIBSVM.jl] | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
-[MLJModels.jl] (builtins) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ConstantRegressor, ConstantClassifier, (KNNRegressor) | medium |
+[MLJModels.jl] (builtins) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ConstantRegressor, ConstantClassifier | medium |
 [MLJLinearModels.jl] | LinearRegressor, RidgeRegressor, LassoRegressor, ElasticNetRegressor, QuantileRegressor, HuberRegressor, RobustRegressor, LADRegressor, LogisticClassifier, MultinomialClassifier | experimental |
-[MultivariateStats.jl] | RidgeRegressor, PCA, KernelPCA, ICA, LDA, BayesianLDA, SubspaceLDA, BayesianSubspaceLDA | high | [note]
+[MultivariateStats.jl] | RidgeRegressor, PCA, KernelPCA, ICA, LDA, BayesianLDA, SubspaceLDA, BayesianSubspaceLDA | high | †
 [NaiveBayes.jl] | GaussianNBClassifier, MultinomialNBClassifier, HybridNBClassifier | medium |
 [NearestNeighbors.jl] | KNNClassifier, KNNRegressor | high |
-[ScikitLearn.jl] | SVMClassifier, SVMRegressor, SVMNuClassifier, SVMNuRegressor, SVMLClassifier, SVMLRegressor, ARDRegressor, BayesianRidgeRegressor, ElasticNetRegressor, ElasticNetCVRegressor, HuberRegressor, LarsRegressor, LarsCVRegressor, LassoRegressor, LassoCVRegressor, LassoLarsRegressor, LassoLarsCVRegressor, LassoLarsICRegressor, LinearRegressor, OrthogonalMatchingPursuitRegressor, OrthogonalMatchingPursuitCVRegressor, PassiveAggressiveRegressor, RidgeRegressor, RidgeCVRegressor, SGDRegressor, TheilSenRegressor, LogisticClassifier, LogisticCVClassifier, PerceptronClassifier, RidgeClassifier, RidgeCVClassifier, PassiveAggressiveClassifier, SGDClassifier, GaussianProcessRegressor, GaussianProcessClassifier, AdaBoostRegressor, AdaBoostClassifier, BaggingRegressor, BaggingClassifier, GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, RandomForestClassifier, GaussianNB, MultinomialNB, ComplementNB, BayesianLDA, BayesianQDA | high | [note]
+[ScikitLearn.jl] | SVMClassifier, SVMRegressor, SVMNuClassifier, SVMNuRegressor, SVMLClassifier, SVMLRegressor, ARDRegressor, BayesianRidgeRegressor, ElasticNetRegressor, ElasticNetCVRegressor, HuberRegressor, LarsRegressor, LarsCVRegressor, LassoRegressor, LassoCVRegressor, LassoLarsRegressor, LassoLarsCVRegressor, LassoLarsICRegressor, LinearRegressor, OrthogonalMatchingPursuitRegressor, OrthogonalMatchingPursuitCVRegressor, PassiveAggressiveRegressor, RidgeRegressor, RidgeCVRegressor, SGDRegressor, TheilSenRegressor, LogisticClassifier, LogisticCVClassifier, PerceptronClassifier, RidgeClassifier, RidgeCVClassifier, PassiveAggressiveClassifier, SGDClassifier, GaussianProcessRegressor, GaussianProcessClassifier, AdaBoostRegressor, AdaBoostClassifier, BaggingRegressor, BaggingClassifier, GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, RandomForestClassifier, GaussianNB, MultinomialNB, ComplementNB, BayesianLDA, BayesianQDA | high | †
 [XGBoost.jl] | XGBoostRegressor, XGBoostClassifier, XGBoostCount | high |
 
-[note]: some models are missing, your help is welcome to complete the interface. Get in touch with Thibaut Lienart on Slack if you want to help.
+**Note** (†): some models are missing, your help is welcome to complete the interface. Get in touch with Thibaut Lienart on Slack if you want to help.
 
 [Clustering.jl]: https://github.com/JuliaStats/Clustering.jl
 [DecisionTree.jl]: https://github.com/bensadeghi/DecisionTree.jl
@@ -194,6 +203,8 @@ The table below indicates the models that are accessible at present along with a
 ```
 
 #### Contributors
+
+*Core design*: A. Blaom, F. Kiraly, S. Vollmer
 
 *Active maintainers*: A. Blaom, T. Lienart
 
