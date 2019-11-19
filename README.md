@@ -162,7 +162,7 @@ The table below indicates the models that are accessible at present along with a
 [ScikitLearn.jl] | SVMClassifier, SVMRegressor, SVMNuClassifier, SVMNuRegressor, SVMLClassifier, SVMLRegressor, ARDRegressor, BayesianRidgeRegressor, ElasticNetRegressor, ElasticNetCVRegressor, HuberRegressor, LarsRegressor, LarsCVRegressor, LassoRegressor, LassoCVRegressor, LassoLarsRegressor, LassoLarsCVRegressor, LassoLarsICRegressor, LinearRegressor, OrthogonalMatchingPursuitRegressor, OrthogonalMatchingPursuitCVRegressor, PassiveAggressiveRegressor, RidgeRegressor, RidgeCVRegressor, SGDRegressor, TheilSenRegressor, LogisticClassifier, LogisticCVClassifier, PerceptronClassifier, RidgeClassifier, RidgeCVClassifier, PassiveAggressiveClassifier, SGDClassifier, GaussianProcessRegressor, GaussianProcessClassifier, AdaBoostRegressor, AdaBoostClassifier, BaggingRegressor, BaggingClassifier, GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, RandomForestClassifier, GaussianNB, MultinomialNB, ComplementNB, BayesianLDA, BayesianQDA | high | †
 [XGBoost.jl] | XGBoostRegressor, XGBoostClassifier, XGBoostCount | high |
 
-**Note** (†): some models are missing, your help is welcome to complete the interface. Get in touch with Thibaut Lienart on Slack if you want to help.
+**Note** (†): some models are missing, your help is welcome to complete the interface. Get in touch with Thibaut Lienart on Slack if you would like to help, thanks!
 
 [Clustering.jl]: https://github.com/JuliaStats/Clustering.jl
 [DecisionTree.jl]: https://github.com/bensadeghi/DecisionTree.jl
