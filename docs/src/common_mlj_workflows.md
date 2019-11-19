@@ -37,7 +37,7 @@ Loading a built-in supervised dataset:
 
 ```@example workflows
 X, y = @load_iris;
-first(X, 4) 
+selectrows(X, 1:4) # selectrows works for any Tables.jl table
 ```
 
 ```@example workflows

@@ -41,12 +41,15 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
     tuned = machine(tuned_model, X, y)
 
     fit!(tuned)
-    report(tuned)
+    r = report(tuned)
+    @test r.best_report isa NamedTuple{(:machines, :reports)}
     tuned_model.full_report=true
     fit!(tuned)
     report(tuned)
-
-    b = fitted_params(tuned).best_model
+    fp = fitted_params(tuned)
+    @test fp.best_fitted_params isa NamedTuple{(:machines, :fitted_params)}
+    b = fp.best_model
+    @test b isa MLJ.SimpleDeterministicCompositeModel
 
     measurements = tuned.report.measurements
     # should be all different:
