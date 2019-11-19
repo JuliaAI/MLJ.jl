@@ -28,11 +28,12 @@ MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institu
 
 <br>
 <p align="center">
-  <a href="#the-mlj-universe">MLJ Universe</a> •
   <a href="#using-mlj">Using MLJ</a> •
+  <a href="#the-mlj-universe">MLJ Universe</a> •
   <a href="#contributing-to-mlj">Contributing</a> •
   <a href="#models-available">Available Models</a> •
-  <a href="#citing-mlj">Citing MLJ</a>
+  <a href="">MLJ Cheatsheet</a> •
+  <a href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/mlj_cheatsheet.md">Citing MLJ</a>
 </p>
 
 ### Key goals
@@ -47,6 +48,41 @@ MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institu
 * Extensive support for model composition (*pipelines* and *learning networks*),
 * Convenient syntax to tune and evaluate (composite) models,
 * Consistent interface to handle probabilistic predictions.
+
+---
+
+### Using MLJ
+
+It is a good idea to use a [separate environment](https://julialang.github.io/Pkg.jl/v1/environments/) for MLJ in order to avoid version clashes with other packages you may be using.
+You can do so with
+
+```julia
+julia> using Pkg; Pkg.activate("My_MLJ_env", shared=true)
+```
+
+Installing MLJ is also done with the package manager:
+
+```julia
+julia> Pkg.add(["MLJ", "MLJModels"])
+```
+
+It is important to note that MLJ is essentially a big wrapper providing a unified access to _model providing packages_ and so you will also need to make sure these packages are available in your environment.
+For instance, if you want to use a **Decision Tree Classifier**, you need to have [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl) installed:
+
+```julia
+julia> Pkg.add("DecisionTree");
+julia> using MLJ;
+julia> @load DecisionTreeClassifier
+```
+
+For a list of models and their packages see the [table below](#models-available), we recommend you start with models marked as coming from _mature_ packages such as _DecisionTree_, _ScikitLearn_ or _XGBoost_.
+
+#### Tutorials
+
+The best place to get started with MLJ is to go the [MLJ Tutorials](https://alan-turing-institute.github.io/MLJTutorials/) website.
+Each of the tutorial can be downloaded as a notebook or Julia script to facilitate experimentation with the packages.
+
+You're also welcome to join the `#mlj` Julia slack channel to ask questions and make suggestions.
 
 ---
 
@@ -67,22 +103,6 @@ and maybe most importantly:
 
 ---
 
-### Using MLJ
-
-Installing MLJ is done with the package manager:
-
-```julia
-(v1.x) pkg> add MLJ
-```
-
-it is a good idea to use a [separate environment](https://julialang.github.io/Pkg.jl/v1/environments/) for MLJ in order to avoid version clashes with other packages you may be using.
-We also recommend you start with models from "mature" packages (see the table further below) e.g.: _DecisionTree_, _ScikitLearn_ or _XGBoost_.
-
-The best place to get started with MLJ is to go the [MLJ Tutorials](https://alan-turing-institute.github.io/MLJTutorials/) website.
-Each of the tutorial can be downloaded as a notebook or Julia script to facilitate experimentation with the packages.
-
-You're also welcome to join the `#mlj` Julia slack channel to ask questions and make suggestions.
-
 ### Contributing to MLJ
 
 MLJ is an ambitious project and we need all the help we can get!
@@ -97,12 +117,14 @@ Julia | ML         | What to do
 ⭒     | ⭒          | functionalities for time series
 ⭒     | ⭒          | functionalities for systematic benchmarking of models
 ⭒⭒    | =          | decrease the overhead incurred by MLJ
-⭒⭒    | ⭒          | add parallelism and/or multithreading to MLJ
+⭒⭒    | ⭒          | add parallelism and/or multithreading to MLJ (*there is an ongoing effort to interface with [Dagger.jl](https://github.com/JuliaParallel/Dagger.jl)*)
 ⭒     | ⭒⭒         | add  interface with probabilistic programming packages (*there is an ongoing effort to interface with [Soss.jl](https://github.com/cscherrer/Soss.jl)*)
-⭒⭒    | ⭒⭒         | more sophisticated HP tuning (BO, Bandit, early stopping, ...) possibly as part of a external package(s), possibly integrating with Julia's optimisation and autodiff packages
+⭒⭒    | ⭒⭒         | more sophisticated HP tuning (BO, Bandit, early stopping, ...) possibly as part of an external package(s), possibly integrating with Julia's optimisation and autodiff packages
 
 If you're interested in one of these beyond the first one, please get in touch with either Anthony Blaom or Thibaut Lienart on Slack and we can further guide you.
 Thank you!
+
+You can also have a look at MLJ's [release notes](https://github.com/alan-turing-institute/MLJ.jl/releases) to get an idea for what's been happening recently.
 
 ---
 
@@ -173,24 +195,11 @@ The table below indicates the models that are accessible at present along with a
 
 #### Contributors
 
-*Active maintainers*:
-- Anthony Blaom
-- Thibaut Lienart
+*Active maintainers*: A. Blaom, T. Lienart
 
-*Active collaborators*:
-- Diego Arenas
-- David Buchaca
-- Julio Hoffimann
-- Samuel Okon
-- Julian Samaroo
-- Sebastian Vollmer
+*Active collaborators*: D. Arenas, D. Buchaca, J. Hoffimann, S. Okon, J. Samaroo, S. Vollmer
 
-*Past collaborators*:
-- Ed Barp
-- Mosè Giordano
-- Franz Kiraly
-- Zac Nugent
-- Yiannis Simillides
+*Past collaborators*: D. Aluthge, E. Barp, G. Bohner, M. K. Borregaard, V. Churavy, H. Devereux, M. Giordano, M. Innes, F. Kiraly, M. Nook, Z. Nugent, P. Oleśkiewicz, A. Shridar, Y. Simillides, A. Sengupta, A. Stechemesser.
 
 #### License
 
