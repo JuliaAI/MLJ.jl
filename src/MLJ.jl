@@ -45,7 +45,7 @@ export nrows, nfeatures, color_off, color_on,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
     classes,
     partition, unpack,
-    default_measure,
+    default_measure, measures,
     @load_boston, @load_ames, @load_iris, @load_reduced_ames,
     @load_crabs
 
