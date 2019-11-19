@@ -86,10 +86,7 @@ Or define their own re-usable `ResamplingStrategy` objects, - see
 [Custom resampling strategies](@ref) below.
 
 
-### Resampling strategies
-
-`Holdout` and `CV` (cross-validation) resampling strategies are
-available:
+### Built-in resampling strategies
 
 
 ```@docs
@@ -98,6 +95,10 @@ Holdout
 
 ```@docs
 CV
+```
+
+```@docs
+StratifiedCV
 ```
 
 
