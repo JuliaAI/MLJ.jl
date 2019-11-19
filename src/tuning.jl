@@ -105,6 +105,11 @@ If `measure` supports sample weights (`MLJ.supports_weights(measure)
 In the case of two-parameter tuning, a Plots.jl plot of performance
 estimates is returned by `plot(mach)` or `heatmap(mach)`.
 
+Once a tuning machine `mach` has bee trained as above, one can access
+the learned parameters of the best model, using
+`fitted_params(mach).best_fitted_params`. Similarly, the report of
+training the best model is accessed via `report(mach).best_report`.
+
 """
 function TunedModel(;model=nothing,
                     tuning=Grid(),
