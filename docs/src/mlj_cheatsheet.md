@@ -28,7 +28,8 @@ for "RidgeRegresssor", which is provided by multiple packages
 **experimetnal!** With additional conditions:
 
 ```julia
-models(matching(X, y)) do model
+models() do model
+    matching(model, X, y)) &&
     model.prediction_type == :probabilistic &&
 	model.is_pure_julia
 end

@@ -92,10 +92,11 @@ for example, one executes
 models(matching(X, y))
 ```
 
-while the preceding search can be compactly written
+while the preceding search can also be written
 
 ```julia 
-models(matching(X, y)) do model
+models() do model
+    matching(model, X, y) &&
     model.prediction_type == :probabilistic
 end
 ```
