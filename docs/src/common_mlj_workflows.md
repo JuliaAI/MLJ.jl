@@ -64,8 +64,8 @@ More refined searches:
 ```@example workflows
 models() do model
     matching(model, X, y) &&
-        model.prediction_type == :deterministic &&
-        model.is_pure_julia
+    model.prediction_type == :deterministic &&
+    model.is_pure_julia
 end
 ```
 
