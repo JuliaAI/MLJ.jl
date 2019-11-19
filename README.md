@@ -151,13 +151,12 @@ The table below indicates the models that are accessible at present along with a
 | ------- | ------ | -------- | ----
 [Clustering.jl] | KMeans, KMedoids | high | †
 [DecisionTree.jl] | DecisionTreeClassifier, DecisionTreeRegressor | high | †
-[GaussianProcesses.jl] | GPClassifier | medium | †
 [GLM.jl] | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium | †
 [LIBSVM.jl] | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
 [MLJModels.jl] (builtins) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ConstantRegressor, ConstantClassifier | medium |
 [MLJLinearModels.jl] | LinearRegressor, RidgeRegressor, LassoRegressor, ElasticNetRegressor, QuantileRegressor, HuberRegressor, RobustRegressor, LADRegressor, LogisticClassifier, MultinomialClassifier | experimental |
 [MultivariateStats.jl] | RidgeRegressor, PCA, KernelPCA, ICA, LDA, BayesianLDA, SubspaceLDA, BayesianSubspaceLDA | high | †
-[NaiveBayes.jl] | GaussianNBClassifier, MultinomialNBClassifier, HybridNBClassifier | medium |
+[NaiveBayes.jl] | GaussianNBClassifier, MultinomialNBClassifier, HybridNBClassifier | low |
 [NearestNeighbors.jl] | KNNClassifier, KNNRegressor | high |
 [ScikitLearn.jl] | SVMClassifier, SVMRegressor, SVMNuClassifier, SVMNuRegressor, SVMLClassifier, SVMLRegressor, ARDRegressor, BayesianRidgeRegressor, ElasticNetRegressor, ElasticNetCVRegressor, HuberRegressor, LarsRegressor, LarsCVRegressor, LassoRegressor, LassoCVRegressor, LassoLarsRegressor, LassoLarsCVRegressor, LassoLarsICRegressor, LinearRegressor, OrthogonalMatchingPursuitRegressor, OrthogonalMatchingPursuitCVRegressor, PassiveAggressiveRegressor, RidgeRegressor, RidgeCVRegressor, SGDRegressor, TheilSenRegressor, LogisticClassifier, LogisticCVClassifier, PerceptronClassifier, RidgeClassifier, RidgeCVClassifier, PassiveAggressiveClassifier, SGDClassifier, GaussianProcessRegressor, GaussianProcessClassifier, AdaBoostRegressor, AdaBoostClassifier, BaggingRegressor, BaggingClassifier, GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, RandomForestClassifier, GaussianNB, MultinomialNB, ComplementNB, BayesianLDA, BayesianQDA | high | †
 [XGBoost.jl] | XGBoostRegressor, XGBoostClassifier, XGBoostCount | high |
