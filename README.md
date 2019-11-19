@@ -171,7 +171,7 @@ The table below indicates the models that are accessible at present along with a
 [LIBSVM.jl]: https://github.com/mpastell/LIBSVM.jl
 [MLJLinearModels.jl]: https://github.com/alan-turing-institute/MLJLinearModels.jl
 [MLJModels.jl]: https://github.com/alan-turing-institute/MLJModels.jl
-[MultivariateStats.jl]: https://github.com/mpastell/LIBSVM.jl
+[MultivariateStats.jl]: https://github.com/JuliaStats/MultivariateStats.jl
 [NaiveBayes.jl]: https://github.com/dfdx/NaiveBayes.jl
 [NearestNeighbors.jl]: https://github.com/KristofferC/NearestNeighbors.jl
 [ScikitLearn.jl]: https://github.com/cstjean/ScikitLearn.jl
