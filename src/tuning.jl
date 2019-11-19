@@ -291,26 +291,25 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
         # TODO: maybe avoid using machines here and use model fit/predict?
         fitresult = machine(best_model, X, y)
         fit!(fitresult, verbosity=verbosity-1)
+        best_report = fitresult.report
     else
         fitresult = tuned_model.model
+        best_report = missing
     end
 
-    if tuned_model.full_report
-        report = (# models=models,
-                  # best_model=best_model,
-                  parameter_names= permutedims(parameter_names), # row vector
-                  parameter_scales=permutedims(scales),  # row vector
-                  parameter_values=A,
-                  measurements=measurements,
-                  best_measurement=best_measurement)
-    else
-        report = (# models=[deepcopy(clone),][1:0],         # empty vector
-                  # best_model=best_model,
-                  parameter_names= permutedims(parameter_names), # row vector
+    pre_report = (parameter_names= permutedims(parameter_names), # row vector
                   parameter_scales=permutedims(scales),   # row vector
-                  parameter_values=A[1:0,1:0],            # empty matrix
-                  measurements=[best_measurement, ][1:0], # empty vector
-                  best_measurement=best_measurement)
+                  best_measurement=best_measurement,
+                  best_report=best_report)
+
+    if tuned_model.full_report
+        report = merge(pre_report,
+                       (parameter_values=A,
+                        measurements=measurements,))
+    else
+        report = merge(pre_report,
+                       (parameter_values=missing,
+                        measurements=missing,))
     end
 
     cache = nothing
@@ -319,7 +318,15 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
 
 end
 
-MLJBase.fitted_params(::EitherTunedModel, fitresult) = (best_model=fitresult.model,)
+function MLJBase.fitted_params(tuned_model::EitherTunedModel, fitresult)
+    if tuned_model.train_best
+        return (best_model=fitresult.model,
+                best_fitted_params=fitted_params(fitresult))
+    else
+        return (best_model=fitresult.model,
+                best_fitted_params=missing)
+    end
+end
 
 MLJBase.predict(tuned_model::EitherTunedModel, fitresult, Xnew) = predict(fitresult, Xnew)
 MLJBase.best(model::EitherTunedModel, fitresult) = fitresult.model
