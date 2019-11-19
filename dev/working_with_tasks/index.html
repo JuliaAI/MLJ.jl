@@ -33,7 +33,7 @@ julia&gt; task = supervised(data=iris, target=:Species, is_probabilistic=true)
 │ is_probabilistic = true
 │ input_scitype = Table{AbstractArray{Continuous,1}} 
 └ target_scitype = AbstractArray{Multiclass{3},1}
-SupervisedTask @ 4…16
+SupervisedTask @ 1…30
 
 julia&gt; tree = @load DecisionTreeClassifier verbosity=1
 import MLJModels ✔
@@ -48,16 +48,16 @@ MLJModels.DecisionTree_.DecisionTreeClassifier(pruning_purity = 1.0,
                                                display_depth = 5,
                                                post_prune = false,
                                                merge_purity_threshold = 0.9,
-                                               pdf_smoothing = 0.05,) @ 3…20
+                                               pdf_smoothing = 0.05,) @ 1…25
 
 julia&gt; mach = machine(tree, task)
-Machine{DecisionTreeClassifier} @ 9…56
+Machine{DecisionTreeClassifier} @ 8…44
 
 julia&gt; evaluate!(mach, operation=predict_mode,
                  resampling=Holdout(), measure=misclassification_rate, verbosity=0)
 (measure = MLJBase.MisclassificationRate[misclassification_rate],
- measurement = [0.26666666666666666],
- per_fold = Array{Float64,1}[[0.26666666666666666]],
+ measurement = [0.2222222222222222],
+ per_fold = Array{Float64,1}[[0.2222222222222222]],
  per_observation = Missing[missing],)</code></pre><h3><a class="nav-anchor" id="API-Reference-1" href="#API-Reference-1">API Reference</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJ.supervised" href="#MLJ.supervised"><code>MLJ.supervised</code></a> — <span class="docstring-category">Function</span>.</div><div><div><pre><code class="language-julia">task = supervised(data=nothing,
                   types=Dict(),
                   target=nothing,
