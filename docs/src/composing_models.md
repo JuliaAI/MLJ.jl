@@ -142,7 +142,7 @@ understand how the stand-alone models work under the hood.
 
 In MLJ learning networks treat the flow of information during training
 and predicting separately. Also, different nodes may use the same
-paramaters (fitresult) learned during the training of some model (that
+parameters (fitresult) learned during the training of some model (that
 is, point to a common *nodal machine*; see below). For these reasons,
 simple examples may appear more slightly more complicated than in
 other frameworks. However, in more sophisticated applications, the
@@ -164,7 +164,7 @@ outcomes are stored, as in the basic fit/predict scenario
 Looking ahead, we note that the new composite model type we will
 create later will be assigned a single hyperparameter `regressor`, and the
 learning network model `RidgeRegressor(lambda=0.1)` will become this
-parameter's default value. Since model hyperparmaters are mutable,
+parameter's default value. Since model hyperparameters are mutable,
 this regressor can be changed to a different one (e.g.,
 `HuberRegressor()`).
 
@@ -409,7 +409,7 @@ macros. The two steps required are:
 
 - Wrap the learning network code in a model `fit` method.
 
-We now demonstrate this second method to the preceeding example. To
+We now demonstrate this second method to the preceding example. To
 see how to use the method to expose user-specified hyperparameters
 that are not component models, see
 [here](https://alan-turing-institute.github.io/MLJTutorials/pub/end-to-end/AMES.html#tuning_the_model).
@@ -539,7 +539,7 @@ DoubleRegressor1(regressor1 = RidgeRegressor(lambda = 0.1,),
 ```
 
 To deal with operations on nodes not supported out-of-the box, one
-uses the `nodes` method. Supposing, in the preceeding example, we
+uses the `nodes` method. Supposing, in the preceding example, we
 wanted the geometric mean rather than arithmetic mean. Then, the
 definition of `zhat` above can be replaced with
 
@@ -573,9 +573,11 @@ Now that the static transformer `Averager` is defined, our new definition of
 `zhat` and `yhat` become:
 
 ```julia
-averager_model = Averager()
-averager = machine(averager_model, predict(mach1, W), predict(mach2, W))
-zhat = transform(avemachine(Averager(), y1, y2), y1, y2)
+averager_model = Averager(0.5)
+y1 = predict(mach1, W)
+y2 = predict(mach2, W)
+averager = machine(averager_model, y1, y2)
+zhat = transform(averager, y1, y1)
 yhat = exp(zhat)
 ```
 
@@ -620,7 +622,7 @@ import Base.+
 +(y1::AbstractNode, y2) = node(+, y1, y2)
 ```
 
-Here `AbstractNode` is the common supertype of `Node` and `Source`.
+Here `AbstractNode` is the common super-type of `Node` and `Source`.
 
 As a final example, here's how to extend row shuffling to nodes:
 
