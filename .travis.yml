@@ -24,8 +24,9 @@ after_success:
 ## uncomment following lines to deploy documentation
 jobs:
   include:
-    - if: branch = master
-      stage: "Documentation"
+##    - if: branch = master
+##      stage: "Documentation"
+    - stage: "Documentation"
       julia: 1.2
       os: linux
       # disable global before_script in order not to install Compose twice
