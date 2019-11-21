@@ -58,6 +58,14 @@ method:
 info(l1)
 ```
 
+Use `measures()` to list all measures and `measures(conditions...)` to
+search for measures with given traits (as you would query models; see
+[Model Search](model_search.md)
+
+```@docs
+measures(conditions...)
+```
+
 A user-defined measure in MLJ can be passed to the `evaluate!`
 method, and elsewhere in MLJ, provided it is a function or callable
 object conforming to the above syntactic conventions. By default, a
@@ -141,11 +149,8 @@ loss = MLJ.value(ZeroOneLoss(), ŷ, X, y, w) # X is ignored here
 mean(loss) ≈ misclassification_rate(mode.(ŷ), y, w)
 ```
 
-### API for built-in loss functions
 
-```@docs
-cross_entropy
-```
+### List of built-in measures (excluding LossFunctions.jl losses)
 
 ```@docs
 l1
@@ -177,6 +182,79 @@ rmslp1
 
 ```@docs
 rmsp
+```
+
+```@docs
+cross_entropy
+```
+
+```@docs
+BrierScore
+```
+
+```@docs
+accuracy
+```
+
+```@docs
+balanced_accuracy
+```
+
+```@docs
+mathhews_correlation
+```
+
+```@docs
+auc
+```
+
+```@docs
+tp
+```
+
+```@docs
+tn
+```
+
+```@docs
+fp
+```
+
+```@docs
+fn
+```
+
+```@docs
+tpr
+```
+
+```@docs
+tnr
+```
+```@docs
+fpr
+```
+
+```@docs
+fnr
+```
+
+```@docs
+FScore
+```
+
+### Other performance related tools 
+
+```@docs
+ConfusionMatrix
+```
+
+```@docs
+confusion_matrix
+```
+
+```@docs
+roc_curve
 ```
 
 
