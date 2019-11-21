@@ -59,8 +59,8 @@ info(l1)
 ```
 
 Use `measures()` to list all measures and `measures(conditions...)` to
-search for measures with given traits (as you would query models; see
-[Model Search](model_search.md)
+search for measures with given traits (as you would [query
+models](model_search.md)).
 
 ```@docs
 measures(conditions...)
