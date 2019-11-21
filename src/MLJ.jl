@@ -32,7 +32,7 @@ export std, support
 export nrows, nfeatures, color_off, color_on,
     selectrows, selectcols,
     SupervisedTask, UnsupervisedTask, MLJTask,
-    Deterministic, Probabilistic, Unsupervised, Supervised,
+    Deterministic, Probabilistic, Unsupervised, Supervised, Static,
     DeterministicNetwork, ProbabilisticNetwork,
     GrayImage, ColorImage, Image,
     Found, Continuous, Finite, Infinite,

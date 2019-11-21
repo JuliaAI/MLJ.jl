@@ -9,7 +9,7 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
     cache
     args::Tuple
     report
-    previous_rows 
+    previous_rows
 
     function Machine{M}(model, args...) where M
         machine = new{M}(model)
@@ -47,18 +47,22 @@ function machine(model::M, args...) where M <: Model
 
     else # M <: Unsupervised
 
-        length(args) == 1 ||
-            error("Wrong number of arguments. " *
-                  "Use machine(model, X) for an unsupervised model.")
-        X = args[1]
+        if !(M <: Static)
 
-        input_scitype(model) <: Unknown ||
-            scitype(X) <: input_scitype(model) ||
-            @warn "The scitype of `X`, in `machine(model, X)` is "*
-        "incompatible with `model`:\n"*
-        "scitype(X) = $(scitype(X))\n"*
-        "input_scitype(model) = $(input_scitype(model)). "
-        
+            length(args) == 1 ||
+                error("Wrong number of arguments. " *
+                      "Use machine(model, X) for an unsupervised model.")
+            X = args[1]
+
+            input_scitype(model) <: Unknown ||
+                scitype(X) <: input_scitype(model) ||
+                @warn "The scitype of `X`, in `machine(model, X)` is "*
+            "incompatible with `model`:\n"*
+            "scitype(X) = $(scitype(X))\n"*
+            "input_scitype(model) = $(input_scitype(model)). "
+
+        end
+
     end
     return Machine(model, args...)
 end
@@ -165,7 +169,7 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
     if mach isa NodalMachine
         mach.upstream_state = upstream_state
-        mach.state = mach.state + 1
+         mach.state = mach.state + 1
     end
 
     return mach

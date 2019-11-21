@@ -125,9 +125,12 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
             throw(error("Wrong number of arguments. " *
                         "You must provide target(s) for supervised models."))
 
-        !(M <: Unsupervised) || length(args) == 1 ||
-            throw(error("Wrong number of arguments. " *
-                        "Use NodalMachine(model, X) for an unsupervised model."))
+        if M <: Unsupervised && !(M <: Static)
+            length(args) == 1 ||
+                throw(error("Wrong number of arguments. " *
+                            "Use NodalMachine(model, X) for an "*
+                            "unsupervised model."))
+        end
 
         machine = new{M}(model)
         machine.frozen = false
