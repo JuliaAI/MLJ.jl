@@ -227,14 +227,18 @@ ex = Meta.parse("Comp() <= z")
              MLJ.from_network_preprocess(TestComposites,ex))
 
 X2s = source(nothing)
-z = @test_logs (:warn, r"^A node ref") vcat(Xs, X2s)
+# z = @test_logs (:warn, r"^A node ref") vcat(Xs, X2s)
+z = vcat(Xs, X2s)
 ex = Meta.parse("Comp() <= z")
 @test_throws(ArgumentError,
              MLJ.from_network_preprocess(TestComposites, ex))
 
 
 y2s = source(nothing, kind=:target)
-z = @test_logs (:warn, r"^A node ref") vcat(ys, y2s, Xs)
+# z = @test_logs (:warn, r"^A node ref") vcat(ys, y2s, Xs)
+z = vcat(ys, y2s, Xs)
+@test_throws Exception z(Xs())
+
 ex = Meta.parse("Comp() <= z")
 @test_throws(ArgumentError,
              MLJ.from_network_preprocess(TestComposites, ex))
