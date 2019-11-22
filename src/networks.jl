@@ -204,7 +204,7 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
             throw(error("`args` in `Node(::Function, args...)` must be non-empty. "))
         end
 
-        # origins_ = unique(vcat([origins(arg) for arg in args]...))
+        origins_ = unique(vcat([origins(arg) for arg in args]...))
         # length(origins_) == 1 ||
         #     @warn "A node referencing multiple origins when called " *
         #           "has been defined:\n$(origins_). "
@@ -291,7 +291,7 @@ Node(operation, args::AbstractNode...) = Node(operation, nothing, args...)
     (y.operation)(y.machine, [arg(rows=rows) for arg in y.args]...)
 function (y::Node)(Xnew)
     length(y.origins) == 1 ||
-        error("Node $y$ has multiple origins and cannot be called "*
+        error("Node $y has multiple origins and cannot be called "*
               "on new data. ")
     return (y.operation)(y.machine, [arg(Xnew) for arg in y.args]...)
 end
@@ -301,7 +301,7 @@ end
     (y.operation)([arg(rows=rows) for arg in y.args]...)
 function (y::Node{Nothing})(Xnew)
     length(y.origins) == 1 ||
-        error("Node $y$ has multiple origins and cannot be called "*
+        error("Node $y has multiple origins and cannot be called "*
               "on new data. ")
     return (y.operation)([arg(Xnew) for arg in y.args]...)
 end
