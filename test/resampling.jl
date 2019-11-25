@@ -124,6 +124,41 @@ end
     @test shuffled.measurement[1] != result.measurement[1]
 end
 
+@testset "stratified_cv" begin
+
+    # check in explicit example:
+    y = categorical(['c', 'a', 'b', 'a', 'c', 'x',
+                 'c', 'a', 'a', 'b', 'b', 'b', 'b', 'b'])
+    rows = [14, 13, 12, 11, 10, 9, 8, 7, 5, 4, 3, 2, 1]
+    @test y[rows] == collect("bbbbbaaccabac")
+    scv = StratifiedCV(nfolds=3)
+    pairs = MLJ.train_test_pairs(scv, rows, nothing, y)
+    @test pairs == [([12, 11, 10, 8, 5, 4, 3, 2, 1], [14, 13, 9, 7]),
+                    ([14, 13, 10, 9, 7, 4, 3, 2, 1], [12, 11, 8, 5]),
+                    ([14, 13, 12, 11, 9, 8, 7, 5], [10, 4, 3, 2, 1])]
+    scv_random = StratifiedCV(nfolds=3, shuffle=true)
+    pairs_random = MLJ.train_test_pairs(scv_random, rows, nothing, y)
+    @test pairs != pairs_random
+
+    # wrong target type throws error:
+    @test_throws Exception MLJ.train_test_pairs(scv, rows, nothing, get.(y))
+
+    # too many folds throws error:
+    @test_throws Exception MLJ.train_test_pairs(StratifiedCV(nfolds=4),
+                                                rows, nothing, y)
+
+    # check class distribution is preserved in a larger randomized example:
+    N = 30
+    y = shuffle(vcat(fill(:a, N), fill(:b, 2N),
+                        fill(:c, 3N), fill(:d, 4N))) |> categorical;
+    d = fit(UnivariateFinite, y)
+    pairs = MLJ.train_test_pairs(scv, 1:10N, nothing, y)
+    folds = vcat(first.(pairs), last.(pairs))
+    @test all([fit(UnivariateFinite, y[fold]) ≈ d for fold in folds])
+
+
+end
+
 @testset "sample weights in evaluation" begin
 
     # cv:

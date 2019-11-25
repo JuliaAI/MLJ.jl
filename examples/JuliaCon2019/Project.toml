@@ -1,7 +1,0 @@
-[deps]
-DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
-LIBSVM = "b1bec4e5-fd48-53fe-b0cb-9723c09d164b"
-MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
-MLJModels = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
-MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
-RDatasets = "ce6b1742-4840-55fa-b093-852dadbb1d8b"

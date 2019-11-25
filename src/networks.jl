@@ -125,9 +125,12 @@ mutable struct NodalMachine{M<:Model} <: AbstractMachine{M}
             throw(error("Wrong number of arguments. " *
                         "You must provide target(s) for supervised models."))
 
-        !(M <: Unsupervised) || length(args) == 1 ||
-            throw(error("Wrong number of arguments. " *
-                        "Use NodalMachine(model, X) for an unsupervised model."))
+        if M <: Unsupervised && !(M <: Static)
+            length(args) == 1 ||
+                throw(error("Wrong number of arguments. " *
+                            "Use NodalMachine(model, X) for an "*
+                            "unsupervised model."))
+        end
 
         machine = new{M}(model)
         machine.frozen = false
@@ -202,9 +205,9 @@ struct Node{T<:Union{NodalMachine, Nothing}} <: AbstractNode
         end
 
         origins_ = unique(vcat([origins(arg) for arg in args]...))
-        length(origins_) == 1 ||
-            @warn "A node referencing multiple origins when called " *
-                  "has been defined:\n$(origins_). "
+        # length(origins_) == 1 ||
+        #     @warn "A node referencing multiple origins when called " *
+        #           "has been defined:\n$(origins_). "
 
         # initialize the list of upstream nodes:
         nodes_ = AbstractNode[]
@@ -284,17 +287,24 @@ Node(operation, machine::M, args...) where M <: Union{NodalMachine,Nothing} =
 Node(operation, args::AbstractNode...) = Node(operation, nothing, args...)
 
 # make nodes callable:
-(y::Node)(; rows=:) = (y.operation)(y.machine, [arg(rows=rows) for arg in y.args]...)
+(y::Node)(; rows=:) =
+    (y.operation)(y.machine, [arg(rows=rows) for arg in y.args]...)
 function (y::Node)(Xnew)
     length(y.origins) == 1 ||
-        error("Nodes with multiple origins are not callable on new data. "*
-              "Use origins(node) to inspect. ")
+        error("Node $y has multiple origins and cannot be called "*
+              "on new data. ")
     return (y.operation)(y.machine, [arg(Xnew) for arg in y.args]...)
 end
 
 # and for the special case of static operations:
-(y::Node{Nothing})(; rows=:) = (y.operation)([arg(rows=rows) for arg in y.args]...)
-(y::Node{Nothing})(Xnew) = (y.operation)([arg(Xnew) for arg in y.args]...)
+(y::Node{Nothing})(; rows=:) =
+    (y.operation)([arg(rows=rows) for arg in y.args]...)
+function (y::Node{Nothing})(Xnew)
+    length(y.origins) == 1 ||
+        error("Node $y has multiple origins and cannot be called "*
+              "on new data. ")
+    return (y.operation)([arg(Xnew) for arg in y.args]...)
+end
 
 """
     fit!(N::Node; rows=nothing, verbosity::Int=1, force::Bool=false)

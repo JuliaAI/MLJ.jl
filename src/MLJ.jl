@@ -8,7 +8,8 @@ export MLJ_VERSION
 export @curve, @pcurve, pretty,                   # utilities.jl
     coerce, supervised, unsupervised,             # tasks.jl
     report,                                       # machines.jl
-    Holdout, CV, evaluate!, Resampler,            # resampling.jl
+    Holdout, CV, StratifiedCV, evaluate!,         # resampling.jl
+    Resampler,                                    # resampling.jl
     Params, params, set_params!,                  # parameters.jl
     strange, iterator,                            # parameters.jl
     Grid, TunedModel, learning_curve!,            # tuning.jl
@@ -32,13 +33,13 @@ export std, support
 export nrows, nfeatures, color_off, color_on,
     selectrows, selectcols,
     SupervisedTask, UnsupervisedTask, MLJTask,
-    Deterministic, Probabilistic, Unsupervised, Supervised,
+    Deterministic, Probabilistic, Unsupervised, Supervised, Static,
     DeterministicNetwork, ProbabilisticNetwork,
     GrayImage, ColorImage, Image,
     Found, Continuous, Finite, Infinite,
     OrderedFactor, Unknown,
     Count, Multiclass, Binary, Scientific,
-    scitype, scitype_union, schema, scitypes,
+    scitype, scitype_union, schema, scitypes, autotype,
     target_scitype, input_scitype, output_scitype,
     predict, predict_mean, predict_median, predict_mode,
     transform, inverse_transform, se, evaluate, fitted_params,
@@ -47,9 +48,38 @@ export nrows, nfeatures, color_off, color_on,
     partition, unpack,
     mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,
     misclassification_rate, cross_entropy, BrierScore,
-    default_measure,
+    default_measure, measures,
     @load_boston, @load_ames, @load_iris, @load_reduced_ames,
     @load_crabs
+
+# measures to be re-exported from MLJBase:
+export mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2
+# -- confmat (measures/confusion_matrix)
+export confusion_matrix, confmat
+# -- finite (measures/finite)
+export cross_entropy, BrierScore,
+    misclassification_rate, mcr, accuracy,
+    balanced_accuracy, bacc, bac,
+    matthews_correlation, mcc
+# -- -- binary // order independent
+export auc, roc_curve, roc
+# -- -- binary // order dependent
+export TruePositive, TrueNegative, FalsePositive, FalseNegative,
+    TruePositiveRate, TrueNegativeRate, FalsePositiveRate, FalseNegativeRate,
+    FalseDiscoveryRate, Precision, NPV, FScore,
+    # standard synonyms
+    TPR, TNR, FPR, FNR,
+    FDR, PPV,
+    Recall, Specificity, BACC,
+    # defaults and their synonyms
+    truepositive, truenegative, falsepositive, falsenegative,
+    truepositive_rate, truenegative_rate, falsepositive_rate,
+    falsenegative_rate, negativepredicitive_value,
+    positivepredictive_value,
+    tp, tn, fp, fn, tpr, tnr, fpr, fnr,
+    falsediscovery_rate, fdr, npv, ppv,
+    recall, sensitivity, hit_rate, miss_rate,
+    specificity, selectivity, f1score, f1, fallout
 
 # re-export from MLJModels:
 export models, localmodels, @load, load, info,
@@ -66,6 +96,11 @@ export models, localmodels, @load, load, info,
 using MLJBase
 using MLJModels
 
+# these are defined in MLJBase
+export load_boston, load_ames, load_iris
+export load_reduced_ames
+export load_crabs
+
 # to be extended:
 import MLJBase: fit, update, clean!,
     predict, predict_mean, predict_median, predict_mode,
@@ -73,22 +108,23 @@ import MLJBase: fit, update, clean!,
     show_as_constructed, params
 import MLJModels: models
 
-using Requires
-import Pkg.TOML
-import Pkg
-using OrderedCollections
+import Pkg, Pkg.TOML
+using Tables, OrderedCollections
+
 using  CategoricalArrays
-import Distributions: pdf, mode
 import Distributions
-import StatsBase
+import Distributions: pdf, mode
+import Statistics, StatsBase, LinearAlgebra, Random
+import Random: AbstractRNG, MersenneTwister
+
 using ProgressMeter
-import Tables
+
 import PrettyTables
-import Random
 using ScientificTypes
-import ScientificTypes
+
 using ComputationalResources
-import ComputationalResources: CPUProcesses
+using ComputationalResources: CPUProcesses
+
 const DEFAULT_RESOURCE = Ref{AbstractResource}(CPU1())
 
 # convenience packages
@@ -99,9 +135,6 @@ import Base: ==, getindex, setindex!
 import StatsBase.fit!
 
 # from Standard Library:
-using Statistics
-using LinearAlgebra
-using Random
 import Distributed: @distributed, nworkers, pmap
 using RecipesBase # for plotting
 
@@ -117,7 +150,6 @@ const CategoricalElement = Union{CategoricalString,CategoricalValue}
 # and https://github.com/JuliaLang/Pkg.jl/pull/1086/commits/996c6b9b69ef0c058e0105427983622b7cc8cb1d
 toml = Pkg.TOML.parsefile(joinpath(dirname(dirname(pathof(MLJ))), "Project.toml"))
 const MLJ_VERSION = toml["version"]
-
 
 ## INCLUDES
 
@@ -140,14 +172,5 @@ include("model_matching.jl")# inferring model search criterion from data
 include("tasks.jl")         # enhancements to MLJBase task interface
 include("scitypes.jl")      # extensions to ScientificTypes.sictype
 include("plotrecipes.jl")
-
-
-## INCLUDES FOR OPTIONAL DEPENDENCIES
-
-function __init__()
-    @require(CSV="336ed68f-0bac-5ca0-87d4-7b16caf5d00b",
-             include("datasets_requires.jl"))
-end
-
 
 end # module

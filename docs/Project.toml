@@ -20,5 +20,5 @@ TypedTables = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9"
 
 [compat]
 DecisionTree = "0.8, 0.9.1"
-Documenter = "~0.22"
+Documenter = "^0.22,0.23"
 julia = "1.2"

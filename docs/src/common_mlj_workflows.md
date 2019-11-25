@@ -37,7 +37,7 @@ Loading a built-in supervised dataset:
 
 ```@example workflows
 X, y = @load_iris;
-first(X, 4) 
+selectrows(X, 1:4) # selectrows works for any Tables.jl table
 ```
 
 ```@example workflows
@@ -64,8 +64,8 @@ More refined searches:
 ```@example workflows
 models() do model
     matching(model, X, y) &&
-        model.prediction_type == :deterministic &&
-        model.is_pure_julia
+    model.prediction_type == :deterministic &&
+    model.is_pure_julia
 end
 ```
 
