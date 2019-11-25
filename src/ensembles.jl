@@ -159,13 +159,21 @@ function get_ensemble(atom::Supervised, verbosity, n, n_patterns,
                       n_train, rng, progress_meter, args...)
 
     # define generator of training rows:
-    ensemble_indices = (StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
-                        for i in 1:n)
+    if n_train == n_patterns
+        # keep deterministic by avoiding re-ordering:
+        ensemble_indices = (1:n_patterns for i in 1:n)
+    else
+        ensemble_indices =
+            (StatsBase.sample(rng, 1:n_patterns, n_train, replace=false)
+             for i in 1:n)
+    end
+
     ensemble = map(ensemble_indices) do train_rows
         verbosity == 1 && next!(progress_meter)
         verbosity < 2 ||  print("#")
         atom_fitresult, atom_cache, atom_report =
-            fit(atom, verbosity - 1, [selectrows(arg, train_rows) for arg in args]...)
+            fit(atom, verbosity - 1, [selectrows(arg, train_rows) for
+                                      arg in args]...)
         atom_fitresult
     end
     verbosity < 1 || println()
@@ -496,20 +504,27 @@ function fit(model::EitherEnsembleModel{Atom},
             end
             for k in eachindex(out_of_bag_measure)
                 m = out_of_bag_measure[k]
-                metrics[i,k] = value(m, yhat, Xtest, ytest, wtest)
-            end
-
+                if reports_each_observation(m)
+                    s =  aggregate(value(m, yhat, Xtest, ytest, wtest), m)
+                else
+                    s = value(m, yhat, Xtest, ytest, wtest)
+                end
+                metrics[i,k] = s
+            end                
         end
-        metrics=mean(metrics, dims=1)
+
+        # aggregate metrics across the ensembles:
+        aggregated_metrics = map(eachindex(out_of_bag_measure)) do k
+            aggregate(metrics[:,k], out_of_bag_measure[k])
+        end
 
         names = Symbol.(string.(out_of_bag_measure))
-        oob_estimates=NamedTuple{Tuple(names)}(Tuple(vec(metrics)))
 
     else
-        oob_estimates=NamedTuple()
+        aggregated_metrics = missing
     end
 
-    report=(oob_estimates=oob_estimates,)
+    report=(measures=out_of_bag_measure, oob_measurements=aggregated_metrics,)
     cache = deepcopy(model)
 
     return fitresult, cache, report
