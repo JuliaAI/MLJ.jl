@@ -95,7 +95,7 @@ function predict(wens::WrappedEnsemble, atomic_weights, Xnew,
     n_rows = size(predictions, 1)
 
     # the weighted averages over the ensemble of the discrete pdf's:
-    predictions  = [MLJBase.average([predictions[i,k] for k in 1:n_atoms], atomic_weights=atomic_weights) for i in 1:n_rows]
+    predictions  = [MLJBase.average([predictions[i,k] for k in 1:n_atoms], weights=atomic_weights) for i in 1:n_rows]
 
     return predictions
 end
