@@ -38,8 +38,8 @@ See also: [`@from_network`](@ref], [`sources`](@ref),
 
 """
 function source(X; kind=:input)
-    kind in [:input, :target, :weight] ||
-        @warn "`Source` kind is neither :input, :target, or :weight. "
+    kind in [:input, :target, :weights] ||
+        @warn "`Source` kind is neither :input, :target, or :weights. "
     return Source{kind}(X)
 end
 

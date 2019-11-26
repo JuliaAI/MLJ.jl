@@ -175,7 +175,10 @@ function fit_method(network, models...)
 
     network_Xs = sources(network, kind=:input)[1]
 
-    function fit(model::M, verbosity, X, y) where M <: Supervised
+    function fit(model::M, verbosity, args...) where M <: Supervised
+        X = args[1]
+        y = args[2]
+        length(args) == 3 && (w = args[3])
         replacement_models = [getproperty(model, fld)
                               for fld in fieldnames(M)]
         model_replacements = [models[j] => replacement_models[j]
@@ -183,13 +186,26 @@ function fit_method(network, models...)
         network_ys = sources(network, kind=:target)[1]
         Xs = source(X)
         ys = source(y, kind=:target)
+        if length(args) == 3
+            network_ws = sources(network, kind=:weights)[1]
+            ws = source(w, kind=:weights)
+        end
         source_replacements = [network_Xs => Xs, network_ys => ys]
+        if length(args) == 3
+            push!(source_replacements, network_ws => ws)
+        end
         replacements = vcat(model_replacements, source_replacements)
         yhat = replace(network, replacements...)
 
-        Set([Xs, ys]) == Set(sources(yhat)) ||
-            error("Failed to replace sources in network blueprint. ")
-
+        if length(args) == 2
+            Set([Xs, ys]) == Set(sources(yhat)) ||
+                error("Failed to replace sources in network blueprint. ")
+        elseif length(args) == 3
+            Set([Xs, ys, ws]) == Set(sources(yhat)) ||
+                error("Failed to replace sources in network blueprint. ")
+        else
+            throw(ArgumentError)
+        end
         fit!(yhat, verbosity=verbosity)
 
         return fitresults(yhat)
@@ -273,6 +289,7 @@ function from_network_preprocess(modl, ex,
 
     inputs = sources(N, kind=:input)
     targets = sources(N, kind=:target)
+    weights = sources(N, kind=:weights)
 
     length(inputs) == 0 &&
         net_alert("Network has no source with `kind=:input`.")
@@ -280,6 +297,8 @@ function from_network_preprocess(modl, ex,
         net_alert("Network has multiple sources with `kind=:input`.")
     length(targets) > 1 &&
         net_alert("Network has multiple sources with `kind=:target`.")
+    length(weights) > 1 &&
+        net_alert("Network has multiple sources with `kind=:weights`.")
 
     is_supervised = length(targets) == 1
 
@@ -347,11 +366,11 @@ end
 """
     @from_network(NewCompositeModel(fld1=model1, fld2=model2, ...) <= N
     @from_network(NewCompositeModel(fld1=model1, fld2=model2, ...) <= N is_probabilistic=false
-    
+
 Create a new stand-alone model type called `NewCompositeModel`, using
 a learning network as a blueprint. Here `N` refers to the terminal
 node of the learning network (from which final predictions or
-transformations are fetched). 
+transformations are fetched).
 
 *Important.* If the learning network is supervised (has a source with
 `kind=:target`) and makes probabilistic predictions, then one must

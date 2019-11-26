@@ -4,12 +4,14 @@ module TestComposites
 using Test
 using MLJ
 using CategoricalArrays
+import Random.seed!
+seed!(1234)
 
 @load KNNRegressor
 
 include("foobarmodel.jl")
 
-N = 50 
+N = 50
 Xin = (a=rand(N), b=rand(N), c=rand(N))
 yin = rand(N)
 
@@ -26,13 +28,13 @@ selector_model = FeatureSelector()
                                                   transformer=selector_model)
 
     fitresult, cache, report = MLJ.fit(composite, 3, Xtrain, ytrain)
-    
+
     # to check internals:
     ridge = MLJ.machines(fitresult)[1]
     selector = MLJ.machines(fitresult)[2]
     ridge_old = deepcopy(ridge)
     selector_old = deepcopy(selector)
-    
+
     # this should trigger no retraining:
     fitresult, cache, report =
         @test_logs(
@@ -41,9 +43,9 @@ selector_model = FeatureSelector()
             MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain))
     @test ridge.fitresult == ridge_old.fitresult
     @test selector.fitresult == selector_old.fitresult
-    
+
     # this should trigger update of selector and training of ridge:
-    selector_model.features = [:a, :b] 
+    selector_model.features = [:a, :b]
     fitresult, cache, report =
         @test_logs(
             (:info, r"^Updating"),
@@ -53,7 +55,7 @@ selector_model = FeatureSelector()
     @test selector.fitresult != selector_old.fitresult
     ridge_old = deepcopy(ridge)
     selector_old = deepcopy(selector)
-    
+
     # this should trigger updating of ridge only:
     ridge_model.lambda = 1.0
     fitresult, cache, report =
@@ -63,12 +65,12 @@ selector_model = FeatureSelector()
             MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain))
     @test ridge.fitresult != ridge_old.fitresult
     @test selector.fitresult == selector_old.fitresult
-    
+
     predict(composite, fitresult, MLJ.selectrows(Xin, test))
-    
+
     Xs = source(Xtrain)
     ys = source(ytrain, kind=:target)
-    
+
     mach = machine(composite, Xs, ys)
     yhat = predict(mach, Xs)
     fit!(yhat, verbosity=3)
@@ -86,31 +88,31 @@ mutable struct WrappedRidge <: DeterministicNetwork
     ridge
 end
 
-@testset "second test of hand-exported network" begin 
+@testset "second test of hand-exported network" begin
 
     function MLJ.fit(model::WrappedRidge, verbosity::Integer, X, y)
         Xs = source(X)
         ys = source(y, kind=:target)
-        
+
         stand = Standardizer()
         standM = machine(stand, Xs)
         W = transform(standM, Xs)
-        
+
         boxcox = UnivariateBoxCoxTransformer()
         boxcoxM = machine(boxcox, ys)
         z = transform(boxcoxM, ys)
-        
+
         ridgeM = machine(model.ridge, W, z)
         zhat = predict(ridgeM, W)
         yhat = inverse_transform(boxcoxM, zhat)
-        
+
         fit!(yhat)
         return fitresults(yhat)
     end
-    
+
     MLJBase.input_scitype(::Type{<:WrappedRidge}) = Table(Continuous)
     MLJBase.target_scitype(::Type{<:WrappedRidge}) = AbstractVector{<:Continuous}
-    
+
     ridge = FooBarRegressor(lambda=0.1)
     model_ = WrappedRidge(ridge)
     mach = machine(model_, Xin, yin)
@@ -166,7 +168,7 @@ modeltype_ex, fieldname_exs, model_exs, N_ex, kind =
 fea = FeatureSelector()
 feaM = machine(fea, Xs)
 G = transform(feaM, Xs)
-hotM = machine(hot, G)    
+hotM = machine(hot, G)
 H = transform(hotM, G)
 elm = DecisionTreeClassifier()
 elmM = machine(elm, H, ys)
@@ -316,7 +318,7 @@ hot2.drop_last = true
 
 # export a supervised network:
 model_ = @from_network Composite(knn_rgs=knn, one_hot_enc=hot) <= yhat
-                               
+
 mach = machine(model_, X, y)
 @test_logs((:info, r"^Train.*Composite"),
            (:info, r"^Train.*OneHot"),
@@ -359,8 +361,46 @@ model_.one_hot.drop_last=true
 
 # check data anomynity:
 @test all(x->(x===nothing), [s.data for s in sources(mach.fitresult)])
-    
+
 transform(mach)
+
+
+## TEST MACRO-EXPORTED SUPERVISED NETWORK WITH SAMPLE WEIGHTS
+
+Random.seed!(1234)
+N = 100
+X = (x = rand(3N), );
+y = categorical(rand("abc", 3N));
+# define class weights :a, :b, :c in ration 2:4:1
+w = map(y) do η
+    if η == 'a'
+        return 2
+    elseif η == 'b'
+        return 4
+    else
+        return 1
+    end
+end;
+Xs = source(X)
+ys = source(y, kind=:target)
+ws = source(w, kind=:weights)
+
+standM = machine(Standardizer(), Xs)
+W = transform(standM, Xs)
+
+rgs = ConstantClassifier() # supports weights
+rgsM = machine(rgs, W, ys, ws)
+yhat = predict(rgsM, W)
+
+composite = @from_network Composite3(regressor=rgs) <= yhat
+
+mach = fit!(machine(composite, X, y, w))
+posterior = predict(mach, X)[1]
+
+# "posterior" is skewed appropriately in weighted case:
+@test abs(pdf(posterior, 'b')/(2*pdf(posterior, 'a'))  - 1) < 0.15
+@test abs(pdf(posterior, 'b')/(4*pdf(posterior, 'c'))  - 1) < 0.15
+
 
 end
 true
