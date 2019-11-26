@@ -182,6 +182,13 @@ MLJBase.package_name(::Type{<:SomeSupervisedModel}) = "Unknown"
 MLJBase.package_uuid(::Type{<:SomeSupervisedModel}) = "Unknown"
 ```
 
+Required to be set to `true`, if sample weights can be specified when
+training `SomeSupervisedModel`:
+
+```julia
+MLJBase.supports_weights(::Type{<:SomeSupervisedModel}, fitresult, Xnew) = false
+```
+
 Strongly recommended, to constrain the form of input data passed to
 fit and predict:
 
@@ -285,6 +292,15 @@ these in the report field.
 The `verbosity` level (0 for silent) is for passing to learning
 algorithm itself. A `fit` method wrapping such an algorithm should
 generally avoid doing any of its own logging.
+
+*Sample weight support.* If
+`supports_weights(::Type{<:SomeSupervisedModel})` has been declared
+`true`, then one must also implement an extended signature version of
+`fit`:
+
+```julia
+MLJBase.fit(model::SomeSupervisedModel, verbosity::Int, X, y, w) -> fitresult, cache, report
+```
 
 
 #### The fitted_params method
@@ -429,7 +445,7 @@ julia> maybe = y[4]; pdf(d, maybe)
 Alternatively, a dictionary can be passed to the constructor.
 
 See
-[BinaryClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/GLM.jl)
+[LinearBinaryClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/GLM.jl)
 for an example of a Probabilistic classifier implementation.
 
 
@@ -441,8 +457,8 @@ MLJBase.UnivariateFinite
 "Binary" scitype distinct from `Multiclass{2}` or `OrderedFactor{2}`;
 `Binary` is just an alias for
 `Union{Multiclass{2},OrderedFactor{2}}`. The `target_scitype` of a
-binary classifier will be `AbstractVector{<:Binary}` and according to
-the *mlj* scitype convention, elements of `y` have type
+binary classifier will generally be `AbstractVector{<:Binary}` and
+according to the *mlj* scitype convention, elements of `y` have type
 `CategoricalValue` or `CategoricalString`, and *not* `Bool`. See
 [BinaryClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/GLM.jl)
 for an example.
@@ -501,12 +517,21 @@ targets.  For example, if we declare
 target_scitype(SomeSupervisedModel) = Table(Continuous)
 ```
 
+then this constrains the target to be any table whose columns have `Continous` element scitype (i.e., `AbstractFloat`), while 
+
+```julia
+target_scitype(SomeSupervisedModel) = Table(Continuous, Finite{2})
+```
+
+restricts to tables with continuous or binary (ordered or unordered)
+columns. 
+
 For predicting variable length sequences of, say, binary values
 (`CategoricalValue`s or `CategoricalString`s with some common size-two
 pool) we declare
 
 ```julia
-target_scitype(SomeSupervisedModel) = AbstractVector{<:NTuple{<:Binary}}
+target_scitype(SomeSupervisedModel) = AbstractVector{<:NTuple{<:Finite{2}}}
 ```
 
 The trait functions controlling the form of data are summarized as follows:
@@ -529,6 +554,7 @@ method                   | return type       | declarable return values         
 `package_url`            | `String`          | unrestricted                       | "unknown"
 `package_license`        | `String`          | unrestricted                       | "unknown"
 `is_pure_julia`          | `Bool`            | `true` or `false`                  | `false`
+`supports_weights`       | `Bool`            | `true` or `false`                  | `false`
 
 Here is the complete list of trait function declarations for `DecisionTreeClassifier`
 ([source](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/DecisionTree.jl)):
@@ -577,15 +603,16 @@ defines a fallback for `update` which just calls `fit`. For context,
 see [MLJ Internals](internals.md).
 
 Learning networks wrapped as models constitute one use-case (see
-[Composing Models](index.md)): one would like each component model to be
-retrained only when hyperparameter changes "upstream" make this
+[Composing Models](index.md)): one would like each component model to
+be retrained only when hyperparameter changes "upstream" make this
 necessary. In this case MLJ provides a fallback (specifically, the
 fallback is for any subtype of `SupervisedNetwork =
 Union{DeterministicNetwork,ProbabilisticNetwork}`). A second more
 generally relevant use-case is iterative models, where calls to
 increase the number of iterations only restarts the iterative
-procedure if other hyperparameters have also changed. For an example,
-see the MLJ [ensemble
+procedure if other hyperparameters have also changed. (A useful method
+for inspecting model changes in such cases is
+`MLJBase.is_same_except`. ) For an example, see the MLJ [ensemble
 code](https://github.com/alan-turing-institute/MLJ.jl/blob/master/src/ensembles.jl).
 
 A third use-case is to avoid repeating time-consuming preprocessing of
