@@ -201,7 +201,7 @@ balanced_accuracy
 ```
 
 ```@docs
-mathhews_correlation
+matthews_correlation
 ```
 
 ```@docs
