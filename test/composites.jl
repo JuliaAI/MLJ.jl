@@ -171,7 +171,7 @@ modeltype_ex, fieldname_exs, model_exs, N_ex, kind, trait_dic =
 
 # unsupervised:
 ex = Meta.parse("Composite(one_hot_enc=hot) <= W")
-modeltype_ex, fieldname_exs, model_exs, N_ex, kind =
+modeltype_ex, fieldname_exs, model_exs, N_ex, kind, trait_dic =
     MLJ.from_network_preprocess(TestComposites, ex)
 @test modeltype_ex == :Composite
 @test fieldname_exs == [:one_hot_enc,]
@@ -310,8 +310,14 @@ knn2 = deepcopy(knn)
 ys2 = source(nothing, kind=:target)
 
 # duplicate a network:
-yhat2 = @test_logs((:warn, r"^No replacement"),
-                   replace(yhat, hot=>hot2, knn=>knn2, ys=>source(ys.data, kind=:target)))
+yhat2 = replace(yhat, hot=>hot2, knn=>knn2,
+                ys=>source(ys.data, kind=:target);
+                empty_unspecified_sources=true)
+@test isempty(sources(yhat2, kind=:input)[1])
+yhat2 = @test_logs((:warn, r"No replacement"),
+                   replace(yhat, hot=>hot2, knn=>knn2,
+                           ys=>source(ys.data, kind=:target)))
+@test !isempty(sources(yhat2, kind=:input)[1])
 
 @test_logs((:info, r"^Train.*OneHot"),
            (:info, r"^Spawn"),
@@ -322,7 +328,6 @@ yhat2 = @test_logs((:warn, r"^No replacement"),
 @test models(yhat) == models(yhat2)
 @test sources(yhat) == sources(yhat2)
 @test MLJ.tree(yhat) == MLJ.tree(yhat2)
-fit!(yhat2)
 @test yhat() ≈ yhat2()
 
 # this change should trigger retraining of all machines except the
@@ -385,7 +390,7 @@ transform(mach)
 
 ## TEST MACRO-EXPORTED SUPERVISED NETWORK WITH SAMPLE WEIGHTS
 
-Random.seed!(1234)
+seed!(1234)
 N = 100
 X = (x = rand(3N), );
 y = categorical(rand("abc", 3N));
@@ -410,26 +415,28 @@ rgs = ConstantClassifier() # supports weights
 rgsM = machine(rgs, W, ys, ws)
 yhat = predict(rgsM, W)
 
+fit!(yhat)
+fit!(yhat, rows=1:div(N,2))
+yhat(rows=1:div(N,2));
+
 composite = @from_network Composite3(regressor=rgs) <= yhat
 
 @test MLJ.supports_weights(composite)
-mach = fit!(machine(composite, X, y, w))
-posterior = predict(mach, X)[1]
+mach = fit!(machine(composite, X, y))
+predict(mach, rows=1:div(N,2))[1]
+posterior = predict(mach, rows=1:div(N,2))[1]
+
+# "posterior" is roughly uniform:
+@test abs(pdf(posterior, 'b')/(pdf(posterior, 'a'))  - 1) < 0.15
+@test abs(pdf(posterior, 'b')/(pdf(posterior, 'c'))  - 1) < 0.15
+
+# now add weights:
+mach = fit!(machine(composite, X, y, w), rows=1:div(N,2))
+posterior = predict(mach, rows=1:div(N,2))[1]
 
 # "posterior" is skewed appropriately in weighted case:
 @test abs(pdf(posterior, 'b')/(2*pdf(posterior, 'a'))  - 1) < 0.15
 @test abs(pdf(posterior, 'b')/(4*pdf(posterior, 'c'))  - 1) < 0.15
-
-# test a pipeline:
-# pipe = @pipeline MyPipe42(transformer=Standardizer(),
-#                           regressor=ConstantClassifier())
-# mach = fit!(machine(pipe, X, y, w))
-# posterior = predict(mach, X)[1]
-# @test abs(pdf(posterior, 'b')/(2*pdf(posterior, 'a'))  - 1) < 0.15
-# @test abs(pdf(posterior, 'b')/(4*pdf(posterior, 'c'))  - 1) < 0.15
-
-
-
 
 end
 true

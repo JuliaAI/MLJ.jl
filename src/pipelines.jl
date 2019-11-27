@@ -50,7 +50,6 @@ function linear_learning_network(Xs, ys, ws, target, inverse, models_and_functio
     for i = 2:(n + 1)
         m = models_and_functions[i-1]
         if m isa Supervised
-            @show m nodes tail_args
             supervised_machine = machine(m, nodes[i-1], tail_args...)
             nodes[i] = predict(supervised_machine, nodes[i-1])
        else

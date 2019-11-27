@@ -99,7 +99,7 @@ function fitresults(yhat)
     cache = anonymize!(vcat(inputs, targets, weights)...)
 
     r = report(yhat)
-    
+
     return yhat, cache, r
 end
 
@@ -107,13 +107,17 @@ end
 ## EXPORTING LEARNING NETWORKS AS MODELS WITH @from_network
 
 """
-    replace(W::MLJ.Node, a1=>b1, a2=>b2, ...)
+    replace(W::MLJ.Node, a1=>b1, a2=>b2, ...; empty_unspecified_sources=false)
 
 Create a deep copy of a node `W`, and thereby replicate the learning
 network terminating at `W`, but replacing any specified sources and
 models `a1, a2, ...` of the original network with `b1, b2, ...`.
+
+If `empty_unspecified_sources=ture` then any source nodes not
+specified are replaced with empty version of the same kind.
+
 """
-function Base.replace(W::Node, pairs::Pair...)
+function Base.replace(W::Node, pairs::Pair...; empty_unspecified_sources=false)
 
     # Note: We construct nodes of the new network as values of a
     # dictionary keyed on the nodes of the old network. Additionally,
@@ -131,17 +135,27 @@ function Base.replace(W::Node, pairs::Pair...)
     newmodel_given_old = IdDict(vcat(model_pairs, model_copy_pairs))
 
     # build complete source replacement pairs:
-    source_pairs = filter(collect(pairs)) do pair
+    sources_ = sources(W)
+    specified_source_pairs = filter(collect(pairs)) do pair
         first(pair) isa Source
     end
-    sources_ = sources(W)
-    sources_to_copy = setdiff(sources_, first.(source_pairs))
-    sources_wrapping_something_to_copy = filter(s->!isempty(s), sources_to_copy)
-    isempty(sources_wrapping_something_to_copy) ||
+    unspecified_sources = setdiff(sources_, first.(specified_source_pairs))
+    unspecified_sources_wrapping_something =
+        filter(s -> !isempty(s), unspecified_sources)
+    if !isempty(unspecified_sources_wrapping_something) &&
+        !empty_unspecified_sources
         @warn "No replacement specified for one or more non-empty source "*
-              "nodes. That data will be copied. "
-    source_copy_pairs = [source=>deepcopy(source) for source in sources_to_copy]
-    all_source_pairs = vcat(source_pairs, source_copy_pairs)
+        "nodes. Contents will be duplicated. "
+    end
+    if empty_unspecified_sources
+        unspecified_source_pairs = [s => source(kind=MLJ.kind(s)) for
+                                    s in unspecified_sources]
+    else
+        unspecified_source_pairs = [s => deepcopy(s) for
+                                    s in unspecified_sources]
+    end
+
+    all_source_pairs = vcat(specified_source_pairs, unspecified_source_pairs)
 
     # drop source nodes from all nodes of network terminating at W:
     nodes_ = filter(nodes(W)) do N
@@ -180,33 +194,33 @@ function fit_method(network, models...)
     network_Xs = sources(network, kind=:input)[1]
 
     function fit(model::M, verbosity, args...) where M <: Supervised
-
-        length(args) in [2, 3] || throw(ArgumentError())
-        X = args[1]
-        y = args[2]
-        length(args) == 3 && (w = args[3])
         replacement_models = [getproperty(model, fld)
                               for fld in fieldnames(M)]
         model_replacements = [models[j] => replacement_models[j]
-                          for j in eachindex(models)]
+                              for j in eachindex(models)]
         network_ys = sources(network, kind=:target)[1]
-        Xs = source(X)
-        ys = source(y, kind=:target)
-        if length(args) == 3
-            weights = sources(network, kind=:weights)
-            network_ws = weights[1]
-            ws = source(w, kind=:weights)
-        end
+        Xs = source(args[1])
+        ys = source(args[2], kind=:target)
         source_replacements = [network_Xs => Xs, network_ys => ys]
         if length(args) == 3
+            ws = source(args[3], kind=:weights)
+            network_ws = sources(network, kind=:weights)[1]
             push!(source_replacements, network_ws => ws)
         end
         replacements = vcat(model_replacements, source_replacements)
-        yhat = replace(network, replacements...)
+        yhat = replace(network, replacements...; empty_unspecified_sources=true)
 
-        issubset(Set([Xs, ys]), Set(sources(yhat))) ||
-                     error("Failed to replace some :input or :target source "*
-                           "in network blueprint. ")
+        if length(args) == 2
+            issubset([Xs, ys], sources(yhat)) ||
+                error("Failed to replace learning network "*
+                      ":input or :target source")
+        elseif length(args) == 3
+            issubset([Xs, ys, ws], sources(yhat)) ||
+                error("Failed to replace learning network "*
+                      ":input or :target source")
+        else
+            throw(ArgumentError)
+        end
 
         fit!(yhat, verbosity=verbosity)
 
@@ -223,7 +237,7 @@ function fit_method(network, models...)
         replacements = vcat(model_replacements, source_replacements)
         Xout = replace(network, replacements...)
         Set([Xs]) == Set(sources(Xout)) ||
-            error("Failed to replace sources in network blueprint. ")
+            error("Failed to replace learning network :input source ")
 
         fit!(Xout, verbosity=verbosity)
 

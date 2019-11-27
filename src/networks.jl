@@ -46,6 +46,7 @@ end
 source(X::Source; args...) = X
 source(; args...) = source(nothing; args...)
 
+kind(::Source{k}) where k = k
 Base.isempty(X::Source) = X.data == nothing
 
 is_stale(s::Source) = false
