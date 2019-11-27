@@ -695,6 +695,18 @@ MLJBase.selectcols
 ```
 
 ```@docs
+MLJBase.restrict
+```
+
+```@docs
+MLJBase.corestrict
+```
+
+```@docs
+MLJBase.complement
+```
+
+```@docs
 ScientificTypes.schema
 ```
 
@@ -708,6 +720,10 @@ ScientificTypes.scitype
 
 ```@docs
 ScientificTypes.scitype_union
+```
+
+```@docs
+ScientificTypes.elscitype
 ```
 
 
