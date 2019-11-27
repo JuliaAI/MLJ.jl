@@ -129,6 +129,7 @@ end
 
 ## FROM_NETWORK_PREPROCESS
 
+# supervised:
 Xs = source(nothing)
 ys = source(nothing, kind=:target)
 z  = log(ys)
@@ -147,14 +148,28 @@ zhat = inverse_transform(standM, uhat)
 yhat = exp(zhat)
 
 ex = Meta.parse("Composite(knn_rgs=knn, one_hot_enc=hot) <= yhat")
-modeltype_ex, fieldname_exs, model_exs, N_ex, kind =
+modeltype_ex, fieldname_exs, model_exs, N_ex, kind, trait_dic =
     MLJ.from_network_preprocess(TestComposites, ex)
 @test modeltype_ex == :Composite
 @test fieldname_exs == [:knn_rgs, :one_hot_enc]
 @test model_exs == [:knn, :hot]
 @test N_ex == :yhat
 @test kind == :DeterministicNetwork
+@test !(haskey(trait_dic, :supports_weights)) ||
+    !trait_dic[:supports_weights]
 
+# supervised with sample weights:
+ws = source(kind=:weights)
+knnM = machine(knn, W, u, ws)
+uhat = 0.5*(predict(knnM, W) + predict(oakM, W))
+zhat = inverse_transform(standM, uhat)
+yhat = exp(zhat)
+ex = Meta.parse("Composite(knn_rgs=knn, one_hot_enc=hot) <= yhat")
+modeltype_ex, fieldname_exs, model_exs, N_ex, kind, trait_dic =
+    MLJ.from_network_preprocess(TestComposites, ex)
+@test trait_dic[:supports_weights]
+
+# unsupervised:
 ex = Meta.parse("Composite(one_hot_enc=hot) <= W")
 modeltype_ex, fieldname_exs, model_exs, N_ex, kind =
     MLJ.from_network_preprocess(TestComposites, ex)
@@ -163,8 +178,9 @@ modeltype_ex, fieldname_exs, model_exs, N_ex, kind =
 @test model_exs == [:hot,]
 @test N_ex == :W
 @test kind == :UnsupervisedNetwork
+@test !(haskey(trait_dic, :supports_weights))
 
-
+# second supervised test:
 fea = FeatureSelector()
 feaM = machine(fea, Xs)
 G = transform(feaM, Xs)
@@ -175,7 +191,7 @@ elmM = machine(elm, H, ys)
 yhat = predict(elmM, H)
 
 ex = Meta.parse("Composite(selector=fea,one_hot=hot,tree=elm) <= yhat")
-modeltype_ex, fieldname_exs, model_exs, N_ex, kind =
+modeltype_ex, fieldname_exs, model_exs, N_ex, kind, trait_dic =
     MLJ.from_network_preprocess(TestComposites,
                                 ex, :(is_probabilistic=true))
 @test modeltype_ex == :Composite
@@ -183,6 +199,8 @@ modeltype_ex, fieldname_exs, model_exs, N_ex, kind =
 @test model_exs == [:fea, :hot, :elm]
 @test N_ex == :yhat
 @test kind == :ProbabilisticNetwork
+@test !(haskey(trait_dic, :supports_weights)) ||
+    !trait_dic[:supports_weights]
 
 ex = Meta.parse("45")
 @test_throws(ArgumentError,
@@ -394,12 +412,23 @@ yhat = predict(rgsM, W)
 
 composite = @from_network Composite3(regressor=rgs) <= yhat
 
+@test MLJ.supports_weights(composite)
 mach = fit!(machine(composite, X, y, w))
 posterior = predict(mach, X)[1]
 
 # "posterior" is skewed appropriately in weighted case:
 @test abs(pdf(posterior, 'b')/(2*pdf(posterior, 'a'))  - 1) < 0.15
 @test abs(pdf(posterior, 'b')/(4*pdf(posterior, 'c'))  - 1) < 0.15
+
+# test a pipeline:
+# pipe = @pipeline MyPipe42(transformer=Standardizer(),
+#                           regressor=ConstantClassifier())
+# mach = fit!(machine(pipe, X, y, w))
+# posterior = predict(mach, X)[1]
+# @test abs(pdf(posterior, 'b')/(2*pdf(posterior, 'a'))  - 1) < 0.15
+# @test abs(pdf(posterior, 'b')/(4*pdf(posterior, 'c'))  - 1) < 0.15
+
+
 
 
 end

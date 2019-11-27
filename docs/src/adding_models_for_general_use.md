@@ -296,7 +296,7 @@ generally avoid doing any of its own logging.
 *Sample weight support.* If
 `supports_weights(::Type{<:SomeSupervisedModel})` has been declared
 `true`, then one must also implement an extended signature version of
-`fit`:
+`fit` (and `update` if its fallback is being overloaded; see below):
 
 ```julia
 MLJBase.fit(model::SomeSupervisedModel, verbosity::Int, X, y, w) -> fitresult, cache, report
@@ -590,10 +590,14 @@ You can test all your declarations of traits by calling `MLJBase.info_dict(SomeM
 
 An `update` method may be optionally overloaded to enable a call by
 MLJ to retrain a model (on the same training data) to avoid repeating
-computations unnecessarily.
+computations unnecessarily. If overloading `update` for model
+supporting weights, both signatures below must be implemented.
 
 ```julia
-MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) -> fitresult, cache, report
+MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) -> fit
+result, cache, report
+MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y, w) -> fit
+result, cache, report
 ```
 
 If an MLJ `Machine` is being `fit!` and it is not the first time, then

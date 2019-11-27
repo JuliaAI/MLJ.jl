@@ -46,6 +46,8 @@ end
 source(X::Source; args...) = X
 source(; args...) = source(nothing; args...)
 
+Base.isempty(X::Source) = X.data == nothing
+
 is_stale(s::Source) = false
 
 # make source nodes callable:

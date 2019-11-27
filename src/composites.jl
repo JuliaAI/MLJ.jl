@@ -86,17 +86,20 @@ end
 function fitresults(yhat)
     inputs = sources(yhat, kind=:input)
     targets = sources(yhat, kind=:target)
+    weights = sources(yhat, kind=:weights)
+
     length(inputs) == 1 ||
         error("Improperly exported supervised network does "*
-              "not have a unique input source. ")
-    if length(targets) == 1
-        cache = anonymize!(inputs[1], targets[1])
-    elseif length(targets) == 0
-        cache = anonymize!(inputs[1])
-    else
-        error("Improperly exported network has multiple target sources. ")
-    end
+              "not have a unique :input source. ")
+    length(targets) < 2 ||
+        error("Improperly exported network has multiple :target sources. ")
+    length(weights) < 2 ||
+        error("Improperly exported network has multiple :weights sources. ")
+
+    cache = anonymize!(vcat(inputs, targets, weights)...)
+
     r = report(yhat)
+    
     return yhat, cache, r
 end
 
@@ -133,9 +136,10 @@ function Base.replace(W::Node, pairs::Pair...)
     end
     sources_ = sources(W)
     sources_to_copy = setdiff(sources_, first.(source_pairs))
-    isempty(sources_to_copy) ||
-        @warn "No replacement specified for one or more source nodes. "*
-    "Data there will be duplicated. "
+    sources_wrapping_something_to_copy = filter(s->!isempty(s), sources_to_copy)
+    isempty(sources_wrapping_something_to_copy) ||
+        @warn "No replacement specified for one or more non-empty source "*
+              "nodes. That data will be copied. "
     source_copy_pairs = [source=>deepcopy(source) for source in sources_to_copy]
     all_source_pairs = vcat(source_pairs, source_copy_pairs)
 
@@ -176,6 +180,8 @@ function fit_method(network, models...)
     network_Xs = sources(network, kind=:input)[1]
 
     function fit(model::M, verbosity, args...) where M <: Supervised
+
+        length(args) in [2, 3] || throw(ArgumentError())
         X = args[1]
         y = args[2]
         length(args) == 3 && (w = args[3])
@@ -187,7 +193,8 @@ function fit_method(network, models...)
         Xs = source(X)
         ys = source(y, kind=:target)
         if length(args) == 3
-            network_ws = sources(network, kind=:weights)[1]
+            weights = sources(network, kind=:weights)
+            network_ws = weights[1]
             ws = source(w, kind=:weights)
         end
         source_replacements = [network_Xs => Xs, network_ys => ys]
@@ -197,15 +204,10 @@ function fit_method(network, models...)
         replacements = vcat(model_replacements, source_replacements)
         yhat = replace(network, replacements...)
 
-        if length(args) == 2
-            Set([Xs, ys]) == Set(sources(yhat)) ||
-                error("Failed to replace sources in network blueprint. ")
-        elseif length(args) == 3
-            Set([Xs, ys, ws]) == Set(sources(yhat)) ||
-                error("Failed to replace sources in network blueprint. ")
-        else
-            throw(ArgumentError)
-        end
+        issubset(Set([Xs, ys]), Set(sources(yhat))) ||
+                     error("Failed to replace some :input or :target source "*
+                           "in network blueprint. ")
+
         fit!(yhat, verbosity=verbosity)
 
         return fitresults(yhat)
@@ -256,6 +258,8 @@ end
 function from_network_preprocess(modl, ex,
                                  is_probabilistic::Union{Missing,Bool})
 
+    trait_ex_given_name_ex = Dict{Symbol,Any}()
+
     ex isa Expr || net_alert(1)
     ex.head == :call || net_alert(2)
     ex.args[1] == :(<=) || net_alert(3)
@@ -300,6 +304,10 @@ function from_network_preprocess(modl, ex,
     length(weights) > 1 &&
         net_alert("Network has multiple sources with `kind=:weights`.")
 
+    if length(weights) == 1
+        trait_ex_given_name_ex[:supports_weights] = true
+    end
+
     is_supervised = length(targets) == 1
 
     kind = kind_(is_supervised, is_probabilistic)
@@ -311,11 +319,12 @@ function from_network_preprocess(modl, ex,
     models_ = [modl.eval(e) for e in model_exs]
     issubset(models_, models(N)) ||
         net_alert("One or more specified models are not in the learning network "*
-              "terminating at $N_ex.\n Use models($N_ex) to inspect models. ")
+                  "terminating at $N_ex.\n Use models($N_ex) to inspect models. ")
 
     nodes_  = nodes(N)
 
-    return modeltype_ex, fieldname_exs, model_exs, N_ex, kind
+    return modeltype_ex, fieldname_exs, model_exs, N_ex,
+           kind, trait_ex_given_name_ex
 
 end
 
@@ -335,7 +344,7 @@ function from_network_preprocess(modl, ex, kw_ex)
 end
 
 function from_network_(modl, modeltype_ex, fieldname_exs, model_exs,
-                          N_ex, kind)
+                          N_ex, kind, trait_value_ex_given_name_ex)
 
     args = gensym(:args)
 
@@ -353,12 +362,21 @@ function from_network_(modl, modeltype_ex, fieldname_exs, model_exs,
     end
 
     program2 = quote
+        # defined keyword constructor for composite model:
         defaults =
             MLJ.@set_defaults $modeltype_ex deepcopy.([$(model_exs...)])
-
     end
 
     modl.eval(program1)
+
+    # define composite model traits:
+    for (name_ex, value_ex) in trait_value_ex_given_name_ex
+        program = quote
+            MLJ.$name_ex(::Type{<:$modeltype_ex}) = $value_ex
+        end
+        modl.eval(program)
+    end
+
     modl.eval(program2)
 
 end
