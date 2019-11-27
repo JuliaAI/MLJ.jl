@@ -182,16 +182,6 @@ MLJBase.package_name(::Type{<:SomeSupervisedModel}) = "Unknown"
 MLJBase.package_uuid(::Type{<:SomeSupervisedModel}) = "Unknown"
 ```
 
-Required to be set to `true`, if sample weights can be specified when
-training `SomeSupervisedModel`:
-
-```julia
-MLJBase.supports_weights(::Type{<:SomeSupervisedModel}, fitresult, Xnew) = false
-```
-
-Strongly recommended, to constrain the form of input data passed to
-fit and predict:
-
 ```julia
 MLJBase.input_scitype(::Type{<:SomeSupervisedModel}) = Unknown
 ```
@@ -208,6 +198,25 @@ Optional but recommended:
 MLJBase.package_url(::Type{<:SomeSupervisedModel})  = "unknown"
 MLJBase.is_pure_julia(::Type{<:SomeSupervisedModel}) = false
 MLJBase.package_license(::Type{<:SomeSupervisedModel}) = "unknown"
+```
+
+If `SomeSupervisedModel` supports sample weights, then instead of the `fit` above, one implements
+
+```julia
+MLJBase.fit(model::SomeSupervisedModel, verbosity::Integer, X, y, w=nothing) -> fitresult, cache, report
+```
+
+and, if appropriate
+
+```julia
+MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y, w=nothing) =
+   MLJBase.fit(model, verbosity, X, y, w)
+```
+
+Additionally, if `SomeSupervisedModel` supports sample weights, one must declare
+
+```julia
+MLJBase.supports_weights(model::Type{<:SomeSupervisedModel}) = true
 ```
 
 
@@ -295,11 +304,11 @@ generally avoid doing any of its own logging.
 
 *Sample weight support.* If
 `supports_weights(::Type{<:SomeSupervisedModel})` has been declared
-`true`, then one must also implement an extended signature version of
-`fit` (and `update` if its fallback is being overloaded; see below):
+`true`, then one instead implements the following variation on the
+above `fit`:
 
 ```julia
-MLJBase.fit(model::SomeSupervisedModel, verbosity::Int, X, y, w) -> fitresult, cache, report
+MLJBase.fit(model::SomeSupervisedModel, verbosity::Int, X, y, w=nothing) -> fitresult, cache, report
 ```
 
 
@@ -583,6 +592,14 @@ MLJBase.metadata_model(DecisionTreeClassifier,
                         path="MLJModels.DecisionTree_.DecisionTreeClassifier")
 ```
 
+```@docs
+MLJBase.metadata_pkg
+```
+
+```@docs
+MLJBase.metadata_model
+```
+
 You can test all your declarations of traits by calling `MLJBase.info_dict(SomeModel)`.
 
 
@@ -590,15 +607,17 @@ You can test all your declarations of traits by calling `MLJBase.info_dict(SomeM
 
 An `update` method may be optionally overloaded to enable a call by
 MLJ to retrain a model (on the same training data) to avoid repeating
-computations unnecessarily. If overloading `update` for model
-supporting weights, both signatures below must be implemented.
+computations unnecessarily. 
 
 ```julia
 MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) -> fit
 result, cache, report
-MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y, w) -> fit
+MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y, w=nothing) -> fit
 result, cache, report
 ```
+
+Here the second variation applies if `SomeSupervisedModel` supports
+sample weights.
 
 If an MLJ `Machine` is being `fit!` and it is not the first time, then
 `update` is called instead of `fit`, unless the machine `fit!` has
