@@ -31,7 +31,7 @@ export std, support
 
 # re-export from MLJBase and ScientificTypes:
 export nrows, nfeatures, color_off, color_on,
-    selectrows, selectcols, restrict, corestrict, complement
+    selectrows, selectcols, restrict, corestrict, complement,
     SupervisedTask, UnsupervisedTask, MLJTask,
     Deterministic, Probabilistic, Unsupervised, Supervised, Static,
     DeterministicNetwork, ProbabilisticNetwork,
