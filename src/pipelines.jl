@@ -28,7 +28,7 @@ end
 # element of `models_and_functions`.
 
 # No checks whatsoever are performed. Returns a learning network.
-function linear_learning_network(Xs, ys, target, inverse, models_and_functions...)
+function linear_learning_network(Xs, ys, ws, target, inverse, models_and_functions...)
 
     n = length(models_and_functions)
 
@@ -37,14 +37,20 @@ function linear_learning_network(Xs, ys, target, inverse, models_and_functions..
     else
         yt  = ys
     end
-    
+
+    if ws !== nothing
+        tail_args = (yt, ws)
+    else
+        tail_args = (yt,)
+    end
+
     nodes = Vector(undef, n + 1)
     nodes[1] = Xs
-    
+
     for i = 2:(n + 1)
         m = models_and_functions[i-1]
         if m isa Supervised
-            supervised_machine = machine(m, nodes[i-1], yt)
+            supervised_machine = machine(m, nodes[i-1], tail_args...)
             nodes[i] = predict(supervised_machine, nodes[i-1])
        else
             nodes[i] = node_(m, nodes[i-1]) |> first
@@ -60,7 +66,7 @@ function linear_learning_network(Xs, ys, target, inverse, models_and_functions..
             terminal_node = node_(inverse, nodes[end]) |> first
         end
     end
- 
+
     return terminal_node
 
 end
@@ -93,9 +99,10 @@ function pipeline_preprocess(modl, ex, is_probabilistic::Union{Missing,Bool})
     models_ = []                   # for `from_network`
     models_and_functions_ = []     # for `linear_learning_network`
     models_and_functions  = []     # for `linear_learning_network`
+    trait_value_given_name_ = Dict{Symbol,Any}()
     for ex in ex.args[2:end]
         if ex isa Expr
-            if ex.head == :kw 
+            if ex.head == :kw
                 variable_ = ex.args[1]
                 variable_ isa Symbol || pipe_alert(8)
                 value_, value = eval_and_reassign(modl, ex.args[2])
@@ -124,7 +131,9 @@ function pipeline_preprocess(modl, ex, is_probabilistic::Union{Missing,Bool})
                     inverse = value
                     push!(fieldnames_, :inverse)
                 else
-                    value isa Model || pipe_alert(11)
+                    value isa Model ||
+                        throw(ArgumentError("$value given where `Model` "*
+                                            "instance expected. "))
                     push!(models_and_functions_, value_)
                     push!(models_and_functions, value)
                     push!(fieldnames_, variable_)
@@ -144,25 +153,32 @@ function pipeline_preprocess(modl, ex, is_probabilistic::Union{Missing,Bool})
             push!(models_and_functions, f)
         end
     end
-    
+
     (@isdefined target)  || (target = nothing; target_ = :nothing)
     (@isdefined inverse) || (inverse = nothing; inverse_ = :nothing)
     inverse !== nothing && target === nothing &&
         pipe_alert("You have specified `inverse=...` but no `target`.")
 
     supervised(m) = !(m isa Unsupervised) && !(m isa Function)
-    
+
     supervised_components = filter(supervised, models_and_functions)
-        
+
     length(supervised_components) < 2 ||
         pipe_alert("More than one component of the pipeline is a "*
                    "supervised model .")
 
+    if length(supervised_components) == 1
+        model = supervised_components[1]
+        trait_value_given_name_[:supports_weights] =
+            supports_weights(model)
+    end
+
     is_supervised  =
         length(supervised_components) == 1
-    
+
     # `kind_` is defined in composites.jl:
     kind = kind_(is_supervised, is_probabilistic)
+
     ismissing(kind) &&
         pipe_alert("Network has no supervised components and so "*
                   "`is_probabilistic=true` "*
@@ -175,9 +191,10 @@ function pipeline_preprocess(modl, ex, is_probabilistic::Union{Missing,Bool})
     target == nothing || is_supervised ||
         pipe_alert("`target=...` has been specified but no "*
                    "supervised components have been specified. ")
-        
+
     return (pipetype_, fieldnames_, models_,
-            models_and_functions_, target_, inverse_, kind)
+            models_and_functions_, target_, inverse_,
+            kind, trait_value_given_name_)
 
 end
 
@@ -200,29 +217,37 @@ end
 function pipeline_(modl, ex, kw_ex)
 
     (pipetype_, fieldnames_, models_, models_and_functions_,
-     target_, inverse_, kind) =
+     target_, inverse_, kind, trait_value_given_name_) =
          pipeline_preprocess(modl, ex, kw_ex)
 
     if kind === :UnsupervisedNetwork
         ys_ = :nothing
     else
-        ys_ = :(source(nothing, kind=:target))
+        ys_ = :(source(kind=:target))
     end
-    
+
+    if haskey(trait_value_given_name_, :supports_weights) &&
+        trait_value_given_name_[:supports_weights]
+        ws_ = :(source(kind=:weights))
+    else
+        ws_ = nothing
+    end
+
     N_ex = quote
-        
-        MLJ.linear_learning_network(source(nothing), $ys_,
+
+        MLJ.linear_learning_network(source(nothing), $ys_, $ws_,
                                     $target_, $inverse_,
                                     $(models_and_functions_...))
     end
-                                               
-    from_network_(modl, pipetype_, fieldnames_, models_, N_ex, kind)
-    
+
+    from_network_(modl, pipetype_, fieldnames_, models_, N_ex,
+                  kind, trait_value_given_name_)
+
     return pipetype_
 
 end
 
-pipeline_(modl, ex) = pipeline_(modl, ex, :(is_probabilistic=missing)) 
+pipeline_(modl, ex) = pipeline_(modl, ex, :(is_probabilistic=missing))
 
 """
     @pipeline NewPipeType(fld1=model1, fld2=model2, ...)
@@ -231,7 +256,7 @@ pipeline_(modl, ex) = pipeline_(modl, ex, :(is_probabilistic=missing))
 Create a new pipeline model type `NewPipeType` that composes the types of
 the specified models `model1`, `model2`, ... . The models are composed
 in the specified order, meaning the input(s) of the pipeline goes to
-`model1`, whose output is sent to `model2`, and so forth. 
+`model1`, whose output is sent to `model2`, and so forth.
 
 At most one of the models may be a supervised model, in which case
 `NewPipeType` is supervised. Otherwise it is unsupervised.
@@ -250,7 +275,7 @@ also be inserted in the pipeline as shown in the following example
 (the classifier is probabilistic but the pipeline itself is
 deterministic):
 
-    @pipeline MyPipe(X -> coerce(X, :age=>Continuous), 
+    @pipeline MyPipe(X -> coerce(X, :age=>Continuous),
                      hot=OneHotEncoder(),
                      cnst=ConstantClassifier(),
                      yhat -> mode.(yhat))
@@ -267,10 +292,10 @@ specified, using the keyword `target`, provided the transformer
 provides an `inverse_transform` method:
 
     @load KNNRegressor
-    @pipeline MyPipe(hot=OneHotEncoder(), 
+    @pipeline MyPipe(hot=OneHotEncoder(),
                      knn=KNNRegressor(),
                      target=UnivariateTransformer())
-                     
+
 A static transformation can be specified instead, but then
 an `inverse` must also be given:
 
@@ -297,11 +322,3 @@ macro pipeline(exs...)
         end)
 
 end
-    
-    
-
-
-
-    
-        
-        

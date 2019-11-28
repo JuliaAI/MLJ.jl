@@ -135,10 +135,17 @@ learning network exported as a stand-alone, re-usable `Model` object,
 to which all the MLJ `Model` meta-algorithms can be applied
 (ensembling, systematic tuning, etc).
 
-As we shall see, exporting a learning network as a reusable model, is
-quite simple. While one can entirely skip the build-and-train steps,
-experimenting with raw learning networks may be the best way to
-understand how the stand-alone models work under the hood.
+Different nodes can point to the same machine (i.e., can access a
+common set of learned parameters) and different machines can wrap a
+common model (allowing for hyperparameters in different machines to be
+coupled).
+
+By specifying data at the source nodes of a learning network, one can
+use and test the learning network as it is defined, which is also a
+good way to understand how learning networks work under the hood. This
+data, if specified, is ignored in the export process, for the exported
+composite model, like any other model, is not associated with any data
+until wrapped in a machine.
 
 In MLJ learning networks treat the flow of information during training
 and predicting separately. Also, different nodes may use the same
@@ -159,7 +166,7 @@ target `y`, predicts new target values using ridge regression, and
 then inverse-transforms those predictions, for later comparison with
 the original test data. The machines, labeled in yellow, are where
 data to be used for training enters a node, and where training
-outcomes are stored, as in the basic fit/predict scenario
+outcomes are stored, as in the basic fit/predict scenario.
 
 Looking ahead, we note that the new composite model type we will
 create later will be assigned a single hyperparameter `regressor`, and the
@@ -192,11 +199,12 @@ ys = source(y, kind=:target)
 Source @ 3…40
 ```
 
-*Note.* One can omit the specification of data at the source nodes and
-still export the resulting network as a stand-alone model, which can
-be bound to data like any other model (see the example under [Static
-operations on nodes](@ref) below). However, one will be unable to fit
-or call network nodes as outlined in the following illustration.
+*Note.* One can omit the specification of data at the source nodes (by
+writing instead `Xs = source()` and `ys = source(kind=:target)`) and
+still export the resulting network as a stand-alone model using the
+@from_network macro described later; see the example under [Static
+operations on nodes](@ref). However, one will be unable to fit
+or call network nodes, as illustrated below.
 
 We label the nodes that we will define according to their outputs in
 the diagram. Notice that the nodes `z` and `yhat` use the same
@@ -316,6 +324,12 @@ rms(y[test], yhat(rows=test))
 ```
 
 > **Notable feature.** The machine, `ridge::NodalMachine{RidgeRegressor}`, is retrained, because its underlying model has been mutated. However, since the outcome of this training has no effect on the training inputs of the machines `stand` and `box`, these transformers are left untouched. (During construction, each node and machine in a learning network determines and records all machines on which it depends.) This behavior, which extends to exported learning networks, means we can tune our wrapped regressor (using a holdout set) without re-computing transformations each time the hyperparameter is changed.
+
+### Learning networks with sample weights
+
+To build an exportable learning network supporting sample weights,
+create a source node with `ws = source(w; kind=:weights)` or `ws =
+source(; kind=weights)`.
 
 
 ## Exporting a learning network as a stand-alone model

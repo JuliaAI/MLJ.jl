@@ -31,7 +31,7 @@ export std, support
 
 # re-export from MLJBase and ScientificTypes:
 export nrows, nfeatures, color_off, color_on,
-    selectrows, selectcols,
+    selectrows, selectcols, restrict, corestrict, complement,
     SupervisedTask, UnsupervisedTask, MLJTask,
     Deterministic, Probabilistic, Unsupervised, Supervised, Static,
     DeterministicNetwork, ProbabilisticNetwork,
@@ -46,6 +46,8 @@ export nrows, nfeatures, color_off, color_on,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
     classes,
     partition, unpack,
+    mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,
+    misclassification_rate, cross_entropy, BrierScore,
     default_measure, measures,
     @load_boston, @load_ames, @load_iris, @load_reduced_ames,
     @load_crabs

@@ -285,8 +285,8 @@ are the key aspects of that convention:
 
 - Any `CategoricalValue` or `CategoricalString`, `x`, is interpreted
   as `Multiclass` or `OrderedFactor`, depending on the value of
-  `x.pool.ordered`.
-  
+  `x.pool.ordered`. 
+    
 - `String`s and `Char`s are *not* interpreted as `Finite`; they have
   `Unknown` scitype. Coerce vectors of strings or characters to
   `CategoricalVector`s if they represent `Multiclass` or
@@ -294,7 +294,13 @@ are the key aspects of that convention:
   
 - In particular, *integers* (including `Bool`s) *cannot be used to
   represent categorical data.*
-  
+
+To designate an intrinsic "true" class for binary data (for purposes
+of applying MLJ measures, such as `truepositive`), data should be
+represented by an ordered `CategoricalValue` or
+`CategoricalString`. This data will have scitype `OrderedFactor{2}`
+and the "true" class is understood to be the *second* class in the
+ordering.
 
 
 

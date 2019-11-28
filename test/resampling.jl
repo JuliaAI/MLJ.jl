@@ -1,10 +1,11 @@
 module TestResampling
 
-#  using Revise
+# using Revise
 using Test
 using MLJ
 using MLJBase
 import MLJModels
+import StatsBase
 import Random.seed!
 seed!(1234)
 
@@ -22,7 +23,8 @@ include("foobarmodel.jl")
     y = rand(4)
     override=false
     @test MLJ._check_measure(:junk, :junk, :junk, :junk, true) == nothing
-    @test_throws ArgumentError MLJ._check_measure(model, rms, y, predict, override)
+    @test_throws(ArgumentError,
+                  MLJ._check_measure(model, rms, y, predict, override))
     @test MLJ._check_measure(model, rms, y, predict_mean, override) == nothing
     @test MLJ._check_measure(model, rms, y, predict_median, override) == nothing
     y=categorical(collect("abc"))
@@ -30,7 +32,7 @@ include("foobarmodel.jl")
                  MLJ._check_measure(model, rms, y, predict_median, override))
     model = ConstantClassifier()
     @test_throws(ArgumentError,
-                 MLJ._check_measure(model, misclassification_rate, y, predict, override))
+       MLJ._check_measure(model, misclassification_rate, y, predict, override))
     @test MLJ._check_measure(model, misclassification_rate, y,
                             predict_mode, override) == nothing
     model = MLJModels.DeterministicConstantClassifier()
@@ -89,15 +91,19 @@ end
     result.measurement[1] ≈ 2/3
 
     # test direct evaluation of a model + data:
-    result = evaluate(model, X, y, verbosity=0, resampling=holdout, measure=rms)
+    result = evaluate(model, X, y, verbosity=0,
+                      resampling=holdout, measure=rms)
     @test result.measurement[1] ≈ 2/3
 
     X = (x=rand(100),)
     y = rand(100)
     mach = machine(model, X, y)
-    evaluate!(mach, verbosity=0, Holdout(shuffle=true, rng=123))
-    e1 = evaluate!(mach, verbosity=0, Holdout(shuffle=true)).measurement[1]
-    @test e1 != evaluate!(mach, verbosity=0, Holdout()).measurement[1]
+    evaluate!(mach, verbosity=0,
+              resampling=Holdout(shuffle=true, rng=123))
+    e1 = evaluate!(mach, verbosity=0,
+                   resampling=Holdout(shuffle=true)).measurement[1]
+    @test e1 != evaluate!(mach, verbosity=0,
+                          resampling=Holdout()).measurement[1]
 
 end
 
@@ -153,7 +159,7 @@ end
 
 end
 
-@testset "weights" begin
+@testset "sample weights in evaluation" begin
 
     # cv:
     x1 = ones(4)
@@ -222,6 +228,100 @@ struct DummyResamplingStrategy <: MLJ.ResamplingStrategy end
                  operation=predict_mode)
     @test e.measurement[1] ≈ 1.0
 end
+
+@testset "sample weights in training  and evaluation" begin
+    yraw = ["Perry", "Antonia", "Perry", "Antonia", "Skater"]
+    X = (x=rand(5),)
+    y = categorical(yraw)
+    w = [1, 10, 1, 10, 5]
+
+    # without weights:
+    mach = machine(ConstantClassifier(), X, y)
+    e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
+                  operation=predict_mode, measure=misclassification_rate)
+    @test e.measurement[1] ≈ 1.0
+
+    # with weights in training and evaluation:
+    mach = machine(ConstantClassifier(), X, y, w)
+    e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
+              operation=predict_mode, measure=misclassification_rate)
+    @test e.measurement[1] ≈ 1/3
+
+    # with weights in training but overriden in evaluation:
+    e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
+              operation=predict_mode, measure=misclassification_rate,
+                  weights = fill(1, 5))
+    @test e.measurement[1] ≈ 1/2
+
+    @test_throws(DimensionMismatch,
+                 evaluate!(mach, resampling=Holdout(fraction_train=0.6),
+                           operation=predict_mode,
+                           measure=misclassification_rate,
+                           weights = fill(1, 100)))
+
+    @test_throws(ArgumentError,
+                 evaluate!(mach, resampling=Holdout(fraction_train=0.6),
+                           operation=predict_mode,
+                           measure=misclassification_rate,
+                           weights = fill('a', 5)))
+
+    # resampling on a subset of all rows:
+    model = @load KNNClassifier
+
+    N = 200
+    X = (x = rand(3N), );
+    y = categorical(rand("abcd", 3N));
+    w = rand(3N);
+    rows = StatsBase.sample(1:3N, 2N, replace=false);
+    Xsmall = selectrows(X, rows);
+    ysmall = selectrows(y, rows);
+    wsmall = selectrows(w, rows);
+
+    mach1 = machine(model, Xsmall, ysmall, wsmall)
+    e1 = evaluate!(mach1, resampling=CV(),
+                   measure=misclassification_rate,
+                   operation=predict_mode)
+
+    mach2 = machine(model, X, y, w)
+    e2 = evaluate!(mach2, resampling=CV(),
+                   measure=misclassification_rate,
+                   operation=predict_mode,
+                   rows=rows)
+
+    @test e1.per_fold ≈ e2.per_fold
+
+    # resampler as machine with evaluation weights not specified:
+    resampler = Resampler(model=model, resampling=CV();
+                          measure=misclassification_rate,
+                          operation=predict_mode)
+    resampling_machine = machine(resampler, X, y, w)
+    fit!(resampling_machine)
+    e1 = evaluate(resampling_machine).measurement[1]
+    mach = machine(model, X, y, w)
+    e2 = evaluate!(mach, resampling=CV();
+                   measure=misclassification_rate,
+                   operation=predict_mode).measurement[1]
+    @test e1 ≈ e2
+
+    # resampler as machine with evaluation weights specified:
+    weval = rand(3N);
+    resampler = Resampler(model=model, resampling=CV();
+                          measure=misclassification_rate,
+                          operation=predict_mode,
+                          weights=weval)
+    resampling_machine = machine(resampler, X, y, w)
+    fit!(resampling_machine)
+    e1 = evaluate(resampling_machine).measurement[1]
+    mach = machine(model, X, y, w)
+    e2 = evaluate!(mach, resampling=CV();
+                   measure=misclassification_rate,
+                   operation=predict_mode,
+                   weights=weval).measurement[1]
+    @test e1 ≈ e2
+
+end
+
+
 
 end
 true
