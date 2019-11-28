@@ -75,44 +75,59 @@ MLJBase.is_wrapper(::Type{<:EitherTunedModel}) = true
                              weights=nothing,
                              operation=predict,
                              ranges=ParamRange[],
-                             full_report=true)
+                             full_report=true,
+                             train_best=true)
 
 Construct a model wrapper for hyperparameter optimization of a
 supervised learner.
 
 Calling `fit!(mach)` on a machine `mach=machine(tuned_model, X, y)` or
-`mach=machine(tuned_model, task)` will:
+`mach=machine(tuned_model, X, y, w)` will:
 
 - Instigate a search, over clones of `model`, with the hyperparameter
-  mutations specified by `ranges`, for a model optimizing the specified
-  `measure`, using performance evaluations carried out using the specified
-  `tuning` strategy and `resampling` strategy.
+  mutations specified by `ranges`, for a model optimizing the
+  specified `measure`, using performance evaluations carried out using
+  the specified `tuning` strategy and `resampling` strategy. If
+  `measure` supports weights (`supports_weights(measure) == true`)
+  then any `weights` specified will be passed to the measure.
 
-- Fit an internal machine, based on the optimal model `fitted_params(mach).best_model`,
-  wrapping the optimal `model` object in *all* the provided data `X, y`
-  (or in `task`). Calling `predict(mach, Xnew)` then returns predictions
-  on `Xnew` of this internal machine.
+- Fit an internal machine, based on the optimal model
+  `fitted_params(mach).best_model`, wrapping the optimal `model`
+  object in *all* the provided data `X, y` (or in `task`). Calling
+  `predict(mach, Xnew)` then returns predictions on `Xnew` of this
+  internal machine. The final train can be supressed by setting
+  `train_best=false`.
 
 *Important.* If a custom measure `measure` is used, and the measure is
 a score, rather than a loss, be sure to check that
 `MLJ.orientation(measure) == :score` to ensure maximization of the
-measure, rather than minimization. Overide an incorrect value with
+measure, rather than minimization. Override an incorrect value with
 `MLJ.orientation(::typeof(measure)) = :score`.
 
-If `measure` supports sample weights (`MLJ.supports_weights(measure)
-== true`) then these can be passed to the measure as `weights`.
+*Important:* If `weights` are left unspecified, and `measure` supports
+sample weights, then any weight vector `w` used in constructing a
+corresponding tuning machine, as in `tuning_machine =
+machine(tuned_model, X, y, w)` (which is then used in *training* each
+model in the search) will also be passed to `measure` for evaluation.
 
 In the case of two-parameter tuning, a Plots.jl plot of performance
 estimates is returned by `plot(mach)` or `heatmap(mach)`.
+
+Once a tuning machine `mach` has bee trained as above, one can access
+the learned parameters of the best model, using
+`fitted_params(mach).best_fitted_params`. Similarly, the report of
+training the best model is accessed via `report(mach).best_report`.
 
 """
 function TunedModel(;model=nothing,
                     tuning=Grid(),
                     resampling=Holdout(),
-                    measure=nothing,
+                    measures=nothing,
+                    measure=measures,
                     weights=nothing,
                     operation=predict,
-                    ranges=ParamRange[],
+                    range=ParamRange[],
+                    ranges=range,
                     minimize=true,
                     full_report=true,
                     train_best=true)
@@ -138,7 +153,7 @@ function MLJBase.clean!(model::EitherTunedModel)
     message = ""
     if model.measure === nothing
         model.measure = default_measure(model)
-        message *= "No measure specified. Using measure=$(model.measure). "
+        message *= "No measure specified. Setting measure=$(model.measure). "
     end
     return message
 end
@@ -146,7 +161,8 @@ end
 
 ## GRID SEARCH
 
-function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y) where M
+function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M},
+                     verbosity::Integer, args...) where M
 
     if tuned_model.ranges isa AbstractVector
         ranges = tuned_model.ranges
@@ -210,7 +226,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
                           weights=tuned_model.weights,
                           operation=tuned_model.operation)
 
-    resampling_machine = machine(resampler, X, y)
+    resampling_machine = machine(resampler, args...)
 
     # tuple of iterators over hyper-parameter values:
     iterators = map(eachindex(ranges)) do j
@@ -284,33 +300,35 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
 
     end
 
+    fitresult = machine(best_model, args...)
     if tuned_model.train_best
         verbosity < 1 || @info "Training best model on all supplied data."
 
         # train best model on all the data:
         # TODO: maybe avoid using machines here and use model fit/predict?
-        fitresult = machine(best_model, X, y)
         fit!(fitresult, verbosity=verbosity-1)
+        best_report = fitresult.report
     else
+        verbosity < 1 || @info "Training of best model suppressed.\n "*
+        "To train tuning machine `mach` on all supplied data, call "*
+        "`fit!(mach.fitresult)`."
         fitresult = tuned_model.model
+        best_report = missing
     end
 
-    if tuned_model.full_report
-        report = (# models=models,
-                  # best_model=best_model,
-                  parameter_names= permutedims(parameter_names), # row vector
-                  parameter_scales=permutedims(scales),  # row vector
-                  parameter_values=A,
-                  measurements=measurements,
-                  best_measurement=best_measurement)
-    else
-        report = (# models=[deepcopy(clone),][1:0],         # empty vector
-                  # best_model=best_model,
-                  parameter_names= permutedims(parameter_names), # row vector
+    pre_report = (parameter_names= permutedims(parameter_names), # row vector
                   parameter_scales=permutedims(scales),   # row vector
-                  parameter_values=A[1:0,1:0],            # empty matrix
-                  measurements=[best_measurement, ][1:0], # empty vector
-                  best_measurement=best_measurement)
+                  best_measurement=best_measurement,
+                  best_report=best_report)
+
+    if tuned_model.full_report
+        report = merge(pre_report,
+                       (parameter_values=A,
+                        measurements=measurements,))
+    else
+        report = merge(pre_report,
+                       (parameter_values=missing,
+                        measurements=missing,))
     end
 
     cache = nothing
@@ -319,7 +337,15 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M}, verbosity::Int, X, y
 
 end
 
-MLJBase.fitted_params(::EitherTunedModel, fitresult) = (best_model=fitresult.model,)
+function MLJBase.fitted_params(tuned_model::EitherTunedModel, fitresult)
+    if tuned_model.train_best
+        return (best_model=fitresult.model,
+                best_fitted_params=fitted_params(fitresult))
+    else
+        return (best_model=fitresult.model,
+                best_fitted_params=missing)
+    end
+end
 
 MLJBase.predict(tuned_model::EitherTunedModel, fitresult, Xnew) = predict(fitresult, Xnew)
 MLJBase.best(model::EitherTunedModel, fitresult) = fitresult.model
@@ -327,30 +353,48 @@ MLJBase.best(model::EitherTunedModel, fitresult) = fitresult.model
 
 ## METADATA
 
-MLJBase.load_path(::Type{<:DeterministicTunedModel}) = "MLJ.DeterministicTunedModel"
+MLJBase.supports_weights(::Type{<:EitherTunedModel{<:Any,M}}) where M =
+    MLJBase.supports_weights(M)
+
+MLJBase.load_path(::Type{<:DeterministicTunedModel}) =
+    "MLJ.DeterministicTunedModel"
 MLJBase.package_name(::Type{<:DeterministicTunedModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:DeterministicTunedModel}) = ""
-MLJBase.package_url(::Type{<:DeterministicTunedModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
-MLJBase.is_pure_julia(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.is_pure_julia(M)
-MLJBase.input_scitype(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.input_scitype(M)
-MLJBase.target_scitype(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} = MLJBase.target_scitype(M)
+MLJBase.package_url(::Type{<:DeterministicTunedModel}) =
+    "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.is_pure_julia(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} =
+    MLJBase.is_pure_julia(M)
+MLJBase.input_scitype(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} =
+    MLJBase.input_scitype(M)
+MLJBase.target_scitype(::Type{<:DeterministicTunedModel{T,M}}) where {T,M} =
+    MLJBase.target_scitype(M)
 
-MLJBase.load_path(::Type{<:ProbabilisticTunedModel}) = "MLJ.ProbabilisticTunedModel"
+MLJBase.load_path(::Type{<:ProbabilisticTunedModel}) =
+    "MLJ.ProbabilisticTunedModel"
 MLJBase.package_name(::Type{<:ProbabilisticTunedModel}) = "MLJ"
 MLJBase.package_uuid(::Type{<:ProbabilisticTunedModel}) = ""
-MLJBase.package_url(::Type{<:ProbabilisticTunedModel}) = "https://github.com/alan-turing-institute/MLJ.jl"
-MLJBase.is_pure_julia(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.is_pure_julia(M)
-MLJBase.input_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.input_scitype(M)
-MLJBase.target_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} = MLJBase.target_scitype(M)
+MLJBase.package_url(::Type{<:ProbabilisticTunedModel}) =
+    "https://github.com/alan-turing-institute/MLJ.jl"
+MLJBase.is_pure_julia(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} =
+    MLJBase.is_pure_julia(M)
+MLJBase.input_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} =
+    MLJBase.input_scitype(M)
+MLJBase.target_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} =
+    MLJBase.target_scitype(M)
 
 
 ## LEARNING CURVES
 
 """
-    curve = learning_curve!(mach; resolution=30, resampling=Holdout(), measure=rms, operation=predict, range=nothing, n=1)
+    curve = learning_curve!(mach; resolution=30,
+                                  resampling=Holdout(),
+                                  measure=rms,
+                                  operation=predict,
+                                  range=nothing,
+                                  n=1)
 
 Given a supervised machine `mach`, returns a named tuple of objects
-needed to generate a plot of performance measurements, as a function
+suitable for generating a plot of  performance measurements, as a function
 of the single hyperparameter specified in `range`. The tuple `curve`
 has the following keys: `:parameter_name`, `:parameter_scale`,
 `:parameter_values`, `:measurements`.

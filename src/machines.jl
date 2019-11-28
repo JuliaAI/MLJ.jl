@@ -1,6 +1,5 @@
 abstract type AbstractMachine{M<:Model} <: MLJType end
 
-# TODO: write out separate method for machine(::Model, ::MLJTask) to simplify logic.
 mutable struct Machine{M<:Model} <: AbstractMachine{M}
 
     model::M
@@ -9,7 +8,7 @@ mutable struct Machine{M<:Model} <: AbstractMachine{M}
     cache
     args::Tuple
     report
-    previous_rows 
+    previous_rows
 
     function Machine{M}(model, args...) where M
         machine = new{M}(model)
@@ -24,45 +23,77 @@ Machine(model::M, args...) where M <: Model = Machine{M}(model, args...)
 
 # public constructor:
 function machine(model::M, args...) where M <: Model
-    # checks on args:
+
+    nargs = length(args)
+
     if M <: Supervised
 
-        (length(args) == 2) ||
-            error("Use machine(model, X, y) for a supervised model. ")
-        X, y = args
+        # checks on args:
+        if nargs == 2
+            X, y = args
+        elseif nargs == 3
+            supports_weights(model) ||
+                @info("$(typeof(model)) does not support sample weights and "*
+                      "the supplied weights will be ignored in "*
+                      "training.\n However, supplied weights will be passed "*
+                      "to weight-supporting measures on calls to `evaluate!` "*
+                      "and in tuning. ")
+            X, y, w = args
+            w isa AbstractVector{<:Real} ||
+                throw(ArgumentError("Weights must be real. "))
+            nrows(w) == nrows(y) ||
+                throw(DimensionMismatch("Weights and target differ in length."))
+        else
+            error("Use `machine(model, X, y)` or `machine(model, X, y, w)` "*
+                  "for a supervised model. ")
+        end
 
+        # checks on input type:
         input_scitype(model) <: Unknown ||
             scitype(X) <: input_scitype(model) ||
-            @warn "The scitype of `X`, in `machine(model, X, y)` is "*
+            @warn "The scitype of `X`, in `machine(model, X, y)` or "
+        "`machine(model, X, y, w)` is "*
         "incompatible with `model`:\n"*
         "scitype(X) = $(scitype(X))\n"*
         "input_scitype(model) = $(input_scitype(model)). "
 
+        # checks on target type:
         target_scitype(model) <: Unknown ||
             scitype(y) <: target_scitype(model) ||
-            @warn "The scitype of `y`, in `machine(model, X, y)` is "*
+            @warn "The scitype of `y`, in `machine(model, X, y)` "*
+        "or `machine(model, X, y, w)` is "*
         "incompatible with `model`:\n"*
         "scitype(y) = $(scitype(y))\n"*
         "target_scitype(model) = $(target_scitype(model)). "
 
+        # checks on dimension matching:
+        nrows(X) == nrows(y) ||
+            throw(DimensionMismatch("Differing number of observations "*
+                                    "in input and target. "))
+
     else # M <: Unsupervised
 
-        length(args) == 1 ||
-            error("Wrong number of arguments. " *
-                  "Use machine(model, X) for an unsupervised model.")
-        X = args[1]
+        if !(M <: Static)
 
-        input_scitype(model) <: Unknown ||
-            scitype(X) <: input_scitype(model) ||
-            @warn "The scitype of `X`, in `machine(model, X)` is "*
-        "incompatible with `model`:\n"*
-        "scitype(X) = $(scitype(X))\n"*
-        "input_scitype(model) = $(input_scitype(model)). "
-        
+            length(args) == 1 ||
+                error("Wrong number of arguments. " *
+                      "Use machine(model, X) for an unsupervised model.")
+            X = args[1]
+
+            input_scitype(model) <: Unknown ||
+                scitype(X) <: input_scitype(model) ||
+                @warn "The scitype of `X`, in `machine(model, X)` is "*
+            "incompatible with `model`:\n"*
+            "scitype(X) = $(scitype(X))\n"*
+            "input_scitype(model) = $(input_scitype(model)). "
+
+        end
+
     end
     return Machine(model, args...)
 end
 
+# to be depreciated:
 machine(model::Model, task::SupervisedTask) = machine(model, task.X, task.y)
 machine(model::Model, task::UnsupervisedTask) = machine(model, task.X)
 
@@ -165,7 +196,7 @@ function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
     if mach isa NodalMachine
         mach.upstream_state = upstream_state
-        mach.state = mach.state + 1
+         mach.state = mach.state + 1
     end
 
     return mach

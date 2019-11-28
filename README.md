@@ -126,6 +126,7 @@ Julia | ML         | What to do
 ⭒     | ⭒          | functionalities for natural language processing (NLP)
 ⭒⭒    | =          | decrease the overhead incurred by MLJ
 ⭒⭒    | =          | improving support for sparse data
+⭒⭒    | ⭒          | improve support for ensemble methods (boosting etc)
 ⭒⭒    | ⭒          | add parallelism and/or multithreading to MLJ (*there is an ongoing effort to interface with [Dagger.jl](https://github.com/JuliaParallel/Dagger.jl)*)
 ⭒     | ⭒⭒         | add  interface with probabilistic programming packages (*there is an ongoing effort to interface with [Soss.jl](https://github.com/cscherrer/Soss.jl)*)
 ⭒⭒    | ⭒⭒         | more sophisticated HP tuning (BO, Bandit, early stopping, ...) possibly as part of an external package(s), possibly integrating with Julia's optimisation and autodiff packages

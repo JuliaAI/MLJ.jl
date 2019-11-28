@@ -106,9 +106,14 @@ StratifiedCV
 
 To define your own resampling strategy, make relevant parameters of
 your strategy the fields of a new type `MyResamplingStrategy <:
-MLJ.ResamplingStrategy`, and implement
-`MLJ.train_test_pairs(my_strategy::MyResamplingStrategy, rows, X, y)`,
-a method which will take a vector of indices `rows` and return a
+MLJ.ResamplingStrategy`, and implement one of the following methods:
+
+```julia
+MLJ.train_test_pairs(my_strategy::MyResamplingStrategy, rows)
+MLJ.train_test_pairs(my_strategy::MyResamplingStrategy, rows, y)
+MLJ.train_test_pairs(my_strategy::MyResamplingStrategy, rows, X, y)
+```
+Each method takes a vector of indices `rows` and return a
 vector `[(t1, e1), (t2, e2), ... (tk, ek)]` of train/test pairs of row
 indices selected from `rows`. Here `X`, `y` are the input and target
 data (ignored in simple strategies, such as `Holdout` and `CV`).
@@ -135,7 +140,7 @@ function Holdout(; fraction_train::Float64=0.7,
     Holdout(fraction_train, shuffle, rng)
 end
 
-function MLJ.train_test_pairs(holdout::Holdout, rows, X, y)
+function MLJ.train_test_pairs(holdout::Holdout, rows)
     if holdout.rng isa Integer
         rng = MersenneTwister(holdout.rng)
     else

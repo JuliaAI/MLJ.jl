@@ -23,10 +23,10 @@ broadcast_mode(v) = mode.(v)
     k = KNNRegressor()
     u = UnivariateStandardizer()
     c = ConstantClassifier()
-        
+
     models = [f, h]
-    lin = MLJ.linear_learning_network(Xs, nothing, nothing, nothing,
-                                      models...) |> MLJ.tree 
+    lin = MLJ.linear_learning_network(Xs, nothing, nothing, nothing, nothing,
+                                      models...) |> MLJ.tree
     @test lin.operation == transform
     @test lin.model == h
     @test lin.arg1.operation == transform
@@ -34,9 +34,9 @@ broadcast_mode(v) = mode.(v)
     @test lin.arg1.arg1.source == Xs
     @test lin.arg1.train_arg1.source == Xs
     @test lin.train_arg1 == lin.arg1
-    
+
     models = [f, k]
-    lin = MLJ.linear_learning_network(Xs, ys, nothing, nothing,
+    lin = MLJ.linear_learning_network(Xs, ys, nothing, nothing, nothing,
                                       models...) |> MLJ.tree
     @test lin.operation == predict
     @test lin.model == k
@@ -46,19 +46,19 @@ broadcast_mode(v) = mode.(v)
     @test lin.arg1.train_arg1.source == Xs
     @test lin.train_arg1 == lin.arg1
     @test lin.train_arg2.source == ys
-    
+
     models = [m, t]
-    lin = MLJ.linear_learning_network(Xs, nothing, nothing, nothing,
+    lin = MLJ.linear_learning_network(Xs, nothing, nothing, nothing, nothing,
                                       models...) |> MLJ.tree
     @test lin.operation == t
     @test lin.model == nothing
-    @test lin.arg1.operation == m 
+    @test lin.arg1.operation == m
     @test lin.arg1.model == nothing
     @test lin.arg1.arg1.source == Xs
-    
+
     # with learned target transformation:
     models = [f, k]
-    lin = MLJ.linear_learning_network(Xs, ys, u, nothing,
+    lin = MLJ.linear_learning_network(Xs, ys, nothing, u, nothing, 
                                       models...) |> MLJ.tree
     @test lin.operation == inverse_transform
     @test lin.model == u
@@ -74,10 +74,10 @@ broadcast_mode(v) = mode.(v)
     @test lin.arg1.train_arg2.arg1.source == ys
     @test lin.arg1.train_arg2.train_arg1.source == ys
     @test lin.train_arg1.source == ys
-    
+
     # with static target transformation:
     models = [f, k]
-    lin = MLJ.linear_learning_network(Xs, ys, StaticTransformer(log),
+    lin = MLJ.linear_learning_network(Xs, ys, nothing, StaticTransformer(log),
                                       StaticTransformer(exp),
                                       models...) |> MLJ.tree
     @test lin.operation == transform
@@ -90,12 +90,12 @@ broadcast_mode(v) = mode.(v)
     @test lin.arg1.arg1.train_arg1.source == Xs
     @test lin.arg1.train_arg1 == lin.arg1.arg1
     @test lin.arg1.train_arg2.operation == transform
-    @test lin.arg1.train_arg2.model.f == log 
+    @test lin.arg1.train_arg2.model.f == log
     @test lin.arg1.train_arg2.arg1.source == ys
 
     # with supervised model not at end and static target transformation:
     models = [f, c, broadcast_mode]
-    lin = MLJ.linear_learning_network(Xs, ys, StaticTransformer(log),
+    lin = MLJ.linear_learning_network(Xs, ys, nothing, StaticTransformer(log),
                                       StaticTransformer(exp),
                                       models...) |> MLJ.tree
     @test lin.operation == transform
@@ -115,7 +115,7 @@ broadcast_mode(v) = mode.(v)
 
     # with supervised model not at end and with learned target transformation:
     models = [f, c, broadcast_mode]
-    lin = MLJ.linear_learning_network(Xs, ys, u, nothing,
+    lin = MLJ.linear_learning_network(Xs, ys, nothing, u, nothing,
                                       models...) |> MLJ.tree
     @test lin.operation == inverse_transform
     @test lin.model == u
@@ -133,14 +133,14 @@ broadcast_mode(v) = mode.(v)
     @test lin.arg1.arg1.train_arg2.arg1.source == ys
     @test lin.arg1.arg1.train_arg2.train_arg1.source == ys
     @test lin.train_arg1.source == ys
-    
+
     # build a linear network for training:
-    N = MLJ.linear_learning_network(Xs, ys, u, nothing, f, k)
+    N = MLJ.linear_learning_network(Xs, ys, nothing, u, nothing, f, k)
     fM = machine(f, Xs)
     Xt = transform(fM, Xs)
 
     # build the same network by hand:
-    uM = machine(u, ys)         
+    uM = machine(u, ys)
     yt = transform(uM, ys)
     kM = machine(k, Xt, yt)
     zhat = predict(kM, Xt)
@@ -152,9 +152,9 @@ broadcast_mode(v) = mode.(v)
     @test yhat ≈ N2()
     k.K = 3; f.features = [:x3,]
     fit!(N); fit!(N2)
-    @test !(yhat ≈ N()) 
+    @test !(yhat ≈ N())
     @test N() ≈ N2()
-    global hand_built = N(); 
+    global hand_built = N();
 
 end
 
@@ -196,6 +196,7 @@ out = MLJ.pipeline_preprocess(TestPipelines, ex)
 @test eval.(out[5]) == U
 @test eval.(out[6]) == nothing
 @test out[7] == :DeterministicNetwork
+@test out[8][:supports_weights] = true
 
 ex =  pipe(f, m, t, h, k, e, l)
 out = MLJ.pipeline_preprocess(TestPipelines, ex)
@@ -207,6 +208,7 @@ out = MLJ.pipeline_preprocess(TestPipelines, ex)
 @test eval.(out[5]).f == exp
 @test eval.(out[6]).f == log
 @test out[7] == :DeterministicNetwork
+@test out[8][:supports_weights] = true
 
 ex =  pipe(f, k)
 out = MLJ.pipeline_preprocess(TestPipelines, ex)
@@ -217,6 +219,7 @@ out = MLJ.pipeline_preprocess(TestPipelines, ex)
 @test eval.(out[5]) == nothing
 @test eval.(out[6]) == nothing
 @test out[7] == :DeterministicNetwork
+@test out[8][:supports_weights] = true
 
 ex =  pipe(f, c)
 out = MLJ.pipeline_preprocess(TestPipelines, ex, :(is_probabilistic=true))
@@ -227,6 +230,7 @@ out = MLJ.pipeline_preprocess(TestPipelines, ex, :(is_probabilistic=true))
 @test eval.(out[5]) == nothing
 @test eval.(out[6]) == nothing
 @test out[7] == :ProbabilisticNetwork
+@test out[8][:supports_weights] = true
 
 ex =  pipe(f, h)
 out = MLJ.pipeline_preprocess(TestPipelines, ex)
@@ -237,6 +241,7 @@ out = MLJ.pipeline_preprocess(TestPipelines, ex)
 @test eval.(out[5]) == nothing
 @test eval.(out[6]) == nothing
 @test out[7] == :UnsupervisedNetwork
+@test !haskey(out[8],:supports_weights)
 
 ex =  :(Pipe())
 @test_throws ArgumentError MLJ.pipeline_preprocess(TestPipelines, ex)
@@ -295,13 +300,21 @@ y = categorical(collect("ffmmfmf"))
 Xs = source(X)
 ys = source(y, kind=:target)
 p = @pipeline(Piper3(hot=OneHotEncoder(), cnst=ConstantClassifier(),
-                    broadcast_mode))
+                     broadcast_mode))
 mach = machine(p, X, y)
 fit!(mach)
 @test predict(mach) == fill('f', 7)
 
+# test pipelines with weights:
+w = map(y) do η
+    η == 'm' ? 100 : 1
+end
+mach = machine(p, X, y, w)
+fit!(mach)
+@test predict(mach) == fill('m', 7)
+
 # test a pipeline with static transformation of target:
-NN = 100 
+NN = 100
 X = (x1=rand(NN), x2=rand(NN), x3=categorical(rand("abc", NN)));
 y = 1000*abs.(2X.x1 - X.x2 + 0.05*rand(NN))
 # by hand:
@@ -342,22 +355,6 @@ p = @pipeline Pipe9(X -> coerce(X, :age=>Continuous),
                     target = UnivariateStandardizer())
 fit!(machine(p, X, height))
 
-# ex = :(Pipe8(X -> coerce(Dict(:age=>Continuous), X),
-#           hot = OneHotEncoder(),
-#           knn = KNNRegressor(K=3),
-#           target = UnivariateStandardizer()))
-
-# MLJ.pipeline_preprocess(Main, ex, missing)
-# eval.(lin[3])
-# eval(eval.(lin[4])[1])
-# eval(lin[5])
-# eval(lin[6])
-# lin[7]
-
-# MLJ.pipeline_(Main, ex, :(is_probabilistic=missing))
-# lin = fit!(machine(p, X, height))
-
 
 end
 true
-
