@@ -177,9 +177,9 @@ MLJBase.predict_median(model::SomeSupervisedModel, fitresult, Xnew) =
 Required, if the model is to be registered (findable by general users):
 
 ```julia
-MLJBase.load_path(::Type{<:SomeSupervisedModel})    = ""
-MLJBase.package_name(::Type{<:SomeSupervisedModel}) = "Unknown"
-MLJBase.package_uuid(::Type{<:SomeSupervisedModel}) = "Unknown"
+MLJBase.load_path(::Type{<:SomeSupervisedModel})    = "SomePkg.SomeModule.SomeSupervisedModel"
+MLJBase.package_name(::Type{<:SomeSupervisedModel}) = "SomePkg"
+MLJBase.package_uuid(::Type{<:SomeSupervisedModel}) = "the-uuid-of-the-pkg-found-in-Project.toml"
 ```
 
 ```julia
