@@ -416,11 +416,11 @@ using Plots
 plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)
 ````
 
-If the specified hyperparameter is the number of iterations in some
-iterative model (and that model has an appropriately overloaded
-`MLJBase.update` method) then training is not restarted from scratch
-for each increment of the parameter, ie the model is trained
-progressively.
+If using a `Holdout` `resampling` strategy, and the specified
+hyperparameter is the number of iterations in some iterative model
+(and that model has an appropriately overloaded `MLJBase.update`
+method) then training is not restarted from scratch for each increment
+of the parameter, ie the model is trained progressively.
 
 ````julia
 atom.lambda=1.0
