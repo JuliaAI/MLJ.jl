@@ -3,7 +3,7 @@ Base.show(stream::IO, t::Random.MersenneTwister) =
     print(stream, "MersenneTwister($(t.seed))")
 
 
-## WEIGHTED ENSEMBLES OF FITRESULTS
+## ENSEMBLES OF FITRESULTS
 
 # Atom is atomic model type, eg, DecisionTree
 # R will be the tightest type of the atom fit-results.
