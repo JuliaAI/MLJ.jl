@@ -1,6 +1,6 @@
 # shorter display of MersenneTwister:
 Base.show(stream::IO, t::Random.MersenneTwister) =
-    print(stream, "MersenneTwister($(t.seed))")
+    print(stream, "MersenneTwister($(t.seed)) @ $(t.idxF)")
 
 
 ## ENSEMBLES OF FITRESULTS
@@ -470,7 +470,7 @@ function fit(model::EitherEnsembleModel{Atom},
     n_train = round(Int, floor(model.bagging_fraction*n_patterns))
 
     progress_meter = Progress(n, dt=0.5, desc="Training ensemble: ",
-                              barglyphs=BarGlyphs("[=> ]"), barlen=50, color=:yellow)
+               barglyphs=BarGlyphs("[=> ]"), barlen=50, color=:yellow)
 
     if !isempty(out_of_bag_measure)
 
