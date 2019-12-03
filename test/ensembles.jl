@@ -17,6 +17,14 @@ using Distributions
 
 @load KNNRegressor
 
+## HELPER FUNCTIONS
+
+@test MLJ._reducer([1, 2], [3, ]) == [1, 2, 3]
+@test MLJ._reducer(([1, 2], [:x, :y]), ([3, 4, 5], [:z, :w, :a])) ==
+    ([1, 2, 3, 4, 5], [:x, :y, :z, :w, :a])
+
+pair_vcat(p, q) = (vcat(p[1], q[1]), vcat(p[2], q[2]))
+
 
 ## WRAPPED ENSEMBLES OF FITRESULTS
 

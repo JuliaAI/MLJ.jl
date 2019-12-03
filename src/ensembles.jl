@@ -3,7 +3,7 @@ Base.show(stream::IO, t::Random.MersenneTwister) =
     print(stream, "MersenneTwister($(t.seed))")
 
 
-## WEIGHTED ENSEMBLES OF FITRESULTS
+## ENSEMBLES OF FITRESULTS
 
 # Atom is atomic model type, eg, DecisionTree
 # R will be the tightest type of the atom fit-results.
@@ -182,7 +182,12 @@ function get_ensemble(atom::Supervised, verbosity, n, n_patterns,
 
 end
 
-pair_vcat(p, q) = (vcat(p[1], q[1]), vcat(p[2], q[2]))
+
+# for combining vectors:
+_reducer(p, q) = vcat(p, q)
+# for combining 2-tuples of vectors:
+_reducer(p::Tuple, q::Tuple) = (vcat(p[1], q[1]), vcat(p[2], q[2]))
+
 
 
 ## ENSEMBLE MODEL FOR DETERMINISTIC MODELS
@@ -398,7 +403,7 @@ function _fit(res::CPUProcesses, func, verbosity, stuff)
     end
     chunk_size = div(n, nworkers())
     left_over = mod(n, nworkers())
-    return @distributed (pair_vcat) for i = 1:nworkers()
+    return @distributed (_reducer) for i = 1:nworkers()
         if i != nworkers()
             func(atom, 0, chunk_size, n_patterns, n_train,
                  rng, progress_meter, args...)
@@ -427,7 +432,7 @@ end
                              rng, progress_meter, args...)
             end
         end
-        return reduce(pair_vcat, resvec)
+        return reduce(_reducer, resvec)
     end
 end
 
