@@ -217,8 +217,12 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M},
     parameter_names = [string(r.field) for r in ranges]
     scales = [scale(r) for r in ranges]
 
-    # the mutating model:
+    # We mutate a clone of the provided model but with any :rng field
+    # passed to the clone:
     clone = deepcopy(tuned_model.model)
+    if isdefined(clone, :rng)
+        clone.rng = tuned_model.model.rng
+    end
 
     resampler = Resampler(model=clone,
                           resampling=tuned_model.resampling,
@@ -399,21 +403,24 @@ of the single hyperparameter specified in `range`. The tuple `curve`
 has the following keys: `:parameter_name`, `:parameter_scale`,
 `:parameter_values`, `:measurements`.
 
-For `n` not equal to 1, multiple curves are computed, and the value of
+For `n > 1`, multiple curves are computed, and the value of
 `curve.measurements` is an array, one column for each run. This is
 useful in the case of models with indeterminate fit-results, such as a
 random forest.
 
 ````julia
-using CSV
-X, y = datanow()
-atom = RidgeRegressor()
-ensemble = EnsembleModel(atom=atom)
+X, y = @load_boston;
+atom = @load RidgeRegressor pkg=MultivariateStats
+ensemble = EnsembleModel(atom=atom, n=1000)
 mach = machine(ensemble, X, y)
-r_lambda = range(ensemble, :(atom.lambda), lower=0.1, upper=100, scale=:log10)
-curve = MLJ.learning_curve!(mach; range=r_lambda)
+r_lambda = range(ensemble, :(atom.lambda), lower=10, upper=500, scale=:log10)
+curve = MLJ.learning_curve!(mach; range=r_lambda, resampling=CV(), measure=mav)
 using Plots
-plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)
+plot(curve.parameter_values,
+     curve.measurements,
+     xlab=curve.parameter_name,
+     xscale=curve.parameter_scale,
+     ylab = "CV estimate of RMS error")
 ````
 
 If using a `Holdout` `resampling` strategy, and the specified
@@ -423,10 +430,13 @@ method) then training is not restarted from scratch for each increment
 of the parameter, ie the model is trained progressively.
 
 ````julia
-atom.lambda=1.0
-r_n = range(ensemble, :n, lower=2, upper=150)
-curves = MLJ.learning_curve!(mach; range=r_n, verbosity=3, n=5)
-plot(curves.parameter_values, curves.measurements, xlab=curves.parameter_name)
+atom.lambda=200
+r_n = range(ensemble, :n, lower=1, upper=250)
+curves = MLJ.learning_curve!(mach; range=r_n, verbosity=0, n=5)
+plot(curves.parameter_values, 
+     curves.measurements, 
+     xlab=curves.parameter_name,
+     ylab="Holdout estimate of RMS error")
 ````
 
 """
@@ -441,6 +451,7 @@ function learning_curve!(mach::Machine{<:Supervised};
                              tuning=Grid(resolution=resolution),
                              resampling=resampling, measure=measure,
                              full_report=true, train_best=false)
+
     tuned = machine(tuned_model, mach.args...)
 
     measurements = reduce(hcat, [(fit!(tuned, verbosity=verbosity, force=true);
