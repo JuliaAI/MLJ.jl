@@ -6,18 +6,42 @@ using MLJ
 using MLJBase
 import MLJModels
 import StatsBase
+using Distributed
+import ComputationalResources: CPU1, CPUProcesses, CPUThreads
 import Random.seed!
 seed!(1234)
 
-@everywhere include("foobarmodel.jl")
+include("foobarmodel.jl")
+@everywhere workers() include("foobarmodel.jl")
 
-macro testset_parallel(name::String, var, ex)
-    esc(quote
-        $var = false
+mutable struct BreakingTestSet <: Test.AbstractTestSet
+    results::Vector
+    BreakingTestSet(desc) = new([])
+end
+function Test.record(ts::BreakingTestSet, t::Test.Result)
+    if t isa Test.Error
+        t = Test.Broken(t.test_type, t.orig_expr)
+    end
+    push!(ts.results, t)
+    return t
+end
+Test.finish(ts::BreakingTestSet) = ts.results
+macro testset_accelerated(name::String, var, ex)
+    final_ex = quote
+        $var = CPU1()
         @testset $name $ex
-        $var = true
-        @testset $("Parallel: "*name) $ex
-    end)
+    end
+    resources = Any[CPUProcesses()]
+    @static if VERSION >= v"1.3.0-DEV.573"
+        push!(resources, CPUThreads())
+    end
+    for res in resources
+        push!(final_ex.args, quote
+            $var = $res
+            @testset #=BreakingTestSet=# $(name*" (accelerated with $(repr(typeof(res)))") $ex
+        end)
+    end
+    return final_ex
 end
 
 @test CV(nfolds=6) == CV(nfolds=6)
@@ -49,7 +73,7 @@ end
                             predict, override)
 end
 
-@testset_parallel "folds specified" dopar begin
+@testset_accelerated "folds specified" accel begin
     x1 = ones(10)
     x2 = ones(10)
     X = (x1=x1, x2=x2)
@@ -70,9 +94,9 @@ end
 
     # check detection of incompatible measure (cross_entropy):
     @test_throws ArgumentError evaluate!(mach, resampling=resampling,
-                                         measure=[cross_entropy, rmslp1], parallel=dopar)
+                                         measure=[cross_entropy, rmslp1], acceleration=accel)
     result = evaluate!(mach, resampling=resampling,
-                       measure=[my_rms, my_mav, rmslp1], parallel=dopar)
+                       measure=[my_rms, my_mav, rmslp1], acceleration=accel)
     v = [1/2, 3/4, 1/2, 3/4, 1/2]
     @test result.per_fold[1] ≈ v
     @test result.per_fold[2] ≈ v
@@ -84,7 +108,7 @@ end
     @test result.measurement[2] ≈ mean(v)
 end
 
-@testset_parallel "holdout" dopar begin
+@testset_accelerated "holdout" accel begin
     x1 = ones(4)
     x2 = ones(4)
     X = (x1=x1, x2=x2)
@@ -95,8 +119,8 @@ end
     model = MLJModels.DeterministicConstantRegressor()
     mach = machine(model, X, y)
     result = evaluate!(mach, resampling=holdout,
-                       measure=[rms, rmslp1], parallel=dopar)
-    result = evaluate!(mach, verbosity=0, resampling=holdout, parallel=dopar)
+                       measure=[rms, rmslp1], acceleration=accel)
+    result = evaluate!(mach, verbosity=0, resampling=holdout, acceleration=accel)
     result.measurement[1] ≈ 2/3
 
     # test direct evaluation of a model + data:
@@ -108,15 +132,15 @@ end
     y = rand(100)
     mach = machine(model, X, y)
     evaluate!(mach, verbosity=0,
-              resampling=Holdout(shuffle=true, rng=123), parallel=dopar)
+              resampling=Holdout(shuffle=true, rng=123), acceleration=accel)
     e1 = evaluate!(mach, verbosity=0,
                    resampling=Holdout(shuffle=true),
-                   parallel=dopar).measurement[1]
+                   acceleration=accel).measurement[1]
     @test e1 != evaluate!(mach, verbosity=0,
-                          resampling=Holdout(), parallel=dopar).measurement[1]
+                          resampling=Holdout(), acceleration=accel).measurement[1]
 end
 
-@testset_parallel "cv" dopar begin
+@testset_accelerated "cv" accel begin
     x1 = ones(10)
     x2 = ones(10)
     X = (x1=x1, x2=x2)
@@ -126,10 +150,12 @@ end
     cv=CV(nfolds=5)
     model = MLJModels.DeterministicConstantRegressor()
     mach = machine(model, X, y)
-    result = evaluate!(mach, resampling=cv, measure=[rms, rmslp1], parallel=dopar)
+    result = evaluate!(mach, resampling=cv, measure=[rms, rmslp1],
+                       acceleration=accel)
     @test result.per_fold[1] ≈ [1/2, 3/4, 1/2, 3/4, 1/2]
 
-    shuffled =  evaluate!(mach, resampling=CV(shuffle=true), parallel=dopar) # using rms default
+    shuffled = evaluate!(mach, resampling=CV(shuffle=true),
+                          acceleration=accel) # using rms default
     @test shuffled.measurement[1] != result.measurement[1]
 end
 
@@ -168,7 +194,7 @@ end
 
 end
 
-@testset_parallel "sample weights in evaluation" dopar begin
+@testset_accelerated "sample weights in evaluation" accel begin
 
     # cv:
     x1 = ones(4)
@@ -180,11 +206,11 @@ end
     model = MLJModels.DeterministicConstantRegressor()
     mach = machine(model, X, y)
     e = evaluate!(mach, resampling=cv, measure=l1,
-                  weights=w, verbosity=0, parallel=dopar).measurement[1]
+                  weights=w, verbosity=0, acceleration=accel).measurement[1]
     @test e ≈ (1/3 + 13/14)/2
 end
 
-@testset_parallel "resampler as machine" dopar begin
+@testset_accelerated "resampler as machine" accel begin
     N = 50
     X = (x1=rand(N), x2=rand(N), x3=rand(N))
     y = X.x1 -2X.x2 + 0.05*rand(N)
@@ -197,7 +223,8 @@ end
     e1=evaluate(resampling_machine).measurement[1]
     mach = machine(ridge_model, X, y)
     @test e1 ≈  evaluate!(mach, resampling=holdout,
-                          measure=mav, verbosity=0, parallel=dopar).measurement[1]
+                          measure=mav, verbosity=0,
+                          acceleration=accel).measurement[1]
     ridge_model.lambda=1.0
     fit!(resampling_machine, verbosity=2)
     e2=evaluate(resampling_machine).measurement[1]
