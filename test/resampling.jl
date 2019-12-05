@@ -14,19 +14,13 @@ seed!(1234)
 include("foobarmodel.jl")
 @everywhere workers() include("foobarmodel.jl")
 
-mutable struct BreakingTestSet <: Test.AbstractTestSet
-    results::Vector
-    BreakingTestSet(desc) = new([])
-end
-function Test.record(ts::BreakingTestSet, t::Test.Result)
-    if t isa Test.Error
-        t = Test.Broken(t.test_type, t.orig_expr)
-    end
-    push!(ts.results, t)
-    return t
-end
-Test.finish(ts::BreakingTestSet) = ts.results
 macro testset_accelerated(name::String, var, ex)
+    testset_accelerated(name, var, ex)
+end
+macro testset_accelerated(name::String, var, opts::Expr, ex)
+    testset_accelerated(name, var, ex; eval(opts)...)
+end
+function testset_accelerated(name::String, var, ex; exclude=[])
     final_ex = quote
         $var = CPU1()
         @testset $name $ex
@@ -36,10 +30,19 @@ macro testset_accelerated(name::String, var, ex)
         push!(resources, CPUThreads())
     end
     for res in resources
-        push!(final_ex.args, quote
-            $var = $res
-            @testset #=BreakingTestSet=# $(name*" (accelerated with $(repr(typeof(res)))") $ex
-        end)
+        if any(x->typeof(res)<:x, exclude)
+            push!(final_ex.args, quote
+                $var = $res
+                @testset $(name*" (accelerated with $(typeof(res).name))") begin
+                    @test_broken false
+                end
+            end)
+        else
+            push!(final_ex.args, quote
+                $var = $res
+                @testset $(name*" (accelerated with $(typeof(res).name))") $ex
+            end)
+        end
     end
     return final_ex
 end
@@ -73,7 +76,7 @@ end
                             predict, override)
 end
 
-@testset_accelerated "folds specified" accel begin
+@testset_accelerated "folds specified" accel (exclude=[CPUProcesses],) begin
     x1 = ones(10)
     x2 = ones(10)
     X = (x1=x1, x2=x2)
@@ -210,7 +213,7 @@ end
     @test e ≈ (1/3 + 13/14)/2
 end
 
-@testset_accelerated "resampler as machine" accel begin
+@testset_accelerated "resampler as machine" accel (exclude=[CPUProcesses],) begin
     N = 50
     X = (x1=rand(N), x2=rand(N), x3=rand(N))
     y = X.x1 -2X.x2 + 0.05*rand(N)
@@ -242,7 +245,7 @@ end
 
 struct DummyResamplingStrategy <: MLJ.ResamplingStrategy end
 
-@testset "custom strategy using resampling depending on X, y" begin
+@testset_accelerated "custom strategy using resampling depending on X, y" accel begin
     function MLJ.train_test_pairs(resampling::DummyResamplingStrategy,
                               rows, X, y)
         train = filter(rows) do j
@@ -260,11 +263,12 @@ struct DummyResamplingStrategy <: MLJ.ResamplingStrategy end
     e = evaluate(ConstantClassifier(), X, y,
                  measure=misclassification_rate,
                  resampling=DummyResamplingStrategy(),
-                 operation=predict_mode)
+                 operation=predict_mode,
+                 acceleration=accel)
     @test e.measurement[1] ≈ 1.0
 end
 
-@testset "sample weights in training  and evaluation" begin
+@testset "sample weights in training and evaluation" begin
     yraw = ["Perry", "Antonia", "Perry", "Antonia", "Skater"]
     X = (x=rand(5),)
     y = categorical(yraw)
@@ -279,12 +283,12 @@ end
     # with weights in training and evaluation:
     mach = machine(ConstantClassifier(), X, y, w)
     e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
-              operation=predict_mode, measure=misclassification_rate)
+                  operation=predict_mode, measure=misclassification_rate)
     @test e.measurement[1] ≈ 1/3
 
     # with weights in training but overriden in evaluation:
     e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
-              operation=predict_mode, measure=misclassification_rate,
+                  operation=predict_mode, measure=misclassification_rate,
                   weights = fill(1, 5))
     @test e.measurement[1] ≈ 1/2
 
