@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Evaluating Model Performance · MLJ</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>MLJ</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Getting Started</a></li><li><a class="toctext" href="../common_mlj_workflows/">Common MLJ Workflows</a></li><li><a class="toctext" href="../model_search/">Model Search</a></li><li><a class="toctext" href="../machines/">Machines</a></li><li class="current"><a class="toctext" href>Evaluating Model Performance</a><ul class="internal"></ul></li><li><a class="toctext" href="../performance_measures/">Performance Measures</a></li><li><a class="toctext" href="../tuning_models/">Tuning Models</a></li><li><a class="toctext" href="../learning_curves/">Learning Curves</a></li><li><a class="toctext" href="../built_in_transformers/">Built-in Transformers</a></li><li><a class="toctext" href="../composing_models/">Composing Models</a></li><li><a class="toctext" href="../homogeneous_ensembles/">Homogeneous Ensembles</a></li><li><a class="toctext" href="../simple_user_defined_models/">Simple User Defined Models</a></li><li><a class="toctext" href="../adding_models_for_general_use/">Adding Models for General Use</a></li><li><a class="toctext" href="../benchmarking/">Benchmarking</a></li><li><a class="toctext" href="../working_with_tasks/">Working with Tasks</a></li><li><a class="toctext" href="../internals/">Internals</a></li><li><a class="toctext" href="../glossary/">Glossary</a></li><li><a class="toctext" href="../api/">API</a></li><li><a class="toctext" href="../mlj_cheatsheet/">MLJ Cheatsheet</a></li><li><a class="toctext" href="../NEWS/">MLJ News</a></li><li><a class="toctext" href="../frequently_asked_questions/">FAQ</a></li><li><a class="toctext" href="../julia_blogpost/">Julia BlogPost</a></li><li><a class="toctext" href="../acceleration_and_parallelism/">Acceleration and Parallelism</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Evaluating Model Performance</a></li></ul><a class="edit-page" href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/evaluating_model_performance.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Evaluating Model Performance</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Evaluating-Model-Performance-1" href="#Evaluating-Model-Performance-1">Evaluating Model Performance</a></h1><p>MLJ allows quick evaluation of a supervised model&#39;s performance against a battery of selected losses or scores. For more on available performance measures, see <a href="../performance_measures/">Performance Measures</a>.</p><p>In addition to hold-out and cross-validation, the user can specify their own list of train/test pairs of row indices for resampling, or define their own re-usable resampling strategies.</p><p>For simultaneously evaluating <em>multiple</em> models and/or data sets, see <a href="../benchmarking/">Benchmarking</a>.</p><h3><a class="nav-anchor" id="Evaluating-against-a-single-measure-1" href="#Evaluating-against-a-single-measure-1">Evaluating against a single measure</a></h3><div></div><pre><code class="language-julia-repl">julia&gt; using MLJ
+
+julia&gt; X = (a=rand(12), b=rand(12), c=rand(12));
+
+julia&gt; y = X.a + 2X.b + 0.05*rand(12);
+
+julia&gt; model = @load RidgeRegressor pkg=MultivariateStats
+MLJModels.MultivariateStats_.RidgeRegressor(lambda = 1.0,) @ 1…03
+
+julia&gt; cv=CV(nfolds=3)
+CV(nfolds = 3,
+   shuffle = false,
+   rng = MersenneTwister(UInt32[0xe50df073, 0x6e0aaf16, 0xdc3b507e, 0xf0b65af4]) @ 10,) @ 2…74
+
+julia&gt; evaluate(model, X, y, resampling=cv, measure=l2, verbosity=0)
+(measure = MLJBase.L2[l2],
+ measurement = [0.2444562707557786],
+ per_fold = Array{Float64,1}[[0.21693342591735185, 0.18891965298458932, 0.32751573336539475]],
+ per_observation = Array{Array{Float64,1},1}[[[0.3136705056977176, 0.023424028808997518, 0.1555417693091496, 0.3750973998535427], [0.0012922550632830658, 0.00023304430910422167, 0.6322493355168817, 0.12190397704908826], [0.026313654861524927, 0.7795503032764438, 0.1704123173970394, 0.3337866579265707]]],)</code></pre><p>Alternatively, instead of applying <code>evaluate</code> to a model + data, one may call <code>evaluate!</code> on an existing machine wrapping the model in data:</p><pre><code class="language-julia-repl">julia&gt; mach = machine(model, X, y)
+Machine{RidgeRegressor} @ 6…76
+
+julia&gt; evaluate!(mach, resampling=cv, measure=l2, verbosity=0)
+(measure = MLJBase.L2[l2],
+ measurement = [0.2444562707557786],
+ per_fold = Array{Float64,1}[[0.21693342591735185, 0.18891965298458932, 0.32751573336539475]],
+ per_observation = Array{Array{Float64,1},1}[[[0.3136705056977176, 0.023424028808997518, 0.1555417693091496, 0.3750973998535427], [0.0012922550632830658, 0.00023304430910422167, 0.6322493355168817, 0.12190397704908826], [0.026313654861524927, 0.7795503032764438, 0.1704123173970394, 0.3337866579265707]]],)</code></pre><p>(The latter call is a mutating call as the learned parameters stored in the machine potentially change. )</p><h3><a class="nav-anchor" id="Multiple-measures-1" href="#Multiple-measures-1">Multiple measures</a></h3><pre><code class="language-julia-repl">julia&gt; evaluate!(mach,
+                 resampling=cv,
+                 measure=[l1, rms, rmslp1], verbosity=0)
+(measure = MLJBase.Measure[l1, rms, rmslp1],
+ measurement = [0.4125952887763047, 0.49442519227460346, 0.19419504437835647],
+ per_fold = Array{Float64,1}[[0.42998796306531323, 0.2988755794073437, 0.5089223238562572], [0.4657611253822627, 0.4346488847156856, 0.5722899032530582], [0.18913118943225135, 0.21113530003350806, 0.18107021855357078]],
+ per_observation = Union{Missing, Array{Array{Float64,1},1}}[Array{Float64,1}[[0.5600629479779193, 0.15304910587454446, 0.3943878412288462, 0.6124519571799429], [0.03594794936130663, 0.01526578884644425, 0.7951410790022622, 0.3491475004193618], [0.1622148416807936, 0.8829214592909405, 0.41281026803731447, 0.5777427264159807]], missing, missing],)</code></pre><h3><a class="nav-anchor" id="Custom-measures-and-weighted-measures-1" href="#Custom-measures-and-weighted-measures-1">Custom measures and weighted measures</a></h3><pre><code class="language-julia-repl">julia&gt; my_loss(yhat, y) = maximum((yhat - y).^2);
+
+julia&gt; my_per_observation_loss(yhat, y) = abs.(yhat - y);
+
+julia&gt; MLJ.reports_each_observation(::typeof(my_per_observation_loss)) = true;
+
+julia&gt; my_weighted_score(yhat, y) = 1/mean(abs.(yhat - y));
+
+julia&gt; my_weighted_score(yhat, y, w) = 1/mean(abs.((yhat - y).^w));
+
+julia&gt; MLJ.supports_weights(::typeof(my_weighted_score)) = true;
+
+julia&gt; MLJ.orientation(::typeof(my_weighted_score)) = :score;
+
+julia&gt; holdout = Holdout(fraction_train=0.8)
+Holdout(fraction_train = 0.8,
+        shuffle = false,
+        rng = MersenneTwister(UInt32[0xe50df073, 0x6e0aaf16, 0xdc3b507e, 0xf0b65af4]) @ 10,) @ 1…17
+
+julia&gt; weights = [1, 1, 2, 1, 1, 2, 3, 1, 1, 2, 3, 1];
+
+julia&gt; evaluate!(mach,
+                 resampling=CV(nfolds=3),
+                 measure=[my_loss, my_per_observation_loss, my_weighted_score, l1],
+                 weights=weights, verbosity=0)
+┌ Warning: Sample weights ignored in evaluations of the following measures, as unsupported: 
+│ my_loss, my_per_observation_loss 
+└ @ MLJ ~/build/alan-turing-institute/MLJ.jl/src/resampling.jl:420
+(measure = Any[Main.ex-evaluation_of_supervised_models.my_loss, Main.ex-evaluation_of_supervised_models.my_per_observation_loss, Main.ex-evaluation_of_supervised_models.my_weighted_score, l1],
+ measurement = [0.5956323462156227, 0.4125952887763047, 3.240285730346345, 0.45263605362652765],
+ per_fold = Array{Float64,1}[[0.3750973998535427, 0.6322493355168817, 0.7795503032764438], [0.42998796306531323, 0.2988755794073437, 0.5089223238562572], [2.700684889014182, 4.5042208961793255, 2.515951405845526], [0.42286793869801986, 0.4001500377829062, 0.5348901843986569]],
+ per_observation = Union{Missing, Array{Array{Float64,1},1}}[missing, Array{Float64,1}[[0.5600629479779193, 0.15304910587454446, 0.3943878412288462, 0.6124519571799429], [0.03594794936130663, 0.01526578884644425, 0.7951410790022622, 0.3491475004193618], [0.1622148416807936, 0.8829214592909405, 0.41281026803731447, 0.5777427264159807]], missing, Array{Float64,1}[[0.4480503583823355, 0.12243928469963557, 0.6310205459661539, 0.48996156574395433], [0.020541685349318075, 0.017446615824507714, 1.3630989925753065, 0.19951285738249247], [0.09269419524616776, 1.0090530963325033, 0.7076747452068248, 0.3301387008091318]]],)</code></pre><h3><a class="nav-anchor" id="User-specified-train/test-sets-1" href="#User-specified-train/test-sets-1">User-specified train/test sets</a></h3><p>Users can either provide their own list of train/test pairs of row indices for resampling, as in this example:</p><pre><code class="language-julia-repl">julia&gt; fold1 = 1:6; fold2 = 7:12;
+
+julia&gt; evaluate!(mach,
+                 resampling = [(fold1, fold2), (fold2, fold1)],
+                 measure=[l1, l2], verbosity=0)
+(measure = MLJBase.Measure[l1, l2],
+ measurement = [0.4601035617737052, 0.28168964585552253],
+ per_fold = Array{Float64,1}[[0.5593359925711393, 0.3608711309762711], [0.4008128320748427, 0.1625664596362024]],
+ per_observation = Array{Array{Float64,1},1}[[[0.9401607124028213, 0.3775786543459212, 0.3490555397335724, 0.958880660550016, 0.17752857484009854, 0.5528118135544067], [0.5508337299065111, 0.11924870534709386, 0.42041058348125615, 0.6110347030883778, 0.24032974466196744, 0.22336931937242022]], [[0.8839021651457805, 0.14256564021767662, 0.12183976981869554, 0.919452121176835, 0.031516394884756466, 0.3056009012053121], [0.3034177980027193, 0.014220253726958013, 0.17674505870305024, 0.373363408378302, 0.05775838616928647, 0.04989385283689826]]],)</code></pre><p>Or define their own re-usable <code>ResamplingStrategy</code> objects, - see <a href="#Custom-resampling-strategies-1">Custom resampling strategies</a> below.</p><h3><a class="nav-anchor" id="Built-in-resampling-strategies-1" href="#Built-in-resampling-strategies-1">Built-in resampling strategies</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJ.Holdout" href="#MLJ.Holdout"><code>MLJ.Holdout</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">holdout = Holdout(; fraction_train=0.7,
+                     shuffle=false,
+                     rng=Random.GLOBAL_RNG)</code></pre><p>Holdout resampling strategy, for use in <code>evaluate!</code>, <code>evaluate</code> and in tuning.</p><pre><code class="language-none">train_test_pairs(holdout, rows)</code></pre><p>Returns the pair <code>[(train, test)]</code>, where <code>train</code> and <code>test</code> are vectors such that <code>rows=vcat(train, test)</code> and <code>length(train)/length(test) ≈ fraction_train</code>.</p><p>If <code>rng</code> is an integer, then <code>MersenneTwister(rng)</code> is the random number generator used for shuffling rows. Otherwise some <code>AbstractRNG</code> object is expected.</p></div></div><a class="source-link" target="_blank" href="https://github.com/alan-turing-institute/MLJ.jl/blob/91ddf3650f4fe84ac466d633d0fad741d8543b9f/src/resampling.jl#L20-L37">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJ.CV" href="#MLJ.CV"><code>MLJ.CV</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">cv = CV(; nfolds=6,  shuffle=false, rng=Random.GLOBAL_RNG)</code></pre><p>Cross-validation resampling strategy, for use in <code>evaluate!</code>, <code>evaluate</code> and tuning.</p><pre><code class="language-none">train_test_pairs(cv, rows)</code></pre><p>Returns an <code>nfolds</code>-length iterator of <code>(train, test)</code> pairs of vectors (row indices), where each <code>train</code> and <code>test</code> is a sub-vector of <code>rows</code>. The <code>test</code> vectors are mutually exclusive and exhaust <code>rows</code>. Each <code>train</code> vector is the complement of the corresponding <code>test</code> vector. With no shuffling, the order of <code>rows</code> is preserved, in the sense that <code>rows</code> coincides precisely with the concatenation of the <code>test</code> vectors, in the order they are generated. All but the last <code>test</code> vector have equal length.</p><p>Declaring <code>shuffle=true</code> results in <code>rows</code> being shuffled first. If <code>rng</code> is an integer, then <code>MersenneTwister(rng)</code> is the random number generator used for shuffling <code>rows</code>. Otherwise some <code>AbstractRNG</code> object is expected.</p></div></div><a class="source-link" target="_blank" href="https://github.com/alan-turing-institute/MLJ.jl/blob/91ddf3650f4fe84ac466d633d0fad741d8543b9f/src/resampling.jl#L70-L92">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJ.StratifiedCV" href="#MLJ.StratifiedCV"><code>MLJ.StratifiedCV</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">stratified_cv = StratifiedCV(; nfolds=6,  
+                               shuffle=false, 
+                               rng=Random.GLOBAL_RNG)</code></pre><p>Stratified cross-validation resampling strategy, for use in <code>evaluate!</code>, <code>evaluate</code> and in tuning. Applies only to classification problems (<code>OrderedFactor</code> or <code>Multiclass</code> targets).</p><pre><code class="language-none">train_test_pairs(stratified_cv, rows, y)</code></pre><p>Returns an <code>nfolds</code>-length iterator of <code>(train, test)</code> pairs of vectors (row indices) where each <code>train</code> and <code>test</code> is a sub-vector of <code>rows</code>. The <code>test</code> vectors are mutually exclusive and exhaust <code>rows</code>. Each <code>train</code> vector is the complement of the corresponding <code>test</code> vector. </p><p>Unlike regular cross-validation, the distribution of the levels of the target <code>y</code> corresponding to each <code>train</code> and <code>test</code> is constrained, as far as possible, to replicate that of <code>y[rows]</code> as a whole.</p><p>Specifically, the data is split into a number of groups on which <code>y</code> is constant, and each individual group is resampled according to the ordinary cross-validation strategy <code>CV(nfolds=nfolds)</code>. To obtain the final <code>(train, test)</code> pairs of row indices, the per-group pairs are collated in such a way that each collated <code>train</code> and <code>test</code> respects the original order of <code>rows</code> (after shuffling, if <code>shuffle=true</code>).</p><p>If <code>rng</code> is an integer, then <code>MersenneTwister(rng)</code> is the random number generator used for shuffling rows. Otherwise some <code>AbstractRNG</code> object is expected.</p></div></div><a class="source-link" target="_blank" href="https://github.com/alan-turing-institute/MLJ.jl/blob/91ddf3650f4fe84ac466d633d0fad741d8543b9f/src/resampling.jl#L142-L174">source</a></section><h3><a class="nav-anchor" id="Custom-resampling-strategies-1" href="#Custom-resampling-strategies-1">Custom resampling strategies</a></h3><p>To define your own resampling strategy, make relevant parameters of your strategy the fields of a new type <code>MyResamplingStrategy &lt;: MLJ.ResamplingStrategy</code>, and implement one of the following methods:</p><pre><code class="language-julia">MLJ.train_test_pairs(my_strategy::MyResamplingStrategy, rows)
+MLJ.train_test_pairs(my_strategy::MyResamplingStrategy, rows, y)
+MLJ.train_test_pairs(my_strategy::MyResamplingStrategy, rows, X, y)</code></pre><p>Each method takes a vector of indices <code>rows</code> and return a vector <code>[(t1, e1), (t2, e2), ... (tk, ek)]</code> of train/test pairs of row indices selected from <code>rows</code>. Here <code>X</code>, <code>y</code> are the input and target data (ignored in simple strategies, such as <code>Holdout</code> and <code>CV</code>).</p><p>Here is the code for the <code>Holdout</code> strategy as an example:</p><pre><code class="language-julia">struct Holdout &lt;: MLJ.ResamplingStrategy
+    fraction_train::Float64
+    shuffle::Bool
+    rng::Union{Int,AbstractRNG}
+	
+    function Holdout(fraction_train, shuffle, rng)
+        0 &lt; fraction_train &lt; 1 || 
+		error(&quot;`fraction_train` must be between 0 and 1.&quot;)
+        return new(fraction_train, shuffle, rng)
+    end
+end
+
+# Keyword Constructor
+function Holdout(; fraction_train::Float64=0.7,
+                   shuffle::Bool=false,
+                   rng::Union{Int,AbstractRNG}=Random.GLOBAL_RNG)
+    Holdout(fraction_train, shuffle, rng)
+end
+
+function MLJ.train_test_pairs(holdout::Holdout, rows)
+    if holdout.rng isa Integer
+        rng = MersenneTwister(holdout.rng)
+    else
+        rng = holdout.rng
+    end
+    train, evalu = partition(rows, holdout.fraction_train,
+                             shuffle=holdout.shuffle, rng=rng)
+    return [(train, evalu),]
+end</code></pre><h3><a class="nav-anchor" id="API-1" href="#API-1">API</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJ.evaluate!" href="#MLJ.evaluate!"><code>MLJ.evaluate!</code></a> — <span class="docstring-category">Function</span>.</div><div><div><pre><code class="language-julia">evaluate!(mach,
+          resampling=CV(),
+          measure=nothing,
+          weights=nothing,
+          operation=predict,
+          acceleration=DEFAULT_RESOURCE[],
+          force=false,
+          verbosity=1)</code></pre><p>Estimate the performance of a machine <code>mach</code> wrapping a supervised model in data, using the specified <code>resampling</code> strategy (defaulting to 6-fold cross-validation) and <code>measure</code>, which can be a single measure or vector.</p><p>Do <code>subtypes(MLJ.ResamplingStrategy)</code> to obtain a list of available resampling strategies. If <code>resampling</code> is not an object of type <code>MLJ.ResamplingStrategy</code>, then a vector of pairs (of the form <code>(train_rows, test_rows)</code> is expected. For example, setting</p><pre><code class="language-none">resampling = [(1:100), (101:200)),
+               (101:200), (1:100)]</code></pre><p>gives two-fold cross-validation using the first 200 rows of data.</p><p>If <code>resampling isa MLJ.ResamplingStrategy</code> then one may optionally restrict the data used in evaluation by specifying <code>rows</code>.</p><p>An optional <code>weights</code> vector may be passed for measures that support sample weights (<code>MLJ.supports_weights(measure) == true</code>), which is ignored by those that don&#39;t. </p><p><em>Important:</em> If <code>mach</code> already wraps sample weights <code>w</code> (as in <code>mach = machine(model, X, y, w)</code>) then these weights, which are used for <em>training</em>, are automatically passed to the measures for evaluation. However, for evaluation purposes, any <code>weights</code> specified as a keyword argument will take precedence over <code>w</code>.</p><p>User-defined measures are supported; see the manual for details.</p><p>If no measure is specified, then <code>default_measure(mach.model)</code> is used, unless this default is <code>nothing</code> and an error is thrown.</p><p>The <code>acceleration</code> keyword argument is used to specify the compute resource (a subtype of <code>ComputationalResources.AbstractResource</code>) that will be used to accelerate/parallelize the resampling operation.</p><p>Although evaluate! is mutating, <code>mach.model</code> and <code>mach.args</code> are untouched.</p></div></div><a class="source-link" target="_blank" href="https://github.com/alan-turing-institute/MLJ.jl/blob/91ddf3650f4fe84ac466d633d0fad741d8543b9f/src/resampling.jl#L341-L391">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJBase.evaluate" href="#MLJBase.evaluate"><code>MLJBase.evaluate</code></a> — <span class="docstring-category">Function</span>.</div><div><div><pre><code class="language-julia">evaluate(model, X, y; measure=nothing, options...)
+evaluate(model, X, y, w; measure=nothing, options...)</code></pre><p>Evaluate the performance of a supervised model <code>model</code> on input data <code>X</code> and target <code>y</code>, optionally specifying sample weights <code>w</code> for training, where supported. The same weights are passed to measures that support sample weights, unless this behaviour is overridden by explicitly specifying the option <code>weights=...</code>.</p><p>See the machine version <code>evaluate!</code> for the complete list of options.</p></div></div><a class="source-link" target="_blank" href="https://github.com/alan-turing-institute/MLJ.jl/blob/91ddf3650f4fe84ac466d633d0fad741d8543b9f/src/resampling.jl#L430-L442">source</a></section><footer><hr/><a class="previous" href="../machines/"><span class="direction">Previous</span><span class="title">Machines</span></a><a class="next" href="../performance_measures/"><span class="direction">Next</span><span class="title">Performance Measures</span></a></footer></article></body></html>
