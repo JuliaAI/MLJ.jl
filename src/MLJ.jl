@@ -1,7 +1,6 @@
 module MLJ
 
 ## EXPORTS
-
 export MLJ_VERSION
 
 # defined in include files:
@@ -44,10 +43,8 @@ export nrows, nfeatures, color_off, color_on,
     predict, predict_mean, predict_median, predict_mode,
     transform, inverse_transform, se, evaluate, fitted_params,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
-    classes,
+    classes, table,
     partition, unpack,
-    mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,
-    misclassification_rate, cross_entropy, BrierScore,
     default_measure, measures,
     @load_boston, @load_ames, @load_iris, @load_reduced_ames,
     @load_crabs
@@ -106,6 +103,7 @@ import MLJBase: fit, update, clean!,
     predict, predict_mean, predict_median, predict_mode,
     transform, inverse_transform, se, evaluate, fitted_params,
     show_as_constructed, params
+
 import MLJModels: models
 
 import Pkg, Pkg.TOML
