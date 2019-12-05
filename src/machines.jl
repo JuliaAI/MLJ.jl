@@ -51,20 +51,20 @@ function machine(model::M, args...) where M <: Model
         # checks on input type:
         input_scitype(model) <: Unknown ||
             scitype(X) <: input_scitype(model) ||
-            @warn "The scitype of `X`, in `machine(model, X, y)` or "
-        "`machine(model, X, y, w)` is "*
-        "incompatible with `model`:\n"*
-        "scitype(X) = $(scitype(X))\n"*
-        "input_scitype(model) = $(input_scitype(model)). "
+            @warn "The scitype of `X`, in `machine(model, X, y)` or " *
+                    "`machine(model, X, y, w)` is "*
+                    "incompatible with `model`:\n"*
+                    "scitype(X) = $(scitype(X))\n"*
+                    "input_scitype(model) = $(input_scitype(model)). "
 
         # checks on target type:
         target_scitype(model) <: Unknown ||
             scitype(y) <: target_scitype(model) ||
             @warn "The scitype of `y`, in `machine(model, X, y)` "*
-        "or `machine(model, X, y, w)` is "*
-        "incompatible with `model`:\n"*
-        "scitype(y) = $(scitype(y))\n"*
-        "target_scitype(model) = $(target_scitype(model)). "
+                    "or `machine(model, X, y, w)` is "*
+                    "incompatible with `model`:\n"*
+                    "scitype(y) = $(scitype(y))\n"*
+                    "target_scitype(model) = $(target_scitype(model)). "
 
         # checks on dimension matching:
         nrows(X) == nrows(y) ||
