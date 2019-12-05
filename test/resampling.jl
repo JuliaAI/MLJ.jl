@@ -44,7 +44,7 @@ function testset_accelerated(name::String, var, ex; exclude=[])
             end)
         end
     end
-    return final_ex
+    return esc(final_ex)
 end
 
 @test CV(nfolds=6) == CV(nfolds=6)
