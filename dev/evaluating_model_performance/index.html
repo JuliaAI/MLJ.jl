@@ -6,31 +6,31 @@ julia&gt; X = (a=rand(12), b=rand(12), c=rand(12));
 julia&gt; y = X.a + 2X.b + 0.05*rand(12);
 
 julia&gt; model = @load RidgeRegressor pkg=MultivariateStats
-MLJModels.MultivariateStats_.RidgeRegressor(lambda = 1.0,) @ 1…42
+MLJModels.MultivariateStats_.RidgeRegressor(lambda = 1.0,) @ 7…42
 
 julia&gt; cv=CV(nfolds=3)
 CV(nfolds = 3,
    shuffle = false,
-   rng = MersenneTwister(UInt32[0x9a4ed812, 0x56b71f48, 0xf4f1b8c8, 0x6bba049e]) @ 486,) @ 1…98
+   rng = MersenneTwister(UInt32[0xa7a83a4e, 0x2fd20519, 0x12408b3b, 0x6e9c63bd]) @ 695,) @ 8…52
 
 julia&gt; evaluate(model, X, y, resampling=cv, measure=l2, verbosity=0)
 (measure = MLJBase.L2[l2],
- measurement = [0.22189828184927682],
- per_fold = Array{Float64,1}[[0.32755666722708127, 0.10807650196525918, 0.23006167635548996]],
- per_observation = Array{Array{Float64,1},1}[[[0.052735351549665965, 0.7895271033959331, 0.43611834408474337, 0.031845869877982706], [0.01267333354963344, 0.002925323540754944, 0.2575557426750767, 0.15915160809557166], [0.00928522198115058, 0.06928353807821352, 0.18557975697843884, 0.6560981883841569]]],)</code></pre><p>Alternatively, instead of applying <code>evaluate</code> to a model + data, one may call <code>evaluate!</code> on an existing machine wrapping the model in data:</p><pre><code class="language-julia-repl">julia&gt; mach = machine(model, X, y)
-Machine{RidgeRegressor} @ 1…79
+ measurement = [0.20332638553151616],
+ per_fold = Array{Float64,1}[[0.14606435006847218, 0.0947317289471773, 0.369183077578899]],
+ per_observation = Array{Array{Float64,1},1}[[[0.006714281213612673, 0.2995488443652601, 0.019522684938826, 0.25847158975618995], [0.2992554681296521, 0.0022676958222614045, 0.0772509779323612, 0.00015277390443451915], [0.0037907892525009504, 0.5254400366487914, 0.3350753815709812, 0.6124261028433223]]],)</code></pre><p>Alternatively, instead of applying <code>evaluate</code> to a model + data, one may call <code>evaluate!</code> on an existing machine wrapping the model in data:</p><pre><code class="language-julia-repl">julia&gt; mach = machine(model, X, y)
+Machine{RidgeRegressor} @ 8…36
 
 julia&gt; evaluate!(mach, resampling=cv, measure=l2, verbosity=0)
 (measure = MLJBase.L2[l2],
- measurement = [0.22189828184927682],
- per_fold = Array{Float64,1}[[0.32755666722708127, 0.10807650196525918, 0.23006167635548996]],
- per_observation = Array{Array{Float64,1},1}[[[0.052735351549665965, 0.7895271033959331, 0.43611834408474337, 0.031845869877982706], [0.01267333354963344, 0.002925323540754944, 0.2575557426750767, 0.15915160809557166], [0.00928522198115058, 0.06928353807821352, 0.18557975697843884, 0.6560981883841569]]],)</code></pre><p>(The latter call is a mutating call as the learned parameters stored in the machine potentially change. )</p><h3><a class="nav-anchor" id="Multiple-measures-1" href="#Multiple-measures-1">Multiple measures</a></h3><pre><code class="language-julia-repl">julia&gt; evaluate!(mach,
+ measurement = [0.20332638553151616],
+ per_fold = Array{Float64,1}[[0.14606435006847218, 0.0947317289471773, 0.369183077578899]],
+ per_observation = Array{Array{Float64,1},1}[[[0.006714281213612673, 0.2995488443652601, 0.019522684938826, 0.25847158975618995], [0.2992554681296521, 0.0022676958222614045, 0.0772509779323612, 0.00015277390443451915], [0.0037907892525009504, 0.5254400366487914, 0.3350753815709812, 0.6124261028433223]]],)</code></pre><p>(The latter call is a mutating call as the learned parameters stored in the machine potentially change. )</p><h3><a class="nav-anchor" id="Multiple-measures-1" href="#Multiple-measures-1">Multiple measures</a></h3><pre><code class="language-julia-repl">julia&gt; evaluate!(mach,
                  resampling=cv,
                  measure=[l1, rms, rmslp1], verbosity=0)
 (measure = MLJBase.Measure[l1, rms, rmslp1],
- measurement = [0.3858756416264004, 0.471060804832324, 0.2507965003171232],
- per_fold = Array{Float64,1}[[0.4892604614989762, 0.26827494055528034, 0.40009152282494487], [0.572325665357654, 0.32874990793194026, 0.4796474500667026], [0.3496771408394692, 0.17712331304212137, 0.18721613943585907]],
- per_observation = Union{Missing, Array{Array{Float64,1},1}}[Array{Float64,1}[[0.229641789641315, 0.8885533767849476, 0.6603925681628643, 0.17845411140677792], [0.11257590128279427, 0.05408626018458795, 0.5074995001722432, 0.3989381005814958], [0.09635985668913472, 0.26321766292977666, 0.4307896899630246, 0.8099988817178434]], missing, missing],)</code></pre><h3><a class="nav-anchor" id="Custom-measures-and-weighted-measures-1" href="#Custom-measures-and-weighted-measures-1">Custom measures and weighted measures</a></h3><pre><code class="language-julia-repl">julia&gt; my_loss(yhat, y) = maximum((yhat - y).^2);
+ measurement = [0.3591845684689517, 0.45091727127214387, 0.21431744332103955],
+ per_fold = Array{Float64,1}[[0.3193439720110723, 0.22124089482204115, 0.5369688385737418], [0.38218366012752586, 0.3077851993634153, 0.6076043758720793], [0.1784075328217494, 0.10396710729840973, 0.30847608070555227]],
+ per_observation = Union{Missing, Array{Array{Float64,1},1}}[Array{Float64,1}[[0.08194071767816458, 0.547310555685947, 0.13972360193906397, 0.5084010127411136], [0.5470424737894235, 0.04762032992600329, 0.27794060144635435, 0.01236017412638346], [0.06156938567584502, 0.724872427844232, 0.578856961235659, 0.782576579539231]], missing, missing],)</code></pre><h3><a class="nav-anchor" id="Custom-measures-and-weighted-measures-1" href="#Custom-measures-and-weighted-measures-1">Custom measures and weighted measures</a></h3><pre><code class="language-julia-repl">julia&gt; my_loss(yhat, y) = maximum((yhat - y).^2);
 
 julia&gt; my_per_observation_loss(yhat, y) = abs.(yhat - y);
 
@@ -47,7 +47,7 @@ julia&gt; MLJ.orientation(::typeof(my_weighted_score)) = :score;
 julia&gt; holdout = Holdout(fraction_train=0.8)
 Holdout(fraction_train = 0.8,
         shuffle = false,
-        rng = MersenneTwister(UInt32[0x9a4ed812, 0x56b71f48, 0xf4f1b8c8, 0x6bba049e]) @ 486,) @ 6…52
+        rng = MersenneTwister(UInt32[0xa7a83a4e, 0x2fd20519, 0x12408b3b, 0x6e9c63bd]) @ 695,) @ 4…60
 
 julia&gt; weights = [1, 1, 2, 1, 1, 2, 3, 1, 1, 2, 3, 1];
 
@@ -59,17 +59,17 @@ julia&gt; evaluate!(mach,
 │ my_loss, my_per_observation_loss 
 └ @ MLJ ~/build/alan-turing-institute/MLJ.jl/src/resampling.jl:420
 (measure = Any[Main.ex-evaluation_of_supervised_models.my_loss, Main.ex-evaluation_of_supervised_models.my_per_observation_loss, Main.ex-evaluation_of_supervised_models.my_weighted_score, l1],
- measurement = [0.5677270114850556, 0.3858756416264004, 4.0993077133453, 0.40627411127276564],
- per_fold = Array{Float64,1}[[0.7895271033959331, 0.2575557426750767, 0.6560981883841569], [0.4892604614989762, 0.26827494055528034, 0.40009152282494487], [2.3084457196706505, 6.200120648627201, 3.7893567717380496], [0.5234868828317538, 0.3060264318214565, 0.3893090191650864]],
- per_observation = Union{Missing, Array{Array{Float64,1},1}}[missing, Array{Float64,1}[[0.229641789641315, 0.8885533767849476, 0.6603925681628643, 0.17845411140677792], [0.11257590128279427, 0.05408626018458795, 0.5074995001722432, 0.3989381005814958], [0.09635985668913472, 0.26321766292977666, 0.4307896899630246, 0.8099988817178434]], missing, Array{Float64,1}[[0.183713431713052, 0.7108427014279581, 1.056628109060583, 0.14276328912542233], [0.06432908644731102, 0.06181286878238623, 0.8699991431524169, 0.22796462890371189], [0.05506277525093412, 0.30082018620545903, 0.738496611365185, 0.46285650383876764]]],)</code></pre><h3><a class="nav-anchor" id="User-specified-train/test-sets-1" href="#User-specified-train/test-sets-1">User-specified train/test sets</a></h3><p>Users can either provide their own list of train/test pairs of row indices for resampling, as in this example:</p><pre><code class="language-julia-repl">julia&gt; fold1 = 1:6; fold2 = 7:12;
+ measurement = [0.4037434717794115, 0.3591845684689517, 4.291459565330535, 0.357279338223528],
+ per_fold = Array{Float64,1}[[0.2995488443652601, 0.2992554681296521, 0.6124261028433223], [0.3193439720110723, 0.22124089482204115, 0.5369688385737418], [3.4566941906728537, 6.859398301696692, 2.5582862036220586], [0.28341989799667067, 0.21263787315812524, 0.5757802435157882]],
+ per_observation = Union{Missing, Array{Array{Float64,1},1}}[missing, Array{Float64,1}[[0.08194071767816458, 0.547310555685947, 0.13972360193906397, 0.5084010127411136], [0.5470424737894235, 0.04762032992600329, 0.27794060144635435, 0.01236017412638346], [0.06156938567584502, 0.724872427844232, 0.578856961235659, 0.782576579539231]], missing, Array{Float64,1}[[0.06555257414253166, 0.4378484445487576, 0.22355776310250236, 0.40672081019289086], [0.312595699308242, 0.05442323420114662, 0.4764696024794646, 0.007062956643647692], [0.03518250610048287, 0.8284256318219795, 0.9923262192611296, 0.4471866168795606]]],)</code></pre><h3><a class="nav-anchor" id="User-specified-train/test-sets-1" href="#User-specified-train/test-sets-1">User-specified train/test sets</a></h3><p>Users can either provide their own list of train/test pairs of row indices for resampling, as in this example:</p><pre><code class="language-julia-repl">julia&gt; fold1 = 1:6; fold2 = 7:12;
 
 julia&gt; evaluate!(mach,
                  resampling = [(fold1, fold2), (fold2, fold1)],
                  measure=[l1, l2], verbosity=0)
 (measure = MLJBase.Measure[l1, l2],
- measurement = [0.47877739229724686, 0.3157359061777968],
- per_fold = Array{Float64,1}[[0.5226731154297594, 0.43488166916473436], [0.34745993363004996, 0.2840118787255436]],
- per_observation = Array{Array{Float64,1},1}[[[0.38271976555305487, 0.7239705326237873, 0.13605759625436809, 0.370017417779717, 0.5396610202326384, 0.9836123601349902], [0.3105334231436252, 0.9591564072166154, 0.7467274369202644, 0.1197018747260783, 0.28007974978381434, 0.19309112319800859]], [[0.14647441894498528, 0.5241333321075703, 0.018511669498516636, 0.1369128894603696, 0.29123401675853217, 0.9674932750103257], [0.09643100688929777, 0.9199810135046859, 0.5576018650495075, 0.014328538812937741, 0.07844466623896405, 0.037284181857868526]]],)</code></pre><p>Or define their own re-usable <code>ResamplingStrategy</code> objects, - see <a href="#Custom-resampling-strategies-1">Custom resampling strategies</a> below.</p><h3><a class="nav-anchor" id="Built-in-resampling-strategies-1" href="#Built-in-resampling-strategies-1">Built-in resampling strategies</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJ.Holdout" href="#MLJ.Holdout"><code>MLJ.Holdout</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">holdout = Holdout(; fraction_train=0.7,
+ measurement = [0.3958010050200179, 0.24084188666873985],
+ per_fold = Array{Float64,1}[[0.44937166729081945, 0.3422303427492164], [0.2832546501346472, 0.19842912320283249]],
+ per_observation = Array{Array{Float64,1},1}[[[0.29099849998956184, 0.16034688944549425, 0.08820246543060595, 0.7831070721334354, 0.5755534568268704, 0.7980216199189489], [0.02965970963987896, 0.7008090831973446, 0.10319766888751447, 0.5014835674867837, 0.6578613231598789, 0.060370704123897556]], [[0.08468012699617503, 0.025711124954845555, 0.007779674908037237, 0.6132566864254017, 0.3312617816653602, 0.6368385058580633], [0.000879698375921929, 0.49113337109190264, 0.010649758863817072, 0.2514857684592715, 0.4327815205096666, 0.0036446219164151814]]],)</code></pre><p>Or define their own re-usable <code>ResamplingStrategy</code> objects, - see <a href="#Custom-resampling-strategies-1">Custom resampling strategies</a> below.</p><h3><a class="nav-anchor" id="Built-in-resampling-strategies-1" href="#Built-in-resampling-strategies-1">Built-in resampling strategies</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJ.Holdout" href="#MLJ.Holdout"><code>MLJ.Holdout</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">holdout = Holdout(; fraction_train=0.7,
                      shuffle=false,
                      rng=Random.GLOBAL_RNG)</code></pre><p>Holdout resampling strategy, for use in <code>evaluate!</code>, <code>evaluate</code> and in tuning.</p><pre><code class="language-none">train_test_pairs(holdout, rows)</code></pre><p>Returns the pair <code>[(train, test)]</code>, where <code>train</code> and <code>test</code> are vectors such that <code>rows=vcat(train, test)</code> and <code>length(train)/length(test) ≈ fraction_train</code>.</p><p>If <code>rng</code> is an integer, then <code>MersenneTwister(rng)</code> is the random number generator used for shuffling rows. Otherwise some <code>AbstractRNG</code> object is expected.</p></div></div><a class="source-link" target="_blank" href="https://github.com/alan-turing-institute/MLJ.jl/blob/575140bfa9108d118fdbba949e3e30cc4f6ca4d0/src/resampling.jl#L20-L37">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJ.CV" href="#MLJ.CV"><code>MLJ.CV</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">cv = CV(; nfolds=6,  shuffle=false, rng=Random.GLOBAL_RNG)</code></pre><p>Cross-validation resampling strategy, for use in <code>evaluate!</code>, <code>evaluate</code> and tuning.</p><pre><code class="language-none">train_test_pairs(cv, rows)</code></pre><p>Returns an <code>nfolds</code>-length iterator of <code>(train, test)</code> pairs of vectors (row indices), where each <code>train</code> and <code>test</code> is a sub-vector of <code>rows</code>. The <code>test</code> vectors are mutually exclusive and exhaust <code>rows</code>. Each <code>train</code> vector is the complement of the corresponding <code>test</code> vector. With no shuffling, the order of <code>rows</code> is preserved, in the sense that <code>rows</code> coincides precisely with the concatenation of the <code>test</code> vectors, in the order they are generated. All but the last <code>test</code> vector have equal length.</p><p>Declaring <code>shuffle=true</code> results in <code>rows</code> being shuffled first. If <code>rng</code> is an integer, then <code>MersenneTwister(rng)</code> is the random number generator used for shuffling <code>rows</code>. Otherwise some <code>AbstractRNG</code> object is expected.</p></div></div><a class="source-link" target="_blank" href="https://github.com/alan-turing-institute/MLJ.jl/blob/575140bfa9108d118fdbba949e3e30cc4f6ca4d0/src/resampling.jl#L70-L92">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="MLJ.StratifiedCV" href="#MLJ.StratifiedCV"><code>MLJ.StratifiedCV</code></a> — <span class="docstring-category">Type</span>.</div><div><div><pre><code class="language-julia">stratified_cv = StratifiedCV(; nfolds=6,  
                                shuffle=false, 
