@@ -24,7 +24,7 @@ after_success:
 ## uncomment following lines to deploy documentation
 jobs:
   include:
-    - if: branch = master
+    - if: branch = master OR tag IS present
       stage: "Documentation"
       julia: 1.2
       os: linux
