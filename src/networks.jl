@@ -317,7 +317,9 @@ appropriate order. These machines are those returned by `machines(N)`.
 
 """
 function fit!(y::Node; rows=nothing, verbosity::Int=1,
-force::Bool=false) if rows === nothing rows = (:) end
+              force::Bool=false)
+
+    if rows === nothing rows = (:) end
 
     # get non-source nodes:
     nodes_ = filter(nodes(y)) do n
@@ -546,9 +548,9 @@ end
 
 A vector of all sources referenced by calls `N()` and `fit!(N)`. These
 are the sources of the directed acyclic graph associated with the
-learning network terminating at `N`. The return value can be
-restricted further by specifying `kind=:input`, `kind=:target`,
-`kind=:weight`, etc.
+learning network terminating at `N`, including training edges. The
+return value can be restricted further by specifying `kind=:input`,
+`kind=:target`, `kind=:weight`, etc.
 
 Not to be confused with `origins(N)` which refers to the same graph with edges
 corresponding to training arguments deleted.
