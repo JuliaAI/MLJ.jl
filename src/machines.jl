@@ -104,28 +104,34 @@ machine(model::Model, task::UnsupervisedTask) = machine(model, task.X)
 """
     fit!(mach::Machine; rows=nothing, verbosity=1, force=false)
 
-When called for the first time, call `MLJBase.fit` on `mach.model` and
-store the returned fit-result and report. Subsequent calls do nothing
-unless: (i) `force=true`, or (ii) the specified `rows` are different
-from those used the last time a fit-result was computed, or (iii)
-`mach.model` has changed since the last time a fit-result was computed
-(the machine is *stale*). In cases (i) or (ii) `MLJBase.fit` is
-called on `mach.model`. Otherwise, `MLJBase.update` is called.
+When called for the first time, call 
+
+    MLJBase.fit(mach.model, verbosity, mach.args...)
+
+storing the returned fit-result and report in `mach`. Subsequent calls
+do nothing unless: (i) `force=true`, or (ii) the specified `rows` are
+different from those used the last time a fit-result was computed, or
+(iii) `mach.model` has changed since the last time a fit-result was
+computed (the machine is *stale*). In cases (i) or (ii) `MLJBase.fit`
+is called again. Otherwise, `MLJBase.update` is called.
 
     fit!(mach::NodalMachine; rows=nothing, verbosity=1, force=false)
 
-When called for the first time, attempt to call `MLJBase.fit` on
-`fit.model`. This will fail if an argument of the machine depends
-ultimately on some other untrained machine for successful calling, but
-this is resolved by instead calling `fit!` on fitting any node `N` for
-which `mach in machines(N)` is true, which trains all necessary
-machines in an appropriate order. Subsequent `fit!` calls do nothing
-unless: (i) `force=true`, or (ii) some machine on which `mach` depends
-has computed a new fit-result since `mach` last computed its
-fit-result, or (iii) the specified `rows` have changed since the last
-time a fit-result was last computed, or (iv) `mach` is stale (see
-below). In cases (i), (ii) or (iii), `MLJBase.fit` is
-called. Otherwise `MLJBase.update` is called.
+When called for the first time, attempt to call 
+
+    MLJBase.fit(mach.model, verbosity, mach.args...)
+
+This will fail if an argument of the machine depends ultimately on
+some other untrained machine for successful calling, but this is
+resolved by instead calling `fit!` any node `N` for which
+`mach in machines(N)` is true, which trains all necessary machines in
+an appropriate order. Subsequent `fit!` calls do nothing unless: (i)
+`force=true`, or (ii) some machine on which `mach` depends has
+computed a new fit-result since `mach` last computed its fit-result,
+or (iii) the specified `rows` have changed since the last time a
+fit-result was last computed, or (iv) `mach` is stale (see below). In
+cases (i), (ii) or (iii), `MLJBase.fit` is called. Otherwise
+`MLJBase.update` is called.
 
 A machine `mach` is *stale* if `mach.model` has changed since the last
 time a fit-result was computed, or if if one of its training arguments
@@ -136,6 +142,7 @@ Note that a nodal machine obtains its training data by *calling* its
 node arguments on the specified `rows` (rather than *indexing* its arguments
 on those rows) and that this calling is a recursive operation on nodes
 upstream of those arguments.
+
 """
 function fit!(mach::AbstractMachine; rows=nothing, verbosity=1, force=false)
 
