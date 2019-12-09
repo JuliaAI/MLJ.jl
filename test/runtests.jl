@@ -48,6 +48,10 @@ end
     @test include("tuning.jl")
 end
 
+@testset "learning_curves" begin
+    @test include("learning_curves.jl")
+end
+
 @testset "ensembles" begin
     @test include("ensembles.jl")
 end

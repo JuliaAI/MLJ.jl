@@ -166,6 +166,7 @@ end
 include("resampling.jl")    # resampling strategies and model evaluation
 include("parameters.jl")    # hyperparameter ranges and grid generation
 include("tuning.jl")
+include("learning_curves.jl")
 include("ensembles.jl")     # homogeneous ensembles
 include("model_matching.jl")# inferring model search criterion from data
 include("tasks.jl")         # enhancements to MLJBase task interface
