@@ -469,3 +469,16 @@ function learning_curve!(mach::Machine{<:Supervised};
             parameter_values=parameter_values,
             measurements = measurements_)
 end
+
+"""
+    learning_curve(model::Supervised, args...; kwargs...)
+
+Plot a learning curve (or curves) without first constructing a
+machine. Equivalent to `learing_curve!(machine(model, args...);
+kwargs...)
+
+See [learning_curve!](@ref)
+
+"""
+learning_curve(model::Supervised, args...; kwargs...) =
+    learning_curve!(machine(model, args...); kwargs...)

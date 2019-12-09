@@ -13,6 +13,7 @@ export @curve, @pcurve, pretty,                   # utilities.jl
     Params, params, set_params!,                  # parameters.jl
     strange, iterator,                            # parameters.jl
     Grid, TunedModel, learning_curve!,            # tuning.jl
+    learning_curve,                               # tuning.jl
     EnsembleModel,                                # ensembles.jl
     rebind!,                                      # networks.jl
     machines, sources, anonymize!,                # composites.jl
