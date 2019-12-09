@@ -222,7 +222,7 @@ out = MLJ.pipeline_preprocess(TestPipelines, ex)
 @test out[8][:supports_weights] = true
 
 ex =  pipe(f, c)
-out = MLJ.pipeline_preprocess(TestPipelines, ex, :(is_probabilistic=true))
+out = MLJ.pipeline_preprocess(TestPipelines, ex, :(prediction_type=:probabilistic))
 @test out[1] == :Pipe
 @test out[2] == [:fea, :cnst]
 @test eval.(out[3]) == [F, C]
@@ -262,10 +262,10 @@ ex =  pipe(f, h, u)
 ex =  pipe(f, m, t, h, k, e)
 @test_throws ArgumentError MLJ.pipeline_preprocess(TestPipelines, ex)
 
-# is_probabilistic=true declared but no supervised models
+# prediction_type=:probabilistic declared but no supervised models
 ex = pipe(f, m, t, h)
 @test_throws ArgumentError MLJ.pipeline_preprocess(TestPipelines, ex,
-                                                   :(is_probabilistic=true))
+                                      :(prediction_type=:probabilistic))
 
 
 ## SIMPLE SUPERVISED PIPELINE WITH TARGET TRANSFORM
@@ -288,7 +288,7 @@ Xs = source(X)
 ys = source(y, kind=:target)
 p = @pipeline(Pipe21(hot=OneHotEncoder(),
                     cnst=ConstantClassifier()),
-              is_probabilistic=true)
+              prediction_type=:probabilistic)
 mach = machine(p, X, y)
 fit!(mach)
 @test p isa ProbabilisticNetwork

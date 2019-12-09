@@ -347,13 +347,25 @@ from_network_preprocess(modl, ex) = from_network_preprocess(modl, ex, missing)
 function from_network_preprocess(modl, ex, kw_ex)
     kw_ex isa Expr || net_alert(10)
     kw_ex.head == :(=) || net_alert(11)
-    kw_ex.args[1] == :is_probabilistic ||
-        net_alert("Unrecognized keywork `$(kw_ex.args[1])`.")
-    value = kw_ex.args[2]
-    if value isa Bool
-        return from_network_preprocess(modl, ex, value)
+    if kw_ex.args[1] == :is_probabilistic
+        value = kw_ex.args[2]
+        if value isa Bool
+            return from_network_preprocess(modl, ex, value)
+        else
+            net_alert("`is_probabilistic` can only be `true` or `false`.")
+        end
+    elseif kw_ex.args[1] == :prediction_type
+        value = kw_ex.args[2].value
+        if value == :probabilistic
+            return from_network_preprocess(modl, ex, true)
+        elseif value == :deterministic
+            return from_network_preprocess(modl, ex, false)
+        else
+            net_alert("`prediction_type` can only be `:probabilistic` "*
+                      "or `:deterministic`.")
+        end
     else
-        net_alert("`is_probabilistic` can only be `true` or `false`.")
+        net_alert("Unrecognized keywork `$(kw_ex.args[1])`.")
     end
 end
 
