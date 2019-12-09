@@ -449,7 +449,9 @@ function learning_curve!(mach::Machine{<:Supervised};
 
     tuned_model = TunedModel(model=mach.model, ranges=range,
                              tuning=Grid(resolution=resolution),
-                             resampling=resampling, measure=measure,
+                             resampling=resampling,
+                             operation=operation,
+                             measure=measure,
                              full_report=true, train_best=false)
 
     tuned = machine(tuned_model, mach.args...)
