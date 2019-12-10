@@ -181,7 +181,8 @@ function pipeline_preprocess(modl, ex, is_probabilistic::Union{Missing,Bool})
 
     ismissing(kind) &&
         pipe_alert("Network has no supervised components and so "*
-                  "`is_probabilistic=true` "*
+                  "`prediction_type=:probablistic` (or "*
+                   "`is_probabilistic=true`) "*
                   "declaration is not allowed. ")
 
     target isa StaticTransformer && inverse == nothing &&
@@ -201,15 +202,27 @@ end
 function pipeline_preprocess(modl, ex, kw_ex)
     kw_ex isa Expr || pipe_alert(10)
     kw_ex.head == :(=) || pipe_alert(11)
-    kw_ex.args[1] == :is_probabilistic ||
-        pipe_alert("Unrecognized keywork `$(kw_ex.args[1])`.")
-    value_ = kw_ex.args[2]
-    if value_ == :missing
-        value = missing
+    if kw_ex.args[1] == :is_probabilistic
+        value_ = kw_ex.args[2]
+        if value_ == :missing
+            value = missing
+        else
+            value = value_
+            value isa Bool ||
+                pipe_alert("`is_probabilistic` can only be `true` or `false`.")
+        end
+    elseif kw_ex.args[1] == :prediction_type
+        value_ = kw_ex.args[2].value
+        if value_ == :probabilistic
+            value = true
+        elseif value_ == :deterministic
+            value =false
+        else
+            pipe_alert("`prediction_type` can only be `:probabilistic` "*
+                      "or `:deterministic`.")
+        end
     else
-        value = value_
-        value isa Bool ||
-            pipe_alert("`is_probabilistic` can only be `true` or `false`.")
+        pipe_alert("Unrecognized keywork `$(kw_ex.args[1])`.")
     end
     return pipeline_preprocess(modl, ex, value)
 end
@@ -251,7 +264,7 @@ pipeline_(modl, ex) = pipeline_(modl, ex, :(is_probabilistic=missing))
 
 """
     @pipeline NewPipeType(fld1=model1, fld2=model2, ...)
-    @pipeline NewPipeType(fld1=model1, fld2=model2, ...) is_probabilistic=false
+    @pipeline NewPipeType(fld1=model1, fld2=model2, ...) prediction_type=:probabilistic
 
 Create a new pipeline model type `NewPipeType` that composes the types of
 the specified models `model1`, `model2`, ... . The models are composed
@@ -266,9 +279,10 @@ The new model type `NewPipeType` has hyperparameters (fields) named
 generated keyword constructor are deep copies of `model1`, `model2`,
 ... .
 
-*Important.* If the overall pipeline is supervised and makes probabilistic
-predictions, then one must declare `is_probabilistic=true`. In the
-deterministic case the keyword argument can be omitted.
+*Important.* If the overall pipeline is supervised and makes
+probabilistic predictions, then one must declare
+`prediction_type=:probabilistic`. In the deterministic case no
+declaration is necessary.
 
 Static (unlearned) transformations - that is, ordinary functions - may
 also be inserted in the pipeline as shown in the following example

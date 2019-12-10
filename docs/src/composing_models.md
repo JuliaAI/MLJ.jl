@@ -383,11 +383,12 @@ evaluate(wrapped_regressor, X, y, resampling=CV(), measure=rms, verbosity=0)
 langs_composite = @from_network LangsComposite(pca=network_pca) <= Xout
 ```
 
-- For a supervised network making *probabilistic* predictions, one must add
-`is_probabilistic=true` to the end of the `@from network` call. For example:
+- For a supervised network making *probabilistic* predictions, one
+must add `prediction_type=:probabilistic` to the end of the `@from
+network` call. For example:
 
 ```julia
-petes_composite = @from_network PetesComposite(tree_classifier=network_tree) probabilistic=true
+petes_composite = @from_network PetesComposite(tree_classifier=network_tree) prediction_type=:probabilistic
 ```
 
 Returning to the `WrappedRegressor` model, we can change the regressor
