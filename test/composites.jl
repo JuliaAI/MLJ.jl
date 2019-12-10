@@ -193,7 +193,7 @@ yhat = predict(elmM, H)
 ex = Meta.parse("Composite(selector=fea,one_hot=hot,tree=elm) <= yhat")
 modeltype_ex, fieldname_exs, model_exs, N_ex, kind, trait_dic =
     MLJ.from_network_preprocess(TestComposites,
-                                ex, :(is_probabilistic=true))
+                                ex, :(prediction_type=:probabilistic))
 @test modeltype_ex == :Composite
 @test fieldname_exs == [:selector, :one_hot, :tree]
 @test model_exs == [:fea, :hot, :elm]
@@ -205,41 +205,41 @@ modeltype_ex, fieldname_exs, model_exs, N_ex, kind, trait_dic =
 ex = Meta.parse("45")
 @test_throws(ArgumentError,
              MLJ.from_network_preprocess(TestComposites,
-                                         ex, :(is_probabilistic=true)))
+                                         ex, :(prediction_type=:probabilistic)))
 
 ex = Meta.parse("Composite(elm=elm) << yhat")
 @test_throws(ArgumentError,
              MLJ.from_network_preprocess(TestComposites,
-                                         ex, :(is_probabilistic=true)))
+                                         ex, :(prediction_type=:probabilistic)))
 
 ex = Meta.parse("45")
 @test_throws(ArgumentError,
              MLJ.from_network_preprocess(TestComposites,
-                                         ex, :(is_probabilistic=true)))
+                                         ex, :(prediction_type=:probabilistic)))
 
 ex = Meta.parse("45 <= yhat")
 @test_throws(ArgumentError,
              MLJ.from_network_preprocess(TestComposites,
-                                         ex, :(is_probabilistic=true)))
+                                         ex, :(prediction_type=:probabilistic)))
 ex = Meta.parse("Comp(elm=45) <= yhat")
 @test_throws(ArgumentError,
              MLJ.from_network_preprocess(TestComposites,
-                                         ex, :(is_probabilistic=true)))
+                                         ex, :(prediction_type=:probabilistic)))
 
 ex = Meta.parse("Comp(elm=>elm) <= yhat")
 @test_throws(ArgumentError,
              MLJ.from_network_preprocess(TestComposites,
-                                         ex, :(is_probabilistic=true)))
+                                         ex, :(prediction_type=:probabilistic)))
 
 ex = Meta.parse("Comp(34=elm) <= yhat")
 @test_throws(ArgumentError,
              MLJ.from_network_preprocess(TestComposites,
-                                         ex, :(is_probabilistic=true)))
+                                         ex, :(prediction_type=:probabilistic)))
 
 ex = Meta.parse("Comp(elm=elm) <= 45")
 @test_throws(ArgumentError,
              MLJ.from_network_preprocess(TestComposites,
-                                         ex, :(is_probabilistic=true)))
+                                         ex, :(prediction_type=:probabilistic)))
 
 z = vcat(ys, ys)
 ex = Meta.parse("Comp() <= z")
@@ -266,7 +266,7 @@ ex = Meta.parse("Comp() <= z")
 ex = Meta.parse("Composite(one_hot_enc=hot) <= W")
 @test_throws(ArgumentError,
              MLJ.from_network_preprocess(TestComposites,
-                                         ex, :(is_probabilistic=true)))
+                                         ex, :(prediction_type=:probabilistic)))
 
 
 ## TEST MACRO-EXPORTED SUPERVISED NETWORK

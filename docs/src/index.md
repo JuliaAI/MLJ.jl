@@ -142,13 +142,14 @@ evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
           verbosity=0)
 ```
 
+
 ### Next steps
 
-To learn a little more about what MLJ can do, take the MLJ
-[tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/examples/tour/tour.ipynb)
-or browse [Common MLJ Workflows](common_mlj_workflows.md), returning to
-the manual as needed. *Read at least the remainder of this page before
-considering serious use of MLJ.*
+To learn a little more about what MLJ can do, browse [Common MLJ
+Workflows](common_mlj_workflows.md) or MLJ's
+[tutorials](https://alan-turing-institute.github.io/MLJTutorials/),
+returning to the manual as needed. *Read at least the remainder of
+this page before considering serious use of MLJ.*
 
 
 ### Prerequisites

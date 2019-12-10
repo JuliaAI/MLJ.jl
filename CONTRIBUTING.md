@@ -34,9 +34,11 @@ methods, dispatched on machines. A machine wraps a model in data (or a
 *task*) and the results of training. The model interface has a
 functional style, the machine interface is more "object-oriented".
 
-A generalization of machine, called a *nodal* machine, is the key
+A generalization of machine, called a *nodal* machine, is a key
 element of *learning networks* which combine several models
-together. See the [tour](docs/src/tour.ipynb) for more on these.
+together. See
+[here](https://alan-turing-institute.github.io/MLJ.jl/dev/composing_models/)
+for more on these.
 
 The core MLJ ecosystem is currently spread across three repositories:
 

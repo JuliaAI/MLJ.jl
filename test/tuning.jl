@@ -191,13 +191,16 @@ end
 
 @testset "learning curves" begin
     atom = FooBarRegressor()
-    ensemble = EnsembleModel(atom=atom, n=500)
+    ensemble = EnsembleModel(atom=atom, n=50, rng=1)
     mach = machine(ensemble, X, y)
-    r_lambda = range(ensemble, :(atom.lambda), lower=0.0001, upper=0.1, scale=:log10)
+    r_lambda = range(ensemble, :(atom.lambda),
+                     lower=0.0001, upper=0.1, scale=:log10)
     curve = MLJ.learning_curve!(mach; range=r_lambda)
     atom.lambda=0.3
     r_n = range(ensemble, :n, lower=10, upper=100)
     curve2 = MLJ.learning_curve!(mach; range=r_n)
+    curve3 = learning_curve(ensemble, X, y; range=r_n)
+    @test curve2.measurements ≈ curve3.measurements
 end
 end # module
 true

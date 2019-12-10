@@ -1,7 +1,6 @@
 module MLJ
 
 ## EXPORTS
-
 export MLJ_VERSION
 
 # defined in include files:
@@ -13,6 +12,7 @@ export @curve, @pcurve, pretty,                   # utilities.jl
     Params, params, set_params!,                  # parameters.jl
     strange, iterator,                            # parameters.jl
     Grid, TunedModel, learning_curve!,            # tuning.jl
+    learning_curve,                               # tuning.jl
     EnsembleModel,                                # ensembles.jl
     rebind!,                                      # networks.jl
     machines, sources, anonymize!,                # composites.jl
@@ -44,10 +44,8 @@ export nrows, nfeatures, color_off, color_on,
     predict, predict_mean, predict_median, predict_mode,
     transform, inverse_transform, se, evaluate, fitted_params,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
-    classes,
+    classes, table,
     partition, unpack,
-    mav, mae, rms, rmsl, rmslp1, rmsp, l1, l2,
-    misclassification_rate, cross_entropy, BrierScore,
     default_measure, measures,
     @load_boston, @load_ames, @load_iris, @load_reduced_ames,
     @load_crabs
@@ -106,6 +104,7 @@ import MLJBase: fit, update, clean!,
     predict, predict_mean, predict_median, predict_mode,
     transform, inverse_transform, se, evaluate, fitted_params,
     show_as_constructed, params
+
 import MLJModels: models
 
 import Pkg, Pkg.TOML
@@ -167,6 +166,7 @@ end
 include("resampling.jl")    # resampling strategies and model evaluation
 include("parameters.jl")    # hyperparameter ranges and grid generation
 include("tuning.jl")
+include("learning_curves.jl")
 include("ensembles.jl")     # homogeneous ensembles
 include("model_matching.jl")# inferring model search criterion from data
 include("tasks.jl")         # enhancements to MLJBase task interface
