@@ -268,7 +268,7 @@ struct DummyResamplingStrategy <: MLJ.ResamplingStrategy end
     @test e.measurement[1] ≈ 1.0
 end
 
-@testset "sample weights in training and evaluation" begin
+@testset_accelerated "sample weights in training and evaluation" accel begin
     yraw = ["Perry", "Antonia", "Perry", "Antonia", "Skater"]
     X = (x=rand(5),)
     y = categorical(yraw)
@@ -277,32 +277,34 @@ end
     # without weights:
     mach = machine(ConstantClassifier(), X, y)
     e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
-                  operation=predict_mode, measure=misclassification_rate)
+                  operation=predict_mode, measure=misclassification_rate,
+                  acceleration=accel)
     @test e.measurement[1] ≈ 1.0
 
     # with weights in training and evaluation:
     mach = machine(ConstantClassifier(), X, y, w)
     e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
-                  operation=predict_mode, measure=misclassification_rate)
+                  operation=predict_mode, measure=misclassification_rate,
+                  acceleration=accel)
     @test e.measurement[1] ≈ 1/3
 
     # with weights in training but overriden in evaluation:
     e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
                   operation=predict_mode, measure=misclassification_rate,
-                  weights = fill(1, 5))
+                  weights = fill(1, 5), acceleration=accel)
     @test e.measurement[1] ≈ 1/2
 
     @test_throws(DimensionMismatch,
                  evaluate!(mach, resampling=Holdout(fraction_train=0.6),
                            operation=predict_mode,
                            measure=misclassification_rate,
-                           weights = fill(1, 100)))
+                           weights = fill(1, 100), acceleration=accel))
 
     @test_throws(ArgumentError,
                  evaluate!(mach, resampling=Holdout(fraction_train=0.6),
                            operation=predict_mode,
                            measure=misclassification_rate,
-                           weights = fill('a', 5)))
+                           weights = fill('a', 5), acceleration=accel))
 
     # resampling on a subset of all rows:
     model = @load KNNClassifier
@@ -319,13 +321,13 @@ end
     mach1 = machine(model, Xsmall, ysmall, wsmall)
     e1 = evaluate!(mach1, resampling=CV(),
                    measure=misclassification_rate,
-                   operation=predict_mode)
+                   operation=predict_mode, acceleration=accel)
 
     mach2 = machine(model, X, y, w)
     e2 = evaluate!(mach2, resampling=CV(),
                    measure=misclassification_rate,
                    operation=predict_mode,
-                   rows=rows)
+                   rows=rows, acceleration=accel)
 
     @test e1.per_fold ≈ e2.per_fold
 
@@ -339,7 +341,7 @@ end
     mach = machine(model, X, y, w)
     e2 = evaluate!(mach, resampling=CV();
                    measure=misclassification_rate,
-                   operation=predict_mode).measurement[1]
+                   operation=predict_mode, acceleration=accel).measurement[1]
     @test e1 ≈ e2
 
     # resampler as machine with evaluation weights specified:
@@ -347,7 +349,7 @@ end
     resampler = Resampler(model=model, resampling=CV();
                           measure=misclassification_rate,
                           operation=predict_mode,
-                          weights=weval)
+                          weights=weval, acceleration=accel)
     resampling_machine = machine(resampler, X, y, w)
     fit!(resampling_machine)
     e1 = evaluate(resampling_machine).measurement[1]
@@ -355,7 +357,7 @@ end
     e2 = evaluate!(mach, resampling=CV();
                    measure=misclassification_rate,
                    operation=predict_mode,
-                   weights=weval).measurement[1]
+                   weights=weval, acceleration=accel).measurement[1]
     @test e1 ≈ e2
 
 end
