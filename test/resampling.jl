@@ -6,10 +6,46 @@ using MLJ
 using MLJBase
 import MLJModels
 import StatsBase
+using Distributed
+import ComputationalResources: CPU1, CPUProcesses, CPUThreads
 import Random.seed!
 seed!(1234)
 
 include("foobarmodel.jl")
+@everywhere workers() include("foobarmodel.jl")
+
+macro testset_accelerated(name::String, var, ex)
+    testset_accelerated(name, var, ex)
+end
+macro testset_accelerated(name::String, var, opts::Expr, ex)
+    testset_accelerated(name, var, ex; eval(opts)...)
+end
+function testset_accelerated(name::String, var, ex; exclude=[])
+    final_ex = quote
+        $var = CPU1()
+        @testset $name $ex
+    end
+    resources = Any[CPUProcesses()]
+    @static if VERSION >= v"1.3.0-DEV.573"
+        push!(resources, CPUThreads())
+    end
+    for res in resources
+        if any(x->typeof(res)<:x, exclude)
+            push!(final_ex.args, quote
+                $var = $res
+                @testset $(name*" (accelerated with $(typeof(res).name))") begin
+                    @test_broken false
+                end
+            end)
+        else
+            push!(final_ex.args, quote
+                $var = $res
+                @testset $(name*" (accelerated with $(typeof(res).name))") $ex
+            end)
+        end
+    end
+    return esc(final_ex)
+end
 
 @test CV(nfolds=6) == CV(nfolds=6)
 @test CV(nfolds=5) != CV(nfolds=6)
@@ -40,7 +76,7 @@ include("foobarmodel.jl")
                             predict, override)
 end
 
-@testset "folds specified" begin
+@testset_accelerated "folds specified" accel (exclude=[CPUProcesses],) begin
     x1 = ones(10)
     x2 = ones(10)
     X = (x1=x1, x2=x2)
@@ -61,9 +97,9 @@ end
 
     # check detection of incompatible measure (cross_entropy):
     @test_throws ArgumentError evaluate!(mach, resampling=resampling,
-                                         measure=[cross_entropy, rmslp1])
+                                         measure=[cross_entropy, rmslp1], acceleration=accel)
     result = evaluate!(mach, resampling=resampling,
-                       measure=[my_rms, my_mav, rmslp1])
+                       measure=[my_rms, my_mav, rmslp1], acceleration=accel)
     v = [1/2, 3/4, 1/2, 3/4, 1/2]
     @test result.per_fold[1] ≈ v
     @test result.per_fold[2] ≈ v
@@ -75,7 +111,7 @@ end
     @test result.measurement[2] ≈ mean(v)
 end
 
-@testset "holdout" begin
+@testset_accelerated "holdout" accel begin
     x1 = ones(4)
     x2 = ones(4)
     X = (x1=x1, x2=x2)
@@ -86,8 +122,8 @@ end
     model = MLJModels.DeterministicConstantRegressor()
     mach = machine(model, X, y)
     result = evaluate!(mach, resampling=holdout,
-                       measure=[rms, rmslp1])
-    result = evaluate!(mach, verbosity=0, resampling=holdout)
+                       measure=[rms, rmslp1], acceleration=accel)
+    result = evaluate!(mach, verbosity=0, resampling=holdout, acceleration=accel)
     result.measurement[1] ≈ 2/3
 
     # test direct evaluation of a model + data:
@@ -99,15 +135,15 @@ end
     y = rand(100)
     mach = machine(model, X, y)
     evaluate!(mach, verbosity=0,
-              resampling=Holdout(shuffle=true, rng=123))
+              resampling=Holdout(shuffle=true, rng=123), acceleration=accel)
     e1 = evaluate!(mach, verbosity=0,
-                   resampling=Holdout(shuffle=true)).measurement[1]
+                   resampling=Holdout(shuffle=true),
+                   acceleration=accel).measurement[1]
     @test e1 != evaluate!(mach, verbosity=0,
-                          resampling=Holdout()).measurement[1]
-
+                          resampling=Holdout(), acceleration=accel).measurement[1]
 end
 
-@testset "cv" begin
+@testset_accelerated "cv" accel begin
     x1 = ones(10)
     x2 = ones(10)
     X = (x1=x1, x2=x2)
@@ -117,10 +153,12 @@ end
     cv=CV(nfolds=5)
     model = MLJModels.DeterministicConstantRegressor()
     mach = machine(model, X, y)
-    result = evaluate!(mach, resampling=cv, measure=[rms, rmslp1])
+    result = evaluate!(mach, resampling=cv, measure=[rms, rmslp1],
+                       acceleration=accel)
     @test result.per_fold[1] ≈ [1/2, 3/4, 1/2, 3/4, 1/2]
 
-    shuffled =  evaluate!(mach, resampling=CV(shuffle=true)) # using rms default
+    shuffled = evaluate!(mach, resampling=CV(shuffle=true),
+                          acceleration=accel) # using rms default
     @test shuffled.measurement[1] != result.measurement[1]
 end
 
@@ -159,7 +197,7 @@ end
 
 end
 
-@testset "sample weights in evaluation" begin
+@testset_accelerated "sample weights in evaluation" accel begin
 
     # cv:
     x1 = ones(4)
@@ -171,12 +209,11 @@ end
     model = MLJModels.DeterministicConstantRegressor()
     mach = machine(model, X, y)
     e = evaluate!(mach, resampling=cv, measure=l1,
-                  weights=w, verbosity=0).measurement[1]
+                  weights=w, verbosity=0, acceleration=accel).measurement[1]
     @test e ≈ (1/3 + 13/14)/2
-
 end
 
-@testset "resampler as machine" begin
+@testset_accelerated "resampler as machine" accel (exclude=[CPUProcesses],) begin
     N = 50
     X = (x1=rand(N), x2=rand(N), x3=rand(N))
     y = X.x1 -2X.x2 + 0.05*rand(N)
@@ -189,7 +226,8 @@ end
     e1=evaluate(resampling_machine).measurement[1]
     mach = machine(ridge_model, X, y)
     @test e1 ≈  evaluate!(mach, resampling=holdout,
-                          measure=mav, verbosity=0).measurement[1]
+                          measure=mav, verbosity=0,
+                          acceleration=accel).measurement[1]
     ridge_model.lambda=1.0
     fit!(resampling_machine, verbosity=2)
     e2=evaluate(resampling_machine).measurement[1]
@@ -207,7 +245,7 @@ end
 
 struct DummyResamplingStrategy <: MLJ.ResamplingStrategy end
 
-@testset "custom strategy using resampling depending on X, y" begin
+@testset_accelerated "custom strategy using resampling depending on X, y" accel begin
     function MLJ.train_test_pairs(resampling::DummyResamplingStrategy,
                               rows, X, y)
         train = filter(rows) do j
@@ -225,11 +263,12 @@ struct DummyResamplingStrategy <: MLJ.ResamplingStrategy end
     e = evaluate(ConstantClassifier(), X, y,
                  measure=misclassification_rate,
                  resampling=DummyResamplingStrategy(),
-                 operation=predict_mode)
+                 operation=predict_mode,
+                 acceleration=accel)
     @test e.measurement[1] ≈ 1.0
 end
 
-@testset "sample weights in training  and evaluation" begin
+@testset_accelerated "sample weights in training and evaluation" accel begin
     yraw = ["Perry", "Antonia", "Perry", "Antonia", "Skater"]
     X = (x=rand(5),)
     y = categorical(yraw)
@@ -238,32 +277,34 @@ end
     # without weights:
     mach = machine(ConstantClassifier(), X, y)
     e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
-                  operation=predict_mode, measure=misclassification_rate)
+                  operation=predict_mode, measure=misclassification_rate,
+                  acceleration=accel)
     @test e.measurement[1] ≈ 1.0
 
     # with weights in training and evaluation:
     mach = machine(ConstantClassifier(), X, y, w)
     e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
-              operation=predict_mode, measure=misclassification_rate)
+                  operation=predict_mode, measure=misclassification_rate,
+                  acceleration=accel)
     @test e.measurement[1] ≈ 1/3
 
     # with weights in training but overriden in evaluation:
     e = evaluate!(mach, resampling=Holdout(fraction_train=0.6),
-              operation=predict_mode, measure=misclassification_rate,
-                  weights = fill(1, 5))
+                  operation=predict_mode, measure=misclassification_rate,
+                  weights = fill(1, 5), acceleration=accel)
     @test e.measurement[1] ≈ 1/2
 
     @test_throws(DimensionMismatch,
                  evaluate!(mach, resampling=Holdout(fraction_train=0.6),
                            operation=predict_mode,
                            measure=misclassification_rate,
-                           weights = fill(1, 100)))
+                           weights = fill(1, 100), acceleration=accel))
 
     @test_throws(ArgumentError,
                  evaluate!(mach, resampling=Holdout(fraction_train=0.6),
                            operation=predict_mode,
                            measure=misclassification_rate,
-                           weights = fill('a', 5)))
+                           weights = fill('a', 5), acceleration=accel))
 
     # resampling on a subset of all rows:
     model = @load KNNClassifier
@@ -280,13 +321,13 @@ end
     mach1 = machine(model, Xsmall, ysmall, wsmall)
     e1 = evaluate!(mach1, resampling=CV(),
                    measure=misclassification_rate,
-                   operation=predict_mode)
+                   operation=predict_mode, acceleration=accel)
 
     mach2 = machine(model, X, y, w)
     e2 = evaluate!(mach2, resampling=CV(),
                    measure=misclassification_rate,
                    operation=predict_mode,
-                   rows=rows)
+                   rows=rows, acceleration=accel)
 
     @test e1.per_fold ≈ e2.per_fold
 
@@ -300,7 +341,7 @@ end
     mach = machine(model, X, y, w)
     e2 = evaluate!(mach, resampling=CV();
                    measure=misclassification_rate,
-                   operation=predict_mode).measurement[1]
+                   operation=predict_mode, acceleration=accel).measurement[1]
     @test e1 ≈ e2
 
     # resampler as machine with evaluation weights specified:
@@ -308,7 +349,7 @@ end
     resampler = Resampler(model=model, resampling=CV();
                           measure=misclassification_rate,
                           operation=predict_mode,
-                          weights=weval)
+                          weights=weval, acceleration=accel)
     resampling_machine = machine(resampler, X, y, w)
     fit!(resampling_machine)
     e1 = evaluate(resampling_machine).measurement[1]
@@ -316,7 +357,7 @@ end
     e2 = evaluate!(mach, resampling=CV();
                    measure=misclassification_rate,
                    operation=predict_mode,
-                   weights=weval).measurement[1]
+                   weights=weval, acceleration=accel).measurement[1]
     @test e1 ≈ e2
 
 end

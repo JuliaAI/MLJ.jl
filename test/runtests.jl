@@ -3,10 +3,15 @@
 # this test code be wrapped in a module. Any new module name will do -
 # eg, `module TestDatasets` for code testing `datasets.jl`.
 
+using Distributed
+addprocs(2)
+
+@everywhere begin
 using MLJ
 using MLJBase
 using Test
 using Random
+end
 
 @constant junk=ConstantRegressor()
 

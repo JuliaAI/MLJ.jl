@@ -475,7 +475,7 @@ end
 @static if VERSION >= v"1.3.0-DEV.573"
     function _evaluate!(func::Function, res::CPUThreads, nfolds, verbosity)
         task_vec = [Threads.@spawn func(k) for k in 1:nfolds]
-        return fetch.(task_vec)
+        return reduce(vcat, fetch.(task_vec))
     end
 end
 
