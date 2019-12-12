@@ -13,15 +13,13 @@ using Test
 using Random
 end
 
-@constant junk=ConstantRegressor()
+# @testset "utilities" begin
+#   @test include("utilities.jl")
+# end
 
-@testset "utilities" begin
-  @test include("utilities.jl")
-end
-
-@testset "parameters" begin
-  @test include("parameters.jl")
-end
+# @testset "parameters" begin
+#   @test include("parameters.jl")
+# end
 
 @testset "Machines" begin
   @test include("machines.jl")

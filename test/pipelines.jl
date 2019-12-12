@@ -1,6 +1,7 @@
 module TestPipelines
 
 using MLJ
+import MLJBase
 using Test
 using Statistics
 import Random.seed!
@@ -26,7 +27,7 @@ broadcast_mode(v) = mode.(v)
 
     models = [f, h]
     lin = MLJ.linear_learning_network(Xs, nothing, nothing, nothing, nothing,
-                                      models...) |> MLJ.tree
+                                      models...) |> MLJBase.tree
     @test lin.operation == transform
     @test lin.model == h
     @test lin.arg1.operation == transform
@@ -37,7 +38,7 @@ broadcast_mode(v) = mode.(v)
 
     models = [f, k]
     lin = MLJ.linear_learning_network(Xs, ys, nothing, nothing, nothing,
-                                      models...) |> MLJ.tree
+                                      models...) |> MLJBase.tree
     @test lin.operation == predict
     @test lin.model == k
     @test lin.arg1.operation == transform
@@ -49,7 +50,7 @@ broadcast_mode(v) = mode.(v)
 
     models = [m, t]
     lin = MLJ.linear_learning_network(Xs, nothing, nothing, nothing, nothing,
-                                      models...) |> MLJ.tree
+                                      models...) |> MLJBase.tree
     @test lin.operation == t
     @test lin.model == nothing
     @test lin.arg1.operation == m
@@ -59,7 +60,7 @@ broadcast_mode(v) = mode.(v)
     # with learned target transformation:
     models = [f, k]
     lin = MLJ.linear_learning_network(Xs, ys, nothing, u, nothing, 
-                                      models...) |> MLJ.tree
+                                      models...) |> MLJBase.tree
     @test lin.operation == inverse_transform
     @test lin.model == u
     @test lin.arg1.operation == predict
@@ -77,9 +78,9 @@ broadcast_mode(v) = mode.(v)
 
     # with static target transformation:
     models = [f, k]
-    lin = MLJ.linear_learning_network(Xs, ys, nothing, StaticTransformer(log),
-                                      StaticTransformer(exp),
-                                      models...) |> MLJ.tree
+    lin = MLJ.linear_learning_network(Xs, ys, nothing, MLJBase.StaticTransformer(log),
+                                      MLJBase.StaticTransformer(exp),
+                                      models...) |> MLJBase.tree
     @test lin.operation == transform
     @test lin.model.f == exp
     @test lin.arg1.operation == predict
@@ -95,9 +96,9 @@ broadcast_mode(v) = mode.(v)
 
     # with supervised model not at end and static target transformation:
     models = [f, c, broadcast_mode]
-    lin = MLJ.linear_learning_network(Xs, ys, nothing, StaticTransformer(log),
-                                      StaticTransformer(exp),
-                                      models...) |> MLJ.tree
+    lin = MLJ.linear_learning_network(Xs, ys, nothing, MLJBase.StaticTransformer(log),
+                                      MLJBase.StaticTransformer(exp),
+                                      models...) |> MLJBase.tree
     @test lin.operation == transform
     @test lin.model.f == exp
     @test lin.arg1.operation == broadcast_mode
@@ -116,7 +117,7 @@ broadcast_mode(v) = mode.(v)
     # with supervised model not at end and with learned target transformation:
     models = [f, c, broadcast_mode]
     lin = MLJ.linear_learning_network(Xs, ys, nothing, u, nothing,
-                                      models...) |> MLJ.tree
+                                      models...) |> MLJBase.tree
     @test lin.operation == inverse_transform
     @test lin.model == u
     @test lin.arg1.operation == broadcast_mode
@@ -203,7 +204,7 @@ out = MLJ.pipeline_preprocess(TestPipelines, ex)
 @test out[1] == :Pipe
 @test out[2] == [:fea, :hot, :knn, :target, :inverse]
 @test eval.(out[3])[1:3] == [F, H, K]
-@test [eval.(out[3])[4:5]...]  isa AbstractVector{<:StaticTransformer}
+@test [eval.(out[3])[4:5]...]  isa AbstractVector{<:MLJBase.StaticTransformer}
 @test eval.(out[4]) == [F, MLJ.matrix, MLJ.table, H, K]
 @test eval.(out[5]).f == exp
 @test eval.(out[6]).f == log
@@ -277,8 +278,8 @@ p = @pipeline(Pipe(sel=FeatureSelector(), knn=KNNRegressor(),
 p.knn.K = 3; p.sel.features = [:x3,]
 mach = machine(p, X, y)
 fit!(mach)
-@test MLJ.tree(mach.fitresult).arg1.model.K == 3
-MLJ.tree(mach.fitresult).arg1.arg1.model.features == [:x3, ]
+@test MLJBase.tree(mach.fitresult).arg1.model.K == 3
+MLJBase.tree(mach.fitresult).arg1.arg1.model.features == [:x3, ]
 @test predict(mach) ≈ hand_built
 
 # test a simple probabilistic classifier pipeline:

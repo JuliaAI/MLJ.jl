@@ -75,7 +75,7 @@ function anonymize!(sources...)
     return (sources=sources, data=data)
 end
 
-function report(yhat::Node)
+function MLJBase.report(yhat::Node)
     machs = machines(yhat)
     reports = [report(m) for m in machs]
     return (machines=machs, reports=reports)
@@ -148,7 +148,7 @@ function Base.replace(W::Node, pairs::Pair...; empty_unspecified_sources=false)
         "nodes. Contents will be duplicated. "
     end
     if empty_unspecified_sources
-        unspecified_source_pairs = [s => source(kind=MLJ.kind(s)) for
+        unspecified_source_pairs = [s => source(kind=MLJBase.kind(s)) for
                                     s in unspecified_sources]
     else
         unspecified_source_pairs = [s => deepcopy(s) for

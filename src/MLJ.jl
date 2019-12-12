@@ -6,7 +6,6 @@ export MLJ_VERSION
 # defined in include files:
 export @curve, @pcurve, pretty,                   # utilities.jl
     coerce, supervised, unsupervised,             # tasks.jl
-    report,                                       # machines.jl
     Holdout, CV, StratifiedCV, evaluate!,         # resampling.jl
     Resampler,                                    # resampling.jl
     Params, params, set_params!,                  # parameters.jl
@@ -14,7 +13,6 @@ export @curve, @pcurve, pretty,                   # utilities.jl
     Grid, TunedModel, learning_curve!,            # tuning.jl
     learning_curve,                               # tuning.jl
     EnsembleModel,                                # ensembles.jl
-    rebind!,                                      # networks.jl
     machines, sources, anonymize!,                # composites.jl
     @from_network,                                # composites.jl
     fitresults,                                   # composites.jl
@@ -44,7 +42,7 @@ export nrows, nfeatures, color_off, color_on,
     predict, predict_mean, predict_median, predict_mode,
     transform, inverse_transform, se, evaluate, fitted_params,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
-    classes, table,
+    classes, table, report, rebind,
     partition, unpack,
     default_measure, measures,
     @load_boston, @load_ames, @load_iris, @load_reduced_ames,
@@ -92,6 +90,7 @@ export models, localmodels, @load, load, info,
 ## IMPORTS
 
 using MLJBase
+import MLJBase
 using MLJModels
 
 # these are defined in MLJBase
@@ -153,11 +152,8 @@ const MLJ_VERSION = toml["version"]
 ## INCLUDES
 
 include("utilities.jl")     # general purpose utilities
-include("machines.jl")
-include("networks.jl")      # for building learning networks
 include("composites.jl")    # composite models & exporting learning networks
 include("pipelines.jl")     # pipelines (exported linear learning networks)
-include("operations.jl")    # syntactic sugar for operations (predict, etc)
 
 if VERSION ≥ v"1.3.0-"
     include("arrows.jl")

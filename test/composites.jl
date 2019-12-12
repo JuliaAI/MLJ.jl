@@ -295,9 +295,9 @@ zhat = inverse_transform(standM, uhat)
 yhat = exp(zhat)
 
 # test that state changes after fit:
-@test sum(MLJ.state(yhat) |> MLJ.flat_values) == 0
+@test sum(MLJBase.state(yhat) |> MLJ.flat_values) == 0
 fit!(yhat)
-@test sum(MLJ.state(W) |> MLJ.flat_values) == 1
+@test sum(MLJBase.state(W) |> MLJ.flat_values) == 1
 
 # test nested reporting:
 r = MLJ.report(yhat)
@@ -327,7 +327,7 @@ yhat2 = @test_logs((:warn, r"No replacement"),
 @test length(MLJ.machines(yhat)) == length(MLJ.machines(yhat2))
 @test models(yhat) == models(yhat2)
 @test sources(yhat) == sources(yhat2)
-@test MLJ.tree(yhat) == MLJ.tree(yhat2)
+@test MLJBase.tree(yhat) == MLJBase.tree(yhat2)
 @test yhat() ≈ yhat2()
 
 # this change should trigger retraining of all machines except the
@@ -356,7 +356,7 @@ model_.knn_rgs.K = 55
            (:info, r"^Updat.*KNN"),
            (:info, r"^Not.*Dec"), fit!(mach))
 
-@test MLJ.tree(mach.fitresult).arg1.arg1.arg1.arg1.model.K == 55
+@test MLJBase.tree(mach.fitresult).arg1.arg1.arg1.arg1.model.K == 55
 
 # check data anomynity:
 @test all(x->(x===nothing), [s.data for s in sources(mach.fitresult)])

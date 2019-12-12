@@ -110,7 +110,7 @@ function pipeline_preprocess(modl, ex, is_probabilistic::Union{Missing,Bool})
                     if value isa Function
                         value_, value =
                             eval_and_reassign(modl,
-                                              :(MLJ.StaticTransformer($value)))
+                                              :(MLJBase.StaticTransformer($value)))
                     end
                     value isa Unsupervised ||
                         pipe_alert("Got $value where a function or "*
@@ -123,7 +123,7 @@ function pipeline_preprocess(modl, ex, is_probabilistic::Union{Missing,Bool})
                     if value isa Function
                         value_, value =
                             eval_and_reassign(modl,
-                                              :(MLJ.StaticTransformer($value)))
+                                              :(MLJBase.StaticTransformer($value)))
                     else
                         pipe_alert(10)
                     end
@@ -185,7 +185,7 @@ function pipeline_preprocess(modl, ex, is_probabilistic::Union{Missing,Bool})
                    "`is_probabilistic=true`) "*
                   "declaration is not allowed. ")
 
-    target isa StaticTransformer && inverse == nothing &&
+    target isa MLJBase.StaticTransformer && inverse == nothing &&
         pipe_alert("It appears `target` is a function. "*
                    "You must therefore specify `inverse=...` .")
 

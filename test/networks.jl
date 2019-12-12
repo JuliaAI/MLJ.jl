@@ -37,7 +37,7 @@ seed!(1234)
     yhat = predict(knn1, Xs)
     yhat(selectrows(X, test))
     @test rms(yhat(selectrows(X, test)), y[test]) < 0.3
-    @test MLJ.is_stale(knn1) == false
+#    @test MLJ.is_stale(knn1) == false
 
 end
 
