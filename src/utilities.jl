@@ -197,7 +197,7 @@ end
 
 ## FOR PRETTY PRINTING COLUMN TABLES
 
-function pretty(X; showtypes=true, alignment=:l, kwargs...)
+function pretty(io::IO, X; showtypes=true, alignment=:l, kwargs...)
     names = schema(X).names |> collect
     if showtypes
         types = schema(X).types |> collect
@@ -209,7 +209,7 @@ function pretty(X; showtypes=true, alignment=:l, kwargs...)
     show_color = MLJBase.SHOW_COLOR
     color_off()
     try
-        PrettyTables.pretty_table(MLJBase.matrix(X),
+        PrettyTables.pretty_table(io, MLJBase.matrix(X),
                                   header; alignment=alignment, kwargs...)
     catch
         println("Trouble displaying table.")
@@ -218,4 +218,4 @@ function pretty(X; showtypes=true, alignment=:l, kwargs...)
     return nothing
 end
 
-
+pretty(X; kwargs...) = pretty(stdout, X; kwargs...)
