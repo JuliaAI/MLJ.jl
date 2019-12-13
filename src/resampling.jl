@@ -563,7 +563,8 @@ function evaluate!(mach::Machine, resampling, weights, rows, verbosity,
            per_observation=per_observation)
 
     verbosity < 1 || nmeasures < 2 ||
-        pretty(selectcols(ret, 1:2), showtypes=false)
+        pretty(selectcols(ret, 1:2), showtypes=false,
+               header_crayon=PrettyTables.Crayon(bold=false))
 
     return ret
 
