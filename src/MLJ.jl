@@ -174,7 +174,7 @@ include("learning_curves.jl")
 include("ensembles.jl")     # homogeneous ensembles
 include("model_matching.jl")# inferring model search criterion from data
 include("tasks.jl")         # enhancements to MLJBase task interface
-include("scitypes.jl")      # extensions to ScientificTypes.sictype
+include("scitypes.jl")      # extensions to ScientificTypes.scitype
 include("plotrecipes.jl")
 
 end # module
