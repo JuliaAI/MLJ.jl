@@ -10,15 +10,15 @@ seed!(1234)
 @load KNNRegressor
 
 NN = 7
-X = MLJ.table(rand(NN, 3));
+X = MLJBase.table(rand(NN, 3));
 y = 2X.x1 - X.x2 + 0.05*rand(NN);
 Xs = source(X); ys = source(y, kind=:target)
 
 broadcast_mode(v) = mode.(v)
 
 @testset "linear_learning_network" begin
-    t = MLJ.table
-    m = MLJ.matrix
+    t = MLJBase.table
+    m = MLJBase.matrix
     f = FeatureSelector()
     h = OneHotEncoder()
     k = KNNRegressor()
@@ -26,7 +26,7 @@ broadcast_mode(v) = mode.(v)
     c = ConstantClassifier()
 
     models = [f, h]
-    lin = MLJ.linear_learning_network(Xs, nothing, nothing, nothing, nothing,
+    lin = MLJBase.linear_learning_network(Xs, nothing, nothing, nothing, nothing,
                                       models...) |> MLJBase.tree
     @test lin.operation == transform
     @test lin.model == h
@@ -37,7 +37,7 @@ broadcast_mode(v) = mode.(v)
     @test lin.train_arg1 == lin.arg1
 
     models = [f, k]
-    lin = MLJ.linear_learning_network(Xs, ys, nothing, nothing, nothing,
+    lin = MLJBase.linear_learning_network(Xs, ys, nothing, nothing, nothing,
                                       models...) |> MLJBase.tree
     @test lin.operation == predict
     @test lin.model == k
@@ -49,7 +49,7 @@ broadcast_mode(v) = mode.(v)
     @test lin.train_arg2.source == ys
 
     models = [m, t]
-    lin = MLJ.linear_learning_network(Xs, nothing, nothing, nothing, nothing,
+    lin = MLJBase.linear_learning_network(Xs, nothing, nothing, nothing, nothing,
                                       models...) |> MLJBase.tree
     @test lin.operation == t
     @test lin.model == nothing
@@ -59,7 +59,7 @@ broadcast_mode(v) = mode.(v)
 
     # with learned target transformation:
     models = [f, k]
-    lin = MLJ.linear_learning_network(Xs, ys, nothing, u, nothing, 
+    lin = MLJBase.linear_learning_network(Xs, ys, nothing, u, nothing, 
                                       models...) |> MLJBase.tree
     @test lin.operation == inverse_transform
     @test lin.model == u
@@ -78,7 +78,7 @@ broadcast_mode(v) = mode.(v)
 
     # with static target transformation:
     models = [f, k]
-    lin = MLJ.linear_learning_network(Xs, ys, nothing, MLJBase.StaticTransformer(log),
+    lin = MLJBase.linear_learning_network(Xs, ys, nothing, MLJBase.StaticTransformer(log),
                                       MLJBase.StaticTransformer(exp),
                                       models...) |> MLJBase.tree
     @test lin.operation == transform
@@ -96,7 +96,7 @@ broadcast_mode(v) = mode.(v)
 
     # with supervised model not at end and static target transformation:
     models = [f, c, broadcast_mode]
-    lin = MLJ.linear_learning_network(Xs, ys, nothing, MLJBase.StaticTransformer(log),
+    lin = MLJBase.linear_learning_network(Xs, ys, nothing, MLJBase.StaticTransformer(log),
                                       MLJBase.StaticTransformer(exp),
                                       models...) |> MLJBase.tree
     @test lin.operation == transform
@@ -116,7 +116,7 @@ broadcast_mode(v) = mode.(v)
 
     # with supervised model not at end and with learned target transformation:
     models = [f, c, broadcast_mode]
-    lin = MLJ.linear_learning_network(Xs, ys, nothing, u, nothing,
+    lin = MLJBase.linear_learning_network(Xs, ys, nothing, u, nothing,
                                       models...) |> MLJBase.tree
     @test lin.operation == inverse_transform
     @test lin.model == u
@@ -136,7 +136,7 @@ broadcast_mode(v) = mode.(v)
     @test lin.train_arg1.source == ys
 
     # build a linear network for training:
-    N = MLJ.linear_learning_network(Xs, ys, nothing, u, nothing, f, k)
+    N = MLJBase.linear_learning_network(Xs, ys, nothing, u, nothing, f, k)
     fM = machine(f, Xs)
     Xt = transform(fM, Xs)
 
@@ -168,8 +168,8 @@ K = KNNRegressor()
 C = ConstantClassifier()
 U = UnivariateStandardizer()
 
-m = :(MLJ.matrix)
-t = :(MLJ.table)
+m = :(MLJBase.matrix)
+t = :(MLJBase.table)
 f = :(fea=F)
 h = :(hot=H)
 k = :(knn=K)
@@ -185,34 +185,34 @@ function pipe(args...)
     end
     return Meta.parse(ret*")")
 end
-MLJ.pipeline_preprocess(modl, ex) =
-    MLJ.pipeline_preprocess(modl, ex, missing)
+MLJBase.pipeline_preprocess(modl, ex) =
+    MLJBase.pipeline_preprocess(modl, ex, missing)
 
 ex = pipe(f, m, t, h, k, u)
-out = MLJ.pipeline_preprocess(TestPipelines, ex)
+out = MLJBase.pipeline_preprocess(TestPipelines, ex)
 @test out[1] == :Pipe
 @test out[2] == [:fea, :hot, :knn, :target]
 @test eval.(out[3]) == [F, H, K, U]
-@test eval.(out[4]) == [F, MLJ.matrix, MLJ.table, H, K]
+@test eval.(out[4]) == [F, MLJBase.matrix, MLJBase.table, H, K]
 @test eval.(out[5]) == U
 @test eval.(out[6]) == nothing
 @test out[7] == :DeterministicNetwork
 @test out[8][:supports_weights] = true
 
 ex =  pipe(f, m, t, h, k, e, l)
-out = MLJ.pipeline_preprocess(TestPipelines, ex)
+out = MLJBase.pipeline_preprocess(TestPipelines, ex)
 @test out[1] == :Pipe
 @test out[2] == [:fea, :hot, :knn, :target, :inverse]
 @test eval.(out[3])[1:3] == [F, H, K]
 @test [eval.(out[3])[4:5]...]  isa AbstractVector{<:MLJBase.StaticTransformer}
-@test eval.(out[4]) == [F, MLJ.matrix, MLJ.table, H, K]
+@test eval.(out[4]) == [F, MLJBase.matrix, MLJBase.table, H, K]
 @test eval.(out[5]).f == exp
 @test eval.(out[6]).f == log
 @test out[7] == :DeterministicNetwork
 @test out[8][:supports_weights] = true
 
 ex =  pipe(f, k)
-out = MLJ.pipeline_preprocess(TestPipelines, ex)
+out = MLJBase.pipeline_preprocess(TestPipelines, ex)
 @test out[1] == :Pipe
 @test out[2] == [:fea, :knn]
 @test eval.(out[3]) == [F, K]
@@ -223,7 +223,7 @@ out = MLJ.pipeline_preprocess(TestPipelines, ex)
 @test out[8][:supports_weights] = true
 
 ex =  pipe(f, c)
-out = MLJ.pipeline_preprocess(TestPipelines, ex, :(prediction_type=:probabilistic))
+out = MLJBase.pipeline_preprocess(TestPipelines, ex, :(prediction_type=:probabilistic))
 @test out[1] == :Pipe
 @test out[2] == [:fea, :cnst]
 @test eval.(out[3]) == [F, C]
@@ -234,7 +234,7 @@ out = MLJ.pipeline_preprocess(TestPipelines, ex, :(prediction_type=:probabilisti
 @test out[8][:supports_weights] = true
 
 ex =  pipe(f, h)
-out = MLJ.pipeline_preprocess(TestPipelines, ex)
+out = MLJBase.pipeline_preprocess(TestPipelines, ex)
 @test out[1] == :Pipe
 @test out[2] == [:fea, :hot]
 @test eval.(out[3]) == [F, H]
@@ -245,27 +245,27 @@ out = MLJ.pipeline_preprocess(TestPipelines, ex)
 @test !haskey(out[8],:supports_weights)
 
 ex =  :(Pipe())
-@test_throws ArgumentError MLJ.pipeline_preprocess(TestPipelines, ex)
+@test_throws ArgumentError MLJBase.pipeline_preprocess(TestPipelines, ex)
 
 # target is a function but no inverse=...:
 ex =  pipe(f, m, t, h, k, e)
-@test_throws ArgumentError MLJ.pipeline_preprocess(TestPipelines, ex)
+@test_throws ArgumentError MLJBase.pipeline_preprocess(TestPipelines, ex)
 
 # inverse but no target:
 ex =  pipe(f, k, l)
-@test_throws ArgumentError MLJ.pipeline_preprocess(TestPipelines, ex)
+@test_throws ArgumentError MLJBase.pipeline_preprocess(TestPipelines, ex)
 
 # target specified but no component is supervised:
 ex =  pipe(f, h, u)
-@test_throws ArgumentError MLJ.pipeline_preprocess(TestPipelines, ex)
+@test_throws ArgumentError MLJBase.pipeline_preprocess(TestPipelines, ex)
 
 # function as target but no inverse:
 ex =  pipe(f, m, t, h, k, e)
-@test_throws ArgumentError MLJ.pipeline_preprocess(TestPipelines, ex)
+@test_throws ArgumentError MLJBase.pipeline_preprocess(TestPipelines, ex)
 
 # prediction_type=:probabilistic declared but no supervised models
 ex = pipe(f, m, t, h)
-@test_throws ArgumentError MLJ.pipeline_preprocess(TestPipelines, ex,
+@test_throws ArgumentError MLJBase.pipeline_preprocess(TestPipelines, ex,
                                       :(prediction_type=:probabilistic))
 
 
@@ -283,7 +283,7 @@ MLJBase.tree(mach.fitresult).arg1.arg1.model.features == [:x3, ]
 @test predict(mach) ≈ hand_built
 
 # test a simple probabilistic classifier pipeline:
-X = MLJ.table(rand(7,3))
+X = MLJBase.table(rand(7,3))
 y = categorical(collect("ffmmfmf"))
 Xs = source(X)
 ys = source(y, kind=:target)
@@ -296,7 +296,7 @@ fit!(mach)
 pdf(predict(mach)[1], 'f') ≈ 4/7
 
 # test a simple deterministic classifier pipeline:
-X = MLJ.table(rand(7,3))
+X = MLJBase.table(rand(7,3))
 y = categorical(collect("ffmmfmf"))
 Xs = source(X)
 ys = source(y, kind=:target)

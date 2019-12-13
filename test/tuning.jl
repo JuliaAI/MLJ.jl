@@ -10,6 +10,7 @@ seed!(1234)
 @load KNNRegressor
 
 include("foobarmodel.jl")
+include("simple_composite_model.jl")
 
 x1 = rand(100);
 x2 = rand(100);
@@ -22,7 +23,7 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
     sel = FeatureSelector()
     stand = UnivariateStandardizer()
     ridge = FooBarRegressor()
-    composite = MLJ.SimpleDeterministicCompositeModel(transformer=sel, model=ridge)
+    composite = SimpleDeterministicCompositeModel(transformer=sel, model=ridge)
 
     features_ = range(composite, :(transformer.features), values=[[:x1], [:x1, :x2], [:x2, :x3], [:x1, :x2, :x3]])
     lambda_ = range(composite, :(model.lambda), lower=1e-6, upper=1e-1, scale=:log10)
@@ -49,7 +50,7 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
     fp = fitted_params(tuned)
     @test fp.best_fitted_params isa NamedTuple{(:machines, :fitted_params)}
     b = fp.best_model
-    @test b isa MLJ.SimpleDeterministicCompositeModel
+    @test b isa SimpleDeterministicCompositeModel
 
     measurements = tuned.report.measurements
     # should be all different:

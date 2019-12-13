@@ -16,70 +16,11 @@ Xin = (a=rand(N), b=rand(N), c=rand(N))
 yin = rand(N)
 
 train, test = partition(eachindex(yin), 0.7);
-Xtrain = MLJ.selectrows(Xin, train)
+Xtrain = MLJBase.selectrows(Xin, train)
 ytrain = yin[train]
 
 ridge_model = FooBarRegressor(lambda=0.1)
 selector_model = FeatureSelector()
-
-@testset "first test of hand-exported network" begin
-
-    composite = MLJ.SimpleDeterministicCompositeModel(model=ridge_model,
-                                                  transformer=selector_model)
-
-    fitresult, cache, report = MLJ.fit(composite, 3, Xtrain, ytrain)
-
-    # to check internals:
-    ridge = MLJ.machines(fitresult)[1]
-    selector = MLJ.machines(fitresult)[2]
-    ridge_old = deepcopy(ridge)
-    selector_old = deepcopy(selector)
-
-    # this should trigger no retraining:
-    fitresult, cache, report =
-        @test_logs(
-            (:info, r"^Not"),
-            (:info, r"^Not"),
-            MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain))
-    @test ridge.fitresult == ridge_old.fitresult
-    @test selector.fitresult == selector_old.fitresult
-
-    # this should trigger update of selector and training of ridge:
-    selector_model.features = [:a, :b]
-    fitresult, cache, report =
-        @test_logs(
-            (:info, r"^Updating"),
-            (:info, r"^Training"),
-            MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain))
-    @test ridge.fitresult != ridge_old.fitresult
-    @test selector.fitresult != selector_old.fitresult
-    ridge_old = deepcopy(ridge)
-    selector_old = deepcopy(selector)
-
-    # this should trigger updating of ridge only:
-    ridge_model.lambda = 1.0
-    fitresult, cache, report =
-        @test_logs(
-            (:info, r"^Not"),
-            (:info, r"^Updating"),
-            MLJ.update(composite, 2, fitresult, cache, Xtrain, ytrain))
-    @test ridge.fitresult != ridge_old.fitresult
-    @test selector.fitresult == selector_old.fitresult
-
-    predict(composite, fitresult, MLJ.selectrows(Xin, test))
-
-    Xs = source(Xtrain)
-    ys = source(ytrain, kind=:target)
-
-    mach = machine(composite, Xs, ys)
-    yhat = predict(mach, Xs)
-    fit!(yhat, verbosity=3)
-    composite.transformer.features = [:b, :c]
-    fit!(yhat, verbosity=3)
-    fit!(yhat, rows=1:20, verbosity=3)
-    yhat(MLJ.selectrows(Xin, test))
-
-end
 
 import MLJBase
 using ScientificTypes
@@ -90,7 +31,7 @@ end
 
 @testset "second test of hand-exported network" begin
 
-    function MLJ.fit(model::WrappedRidge, verbosity::Integer, X, y)
+    function MLJBase.fit(model::WrappedRidge, verbosity::Integer, X, y)
         Xs = source(X)
         ys = source(y, kind=:target)
 
@@ -149,7 +90,7 @@ yhat = exp(zhat)
 
 ex = Meta.parse("Composite(knn_rgs=knn, one_hot_enc=hot) <= yhat")
 modeltype_ex, fieldname_exs, model_exs, N_ex, kind, trait_dic =
-    MLJ.from_network_preprocess(TestComposites, ex)
+    MLJBase.from_network_preprocess(TestComposites, ex)
 @test modeltype_ex == :Composite
 @test fieldname_exs == [:knn_rgs, :one_hot_enc]
 @test model_exs == [:knn, :hot]
@@ -166,13 +107,13 @@ zhat = inverse_transform(standM, uhat)
 yhat = exp(zhat)
 ex = Meta.parse("Composite(knn_rgs=knn, one_hot_enc=hot) <= yhat")
 modeltype_ex, fieldname_exs, model_exs, N_ex, kind, trait_dic =
-    MLJ.from_network_preprocess(TestComposites, ex)
+    MLJBase.from_network_preprocess(TestComposites, ex)
 @test trait_dic[:supports_weights]
 
 # unsupervised:
 ex = Meta.parse("Composite(one_hot_enc=hot) <= W")
 modeltype_ex, fieldname_exs, model_exs, N_ex, kind, trait_dic =
-    MLJ.from_network_preprocess(TestComposites, ex)
+    MLJBase.from_network_preprocess(TestComposites, ex)
 @test modeltype_ex == :Composite
 @test fieldname_exs == [:one_hot_enc,]
 @test model_exs == [:hot,]
@@ -192,7 +133,7 @@ yhat = predict(elmM, H)
 
 ex = Meta.parse("Composite(selector=fea,one_hot=hot,tree=elm) <= yhat")
 modeltype_ex, fieldname_exs, model_exs, N_ex, kind, trait_dic =
-    MLJ.from_network_preprocess(TestComposites,
+    MLJBase.from_network_preprocess(TestComposites,
                                 ex, :(prediction_type=:probabilistic))
 @test modeltype_ex == :Composite
 @test fieldname_exs == [:selector, :one_hot, :tree]
@@ -204,54 +145,54 @@ modeltype_ex, fieldname_exs, model_exs, N_ex, kind, trait_dic =
 
 ex = Meta.parse("45")
 @test_throws(ArgumentError,
-             MLJ.from_network_preprocess(TestComposites,
+             MLJBase.from_network_preprocess(TestComposites,
                                          ex, :(prediction_type=:probabilistic)))
 
 ex = Meta.parse("Composite(elm=elm) << yhat")
 @test_throws(ArgumentError,
-             MLJ.from_network_preprocess(TestComposites,
+             MLJBase.from_network_preprocess(TestComposites,
                                          ex, :(prediction_type=:probabilistic)))
 
 ex = Meta.parse("45")
 @test_throws(ArgumentError,
-             MLJ.from_network_preprocess(TestComposites,
+             MLJBase.from_network_preprocess(TestComposites,
                                          ex, :(prediction_type=:probabilistic)))
 
 ex = Meta.parse("45 <= yhat")
 @test_throws(ArgumentError,
-             MLJ.from_network_preprocess(TestComposites,
+             MLJBase.from_network_preprocess(TestComposites,
                                          ex, :(prediction_type=:probabilistic)))
 ex = Meta.parse("Comp(elm=45) <= yhat")
 @test_throws(ArgumentError,
-             MLJ.from_network_preprocess(TestComposites,
+             MLJBase.from_network_preprocess(TestComposites,
                                          ex, :(prediction_type=:probabilistic)))
 
 ex = Meta.parse("Comp(elm=>elm) <= yhat")
 @test_throws(ArgumentError,
-             MLJ.from_network_preprocess(TestComposites,
+             MLJBase.from_network_preprocess(TestComposites,
                                          ex, :(prediction_type=:probabilistic)))
 
 ex = Meta.parse("Comp(34=elm) <= yhat")
 @test_throws(ArgumentError,
-             MLJ.from_network_preprocess(TestComposites,
+             MLJBase.from_network_preprocess(TestComposites,
                                          ex, :(prediction_type=:probabilistic)))
 
 ex = Meta.parse("Comp(elm=elm) <= 45")
 @test_throws(ArgumentError,
-             MLJ.from_network_preprocess(TestComposites,
+             MLJBase.from_network_preprocess(TestComposites,
                                          ex, :(prediction_type=:probabilistic)))
 
 z = vcat(ys, ys)
 ex = Meta.parse("Comp() <= z")
 @test_throws(ArgumentError,
-             MLJ.from_network_preprocess(TestComposites,ex))
+             MLJBase.from_network_preprocess(TestComposites,ex))
 
 X2s = source(nothing)
 # z = @test_logs (:warn, r"^A node ref") vcat(Xs, X2s)
 z = vcat(Xs, X2s)
 ex = Meta.parse("Comp() <= z")
 @test_throws(ArgumentError,
-             MLJ.from_network_preprocess(TestComposites, ex))
+             MLJBase.from_network_preprocess(TestComposites, ex))
 
 
 y2s = source(nothing, kind=:target)
@@ -261,11 +202,11 @@ z = vcat(ys, y2s, Xs)
 
 ex = Meta.parse("Comp() <= z")
 @test_throws(ArgumentError,
-             MLJ.from_network_preprocess(TestComposites, ex))
+             MLJBase.from_network_preprocess(TestComposites, ex))
 
 ex = Meta.parse("Composite(one_hot_enc=hot) <= W")
 @test_throws(ArgumentError,
-             MLJ.from_network_preprocess(TestComposites,
+             MLJBase.from_network_preprocess(TestComposites,
                                          ex, :(prediction_type=:probabilistic)))
 
 
@@ -295,12 +236,12 @@ zhat = inverse_transform(standM, uhat)
 yhat = exp(zhat)
 
 # test that state changes after fit:
-@test sum(MLJBase.state(yhat) |> MLJ.flat_values) == 0
+@test sum(MLJBase.state(yhat) |> MLJBase.flat_values) == 0
 fit!(yhat)
-@test sum(MLJBase.state(W) |> MLJ.flat_values) == 1
+@test sum(MLJBase.state(W) |> MLJBase.flat_values) == 1
 
 # test nested reporting:
-r = MLJ.report(yhat)
+r = MLJBase.report(yhat)
 @test r isa NamedTuple
 @test length(r.reports) == 4
 @test r.reports[1] == NamedTuple()
@@ -324,7 +265,7 @@ yhat2 = @test_logs((:warn, r"No replacement"),
            (:info, r"^Train.*Univ"),
            (:info, r"^Train.*KNN"),
            (:info, r"^Train.*Dec"), fit!(yhat2))
-@test length(MLJ.machines(yhat)) == length(MLJ.machines(yhat2))
+@test length(MLJBase.machines(yhat)) == length(MLJBase.machines(yhat2))
 @test models(yhat) == models(yhat2)
 @test sources(yhat) == sources(yhat2)
 @test MLJBase.tree(yhat) == MLJBase.tree(yhat2)
@@ -421,7 +362,7 @@ yhat(rows=1:div(N,2));
 
 composite = @from_network Composite3(regressor=rgs) <= yhat
 
-@test MLJ.supports_weights(composite)
+@test MLJBase.supports_weights(composite)
 mach = fit!(machine(composite, X, y))
 predict(mach, rows=1:div(N,2))[1]
 posterior = predict(mach, rows=1:div(N,2))[1]

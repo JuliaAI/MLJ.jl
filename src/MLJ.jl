@@ -23,12 +23,6 @@ export learning_curve!, learning_curve
 # ensembles.jl:
 export EnsembleModel
 
-# composites.jl:
-export machines, sources, anonymize!, @from_network, fitresults
-
-# pipelines.jl:
-export @pipeline
-
 # model_matching.jl:
 export matching
 
@@ -55,8 +49,6 @@ export nrows, nfeatures, color_off, color_on,
     SupervisedTask, UnsupervisedTask, MLJTask,
     Deterministic, Probabilistic, Unsupervised, Supervised, Static,
     DeterministicNetwork, ProbabilisticNetwork,
-    Machine, NodalMachine, machine, AbstractNode,
-    source, node, fit!, freeze!, thaw!, Node, sources, origins,
     target_scitype, input_scitype, output_scitype,
     predict, predict_mean, predict_median, predict_mode,
     transform, inverse_transform, se, evaluate, fitted_params, params,
@@ -65,7 +57,11 @@ export nrows, nfeatures, color_off, color_on,
     partition, unpack,
     default_measure, measures,
     @load_boston, @load_ames, @load_iris, @load_reduced_ames, @load_crabs,
-    load_boston, load_ames, load_iris, load_reduced_ames, load_crabs
+    load_boston, load_ames, load_iris, load_reduced_ames, load_crabs,
+    Machine, NodalMachine, machine, AbstractNode,
+    source, node, fit!, freeze!, thaw!, Node, sources, origins,
+    machines, sources, anonymize!, @from_network, fitresults,
+    @pipeline
 
 # re-export from MLJBase - relating to measures:
 export measures,
@@ -160,8 +156,6 @@ const MLJ_VERSION = toml["version"]
 ## INCLUDE FILES
 
 include("utilities.jl")     # general purpose utilities
-include("composites.jl")    # composite models & exporting learning networks
-include("pipelines.jl")     # pipelines (exported linear learning networks)
 
 if VERSION ≥ v"1.3.0-"
     include("arrows.jl")
