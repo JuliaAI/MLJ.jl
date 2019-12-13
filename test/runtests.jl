@@ -13,20 +13,12 @@ using Test
 using Random
 end
 
-# @testset "utilities" begin
-#   @test include("utilities.jl")
-# end
-
-# @testset "parameters" begin
-#   @test include("parameters.jl")
-# end
-
-@testset "Machines" begin
-  @test include("machines.jl")
+@testset "utilities" begin
+  @test include("utilities.jl")
 end
 
-@testset "networks" begin
-  @test include("networks.jl")
+@testset "parameters" begin
+  @test include("parameters.jl")
 end
 
 if VERSION ≥ v"1.3.0-"
