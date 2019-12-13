@@ -15,6 +15,8 @@ import MLJModels
 using CategoricalArrays
 using Distributions
 
+include("testset_accelerated.jl")
+
 @load KNNRegressor
 
 ## HELPER FUNCTIONS
@@ -189,7 +191,7 @@ MLJBase.info_dict(ensemble_model)
 @test EnsembleModel(atom=ConstantRegressor()) isa Probabilistic
 @test EnsembleModel(atom=MLJModels.DeterministicConstantRegressor()) isa Deterministic
 
-@testset "further test of sample weights" begin
+@testset_accelerated "further test of sample weights" accel begin
     N = 20
     X = (x = rand(3N), );
     y = categorical(rand("abbbc", 3N));
@@ -197,25 +199,30 @@ MLJBase.info_dict(ensemble_model)
     ensemble_model = MLJ.ProbabilisticEnsembleModel(atom=atom,
                                                     bagging_fraction=1,
                                                     n = 5)
-    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y,
+                                       acceleration=accel)
     @test predict_mode(ensemble_model, fitresult, (x = [0, ],))[1] == 'b'
     w = map(y) do η
         η == 'a' ? 100 : 1
     end
-    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y, w)
+    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y, w,
+                                       acceleration=accel)
     @test predict_mode(ensemble_model, fitresult, (x = [0, ],))[1] == 'a'
 
     ensemble_model.rng = 1234 # always start with same rng
     ensemble_model.bagging_fraction=0.6
     ensemble_model.out_of_bag_measure = [BrierScore(), cross_entropy]
-    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y,
+                                       acceleration=accel)
     m1 = report.oob_measurements[1]
-    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y,
+                                       acceleration=accel)
     m2 = report.oob_measurements[1]
     @test m1 == m2
     # supplying sample weights should change the oob meausurements for
     # measures that support weights:
-    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y, w)
+    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y, w,
+                                       acceleration=accel)
     m3 = report.oob_measurements[1]
     @test !(m1 ≈ m3)
 end
