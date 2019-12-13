@@ -21,20 +21,6 @@ end
   @test include("parameters.jl")
 end
 
-if VERSION ≥ v"1.3.0-"
-  @testset "arrows" begin
-    @test include("arrows.jl")
-  end
-end
-
-@testset "composites" begin
-  @test include("composites.jl")
-end
-
-@testset "pipelines" begin
-  @test include("pipelines.jl")
-end
-
 @testset "resampling" begin
     @test include("resampling.jl")
 end
