@@ -156,11 +156,6 @@ const MLJ_VERSION = toml["version"]
 ## INCLUDE FILES
 
 include("utilities.jl")     # general purpose utilities
-
-if VERSION ≥ v"1.3.0-"
-    include("arrows.jl")
-end
-
 include("resampling.jl")    # resampling strategies and model evaluation
 include("parameters.jl")    # hyperparameter ranges and grid generation
 include("tuning.jl")
