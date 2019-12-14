@@ -475,7 +475,7 @@ end
 @static if VERSION >= v"1.3.0-DEV.573"
     function _evaluate!(func::Function, res::CPUThreads, nfolds, verbosity)
         task_vec = [Threads.@spawn func(k) for k in 1:nfolds]
-        return fetch.(task_vec)
+        return reduce(vcat, fetch.(task_vec))
     end
 end
 
@@ -563,7 +563,8 @@ function evaluate!(mach::Machine, resampling, weights, rows, verbosity,
            per_observation=per_observation)
 
     verbosity < 1 || nmeasures < 2 ||
-        pretty(selectcols(ret, 1:2), showtypes=false)
+        pretty(selectcols(ret, 1:2), showtypes=false,
+               header_crayon=PrettyTables.Crayon(bold=false))
 
     return ret
 

@@ -121,37 +121,38 @@ data (ignored in simple strategies, such as `Holdout` and `CV`).
 Here is the code for the `Holdout` strategy as an example:
 
 ```julia
-struct Holdout <: MLJ.ResamplingStrategy
+struct Holdout <: ResamplingStrategy
     fraction_train::Float64
     shuffle::Bool
     rng::Union{Int,AbstractRNG}
-	
+
     function Holdout(fraction_train, shuffle, rng)
-        0 < fraction_train < 1 || 
-		error("`fraction_train` must be between 0 and 1.")
+        0 < fraction_train < 1 ||
+            error("`fraction_train` must be between 0 and 1.")
         return new(fraction_train, shuffle, rng)
     end
 end
 
 # Keyword Constructor
-function Holdout(; fraction_train::Float64=0.7,
-                   shuffle::Bool=false,
-                   rng::Union{Int,AbstractRNG}=Random.GLOBAL_RNG)
-    Holdout(fraction_train, shuffle, rng)
+function Holdout(; fraction_train::Float64=0.7, shuffle=nothing, rng=nothing)
+    if rng isa Integer
+        rng = MersenneTwister(rng)
+    end
+    if shuffle === nothing
+        shuffle = ifelse(rng===nothing, false, true)
+    end
+    if rng === nothing
+        rng = Random.GLOBAL_RNG
+    end
+    return Holdout(fraction_train, shuffle, rng)
 end
 
-function MLJ.train_test_pairs(holdout::Holdout, rows)
-    if holdout.rng isa Integer
-        rng = MersenneTwister(holdout.rng)
-    else
-        rng = holdout.rng
-    end
-    train, evalu = partition(rows, holdout.fraction_train,
-                             shuffle=holdout.shuffle, rng=rng)
-    return [(train, evalu),]
+function train_test_pairs(holdout::Holdout, rows)
+    train, test = partition(rows, holdout.fraction_train,
+                          shuffle=holdout.shuffle, rng=holdout.rng)
+    return [(train, test),]
 end
 ```
-
 
 ### API
 

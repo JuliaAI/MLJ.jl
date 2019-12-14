@@ -15,8 +15,6 @@
 #     inverse_transform(Scale, scale(log10), 100) = 2
 
 
-# See also: strange
-
 struct SCALE end
 Scale = SCALE()
 scale(s::Symbol) = Val(s)
