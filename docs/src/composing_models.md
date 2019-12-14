@@ -2,10 +2,16 @@
 
 MLJ has a flexible interface for composing multiple machine learning
 elements to form a *learning network*, whose complexity can extend
-beyond the "pipelines" of other machine learning toolboxes. However,
-MLJ does provide special syntax for common use cases, which are
-described first below. A description of the general framework begins
-at [Learning Networks](@ref).
+beyond the "pipelines" of other machine learning toolboxes. While
+these learning networks can be applied directly to learning tasks,
+they are more commonly used to specify new re-usable, stand-alone,
+composite model types, that behave like any other model type. The main
+novelty of composite models is that they include other models as
+hyper-parameters. 
+
+That said, MLJ also provides dedicated syntax for the most common
+composition use-cases, which are described first below. A description
+of the general framework begins at [Learning Networks](@ref).
 
 
 ## Linear pipelines
