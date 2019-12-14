@@ -1,11 +1,3 @@
-# depreciated:
-function scitypes(X)
-    Tables.istable(X) || throw(ArgumentError("Table expected here. "))
-    s = schema(X)
-    return (names=collect(s.names), scitypes=collect(s.scitypes))
-end
-
-
 ## SUPERVISED
 
 struct SupervisedScitype{input_scitype, target_scitype, prediction_type} end

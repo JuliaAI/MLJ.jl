@@ -62,8 +62,7 @@ end
     @test scitype_union(task.X.x) <: Continuous
     @test scitype_union(task.X.w) === Union{Count, Missing}
     @test scitype_union(task.y) <: Count
-    @test_logs((:info, r"\nis_probabilistic = true"),
-               supervised(task.X, task.y, is_probabilistic=true))
+    supervised(task.X, task.y, is_probabilistic=true)
 end
 
 end # module

@@ -84,7 +84,7 @@ Returns the input `X` and target `y` of the task, also available as
 
 """
 supervised(; data=nothing, types=Dict(), kwargs...) =
-	    SupervisedTask(; data = coerce(data, types), kwargs...)
+            SupervisedTask(; data = coerce(data, types), kwargs...)
 supervised(X, y; kwargs...) = SupervisedTask(X, y; kwargs...)
 """
     task = unsupervised(data=nothing, types=Dict(), ignore=Symbol[], verbosity=1)
@@ -108,11 +108,11 @@ ignored.
 
 Return the input data in form to be used in models.
 
-See also [`scitype`](@ref), [`scitype_union`](@ref) 
+See also [`scitype`](@ref), [`scitype_union`](@ref)
 
 """
 unsupervised(; data=nothing, types=Dict(), kwargs...) =
-	    UnsupervisedTask(; data = coerce(types, data), kwargs...)
+            UnsupervisedTask(; data = coerce(types, data), kwargs...)
 
 
 ## MODEL MATCHING
@@ -131,4 +131,3 @@ models(task::UnsupervisedTask) = models() do model
     !(model.is_supervised) &&
         task.input_scitype <: model.input_scitype
 end
-

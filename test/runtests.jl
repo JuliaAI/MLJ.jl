@@ -13,36 +13,12 @@ using Test
 using Random
 end
 
-@constant junk=ConstantRegressor()
-
 @testset "utilities" begin
   @test include("utilities.jl")
 end
 
 @testset "parameters" begin
   @test include("parameters.jl")
-end
-
-@testset "Machines" begin
-  @test include("machines.jl")
-end
-
-@testset "networks" begin
-  @test include("networks.jl")
-end
-
-if VERSION ≥ v"1.3.0-"
-  @testset "arrows" begin
-    @test include("arrows.jl")
-  end
-end
-
-@testset "composites" begin
-  @test include("composites.jl")
-end
-
-@testset "pipelines" begin
-  @test include("pipelines.jl")
 end
 
 @testset "resampling" begin
@@ -73,18 +49,4 @@ end
     @test include("scitypes.jl")
 end
 
-# @testset "registry environment compatibility" begin
-#     @test MLJ.Registry.@update(true)
-# end
 
-
-## TEST THE EXAMPLES
-
-const exdir = joinpath(MLJ.srcdir, "..", "examples")
-
-# uncomment remaining code to test examples:
-# @testset "/examples" begin
-#     @test include(joinpath(exdir, "using_tasks.jl"))
-#     @test include(joinpath(exdir, "random_forest.jl"))
-#     @test include(joinpath(exdir, "two_parameter_tune.jl"))
-# end
