@@ -9,18 +9,18 @@ MLJ_VERSION # version of MLJ for this cheatsheet
 ```
 
 #### Model search and code loading
- 
+
 `info("PCA")` retrieves registry metadata for the model called "PCA"
 
 `info("RidgeRegressor", pkg="MultivariateStats")` retrieves metadata
 for "RidgeRegresssor", which is provided by multiple packages
 
 `models()` lists metadata of every registered model.
- 
-`models(x -> x.is_supervised && x.is_pure_julia)` lists all supervised models written in pure julia. 
+
+`models(x -> x.is_supervised && x.is_pure_julia)` lists all supervised models written in pure julia.
 
 **experimental:**
-`models(matching(X))` lists all unsupervised models compatible with input `X`. 
+`models(matching(X))` lists all unsupervised models compatible with input `X`.
 
 **experimental!**
 `models(matching(X, y))` lists all supervised modesl compatible with input/target `X/y`.
@@ -33,7 +33,7 @@ models() do model
     model.prediction_type == :probabilistic &&
 	model.is_pure_julia
 end
-```	
+```
 
 `tree = @load DecisionTreeClassifier` to load code and instantiate "DecisionTreeClassifier" model
 
@@ -46,7 +46,7 @@ instantiates a model provided by multiple packages
 #### Scitypes and coercion
 
 `scitype(x)` is the scientific type of `x`. For example `scitype(2.4) = Continuous`
- 
+
 ![scitypes.png](scitypes_small.png)
 
 type                                       | scitype
@@ -58,7 +58,7 @@ type                                       | scitype
 *Figure and Table for scalar scitypes*
 
 Use `schema(X)` to get the column scitypes of a table `X`
- 
+
 `coerce(y, Multiclass)` attempts coercion of all elements of `y` into scitype `Multiclass`
 
 `coerce(X, :x1 => Continuous, :x2 => OrderedFactor)` to coerce columns `:x1` and `:x2` of table `X`.
@@ -88,11 +88,11 @@ Splitting row indices into train/validation/test:
 
 Supervised case:
 
-`model = KNNRegressor(K=1)` and `mach = machine(model, X, y)` 
- 
+`model = KNNRegressor(K=1)` and `mach = machine(model, X, y)`
+
 Unsupervised case:
 
-`model = OneHotEncoder()` and `mach = machine(model, X)` 
+`model = OneHotEncoder()` and `mach = machine(model, X)`
 
 
 #### Fitting
@@ -103,7 +103,7 @@ Unsupervised case:
 #### Prediction
 
 Supervised case: `predict(mach, Xnew)` or `predict(mach, rows=1:100)`
-  
+
 Similarly, for probabilistic models: `predict_mode`, `predict_mean` and `predict_median`.
 
 Unsupervised case: `transform(mach, rows=1:100)` or `inverse_transform(mach, rows)`, etc.
@@ -128,23 +128,23 @@ pkg="MultivariateStats")` gets all properties (aka traits) of registered models
 
 `report(mach)` gets other training results (e.g. feature rankings)
 
-    
+
 #### Resampling strategies
-    
+
 `Holdout(fraction_train=…, shuffle=false)` for simple holdout
- 
+
 `CV(nfolds=6, shuffle=false)` for cross-validation
 
 or a list of pairs of row indices:
 
-`[(train1, eval1), (train2, eval2), ... (traink, evalk)]` 
+`[(train1, eval1), (train2, eval2), ... (traink, evalk)]`
 
 
 #### Performance estimation
 
 `evaluate(model, X, y, resampling=CV(), measure=rms, operation=predict, weights=..., verbosity=1)`
 `evaluate!(mach, resampling=Holdout(), measure=[rms, mav], operation=predict, weights=..., verbosity=1)`
-`evaluate!(mach, resampling=[(fold1, fold2), (fold2, fold1)], measure=rms)` 
+`evaluate!(mach, resampling=[(fold1, fold2), (fold2, fold1)], measure=rms)`
 
 
 #### Ranges for tuning
@@ -172,7 +172,7 @@ Nested ranges: Use dot syntax, as in `r = range(EnsembleModel(atom=tree), :(atom
 
 If using Plots.jl:
 
-`plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)` 
+`plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)`
 
 
 #### Built-in performance measures
@@ -184,7 +184,7 @@ If using Plots.jl:
 `using LossFunctions` to use more measures
 
 
-#### Transformers 
+#### Transformers
 
 Built-ins include: `Standardizer`, `OneHotEncoder`, `UnivariateBoxCoxTransformer`, `FeatureSelector`, `UnivariateStandardizer`
 
@@ -198,12 +198,12 @@ Full list: do `models(m -> !m[:is_supervised])`
 `EnsembleModel(atom=…, weights=Float64[], bagging_fraction=0.8, rng=GLOBAL_RNG, n=100, parallel=true, out_of_bag_measure=[])`
 
 
-#### Pipelines 
+#### Pipelines
 
 With point predictions:
 
 `pipe = @pipeline MyPipe(hot=OneHotEncoder(), knn=KNNRegressor(K=3), target=UnivariateStandardizer())`
-						 
+
 
 With probabilistic-predictions:
 
@@ -238,5 +238,5 @@ Supervised, with `yhat` final node returning probabilistic predictions:
 
 Unsupervised, with final node `Xout`:
 
-`@from_network Composite(pca=network_pca) <= Xout` 
-    
+`@from_network Composite(pca=network_pca) <= Xout`
+
