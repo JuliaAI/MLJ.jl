@@ -133,7 +133,7 @@ pkg="MultivariateStats")` gets all properties (aka traits) of registered models
     
 `Holdout(fraction_train=…, shuffle=false)` for simple holdout
  
-`CV(nfolds=6, parallel=true, shuffle=false)` for cross-validation
+`CV(nfolds=6, shuffle=false)` for cross-validation
 
 or a list of pairs of row indices:
 
@@ -158,7 +158,7 @@ Nested ranges: Use dot syntax, as in `r = range(EnsembleModel(atom=tree), :(atom
 
 #### Tuning strategies
 
-`Grid(resolution=10, parallel=true)` for grid search
+`Grid(resolution=10)` for grid search
 
 
 #### Tuning model wrapper

@@ -2,7 +2,7 @@ abstract type TuningStrategy <: MLJ.MLJType end
 const ParameterName=Union{Symbol,Expr}
 
 """
-    Grid(resolution=10, parallel=true)
+    Grid(resolution=10, acceleration=DEFAULT_RESOURCE[])
 
 Define a grid-based hyperparameter tuning strategy, using the
 specified `resolution` for numeric hyperparameters. For use with a
@@ -13,6 +13,10 @@ Individual hyperparameter resolutions can also be specified, as in
     Grid(resolution=[:n => r1, :(atom.max_depth) => r2])
 
 where `r1` and `r2` are `NumericRange` objects.
+
+The `acceleration` keyword argument is used to specify the compute resource (a
+subtype of `ComputationalResources.AbstractResource`) that will be used to
+accelerate/parallelize the resampling operation.
 
 See also [TunedModel](@ref), [range](@ref).
 
