@@ -47,7 +47,7 @@ Holdout resampling strategy, for use in `evaluate!`, `evaluate` and in tuning.
 
 Returns the pair `[(train, test)]`, where `train` and `test` are
 vectors such that `rows=vcat(train, test)` and
-`length(train)/length(test)` is approximatey equal to fraction_train`.
+`length(train)/length(rows)` is approximatey equal to fraction_train`.
 
 Pre-shuffling of `rows` is controlled by `rng` and `shuffle`. If `rng`
 is an integer, then the `Holdout` keyword constructor resets it to
