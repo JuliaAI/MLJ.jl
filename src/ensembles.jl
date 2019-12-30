@@ -361,7 +361,7 @@ accelerate/parallelize ensemble fitting.
 If a single measure or non-empty vector of measures is specified by
 `out_of_bag_measure`, then out-of-bag estimates of performance are
 written to the trainig report (call `report` on the trained
-machine wrapping the ensemble model). 
+machine wrapping the ensemble model).
 
 *Important:* If sample weights `w` (as opposed to atomic weights) are
 specified when constructing a machine for the ensemble model, as in
@@ -446,7 +446,7 @@ function fit(model::EitherEnsembleModel{Atom},
     else
         w = nothing
     end
-    
+
     acceleration = model.acceleration
     if acceleration isa CPUProcesses && nworkers() == 1
         acceleration = DEFAULT_RESOURCE[]
@@ -515,7 +515,7 @@ function fit(model::EitherEnsembleModel{Atom},
                     s = value(m, yhat, Xtest, ytest, wtest)
                 end
                 metrics[i,k] = s
-            end                
+            end
         end
 
         # aggregate metrics across the ensembles:
