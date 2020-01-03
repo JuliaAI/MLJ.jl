@@ -2,21 +2,21 @@
 
 struct SupervisedScitype{input_scitype, target_scitype, prediction_type} end
 
-ScientificTypes.scitype(model::Deterministic, ::Val{:mlj}) =
+ScientificTypes.scitype(model::Deterministic, ::ScientificTypes.MLJ) =
     SupervisedScitype{input_scitype(model),
                     target_scitype(model),
                     :deterministic}
-                    
-ScientificTypes.scitype(model::Probabilistic, ::Val{:mlj}) =
+
+ScientificTypes.scitype(model::Probabilistic, ::ScientificTypes.MLJ) =
     SupervisedScitype{input_scitype(model),
                     target_scitype(model),
                     :probabilistic}
-                    
-ScientificTypes.scitype(model::Interval, ::Val{:mlj}) =
+
+ScientificTypes.scitype(model::Interval, ::ScientificTypes.MLJ) =
     SupervisedScitype{input_scitype(model),
                     target_scitype(model),
                     :interval}
-                    
+
 function Base.getproperty(::SupervisedScitype{input_scitype, target_scitype, prediction_type},
                           field::Symbol) where {input_scitype, target_scitype, prediction_type}
     if field === :input_scitype
@@ -48,7 +48,7 @@ end
 
 struct UnsupervisedScitype{input_scitype, output_scitype} end
 
-ScientificTypes.scitype(model::Unsupervised, ::Val{:mlj}) =
+ScientificTypes.scitype(model::Unsupervised, ::ScientificTypes.MLJ) =
     UnsupervisedScitype{input_scitype(model),
                       MLJBase.output_scitype(model)}
 
@@ -77,7 +77,7 @@ function Base.show(io::IO, ::MIME"text/plain", S::UnsupervisedScitype)
     show(io, MIME("text/plain"), _as_named_tuple(S))
 end
 
-              
+
 ## MEASURES
 
 struct MeasureScitype{target_scitype,
@@ -87,7 +87,7 @@ struct MeasureScitype{target_scitype,
                is_feature_dependent,
                supports_weights} end
 
-ScientificTypes.scitype(measure, ::Val{:mlj}, ::Val{:measure}) =
+ScientificTypes.scitype(measure, ::ScientificTypes.MLJ, ::Val{:measure}) =
     MeasureScitype{target_scitype(measure),
                prediction_type(measure),
                orientation(measure),
@@ -140,5 +140,3 @@ end
 function Base.show(io::IO, ::MIME"text/plain", M::MeasureScitype)
       show(io, MIME("text/plain"), _as_named_tuple(M))
 end
-
-
