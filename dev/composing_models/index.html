@@ -12,7 +12,7 @@ height = [67.0, 81.5, 55.6, 90.0, 61.1];</code></pre><pre><code class="language-
                                          metric = Distances.Euclidean(0.0),
                                          leafsize = 10,
                                          reorder = true,
-                                         weights = :uniform,) @ 1…48</code></pre><pre><code class="language-julia">julia&gt; pipe = @pipeline MyPipe(X -&gt; coerce(X, :age=&gt;Continuous),
+                                         weights = :uniform,) @ 6…49</code></pre><pre><code class="language-julia">julia&gt; pipe = @pipeline MyPipe(X -&gt; coerce(X, :age=&gt;Continuous),
                                hot = OneHotEncoder(),
                                regressor = KNNRegressor(K=3),
                                target = UnivariateStandardizer())
