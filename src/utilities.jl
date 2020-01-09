@@ -195,27 +195,3 @@ macro pcurve(var1, range, code)
 end
 
 
-## FOR PRETTY PRINTING COLUMN TABLES
-
-function pretty(io::IO, X; showtypes=true, alignment=:l, kwargs...)
-    names = schema(X).names |> collect
-    if showtypes
-        types = schema(X).types |> collect
-        scitypes = schema(X).scitypes |> collect
-        header = hcat(names, types, scitypes) |> permutedims
-    else
-        header  = names
-    end
-    show_color = MLJBase.SHOW_COLOR
-    color_off()
-    try
-        PrettyTables.pretty_table(io, MLJBase.matrix(X),
-                                  header; alignment=alignment, kwargs...)
-    catch
-        println("Trouble displaying table.")
-    end
-    show_color ? color_on() : color_off()
-    return nothing
-end
-
-pretty(X; kwargs...) = pretty(stdout, X; kwargs...)

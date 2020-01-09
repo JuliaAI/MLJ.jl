@@ -6,10 +6,7 @@ module MLJ
 export MLJ_VERSION
 
 # utilities.jl:
-export @curve, @pcurve, pretty
-
-# resampling.jl:
-export Holdout, CV, StratifiedCV, evaluate!, Resampler
+export @curve, @pcurve
 
 # parameters.jl:
 export Params, iterator
@@ -61,9 +58,11 @@ export nrows, nfeatures, color_off, color_on,
     Machine, NodalMachine, machine, AbstractNode,
     source, node, fit!, freeze!, thaw!, Node, sources, origins,
     machines, sources, anonymize!, @from_network, fitresults,
-    @pipeline
+    @pipeline,
+    ResamplingStrategy, Holdout, CV,
+    StratifiedCV, evaluate!, Resampler, iterator,
+    default_resource, pretty
 
-# re-export from MLJBase - relating to measures:
 export measures,
     orientation, reports_each_observation,
     is_feature_dependent, aggregation,
@@ -138,7 +137,6 @@ import MLJModels: models
 
 ## CONSTANTS
 
-const DEFAULT_RESOURCE = Ref{AbstractResource}(CPU1())
 const srcdir = dirname(@__FILE__)
 const CategoricalElement = Union{CategoricalString,CategoricalValue}
 
@@ -156,7 +154,6 @@ const MLJ_VERSION = toml["version"]
 ## INCLUDE FILES
 
 include("utilities.jl")     # general purpose utilities
-include("resampling.jl")    # resampling strategies and model evaluation
 include("parameters.jl")    # hyperparameter ranges and grid generation
 include("tuning.jl")
 include("learning_curves.jl")
