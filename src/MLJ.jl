@@ -154,7 +154,6 @@ const MLJ_VERSION = toml["version"]
 ## INCLUDE FILES
 
 include("utilities.jl")     # general purpose utilities
-include("parameters.jl")    # hyperparameter ranges and grid generation
 include("tuning.jl")
 include("learning_curves.jl")
 include("ensembles.jl")     # homogeneous ensembles
