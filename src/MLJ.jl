@@ -130,7 +130,7 @@ using RecipesBase
 # to be extended:
 import MLJBase: fit, update, clean!, fit!,
     predict, predict_mean, predict_median, predict_mode,
-    transform, inverse_transform, se, evaluate, fitted_params,
+    transform, inverse_transform, evaluate, fitted_params,
     show_as_constructed, ==, getindex, setindex!
 import MLJModels: models
 

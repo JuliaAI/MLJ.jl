@@ -257,7 +257,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M},
 #    nested_iterators = copy(tuned_model.ranges, iterators)
 
     n_iterators = length(iterators) # same as number of ranges
-    A = MLJ.unwind(iterators...)
+    A = MLJBase.unwind(iterators...)
     N = size(A, 1)
 
     if tuned_model.full_report
