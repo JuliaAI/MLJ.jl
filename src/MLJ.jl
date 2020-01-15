@@ -121,7 +121,6 @@ import Distributions: pdf, mode
 import Statistics, StatsBase, LinearAlgebra, Random
 import Random: AbstractRNG, MersenneTwister
 using ProgressMeter
-import PrettyTables
 using ComputationalResources
 using ComputationalResources: CPUProcesses
 using DocStringExtensions: SIGNATURES, TYPEDEF
