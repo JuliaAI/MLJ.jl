@@ -49,7 +49,7 @@ julia&gt; task = supervised(data=iris, target=:Species, is_probabilistic=true)
 │ is_probabilistic = true
 │ input_scitype = Table{AbstractArray{Continuous,1}} 
 └ target_scitype = AbstractArray{Multiclass{3},1}
-SupervisedTask @ 4…96
+SupervisedTask @ 9…94
 
 julia&gt; tree = @load DecisionTreeClassifier verbosity=1
 import MLJModels ✔
@@ -64,10 +64,10 @@ DecisionTreeClassifier(
     post_prune = false,
     merge_purity_threshold = 1.0,
     pdf_smoothing = 0.0,
-    display_depth = 5) @ 1…02
+    display_depth = 5) @ 4…73
 
 julia&gt; mach = machine(tree, task)
-Machine{DecisionTreeClassifier} @ 7…25
+Machine{DecisionTreeClassifier} @ 1…04
 
 julia&gt; evaluate!(mach, operation=predict_mode,
                  resampling=Holdout(), measure=misclassification_rate, verbosity=0)

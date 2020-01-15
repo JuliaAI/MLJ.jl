@@ -34,7 +34,7 @@ DecisionTreeRegressor(
     min_purity_increase = 0.0010000000000000002,
     n_subfeatures = 0,
     post_prune = false,
-    merge_purity_threshold = 1.0) @ 1…22</code></pre><p>Predicting on new input observations using the optimal model:</p><pre><code class="language-julia-repl">julia&gt; predict(self_tuning_tree, (x1=rand(3), x2=rand(3), x3=rand(3)))
+    merge_purity_threshold = 1.0) @ 4…66</code></pre><p>Predicting on new input observations using the optimal model:</p><pre><code class="language-julia-repl">julia&gt; predict(self_tuning_tree, (x1=rand(3), x2=rand(3), x3=rand(3)))
 3-element Array{Float64,1}:
  0.15003587564409124
  0.0040336796584925306
@@ -65,7 +65,7 @@ julia&gt; self_tuning_forest_model = TunedModel(model=forest_model,
 julia&gt; self_tuning_forest = machine(self_tuning_forest_model, X, y);
 
 julia&gt; fit!(self_tuning_forest, verbosity=0)
-Machine{DeterministicTunedModel} @ 1…45
+Machine{DeterministicTunedModel} @ 1…84
 
 julia&gt; report(self_tuning_forest)
 (parameter_names = [&quot;atom.n_subfeatures&quot; &quot;bagging_fraction&quot;],
