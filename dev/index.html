@@ -15,17 +15,17 @@ julia&gt; first(X, 3) |&gt; pretty
 │ 4.9         │ 3.0        │ 1.4         │ 0.2        │
 │ 4.7         │ 3.2        │ 1.3         │ 0.2        │
 └─────────────┴────────────┴─────────────┴────────────┘</code></pre><p>To list all models available in MLJ&#39;s <a href="model_search/">model registry</a>:</p><pre><code class="language-julia-repl">julia&gt; models()
-111-element Array{NamedTuple,1}:
+115-element Array{NamedTuple,1}:
  (name = ARDRegressor, package_name = ScikitLearn, ... )
  (name = AdaBoostClassifier, package_name = ScikitLearn, ... )
  (name = AdaBoostRegressor, package_name = ScikitLearn, ... )
+ (name = AdaBoostStumpClassifier, package_name = DecisionTree, ... )
  (name = BaggingClassifier, package_name = ScikitLearn, ... )
  (name = BaggingRegressor, package_name = ScikitLearn, ... )
  (name = BayesianLDA, package_name = MultivariateStats, ... )
  (name = BayesianLDA, package_name = ScikitLearn, ... )
  (name = BayesianQDA, package_name = ScikitLearn, ... )
  (name = BayesianRidgeRegressor, package_name = ScikitLearn, ... )
- (name = BayesianSubspaceLDA, package_name = MultivariateStats, ... )
  ⋮
  (name = StaticTransformer, package_name = MLJBase, ... )
  (name = SubspaceLDA, package_name = MultivariateStats, ... )
@@ -39,40 +39,42 @@ julia&gt; first(X, 3) |&gt; pretty
 import MLJModels ✔
 import DecisionTree ✔
 import MLJModels.DecisionTree_.DecisionTreeClassifier ✔
-MLJModels.DecisionTree_.DecisionTreeClassifier(pruning_purity = 1.0,
-                                               max_depth = -1,
-                                               min_samples_leaf = 1,
-                                               min_samples_split = 2,
-                                               min_purity_increase = 0.0,
-                                               n_subfeatures = 0,
-                                               display_depth = 5,
-                                               post_prune = false,
-                                               merge_purity_threshold = 0.9,
-                                               pdf_smoothing = 0.05,) @ 1…01</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model can be evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
+DecisionTreeClassifier(
+    max_depth = -1,
+    min_samples_leaf = 1,
+    min_samples_split = 2,
+    min_purity_increase = 0.0,
+    n_subfeatures = 0,
+    post_prune = false,
+    merge_purity_threshold = 1.0,
+    pdf_smoothing = 0.0,
+    display_depth = 5) @ 1…69</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model can be evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
                 resampling=CV(shuffle=true), measure=cross_entropy, verbosity=0)
-(measure = MLJBase.CrossEntropy[cross_entropy],
- measurement = [0.22385923572668878],
- per_fold = Array{Float64,1}[[0.03278982282299079, 0.0327898228229908, 0.1965636053118747, 0.1965636053118747, 0.5241111702896429, 0.36033738780075886]],
- per_observation = Array{Array{Float64,1},1}[[[0.032789822822990956, 0.032789822822990956, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.032789822822990956, 0.03278982282299073  …  0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073], [0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.032789822822990956, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073  …  0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073], [0.032789822822990956, 0.032789822822990956, 4.127134385045092, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073  …  0.032789822822990956, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073], [0.032789822822990956, 0.032789822822990956, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073  …  0.03278982282299073, 0.03278982282299073, 4.127134385045092, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073], [0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.03278982282299073  …  0.03278982282299073, 0.03278982282299073, 4.127134385045092, 0.032789822822990956, 0.03278982282299073, 4.127134385045092, 0.032789822822990956, 0.03278982282299073, 0.032789822822990956, 0.032789822822990956], [0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073  …  0.032789822822990956, 4.127134385045092, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 4.127134385045092, 0.032789822822990956, 0.032789822822990956, 0.03278982282299073]]],)</code></pre><p>Evaluating against multiple performance measures is also possible. See <a href="evaluating_model_performance/">Evaluating Model Performance</a> for details.</p><h3><a class="nav-anchor" id="Fit-and-predict-1" href="#Fit-and-predict-1">Fit and predict</a></h3><p>To illustrate MLJ&#39;s fit and predict interface, let&#39;s perform the above evaluations by hand.</p><p>Wrapping the model in data creates a <em>machine</em> which will store training outcomes:</p><pre><code class="language-julia-repl">julia&gt; tree = machine(tree_model, X, y)
-Machine{DecisionTreeClassifier} @ 1…37</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
+┌───────────────┬───────────────┬──────────────────────────────────────────────┐
+│ _.measure     │ _.measurement │ _.per_fold                                   │
+├───────────────┼───────────────┼──────────────────────────────────────────────┤
+│ cross_entropy │ 1.68          │ [2.22e-16, 2.22e-16, 1.44, 1.44, 4.33, 2.88] │
+└───────────────┴───────────────┴──────────────────────────────────────────────┘
+_.per_observation = [[[2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16]]]</code></pre><p>Evaluating against multiple performance measures is also possible. See <a href="evaluating_model_performance/">Evaluating Model Performance</a> for details.</p><h3><a class="nav-anchor" id="Fit-and-predict-1" href="#Fit-and-predict-1">Fit and predict</a></h3><p>To illustrate MLJ&#39;s fit and predict interface, let&#39;s perform the above evaluations by hand.</p><p>Wrapping the model in data creates a <em>machine</em> which will store training outcomes:</p><pre><code class="language-julia-repl">julia&gt; tree = machine(tree_model, X, y)
+Machine{DecisionTreeClassifier} @ 1…91</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
 
 julia&gt; fit!(tree, rows=train);
-[ Info: Training Machine{DecisionTreeClassifier} @ 1…37.
+[ Info: Training Machine{DecisionTreeClassifier} @ 1…91.
 
 julia&gt; yhat = predict(tree, X[test,:]);
 
 julia&gt; yhat[3:5]
 3-element Array{UnivariateFinite{String,UInt8,Float64},1}:
- UnivariateFinite(setosa=&gt;0.0161, versicolor=&gt;0.968, virginica=&gt;0.0161)
- UnivariateFinite(setosa=&gt;0.968, versicolor=&gt;0.0161, virginica=&gt;0.0161)
- UnivariateFinite(setosa=&gt;0.0161, versicolor=&gt;0.968, virginica=&gt;0.0161)
+ UnivariateFinite(setosa=&gt;0.0, versicolor=&gt;1.0, virginica=&gt;0.0)
+ UnivariateFinite(setosa=&gt;1.0, versicolor=&gt;0.0, virginica=&gt;0.0)
+ UnivariateFinite(setosa=&gt;0.0, versicolor=&gt;1.0, virginica=&gt;0.0)
 
 julia&gt; cross_entropy(yhat, y[test]) |&gt; mean
-0.1237752575390374</code></pre><p>Notice that <code>yhat</code> is a vector of <code>Distribution</code> objects (because DecisionTreeClassifier makes probabilistic predictions). The methods of the <a href="https://github.com/JuliaStats/Distributions.jl">Distributions</a> package can be applied to such distributions:</p><pre><code class="language-julia-repl">julia&gt; broadcast(pdf, yhat[3:5], &quot;virginica&quot;) # predicted probabilities of virginica
+0.8009700753137147</code></pre><p>Notice that <code>yhat</code> is a vector of <code>Distribution</code> objects (because DecisionTreeClassifier makes probabilistic predictions). The methods of the <a href="https://github.com/JuliaStats/Distributions.jl">Distributions</a> package can be applied to such distributions:</p><pre><code class="language-julia-repl">julia&gt; broadcast(pdf, yhat[3:5], &quot;virginica&quot;) # predicted probabilities of virginica
 3-element Array{Float64,1}:
- 0.01612903225806452
- 0.01612903225806452
- 0.01612903225806452
+ 0.0
+ 0.0
+ 0.0
 
 julia&gt; mode.(yhat[3:5])
 3-element CategoricalArrays.CategoricalArray{String,1,UInt8}:
@@ -90,14 +92,14 @@ julia&gt; mode.(yhat[3:5])
  4
 
 julia&gt; stand_model = UnivariateStandardizer()
-UnivariateStandardizer() @ 8…84
+UnivariateStandardizer() @ 1…31
 
 julia&gt; stand = machine(stand_model, v)
-Machine{UnivariateStandardizer} @ 5…19
+Machine{UnivariateStandardizer} @ 1…64
 
 julia&gt; fit!(stand)
-[ Info: Training Machine{UnivariateStandardizer} @ 5…19.
-Machine{UnivariateStandardizer} @ 5…19
+[ Info: Training Machine{UnivariateStandardizer} @ 1…64.
+Machine{UnivariateStandardizer} @ 1…64
 
 julia&gt; w = transform(stand, v)
 4-element Array{Float64,1}:
@@ -114,19 +116,23 @@ julia&gt; inverse_transform(stand, w)
  4.0</code></pre><p><a href="machines/">Machines</a> have an internal state which allows them to avoid redundant calculations when retrained, in certain conditions - for example when increasing the number of trees in a random forest, or the number of epochs in a neural network. The machine building syntax also anticipates a more general syntax for composing multiple models, as explained in <a href="composing_models/">Composing Models</a>.</p><p>There is a version of <code>evaluate</code> for machines as well as models. An exclamation point is added to the method name because machines are generally mutated when trained:</p><pre><code class="language-julia-repl">julia&gt; evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
                        measure=cross_entropy,
                        verbosity=0)
-(measure = MLJBase.CrossEntropy[cross_entropy],
- measurement = [0.25115486614150284],
- per_fold = Array{Float64,1}[[0.25115486614150284]],
- per_observation = Array{Array{Float64,1},1}[[[0.03278982282299073, 0.03278982282299073, 4.127134385045092, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.032789822822990956, 0.032789822822990956, 0.03278982282299073  …  0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956]]],)</code></pre><p>Changing a hyperparameter and re-evaluating:</p><pre><code class="language-julia-repl">julia&gt; tree_model.max_depth = 3
+┌───────────────┬───────────────┬────────────┐
+│ _.measure     │ _.measurement │ _.per_fold │
+├───────────────┼───────────────┼────────────┤
+│ cross_entropy │ 1.92          │ [1.92]     │
+└───────────────┴───────────────┴────────────┘
+_.per_observation = [[[2.22e-16, 2.22e-16, ..., 2.22e-16]]]</code></pre><p>Changing a hyperparameter and re-evaluating:</p><pre><code class="language-julia-repl">julia&gt; tree_model.max_depth = 3
 3
 
 julia&gt; evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
                  measure=cross_entropy,
                  verbosity=0)
-(measure = MLJBase.CrossEntropy[cross_entropy],
- measurement = [0.25023646501669833],
- per_fold = Array{Float64,1}[[0.25023646501669833]],
- per_observation = Array{Array{Float64,1},1}[[[0.03278982282299073, 1.1151415906193203, 0.032789822822990956, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.032789822822990956, 0.03278982282299073  …  0.03278982282299073, 0.03278982282299073, 0.032789822822990956, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073, 0.03278982282299073]]],)</code></pre><h3><a class="nav-anchor" id="Next-steps-1" href="#Next-steps-1">Next steps</a></h3><p>To learn a little more about what MLJ can do, browse <a href="common_mlj_workflows/">Common MLJ Workflows</a> or MLJ&#39;s <a href="https://alan-turing-institute.github.io/MLJTutorials/">tutorials</a>, returning to the manual as needed. <em>Read at least the remainder of this page before considering serious use of MLJ.</em></p><h3><a class="nav-anchor" id="Prerequisites-1" href="#Prerequisites-1">Prerequisites</a></h3><p>MLJ assumes some familiarity with the <code>CategoricalValue</code> and <code>CategoricalString</code> types from <a href="https://github.com/JuliaData/CategoricalArrays.jl">CategoricalArrays.jl</a>, used here for representing categorical data. For probabilistic predictors, a basic acquaintance with <a href="https://github.com/JuliaStats/Distributions.jl">Distributions.jl</a> is also assumed.</p><h3><a class="nav-anchor" id="Data-containers-and-scientific-types-1" href="#Data-containers-and-scientific-types-1">Data containers and scientific types</a></h3><p>The MLJ user should acquaint themselves with some basic assumptions about the form of data expected by MLJ, as outlined below. </p><pre><code class="language-none">machine(model::Supervised, X, y) 
+┌───────────────┬───────────────┬────────────┐
+│ _.measure     │ _.measurement │ _.per_fold │
+├───────────────┼───────────────┼────────────┤
+│ cross_entropy │ 1.5           │ [1.5]      │
+└───────────────┴───────────────┴────────────┘
+_.per_observation = [[[2.22e-16, 1.1, ..., 2.22e-16]]]</code></pre><h3><a class="nav-anchor" id="Next-steps-1" href="#Next-steps-1">Next steps</a></h3><p>To learn a little more about what MLJ can do, browse <a href="common_mlj_workflows/">Common MLJ Workflows</a> or MLJ&#39;s <a href="https://alan-turing-institute.github.io/MLJTutorials/">tutorials</a>, returning to the manual as needed. <em>Read at least the remainder of this page before considering serious use of MLJ.</em></p><h3><a class="nav-anchor" id="Prerequisites-1" href="#Prerequisites-1">Prerequisites</a></h3><p>MLJ assumes some familiarity with the <code>CategoricalValue</code> and <code>CategoricalString</code> types from <a href="https://github.com/JuliaData/CategoricalArrays.jl">CategoricalArrays.jl</a>, used here for representing categorical data. For probabilistic predictors, a basic acquaintance with <a href="https://github.com/JuliaStats/Distributions.jl">Distributions.jl</a> is also assumed.</p><h3><a class="nav-anchor" id="Data-containers-and-scientific-types-1" href="#Data-containers-and-scientific-types-1">Data containers and scientific types</a></h3><p>The MLJ user should acquaint themselves with some basic assumptions about the form of data expected by MLJ, as outlined below. </p><pre><code class="language-none">machine(model::Supervised, X, y) 
 machine(model::Unsupervised, X)</code></pre><p>Each supervised model in MLJ declares the permitted <em>scientific type</em> of the inputs <code>X</code> and targets <code>y</code> that can be bound to it in the first constructor above, rather than specifying specific machine types (such as <code>Array{Float32, 2}</code>). Similar remarks apply to the input <code>X</code> of an unsupervised model.</p><p>Scientific types are julia types defined in the package <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes.jl</a>, which also defines the convention used here (and there called <em>mlj</em>) for assigning a specific scientific type (interpretation) to each julia object (see the <code>scitype</code> examples below).</p><p>The basic &quot;scalar&quot; scientific types are <code>Continuous</code>, <code>Multiclass{N}</code>, <code>OrderedFactor{N}</code> and <code>Count</code>. Be sure you read <a href="#Container-element-types-1">Container element types</a> below to be guarantee your scalar data is interpreted correctly. Tools exist to coerce the data to have the appropriate scientfic type; see <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes.jl</a> or run <code>?coerce</code> for details.</p><p>Additionally, most data containers - such as tuples, vectors, matrices and tables - have a scientific type.</p><p><img src="scitypes.png" alt/></p><p><em>Figure 1. Part of the scientific type heirarchy in</em> ScientificTypes.jl.</p><pre><code class="language-julia-repl">julia&gt; scitype(4.6)
 Continuous
 
@@ -158,16 +164,17 @@ julia&gt; scitype(tree)
 (input_scitype = ScientificTypes.Table{#s13} where #s13&lt;:(AbstractArray{#s12,1} where #s12&lt;:Continuous),
  target_scitype = AbstractArray{#s21,1} where #s21&lt;:Finite,
  is_probabilistic = true,)</code></pre><p>This does not work if relevant model code has not been loaded. In that case one can extract this information from the model type&#39;s registry entry, using <code>info</code>:</p><pre><code class="language-julia-repl">julia&gt; info(&quot;DecisionTreeClassifier&quot;)
-Decision Tree Classifier.
+CART decision tree classifier.
 → based on [DecisionTree](https://github.com/bensadeghi/DecisionTree.jl).
 → do `@load DecisionTreeClassifier pkg=&quot;DecisionTree&quot;` to use the model.
 → do `?DecisionTreeClassifier` for documentation.
 (name = &quot;DecisionTreeClassifier&quot;,
  package_name = &quot;DecisionTree&quot;,
  is_supervised = true,
- docstring = &quot;Decision Tree Classifier.\n→ based on [DecisionTree](https://github.com/bensadeghi/DecisionTree.jl).\n→ do `@load DecisionTreeClassifier pkg=\&quot;DecisionTree\&quot;` to use the model.\n→ do `?DecisionTreeClassifier` for documentation.&quot;,
- hyperparameter_types = [&quot;Float64&quot;, &quot;Int64&quot;, &quot;Int64&quot;, &quot;Int64&quot;, &quot;Float64&quot;, &quot;Int64&quot;, &quot;Int64&quot;, &quot;Bool&quot;, &quot;Float64&quot;, &quot;Float64&quot;],
- hyperparameters = Symbol[:pruning_purity, :max_depth, :min_samples_leaf, :min_samples_split, :min_purity_increase, :n_subfeatures, :display_depth, :post_prune, :merge_purity_threshold, :pdf_smoothing],
+ docstring = &quot;CART decision tree classifier.\n→ based on [DecisionTree](https://github.com/bensadeghi/DecisionTree.jl).\n→ do `@load DecisionTreeClassifier pkg=\&quot;DecisionTree\&quot;` to use the model.\n→ do `?DecisionTreeClassifier` for documentation.&quot;,
+ hyperparameter_ranges = (nothing, nothing, nothing, nothing, nothing, nothing, nothing, nothing, nothing),
+ hyperparameter_types = (&quot;Int64&quot;, &quot;Int64&quot;, &quot;Int64&quot;, &quot;Float64&quot;, &quot;Int64&quot;, &quot;Bool&quot;, &quot;Float64&quot;, &quot;Float64&quot;, &quot;Int64&quot;),
+ hyperparameters = (:max_depth, :min_samples_leaf, :min_samples_split, :min_purity_increase, :n_subfeatures, :post_prune, :merge_purity_threshold, :pdf_smoothing, :display_depth),
  implemented_methods = Symbol[:fit, :predict, :fitted_params],
  is_pure_julia = true,
  is_wrapper = false,
@@ -179,4 +186,4 @@ Decision Tree Classifier.
  supports_online = false,
  supports_weights = false,
  input_scitype = Table{_s13} where _s13&lt;:Union{AbstractArray{_s12,1} where _s12&lt;:Continuous, AbstractArray{_s12,1} where _s12&lt;:Count, AbstractArray{_s12,1} where _s12&lt;:OrderedFactor},
- target_scitype = AbstractArray{_s797,1} where _s797&lt;:Finite,)</code></pre><h4><a class="nav-anchor" id="Container-element-types-1" href="#Container-element-types-1">Container element types</a></h4><p>Models in MLJ will always apply the <em>mlj</em> convention described in <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes.jl</a> to decide how to interpret the elements of your container types. Here are the key aspects of that convention:</p><ul><li><p>Any <code>AbstractFloat</code> is interpreted as <code>Continuous</code>.</p></li><li><p>Any <code>Integer</code> is interpreted as <code>Count</code>. </p></li><li><p>Any <code>CategoricalValue</code> or <code>CategoricalString</code>, <code>x</code>, is interpreted as <code>Multiclass</code> or <code>OrderedFactor</code>, depending on the value of <code>x.pool.ordered</code>. </p></li><li><p><code>String</code>s and <code>Char</code>s are <em>not</em> interpreted as <code>Finite</code>; they have <code>Unknown</code> scitype. Coerce vectors of strings or characters to <code>CategoricalVector</code>s if they represent <code>Multiclass</code> or <code>OrderedFactor</code> data. Do <code>?coerce</code> and <code>?unpack</code> to learn how. </p></li><li><p>In particular, <em>integers</em> (including <code>Bool</code>s) <em>cannot be used to represent categorical data.</em></p></li></ul><p>To designate an intrinsic &quot;true&quot; class for binary data (for purposes of applying MLJ measures, such as <code>truepositive</code>), data should be represented by an ordered <code>CategoricalValue</code> or <code>CategoricalString</code>. This data will have scitype <code>OrderedFactor{2}</code> and the &quot;true&quot; class is understood to be the <em>second</em> class in the ordering.</p><footer><hr/><a class="next" href="common_mlj_workflows/"><span class="direction">Next</span><span class="title">Common MLJ Workflows</span></a></footer></article></body></html>
+ target_scitype = AbstractArray{_s670,1} where _s670&lt;:Finite,)</code></pre><h4><a class="nav-anchor" id="Container-element-types-1" href="#Container-element-types-1">Container element types</a></h4><p>Models in MLJ will always apply the <em>mlj</em> convention described in <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes.jl</a> to decide how to interpret the elements of your container types. Here are the key aspects of that convention:</p><ul><li><p>Any <code>AbstractFloat</code> is interpreted as <code>Continuous</code>.</p></li><li><p>Any <code>Integer</code> is interpreted as <code>Count</code>. </p></li><li><p>Any <code>CategoricalValue</code> or <code>CategoricalString</code>, <code>x</code>, is interpreted as <code>Multiclass</code> or <code>OrderedFactor</code>, depending on the value of <code>x.pool.ordered</code>. </p></li><li><p><code>String</code>s and <code>Char</code>s are <em>not</em> interpreted as <code>Finite</code>; they have <code>Unknown</code> scitype. Coerce vectors of strings or characters to <code>CategoricalVector</code>s if they represent <code>Multiclass</code> or <code>OrderedFactor</code> data. Do <code>?coerce</code> and <code>?unpack</code> to learn how. </p></li><li><p>In particular, <em>integers</em> (including <code>Bool</code>s) <em>cannot be used to represent categorical data.</em></p></li></ul><p>To designate an intrinsic &quot;true&quot; class for binary data (for purposes of applying MLJ measures, such as <code>truepositive</code>), data should be represented by an ordered <code>CategoricalValue</code> or <code>CategoricalString</code>. This data will have scitype <code>OrderedFactor{2}</code> and the &quot;true&quot; class is understood to be the <em>second</em> class in the ordering.</p><footer><hr/><a class="next" href="common_mlj_workflows/"><span class="direction">Next</span><span class="title">Common MLJ Workflows</span></a></footer></article></body></html>

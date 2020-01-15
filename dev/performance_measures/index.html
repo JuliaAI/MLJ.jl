@@ -99,10 +99,15 @@ julia&gt; evaluate!(mach,
                  operation=predict,
                  weights=w,
                  verbosity=0)
-(measure = LearnBase.MarginLoss[LossFunctions.ZeroOneLoss(), LossFunctions.L1HingeLoss(), LossFunctions.L2HingeLoss(), LossFunctions.SigmoidLoss()],
- measurement = [0.4, 0.8, 1.6, 0.847681168808847],
- per_fold = Array{Float64,1}[[0.4], [0.8], [1.6], [0.847681168808847]],
- per_observation = Array{Array{Float64,1},1}[[[0.8, 0.0]], [[1.6, 0.0]], [[3.2, 0.0]], [[1.409275324764612, 0.2860870128530822]]],)</code></pre><p><em>Note:</em> Although <code>ZeroOneLoss(ŷ, y)</code> makes no sense (neither <code>ŷ</code> nor <code>y</code> have a type expected by LossFunctions.jl), one can instead use the adaptor <code>MLJ.value</code> as discussed above:</p><pre><code class="language-julia-repl">julia&gt; ŷ = predict(mach, X);
+┌─────────────┬───────────────┬────────────┐
+│ _.measure   │ _.measurement │ _.per_fold │
+├─────────────┼───────────────┼────────────┤
+│ ZeroOneLoss │ 0.4           │ [0.4]      │
+│ L1HingeLoss │ 0.8           │ [0.8]      │
+│ L2HingeLoss │ 1.6           │ [1.6]      │
+│ SigmoidLoss │ 0.848         │ [0.848]    │
+└─────────────┴───────────────┴────────────┘
+_.per_observation = [[[0.8, 0.0]], [[1.6, 0.0]], [[3.2, 0.0]], [[1.409275324764612, 0.2860870128530822]]]</code></pre><p><em>Note:</em> Although <code>ZeroOneLoss(ŷ, y)</code> makes no sense (neither <code>ŷ</code> nor <code>y</code> have a type expected by LossFunctions.jl), one can instead use the adaptor <code>MLJ.value</code> as discussed above:</p><pre><code class="language-julia-repl">julia&gt; ŷ = predict(mach, X);
 
 julia&gt; loss = MLJ.value(ZeroOneLoss(), ŷ, X, y, w) # X is ignored here
 5-element Array{Float64,1}:
