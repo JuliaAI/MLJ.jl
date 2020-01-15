@@ -125,6 +125,30 @@ function RidgeRegressor(; lambda=0.0)
 end
 ```
 
+An alternative to declaring the model struct, clean! method and keyword
+constructor, is to use the `@mlj_model` macro, as in the following example:
+
+```julia
+@mlj_model mutable struct YourModel <: MLJBase.Deterministic
+    a::Float64 = 0.5::(_ > 0)
+    b::String  = "svd"::(_ in ("svd","qr"))
+end
+```
+
+This declaration specifies:
+
+* A keyword constructor (here `YourModel(; a=..., b=...)`),
+* Default values for the hyperparameters,
+* Constraints on the hyperparameters where `_` refers to a value
+  passed.
+
+For example, `a::Float64 = 0.5::(_ > 0)` indicates that
+the field `a` is a `Float64`, takes `0.5` as default value, and
+expects its value to be positive.
+
+You cannot use the `@mlj_model` macro if your model struct has type
+parameters.
+
 
 ### Supervised models
 
@@ -161,6 +185,12 @@ associated with a model:
 ```julia
 MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) =
    MLJBase.fit(model, verbosity, X, y)
+```
+
+Optional, to specify default hyperparameter ranges (for use in tuning):
+
+```julia
+MLJBase.hyperparameter_ranges(T::Type) = Tuple(fill(nothing, length(fieldnames(T))))
 ```
 
 Optional, if `SomeSupervisedModel <: Probabilistic`:
@@ -564,6 +594,40 @@ method                   | return type       | declarable return values         
 `package_license`        | `String`          | unrestricted                       | "unknown"
 `is_pure_julia`          | `Bool`            | `true` or `false`                  | `false`
 `supports_weights`       | `Bool`            | `true` or `false`                  | `false`
+
+**New.** A final trait you can optionally implement is the
+`hyperparamter_ranges` trait. It declares default `ParamRange` objects
+for one or more of your model's hyperparameters. This is for use (in
+the future) by tuning algorithms (e.g., grid generation). It does not
+represent the full space of *allowed values*. This information is
+encoded in your `clean!` method (or `@mlj_model` call).
+
+The value returned by `hyperparamter_ranges` must be a tuple of
+`ParamRange` objects (query `?range` for details) whose length is the
+number of hyperparameters (fields of your model). Note that varying a
+hyperparameter over a specified range should not alter any type
+parameters in your model struct (this never applies to numeric
+ranges). If it doesn't make sense to provide a range for a parameter,
+a `nothing` entry is allowed. The fallback returns a tuple of
+`nothing`s.
+
+For example, a three parameter model of the form
+
+```julia
+mutable struct MyModel{D} <: Deterministic
+    alpha::Float64
+	beta::Int
+    distribution::D
+end
+```
+you might declare (order matters):
+
+```julia
+MLJBase.hyperparameter_ranges(::Type{<:MyModel}) = 
+    (range(Float64, :alpha, lower=0, upper=1, scale=:log),
+	 range(Int, :beta, lower=1, upper=Inf, origin=100, unit=50, scale=:log),
+	 nothing)
+```
 
 Here is the complete list of trait function declarations for `DecisionTreeClassifier`
 ([source](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/DecisionTree.jl)):
