@@ -17,14 +17,6 @@ end
   @test include("utilities.jl")
 end
 
-@testset "parameters" begin
-  @test include("parameters.jl")
-end
-
-@testset "resampling" begin
-    @test include("resampling.jl")
-end
-
 @testset "tuning" begin
     @test include("tuning.jl")
 end

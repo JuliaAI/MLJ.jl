@@ -25,7 +25,7 @@ for "RidgeRegresssor", which is provided by multiple packages
 **experimental!**
 `models(matching(X, y))` lists all supervised modesl compatible with input/target `X/y`.
 
-**experimetnal!** With additional conditions:
+**experimental!** With additional conditions:
 
 ```julia
 models() do model

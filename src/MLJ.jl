@@ -6,10 +6,7 @@ module MLJ
 export MLJ_VERSION
 
 # utilities.jl:
-export @curve, @pcurve, pretty
-
-# resampling.jl:
-export Holdout, CV, StratifiedCV, evaluate!, Resampler
+export @curve, @pcurve
 
 # parameters.jl:
 export Params, iterator
@@ -51,7 +48,7 @@ export nrows, nfeatures, color_off, color_on,
     DeterministicNetwork, ProbabilisticNetwork,
     target_scitype, input_scitype, output_scitype,
     predict, predict_mean, predict_median, predict_mode,
-    transform, inverse_transform, se, evaluate, fitted_params, params,
+    transform, inverse_transform, evaluate, fitted_params, params,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
     classes, table, report, rebind!,
     partition, unpack,
@@ -61,9 +58,11 @@ export nrows, nfeatures, color_off, color_on,
     Machine, NodalMachine, machine, AbstractNode,
     source, node, fit!, freeze!, thaw!, Node, sources, origins,
     machines, sources, anonymize!, @from_network, fitresults,
-    @pipeline
+    @pipeline,
+    ResamplingStrategy, Holdout, CV,
+    StratifiedCV, evaluate!, Resampler, iterator,
+    default_resource, pretty
 
-# re-export from MLJBase - relating to measures:
 export measures,
     orientation, reports_each_observation,
     is_feature_dependent, aggregation,
@@ -122,7 +121,6 @@ import Distributions: pdf, mode
 import Statistics, StatsBase, LinearAlgebra, Random
 import Random: AbstractRNG, MersenneTwister
 using ProgressMeter
-import PrettyTables
 using ComputationalResources
 using ComputationalResources: CPUProcesses
 using DocStringExtensions: SIGNATURES, TYPEDEF
@@ -131,14 +129,13 @@ using RecipesBase
 # to be extended:
 import MLJBase: fit, update, clean!, fit!,
     predict, predict_mean, predict_median, predict_mode,
-    transform, inverse_transform, se, evaluate, fitted_params,
+    transform, inverse_transform, evaluate, fitted_params,
     show_as_constructed, ==, getindex, setindex!
 import MLJModels: models
 
 
 ## CONSTANTS
 
-const DEFAULT_RESOURCE = Ref{AbstractResource}(CPU1())
 const srcdir = dirname(@__FILE__)
 const CategoricalElement = Union{CategoricalString,CategoricalValue}
 
@@ -156,8 +153,6 @@ const MLJ_VERSION = toml["version"]
 ## INCLUDE FILES
 
 include("utilities.jl")     # general purpose utilities
-include("resampling.jl")    # resampling strategies and model evaluation
-include("parameters.jl")    # hyperparameter ranges and grid generation
 include("tuning.jl")
 include("learning_curves.jl")
 include("ensembles.jl")     # homogeneous ensembles

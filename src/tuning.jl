@@ -27,7 +27,7 @@ mutable struct Grid <: TuningStrategy
 end
 
 # Constructor with keywords
-Grid(; resolution=10, acceleration::AbstractResource=DEFAULT_RESOURCE[]) =
+Grid(; resolution=10, acceleration::AbstractResource=default_resource()) =
     Grid(resolution, acceleration)
 
 MLJBase.show_as_constructed(::Type{<:Grid}) = true
@@ -47,6 +47,7 @@ mutable struct DeterministicTunedModel{T,M<:Deterministic} <: MLJ.Deterministic
     ranges::Union{Vector{<:ParamRange},ParamRange}
     full_report::Bool
     train_best::Bool
+    repeats::Int
 end
 
 """
@@ -64,6 +65,7 @@ mutable struct ProbabilisticTunedModel{T,M<:Probabilistic} <: MLJ.Probabilistic
     ranges::Union{Vector{<:ParamRange},ParamRange}
     full_report::Bool
     train_best::Bool
+    repeats::Int
 end
 
 const EitherTunedModel{T,M} =
@@ -77,6 +79,7 @@ MLJBase.is_wrapper(::Type{<:EitherTunedModel}) = true
                              resampling=Holdout(),
                              measure=nothing,
                              weights=nothing,
+                             repeats=1,
                              operation=predict,
                              ranges=ParamRange[],
                              full_report=true,
@@ -101,6 +104,9 @@ Calling `fit!(mach)` on a machine `mach=machine(tuned_model, X, y)` or
   `predict(mach, Xnew)` then returns predictions on `Xnew` of this
   internal machine. The final train can be supressed by setting
   `train_best=false`.
+
+Specify `repeats > 1` for repeated resampling per model evaluation. See
+[`evaluate!](@ref) options for details.
 
 *Important.* If a custom measure `measure` is used, and the measure is
 a score, rather than a loss, be sure to check that
@@ -134,7 +140,8 @@ function TunedModel(;model=nothing,
                     ranges=range,
                     minimize=true,
                     full_report=true,
-                    train_best=true)
+                    train_best=true,
+                    repeats=1)
 
     !isempty(ranges) || error("You need to specify ranges=... ")
     model !== nothing || error("You need to specify model=... ")
@@ -145,10 +152,12 @@ function TunedModel(;model=nothing,
 
     if model isa Deterministic
         return DeterministicTunedModel(model, tuning, resampling,
-           measure, weights, operation, ranges, full_report, train_best)
+                                       measure, weights, operation, ranges,
+                                       full_report, train_best, repeats)
     elseif model isa Probabilistic
         return ProbabilisticTunedModel(model, tuning, resampling,
-           measure, weights, operation, ranges, full_report, train_best)
+                                       measure, weights, operation, ranges,
+                                       full_report, train_best, repeats)
     end
     error("$model does not appear to be a Supervised model.")
 end
@@ -232,7 +241,8 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M},
                           resampling=tuned_model.resampling,
                           measure=measure,
                           weights=tuned_model.weights,
-                          operation=tuned_model.operation)
+                          operation=tuned_model.operation,
+                          repeats=tuned_model.repeats)
 
     resampling_machine = machine(resampler, args...)
 
@@ -251,7 +261,7 @@ function MLJBase.fit(tuned_model::EitherTunedModel{Grid,M},
 #    nested_iterators = copy(tuned_model.ranges, iterators)
 
     n_iterators = length(iterators) # same as number of ranges
-    A = MLJ.unwind(iterators...)
+    A = MLJBase.unwind(iterators...)
     N = size(A, 1)
 
     if tuned_model.full_report
@@ -356,7 +366,7 @@ function MLJBase.fitted_params(tuned_model::EitherTunedModel, fitresult)
 end
 
 MLJBase.predict(tuned_model::EitherTunedModel, fitresult, Xnew) = predict(fitresult, Xnew)
-MLJBase.best(model::EitherTunedModel, fitresult) = fitresult.model
+best(model::EitherTunedModel, fitresult) = fitresult.model
 
 
 ## METADATA
@@ -389,5 +399,3 @@ MLJBase.input_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} =
     MLJBase.input_scitype(M)
 MLJBase.target_scitype(::Type{<:ProbabilisticTunedModel{T,M}}) where {T,M} =
     MLJBase.target_scitype(M)
-
-
