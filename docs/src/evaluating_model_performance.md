@@ -90,15 +90,15 @@ Or define their own re-usable `ResamplingStrategy` objects, - see
 
 
 ```@docs
-Holdout
+MLJBase.Holdout
 ```
 
 ```@docs
-CV
+MLJBase.CV
 ```
 
 ```@docs
-StratifiedCV
+MLJBase.StratifiedCV
 ```
 
 
@@ -157,9 +157,9 @@ end
 ### API
 
 ```@docs
-evaluate!
+MLJBase.evaluate!
 ```
 
 ```@docs
-evaluate
+MLJBase.evaluate
 ```

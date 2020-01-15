@@ -25,11 +25,12 @@ computation, while `acceleration=CPUThreads()` will use Julia's PARTR
 threading model to perform acceleration.
 
 The default computational resource is `CPU1()`, which is simply serial
-processing via CPU. The default resource can be changed by setting
-`MLJ.DEFAULT_RESOURCE[]` to an instance of
-`ComputationalResources.AbstractResource`.
+processing via CPU. The default resource can be changed as in this
+example: `MLJ.default_resource(CPUProcesses())`. The argument must
+always have type `<:ComputationalResource.AbstractResource`. To
+inspect the current default, use `MLJ.default_resource()`.
 
 !!! note
 
-    The `CPUThreads()` dispatch is only available when running a version of
+    The `CPUThreads()` resource is only available when running a version of
     Julia with `Threads.@spawn` available.

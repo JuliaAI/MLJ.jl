@@ -842,4 +842,4 @@ The MLJ model registry is located in the [MLJModels.jl repository](https://githu
 
 1) Ensure your model conforms to the interface defined above
 2) Raise an issue at https://github.com/alan-turing-institute/MLJModels.jl/issues and point out where the MLJ-interface implementation is, e.g. by providing a link to the code.
-3) The core developer will then review your implementation and work with you to add the model to the registry
+3) An administrator will then review your implementation and work with you to add the model to the registry
