@@ -242,7 +242,7 @@ function DeterministicEnsembleModel(;atom=DeterministicConstantClassifier(),
                                     bagging_fraction=0.8,
                                     rng=Random.GLOBAL_RNG,
                                     n::Int=100,
-                                    acceleration=DEFAULT_RESOURCE[],
+                                    acceleration=default_resource(),
                                     out_of_bag_measure=[])
 
     model = DeterministicEnsembleModel(atom, atomic_weights, bagging_fraction, rng,
@@ -299,7 +299,7 @@ function ProbabilisticEnsembleModel(;atom=ConstantProbabilisticClassifier(),
                                     bagging_fraction=0.8,
                                     rng=Random.GLOBAL_RNG,
                                     n::Int=100,
-                                    acceleration=DEFAULT_RESOURCE[],
+                                    acceleration=default_resource(),
                                     out_of_bag_measure=[])
 
     model = ProbabilisticEnsembleModel(atom, atomic_weights, bagging_fraction, rng, n, acceleration, out_of_bag_measure)
@@ -319,7 +319,7 @@ end
                   bagging_fraction=0.8,
                   n=100,
                   rng=GLOBAL_RNG,
-                  acceleration=DEFAULT_RESOURCE[],
+                  acceleration=default_resource(),
                   out_of_bag_measure=[])
 
 Create a model for training an ensemble of `n` learners, with optional
@@ -449,7 +449,7 @@ function fit(model::EitherEnsembleModel{Atom},
     
     acceleration = model.acceleration
     if acceleration isa CPUProcesses && nworkers() == 1
-        acceleration = DEFAULT_RESOURCE[]
+        acceleration = default_resource()
     end
 
     if model.out_of_bag_measure isa Vector

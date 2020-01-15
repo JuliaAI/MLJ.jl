@@ -127,7 +127,8 @@ dimension of the grid. See [Grid](@ref) below for details.
 ### API
 
 ```@docs
-MLJ.range
+MLJBase.range
+MLJBase.iterator
 MLJ.Grid
 MLJ.TunedModel
 ```

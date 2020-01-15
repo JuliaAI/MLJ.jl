@@ -100,7 +100,7 @@ The MLJ universe is made out of several repositories some of which can be used i
 * (⟂) [MLJBase.jl](https://github.com/alan-turing-institute/MLJBase.jl) offers essential tools to load and interpret data, describe ML models and use metrics; it is the repository you should interface with if you wish to make your package accessible via MLJ,
 * [MLJ.jl](https://github.com/alan-turing-institute/MLJ.jl) offers tools to compose, tune and evaluate models,
 * [MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl) contains interfaces to a number of important model-providing packages such as,  [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl), [ScikitLearn.jl](https://github.com/bensadeghi/ScikitLearn.jl) or [XGBoost.jl](https://github.com/dmlc/XGBoost.jl) as well as a few built-in transformations (one hot encoding, standardisation, ...), it also hosts the *model registry* which keeps track of all models accessible via MLJ,
-* (⟂) [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl) a lightweight package to help specify the *interpretation* of data beyond how the data is currently encoded,
+* (⟂) [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl) a lightweight package to help MLJ articulate it's conventions about how different types of data (`2.71`, `"male"`, `CategoricalArray{Int}`, etc ) should be *interpreted* by models (`Continuous`, `Textual`, `AbstractArray{Multiclass}`, etc). 
 * (⟂) [MLJLinearModels.jl](https://github.com/alan-turing-institute/MLJLinearModels.jl) an experimental package for a wide range of penalised linear models such as Lasso, Elastic-Net, Robust regression, LAD regression, etc.
 * [MLJFlux.jl](https://github.com/alan-turing-institute/MLJFlux.jl) an experimental package to use Flux within MLJ.
 
@@ -151,7 +151,7 @@ The table below indicates the models that are accessible at present along with a
 | Package | Models | Maturity | Note
 | ------- | ------ | -------- | ----
 [Clustering.jl] | KMeans, KMedoids | high | †
-[DecisionTree.jl] | DecisionTreeClassifier, DecisionTreeRegressor | high | †
+[DecisionTree.jl] | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier | high | †
 [GLM.jl] | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium | †
 [LIBSVM.jl] | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
 [MLJModels.jl] (builtins) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ConstantRegressor, ConstantClassifier | medium |
