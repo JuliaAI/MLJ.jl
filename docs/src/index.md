@@ -8,6 +8,7 @@
 import Base.eval # hack b/s auto docs put's code in baremodule
 import Random.seed! 
 using MLJ
+using InteractiveUtils
 MLJ.color_off()
 seed!(1234) 
 ```
@@ -66,10 +67,59 @@ Evaluating against multiple performance measures is also possible. See
 [Evaluating Model Performance](evaluating_model_performance.md) for details.
 
 
+### A preview of data type specification in MLJ
+
+The target `y` above is a categorical vector, which is appropriate
+because our model is a decision tree *classifier*:
+
+```@repl doda
+typeof(y)
+```
+
+However, MLJ models do not actually prescribe the machine types for
+the data they operate on. Rather, they specify a *scientific type*,
+which refers to the way data is to be *interpreted*, as opposed to how
+it is *encoded*:
+
+```julia
+julia> info("DecisionTreeClassifier").target_scitype
+AbstractArray{<:Finite, 1}
+```
+
+Here `Finite` is an example of a "scalar" scientific type with two
+subtypes:
+
+```@repl doda
+subtypes(Finite)
+```
+
+We use the `scitype` function to check how MLJ is going to interpret
+given data. Our choice of encoding for `y` works for
+`DecisionTreeClassfier`, because we have:
+
+```@repl doda
+scitype(y)
+```
+
+and `Multiclass{3} <: Finite`. If we would encode with integers
+instead, we obtain:
+
+```@repl doda
+yint = Int.(y.refs);
+scitype(yint)
+```
+
+and using `yint` in place of `y` in classification problems will fail. 
+
+For more on scientific types, see [Data containers and scientific
+types](@ref) below.
+
+
 ### Fit and predict
 
-To illustrate MLJ's fit and predict interface, let's perform the above
-evaluations by hand.
+To illustrate MLJ's fit and predict interface, let's perform our
+performance evaluations by hand, but using a simple holdout set,
+instead of cross-validation.
 
 Wrapping the model in data creates a *machine* which will store
 training outcomes:
@@ -124,21 +174,22 @@ the number of epochs in a neural network. The machine building syntax
 also anticipates a more general syntax for composing multiple models,
 as explained in [Composing Models](composing_models.md).
 
-There is a version of `evaluate` for machines as well as models. An
-exclamation point is added to the method name because machines are
-generally mutated when trained:
+There is a version of `evaluate` for machines as well as models. This
+time we'll add a second performance measure. (An exclamation point is
+added to the method name because machines are generally mutated when
+trained):
 
 ```@repl doda
-evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
-                measure=cross_entropy,
+evaluate!(tree, resampling=Holdout(fraction_train=0.7, shuffle=true),
+                measures=[cross_entropy, BrierScore()],
                 verbosity=0)
 ```
 Changing a hyperparameter and re-evaluating:
 
 ```@repl doda
 tree_model.max_depth = 3
-evaluate!(tree, resampling=Holdout(fraction_train=0.5, shuffle=true),
-          measure=cross_entropy,
+evaluate!(tree, resampling=Holdout(fraction_train=0.7, shuffle=true),
+          measures=[cross_entropy, BrierScore()],
           verbosity=0)
 ```
 
