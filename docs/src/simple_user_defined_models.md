@@ -81,8 +81,7 @@ After loading this code, all MLJ's basic meta-algorithms can be applied to `MyRe
 
 ```@repl regressor_example
 using MLJ
-boston = load_boston();
-y, X = unpack(boston, ==(:MedV), !=(:Chas));
+X, y = @load_boston;
 model = MyRegressor(lambda=1.0)
 regressor = machine(model, X, y)
 evaluate!(regressor, resampling=CV(), measure=rms, verbosity=0)
