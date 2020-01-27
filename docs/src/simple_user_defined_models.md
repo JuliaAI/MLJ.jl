@@ -60,17 +60,33 @@ end
 MLJBase.predict(::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew) * fitresult
 ````
 
+``` @setup regressor_example
+import Base.eval
+import MLJBase
+using LinearAlgebra
+MLJBase.color_off()
+mutable struct MyRegressor <: MLJBase.Deterministic
+    lambda::Float64
+end
+MyRegressor(; lambda=0.1) = MyRegressor(lambda)
+function MLJBase.fit(model::MyRegressor, X, y)
+    x = MLJBase.matrix(X) 
+    fitresult = (x'x + model.lambda*I)\(x'y)
+    return fitresult
+end
+MLJBase.predict(::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew) * fitresult
+```
+
 After loading this code, all MLJ's basic meta-algorithms can be applied to `MyRegressor`:
 
-````julia
-julia> using MLJ
-julia> task = load_boston()
-julia> model = MyRegressor(lambda=1.0)
-julia> regressor = machine(model, task)
-julia> evaluate!(regressor, resampling=CV(), measure=rms) |> mean
-5.332558626486205
+```@repl regressor_example
+using MLJ
+X, y = @load_boston;
+model = MyRegressor(lambda=1.0)
+regressor = machine(model, X, y)
+evaluate!(regressor, resampling=CV(), measure=rms, verbosity=0)
 
-````
+```
 
 ### A simple probabilistic classifier
 
