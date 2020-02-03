@@ -8,10 +8,6 @@ using Test
 using Random
 end
 
-@testset "utilities" begin
-  @test include("utilities.jl")
-end
-
 @testset "ensembles" begin
     @test include("ensembles.jl")
 end
