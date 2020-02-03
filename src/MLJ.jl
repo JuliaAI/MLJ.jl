@@ -8,23 +8,11 @@ export MLJ_VERSION
 # utilities.jl:
 export @curve, @pcurve
 
-# parameters.jl:
-export Params, iterator
-
-# tuning.jl:
-export Grid, TunedModel
-
-# learning_curves.jl
-export learning_curve!, learning_curve
-
 # ensembles.jl:
 export EnsembleModel
 
 # model_matching.jl:
 export matching
-
-# tasks.jl (deprecated):
-export supervised, unsupervised
 
 
 ## METHOD RE-EXPORT
@@ -89,6 +77,9 @@ export measures,
     falsediscovery_rate, fdr, npv, ppv,
     recall, sensitivity, hit_rate, miss_rate,
     specificity, selectivity, f1score, f1, fallout
+
+# re-export from MLJTuning:
+export Grid, Explicit, TunedModel, learning_curve!, learning_curve
 
 # re-export from MLJModels:
 export models, localmodels, @load, load, info,
@@ -157,7 +148,6 @@ include("tuning.jl")
 include("learning_curves.jl")
 include("ensembles.jl")     # homogeneous ensembles
 include("model_matching.jl")# inferring model search criterion from data
-include("tasks.jl")         # enhancements to MLJBase task interface
 include("scitypes.jl")      # extensions to ScientificTypes.scitype
 include("plotrecipes.jl")
 
