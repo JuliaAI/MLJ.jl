@@ -102,6 +102,7 @@ import Pkg.TOML
 using ScientificTypes
 using MLJBase
 import MLJBase
+using MLJTuning
 using MLJModels
 
 using Tables
@@ -115,7 +116,6 @@ using ProgressMeter
 using ComputationalResources
 using ComputationalResources: CPUProcesses
 using DocStringExtensions: SIGNATURES, TYPEDEF
-using RecipesBase
 
 # to be extended:
 import MLJBase: fit, update, clean!, fit!,
@@ -144,11 +144,8 @@ const MLJ_VERSION = toml["version"]
 ## INCLUDE FILES
 
 include("utilities.jl")     # general purpose utilities
-include("tuning.jl")
-include("learning_curves.jl")
 include("ensembles.jl")     # homogeneous ensembles
 include("model_matching.jl")# inferring model search criterion from data
 include("scitypes.jl")      # extensions to ScientificTypes.scitype
-include("plotrecipes.jl")
 
 end # module

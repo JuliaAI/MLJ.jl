@@ -25,8 +25,10 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
     ridge = FooBarRegressor()
     composite = SimpleDeterministicCompositeModel(transformer=sel, model=ridge)
 
-    features_ = range(composite, :(transformer.features), values=[[:x1], [:x1, :x2], [:x2, :x3], [:x1, :x2, :x3]])
-    lambda_ = range(composite, :(model.lambda), lower=1e-6, upper=1e-1, scale=:log10)
+    features_ = range(composite, :(transformer.features),
+                      values=[[:x1], [:x1, :x2], [:x2, :x3], [:x1, :x2, :x3]])
+    lambda_ = range(composite, :(model.lambda), lower=1e-6,
+                    upper=1e-1, scale=:log10)
 
     ranges = [features_, lambda_]
 
@@ -35,7 +37,7 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
 
     tuned_model = TunedModel(model=composite, tuning=grid,
                              resampling=holdout, measure=rms,
-                             ranges=ranges, full_report=false)
+                             ranges=ranges)
 
     MLJBase.info_dict(tuned_model)
 
@@ -44,7 +46,6 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
     fit!(tuned)
     r = report(tuned)
     @test r.best_report isa NamedTuple{(:machines, :reports)}
-    tuned_model.full_report=true
     fit!(tuned)
     report(tuned)
     fp = fitted_params(tuned)
@@ -52,7 +53,7 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
     b = fp.best_model
     @test b isa SimpleDeterministicCompositeModel
 
-    measurements = tuned.report.measurements
+    measurements = tuned.report.plotting.measurements
     # should be all different:
     @test length(unique(measurements)) == length(measurements)
 
@@ -64,17 +65,17 @@ y = 2*x1 .+ 5*x2 .- 3*x3 .+ 0.2*rand(100);
 
     # check this error has same order of magnitude as best measurement
     # during tuning:
-    r = e/tuned.report.best_measurement
+    r = e/tuned.report.best_result.measurement[1]
     @test r < 10 && r > 0.1
 
     # test weights:
     tuned_model.weights = rand(length(y))
     fit!(tuned)
-    @test tuned.report.measurements[1] != measurements[1]
+    @test tuned.report.plotting.measurements[1] != measurements[1]
 
 end
 
-#@testset "multiple resolutions" begin
+# @testset "multiple resolutions" begin
 
     forest = EnsembleModel(atom=@load(KNNRegressor))
     pipe = @pipeline MyPipe(sel=FeatureSelector(), forest=forest)
@@ -88,7 +89,7 @@ end
     ranges = [r1, r2, r3]
 
     holdout = Holdout(fraction_train=0.8)
-    grid = Grid(resolution=5)
+    grid = Grid(resolution=6, shuffle=false)
 
     tuned = TunedModel(model=pipe, tuning=grid,
                        resampling=holdout, measure=rms,
@@ -96,17 +97,16 @@ end
 
     mach = machine(tuned, X, y)
 
-    function num_grid_points(resolution)
+    function num_grid_points(resolution, range)
+        tuned.range = range
         grid.resolution = resolution
         fit!(mach)
-        return report(mach).measurements |> length
+        return report(mach).plotting.measurements |> length
     end
 
-    @test num_grid_points(6) == 72
-    @test num_grid_points([:(forest.atom.K)=>7,
-                           :(forest.bagging_fraction)=>4]) == 56
-    @test num_grid_points([:(forest.atom.K)=>6, ]) == 60
-
+    @test num_grid_points(6, ranges) == 72
+    @test num_grid_points(6, [r1, (r2, 7), (r3, 4)]) == 56
+    @test num_grid_points(5, [r1, (r2, 6), r3]) == 60
 
     @testset "one parameter tune" begin
         ridge = FooBarRegressor()
@@ -117,22 +117,22 @@ end
         report(tuned)
     end
 
-#end
+# end
 
 @testset "nested parameter tune" begin
     tree_model = KNNRegressor()
-    forest_model = EnsembleModel(atom=tree_model)
+    forest_model = EnsembleModel(atom=tree_model, rng=1)
     r1 = range(forest_model, :(atom.K), lower=3, upper=4)
     r2 = range(forest_model, :bagging_fraction, lower=0.4, upper=1.0);
     self_tuning_forest_model = TunedModel(model=forest_model,
-                                          tuning=Grid(resolution=3),
+                                          tuning=Grid(resolution=3, shuffle=false),
                                           resampling=Holdout(),
                                           ranges=[r1, r2],
                                           measure=rms)
     self_tuning_forest = machine(self_tuning_forest_model, X, y)
-    fit!(self_tuning_forest, verbosity=2)
+    fit!(self_tuning_forest, verbosity=3, force=true)
     r = report(self_tuning_forest)
-    @test length(unique(r.measurements)) == 6
+    @test length(unique(r.plotting.measurements)) == 6
 end
 
 @testset "basic tuning with training weights" begin
@@ -203,5 +203,6 @@ end
     curve3 = learning_curve(ensemble, X, y; range=r_n)
     @test curve2.measurements ≈ curve3.measurements
 end
+    
 end # module
 true
