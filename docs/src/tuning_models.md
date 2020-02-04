@@ -2,16 +2,15 @@
 
 In MLJ tuning is implemented as a model wrapper. After wrapping a
 model in a tuning strategy and binding the wrapped model to data in a
-machine, fitting the machine instigates a search for optimal model
-hyperparameters, within the specified range, and then uses all
-supplied data to train the best model. Making predictions using this
-fitted machine then amounts to predicting using a machine based on the
-unwrapped model with the specified hyperparameters optimized. In this
-way the wrapped model may be viewed as a "self-tuning" version of the
+machine, `mach`, calling `fit!(mach)` instigates a search for optimal
+model hyperparameters, within a specified `range`, and then
+uses all supplied data to train the best model. To predict using the
+optimal model, one just calls `predict(mach, Xnew)`. In this way the
+wrapped model may be viewed as a "self-tuning" version of the
 unwrapped model.
 
 
-### Tuning a single hyperparameter
+### Tuning a single hyperparameter using a grid search
 
 ```@setup goof
 import Base.eval
@@ -19,26 +18,27 @@ import Base.eval
 
 ```@repl goof
 using MLJ
-X = (x1=rand(100), x2=rand(100), x3=rand(100));
-y = 2X.x1 - X.x2 + 0.05*rand(100); 
-tree_model = @load DecisionTreeRegressor; 
+X = MLJ.table(rand(100, 10));
+y = 2X.x1 - X.x2 + 0.05*rand(100);
+tree_model = @load DecisionTreeRegressor;
 ```
-    
-Let's tune `min_purity_increase` in the model
-above, using a grid-search. Defining hyperparameter ranges and
-wrapping the model:
+
+Let's tune `min_purity_increase` in the model above, using a
+grid-search. To do so we will use the simplest `range` object, a
+one-dimensional range object constructed using the `range` method:
+
 
 ```@repl goof
 r = range(tree_model, :min_purity_increase, lower=0.001, upper=1.0, scale=:log);
 self_tuning_tree_model = TunedModel(model=tree_model,
                                     resampling = CV(nfolds=3),
                                     tuning = Grid(resolution=10),
-                                    ranges = r,
-                                    measure = rms); 
+                                    range = r,
+                                    measure = rms);
 ```
 
-Incidentally, for a numeric hyperparameter, the object returned by
-`range` can be iterated after specifying a resolution:
+Incidentally, a grid is generated internally "over the range" by calling the
+`iterator` method with an appropriate resolution:
 
 ```@repl goof
 iterator(r, 5)
@@ -47,20 +47,23 @@ iterator(r, 5)
 Non-numeric hyperparameters are handled a little differently:
 
 ```@repl goof
-selector_model = FeatureSelector(); 
-r2 = range(selector_model, :features, values = [[:x1,], [:x1, :x2]]); 
+selector_model = FeatureSelector();
+r2 = range(selector_model, :features, values = [[:x1,], [:x1, :x2]]);
 iterator(r2)
 ```
-    
+
+Unbounded ranges are also permitted. See the `range` and `iterator`
+docstrings below for details.
+
 Returning to the wrapped tree model:
 
 ```@repl goof
-self_tuning_tree = machine(self_tuning_tree_model, X, y); 
+self_tuning_tree = machine(self_tuning_tree_model, X, y);
 fit!(self_tuning_tree, verbosity=0);
 ```
 
 We can inspect the detailed results of the grid search with
-`report(self_tuning_model)` or just retrieve the optimal model, as here:
+`report(self_tuning_tree)` or just retrieve the optimal model, as here:
 
 ```@repl goof
 fitted_params(self_tuning_tree).best_model
@@ -69,23 +72,24 @@ fitted_params(self_tuning_tree).best_model
 Predicting on new input observations using the optimal model:
 
 ```@repl goof
-predict(self_tuning_tree, (x1=rand(3), x2=rand(3), x3=rand(3)))
+Xnew  = MLJ.table(rand(3, 10));
+predict(self_tuning_tree, Xnew)
 ```
 
 
 ### Tuning multiple nested hyperparameters
-    
+
 The following model has another model, namely a `DecisionTreeRegressor`, as a
 hyperparameter:
 
 ```@setup goof
 tree_model = @load DecisionTreeRegressor
-forest_model = EnsembleModel(atom=tree_model); 
+forest_model = EnsembleModel(atom=tree_model);
 ```
 
 ```julia
 julia> tree_model = DecisionTreeRegressor()
-julia> forest_model = EnsembleModel(atom=tree_model); 
+julia> forest_model = EnsembleModel(atom=tree_model);
 ```
 
 Nested hyperparameters can be inspected using `params` (or just type
@@ -95,19 +99,20 @@ Nested hyperparameters can be inspected using `params` (or just type
 params(forest_model)
 ```
 
-Ranges for nested hyperparameters are specified using dot syntax:
+Ranges for nested hyperparameters are specified using dot syntax. In
+this case we will specify a `goal` for the total number of grid
+points, rather than a per-dimension resolution:
 
 ```@repl goof
-r1 = range(forest_model, :(atom.n_subfeatures), lower=1, upper=3); 
-r2 = range(forest_model, :bagging_fraction, lower=0.4, upper=1.0); 
-self_tuning_forest_model = TunedModel(model=forest_model, 
-                                      tuning=Grid(resolution=12),
+r1 = range(forest_model, :(atom.n_subfeatures), lower=1, upper=9);
+r2 = range(forest_model, :bagging_fraction, lower=0.4, upper=1.0);
+self_tuning_forest_model = TunedModel(model=forest_model,
+                                      tuning=Grid(goal=30),
                                       resampling=CV(nfolds=6),
-                                      ranges=[r1, r2],
-                                      measure=rms); 
-self_tuning_forest = machine(self_tuning_forest_model, X, y); 
-fit!(self_tuning_forest, verbosity=0)
-report(self_tuning_forest)
+                                      range=[r1, r2],
+                                      measure=rms);
+self_tuning_forest = machine(self_tuning_forest_model, X, y);
+fit!(self_tuning_forest, verbosity=1)
 ```
 
 In this two-parameter case, a plot of the grid search results is also
@@ -120,8 +125,7 @@ plot(self_tuning_forest)
 
 ![](tuning_plot.png)
 
-It is also possible to specify different resolutions for each
-dimension of the grid. See [Grid](@ref) below for details.
+For more options in a grid search, see the `Grid` docstring below.
 
 
 ### API
@@ -129,6 +133,6 @@ dimension of the grid. See [Grid](@ref) below for details.
 ```@docs
 MLJBase.range
 MLJBase.iterator
-MLJ.Grid
-MLJ.TunedModel
+MLJTuning.TunedModel
+MLJTuning.Grid
 ```

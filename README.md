@@ -8,10 +8,6 @@
     <img src="https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master"
          alt="Build Status">
   </a>
-  <a href="https://coveralls.io/github/alan-turing-institute/MLJ.jl?branch=master">
-    <img src="https://coveralls.io/repos/github/alan-turing-institute/MLJ.jl/badge.svg?branch=master"
-         alt="Coverage">
-  </a>
   <a href="https://slackinvite.julialang.org/">
     <img src="https://img.shields.io/badge/chat-on%20slack-yellow.svg"
          alt="#mlj">

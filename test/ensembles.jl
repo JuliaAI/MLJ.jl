@@ -1,11 +1,5 @@
 module TestEnsembles
 
-# uncomment two lines for testing distributed processing
-# using Distributed
-# addprocs(2)
-# @everywhere using Pkg
-# @everywhere Pkg.activate("working", shared=true)
-
 # using Revise
 using Test
 using Random

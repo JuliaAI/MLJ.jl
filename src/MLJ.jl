@@ -8,23 +8,11 @@ export MLJ_VERSION
 # utilities.jl:
 export @curve, @pcurve
 
-# parameters.jl:
-export Params, iterator
-
-# tuning.jl:
-export Grid, TunedModel
-
-# learning_curves.jl
-export learning_curve!, learning_curve
-
 # ensembles.jl:
 export EnsembleModel
 
 # model_matching.jl:
 export matching
-
-# tasks.jl (deprecated):
-export supervised, unsupervised
 
 
 ## METHOD RE-EXPORT
@@ -90,6 +78,9 @@ export measures,
     recall, sensitivity, hit_rate, miss_rate,
     specificity, selectivity, f1score, f1, fallout
 
+# re-export from MLJTuning:
+export Grid, Explicit, TunedModel, learning_curve!, learning_curve
+
 # re-export from MLJModels:
 export models, localmodels, @load, load, info,
     ConstantRegressor, ConstantClassifier,     # builtins/Constant.jl
@@ -111,10 +102,10 @@ import Pkg.TOML
 using ScientificTypes
 using MLJBase
 import MLJBase
+using MLJTuning
 using MLJModels
 
 using Tables
-using OrderedCollections
 using  CategoricalArrays
 import Distributions
 import Distributions: pdf, mode
@@ -124,13 +115,11 @@ using ProgressMeter
 using ComputationalResources
 using ComputationalResources: CPUProcesses
 using DocStringExtensions: SIGNATURES, TYPEDEF
-using RecipesBase
 
 # to be extended:
 import MLJBase: fit, update, clean!, fit!,
-    predict, predict_mean, predict_median, predict_mode,
-    transform, inverse_transform, evaluate, fitted_params,
-    show_as_constructed, ==, getindex, setindex!
+    predict, fitted_params,
+    show_as_constructed, ==
 import MLJModels: models
 
 
@@ -139,26 +128,21 @@ import MLJModels: models
 const srcdir = dirname(@__FILE__)
 const CategoricalElement = Union{CategoricalString,CategoricalValue}
 
-# FIXME replace with either Pkg.installed()["MLJ"] or
-# uuid = Pkg.project().dependencies["MLJ"]
-# version = Pkg.dependencies()[uuid].version
-# ---
-# this is currently messy because it's been enacted then reverted
-# see https://github.com/JuliaLang/julia/pull/33410
-# and https://github.com/JuliaLang/Pkg.jl/pull/1086/commits/996c6b9b69ef0c058e0105427983622b7cc8cb1d
-toml = Pkg.TOML.parsefile(joinpath(dirname(dirname(pathof(MLJ))), "Project.toml"))
+# FIXME replace with either Pkg.installed()["MLJ"] or uuid =
+# Pkg.project().dependencies["MLJ"] version =
+# Pkg.dependencies()[uuid].version --- this is currently messy because
+# it's been enacted then reverted see
+# https://github.com/JuliaLang/julia/pull/33410 and
+# https://github.com/JuliaLang/Pkg.jl/pull/1086/commits/996c6b9b69ef0c058e0105427983622b7cc8cb1d
+toml = Pkg.TOML.parsefile(joinpath(dirname(dirname(pathof(MLJ))),
+                                  "Project.toml"))
 const MLJ_VERSION = toml["version"]
 
 
 ## INCLUDE FILES
 
-include("utilities.jl")     # general purpose utilities
-include("tuning.jl")
-include("learning_curves.jl")
 include("ensembles.jl")     # homogeneous ensembles
 include("model_matching.jl")# inferring model search criterion from data
-include("tasks.jl")         # enhancements to MLJBase task interface
 include("scitypes.jl")      # extensions to ScientificTypes.scitype
-include("plotrecipes.jl")
 
 end # module
