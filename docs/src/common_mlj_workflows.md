@@ -24,10 +24,10 @@ y, X =  unpack(channing,
                :Exit=>Continuous,
                :Entry=>Continuous,
                :Cens=>Multiclass)
-first(X, 4) 
+first(X, 4)
 ```
 
-*Note:* Before julia 1.2, replace `!=(:Time)` with `col -> col != :Time`. 
+*Note:* Before julia 1.2, replace `!=(:Time)` with `col -> col != :Time`.
 
 ```@example workflows
 y[1:4]
@@ -46,7 +46,7 @@ y[1:4]
 
 ## Model search (**experimental**)
 
-*Reference:*   [Model Search](model_search.md) 
+*Reference:*   [Model Search](model_search.md)
 
 Searching for a supervised model:
 
@@ -381,7 +381,7 @@ pipe = @pipeline MyPipe(X -> coerce(X, :age=>Continuous),
                                hot = OneHotEncoder(),
                                knn = KNNRegressor(K=3),
                                target = UnivariateStandardizer())
-```							   
+```
 
 Evaluating the pipeline (just as you would any other model):
 
@@ -418,23 +418,43 @@ evaluate!(forest, measure=cross_entropy)
 # Performance curves
 
 Generate a plot of performance, as a function of some hyperparameter
-(building on the preceding example):
+(building on the preceding example)
+
+Single performance curve:
 
 ```@example workflows
 r = range(forest_model, :n, lower=1, upper=1000, scale=:log10)
-curve = MLJ.learning_curve!(forest, 
+curve = learning_curve(forest,
                             range=r,
-                            resampling=Holdout(), 
+                            resampling=Holdout(),
+                            resolution=50,
                             measure=cross_entropy,
-                            n=4,
                             verbosity=0)
 ```
 
-```julia
+    ```julia
 using Plots
 plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)
 ```
 
-![](workflows_learning_curves.png)
-   
+![](workflows_learning_curve.png)
 
+Multiple curves:
+
+```@example workflows
+curve = learning_curve(forest,
+                       range=r,
+                       resampling=Holdout(),
+                       measure=cross_entropy,
+                       resolution=50,
+                       rng_name=:rng,
+                       rngs=4,
+                       verbosity=0)
+```
+
+```julia
+plot(curve.parameter_values, curve.measurements, 
+xlab=curve.parameter_name, xscale=curve.parameter_scale)
+```
+
+![](workflows_learning_curves.png)
