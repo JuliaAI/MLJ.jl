@@ -5,6 +5,7 @@ using Pkg
 using Documenter
 using MLJ
 using MLJBase
+using MLJTuning
 using MLJModels
 using ScientificTypes
 
@@ -26,7 +27,6 @@ pages = Any["Getting Started"=>"index.md",
             "Simple User Defined Models" => "simple_user_defined_models.md",
             "Adding Models for General Use" => "adding_models_for_general_use.md",
             "Benchmarking" => "benchmarking.md",
-            "Working with Tasks" => "working_with_tasks.md",
             "Internals"=>"internals.md",
             "Glossary"=>"glossary.md",
             "API"=>"api.md",
@@ -43,7 +43,7 @@ end
 makedocs(
     sitename = "MLJ",
     format = Documenter.HTML(),
-    modules = [MLJ, MLJBase, MLJModels, ScientificTypes],
+    modules = [MLJ, MLJBase, MLJTuning, MLJModels, ScientificTypes],
     pages=pages)
 
 # By default Documenter does not deploy docs just for PR
