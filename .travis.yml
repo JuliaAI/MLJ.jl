@@ -25,17 +25,14 @@ after_success:
 ## uncomment following lines to deploy documentation
 jobs:
   include:
-    - if: branch = master OR tag IS present
-      stage: "Documentation"
+    - stage: "Documentation"
       julia: 1.2
       os: linux
-      # disable global before_script in order not to install Compose twice
-      before_script:
       script:
         - |
           julia --color=yes --project=docs/ -e'
             using Pkg
             Pkg.add(PackageSpec(name="MLJBase", rev="master"));Pkg.add(PackageSpec(name="MLJTuning", rev="master"));Pkg.add(PackageSpec(name="MLJModels", rev="master"));Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
-            include("docs/make.jl")
-          '
+            include("docs/make.jl")'
+     after_success: skip
