@@ -29,10 +29,8 @@ jobs:
       julia: 1.2
       os: linux
       script:
-        - |
-          julia --color=yes --project=docs/ -e'
+        - julia --color=yes --project=docs/ -e '
             using Pkg
             Pkg.add(PackageSpec(name="MLJBase", rev="master"));Pkg.add(PackageSpec(name="MLJTuning", rev="master"));Pkg.add(PackageSpec(name="MLJModels", rev="master"));Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
             include("docs/make.jl")'
-     after_success: skip
