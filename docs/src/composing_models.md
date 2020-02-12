@@ -24,7 +24,6 @@ To illustrate basic construction of a pipeline, consider the following
 toy data:
 
 ```@setup 7
-import Base.eval
 using MLJ
 MLJ.color_off()
 ```

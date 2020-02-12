@@ -209,22 +209,6 @@ auc
 ```
 
 ```@docs
-tp
-```
-
-```@docs
-tn
-```
-
-```@docs
-fp
-```
-
-```@docs
-fn
-```
-
-```@docs
 tpr
 ```
 

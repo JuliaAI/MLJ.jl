@@ -60,7 +60,6 @@ MLJBase.predict(::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew) * fitresu
 ````
 
 ``` @setup regressor_example
-import Base.eval
 import MLJBase
 using LinearAlgebra
 MLJBase.color_off()

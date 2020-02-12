@@ -15,7 +15,6 @@ sets, see [Benchmarking](benchmarking.md).
 ## Evaluating against a single measure
 
 ```@setup evaluation_of_supervised_models
-import Base.eval
 using MLJ
 MLJ.color_off()
 ```

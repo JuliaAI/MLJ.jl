@@ -9,7 +9,11 @@ import MLJBase
 import MLJTuning
 import MLJModels
 import MLJScientificTypes
+import MLJModelInterface
 using CategoricalArrays # avoid types like CategoricalArrays.Categorica
+using LossFunctions
+
+const MMI = MLJModelInterface
 
 # using Literate
 # Literate.markdown("common_mlj_workflows.jl", ".",
@@ -47,7 +51,7 @@ end
 makedocs(
     sitename = "MLJ",
     format   = Documenter.HTML(),
-    modules  = [MLJ, MLJBase, MLJTuning, MLJModels, MLJScientificTypes],
+    modules  = [MLJ, MLJBase, MLJTuning, MLJModels, MLJScientificTypes, MLJModelInterface],
     pages    = pages)
 
 # By default Documenter does not deploy docs just for PR

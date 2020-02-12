@@ -93,21 +93,22 @@ in most cases. `Unsupervised` models may implement an
 Here is an example of a concrete supervised model type declaration:
 
 ```julia
-import MLJ
+import MLJModelInterface
+const MMI = MLJModelInterface
 
-mutable struct RidgeRegressor <: MLJBase.Deterministic
+mutable struct RidgeRegressor <: MMI.Deterministic
     lambda::Float64
 end
 ```
 
 Models (which are mutable) should not be given internal
 constructors. It is recommended that they be given an external lazy
-keyword constructor of the same name. This constructor defines default values for
-every field, and optionally corrects invalid field values by calling a `clean!` method
-(whose fallback returns an empty message string):
+keyword constructor of the same name. This constructor defines default values
+for every field, and optionally corrects invalid field values by calling a
+`clean!` method (whose fallback returns an empty message string):
 
 ```julia
-function MLJ.clean!(model::RidgeRegressor)
+function MMI.clean!(model::RidgeRegressor)
     warning = ""
     if model.lambda < 0
         warning *= "Need lambda ≥ 0. Resetting lambda=0. "
@@ -119,7 +120,7 @@ end
 # keyword constructor
 function RidgeRegressor(; lambda=0.0)
     model = RidgeRegressor(lambda)
-    message = MLJBase.clean!(model)
+    message = MMI.clean!(model)
     isempty(message) || @warn message
     return model
 end
@@ -129,7 +130,7 @@ An alternative to declaring the model struct, clean! method and keyword
 constructor, is to use the `@mlj_model` macro, as in the following example:
 
 ```julia
-@mlj_model mutable struct YourModel <: MLJBase.Deterministic
+@mlj_model mutable struct YourModel <: MMI.Deterministic
     a::Float64 = 0.5::(_ > 0)
     b::String  = "svd"::(_ in ("svd","qr"))
 end
@@ -153,7 +154,7 @@ parameters.
 ## Supervised models
 
 The compulsory and optional methods to be implemented for each
-concrete type `SomeSupervisedModel <: MLJBase.Supervised` are
+concrete type `SomeSupervisedModel <: MMI.Supervised` are
 summarized below. An `=` indicates the return value for a fallback
 version of the method.
 
@@ -163,90 +164,90 @@ version of the method.
 Compulsory:
 
 ```julia
-MLJBase.fit(model::SomeSupervisedModel, verbosity::Integer, X, y) -> fitresult, cache, report
-MLJBase.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
+MMI.fit(model::SomeSupervisedModel, verbosity::Integer, X, y) -> fitresult, cache, report
+MMI.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
 ```
 
 Optional, to check and correct invalid hyperparameter values:
 
 ```julia
-MLJBase.clean!(model::SomeSupervisedModel) = ""
+MMI.clean!(model::SomeSupervisedModel) = ""
 ```
 
 Optional, to return user-friendly form of fitted parameters:
 
 ```julia
-MLJBase.fitted_params(model::SomeSupervisedModel, fitresult) = fitresult
+MMI.fitted_params(model::SomeSupervisedModel, fitresult) = fitresult
 ```
 
 Optional, to avoid redundant calculations when re-fitting machines
 associated with a model:
 
 ```julia
-MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) =
-   MLJBase.fit(model, verbosity, X, y)
+MMI.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) =
+   MMI.fit(model, verbosity, X, y)
 ```
 
 Optional, to specify default hyperparameter ranges (for use in tuning):
 
 ```julia
-MLJBase.hyperparameter_ranges(T::Type) = Tuple(fill(nothing, length(fieldnames(T))))
+MMI.hyperparameter_ranges(T::Type) = Tuple(fill(nothing, length(fieldnames(T))))
 ```
 
 Optional, if `SomeSupervisedModel <: Probabilistic`:
 
 ```julia
-MLJBase.predict_mode(model::SomeSupervisedModel, fitresult, Xnew) =
+MMI.predict_mode(model::SomeSupervisedModel, fitresult, Xnew) =
     mode.(predict(model, fitresult, Xnew))
-MLJBase.predict_mean(model::SomeSupervisedModel, fitresult, Xnew) =
+MMI.predict_mean(model::SomeSupervisedModel, fitresult, Xnew) =
     mean.(predict(model, fitresult, Xnew))
-MLJBase.predict_median(model::SomeSupervisedModel, fitresult, Xnew) =
+MMI.predict_median(model::SomeSupervisedModel, fitresult, Xnew) =
     median.(predict(model, fitresult, Xnew))
 ```
 
 Required, if the model is to be registered (findable by general users):
 
 ```julia
-MLJBase.load_path(::Type{<:SomeSupervisedModel})    = ""
-MLJBase.package_name(::Type{<:SomeSupervisedModel}) = "Unknown"
-MLJBase.package_uuid(::Type{<:SomeSupervisedModel}) = "Unknown"
+MMI.load_path(::Type{<:SomeSupervisedModel})    = ""
+MMI.package_name(::Type{<:SomeSupervisedModel}) = "Unknown"
+MMI.package_uuid(::Type{<:SomeSupervisedModel}) = "Unknown"
 ```
 
 ```julia
-MLJBase.input_scitype(::Type{<:SomeSupervisedModel}) = Unknown
+MMI.input_scitype(::Type{<:SomeSupervisedModel}) = Unknown
 ```
 
 Strongly recommended, to constrain the form of target data passed to fit:
 
 ```julia
-MLJBase.target_scitype(::Type{<:SomeSupervisedModel}) = Unknown
+MMI.target_scitype(::Type{<:SomeSupervisedModel}) = Unknown
 ```
 
 Optional but recommended:
 
 ```julia
-MLJBase.package_url(::Type{<:SomeSupervisedModel})  = "unknown"
-MLJBase.is_pure_julia(::Type{<:SomeSupervisedModel}) = false
-MLJBase.package_license(::Type{<:SomeSupervisedModel}) = "unknown"
+MMI.package_url(::Type{<:SomeSupervisedModel})  = "unknown"
+MMI.is_pure_julia(::Type{<:SomeSupervisedModel}) = false
+MMI.package_license(::Type{<:SomeSupervisedModel}) = "unknown"
 ```
 
 If `SomeSupervisedModel` supports sample weights, then instead of the `fit` above, one implements
 
 ```julia
-MLJBase.fit(model::SomeSupervisedModel, verbosity::Integer, X, y, w=nothing) -> fitresult, cache, report
+MMI.fit(model::SomeSupervisedModel, verbosity::Integer, X, y, w=nothing) -> fitresult, cache, report
 ```
 
 and, if appropriate
 
 ```julia
-MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y, w=nothing) =
-   MLJBase.fit(model, verbosity, X, y, w)
+MMI.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y, w=nothing) =
+   MMI.fit(model, verbosity, X, y, w)
 ```
 
 Additionally, if `SomeSupervisedModel` supports sample weights, one must declare
 
 ```julia
-MLJBase.supports_weights(model::Type{<:SomeSupervisedModel}) = true
+MMI.supports_weights(model::Type{<:SomeSupervisedModel}) = true
 ```
 
 
@@ -273,7 +274,7 @@ more specific form, then `fit` will need to coerce the table into the
 form desired (and the same coercions applied to `X` will have to be
 repeated for `Xnew` in `predict`). To assist with common cases, MLJ
 provides the convenience method
-`MLJBase.matrix`. `MLJBase.matrix(Xtable)` has type `Matrix{T}` where
+`MMI.matrix`. `MMI.matrix(Xtable)` has type `Matrix{T}` where
 `T` is the tightest common type of elements of `Xtable`, and `Xtable`
 is any table.
 
@@ -288,7 +289,7 @@ methods](@ref) below for details.
 It is to be understood that the columns of the table `X` correspond to
 features and the rows to observations. So, for example, the predict
 method for a linear regression model might look like `predict(model,
-w, Xnew) = MLJBase.matrix(Xnew)*w`, where `w` is the vector of learned
+w, Xnew) = MMI.matrix(Xnew)*w`, where `w` is the vector of learned
 coefficients.
 
 
@@ -297,7 +298,7 @@ coefficients.
 A compulsory `fit` method returns three objects:
 
 ```julia
-MLJBase.fit(model::SomeSupervisedModel, verbosity::Int, X, y) -> fitresult, cache, report
+MMI.fit(model::SomeSupervisedModel, verbosity::Int, X, y) -> fitresult, cache, report
 ```
 
 *Note.* The `Int` typing of `verbosity` cannot be omitted.
@@ -338,7 +339,7 @@ generally avoid doing any of its own logging.
 above `fit`:
 
 ```julia
-MLJBase.fit(model::SomeSupervisedModel, verbosity::Int, X, y, w=nothing) -> fitresult, cache, report
+MMI.fit(model::SomeSupervisedModel, verbosity::Int, X, y, w=nothing) -> fitresult, cache, report
 ```
 
 
@@ -350,7 +351,7 @@ learned parameters of the model (as opposed to the
 hyperparameters). They must be extractable from `fitresult`.
 
 ```julia
-MLJBase.fitted_params(model::SomeSupervisedModel, fitresult) -> friendly_fitresult::NamedTuple
+MMI.fitted_params(model::SomeSupervisedModel, fitresult) -> friendly_fitresult::NamedTuple
 ```
 
 For a linear model, for example, one might declare something like
@@ -363,7 +364,7 @@ The fallback is to return `(fitresult=fitresult,)`.
 
 A compulsory `predict` method has the form
 ```julia
-MLJBase.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
+MMI.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
 ```
 
 Here `Xnew` will have the same form as the `X` passed to `fit`.
@@ -399,10 +400,10 @@ nominal target `yint` of type `Vector{<:Integer}` then a `fit` method
 may look something like this:
 
 ```julia
-function MLJBase.fit(model::SomeSupervisedModel, verbosity, X, y)
-    yint = MLJBase.int(y)
+function MMI.fit(model::SomeSupervisedModel, verbosity, X, y)
+    yint = MMI.int(y)
     a_target_element = y[1]                    # a CategoricalValue/String
-    decode = MLJBase.decoder(a_target_element) # can be called on integers
+    decode = MMI.decoder(a_target_element) # can be called on integers
 
     core_fitresult = SomePackage.fit(X, yint, verbosity=verbosity)
 
@@ -416,7 +417,7 @@ end
 while a corresponding deterministic `predict` operation might look like this:
 
 ```julia
-function MLJBase.predict(model::SomeSupervisedModel, fitresult, Xnew)
+function MMI.predict(model::SomeSupervisedModel, fitresult, Xnew)
     decode, core_fitresult = fitresult
     yhat = SomePackage.predict(core_fitresult, Xnew)
     return decode.(yhat)  # or decode(yhat) also works
@@ -437,11 +438,11 @@ must be an `AbstractVector` whose elements are distributions (one distribution
 per row of `Xnew`).
 
 Presently, a *distribution* is any object `d` for which
-`MLJBase.isdistribution(::d) = true`, which is currently restricted to
+`MMI.isdistribution(::d) = true`, which is currently restricted to
 objects subtyping `Distributions.Sampleable` from the package
 Distributions.jl.
 
-Use the distribution `MLJBase.UnivariateFinite` for `Probabilistic`
+Use the distribution `MMI.UnivariateFinite` for `Probabilistic`
 models predicting a target with `Finite` scitype (classifiers). In
 this case each element of the training target `y` is a
 `CategoricalValue` or `CategoricalString`, as in this contrived example:
@@ -458,7 +459,7 @@ we need it); this is accessible using the convenience method
 
 ```julia
 julia> yes = y[1]
-julia> levels = MLJBase.classes(yes)
+julia> levels = MMI.classes(yes)
 3-element Array{CategoricalValue{Symbol,UInt32},1}:
  :maybe
  :no
@@ -471,7 +472,7 @@ y[1]` and `no = y[2]` are to be assigned respective probabilities of
 follows:
 
 ```julia
-julia> d = MLJBase.UnivariateFinite([yes, no], [0.2, 0.8])
+julia> d = MMI.UnivariateFinite([yes, no], [0.2, 0.8])
 UnivariateFinite(:yes=>0.2, :maybe=>0.0, :no=>0.8)
 
 julia> pdf(d, yes)
@@ -489,7 +490,7 @@ for an example of a Probabilistic classifier implementation.
 
 
 ```@docs
-MLJBase.UnivariateFinite
+MMI.UnivariateFinite
 ```
 
 *Important note on binary classifiers.* ScientificTypes.jl has no
@@ -521,14 +522,13 @@ For example, to ensure that the `X` presented to the
 (and hence `AbstractFloat` machine type), one declares
 
 ```julia
-MLJBase.input_scitype(::Type{<:DecisionTreeClassifier}) = MLJBase.Table(MLJBase.Continuous)
+MMI.input_scitype(::Type{<:DecisionTreeClassifier}) = MMI.Table(MMI.Continuous)
 ```
 
 or, equivalently,
 
 ```julia
-using ScientificTypes
-MLJBase.input_scitype(::Type{<:DecisionTreeClassifier}) = Table(Continuous)
+MMI.input_scitype(::Type{<:DecisionTreeClassifier}) = Table(Continuous)
 ```
 
 If, instead, columns were allowed to have either: (i) a mixture of `Continuous` and `Missing`
@@ -536,7 +536,7 @@ values, or (ii) `Count` (i.e., integer) values, then the
 declaration would be
 
 ```julia
-MLJBase.input_scitype(::Type{<:DecisionTreeClassifier}) = Table(Union{Continuous,Missing},Count)
+MMI.input_scitype(::Type{<:DecisionTreeClassifier}) = Table(Union{Continuous,Missing},Count)
 ```
 
 Similarly, to ensure the target is an AbstractVector whose elements
@@ -544,7 +544,7 @@ have `Finite` scitype (and hence `CategoricalValue` or
 `CategoricalString` machine type) we declare
 
 ```julia
-MLJBase.target_scitype(::Type{<:DecisionTreeClassifier}) = AbstractVector{<:Finite}
+MMI.target_scitype(::Type{<:DecisionTreeClassifier}) = AbstractVector{<:Finite}
 ```
 
 #### Multivariate targets
@@ -623,7 +623,7 @@ end
 you might declare (order matters):
 
 ```julia
-MLJBase.hyperparameter_ranges(::Type{<:MyModel}) =
+MMI.hyperparameter_ranges(::Type{<:MyModel}) =
     (range(Float64, :alpha, lower=0, upper=1, scale=:log),
 	 range(Int, :beta, lower=1, upper=Inf, origin=100, unit=50, scale=:log),
 	 nothing)
@@ -633,35 +633,35 @@ Here is the complete list of trait function declarations for `DecisionTreeClassi
 ([source](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/DecisionTree.jl)):
 
 ```julia
-MLJBase.input_scitype(::Type{<:DecisionTreeClassifier}) = MLJBase.Table(MLJBase.Continuous)
-MLJBase.target_scitype(::Type{<:DecisionTreeClassifier}) = AbstractVector{<:MLJBase.Finite}
-MLJBase.load_path(::Type{<:DecisionTreeClassifier}) = "MLJModels.DecisionTree_.DecisionTreeClassifier"
-MLJBase.package_name(::Type{<:DecisionTreeClassifier}) = "DecisionTree"
-MLJBase.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
-MLJBase.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bensadeghi/DecisionTree.jl"
-MLJBase.is_pure_julia(::Type{<:DecisionTreeClassifier}) = true
+MMI.input_scitype(::Type{<:DecisionTreeClassifier}) = MMI.Table(MMI.Continuous)
+MMI.target_scitype(::Type{<:DecisionTreeClassifier}) = AbstractVector{<:MMI.Finite}
+MMI.load_path(::Type{<:DecisionTreeClassifier}) = "MLJModels.DecisionTree_.DecisionTreeClassifier"
+MMI.package_name(::Type{<:DecisionTreeClassifier}) = "DecisionTree"
+MMI.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+MMI.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bensadeghi/DecisionTree.jl"
+MMI.is_pure_julia(::Type{<:DecisionTreeClassifier}) = true
 ```
 
-Alternatively these traits can also be declared using `MLJBase.metadata_pkg` and `MLJBase.metadata_model` helper functions as:
+Alternatively these traits can also be declared using `MMI.metadata_pkg` and `MMI.metadata_model` helper functions as:
 
 ```julia
-MLJBase.metadata_pkg(DecisionTreeClassifier,name="DecisionTree",
+MMI.metadata_pkg(DecisionTreeClassifier,name="DecisionTree",
                      uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
                      url="https://github.com/bensadeghi/DecisionTree.jl",
                      julia=true)   
 
-MLJBase.metadata_model(DecisionTreeClassifier,
-                        input=MLJBase.Table(MLJBase.Continuous),
-                        target=AbstractVector{<:MLJBase.Finite},
+MMI.metadata_model(DecisionTreeClassifier,
+                        input=MMI.Table(MMI.Continuous),
+                        target=AbstractVector{<:MMI.Finite},
                         path="MLJModels.DecisionTree_.DecisionTreeClassifier")
 ```
 
 ```@docs
-MLJBase.metadata_pkg
+MMI.metadata_pkg
 ```
 
 ```@docs
-MLJBase.metadata_model
+MMI.metadata_model
 ```
 
 You can test all your declarations of traits by calling `MLJBase.info_dict(SomeModel)`.
@@ -674,9 +674,9 @@ MLJ to retrain a model (on the same training data) to avoid repeating
 computations unnecessarily.
 
 ```julia
-MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) -> fit
+MMI.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) -> fit
 result, cache, report
-MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y, w=nothing) -> fit
+MMI.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y, w=nothing) -> fit
 result, cache, report
 ```
 
@@ -727,35 +727,35 @@ optional `inverse_transform` operation.
 ## Convenience methods
 
 ```@docs
-MLJBase.int
+MLJModelInterface.int
 ```
 
 ```@docs
-MLJBase.classes
+MLJModelInterface.classes
 ```
 
 ```@docs
-MLJBase.decoder
+MLJModelInterface.decoder
 ```
 
 ```@docs
-MLJBase.matrix
+MLJModelInterface.matrix
 ```
 
 ```@docs
-MLJBase.table
+MLJModelInterface.table
 ```
 
 ```@docs
-MLJBase.select
+MLJModelInterface.select
 ```
 
 ```@docs
-MLJBase.selectrows
+MLJModelInterface.selectrows
 ```
 
 ```@docs
-MLJBase.selectcols
+MLJModelInterface.selectcols
 ```
 
 ```@docs
@@ -771,23 +771,23 @@ MLJBase.complement
 ```
 
 ```@docs
-ScientificTypes.schema
+MLJScientificTypes.schema
 ```
 
 ```@docs
-MLJBase.nrows
+MLJModelInterface.nrows
 ```
 
 ```@docs
-ScientificTypes.scitype
+MLJScientificTypes.scitype
 ```
 
 ```@docs
-ScientificTypes.scitype_union
+MLJScientificTypes.scitype_union
 ```
 
 ```@docs
-ScientificTypes.elscitype
+MLJScientificTypes.elscitype
 ```
 
 

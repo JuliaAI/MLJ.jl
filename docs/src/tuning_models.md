@@ -11,10 +11,6 @@ unwrapped model.
 
 ## Tuning a single hyperparameter using a grid search
 
-```@setup goof
-import Base.eval
-```
-
 ```@repl goof
 using MLJ
 X = MLJ.table(rand(100, 10));
