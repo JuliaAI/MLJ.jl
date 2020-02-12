@@ -1,13 +1,12 @@
 module TestEnsembles
 
-# using Revise
 using Test
 using Random
 using MLJ
 using MLJBase
 import MLJModels
 using CategoricalArrays
-using Distributions
+import Distributions
 
 @load KNNRegressor
 
@@ -159,8 +158,8 @@ train, test = partition(1:length(y), 0.8);
 ensemble_model = MLJ.ProbabilisticEnsembleModel(atom=atom)
 ensemble_model.n = 10
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
-d1 = fit(Distributions.Normal, [1,1,2,2])
-d2 = fit(Distributions.Normal, [1,1,1,2])
+d1 = Distributions.fit(Distributions.Normal, [1,1,2,2])
+d2 = Distributions.fit(Distributions.Normal, [1,1,1,2])
 # @test reduce(* , [d.μ ≈ d1.μ || d.μ ≈ d2.μ for d in fitresult.ensemble])
 # @test reduce(* , [d.σ ≈ d1.σ || d.σ ≈ d2.σ for d in fitresult.ensemble])
 d=predict(ensemble_model, fitresult, MLJ.selectrows(X, test))[1]
@@ -170,7 +169,7 @@ end
 ensemble_model.bagging_fraction = 1.0
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 d = predict(ensemble_model, fitresult, MLJ.selectrows(X, test))[1]
-d3 = fit(Distributions.Normal, y)
+d3 = Distributions.fit(Distributions.Normal, y)
 @test pdf(d, 1.52) ≈ pdf(d3, 1.52)
 atomic_weights = rand(10)
 atomic_weights = atomic_weights/sum(atomic_weights)

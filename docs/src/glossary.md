@@ -2,16 +2,15 @@
 
 Note: This glossary includes some detail intended mainly for MLJ developers.
 
-### Basics
+## Basics
 
-#### task (object of type `Task`)
+### task (object of type `Task`)
 
 Data plus a learning objective (e.g., "probabilistic prediction of
 Sales"). In MLJ a task does not include a description of how the
 completed task is to be evaluated.
 
-
-#### hyperparameters
+### hyperparameters
 
 Parameters on which some learning algorithm depends, specified before
 the algorithm is applied, and where learning is interpreted in the
@@ -20,16 +19,16 @@ broadest sense. For example, PCA feature reduction is a
 data, governed by a dimension hyperparameter. Hyperparameters in our
 sense may specify configuration (eg, number of parallel processes)
 even when this does not effect the end-product of learning. (But we
-exlcude verbosity level.)
+exclude verbosity level.)
 
-#### model (object of abstract type `Model`)
+### model (object of abstract type `Model`)
 
 Object collecting together hyperameters of a single algorithm. Most
 models are classified either as *supervised* or *unsupervised* models
 (generally, "transformers").
 
 
-#### fit-result (type generally defined outside of MLJ)
+### fit-result (type generally defined outside of MLJ)
 
 Also known as "learned" or "fitted" parameters, these are "weights",
 "coefficients", or similar paramaters learned by an algorithm, after
@@ -38,7 +37,7 @@ of a random forest, the coefficients and intercept of a linear model,
 or the rotation and projection matrices of PCA reduction scheme.
 
 
-#### operation
+### operation
 
 Data-manipulating operations (methods) parameterized by some
 fit-result. For supervised learners, the `predict`, `predict_mean`,
@@ -49,12 +48,11 @@ on a fit-result (e.g., a broadcasted logarithm) which is then called
 *static* operation for clarity. An operation that is not static is
 *dynamic*.
 
-
-#### machine (object of type `Machine`)
+### machine (object of type `Machine`)
 
 An object consisting of:
 
-(1) A model 
+(1) A model
 
 (2) A fit-result (undefined until training)
 
@@ -73,19 +71,17 @@ Machines are trained by calls to a `fit` method which may be
 passed an optional argument specifying the rows of data to be used in
 training.
 
-
-### Learning Networks and Composite Models
+## Learning Networks and Composite Models
 
 *Note:* Multiple nodal machines may share the same model, and
 multiple learning nodes may share the same nodal machine.
 
-#### source node (object of type `Source`)
+### source node (object of type `Source`)
 
 A container for training data and point of entry for new data in a
 learning network (see below).
 
-
-#### nodal machine (object of type `NodalMachine`)
+### nodal machine (object of type `NodalMachine`)
 
 Like a machine with the following exceptions:
 
@@ -93,40 +89,33 @@ Like a machine with the following exceptions:
 in the learning network, instead of data.
 
 (2) The object internally records dependencies on other other nodal
-machines, as implied by the training arguments, and so on. 
+machines, as implied by the training arguments, and so on.
 
 
-####  node (object of type `Node`)
+###  node (object of type `Node`)
 
 Essentially a nodal machine wrapped in an associated operation
 (e.g., `predict` or `inverse_transform`). It detail, it consists of:
 
-(1) An operation, static or dynamic.
-
-(2) A nodal machine, void if the operation is static.
-
-(3) Upstream connections to other learning or source nodes, specified by a list
-   of *arguments* (one for each argument of the operation).
-   
-(4) Metadata recording the dependencies of the object's machine, and
-the dependecies on other nodal machines implied by its
-arguments, and the training arguments of its nodel machine.
+1. An operation, static or dynamic.
+1. A nodal machine, void if the operation is static.
+1. Upstream connections to other learning or source nodes, specified by a list of *arguments* (one for each argument of the operation).
+1. Metadata recording the dependencies of the object's machine, and the dependecies on other nodal machines implied by its arguments, and the training arguments of its nodel machine.
 
 
-#### learning network 
+### learning network
 
 An acyclic directed graph implicit in the connections of a collection
 of source(s) and nodes. Each connected component is ordinarily
 restricted to have a unique source.
 
 
-#### wrapper
+### wrapper
 
 Any model with one or more other models as hyperparameters.
 
 
-#### composite model
+### composite model
 
 Any wrapper, or any learning network, "exported" as a model (see
 [Composing Models](composing_models.md)).
-

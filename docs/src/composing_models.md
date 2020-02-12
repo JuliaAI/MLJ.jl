@@ -7,12 +7,11 @@ these learning networks can be applied directly to learning tasks,
 they are more commonly used to specify new re-usable, stand-alone,
 composite model types, that behave like any other model type. The main
 novelty of composite models is that they include other models as
-hyper-parameters. 
+hyper-parameters.
 
 That said, MLJ also provides dedicated syntax for the most common
 composition use-cases, which are described first below. A description
 of the general framework begins at [Learning Networks](@ref).
-
 
 ## Linear pipelines
 
@@ -25,7 +24,6 @@ To illustrate basic construction of a pipeline, consider the following
 toy data:
 
 ```@setup 7
-import Base.eval
 using MLJ
 MLJ.color_off()
 ```
@@ -164,7 +162,7 @@ extra flexibility is essential.
 
 ### Building a simple learning network
 
-![](wrapped_ridge.png)
+![](img/wrapped_ridge.png)
 
 The diagram above depicts a learning network which standardizes the
 input data `X`, learns an optimal Box-Cox transformation for the

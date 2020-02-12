@@ -20,9 +20,10 @@ X, y = @load_iris;
 mach = machine(forest, X, y)
 fit!(mach, verbosity=2);
 ```
-    
+
 Generally, changing a hyperparameter triggers retraining on calls to
 subsequent `fit!`:
+
 ```@repl machines
 forest.bagging_fraction=0.5
 fit!(mach, verbosity=2);
@@ -48,14 +49,14 @@ However, retraining can be forced:
 fit!(mach, force=true);
 ```
 
-And is retriggered if the view of the data changes:
+And is re-triggered if the view of the data changes:
 
-```@repl machines 
+```@repl machines
 fit!(mach, rows=1:100);
 ```
 
-```@repl machines 
-fit!(mach, rows=1:100); 
+```@repl machines
+fit!(mach, rows=1:100);
 ```
 
 For a supervised machine the `predict` method calls a lower-level
@@ -84,11 +85,11 @@ Here is a complete list of the fields of a machine:
 Instead of data `X` and `y`, the `machine` constructor can be provided
 `Node` or `Source` objects ("dynamic data") to obtain a
 `NodalMachine`, rather than a regular `Machine` object, which includes
-the same fields listed above. See [Composing
-Models](composing_models.md) for more on this advanced feature.
+the same fields listed above.
+See [Composing Models](composing_models.md) for more on this advanced feature.
 
 
-### Inspecting machines
+## Inspecting machines
 
 There are two methods for inspecting the outcomes of training in
 MLJ. To obtain a named-tuple describing the learned parameters, in a
@@ -108,7 +109,7 @@ report(mach)
 ```
 
 
-### API Reference
+## API Reference
 
 ```@docs
 fit!

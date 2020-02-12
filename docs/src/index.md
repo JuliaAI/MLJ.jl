@@ -5,15 +5,14 @@
 
 
 ```@setup doda
-import Base.eval # hack b/s auto docs put's code in baremodule
-import Random.seed! 
+import Random.seed!
 using MLJ
 using InteractiveUtils
 MLJ.color_off()
-seed!(1234) 
+seed!(1234)
 ```
 
-### Choosing and evaluating a model
+## Choosing and evaluating a model
 
 To load some demonstration data, add
 [RDatasets](https://github.com/JuliaStats/RDatasets.jl) to your load
@@ -43,7 +42,7 @@ learning algorithm indicated by the struct name.
 Assuming the DecisionTree.jl package is in your load path, we can use
 `@load` to load the code defining the `DecisionTreeClassifier` model
 type. This macro also returns an instance, with default
-hyperparameters. 
+hyperparameters.
 
 Drop the `verbosity=1` declaration for silent loading:
 
@@ -59,7 +58,7 @@ how to add the package to your current environment.
 Once loaded, a model can be evaluated with the `evaluate` method:
 
 ```@repl doda
-evaluate(tree_model, X, y, 
+evaluate(tree_model, X, y,
          resampling=CV(shuffle=true), measure=cross_entropy, verbosity=0)
 ```
 
@@ -67,7 +66,7 @@ Evaluating against multiple performance measures is also possible. See
 [Evaluating Model Performance](evaluating_model_performance.md) for details.
 
 
-### A preview of data type specification in MLJ
+## A preview of data type specification in MLJ
 
 The target `y` above is a categorical vector, which is appropriate
 because our model is a decision tree *classifier*:
@@ -109,13 +108,13 @@ yint = Int.(y.refs);
 scitype(yint)
 ```
 
-and using `yint` in place of `y` in classification problems will fail. 
+and using `yint` in place of `y` in classification problems will fail.
 
 For more on scientific types, see [Data containers and scientific
 types](@ref) below.
 
 
-### Fit and predict
+## Fit and predict
 
 To illustrate MLJ's fit and predict interface, let's perform our
 performance evaluations by hand, but using a simple holdout set,
@@ -193,8 +192,7 @@ evaluate!(tree, resampling=Holdout(fraction_train=0.7, shuffle=true),
           verbosity=0)
 ```
 
-
-### Next steps
+## Next steps
 
 To learn a little more about what MLJ can do, browse [Common MLJ
 Workflows](common_mlj_workflows.md) or MLJ's
@@ -203,7 +201,7 @@ returning to the manual as needed. *Read at least the remainder of
 this page before considering serious use of MLJ.*
 
 
-### Prerequisites
+## Prerequisites
 
 MLJ assumes some familiarity with the `CategoricalValue` and
 `CategoricalString` types from
@@ -214,14 +212,14 @@ predictors, a basic acquaintance with
 also assumed.
 
 
-### Data containers and scientific types
+## Data containers and scientific types
 
 The MLJ user should acquaint themselves with some
 basic assumptions about the form of data expected by MLJ, as outlined
-below. 
+below.
 
 ```
-machine(model::Supervised, X, y) 
+machine(model::Supervised, X, y)
 machine(model::Unsupervised, X)
 ```
 
@@ -246,14 +244,14 @@ correctly. Tools exist to coerce the data to have the appropriate
 scientfic type; see
 [MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
 or run `?coerce` for details.
- 
+
 Additionally, most data containers - such as tuples,
 vectors, matrices and tables - have a scientific type.
 
 
-![](scitypes.png)
+![](img/scitypes.png)
 
-*Figure 1. Part of the scientific type heirarchy in* ScientificTypes.jl.
+*Figure 1. Part of the scientific type hierarchy in* [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl).
 
 ```@repl doda
 scitype(4.6)
@@ -264,7 +262,7 @@ X = (x1=x1, x2=rand(4), x3=rand(4))  # a "column table"
 scitype(X)
 ```
 
-#### Tabular data
+### Tabular data
 
 All data containers compatible with the
 [Tables.jl](https://github.com/JuliaData/Tables.jl) interface (which
@@ -277,8 +275,7 @@ of the columns, which can be individually inspected using `schema`:
 schema(X)
 ```
 
-
-#### Inputs
+### Inputs
 
 Since an MLJ model only specifies the scientific type of data, if that
 type is `Table` - which is the case for the majority of MLJ models -
@@ -290,31 +287,27 @@ MLJ.table(Xmatrix)`.
 Specifically, the requirement for an arbitrary model's input is `scitype(X)
 <: input_scitype(model)`.
 
-
-#### Targets
+### Targets
 
 The target `y` expected by MLJ models is generally an
-`AbstractVector`. A multivariate target `y` will generally be table. 
+`AbstractVector`. A multivariate target `y` will generally be table.
 
 Specifically, the type requirement for a model target is `scitype(y) <:
 target_scitype(model)`.
 
-#### Querying a model for acceptable data types 
+### Querying a model for acceptable data types
 
 Given a model instance, one can inspect the admissible scientific
 types of its input and target by querying the scientific type of
 the model itself:
- 
+
 ```@setup doda
 tree = @load DecisionTreeClassifier
 ```
 
-```julia 
-julia> tree = DecisionTreeClassifier();
-julia> scitype(tree)
-(input_scitype = ScientificTypes.Table{#s13} where #s13<:(AbstractArray{#s12,1} where #s12<:Continuous),
- target_scitype = AbstractArray{#s21,1} where #s21<:Finite,
- is_probabilistic = true,)
+```@repl doda
+tree = DecisionTreeClassifier();
+scitype(tree)
 ```
 
 This does not work if relevant model code has not been loaded. In that
@@ -326,7 +319,7 @@ info("DecisionTreeClassifier")
 ```
 
 
-#### Container element types
+### Container element types
 
 Models in MLJ will always apply the `MLJ` convention described in
 [MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
@@ -335,17 +328,17 @@ are the key features of that convention:
 
 - Any `AbstractFloat` is interpreted as `Continuous`.
 
-- Any `Integer` is interpreted as `Count`. 
+- Any `Integer` is interpreted as `Count`.
 
 - Any `CategoricalValue` or `CategoricalString`, `x`, is interpreted
   as `Multiclass` or `OrderedFactor`, depending on the value of
-  `x.pool.ordered`. 
-    
+  `x.pool.ordered`.
+
 - `String`s and `Char`s are *not* interpreted as `Finite`; they have
   `Unknown` scitype. Coerce vectors of strings or characters to
   `CategoricalVector`s if they represent `Multiclass` or
-  `OrderedFactor` data. Do `?coerce` and `?unpack` to learn how. 
-  
+  `OrderedFactor` data. Do `?coerce` and `?unpack` to learn how.
+
 - In particular, *integers* (including `Bool`s) *cannot be used to
   represent categorical data.*
 
@@ -355,11 +348,3 @@ represented by an ordered `CategoricalValue` or
 `CategoricalString`. This data will have scitype `OrderedFactor{2}`
 and the "true" class is understood to be the *second* class in the
 ordering.
-
-
-
-
-
-
-
-

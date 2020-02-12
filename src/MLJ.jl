@@ -21,12 +21,12 @@ export matching
 export pdf, mode, median, mean, shuffle!, categorical, shuffle,
     levels, levels!, std, support
 
-# re-export from ScientificTypes:
-export GrayImage, ColorImage, Image,
-    Found, Continuous, Finite, Infinite,
-    OrderedFactor, Unknown,
-    Count, Multiclass, Binary, Scientific,
-    scitype, scitype_union, coerce, schema, autotype, elscitype
+# re-exports from (MLJ)ScientificTypes via MLJBase
+export Scientific, Found, Unknown, Known, Finite, Infinite,
+       OrderedFactor, Multiclass, Count, Continuous, Textual,
+       Binary, ColorImage, GrayImage, Image, Table
+export scitype, scitype_union, elscitype, nonmissing, trait
+export coerce, coerce!, autotype, schema, info
 
 # re-export from MLJBase:
 export nrows, nfeatures, color_off, color_on,
@@ -73,7 +73,7 @@ export measures,
     truepositive_rate, truenegative_rate, falsepositive_rate,
     falsenegative_rate, negativepredicitive_value,
     positivepredictive_value,
-    tp, tn, fp, fn, tpr, tnr, fpr, fnr,
+    tpr, tnr, fpr, fnr,
     falsediscovery_rate, fdr, npv, ppv,
     recall, sensitivity, hit_rate, miss_rate,
     specificity, selectivity, f1score, f1, fallout
@@ -90,7 +90,6 @@ export models, localmodels, @load, load, info,
     OneHotEncoder, UnivariateDiscretizer,
     FillImputer
 
-
 ## METHOD IMPORT
 
 # from the Standard Library:
@@ -99,14 +98,11 @@ import Pkg
 import Pkg.TOML
 
 # from the MLJ universe:
-using ScientificTypes
 using MLJBase
-import MLJBase
 using MLJTuning
 using MLJModels
 
-using Tables
-using  CategoricalArrays
+using Tables, CategoricalArrays
 import Distributions
 import Distributions: pdf, mode
 import Statistics, StatsBase, LinearAlgebra, Random
@@ -114,14 +110,12 @@ import Random: AbstractRNG, MersenneTwister
 using ProgressMeter
 using ComputationalResources
 using ComputationalResources: CPUProcesses
-using DocStringExtensions: SIGNATURES, TYPEDEF
 
 # to be extended:
-import MLJBase: fit, update, clean!, fit!,
-    predict, fitted_params,
-    show_as_constructed, ==
+import MLJBase: fit, update, clean!, fit!, predict, fitted_params,
+                show_as_constructed, ==
 import MLJModels: models
-
+import MLJScientificTypes
 
 ## CONSTANTS
 
