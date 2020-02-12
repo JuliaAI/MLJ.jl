@@ -232,17 +232,19 @@ as `Array{Float32, 2}`). Similar remarks apply to the input `X` of an
 unsupervised model.
 
 Scientific types are julia types defined in the package
-[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl),
-which also defines the convention used here (and there called *mlj*)
-for assigning a specific scientific type (interpretation) to each
-julia object (see the `scitype` examples below).
+[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl);
+the package
+[MLJScientificTypes](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
+implements the particular convention used in the MLJ universe for
+assigning a specific scientific type (interpretation) to each julia
+object (see the `scitype` examples below).
 
 The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
 `OrderedFactor{N}` and `Count`. Be sure you read [Container element
 types](@ref) below to be guarantee your scalar data is interpreted
 correctly. Tools exist to coerce the data to have the appropriate
 scientfic type; see
-[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
+[MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
 or run `?coerce` for details.
  
 Additionally, most data containers - such as tuples,
@@ -307,7 +309,7 @@ the model itself:
 tree = @load DecisionTreeClassifier
 ```
 
-```@julia doda
+```julia 
 julia> tree = DecisionTreeClassifier();
 julia> scitype(tree)
 (input_scitype = ScientificTypes.Table{#s13} where #s13<:(AbstractArray{#s12,1} where #s12<:Continuous),
@@ -326,10 +328,10 @@ info("DecisionTreeClassifier")
 
 #### Container element types
 
-Models in MLJ will always apply the *mlj* convention described in
-[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
+Models in MLJ will always apply the `MLJ` convention described in
+[MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
 to decide how to interpret the elements of your container types. Here
-are the key aspects of that convention:
+are the key features of that convention:
 
 - Any `AbstractFloat` is interpreted as `Continuous`.
 

@@ -8,6 +8,7 @@ using MLJBase
 using MLJTuning
 using MLJModels
 using ScientificTypes
+using MLJScientificTypes
 
 # using Literate
 # Literate.markdown("common_mlj_workflows.jl", ".",
@@ -26,6 +27,7 @@ pages = Any["Getting Started"=>"index.md",
             "Homogeneous Ensembles" => "homogeneous_ensembles.md",
             "Simple User Defined Models" => "simple_user_defined_models.md",
             "Adding Models for General Use" => "adding_models_for_general_use.md",
+"           Step-by-Step Guide to Adding Models" => "step_by_step_guide_to_adding_models.md",
             "Benchmarking" => "benchmarking.md",
             "Internals"=>"internals.md",
             "Glossary"=>"glossary.md",
@@ -43,7 +45,7 @@ end
 makedocs(
     sitename = "MLJ",
     format = Documenter.HTML(),
-    modules = [MLJ, MLJBase, MLJTuning, MLJModels, ScientificTypes],
+    modules = [MLJ, MLJBase, MLJTuning, MLJModels, MLJScientificTypes, ScientificTypes],
     pages=pages)
 
 # By default Documenter does not deploy docs just for PR
