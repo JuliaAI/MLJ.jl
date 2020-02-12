@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Internals · MLJ</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">MLJ</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Getting Started</a></li><li><a class="tocitem" href="../common_mlj_workflows/">Common MLJ Workflows</a></li><li><a class="tocitem" href="../model_search/">Model Search</a></li><li><a class="tocitem" href="../machines/">Machines</a></li><li><a class="tocitem" href="../evaluating_model_performance/">Evaluating Model Performance</a></li><li><a class="tocitem" href="../performance_measures/">Performance Measures</a></li><li><a class="tocitem" href="../tuning_models/">Tuning Models</a></li><li><a class="tocitem" href="../learning_curves/">Learning Curves</a></li><li><a class="tocitem" href="../built_in_transformers/">Built-in Transformers</a></li><li><a class="tocitem" href="../composing_models/">Composing Models</a></li><li><a class="tocitem" href="../homogeneous_ensembles/">Homogeneous Ensembles</a></li><li><a class="tocitem" href="../simple_user_defined_models/">Simple User Defined Models</a></li><li><a class="tocitem" href="../adding_models_for_general_use/">Adding Models for General Use</a></li><li><a class="tocitem" href="../benchmarking/">Benchmarking</a></li><li class="is-active"><a class="tocitem" href>Internals</a><ul class="internal"><li><a class="tocitem" href="#The-machine-interface,-simplified-1"><span>The machine interface, simplified</span></a></li></ul></li><li><a class="tocitem" href="../glossary/">Glossary</a></li><li><a class="tocitem" href="../mlj_cheatsheet/">MLJ Cheatsheet</a></li><li><a class="tocitem" href="../NEWS/">MLJ News</a></li><li><a class="tocitem" href="../frequently_asked_questions/">FAQ</a></li><li><a class="tocitem" href="../julia_blogpost/">Julia BlogPost</a></li><li><a class="tocitem" href="../acceleration_and_parallelism/">Acceleration and Parallelism</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Internals</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Internals</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/internals.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Internals-1"><a class="docs-heading-anchor" href="#Internals-1">Internals</a><a class="docs-heading-anchor-permalink" href="#Internals-1" title="Permalink"></a></h1><h2 id="The-machine-interface,-simplified-1"><a class="docs-heading-anchor" href="#The-machine-interface,-simplified-1">The machine interface, simplified</a><a class="docs-heading-anchor-permalink" href="#The-machine-interface,-simplified-1" title="Permalink"></a></h2><p>The following is simplified description of the <code>Machine</code> interface. See also the <a href="../glossary/">Glossary</a></p><h3 id="The-Machine-type-1"><a class="docs-heading-anchor" href="#The-Machine-type-1">The Machine type</a><a class="docs-heading-anchor-permalink" href="#The-Machine-type-1" title="Permalink"></a></h3><pre><code class="language-julia">mutable struct Machine{M&lt;Model}
+
+    model::M
+    fitresult
+    cache
+    args::Tuple    # e.g., (X, y) for supervised models
+    report
+    previous_rows # remember last rows used
+
+    function Machine{M}(model::M, args...) where M&lt;:Model
+        machine = new{M}(model)
+        machine.args = args
+        machine.report = Dict{Symbol,Any}()
+        return machine
+    end
+
+end</code></pre><h3 id="Constructor-1"><a class="docs-heading-anchor" href="#Constructor-1">Constructor</a><a class="docs-heading-anchor-permalink" href="#Constructor-1" title="Permalink"></a></h3><pre><code class="language-julia">machine(model::M, Xtable, y) = Machine{M}(model, Xtable, y)</code></pre><h3 id="fit!-and-predict/transform-1"><a class="docs-heading-anchor" href="#fit!-and-predict/transform-1">fit! and predict/transform</a><a class="docs-heading-anchor-permalink" href="#fit!-and-predict/transform-1" title="Permalink"></a></h3><pre><code class="language-julia">function fit!(machine::Machine; rows=nothing, force=false, verbosity=1)
+
+    warning = clean!(mach.model)
+    isempty(warning) || verbosity &lt; 0 || @warn warning
+
+    if rows === nothing
+        rows = (:)
+    end
+
+    rows_have_changed  = (!isdefined(mach, :previous_rows) ||
+	    rows != mach.previous_rows)
+
+    args = [MLJ.selectrows(arg, rows) for arg in mach.args]
+
+    if !isdefined(mach, :fitresult) || rows_have_changed || force
+        mach.fitresult, mach.cache, report =
+            fit(mach.model, verbosity, args...)
+    else # call `update`:
+        mach.fitresult, mach.cache, report =
+            update(mach.model, verbosity, mach.fitresult, mach.cache, args...)
+    end
+
+    if rows_have_changed
+        mach.previous_rows = deepcopy(rows)
+    end
+
+    if report !== nothing
+        merge!(mach.report, report)
+    end
+
+    return mach
+
+end
+
+function predict(machine::Machine{&lt;:Supervised}, Xnew)
+    if isdefined(machine, :fitresult)
+        return predict(machine.model, machine.fitresult, Xnew))
+    else
+        throw(error(&quot;$machine is not trained and so cannot predict.&quot;))
+    end
+end
+
+function transform(machine::Machine{&lt;:Unsupervised}, Xnew)
+    if isdefined(machine, :fitresult)
+        return transform(machine.model, machine.fitresult, Xnew))
+    else
+        throw(error(&quot;$machine is not trained and so cannot transform.&quot;))
+    end
+end</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../benchmarking/">« Benchmarking</a><a class="docs-footer-nextpage" href="../glossary/">Glossary »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 12 February 2020 15:16">Wednesday 12 February 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
