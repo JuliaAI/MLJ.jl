@@ -1,18 +1,20 @@
 ## SUPERVISED
 
+const MST = MLJScientificTypes # only used in this file
+
 struct SupervisedScitype{input_scitype, target_scitype, prediction_type} end
 
-ScientificTypes.scitype(model::Deterministic, ::ScientificTypes.MLJ) =
+MST.scitype(model::Deterministic, ::MST.MLJ) =
     SupervisedScitype{input_scitype(model),
                     target_scitype(model),
                     :deterministic}
 
-ScientificTypes.scitype(model::Probabilistic, ::ScientificTypes.MLJ) =
+MST.scitype(model::Probabilistic, ::MST.MLJ) =
     SupervisedScitype{input_scitype(model),
                     target_scitype(model),
                     :probabilistic}
 
-ScientificTypes.scitype(model::Interval, ::ScientificTypes.MLJ) =
+MST.scitype(model::Interval, ::MST.MLJ) =
     SupervisedScitype{input_scitype(model),
                     target_scitype(model),
                     :interval}
@@ -48,7 +50,7 @@ end
 
 struct UnsupervisedScitype{input_scitype, output_scitype} end
 
-ScientificTypes.scitype(model::Unsupervised, ::ScientificTypes.MLJ) =
+MST.scitype(model::Unsupervised, ::MST.MLJ) =
     UnsupervisedScitype{input_scitype(model),
                       MLJBase.output_scitype(model)}
 
@@ -87,7 +89,7 @@ struct MeasureScitype{target_scitype,
                is_feature_dependent,
                supports_weights} end
 
-ScientificTypes.scitype(measure, ::ScientificTypes.MLJ, ::Val{:measure}) =
+MST.scitype(measure, ::MST.MLJ, ::Val{:measure}) =
     MeasureScitype{target_scitype(measure),
                prediction_type(measure),
                orientation(measure),

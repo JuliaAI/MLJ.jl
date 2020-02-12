@@ -7,7 +7,6 @@ Base.show(stream::IO, t::Random.MersenneTwister) =
 
 # Atom is atomic model type, eg, DecisionTree
 # R will be the tightest type of the atom fit-results.
-using StatsBase
 mutable struct WrappedEnsemble{R,Atom <: Supervised} <: MLJType
     atom::Atom
     ensemble::Vector{R}
@@ -27,33 +26,32 @@ function WrappedEnsemble(atom, ensemble::AbstractVector{L}) where L
 end
 
 # to enable trait-based dispatch of predict:
-predict(wens::WrappedEnsemble{R,Atom},
-        atomic_weights, Xnew) where {R,Atom<:Deterministic} =
+function predict(wens::WrappedEnsemble{R,Atom}, atomic_weights, Xnew
+                 ) where {R,Atom<:Deterministic}
     predict(wens, atomic_weights, Xnew, Deterministic, target_scitype(Atom))
-predict(wens::WrappedEnsemble{R,Atom},
-        atomic_weights, Xnew) where {R,Atom<:Probabilistic} =
+end
+
+function predict(wens::WrappedEnsemble{R,Atom}, atomic_weights, Xnew
+                 ) where {R,Atom<:Probabilistic}
     predict(wens, atomic_weights, Xnew, Probabilistic, target_scitype(Atom))
+end
 
-function predict(wens::WrappedEnsemble,
-                 atomic_weights,
-                 Xnew,
+function predict(wens::WrappedEnsemble, atomic_weights, Xnew,
                  ::Type{Deterministic}, ::Type{<:AbstractVector{<:Finite}})
-
     # atomic_weights ignored in this case
-
     ensemble = wens.ensemble
-    atom = wens.atom
-
+    atom     = wens.atom
     n_atoms = length(ensemble)
 
     n_atoms > 0  || @error "Empty ensemble cannot make predictions."
 
     # TODO: make this more memory efficient but note that the type of
     # Xnew is unknown (ie, model dependent)
-    predictions =
-        reduce(hcat, [predict(atom, fitresult, Xnew) for fitresult in ensemble])
-    classes = levels(predictions)
-    n = size(predictions, 1)
+    preds_gen   = (predict(atom, fitresult, Xnew) for fitresult in ensemble)
+    predictions = hcat(preds_gen...)
+
+    classes    = levels(predictions)
+    n          = size(predictions, 1)
     prediction =
         categorical(vcat([mode(predictions[i,:]) for i in 1:n], classes))[1:n]
     return prediction
@@ -61,61 +59,56 @@ end
 
 function predict(wens::WrappedEnsemble, atomic_weights, Xnew,
                  ::Type{Deterministic}, ::Type{<:AbstractVector{<:Continuous}})
+    # considering atomic weights
     ensemble = wens.ensemble
-
-    atom = wens.atom
-
-    n_atoms = length(ensemble)
+    atom     = wens.atom
+    n_atoms  = length(ensemble)
 
     n_atoms > 0  || @error "Empty ensemble cannot make predictions."
 
     # TODO: make more memory efficient:
-    predictions = reduce(hcat, [atomic_weights[k]*predict(atom, ensemble[k], Xnew) for k in 1:n_atoms])
-    prediction =  [sum(predictions[i,:]) for i in 1:size(predictions, 1)]
+    preds_gen   = (atomic_weights[k] * predict(atom, ensemble[k], Xnew)
+                    for k in 1:n_atoms)
+    predictions = hcat(preds_gen...)
+    prediction  = [sum(predictions[i,:]) for i in 1:size(predictions, 1)]
 
     return prediction
 end
 
 function predict(wens::WrappedEnsemble, atomic_weights, Xnew,
                  ::Type{Probabilistic}, ::Type{<:AbstractVector{<:Finite}})
-
     ensemble = wens.ensemble
-
-    atom = wens.atom
-
-    n_atoms = length(ensemble)
+    atom     = wens.atom
+    n_atoms  = length(ensemble)
 
     n_atoms > 0  || @error "Empty ensemble cannot make predictions."
 
     # TODO: make this more memory efficient but note that the type of
     # Xnew is unknown (ie, model dependent):
-
     # a matrix of probability distributions:
-    predictions = reduce(hcat, [predict(atom, fitresult, Xnew) for fitresult in ensemble])
-    n_rows = size(predictions, 1)
+    preds_gen   = (predict(atom, fitresult, Xnew) for fitresult in ensemble)
+    predictions = hcat(preds_gen...)
+    n_rows      = size(predictions, 1)
 
     # the weighted averages over the ensemble of the discrete pdf's:
-    predictions  = [MLJBase.average([predictions[i,k] for k in 1:n_atoms], weights=atomic_weights) for i in 1:n_rows]
+    predictions = [average([predictions[i, k] for k in 1:n_atoms], weights=atomic_weights) for i in 1:n_rows]
 
     return predictions
 end
 
 function predict(wens::WrappedEnsemble, atomic_weights, Xnew,
                  ::Type{Probabilistic}, ::Type{<:AbstractVector{<:Continuous}})
-
     ensemble = wens.ensemble
-
-    atom = wens.atom
-
-    n_atoms = length(ensemble)
+    atom     = wens.atom
+    n_atoms  = length(ensemble)
 
     n_atoms > 0  || @error "Empty ensemble cannot make predictions."
 
     # TODO: make this more memory efficient but note that the type of
     # Xnew is unknown (ie, model dependent):
-
     # a matrix of probability distributions:
-    predictions = reduce(hcat, [predict(atom, fitresult, Xnew) for fitresult in ensemble])
+    preds_gen   = (predict(atom, fitresult, Xnew) for fitresult in ensemble)
+    predictions = hcat(preds_gen...)
 
     # n_rows = size(predictions, 1)
     # # the weighted average over the ensemble of the pdf means and pdf variances:
