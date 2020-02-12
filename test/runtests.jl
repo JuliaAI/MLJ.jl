@@ -2,10 +2,10 @@ using Distributed
 addprocs(2)
 
 @everywhere begin
-using MLJ
-using MLJBase
-using Test
-using Random
+    using MLJ
+    using MLJBase
+    using Test
+    using Random
 end
 
 @testset "ensembles" begin
@@ -19,5 +19,3 @@ end
 @testset "scitypes" begin
     @test include("scitypes.jl")
 end
-
-

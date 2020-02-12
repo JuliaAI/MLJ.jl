@@ -1,5 +1,6 @@
-abstract type TuningStrategy <: MLJ.MLJType end
-const ParameterName=Union{Symbol,Expr}
+abstract type TuningStrategy <: MLJType end
+
+const ParameterName = Union{Symbol,Expr}
 
 """
     Grid(resolution=10, acceleration=DEFAULT_RESOURCE[])

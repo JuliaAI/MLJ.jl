@@ -5,9 +5,9 @@ Anthony Blaom, Diego Arenas, Franz Kiraly, Yiannis Simillides, Sebastian Vollmer
 **May 1st, 2019.** Blog post also posted on the [Julia Language Blog](https://julialang.org/blog/2019/05/beyond-ml-pipelines-with-mlj)
 
 
-![](learningcurves.png) | ![](heatmap.png)
+![](img/learningcurves.png) | ![](img/heatmap.png)
 ------------------------|--------------------------
-![](wrapped_ridge.png)  | ![](MLPackages.png)
+![](img/wrapped_ridge.png)  | ![](img/MLPackages.png)
 
 
 ## Introduction
@@ -31,17 +31,17 @@ composition.
 
 - [MLJ vs ScikitLearn.jl](https://alan-turing-institute.github.io/MLJ.jl/dev/frequently_asked_questions/)  
 
-- Video from [London Julia User Group meetup in March 2019](https://www.youtube.com/watch?v=CfHkjNmj1eE) (skip to [demo at 21'39](https://youtu.be/CfHkjNmj1eE?t=21m39s)) &nbsp; 
+- Video from [London Julia User Group meetup in March 2019](https://www.youtube.com/watch?v=CfHkjNmj1eE) (skip to [demo at 21'39](https://youtu.be/CfHkjNmj1eE?t=21m39s)) &nbsp;
 
 - [![London Julia User Group](0_small.jpg)](http://www.youtube.com/watch?v=CfHkjNmj1eE)
 
-- The MLJ [tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/tour.ipynb) 
+- The MLJ [tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/tour.ipynb)
 
 - Building a [self-tuning random forest](https://github.com/alan-turing-institute/MLJ.jl/blob/master/examples/random_forest.ipynb)
- 
+
 - An MLJ [docker image](https://github.com/ysimillides/mlj-docker) (including tour)
 
-- Implementing the MLJ interface for a [new model](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/) 
+- Implementing the MLJ interface for a [new model](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/)
 
 - How to [contribute](https://github.com/alan-turing-institute/MLJ.jl/blob/master/CONTRIBUTE.md)
 
@@ -60,19 +60,19 @@ MLJ already has substantial functionality:
 - **Automatic tuning.** Automated tuning of hyperparameters, including
   composite models. Tuning implemented as a model wrapper for
   composition with other meta-algorithms.
-  
+
 - **Homogeneous model ensembling.**
 
 - **Registry for model metadata.** Metadata available without loading
   model code. Basis of a "task" interface and facilitates
   model composition.
-  
+
 - **Task interface.** Automatically match models to specified learning
   tasks, to streamline benchmarking and model selection.
-  
+
 - **Clean probabilistic API.** Improves support for Bayesian
   statistics and probabilistic graphical models.
-  
+
 - **Data container agnostic.** Present and manipulate data in your
   favorite Tables.jl format.
 
@@ -93,7 +93,7 @@ see this
 [FAQ](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/frequently_asked_questions.md).
 
 
-## Learning networks 
+## Learning networks
 
 MLJ's model composition interface is flexible enough to implement, for
 example, the [model
@@ -104,7 +104,7 @@ in prediction and training modes is different. This can be seen from
 the following schematic of a simple two-model stack, viewed as a
 network:
 
-![](two_model_stack.png)
+![](img/two_model_stack.png)
 
 ## Building a simple network
 
@@ -146,7 +146,7 @@ Xnewt = transform(hot, Xnew);
 yhat = predict(tree, Xnewt);
 yhat[1:3]
  3-element Array{Float64,1}:
-  223956.9999999999 
+  223956.9999999999
   320142.85714285733
   161227.49999999994
 ```
@@ -169,7 +169,7 @@ yhat = predict(tree, Xt)
 
 If we like, we can think of a node as *dynamic data* - "data" because
 it can be called (indexed) on rows, but "dynamic" because the result
-depends on the outcome of training events, which in turn depend on 
+depends on the outcome of training events, which in turn depend on
 hyperparameter values. For example, after fitting the completed pipeline,
 we can make new predictions like this:
 
@@ -184,7 +184,7 @@ fit!(yhat, rows=1:1300)
 yhat(rows=1301:1302) # to predict on rows of source node
 yhat(Xnew)           # to predict on new data
 156-element Array{Float64,1}:
- 223956.9999999999 
+ 223956.9999999999
  320142.85714285733
  ...
 ```
@@ -223,4 +223,4 @@ read. In this respect we have been inspired by [On Machine Learning
 and Programming Languages](https://julialang.org/blog/2017/12/ml&pl).
 
 ## Invitation to the community
-We now invite the community to try out our newly registered packages, [MLJ](https://github.com/alan-turing-institute/MLJ.jl)alongside [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl), and provide any feedback or suggestions you may have going forward. We are also particularly interested in hearing how you would use our package, and what features it may be lacking. 
+We now invite the community to try out our newly registered packages, [MLJ](https://github.com/alan-turing-institute/MLJ.jl)alongside [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl), and provide any feedback or suggestions you may have going forward. We are also particularly interested in hearing how you would use our package, and what features it may be lacking.

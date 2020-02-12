@@ -8,7 +8,7 @@
     subject to breaking changes during minor or major releases without
     warning.
 
-### User-facing interface
+## User-facing interface
 
 To enable composable, extensible acceleration of core MLJ methods,
 [ComputationalResources.jl](https://github.com/timholy/ComputationalResources.jl)

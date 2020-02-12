@@ -9,12 +9,7 @@ optimal model, one just calls `predict(mach, Xnew)`. In this way the
 wrapped model may be viewed as a "self-tuning" version of the
 unwrapped model.
 
-
-### Tuning a single hyperparameter using a grid search
-
-```@setup goof
-import Base.eval
-```
+## Tuning a single hyperparameter using a grid search
 
 ```@repl goof
 using MLJ
@@ -77,7 +72,7 @@ predict(self_tuning_tree, Xnew)
 ```
 
 
-### Tuning multiple nested hyperparameters
+## Tuning multiple nested hyperparameters
 
 The following model has another model, namely a `DecisionTreeRegressor`, as a
 hyperparameter:
@@ -123,12 +118,12 @@ using Plots
 plot(self_tuning_forest)
 ```
 
-![](tuning_plot.png)
+![](img/tuning_plot.png)
 
 For more options in a grid search, see the `Grid` docstring below.
 
 
-### API
+## API
 
 ```@docs
 MLJBase.range

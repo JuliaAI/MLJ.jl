@@ -327,7 +327,7 @@ Bound the wrapped model to data:
 tuned = machine(tuned_forest, X, y)
 ```
 
-Fitting the resultant machine optimizes the hyperaparameters specified
+Fitting the resultant machine optimizes the hyperparameters specified
 in `range`, using the specified `tuning` and `resampling` strategies
 and performance `measure` (possibly a vector of measures), and
 retrains on all data bound to the machine:
@@ -359,7 +359,7 @@ using Plots
 plot(tuned)
 ```
 
-![](workflows_tuning_plot.png)
+![](img/workflows_tuning_plot.png)
 
 Predicting on new data using the optimized model:
 
@@ -367,7 +367,7 @@ Predicting on new data using the optimized model:
 predict(tuned, Xnew)
 ```
 
-# Constructing a linear pipeline
+## Constructing a linear pipeline
 
 *Reference:*   [Composing Models](composing_models.md)
 
@@ -403,7 +403,7 @@ pipe2 = @pipeline MyPipe2(X -> coerce(X, :age=>Continuous),
                                inverse = z -> exp.(z))
 ```
 
-# Creating a homogeneous ensemble of models
+## Creating a homogeneous ensemble of models
 
 *Reference:* [Homogeneous Ensembles](homogeneous_ensembles.md)
 
@@ -415,7 +415,7 @@ forest = machine(forest_model, X, y)
 evaluate!(forest, measure=cross_entropy)
 ```
 
-# Performance curves
+## Performance curves
 
 Generate a plot of performance, as a function of some hyperparameter
 (building on the preceding example)
@@ -432,12 +432,12 @@ curve = learning_curve(forest,
                             verbosity=0)
 ```
 
-    ```julia
+```julia
 using Plots
 plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)
 ```
 
-![](workflows_learning_curve.png)
+![](img/workflows_learning_curve.png)
 
 Multiple curves:
 
@@ -453,8 +453,8 @@ curve = learning_curve(forest,
 ```
 
 ```julia
-plot(curve.parameter_values, curve.measurements, 
+plot(curve.parameter_values, curve.measurements,
 xlab=curve.parameter_name, xscale=curve.parameter_scale)
 ```
 
-![](workflows_learning_curves.png)
+![](img/workflows_learning_curves.png)

@@ -32,7 +32,7 @@ plot(curve.parameter_values,
      ylab = "CV estimate of RMS error")
 ```
 
-![](learning_curve42.png)
+![](img/learning_curve42.png)
 
 In the case of the number of iterations in some iterative model,
 `learning_curve` will not restart the training from scratch for each
@@ -57,10 +57,10 @@ plot(curves.parameter_values,
      ylab="Holdout estimate of RMS error")
 ```
 
-![](learning_curve_n.png)
+![](img/learning_curve_n.png)
 
 
-### API reference
+## API reference
 
 ```@docs
 MLJTuning.learning_curve
