@@ -1,24 +1,38 @@
 # Adding Models for General Use
 
-This guide outlines in detail the specification of the MLJ model interface and
-provides guidelines for implementing the interface for models intended
-for general use. For sample implementations, see
+This guide outlines in the specification of the MLJ model interface
+and provides detailed guidelines for implementing the interface for
+models intended for general use. See also the more condensed
+[Step-by-Step Guide for Adding Models](@ref).
+
+For sample implementations, see
 [MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src).
 
 The machine learning tools provided by MLJ can be applied to the
 models in any package that imports the package
-[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) and
+[MLJModelInterface](https://github.com/alan-turing-institute/MLJModelInterface.jl) and
 implements the API defined there, as outlined below. For a
 quick-and-dirty implementation of user-defined models see [Simple User
 Defined Models](simple_user_defined_models.md).  To make new models
 available to all MLJ users, see [Where to place code implementing new
 models](@ref).
 
+**Important.**
+[MLJModelInterface](https://github.com/alan-turing-institute/MLJModelInterface.jl)
+is a very light-weight interface allowing you to *define* your
+interface, but does not provide the functionality required to use or
+test your interface. So, while you only need to add
+`MLJModelInterface` to your project's [deps] for testing purposes, you
+need to add
+[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) to your project's
+[extras] and [targets]. In testing, simply use `MLJBase` in place of
+`MLJModelInterface`.
+
 It is assumed the reader has read [Getting Started](index.md).
 To implement the API described here, some familiarity with the
 following packages is also helpful:
 
-- [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
+- [MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
   (for specifying model requirements of data)
 
 - [Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
@@ -54,7 +68,7 @@ ordinary multivariate regression, for example, this would be the
 coefficients and intercept. For a general supervised model, it is the
 (generally minimal) information needed to make new predictions.
 
-The ultimate supertype of all models is `MLJBase.Model`, which
+The ultimate supertype of all models is `MLJModelInterface.Model`, which
 has two abstract subtypes:
 
 ```julia
@@ -83,7 +97,7 @@ a model instance and a fitresult (plus other data), are called
 *operations*. `Probabilistic` supervised models optionally implement a
 `predict_mode` operation (in the case of classifiers) or a
 `predict_mean` and/or `predict_median` operations (in the case of
-regressors) although MLJBase also provides fallbacks that will suffice
+regressors) although MLJModelInterface also provides fallbacks that will suffice
 in most cases. `Unsupervised` models may implement an
 `inverse_transform` operation.
 
@@ -278,7 +292,7 @@ provides the convenience method
 `T` is the tightest common type of elements of `Xtable`, and `Xtable`
 is any table.
 
-Other auxiliary methods provided by MLJBase for handling tabular data
+Other auxiliary methods provided by MLJModelInterface for handling tabular data
 are: `selectrows`, `selectcols`, `select` and `schema` (for extracting
 the size, names and eltypes of a table's columns). See [Convenience
 methods](@ref) below for details.
@@ -382,7 +396,7 @@ MLJ.classes(y[j])` for all admissible `i` and `j`. (The method
 `classes` is described under [Convenience methods](@ref) below).
 
 Unfortunately, code not written with the preservation of categorical
-levels in mind poses special problems. To help with this, MLJBase
+levels in mind poses special problems. To help with this, MLJModelInterface
 provides three utility methods: `int` (for converting a
 `CategoricalValue` or `CategoricalString` into an integer, the
 ordering of these integers being consistent with that of the pool),
@@ -493,13 +507,13 @@ for an example of a Probabilistic classifier implementation.
 MMI.UnivariateFinite
 ```
 
-*Important note on binary classifiers.* ScientificTypes.jl has no
-"Binary" scitype distinct from `Multiclass{2}` or `OrderedFactor{2}`;
-`Binary` is just an alias for
-`Union{Multiclass{2},OrderedFactor{2}}`. The `target_scitype` of a
-binary classifier will generally be `AbstractVector{<:Binary}` and
-according to the *mlj* scitype convention, elements of `y` have type
-`CategoricalValue` or `CategoricalString`, and *not* `Bool`. See
+*Important note on binary classifiers.* There is no "Binary" scitype
+distinct from `Multiclass{2}` or `OrderedFactor{2}`; `Binary` is just
+an alias for `Union{Multiclass{2},OrderedFactor{2}}`. The
+`target_scitype` of a binary classifier will generally be
+`AbstractVector{<:Binary}` and according to the *mlj* scitype
+convention, elements of `y` have type `CategoricalValue` or
+`CategoricalString`, and *not* `Bool`. See
 [BinaryClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/GLM.jl)
 for an example.
 
@@ -514,7 +528,7 @@ attempt to use your model with inappropriately typed data.
 
 The trait functions `input_scitype` and `target_scitype` take
 scientific data types as values. We assume here familiarity with
-[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
+[MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
 (see [Getting Started](index.md) for the basics).
 
 For example, to ensure that the `X` presented to the
@@ -685,7 +699,7 @@ sample weights.
 
 If an MLJ `Machine` is being `fit!` and it is not the first time, then
 `update` is called instead of `fit`, unless the machine `fit!` has
-been called with a new `rows` keyword argument. However, `MLJBase`
+been called with a new `rows` keyword argument. However, `MLJModelInterface`
 defines a fallback for `update` which just calls `fit`. For context,
 see [MLJ Internals](internals.md).
 
@@ -699,7 +713,7 @@ generally relevant use-case is iterative models, where calls to
 increase the number of iterations only restarts the iterative
 procedure if other hyperparameters have also changed. (A useful method
 for inspecting model changes in such cases is
-`MLJBase.is_same_except`. ) For an example, see the MLJ [ensemble
+`MLJModelInterface.is_same_except`. ) For an example, see the MLJ [ensemble
 code](https://github.com/alan-turing-institute/MLJ.jl/blob/master/src/ensembles.jl).
 
 A third use-case is to avoid repeating time-consuming preprocessing of
@@ -836,10 +850,18 @@ registration. If changes are made, lodge an new issue at
 [MLJ](https://github.com/alan-turing-institute/MLJ) requesting your
 changes to be updated.
 
-### How addd model to the MLJ model registry?
+### How add model to the MLJ model registry?
 
-The MLJ model registry is located in the [MLJModels.jl repository](https://github.com/alan-turing-institute/MLJModels.jl). To add a model, you need to follow these steps
+The MLJ model registry is located in the [MLJModels.jl
+repository](https://github.com/alan-turing-institute/MLJModels.jl). To
+add a model, you need to follow these steps
 
 1) Ensure your model conforms to the interface defined above
-2) Raise an issue at https://github.com/alan-turing-institute/MLJModels.jl/issues and point out where the MLJ-interface implementation is, e.g. by providing a link to the code.
-3) An administrator will then review your implementation and work with you to add the model to the registry
+
+2) Raise an issue at
+https://github.com/alan-turing-institute/MLJModels.jl/issues and point
+out where the MLJ-interface implementation is, e.g. by providing a
+link to the code.
+
+3) An administrator will then review your implementation and work with
+you to add the model to the registry

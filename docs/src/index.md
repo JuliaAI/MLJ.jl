@@ -230,8 +230,12 @@ as `Array{Float32, 2}`). Similar remarks apply to the input `X` of an
 unsupervised model.
 
 Scientific types are julia types defined in the package
-[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl).
-The Scientific Type convention used in MLJ is defined in [MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl).
+[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl);
+the package
+[MLJScientificTypes](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
+implements the particular convention used in the MLJ universe for
+assigning a specific scientific type (interpretation) to each julia
+object (see the `scitype` examples below).
 
 The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
 `OrderedFactor{N}` and `Count`. Be sure you read [Container element
@@ -317,10 +321,10 @@ info("DecisionTreeClassifier")
 
 ### Container element types
 
-Models in MLJ will always apply the *mlj* convention described in
+Models in MLJ will always apply the `MLJ` convention described in
 [MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
 to decide how to interpret the elements of your container types. Here
-are the key aspects of that convention:
+are the key features of that convention:
 
 - Any `AbstractFloat` is interpreted as `Continuous`.
 
