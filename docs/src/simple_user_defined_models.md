@@ -35,8 +35,7 @@ Use](adding_models_for_general_use.md).
 For an unsupervised model, implement `transform` and, optionally,
 `inverse_transform` using the same signature at `predict` below.
 
-
-### A simple deterministic regressor
+## A simple deterministic regressor
 
 Here's a quick-and-dirty implementation of a ridge regressor with no intercept:
 
@@ -70,7 +69,7 @@ mutable struct MyRegressor <: MLJBase.Deterministic
 end
 MyRegressor(; lambda=0.1) = MyRegressor(lambda)
 function MLJBase.fit(model::MyRegressor, X, y)
-    x = MLJBase.matrix(X) 
+    x = MLJBase.matrix(X)
     fitresult = (x'x + model.lambda*I)\(x'y)
     return fitresult
 end
@@ -88,7 +87,7 @@ evaluate!(regressor, resampling=CV(), measure=rms, verbosity=0)
 
 ```
 
-### A simple probabilistic classifier
+## A simple probabilistic classifier
 
 The following probabilistic model simply fits a probability
 distribution to the `MultiClass` training target (i.e., ignores `X`)

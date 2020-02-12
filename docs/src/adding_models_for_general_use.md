@@ -38,7 +38,7 @@ reading of this document, the reader may wish to refer to [MLJ
 Internals](internals.md) for context.
 
 
-### Overview
+## Overview
 
 A *model* is an object storing hyperparameters associated with some
 machine learning algorithm.  In MLJ, hyperparameters include configuration
@@ -88,7 +88,7 @@ in most cases. `Unsupervised` models may implement an
 `inverse_transform` operation.
 
 
-### New model type declarations and optional clean! method
+## New model type declarations and optional clean! method
 
 Here is an example of a concrete supervised model type declaration:
 
@@ -150,7 +150,7 @@ You cannot use the `@mlj_model` macro if your model struct has type
 parameters.
 
 
-### Supervised models
+## Supervised models
 
 The compulsory and optional methods to be implemented for each
 concrete type `SomeSupervisedModel <: MLJBase.Supervised` are
@@ -158,7 +158,7 @@ summarized below. An `=` indicates the return value for a fallback
 version of the method.
 
 
-#### Summary of methods
+### Summary of methods
 
 Compulsory:
 
@@ -250,7 +250,7 @@ MLJBase.supports_weights(model::Type{<:SomeSupervisedModel}) = true
 ```
 
 
-#### The form of data for fitting and predicting
+### The form of data for fitting and predicting
 
 The model implementer does not have absolute control over the types of
 data `X`, `y` and `Xnew` appearing in the `fit` and `predict` methods
@@ -266,7 +266,7 @@ MLJ recommendation is to specify a `Table` scientific type for `X`
 matrix input can coerce their inputs appropriately; see below.
 
 
-##### Additional type coercions
+#### Additional type coercions
 
 If the core algorithm being wrapped requires data in a different or
 more specific form, then `fit` will need to coerce the table into the
@@ -275,7 +275,7 @@ repeated for `Xnew` in `predict`). To assist with common cases, MLJ
 provides the convenience method
 `MLJBase.matrix`. `MLJBase.matrix(Xtable)` has type `Matrix{T}` where
 `T` is the tightest common type of elements of `Xtable`, and `Xtable`
-is any table. 
+is any table.
 
 Other auxiliary methods provided by MLJBase for handling tabular data
 are: `selectrows`, `selectcols`, `select` and `schema` (for extracting
@@ -283,7 +283,7 @@ the size, names and eltypes of a table's columns). See [Convenience
 methods](@ref) below for details.
 
 
-##### Important convention
+#### Important convention
 
 It is to be understood that the columns of the table `X` correspond to
 features and the rows to observations. So, for example, the predict
@@ -292,7 +292,7 @@ w, Xnew) = MLJBase.matrix(Xnew)*w`, where `w` is the vector of learned
 coefficients.
 
 
-#### The fit method
+### The fit method
 
 A compulsory `fit` method returns three objects:
 
@@ -342,7 +342,7 @@ MLJBase.fit(model::SomeSupervisedModel, verbosity::Int, X, y, w=nothing) -> fitr
 ```
 
 
-#### The fitted_params method
+### The fitted_params method
 
 A `fitted_params` method may be optionally overloaded. It's purpose is
 to provide MLJ access to a user-friendly representation of the
@@ -359,7 +359,7 @@ For a linear model, for example, one might declare something like
 The fallback is to return `(fitresult=fitresult,)`.
 
 
-#### The predict method
+### The predict method
 
 A compulsory `predict` method has the form
 ```julia
@@ -368,7 +368,7 @@ MLJBase.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
 
 Here `Xnew` will have the same form as the `X` passed to `fit`.
 
-##### Prediction types for deterministic responses.
+#### Prediction types for deterministic responses.
 
 In the case of `Deterministic` models, `yhat` should have the same
 scitype as the `y` passed to `fit` (see above). Any `CategoricalValue`
@@ -430,7 +430,7 @@ for `SVMClassifier`.
 Of course, if you are coding a learning algorithm from scratch, rather
 than wrapping an existing one, these extra measures may be unnecessary.
 
-##### Prediction types for probabilistic responses
+#### Prediction types for probabilistic responses
 
 In the case of `Probabilistic` models with univariate targets, `yhat`
 must be an `AbstractVector` whose elements are distributions (one distribution
@@ -503,7 +503,7 @@ according to the *mlj* scitype convention, elements of `y` have type
 for an example.
 
 
-#### Trait declarations
+### Trait declarations
 
 Two trait functions allow the implementer to restrict the types of
 data `X`, `y` and `Xnew` discussed above. The MLJ task interface uses
@@ -547,7 +547,7 @@ have `Finite` scitype (and hence `CategoricalValue` or
 MLJBase.target_scitype(::Type{<:DecisionTreeClassifier}) = AbstractVector{<:Finite}
 ```
 
-##### Multivariate targets
+#### Multivariate targets
 
 The above remarks continue to hold unchanged for the case multivariate
 targets.  For example, if we declare
@@ -556,14 +556,14 @@ targets.  For example, if we declare
 target_scitype(SomeSupervisedModel) = Table(Continuous)
 ```
 
-then this constrains the target to be any table whose columns have `Continous` element scitype (i.e., `AbstractFloat`), while 
+then this constrains the target to be any table whose columns have `Continous` element scitype (i.e., `AbstractFloat`), while
 
 ```julia
 target_scitype(SomeSupervisedModel) = Table(Continuous, Finite{2})
 ```
 
 restricts to tables with continuous or binary (ordered or unordered)
-columns. 
+columns.
 
 For predicting variable length sequences of, say, binary values
 (`CategoricalValue`s or `CategoricalString`s with some common size-two
@@ -623,7 +623,7 @@ end
 you might declare (order matters):
 
 ```julia
-MLJBase.hyperparameter_ranges(::Type{<:MyModel}) = 
+MLJBase.hyperparameter_ranges(::Type{<:MyModel}) =
     (range(Float64, :alpha, lower=0, upper=1, scale=:log),
 	 range(Int, :beta, lower=1, upper=Inf, origin=100, unit=50, scale=:log),
 	 nothing)
@@ -649,7 +649,7 @@ MLJBase.metadata_pkg(DecisionTreeClassifier,name="DecisionTree",
                      uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
                      url="https://github.com/bensadeghi/DecisionTree.jl",
                      julia=true)   
-            
+
 MLJBase.metadata_model(DecisionTreeClassifier,
                         input=MLJBase.Table(MLJBase.Continuous),
                         target=AbstractVector{<:MLJBase.Finite},
@@ -667,11 +667,11 @@ MLJBase.metadata_model
 You can test all your declarations of traits by calling `MLJBase.info_dict(SomeModel)`.
 
 
-#### Iterative models and the update! method
+### Iterative models and the update! method
 
 An `update` method may be optionally overloaded to enable a call by
 MLJ to retrain a model (on the same training data) to avoid repeating
-computations unnecessarily. 
+computations unnecessarily.
 
 ```julia
 MLJBase.update(model::SomeSupervisedModel, verbosity, old_fitresult, old_cache, X, y) -> fit
@@ -713,7 +713,7 @@ of `X` and `y`), as this is also passed as an argument to the `update`
 method.
 
 
-### Unsupervised models
+## Unsupervised models
 
 TODO
 
@@ -724,7 +724,7 @@ declares an `output_scitype` trait. Instead of implementing a
 optional `inverse_transform` operation.
 
 
-### Convenience methods
+## Convenience methods
 
 ```@docs
 MLJBase.int

@@ -4,7 +4,7 @@ In MLJ loss functions, scoring rules, sensitivities, and so on, are collectively
 to as *measures*. Presently, MLJ includes a few built-in measures,
 provides support for the loss functions in the
 [LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl) library,
-and allows for users to define their own custom measures. 
+and allows for users to define their own custom measures.
 
 Providing further measures for probabilistic predictors, such as
 proper scoring rules, and for constructing multi-target product
@@ -14,7 +14,7 @@ measures, is a work in progress.
  described here are defined in MLJBase.
 
 
-### Built-in measures
+## Built-in measures
 
 These measures all have the common calling syntax
 
@@ -41,13 +41,13 @@ w = [1, 2, 2, 1];
 rms(ŷ, y) # reports an aggregrate loss
 l1(ŷ, y, w) # reports per observation losses
 y = categorical(["male", "female", "female"])
-male = y[1]; female = y[2]; 
+male = y[1]; female = y[2];
 d = UnivariateFinite([male, female], [0.55, 0.45]);
 ŷ = [d, d, d];
 cross_entropy(ŷ, y)
 ```
 
-### Traits and custom measures
+## Traits and custom measures
 
 Notice that `l1` reports per-sample evaluations, while `rms`
 only reports an aggregated result. This and other behavior can be
@@ -71,20 +71,20 @@ method, and elsewhere in MLJ, provided it is a function or callable
 object conforming to the above syntactic conventions. By default, a
 custom measure is understood to:
 
-- be a loss function (rather than a score) 
+- be a loss function (rather than a score)
 
 - report an aggregated value (rather than per-sample evaluations)
 
 - be feature-independent
 
-To override this behavior one simply overloads the appropriate trait,
+To override this behaviour one simply overloads the appropriate trait,
 as shown in the following examples:
 
 ```@repl losses_and_scores
-y = [1, 2, 3, 4]; 
-ŷ = [2, 3, 3, 3]; 
-w = [1, 2, 2, 1]; 
-my_loss(ŷ, y) = maximum((ŷ - y).^2); 
+y = [1, 2, 3, 4];
+ŷ = [2, 3, 3, 3];
+w = [1, 2, 2, 1];
+my_loss(ŷ, y) = maximum((ŷ - y).^2);
 my_loss(ŷ, y)
 my_per_sample_loss(ŷ, y) = abs.(ŷ - y);
 MLJ.reports_each_observation(::typeof(my_per_sample_loss)) = true;
@@ -106,19 +106,19 @@ measure implementing one non-weighted version, and possibly a second
 weighted version.
 
 *Implementation detail:* Internally, every measure is evaluated using
-the syntax 
+the syntax
 
 ```julia
 MLJ.value(measure, ŷ, X, y, w)
 ```
 and the traits determine what can be ignored and how `measure` is actually called. If `w=nothing` then the non-weighted form of `measure` is
-dipatched. 
+dispatched.
 
-### Using LossFunctions.jl
+## Using LossFunctions.jl
 
 The [LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl)
 package includes "distance loss" functions for `Continuous` targets,
-and "marginal loss" functins for `Binary` targets. While the
+and "marginal loss" functions for `Binary` targets. While the
 LossFunctions,jl interface differs from the present one (for, example
 `Binary` observations must be +1 or -1), one can safely pass the loss
 functions defined there to any MLJ algorithm, which re-interprets it
@@ -136,7 +136,7 @@ evaluate!(mach,
           resampling=holdout,
           operation=predict,
           weights=w,
-          verbosity=0) 
+          verbosity=0)
 ```
 
 *Note:* Although `ZeroOneLoss(ŷ, y)` makes no sense (neither `ŷ` nor
@@ -144,13 +144,13 @@ evaluate!(mach,
 adaptor `MLJ.value` as discussed above:
 
 ```@repl losses_and_scores
-ŷ = predict(mach, X); 
+ŷ = predict(mach, X);
 loss = MLJ.value(ZeroOneLoss(), ŷ, X, y, w) # X is ignored here
 mean(loss) ≈ misclassification_rate(mode.(ŷ), y, w)
 ```
 
 
-### List of built-in measures (excluding LossFunctions.jl losses)
+## List of built-in measures (excluding LossFunctions.jl losses)
 
 ```@docs
 l1
@@ -243,7 +243,7 @@ fnr
 FScore
 ```
 
-### Other performance related tools 
+## Other performance related tools
 
 ```@docs
 ConfusionMatrix
@@ -256,5 +256,3 @@ confusion_matrix
 ```@docs
 roc_curve
 ```
-
-

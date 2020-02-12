@@ -1,12 +1,9 @@
 # API
 
-### Functions
+## Functions
 
-<!-- ```@autodocs -->
-<!-- Modules = [MLJ,MLJBase,MLJModels] -->
-<!-- ``` -->
+TODO
 
-### Index
+## Index
 
-```@index
-```
+TODO
