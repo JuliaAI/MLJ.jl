@@ -3,7 +3,7 @@
 This guide outlines in the specification of the MLJ model interface
 and provides detailed guidelines for implementing the interface for
 models intended for general use. See also the more condensed
-[Step-by-Step Guide for Adding Models](@ref).
+[Quick-Start Guide to Adding Models](@ref).
 
 For sample implementations, see
 [MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src).
