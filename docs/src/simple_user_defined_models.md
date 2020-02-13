@@ -52,7 +52,9 @@ MyRegressor(; lambda=0.1) = MyRegressor(lambda)
 function MLJBase.fit(model::MyRegressor, X, y)
     x = MLJBase.matrix(X)                     # convert table to matrix
     fitresult = (x'x + model.lambda*I)\(x'y)  # the coefficients
-    return fitresult
+    cache=nothing
+    report=nothing
+    return fitresult, cache, report
 end
 
 # predict uses coefficients to make new prediction:
