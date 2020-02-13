@@ -3,7 +3,7 @@
 This guide outlines in the specification of the MLJ model interface
 and provides detailed guidelines for implementing the interface for
 models intended for general use. See also the more condensed
-[Quick-Start Guide to Adding Models](@ref).
+[Step-by-Step Guide for Adding Models](@ref).
 
 For sample implementations, see
 [MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src).
@@ -16,6 +16,7 @@ quick-and-dirty implementation of user-defined models see [Simple User
 Defined Models](simple_user_defined_models.md).  To make new models
 available to all MLJ users, see [Where to place code implementing new
 models](@ref).
+
 
 #### Important
 
@@ -771,10 +772,6 @@ MLJModelInterface.selectrows
 
 ```@docs
 MLJModelInterface.selectcols
-```
-
-```@docs
-MLJModelInterface.nrows
 ```
 
 

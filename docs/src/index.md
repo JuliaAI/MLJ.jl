@@ -310,7 +310,6 @@ i.input_scitype
 i.target_scitype
 ```
 
-
 ### Container element types
 
 Models in MLJ will always apply the `MLJ` convention described in
@@ -335,10 +334,10 @@ are the key features of that convention:
   to coerce to a `Finite` scitype. 
 
 Use `coerce(v, OrderedFactor)` or `coerce(v, Multiclass)` to coerce a
-  vector `v` of integers, strings or characters to a vector with an
-  appropriate `Finite` (categorical) scitype. For more on scitype
-  coercion of arrays and tables, see `coerce`, `autotype` and `unpack`
-  below.
+vector `v` of integers, strings or characters to a vector with an
+appropriate `Finite` (categorical) scitype. For more on scitype
+coercion of arrays and tables, see `coerce`, `autotype` and `unpack`
+below.
 
 To designate an intrinsic "true" class for binary data (for purposes
 of applying MLJ measures, such as `truepositive`), data should be
