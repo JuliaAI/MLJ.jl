@@ -230,10 +230,6 @@ FScore
 ## Other performance related tools
 
 ```@docs
-ConfusionMatrix
-```
-
-```@docs
 confusion_matrix
 ```
 

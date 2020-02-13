@@ -203,11 +203,10 @@ this page before considering serious use of MLJ.*
 
 ## Prerequisites
 
-MLJ assumes some familiarity with the `CategoricalValue` and
-`CategoricalString` types from
+MLJ assumes some familiarity with
 [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl),
-used here for representing categorical data. For probabilistic
-predictors, a basic acquaintance with
+used here for representing arrays of categorical data. For
+probabilistic predictors, a basic acquaintance with
 [Distributions.jl](https://github.com/JuliaStats/Distributions.jl) is
 also assumed.
 
@@ -290,7 +289,7 @@ Specifically, the requirement for an arbitrary model's input is `scitype(X)
 ### Targets
 
 The target `y` expected by MLJ models is generally an
-`AbstractVector`. A multivariate target `y` will generally be table.
+`AbstractVector`. A multivariate target `y` will generally be a table.
 
 Specifically, the type requirement for a model target is `scitype(y) <:
 target_scitype(model)`.
@@ -298,24 +297,17 @@ target_scitype(model)`.
 ### Querying a model for acceptable data types
 
 Given a model instance, one can inspect the admissible scientific
-types of its input and target by querying the scientific type of
-the model itself:
+types of its input and target, and without loading the code defining
+the model:
 
 ```@setup doda
 tree = @load DecisionTreeClassifier
 ```
 
 ```@repl doda
-tree = DecisionTreeClassifier();
-scitype(tree)
-```
-
-This does not work if relevant model code has not been loaded. In that
-case one can extract this information from the model type's registry
-entry, using `info`:
-
-```@repl doda
-info("DecisionTreeClassifier")
+i = info("DecisionTreeClassifier")
+i.input_scitype
+i.target_scitype
 ```
 
 
@@ -334,13 +326,19 @@ are the key features of that convention:
   as `Multiclass` or `OrderedFactor`, depending on the value of
   `x.pool.ordered`.
 
-- `String`s and `Char`s are *not* interpreted as `Finite`; they have
-  `Unknown` scitype. Coerce vectors of strings or characters to
-  `CategoricalVector`s if they represent `Multiclass` or
-  `OrderedFactor` data. Do `?coerce` and `?unpack` to learn how.
-
+- `String`s and `Char`s are *not* interpreted as `Multiclass` or
+  `OrderedFactor (they have scitypes `Textual` and `Unknown`
+  respectively). 
+  
 - In particular, *integers* (including `Bool`s) *cannot be used to
-  represent categorical data.*
+  represent categorical data.* Use the preceding `coerce` operations
+  to coerce to a `Finite` scitype. 
+
+Use `coerce(v, OrderedFactor)` or `coerce(v, Multiclass)` to coerce a
+  vector `v` of integers, strings or characters to a vector with an
+  appropriate `Finite` (categorical) scitype. For more on scitype
+  coercion of arrays and tables, see `coerce`, `autotype` and `unpack`
+  below.
 
 To designate an intrinsic "true" class for binary data (for purposes
 of applying MLJ measures, such as `truepositive`), data should be
@@ -348,3 +346,9 @@ represented by an ordered `CategoricalValue` or
 `CategoricalString`. This data will have scitype `OrderedFactor{2}`
 and the "true" class is understood to be the *second* class in the
 ordering.
+
+```@docs
+coerce
+autotype
+unpack
+```

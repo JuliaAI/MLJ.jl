@@ -21,9 +21,9 @@ mach = machine(ensemble, X, y)
 
 r_lambda = range(ensemble, :(atom.lambda), lower=10, upper=500, scale=:log10)
 curve = MLJ.learning_curve(mach;
-                            range=r_lambda,
-                            resampling=CV(nfolds=3),
-                            measure=mav)
+                           range=r_lambda,
+                           resampling=CV(nfolds=3),
+                           measure=mav)
 using Plots
 plot(curve.parameter_values,
      curve.measurements,
@@ -34,14 +34,15 @@ plot(curve.parameter_values,
 
 ![](img/learning_curve42.png)
 
-In the case of the number of iterations in some iterative model,
-`learning_curve` will not restart the training from scratch for each
-new value, unless a non-holdout `resampling` strategy is specified
-(and provided the model implements an appropriate `update` method). To
-obtain multiple curves (that are distinct) you will need to pass the
-name of the model random number generator, and specify the random
-number generators to be used using `rngs=...` (an integer
-automatically generates the number specified):
+In the case the `range` hyperparameter is the number of iterations in
+some iterative model, `learning_curve` will not restart the training
+from scratch for each new value, unless a non-holdout `resampling`
+strategy is specified (and provided the model implements an
+appropriate `update` method). To obtain multiple curves (that are
+distinct) you will need to pass the name of the model random number
+generator, `rng_name`, and specify the random number generators to be
+used using `rngs=...` (an integer automatically generates the number
+specified):
 
 ```julia
 atom.lambda=200

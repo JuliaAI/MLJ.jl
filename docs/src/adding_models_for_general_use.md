@@ -3,7 +3,7 @@
 This guide outlines in the specification of the MLJ model interface
 and provides detailed guidelines for implementing the interface for
 models intended for general use. See also the more condensed
-[Step-by-Step Guide for Adding Models](@ref).
+[Quick-Start Guide to Adding Models](@ref).
 
 For sample implementations, see
 [MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src).
@@ -17,7 +17,8 @@ Defined Models](simple_user_defined_models.md).  To make new models
 available to all MLJ users, see [Where to place code implementing new
 models](@ref).
 
-**Important.**
+#### Important
+
 [MLJModelInterface](https://github.com/alan-turing-institute/MLJModelInterface.jl)
 is a very light-weight interface allowing you to *define* your
 interface, but does not provide the functionality required to use or
@@ -773,35 +774,7 @@ MLJModelInterface.selectcols
 ```
 
 ```@docs
-MLJBase.restrict
-```
-
-```@docs
-MLJBase.corestrict
-```
-
-```@docs
-MLJBase.complement
-```
-
-```@docs
-MLJScientificTypes.schema
-```
-
-```@docs
 MLJModelInterface.nrows
-```
-
-```@docs
-MLJScientificTypes.scitype
-```
-
-```@docs
-MLJScientificTypes.scitype_union
-```
-
-```@docs
-MLJScientificTypes.elscitype
 ```
 
 
@@ -850,18 +823,18 @@ registration. If changes are made, lodge an new issue at
 [MLJ](https://github.com/alan-turing-institute/MLJ) requesting your
 changes to be updated.
 
-### How add model to the MLJ model registry?
+### How add models to the MLJ model registry?
 
 The MLJ model registry is located in the [MLJModels.jl
 repository](https://github.com/alan-turing-institute/MLJModels.jl). To
 add a model, you need to follow these steps
 
-1) Ensure your model conforms to the interface defined above
+- Ensure your model conforms to the interface defined above
 
-2) Raise an issue at
-https://github.com/alan-turing-institute/MLJModels.jl/issues and point
-out where the MLJ-interface implementation is, e.g. by providing a
-link to the code.
+- Raise an issue at
+  https://github.com/alan-turing-institute/MLJModels.jl/issues and
+  point out where the MLJ-interface implementation is, e.g. by
+  providing a link to the code.
 
-3) An administrator will then review your implementation and work with
-you to add the model to the registry
+- An administrator will then review your implementation and work with
+  you to add the model to the registry

@@ -1,13 +1,12 @@
-# Step-by-Step Guide to Adding Models
+# Quick-Start Guide to Adding Models
 
 The definitive specification of the MLJ model interface is given in
-[Adding New Models for General Use](@ref). In the more informal
-step-by-step instructions below, we assume: (i) you have a Julia
+[Adding Models for General Use](@ref). In the more informal and
+condensed instructions below, we assume: (i) you have a Julia
 **registered** package `YourPackage.jl` implementing some machine
 learning models; (ii) that you would like to interface and register
 these models with MLJ; and (iii) that you have a rough understanding
-of how things work with MLJ.  In particular you are expected to be
-familiar with
+of how things work with MLJ.  In particular you are familiar with:
 
 - what [scientific types](https://github.com/alan-turing-institute/MLJScientificTypes.jl) are
 
@@ -24,7 +23,7 @@ familiar with
 
 If you're not familiar with any one of these points, please refer to
 relevant sections of this manual, and in particular [Getting
-Started](@ref) and [Adding New Models for General Use](@ref).
+Started](@ref) and [Adding Models for General Use](@ref).
 
 *But tables don't make sense for my model!* If a case can be made that
 tabular input does not make sense for your particular model, then MLJ can
@@ -35,17 +34,20 @@ input data is tabular.
 
 ### Overview
 
-Writing an interface is fairly straightforward: just create a file or a module in your package including
+To write an interface create a file or a module in your package which
+includes:
 
 - a `using MLJModelInterface` or `import MLJModelInterface` statement
 
 - MLJ-compatible model types and constructors,
 
-- implementation of the `fit`, `predict`/`transform` and optionally `fitted_params` for your models,
+- implementation of `fit`, `predict`/`transform` and optionally
+  `fitted_params` for your models,
 
 - metadata for your package and for each of your models
 
-**Important.**
+#### Important
+
 [MLJModelInterface](https://github.com/alan-turing-institute/MLJModelInterface.jl)
 is a very light-weight interface allowing you to *define* your
 interface, but does not provide the functionality required to use or
@@ -71,8 +73,8 @@ MLJ-compatible constructors for your models need to meet the following requireme
 * have a keyword constructor assigning default values to all
   hyperparameters.
 
-It is recommended that you use the `@mlj_model` macro from `MLJModelInterface` to
-declare a (non parametric) model type:
+You may use the `@mlj_model` macro from `MLJModelInterface` to declare
+a (non parametric) model type:
 
 ```julia
 MLJModelInterface.@mlj_model mutable struct YourModel <: MLJModelInterface.Deterministic
@@ -117,9 +119,12 @@ end
 
 **Additional notes**:
 
-- Please type all your fields if possible,
-- Please prefer `Symbol` over `String` if you can (e.g. to pass the name of a solver),
-- Please add constraints to your fields even if they seem obvious to you,,
+- Please annotate all fields with concrete types, if possible, using type parameters if necessary.
+
+- Please prefer `Symbol` over `String` if you can (e.g. to pass the name of a solver).
+
+- Please add constraints to your fields even if they seem obvious to you.
+
 - Your model may have 0 fields, that's fine.
 
 **Examples**:
@@ -285,8 +290,14 @@ whose performance may suffice.
 
 ### Metadata
 
-Adding metadata for your model(s) is crucial for the discoverability of your package and its models and to make sure your model is used with data it can handle.
-You should use the `metadata_model` and `metadata_pkg` functionalities from `MLJModelInterface` to do this:
+Adding metadata for your model(s) is crucial for the discoverability
+of your package and its models and to make sure your model is used
+with data it can handle.  You can individually overload a number of
+trait functions that encode this metadata by following the instuctions
+in [Adding Models for General Use](@ref)), which also explains these
+traits in more detail. However, your most convenient option is to use
+`metadata_model` and `metadata_pkg` functionalities from
+`MLJModelInterface` to do this:
 
 ```julia
 const ALL_MODELS = Union{YourModel1, YourModel2, ...}
