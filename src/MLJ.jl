@@ -78,7 +78,6 @@ export measures,
     positivepredictive_value,
     positive_predictive_value,
     tpr, tnr, fpr, fnr,
-    tp, tn, fp, fn,
     falsediscovery_rate, false_discovery_rate, fdr, npv, ppv,
     recall, sensitivity, hit_rate, miss_rate,
     specificity, selectivity, f1score, f1, fallout
