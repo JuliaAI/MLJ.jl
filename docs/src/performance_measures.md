@@ -209,23 +209,51 @@ auc
 ```
 
 ```@docs
-tpr
+FScore
 ```
 
 ```@docs
-tnr
-```
-```@docs
-fpr
+fdr
 ```
 
+```@docs
+fn
+```
 ```@docs
 fnr
 ```
 
 ```@docs
-FScore
+fp
 ```
+
+```@docs
+fpr
+```
+
+```@docs
+npv
+```
+
+```@docs
+ppv
+```
+```@docs
+tn
+```
+
+```@docs
+tnr
+```
+
+```@docs
+tp
+```
+
+```@docs
+tpr
+```
+
 
 ## Other performance related tools
 
