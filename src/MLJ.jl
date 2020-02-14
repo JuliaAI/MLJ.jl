@@ -49,7 +49,8 @@ export nrows, nfeatures, color_off, color_on,
     @pipeline,
     ResamplingStrategy, Holdout, CV,
     StratifiedCV, evaluate!, Resampler, iterator,
-    default_resource, pretty
+    default_resource, pretty,
+    OpenML
 
 export measures,
     orientation, reports_each_observation,

@@ -31,6 +31,7 @@ pages = [
     "Built-in Transformers" => "built_in_transformers.md",
     "Composing Models" => "composing_models.md",
     "Homogeneous Ensembles" => "homogeneous_ensembles.md",
+    "OpenML Integration" => "openml_integration.md",
     "Simple User Defined Models" => "simple_user_defined_models.md",
     "Quick-Start Guide to Adding Models" => "quick_start_guide_to_adding_models.md",
     "Adding Models for General Use" => "adding_models_for_general_use.md",
