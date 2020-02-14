@@ -14,7 +14,7 @@ measures, is a work in progress.
  described here are defined in MLJBase.
 
 
-## Built-in measures
+## Using built-in measures
 
 These measures all have the common calling syntax
 
@@ -114,7 +114,7 @@ MLJ.value(measure, ŷ, X, y, w)
 and the traits determine what can be ignored and how `measure` is actually called. If `w=nothing` then the non-weighted form of `measure` is
 dispatched.
 
-## Using LossFunctions.jl
+## Using measures from LossFunctions.jl
 
 The [LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl)
 package includes "distance loss" functions for `Continuous` targets,
@@ -122,8 +122,8 @@ and "marginal loss" functions for `Binary` targets. While the
 LossFunctions,jl interface differs from the present one (for, example
 `Binary` observations must be +1 or -1), one can safely pass the loss
 functions defined there to any MLJ algorithm, which re-interprets it
-under the hood. Note that the "distance losses" in the package
-apply to deterministic predictions, while the "marginal losses" apply to
+under the hood. Note that the "distance losses" in the package apply
+to deterministic predictions, while the "marginal losses" apply to
 probabilistic predictions.
 
 ```@repl losses_and_scores
@@ -150,7 +150,52 @@ mean(loss) ≈ misclassification_rate(mode.(ŷ), y, w)
 ```
 
 
-## List of built-in measures (excluding LossFunctions.jl losses)
+## Built-in measures 
+
+
+```@docs
+area_under_curve
+```
+
+```@docs
+accuracy
+```
+
+```@docs
+balanced_accuracy
+```
+
+```@docs
+BrierScore
+```
+
+```@docs
+cross_entropy
+```
+
+```@docs
+FScore
+```
+
+```@docs
+false_discovery_rate
+```
+
+```@docs
+false_negative
+```
+
+```@docs
+false_negative_rate
+```
+
+```@docs
+false_positive
+```
+
+```@docs
+false_positive_rate
+```
 
 ```@docs
 l1
@@ -165,7 +210,19 @@ mav
 ```
 
 ```@docs
+matthews_correlation
+```
+
+```@docs
 misclassification_rate
+```
+
+```@docs
+negative_predictive_value
+```
+
+```@docs
+positive_predictive_value
 ```
 
 ```@docs
@@ -185,53 +242,33 @@ rmsp
 ```
 
 ```@docs
-cross_entropy
+true_negative
 ```
 
 ```@docs
-BrierScore
+true_negative_rate
 ```
 
 ```@docs
-accuracy
+true_positive
 ```
 
 ```@docs
-balanced_accuracy
+true_positive_rate
 ```
 
-```@docs
-matthews_correlation
-```
+## List of LossFunctions.jl measures
 
-```@docs
-auc
-```
+`DWDMarginLoss()`, `ExpLoss()`, `L1HingeLoss()`, `L2HingeLoss()`,
+`L2MarginLoss()`, `LogitMarginLoss()`, `ModifiedHuberLoss()`,
+`PerceptronLoss()`, `ScaledMarginLoss()`, `SigmoidLoss()`,
+`SmoothedL1HingeLoss()`, `ZeroOneLoss()`, `HuberLoss()`,
+`L1EpsilonInsLoss()`, `L2EpsilonInsLoss()`, `LPDistLoss()`,
+`LogitDistLoss()`, `PeriodicLoss()`, `QuantileLoss()`,
+`ScaledDistanceLoss()`.
 
-```@docs
-tpr
-```
-
-```@docs
-tnr
-```
-```@docs
-fpr
-```
-
-```@docs
-fnr
-```
-
-```@docs
-FScore
-```
 
 ## Other performance related tools
-
-```@docs
-ConfusionMatrix
-```
 
 ```@docs
 confusion_matrix
