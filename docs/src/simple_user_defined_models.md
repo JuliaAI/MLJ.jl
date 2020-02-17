@@ -52,7 +52,9 @@ MyRegressor(; lambda=0.1) = MyRegressor(lambda)
 function MLJBase.fit(model::MyRegressor, X, y)
     x = MLJBase.matrix(X)                     # convert table to matrix
     fitresult = (x'x + model.lambda*I)\(x'y)  # the coefficients
-    return fitresult
+    cache=nothing
+    report=nothing
+    return fitresult, cache, report
 end
 
 # predict uses coefficients to make new prediction:
@@ -67,10 +69,12 @@ mutable struct MyRegressor <: MLJBase.Deterministic
     lambda::Float64
 end
 MyRegressor(; lambda=0.1) = MyRegressor(lambda)
-function MLJBase.fit(model::MyRegressor, X, y)
+function MLJBase.fit(model::MyRegressor, verbosity::Int, X, y)
     x = MLJBase.matrix(X)
     fitresult = (x'x + model.lambda*I)\(x'y)
-    return fitresult
+    cache=nothing
+    report=nothing
+    return fitresult, cache, report
 end
 MLJBase.predict(::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew) * fitresult
 ```
