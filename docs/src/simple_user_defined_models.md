@@ -18,16 +18,16 @@ In the examples below, the training input `X` of `fit`, and the new
 input `Xnew` passed to `predict`, are tables. Each training target `y`
 is a `AbstractVector`.
 
-The predicitions returned by `predict` have the same form as `y` for
-deterministic models, but are `Vector`s of distibutions for
+The predictions returned by `predict` have the same form as `y` for
+deterministic models, but are `Vector`s of distributions for
 probabilistic models.
 
-Advanced model functionality not addressed here are: (i) optional
-`update` method to avoid redundant calculations when refitting
-machines; (ii) reporting extra training-related statistics; (iii)
-exposing model-specific functionality; (iv) enable checks of the
-scientific type of data passed to your model in `machine`
-construction; and (iv) bounds checks on hyperparameter values. All
+Advanced model functionality not addressed here includes: (i) optional
+`update` method to avoid redundant calculations when calling `fit!` on
+machines a second time; (ii) reporting extra training-related
+statistics; (iii) exposing model-specific functionality; (iv) checking
+the scientific type of data passed to your model in `machine`
+construction; and (iv) checking validity of hyperparameter values. All
 this is described in [Adding Models for General
 Use](adding_models_for_general_use.md).
 
