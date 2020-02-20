@@ -132,87 +132,17 @@ The table below indicates the models that are accessible at present along with a
 
 ### The MLJ Universe
 
+The functionality of MLJ is distributed over a number of repositories
+illustrated below.
+
+[Code Organization](ORGANIZATION.md) | [Road Map](ROADMAP.md) | [Contributing to MLJ](CONTRIBUTING.MD)
+
 ![](material/MLJ_stack.png)
 
 *Dependency chart for MLJ repositories. Repositories with dashed
 connections do not currently exist but are planned/proposed.*
 
-The functionality of MLJ is provided by code distributed over several
-repositories hosted by the Alan Turing Institute's GitHub pages. Some
-of these, indicated with a ⟂ symbol, may be of independent interest:
 
-* [MLJ.jl](https://github.com/alan-turing-institute/MLJ.jl) is the
-  general user's point-of-entry for choosing, loading, composing,
-  evaluating and tuning machine learning models. It pulls in most code
-  required from other repositories described below (a current exception being [code
-  for creating homogeneous model ensembles](src/ensembles.jl), which
-  is to be migrated to MLJBase or its own repository
-  MLJEnsembles). MLJ also hosts the [MLJ manual](src/docs) which
-  documents functionality across the repositories, with the exception
-  of ScientificTypes, and MLJScientific types which host their own
-  documentation (the MLJ manual and MLJTutorials do provide
-  overviews).
-
-* [MLJModelInterface](https://github.com/alan-turing-institute/MLJModelInterface.jl)
-  is a lightweight package imported a package wanting to implement
-  MLJ's interface for their machine learning models. It's *sole*
-  dependency is ScientificTypes, which is a tiny package with *no*
-  dependencies. 
-
-* (⟂)
-  [MLJBase.jl](https://github.com/alan-turing-institute/MLJBase.jl) is
-  a large repository with two main purposes: (i) to give "dummy"
-  methods defined in MLJModelInterface their intended functionality
-  (which depends on third party packages, such as
-  [Tables.jl](https://github.com/JuliaData/Tables.jl),
-  [Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
-  and
-  [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl));
-  and (ii) provide functionality essential to the MLJ user that is not
-  contained in one of the "satellite" repositories (on the level
-  immediately below MLJ in the chart).
-
-* [MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl)
-  hosts the MLJ registry, which contains metadata on all the models
-  the MLJ user can search and load from MLJ. It, moreover, provides
-  the functionality for loading model code from MLJ on
-  demand. Finally, it furnishes model interfaces for a number of third
-  party model providers not implementing interfaces natively, such as
-  [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl),
-  [ScikitLearn.jl](https://github.com/cstjean/ScikitLearn.jl) or
-  [XGBoost.jl](https://github.com/dmlc/XGBoost.jl). These packages are
-  *not* imported by MLJModels and are not dependencies from the
-  point-of-view of current package management.
-
-* [MLJTuning.jl](https://github.com/alan-turing-institute/MLJTuning.jl)
-  provides MLJ's interface for hyper-parameter tuning strategies, and
-  some implementations, such as grid search. Possibly some strategies
-  will be implemented by third party packages.
-  
-* (⟂)
-  [MLJLinearModels.jl](https://github.com/alan-turing-institute/MLJLinearModels.jl)
-  an experimental package for a wide range of julia-native penalized linear models
-  such as Lasso, Elastic-Net, Robust regression, LAD regression,
-  etc. 
-
-* [MLJFlux.jl](https://github.com/alan-turing-institute/MLJFlux.jl) an
-  experimental package to use neural-network models built with
-  [Flux.jl](https://github.com/FluxML/Flux.jl) in MLJ.
-  
-* (⟂)
-  [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
-  a tiny, zero-dependency package providing "scientific" types, such as
-  `Continuous` and `OrderedFactor`, for the purpose of formalizing
-  conventions around the scientific interpretation of various ordinary
-  machine types, such as `String` and `Float32`. 
-  
-* (⟂)
-  [MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
-  articulates MLJ's convention for the scientific interpretation of
-  data.
-
-* [MLJTutorials](https://github.com/alan-turing-institute/MLJTutorials)
-  which collects tutorials on how to use MLJ.
 
 ---
 
