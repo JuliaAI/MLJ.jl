@@ -167,7 +167,9 @@ link for further information:
     <br>
 <p></p>
 
-![](material/MLJ_stack.png)
+<div align="center">
+    <img src="material/MLJ_stack.png" alt="Dependency Chart">
+</div>
 
 *Dependency chart for MLJ repositories. Repositories with dashed
 connections do not currently exist but are planned/proposed.*
