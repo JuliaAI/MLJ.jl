@@ -318,9 +318,11 @@ MLJModelInterface.metadata_model(YourModel1,
     output  = MLJModelInterface.Table(MLJModelInterface.Continuous),  # for an unsupervised, what output?
     weights = false,                                                  # does the model support sample weights?
     descr   = "A short description of your model"
-	path    = "YourPackage.ModuleContainingModelStructDefinition.YourModel1"
+	path    = "YourPackage.SubModuleContainingModelStructDefinition.YourModel1"
     )
 ```
+
+*Important.* Do not omit the `path` specification. 
 
 **Examples**:
 

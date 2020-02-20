@@ -672,6 +672,8 @@ MMI.metadata_model(DecisionTreeClassifier,
                         path="MLJModels.DecisionTree_.DecisionTreeClassifier")
 ```
 
+*Important.* Do not omit the `path` specifcation. 
+
 ```@docs
 MMI.metadata_pkg
 ```
