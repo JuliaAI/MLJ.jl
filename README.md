@@ -151,19 +151,18 @@ link for further information:
   <a href="CONTRIBUTING.md">Contributing</a>
 </p>
 <p align="center">
-  <a href="https://github.com/alan-turing-institute/MLJ"></a>MLJ &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJTutorials.jl"></a>MLJTutorials &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJBase.jl"></a>MLJBase &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJModelInterface.jl"></a>MLJModelInterface &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJModels.jl"></a>MLJModels &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJTuning.jl"></a>MLJTuning &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJLinearModels.jl"></a>MLJLinearModels &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJFlux.jl"></a>MLJFlux
-</p>
-<p align="center">
-  <a href="https://github.com/alan-turing-institute/MLJScientificTypes.jl"></a>MLJScientificTypes &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/ScientificTypes.jl"></a>ScientificTypes &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJModels.jl"></a>MLJModels
+  <a href="https://github.com/alan-turing-institute/MLJ">MLJ</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJTutorials.jl">MLJTutorials</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJBase.jl">MLJBase</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJModelInterface.jl">MLJModelInterface</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJModels.jl">MLJModels</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJTuning.jl">MLJTuning</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJLinearModels.jl">MLJLinearModels</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJFlux.jl">MLJFlux</a>
+  <br>
+  <a href="https://github.com/alan-turing-institute/MLJScientificTypes.jl">MLJScientificTypes</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJModels.jl">MLJModels</a>
 </p>
 <p></p>
     <br>
