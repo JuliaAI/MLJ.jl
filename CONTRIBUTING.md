@@ -12,6 +12,30 @@ channel](https://slackinvite.julialang.org), #MLJ.
 
 - [Nice overview of Julia ML packages](https://www.simonwenkel.com/2018/10/05/Julia-for-datascience-machine-learning-and-artificial-intelligence.html)
 
+MLJ is an ambitious project and we need all the help we can get!
+There are multiple ways you can contribute; the table below helps indicate where you can help and what are the subjective requirements in terms of Julia and ML expertise.
+
+Julia | ML         | What to do
+----- | ---------- | ----------
+=     | =          | use MLJ and give us feedback, help us write better tutorials, suggest missing features, test the less mature model packages
+⭒     | =          | package to facilitate visualising results in MLJ
+⭒     | ⭒          | add/improve data pre-processing tools
+⭒     | ⭒          | add/improve interfaces to other model-providing packages
+⭒     | ⭒          | functionalities for time series
+⭒     | ⭒          | functionalities for systematic benchmarking of models
+⭒     | ⭒          | functionalities for natural language processing (NLP)
+⭒⭒    | =          | decrease the overhead incurred by MLJ
+⭒⭒    | =          | improving support for sparse data
+⭒⭒    | ⭒          | improve support for ensemble methods (boosting etc)
+⭒⭒    | ⭒          | add parallelism and/or multithreading to MLJ (*there is an ongoing effort to interface with [Dagger.jl](https://github.com/JuliaParallel/Dagger.jl)*)
+⭒     | ⭒⭒         | add  interface with probabilistic programming packages (*there is an ongoing effort to interface with [Soss.jl](https://github.com/cscherrer/Soss.jl)*)
+⭒⭒    | ⭒⭒         | more sophisticated HP tuning (BO, Bandit, early stopping, ...) possibly as part of an external package(s), possibly integrating with Julia's optimisation and autodiff packages
+
+If you're interested in one of these beyond the first one, please get in touch with either Anthony Blaom or Thibaut Lienart on Slack and we can further guide you.
+Thank you!
+
+You can also have a look at MLJ's [release notes](https://github.com/alan-turing-institute/MLJ.jl/releases) to get an idea for what's been happening recently.
+
 While new model implementations are a priority at present, help adding
 core functionality to MLJ is also welcome. If you are interested in
 contributing, please read the this rest of this document. A guide to

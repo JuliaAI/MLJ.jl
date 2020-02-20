@@ -133,44 +133,20 @@ The table below indicates the models that are accessible at present along with a
 ### The MLJ Universe
 
 The functionality of MLJ is distributed over a number of repositories
-illustrated below.
+illustrated in the dependency chart below. Click on the appropriate
+link further information:
 
-[Code Organization](ORGANIZATION.md) | [Road Map](ROADMAP.md) | [Contributing to MLJ](CONTRIBUTING.MD)
+<br>
+<p align="center">
+  <a href="ORGANIZATION.md">Code Organization</a> •
+  <a href="ROADMAP.md">Road Map</a> •
+  <a href="CONTRIBUTING.md">Contributing</a>
+</p>
 
 ![](material/MLJ_stack.png)
 
 *Dependency chart for MLJ repositories. Repositories with dashed
 connections do not currently exist but are planned/proposed.*
-
-
-
----
-
-### Contributing to MLJ
-
-MLJ is an ambitious project and we need all the help we can get!
-There are multiple ways you can contribute; the table below helps indicate where you can help and what are the subjective requirements in terms of Julia and ML expertise.
-
-Julia | ML         | What to do
------ | ---------- | ----------
-=     | =          | use MLJ and give us feedback, help us write better tutorials, suggest missing features, test the less mature model packages
-⭒     | =          | package to facilitate visualising results in MLJ
-⭒     | ⭒          | add/improve data pre-processing tools
-⭒     | ⭒          | add/improve interfaces to other model-providing packages
-⭒     | ⭒          | functionalities for time series
-⭒     | ⭒          | functionalities for systematic benchmarking of models
-⭒     | ⭒          | functionalities for natural language processing (NLP)
-⭒⭒    | =          | decrease the overhead incurred by MLJ
-⭒⭒    | =          | improving support for sparse data
-⭒⭒    | ⭒          | improve support for ensemble methods (boosting etc)
-⭒⭒    | ⭒          | add parallelism and/or multithreading to MLJ (*there is an ongoing effort to interface with [Dagger.jl](https://github.com/JuliaParallel/Dagger.jl)*)
-⭒     | ⭒⭒         | add  interface with probabilistic programming packages (*there is an ongoing effort to interface with [Soss.jl](https://github.com/cscherrer/Soss.jl)*)
-⭒⭒    | ⭒⭒         | more sophisticated HP tuning (BO, Bandit, early stopping, ...) possibly as part of an external package(s), possibly integrating with Julia's optimisation and autodiff packages
-
-If you're interested in one of these beyond the first one, please get in touch with either Anthony Blaom or Thibaut Lienart on Slack and we can further guide you.
-Thank you!
-
-You can also have a look at MLJ's [release notes](https://github.com/alan-turing-institute/MLJ.jl/releases) to get an idea for what's been happening recently.
 
 ---
 
