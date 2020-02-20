@@ -120,8 +120,16 @@ The table below indicates the models that are accessible at present along with a
 [GaussianProcesses.jl]: https://github.com/STOR-i/GaussianProcesses.jl
 [GLM.jl]: https://github.com/JuliaStats/GLM.jl
 [LIBSVM.jl]: https://github.com/mpastell/LIBSVM.jl
-[MLJLinearModels.jl]: https://github.com/alan-turing-institute/MLJLinearModels.jl
+[MLJ.jl]: https://github.com/alan-turing-institute/MLJ.jl
+[MLJTutorials.jl]: https://github.com/alan-turing-institute/MLJTutorials.jl
+[MLJBase.jl]: https://github.com/alan-turing-institute/MLJBase.jl
+[MLJModelInterface.jl]: https://github.com/alan-turing-institute/MLJModelInterface.jl
 [MLJModels.jl]: https://github.com/alan-turing-institute/MLJModels.jl
+[MLJTuning.jl]: https://github.com/alan-turing-institute/MLJTuning.jl
+[MLJLinearModels.jl]: https://github.com/alan-turing-institute/MLJLinearModels.jl
+[MLJFlux.jl]: https://github.com/alan-turing-institute/MLJFlux.jl
+[MLJScientificTypes.jl]: https://github.com/alan-turing-institute/MLJScientificTypes.jl
+[ScientificTypes.jl]: https://github.com/alan-turing-institute/ScientificTypes.jl
 [MultivariateStats.jl]: https://github.com/JuliaStats/MultivariateStats.jl
 [NaiveBayes.jl]: https://github.com/dfdx/NaiveBayes.jl
 [NearestNeighbors.jl]: https://github.com/KristofferC/NearestNeighbors.jl
@@ -134,13 +142,28 @@ The table below indicates the models that are accessible at present along with a
 
 The functionality of MLJ is distributed over a number of repositories
 illustrated in the dependency chart below. Click on the appropriate
-link further information:
+link for further information:
 
 <br>
 <p align="center">
   <a href="ORGANIZATION.md">Code Organization</a> &nbsp;•&nbsp;
   <a href="ROADMAP.md">Road Map</a>  &nbsp;•&nbsp;
   <a href="CONTRIBUTING.md">Contributing</a>
+</p>
+<p align="center">
+  <a href="https://github.com/alan-turing-institute/MLJ"></a>MLJ &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJTutorials.jl"></a>MLJTutorials &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJBase.jl"></a>MLJBase &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJModelInterface.jl"></a>MLJModelInterface &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJModels.jl"></a>MLJModels &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJTuning.jl"></a>MLJTuning &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJLinearModels.jl"></a>MLJLinearModels &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJFlux.jl"></a>MLJFlux
+</p>
+<p align="center">
+  <a href="https://github.com/alan-turing-institute/MLJScientificTypes.jl"></a>MLJScientificTypes &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/ScientificTypes.jl"></a>ScientificTypes &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJModels.jl"></a>MLJModels
 </p>
 <p></p>
     <br>
