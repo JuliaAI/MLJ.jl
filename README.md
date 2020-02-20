@@ -16,6 +16,11 @@
     <img src="https://img.shields.io/badge/docs-stable-blue.svg"
          alt="Documentation">
   </a>
+  </a>
+  <a href="https://doi.org/10.5281/zenodo.3541506">
+  <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3541506.svg"
+       alt="Cite MLJ">
+  </a>
 </p>
 </h2>
 
@@ -49,8 +54,10 @@ MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institu
 
 ### Using MLJ
 
-It is a good idea to use a [separate environment](https://julialang.github.io/Pkg.jl/v1/environments/) for MLJ in order to avoid version clashes with other packages you may be using.
-You can do so with
+Initially it is recommended that MLJ and associated packages be
+installed in a new
+[environment](https://julialang.github.io/Pkg.jl/v1/environments/) to
+avoid package conflicts. You can do this with
 
 ```julia
 julia> using Pkg; Pkg.activate("My_MLJ_env", shared=true)
@@ -62,8 +69,13 @@ Installing MLJ is also done with the package manager:
 julia> Pkg.add(["MLJ", "MLJModels"])
 ```
 
-It is important to note that MLJ is essentially a big wrapper providing a unified access to _model providing packages_ and so you will also need to make sure these packages are available in your environment.
-For instance, if you want to use a **Decision Tree Classifier**, you need to have [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl) installed:
+It is important to note that MLJ is essentially a big wrapper
+providing a unified access to _model providing packages_ and so you
+will also need to make sure these packages are available in your
+environment.  For instance, if you want to use a **Decision Tree
+Classifier**, you need to have
+[DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl)
+installed:
 
 ```julia
 julia> Pkg.add("DecisionTree");
@@ -80,20 +92,29 @@ models()
 
 We recommend you start with models marked as coming from _mature_ packages such as _DecisionTree_, _ScikitLearn_ or _XGBoost_.
 
+
 #### Tutorials
 
-The best place to get started with MLJ is to go the [MLJ Tutorials](https://alan-turing-institute.github.io/MLJTutorials/) website.
-Each of the tutorial can be downloaded as a notebook or Julia script to facilitate experimentation with the packages.
+The best place to get started with MLJ is to go the [MLJ
+Tutorials](https://alan-turing-institute.github.io/MLJTutorials/)
+website.  Each of the tutorial can be downloaded as a notebook or
+Julia script to facilitate experimentation with the packages. For more
+comprehensive documentation, see the user
+[manual](https://alan-turing-institute.github.io/MLJ.jl/stable/).
 
-You're also welcome to join the `#mlj` Julia slack channel to ask questions and make suggestions.
+You're also welcome to join the `#mlj` Julia slack channel to ask
+questions and make suggestions.
 
 ---
 
 ### Available Models 
 
-There is a wide range of models accessible via MLJ.
-We are always looking for contributors to add new models or help us test existing ones.
-The table below indicates the models that are accessible at present along with a subjective indication of how mature the underlying package is.
+MLJ provides access to to a wide variety of machine learning models.
+We are always looking for contributors to add new models or help us
+test existing ones.  The table below indicates the models that are
+accessible at present along with a subjective indication of how mature
+the underlying package is. (Run `using MLJ; models()` for the most
+up-to-date list.)
 
 * *experimental*: indicates the package is fairly new and/or is under active development; you can help by testing these packages and making them more robust,
 * *medium*: indicates the package is fairly mature but may benefit from optimisations and/or extra features; you can help by suggesting either,
@@ -159,7 +180,7 @@ link for further information:
   <a href="https://github.com/alan-turing-institute/MLJLinearModels.jl">MLJLinearModels</a> &nbsp;•&nbsp;
   <a href="https://github.com/alan-turing-institute/MLJFlux.jl">MLJFlux</a>
   <br>
-  <a href="https://github.com/alan-turing-institute/MLJTutorials.jl">MLJTutorials</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJTutorials">MLJTutorials</a> &nbsp;•&nbsp;
   <a href="https://github.com/alan-turing-institute/MLJScientificTypes.jl">MLJScientificTypes</a> &nbsp;•&nbsp;
   <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes</a>
 </p>
