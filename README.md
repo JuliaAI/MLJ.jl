@@ -138,10 +138,13 @@ link further information:
 
 <br>
 <p align="center">
-  <a href="ORGANIZATION.md">Code Organization</a> •
-  <a href="ROADMAP.md">Road Map</a> •
+  <a href="ORGANIZATION.md">Code Organization</a> &nbsp;•&nbsp;
+  <a href="ROADMAP.md">Road Map</a>  &nbsp;•&nbsp;
   <a href="CONTRIBUTING.md">Contributing</a>
 </p>
+<p></p>
+    <br>
+<p></p>
 
 ![](material/MLJ_stack.png)
 
