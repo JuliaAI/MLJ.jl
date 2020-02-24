@@ -110,11 +110,9 @@ questions and make suggestions.
 ### Available Models 
 
 MLJ provides access to to a wide variety of machine learning models.
-We are always looking for contributors to add new models or help us
-test existing ones.  The table below indicates the models that are
-accessible at present along with a subjective indication of how mature
-the underlying package is. (Run `using MLJ; models()` for the most
-up-to-date list.)
+We are always looking for [help](CONTRIBUTING.md) adding new models or
+test existing ones.  Currently available models are listed below; for
+the most up-to-date list, run `using MLJ; models()`.
 
 * *experimental*: indicates the package is fairly new and/or is under active development; you can help by testing these packages and making them more robust,
 * *medium*: indicates the package is fairly mature but may benefit from optimisations and/or extra features; you can help by suggesting either,
@@ -124,6 +122,7 @@ up-to-date list.)
 | ------- | ------ | -------- | ----
 [Clustering.jl] | KMeans, KMedoids | high | †
 [DecisionTree.jl] | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier | high | †
+[EvoTrees.jl] | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount EvoTreeGaussian | low | gradient boosting models
 [GLM.jl] | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium | †
 [LIBSVM.jl] | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
 [MLJModels.jl] (builtins) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ConstantRegressor, ConstantClassifier | medium |
@@ -138,6 +137,7 @@ up-to-date list.)
 
 [Clustering.jl]: https://github.com/JuliaStats/Clustering.jl
 [DecisionTree.jl]: https://github.com/bensadeghi/DecisionTree.jl
+[EvoTrees.jl]: https://github.com/Evovest/EvoTrees.jl
 [GaussianProcesses.jl]: https://github.com/STOR-i/GaussianProcesses.jl
 [GLM.jl]: https://github.com/JuliaStats/GLM.jl
 [LIBSVM.jl]: https://github.com/mpastell/LIBSVM.jl
@@ -189,7 +189,7 @@ link for further information:
 <p></p>
 
 <div align="center">
-    <img src="material/MLJ_stack.png" alt="Dependency Chart">
+    <img src="material/MLJ_stack.svg" alt="Dependency Chart">
 </div>
 
 *Dependency chart for MLJ repositories. Repositories with dashed

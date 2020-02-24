@@ -1,26 +1,26 @@
 # Code Organization
 
-![](material/MLJ_stack.png)
+![](material/MLJ_stack.svg)
 
 *Dependency chart for MLJ repositories. Repositories with dashed
 connections do not currently exist but are planned/proposed.*
 
-Repositores of be of some possible interest outside of MLJ, or beyond
+Repositories of some possible interest outside of MLJ, or beyond
 its conventional use, are marked with a ⟂ symbol:
 
 * [MLJ.jl](https://github.com/alan-turing-institute/MLJ.jl) is the
   general user's point-of-entry for choosing, loading, composing,
   evaluating and tuning machine learning models. It pulls in most code
-  from other repositories described below (a current exception being
+  from other repositories described below. (A current exception is
   [homogeneous ensembles code](src/ensembles.jl), to be migrated to
-  MLJBase or its own repository MLJEnsembles). MLJ also hosts the [MLJ
+  MLJBase or its own repository MLJEnsembles.) MLJ also hosts the [MLJ
   manual](src/docs) which documents functionality across the
   repositories, with the exception of ScientificTypes, and
   MLJScientific types which host their own documentation. (The MLJ
   manual and MLJTutorials do provide overviews of scientific types.)
 
 * [MLJModelInterface.jl](https://github.com/alan-turing-institute/MLJModelInterface.jl)
-  is a lightweight package imported by a package wanting to implement
+  is a lightweight package imported by packages implementing
   MLJ's interface for their machine learning models. It's *sole*
   dependency is ScientificTypes, which is a tiny package with *no*
   dependencies. 
@@ -34,11 +34,11 @@ its conventional use, are marked with a ⟂ symbol:
   [Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
   and
   [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl));
-  and (ii) provide functionality essential to the MLJ user that is not
-  contained in one of the "satellite" repositories. See the
-  [MLJBase.jl
+  and (ii) provide functionality essential to the MLJ user that has
+  not been relegated to its own "satellite" repository for some
+  reason. See the [MLJBase.jl
   readme](https://github.com/alan-turing-institute/MLJBase.jl) for a
-  detailed description of contents.
+  detailed description of MLJBase's contents.
 
 * [MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl)
   hosts the MLJ **registry**, which contains metadata on all the models
@@ -63,20 +63,21 @@ its conventional use, are marked with a ⟂ symbol:
   etc. 
 
 * [MLJFlux.jl](https://github.com/alan-turing-institute/MLJFlux.jl) an
-  experimental package to use **neural-network models** built with
-  [Flux.jl](https://github.com/FluxML/Flux.jl) in MLJ.
+  experimental package for using **neural-network models**, built with
+  [Flux.jl](https://github.com/FluxML/Flux.jl), in MLJ.
   
 * (⟂)
   [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
-  is a tiny, zero-dependency package providing "scientific" types (such as
-  `Continuous`, `OrderedFactor`, `Image` and `Table`) for the purpose of formalizing
-  conventions around the scientific interpretation of ordinary
-  machine types, such as `Float32` and `DataFrame`.
+  is a tiny, zero-dependency package providing "scientific" types,
+  such as `Continuous`, `OrderedFactor`, `Image` and `Table`. It's
+  purpose is to formalize conventions around the scientific
+  interpretation of ordinary machine types, such as `Float32` and
+  `DataFrame`.
   
 * (⟂)
   [MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
-  articulates MLJ's convention for the scientific interpretation of
+  articulates MLJ's own convention for the scientific interpretation of
   data.
 
 * [MLJTutorials](https://github.com/alan-turing-institute/MLJTutorials)
-  collects tutorials on how to use MLJ.
+  collects tutorials on how to use MLJ. 
