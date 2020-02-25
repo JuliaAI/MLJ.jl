@@ -9,15 +9,18 @@ channel](https://slackinvite.julialang.org), #MLJ.
 - [Code organization](ORGANIZATION.md)
 
 
-### Git work-flow
+### Conventions
 
-**Important.** Please make pull requests to the `dev` branch
-(**not** `master`) of the appropriate repo. 
+We follow
+[this](https://nvie.com/posts/a-successful-git-branching-model/) git
+work-flow and, in particular, ask that **all pull requests be made to
+the`dev` branch** of the appropriate repo, and not to `master`. This
+includes changes to documentation. All pull requests onto `master`
+come from `dev` and generally precede a tagged release.
 
-All pull requests onto `master` come from `dev` and generally precede a new release. 
-
-We follow [this git
-work-flow](https://nvie.com/posts/a-successful-git-branching-model/).
+Contributors are kindly requested to adhere to the
+[Blue](https://github.com/invenia/BlueStyle) style guide, with line
+widths capped at 80 characters.
 
 
 ### Very brief design overview
@@ -33,8 +36,8 @@ internal state reflecting the outcomes of applying `fit!` and
 the machine interface more "object-oriented".
 
 A generalization of machine, called a *nodal* machine, is a key
-element of *learning networks* which combine several models
-together. See
+element of *learning networks* which combine several models together,
+and form the basis for specifying new composite model types. See
 [here](https://alan-turing-institute.github.io/MLJ.jl/dev/composing_models/)
 for more on these.
 
