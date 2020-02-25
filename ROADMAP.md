@@ -30,7 +30,7 @@ in contributing to MLJ.
 ### Priorities
 
 Priorities are somewhat fluid, depending on funding offers and
-available talent. Rought priorities for the development team at
+available talent. Rough priorities for the development team at
 present are marked with **†** below. However, we are always keen to review
 external contributions in any area.
 
