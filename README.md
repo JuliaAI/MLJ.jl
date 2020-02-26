@@ -32,7 +32,7 @@ MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institu
   <a href="#using-mlj">Using MLJ</a> •
   <a href="#available-models">Models Available</a> •
   <a href="#the-mlj-universe">MLJ Universe</a> •
-  <a href="#contributing-to-mlj">Contributing</a> •
+  <a href="CONTRIBUTING.md">Contributing</a> •
   <a href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/mlj_cheatsheet.md">MLJ Cheatsheet</a> •
   <a href="#citing-mlj">Citing MLJ</a>
 </p>
