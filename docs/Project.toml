@@ -21,9 +21,9 @@ TypedTables = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9"
 
 [compat]
 Documenter = "^0.24"
-MLJBase = "^0.11"
+MLJBase = "^0.11.9"
 MLJModelInterface = "^0.1"
-MLJModels = "^0.8"
-MLJScientificTypes = "^0.1"
-MLJTuning = "^0.1"
+MLJModels = "^0.8.2"
+MLJScientificTypes = "^0.2.1"
+MLJTuning = "^0.1.4"
 julia = "1.2"
