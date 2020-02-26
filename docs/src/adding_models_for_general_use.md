@@ -507,7 +507,7 @@ for an example of a Probabilistic classifier implementation.
 
 
 ```@docs
-MMI.UnivariateFinite
+UnivariateFinite
 ```
 
 *Important note on binary classifiers.* There is no "Binary" scitype
