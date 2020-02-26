@@ -1,6 +1,6 @@
 # Adding Models for General Use
 
-This guide outlines in the specification of the MLJ model interface
+This guide outlines the specification of the MLJ model interface
 and provides detailed guidelines for implementing the interface for
 models intended for general use. See also the more condensed
 [Quick-Start Guide to Adding Models](@ref).
@@ -23,12 +23,13 @@ models](@ref).
 [MLJModelInterface](https://github.com/alan-turing-institute/MLJModelInterface.jl)
 is a very light-weight interface allowing you to *define* your
 interface, but does not provide the functionality required to use or
-test your interface. So, while you only need to add
-`MLJModelInterface` to your project's [deps] for testing purposes, you
-need to add
-[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) to your project's
-[extras] and [targets]. In testing, simply use `MLJBase` in place of
-`MLJModelInterface`.
+test your interface; this requires
+[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl).  So,
+while you only need to add `MLJModelInterface` to your project's
+[deps], for testing purposes you need to add
+[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) to your
+project's [extras] and [targets]. In testing, simply use `MLJBase` in
+place of `MLJModelInterface`.
 
 It is assumed the reader has read [Getting Started](index.md).
 To implement the API described here, some familiarity with the
@@ -671,6 +672,8 @@ MMI.metadata_model(DecisionTreeClassifier,
                         target=AbstractVector{<:MMI.Finite},
                         path="MLJModels.DecisionTree_.DecisionTreeClassifier")
 ```
+
+*Important.* Do not omit the `path` specifcation. 
 
 ```@docs
 MMI.metadata_pkg

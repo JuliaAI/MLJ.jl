@@ -51,12 +51,13 @@ includes:
 [MLJModelInterface](https://github.com/alan-turing-institute/MLJModelInterface.jl)
 is a very light-weight interface allowing you to *define* your
 interface, but does not provide the functionality required to use or
-test your interface. So, while you only need to add
-`MLJModelInterface` to your project's [deps], for testing purposes, you
-need to add
-[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) to your project's
-[extras] and [targets]. In testing, simply use `MLJBase` in place of
-`MLJModelInterface`.
+test your interface; this requires
+[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl). So,
+while you only need to add `MLJModelInterface` to your project's
+[deps], for testing purposes you need to add
+[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) to your
+project's [extras] and [targets]. In testing, simply use `MLJBase` in
+place of `MLJModelInterface`.
 
 We give some details for each step below with, each time, a few
 examples that you can mimic.  The instructions are intentionally
@@ -318,9 +319,11 @@ MLJModelInterface.metadata_model(YourModel1,
     output  = MLJModelInterface.Table(MLJModelInterface.Continuous),  # for an unsupervised, what output?
     weights = false,                                                  # does the model support sample weights?
     descr   = "A short description of your model"
-	path    = "YourPackage.ModuleContainingModelStructDefinition.YourModel1"
+	path    = "YourPackage.SubModuleContainingModelStructDefinition.YourModel1"
     )
 ```
+
+*Important.* Do not omit the `path` specification. 
 
 **Examples**:
 
