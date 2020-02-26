@@ -94,6 +94,10 @@ export models, localmodels, @load, load, info,
     OneHotEncoder, UnivariateDiscretizer,
     FillImputer
 
+# re-export from ComputaionalResources:
+export CPU1, CPUProcesses, CPUThreads
+
+
 ## METHOD IMPORT
 
 # from the Standard Library:
