@@ -122,7 +122,7 @@ the most up-to-date list, run `using MLJ; models()`.
 | ------- | ------ | -------- | ----
 [Clustering.jl] | KMeans, KMedoids | high | †
 [DecisionTree.jl] | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier | high | †
-[EvoTrees.jl] | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount EvoTreeGaussian | low | gradient boosting models
+[EvoTrees.jl] | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian | low | gradient boosting models
 [GLM.jl] | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium | †
 [LIBSVM.jl] | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
 [MLJModels.jl] (builtins) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ConstantRegressor, ConstantClassifier | medium |
