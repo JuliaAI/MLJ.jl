@@ -83,7 +83,7 @@ julia> using MLJ;
 julia> @load DecisionTreeClassifier
 ```
 
-For a list of models and their packages see the [table below](#models-available), or run
+For a list of models and their packages see the [table below](#available-models), or run
 
 ```julia
 using MLJ
