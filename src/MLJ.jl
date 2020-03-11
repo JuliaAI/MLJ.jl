@@ -19,7 +19,7 @@ export matching
 
 # re-export from Random, Statistics, Distributions, CategoricalArrays:
 export pdf, mode, median, mean, shuffle!, categorical, shuffle,
-    levels, levels!, std, support
+    levels, levels!, std, support, sampler
 
 # re-exports from (MLJ)ScientificTypes via MLJBase
 export Scientific, Found, Unknown, Known, Finite, Infinite,
