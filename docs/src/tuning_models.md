@@ -49,7 +49,7 @@ iterator(r2)
 
 Unbounded ranges are also permitted. See the `range` and `iterator`
 docstrings below for details, and the `sampler` docstring for
-generating random samples from one-dimensional range.
+generating random samples from one-dimensional ranges.
 
 Returning to the wrapped tree model:
 
@@ -130,6 +130,7 @@ For more options in a grid search, see the `Grid` docstring below.
 MLJBase.range
 MLJBase.iterator
 MLJBase.sampler
+Distributions.fit(::Type{D}, ::MLJBase.NumericRange) where D<:Distributions.Distribution
 MLJTuning.TunedModel
 MLJTuning.Grid
 ```
