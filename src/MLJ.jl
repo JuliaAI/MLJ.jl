@@ -107,6 +107,7 @@ import Pkg.TOML
 
 # from the MLJ universe:
 using MLJBase
+import MLJBase.save
 using MLJTuning
 using MLJModels
 

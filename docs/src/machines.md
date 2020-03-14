@@ -92,8 +92,8 @@ See [Composing Models](composing_models.md) for more on this advanced feature.
 ## Inspecting machines
 
 There are two methods for inspecting the outcomes of training in
-MLJ. To obtain a named-tuple describing the learned parameters, in a
-user-friendly way if possible, use `fitted_params(mach)`. All other
+MLJ. To obtain a named-tuple describing the learned parameters (in a
+user-friendly way where possible) use `fitted_params(mach)`. All other
 training-related outcomes are inspected with `report(mach)`.
 
 ```@example machines
