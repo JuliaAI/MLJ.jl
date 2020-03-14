@@ -59,36 +59,6 @@ fit!(mach, rows=1:100);
 fit!(mach, rows=1:100);
 ```
 
-For a supervised machine the `predict` method calls a lower-level
-`MLJBase.predict` method, dispatched on the underlying model and the
-`fitresult` (see below). To see `predict` in action, as well as its
-unsupervised cousins `transform` and `inverse_transform`, see
-[Getting Started](index.md).
-
-Here is a complete list of the fields of a machine:
-
-- `model` - the struct containing the hyperparameters to be used in
-  calls to `fit!`
-
-- `fitresult` - the learned parameters in a raw form, initially undefined
-
-- `args` -  a tuple of the data (in the supervised learning example above, `args = (X, y)`)
-
-- `report` - outputs of training not encoded in `fitresult` (eg, feature rankings)
-
-- `previous_model` - a deep copy of the model used in the last call to `fit!`
-
-- `previous_rows` -  a copy of the row indices used in last call to `fit!`
-
-- `cache`
-
-Instead of data `X` and `y`, the `machine` constructor can be provided
-`Node` or `Source` objects ("dynamic data") to obtain a
-`NodalMachine`, rather than a regular `Machine` object, which includes
-the same fields listed above.
-See [Composing Models](composing_models.md) for more on this advanced feature.
-
-
 ## Inspecting machines
 
 There are two methods for inspecting the outcomes of training in
@@ -108,9 +78,69 @@ fitted_params(mach)
 report(mach)
 ```
 
+## Saving machines
+
+To save a machine to file, use the [`MLJ.save`](@ref) command:
+
+```julia
+tree = @load DecisionTreeClassifier
+mach = fit!(machine(tree, X, y))
+MLJ.save("my_machine.jlso", mach)
+```
+
+To de-serialize, one uses the `machine` constructor:
+
+```julia
+mach2 = machine("my_machine.jlso")
+predict(mach2, Xnew);
+```
+
+The machine `mach2` cannot be retrained; however, by providing data to
+the constructor one can enable retraining using the saved model
+hyperparameters (which overwrites the saved learned parameters):
+
+```julia
+mach3 = machine("my_machine.jlso", Xnew, ynew)
+fit!(mach3)
+```
+
+
+## Internals
+
+For a supervised machine the `predict` method calls a lower-level
+`MLJBase.predict` method, dispatched on the underlying model and the
+`fitresult` (see below). To see `predict` in action, as well as its
+unsupervised cousins `transform` and `inverse_transform`, see
+[Getting Started](index.md).
+
+The fields of a `Machine` instance (which should not generally be
+accessed byt the user) are:
+
+- `model` - the struct containing the hyperparameters to be used in
+  calls to `fit!`
+
+- `fitresult` - the learned parameters in a raw form, initially undefined
+
+- `args` -  a tuple of the data (in the supervised learning example above, `args = (X, y)`)
+
+- `report` - outputs of training not encoded in `fitresult` (eg, feature rankings)
+
+- `previous_model` - a deep copy of the model used in the last call to `fit!`
+
+- `previous_rows` -  a copy of the row indices used in last call to `fit!`
+
+- `cache`
+
+Instead of data `X` and `y`, the `machine` constructor can be provided
+`Node` or `Source` objects ("dynamic data") to obtain a
+`NodalMachine`, rather than a regular `Machine` object, which has the
+fields listed above and some others. See [Composing
+Models](composing_models.md) for more on this advanced feature.
+
 
 ## API Reference
 
 ```@docs
 fit!
+MLJBase.save
 ```
