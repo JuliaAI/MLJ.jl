@@ -9,6 +9,11 @@ optimal model, one just calls `predict(mach, Xnew)`. In this way the
 wrapped model may be viewed as a "self-tuning" version of the
 unwrapped model.
 
+Below we illustrate tuning by grid and random searches. For a complete
+list of available and planned tuning strategies, see the [MLJTuning
+page](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here)
+
+
 ## Tuning a single hyperparameter using a grid search
 
 ```@repl goof
@@ -49,7 +54,8 @@ iterator(r2)
 
 Unbounded ranges are also permitted. See the `range` and `iterator`
 docstrings below for details, and the `sampler` docstring for
-generating random samples from one-dimensional ranges.
+generating random samples from one-dimensional ranges (used internally
+by the `RandomSearch` strategy).
 
 Returning to the wrapped tree model:
 
@@ -88,16 +94,9 @@ julia> tree_model = DecisionTreeRegressor()
 julia> forest_model = EnsembleModel(atom=tree_model);
 ```
 
-Nested hyperparameters can be inspected using `params` (or just type
-`@more` in the REPL after instantiating `forest_model`):
-
-```@repl goof
-params(forest_model)
-```
-
 Ranges for nested hyperparameters are specified using dot syntax. In
 this case we will specify a `goal` for the total number of grid
-points, rather than a per-dimension resolution:
+points:
 
 ```@repl goof
 r1 = range(forest_model, :(atom.n_subfeatures), lower=1, upper=9);
@@ -108,7 +107,7 @@ self_tuning_forest_model = TunedModel(model=forest_model,
                                       range=[r1, r2],
                                       measure=rms);
 self_tuning_forest = machine(self_tuning_forest_model, X, y);
-fit!(self_tuning_forest, verbosity=1)
+fit!(self_tuning_forest)
 ```
 
 In this two-parameter case, a plot of the grid search results is also
@@ -121,7 +120,57 @@ plot(self_tuning_forest)
 
 ![](img/tuning_plot.png)
 
-For more options in a grid search, see the `Grid` docstring below.
+Instead of specifying a `goal`, we can declare a global `resolution`,
+which is overriden for a particular parameter by pairing it's range
+with the resolution desired. In the next example, the default
+`resolution=100` is applied to the `r2` field, but a resolution of `3`
+is applied to the `r1` field. Additionally, we ask that the grid
+points be randomly traversed, and the the total number of evaluations
+be limited to 25.
+
+```@repl goof
+tuning = Grid(resolution=100, shuffle=true, rng=1234)
+self_tuning_forest_model = TunedModel(model=forest_model,
+                                      tuning=tuning,
+                                      resampling=CV(nfolds=6),
+                                      range=[(r1, 3), r2],
+                                      measure=rms,
+                                      n=25);
+fit!(machine(self_tuning_forest_model, X, y), verbosity=1)
+```
+
+For more options for a grid search, see [`Grid`](@ref) below.
+
+
+## Tuning using a random search
+
+Let's attempt to tune the same hyperparameters using a `RandomSearch`
+tuning strategy. By default, bounded numeric ranges like `r1` and `r2`
+are sampled uniformly (before rounding, in the case of the integer
+range `r1`). Positive unbounded ranges are sampled using a Gamma
+distribution, and all others using a (truncated) normal distributions.
+
+```@repl goof
+self_tuning_forest_model = TunedModel(model=forest_model,
+                                      tuning=RandomSearch(),
+                                      resampling=CV(nfolds=6),
+                                      range=[r1, r2],
+                                      measure=rms,
+                                      n=25);
+self_tuning_forest = machine(self_tuning_forest_model, X, y);
+fit!(self_tuning_forest, verbosity=1)
+```
+
+```julia
+using Plots
+plot(self_tuning_forest)
+```
+
+![](img/random_search_tuning_plot.png)
+
+The prior distributions used for sampling each hyperparameter can be
+customized, as can the global fallbacks. See the
+[`RandomSearch`](@ref) doc-string below for details.
 
 
 ## API
@@ -133,4 +182,5 @@ MLJBase.sampler
 Distributions.fit(::Type{D}, ::MLJBase.NumericRange) where D<:Distributions.Distribution
 MLJTuning.TunedModel
 MLJTuning.Grid
+MLJTuning.RandomSearch
 ```

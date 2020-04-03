@@ -83,7 +83,8 @@ export measures,
     specificity, selectivity, f1score, f1, fallout
 
 # re-export from MLJTuning:
-export Grid, Explicit, TunedModel, learning_curve!, learning_curve
+export Grid, RandomSearch, Explicit, TunedModel,
+    learning_curve!, learning_curve
 
 # re-export from MLJModels:
 export models, localmodels, @load, load, info,
