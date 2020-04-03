@@ -21,10 +21,10 @@ MLJBase.predict(::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew) * fitresu
 
 julia&gt; model = MyRegressor(lambda=1.0)
 MyRegressor(
-    lambda = 1.0) @ 3…97
+    lambda = 1.0) @ 1…60
 
 julia&gt; regressor = machine(model, X, y)
-Machine{MyRegressor} @ 3…33
+Machine{MyRegressor} @ 1…87
 
 julia&gt; evaluate!(regressor, resampling=CV(), measure=rms, verbosity=0)
 ┌───────────┬───────────────┬──────────────────────────────────────┐
@@ -54,4 +54,4 @@ julia&gt; mach = fit!(machine(MyClassifier(), X, y))
 julia&gt; predict(mach, selectrows(X, 1:2))
 2-element Array{UnivariateFinite{String,UInt32,Float64},1}:
  UnivariateFinite(setosa=&gt;0.333, versicolor=&gt;0.333, virginica=&gt;0.333)
- UnivariateFinite(setosa=&gt;0.333, versicolor=&gt;0.333, virginica=&gt;0.333)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../openml_integration/">« OpenML Integration</a><a class="docs-footer-nextpage" href="../quick_start_guide_to_adding_models/">Quick-Start Guide to Adding Models »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 25 March 2020 08:13">Wednesday 25 March 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ UnivariateFinite(setosa=&gt;0.333, versicolor=&gt;0.333, virginica=&gt;0.333)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../openml_integration/">« OpenML Integration</a><a class="docs-footer-nextpage" href="../quick_start_guide_to_adding_models/">Quick-Start Guide to Adding Models »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 3 April 2020 08:45">Friday 3 April 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
