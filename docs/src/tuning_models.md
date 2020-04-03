@@ -148,7 +148,8 @@ Let's attempt to tune the same hyperparameters using a `RandomSearch`
 tuning strategy. By default, bounded numeric ranges like `r1` and `r2`
 are sampled uniformly (before rounding, in the case of the integer
 range `r1`). Positive unbounded ranges are sampled using a Gamma
-distribution, and all others using a (truncated) normal distributions.
+distribution by default, and all others using a (truncated) normal
+distribution.
 
 ```@repl goof
 self_tuning_forest_model = TunedModel(model=forest_model,
