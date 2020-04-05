@@ -72,7 +72,7 @@ So, to search for all supervised probabilistic models handling input
 `X` and target `y`, one can define the testing function `task` by
 
 ```julia
-task(model) = matching(model, X, y) && model.is_probabilistic
+task(model) = matching(model, X, y) && model.prediction_type == :probabilistic
 ```
 
 And execute the search with
