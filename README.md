@@ -96,6 +96,11 @@ models()
 
 We recommend you start with models marked as coming from _mature_ packages such as _DecisionTree_, _ScikitLearn_ or _XGBoost_.
 
+MLJ is supported by a number of satelite packages (MLJTuning,
+MLJModelInterface, etc) which the general user is *not* required to
+install directly. Developers can learn more about these
+[here](ORGANIZATION.md).
+
 
 #### Tutorials
 
