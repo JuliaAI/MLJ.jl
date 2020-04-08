@@ -47,8 +47,12 @@ MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institu
 
 * Data agnostic, train models on any data supported by the [Tables.jl](https://github.com/JuliaData/Tables.jl) interface,
 * Extensive support for model composition (*pipelines* and *learning networks*),
-* Convenient syntax to tune and evaluate (composite) models,
+* Convenient syntax to tune and evaluate (composite) models.
 * Consistent interface to handle probabilistic predictions.
+* Extensible [tuning
+  interface](https://github.com/alan-turing-institute/MLJTuning.jl),
+  to support growing number of optimization strategies, and designed to
+  play well with model composition.
 
 ---
 
