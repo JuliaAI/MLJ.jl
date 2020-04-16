@@ -233,7 +233,7 @@ connections do not currently exist but are planned/proposed.*
 
 *Core design*: A. Blaom, F. Kiraly, S. Vollmer
 
-*Active maintainers*: A. Blaom, T. Lienart
+*Active maintainers*: A. Blaom, T. Lienart, S. Okon
 
 *Active collaborators*: D. Arenas, D. Buchaca, J. Hoffimann, S. Okon, J. Samaroo, S. Vollmer
 
