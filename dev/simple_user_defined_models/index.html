@@ -21,10 +21,10 @@ MLJBase.predict(::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew) * fitresu
 
 julia&gt; model = MyRegressor(lambda=1.0)
 MyRegressor(
-    lambda = 1.0) @ 1…62
+    lambda = 1.0) @ 1…47
 
 julia&gt; regressor = machine(model, X, y)
-Machine{MyRegressor} @ 1…17
+Machine{MyRegressor} @ 3…06
 
 julia&gt; evaluate!(regressor, resampling=CV(), measure=rms, verbosity=0)
 ┌───────────┬───────────────┬──────────────────────────────────────┐
