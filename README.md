@@ -2,7 +2,7 @@
     <img src="https://alan-turing-institute.github.io/MLJTutorials/assets/infra/MLJLogo2.svg" alt="MLJ" width="200">
 </div>
 
-<h2 align="center">A Machine Learning Toolbox for Julia.
+<h2 align="center">A Machine Learning Framework for Julia
 <p align="center">
   <a href="https://travis-ci.com/alan-turing-institute/MLJ.jl">
     <img src="https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master"
@@ -37,6 +37,9 @@ MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institu
   <a href="#citing-mlj">Citing MLJ</a>
 </p>
 
+To deal with **MKL errors** encountered on MacOS, see
+[here](#known-issues-using-scitlearn-models-with-macos).
+
 ### Key goals
 
 * Offer a consistent way to use, compose and tune machine learning models in Julia,
@@ -47,8 +50,12 @@ MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institu
 
 * Data agnostic, train models on any data supported by the [Tables.jl](https://github.com/JuliaData/Tables.jl) interface,
 * Extensive support for model composition (*pipelines* and *learning networks*),
-* Convenient syntax to tune and evaluate (composite) models,
+* Convenient syntax to tune and evaluate (composite) models.
 * Consistent interface to handle probabilistic predictions.
+* Extensible [tuning
+  interface](https://github.com/alan-turing-institute/MLJTuning.jl),
+  to support growing number of optimization strategies, and designed to
+  play well with model composition.
 
 ---
 
@@ -92,6 +99,11 @@ models()
 
 We recommend you start with models marked as coming from _mature_ packages such as _DecisionTree_, _ScikitLearn_ or _XGBoost_.
 
+MLJ is supported by a number of satelite packages (MLJTuning,
+MLJModelInterface, etc) which the general user is *not* required to
+install directly. Developers can learn more about these
+[here](ORGANIZATION.md).
+
 
 #### Tutorials
 
@@ -104,6 +116,22 @@ comprehensive documentation, see the user
 
 You're also welcome to join the `#mlj` Julia slack channel to ask
 questions and make suggestions.
+
+
+#### Known issues using ScitLearn models with MacOS
+
+For users of Mac OS using Julia 1.3 or higher, using ScikitLearn
+models can lead to unexpected MKL errors due to an issue not related
+to MLJ. See
+[this Julia Discourse discussion](https://discourse.julialang.org/t/julia-1-3-1-4-on-macos-and-intel-mkl-error/36469/2) 
+and
+[this issue](https://github.com/JuliaPackaging/BinaryBuilder.jl/issues/700)
+for context. 
+
+A temporary workaround for this issue is to force the installation of
+an older version of the `OpenSpecFun_jll` library. To install an
+appropriate version, activate your MLJ environment and run `using Pkg;
+Pkg.develop(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))`.
 
 ---
 
@@ -224,7 +252,7 @@ connections do not currently exist but are planned/proposed.*
 
 *Core design*: A. Blaom, F. Kiraly, S. Vollmer
 
-*Active maintainers*: A. Blaom, T. Lienart
+*Active maintainers*: A. Blaom, T. Lienart, S. Okon
 
 *Active collaborators*: D. Arenas, D. Buchaca, J. Hoffimann, S. Okon, J. Samaroo, S. Vollmer
 
