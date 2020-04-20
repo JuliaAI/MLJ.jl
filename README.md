@@ -37,7 +37,7 @@ MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institu
   <a href="#citing-mlj">Citing MLJ</a>
 </p>
 
-To deal with MKL errors encountered on MacOS, see
+To deal with **MKL errors** encountered on MacOS, see
 [here](#known-issues-using-scitlearn-models-with-macos).
 
 ### Key goals
@@ -105,22 +105,6 @@ install directly. Developers can learn more about these
 [here](ORGANIZATION.md).
 
 
-#### Known issues using ScitLearn models with MacOS
-
-For users of Mac OS using Julia 1.3 or higher, using ScikitLearn
-models can lead to unexpected MKL errors due to an issue not related
-to MLJ. See
-[this](https://discourse.julialang.org/t/julia-1-3-1-4-on-macos-and-intel-mkl-error/36469/2)
-and
-[this](https://github.com/JuliaPackaging/BinaryBuilder.jl/issues/700)
-for context. 
-
-A temporary workaround for this issue is to force the installation of
-an older version of the `OpenSpecFun_jll` library. To install an
-appropriate version, activate your MLJ environment and run `using Pkg;
-Pkg.develop(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))`.
-
-
 #### Tutorials
 
 The best place to get started with MLJ is to go the [MLJ
@@ -132,6 +116,22 @@ comprehensive documentation, see the user
 
 You're also welcome to join the `#mlj` Julia slack channel to ask
 questions and make suggestions.
+
+
+#### Known issues using ScitLearn models with MacOS
+
+For users of Mac OS using Julia 1.3 or higher, using ScikitLearn
+models can lead to unexpected MKL errors due to an issue not related
+to MLJ. See
+[this Julia Discourse discussion](https://discourse.julialang.org/t/julia-1-3-1-4-on-macos-and-intel-mkl-error/36469/2) 
+and
+[this issue](https://github.com/JuliaPackaging/BinaryBuilder.jl/issues/700)
+for context. 
+
+A temporary workaround for this issue is to force the installation of
+an older version of the `OpenSpecFun_jll` library. To install an
+appropriate version, activate your MLJ environment and run `using Pkg;
+Pkg.develop(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))`.
 
 ---
 
