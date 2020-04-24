@@ -502,17 +502,30 @@ evaluate(wrapped_regressor2, X, y, resampling=CV(), measure=rms, verbosity=0)
 
 Continuing to view nodes as "dynamic data", we can, in addition to
 applying "dynamic" operations like `predict` and `transform` to nodes,
-overload ordinary "static" (unlearned) operations as well. Common
-operations, like addition, scalar multiplication, `exp`, `log`,
-`vcat`, `hcat`, tabularization (`MLJ.table`) and matrixification
-(`MLJ.matrix`) work out-of-the box.
+overload ordinary "static" (unlearned) operations as well. These
+operations can be ordinary functions (with possibly multiple
+arguments) or they could be functions *with parameters*, such as "take
+a weighted average of two nodes", where the weights are
+parameters. Here we address the simpler case of ordinary functions. For
+the parametric case, see "Static transformers" in [Transformers and
+other unsupervised models](@ref)
 
-As a demonstration, consider the learning network below that: (i)
-One-hot encodes the input table `X`; (ii) Log transforms the
-continuous target `y`; (iii) Fits specified K-nearest neighbour and
-ridge regressor models to the data; (iv) Computes an average
-of the individual model predictions; and (v) Inverse transforms
-(exponentiates) the blended predictions.
+
+Let us first give a demonstration of operations that work
+out-of-the-box. These include:
+
+- addition and scalar multiplication
+
+- `exp`, `log`, `vcat`, `hcat`
+
+- tabularization (`MLJ.table`) and matrixification (`MLJ.matrix`) 
+
+As a demonstration of some of these, consider the learning network
+below that: (i) One-hot encodes the input table `X`; (ii) Log
+transforms the continuous target `y`; (iii) Fits specified K-nearest
+neighbour and ridge regressor models to the data; (iv) Computes an
+average of the individual model predictions; and (v) Inverse
+transforms (exponentiates) the blended predictions.
 
 Note, in particular, the lines defining `zhat` and `yhat`, which
 combine several static node operations.
@@ -565,65 +578,6 @@ definition of `zhat` above can be replaced with
 ```julia
 zhat = node((y1, y2)->sqrt.(y1.*y2), predict(mach1, W), predict(mach2, W))
 ```
-
-Finally, suppose we want a *weighted* average of the two models, with
-the weighting controlled by a user-specified parameter `mix` (the
-weights being `(1 - mix)` and `mix` respectively). We can either use
-the advanced export Method II above to arrange for our exported model
-to include `mix` as a hyperparameter (because `@from_network` can
-only expose component models as hyperparameters of the composite) or
-we can encode the weighting operation in a new custom "static" model
-type defined in the following way:
-
-```julia
-mutable struct Averager <: Static
-    mix::Float64
-end
-
-import MLJBase
-MLJBase.transform(a::Averager, _, y1, y2) = (1 - a.mix)*y1 + a.mix*y2
-```
-
-Such static transformers with (unlearned) parameters can have
-arbitrarily many inputs, but only one output. In the single input
-case an `inverse_transform` can also be defined.
-
-Now that the static transformer `Averager` is defined, our new definition of
-`zhat` and `yhat` become:
-
-```julia
-averager_model = Averager(0.5)
-y1 = predict(mach1, W)
-y2 = predict(mach2, W)
-averager = machine(averager_model, y1, y2)
-zhat = transform(averager, y1, y1)
-yhat = exp(zhat)
-```
-
-Exporting to obtain the composite model instance:
-
-```julia
-composite = @from_network(DoubleRegressor3(regressor1=model1,
-                                           regressor2=model2,
-                                           averager=averager_model) <= yhat)
-
-```
-
-Training on some data, using the default regressors and `mix=0.2`:
-
-```julia
-julia> composite.averager.mix = 0.2
-julia> evaluate(composite, X, y, resampling=Holdout(fraction_train=0.7), measure=rmsl)
-```
-
-```julia
-Evaluating over 1 folds: 100%[=========================] Time: 0:00:09
-(measure = MLJBase.RMSL[rmsl],
- measurement = [0.546889],
- per_fold = Array{Float64,1}[[0.546889]],
- per_observation = Missing[missing],)
-```
-
 
 ### More `node` examples
 

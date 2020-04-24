@@ -92,7 +92,7 @@ export models, localmodels, @load, load, info,
     StaticTransformer, FeatureSelector,        # builtins/Transformers.jl
     UnivariateStandardizer, Standardizer,
     UnivariateBoxCoxTransformer,
-    OneHotEncoder, UnivariateDiscretizer,
+    OneHotEncoder, ContinuousEncoder, UnivariateDiscretizer,
     FillImputer
 
 # re-export from ComputaionalResources:
