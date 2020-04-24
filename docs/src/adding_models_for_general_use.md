@@ -814,7 +814,6 @@ end
 DistributionFitter(; distribution=Distributions.Normal()) =
     DistributionFitter(distribution)
 
-
 function MLJModelInterface.fit(model::DistributionFitter{D},
                                verbosity::Int,
                                ::Nothing,
