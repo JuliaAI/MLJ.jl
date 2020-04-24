@@ -1,3 +1,4 @@
+
 # Adding Models for General Use
 
 This guide outlines the specification of the MLJ model interface
@@ -731,16 +732,114 @@ additional information required (for example, pre-processed versions
 of `X` and `y`), as this is also passed as an argument to the `update`
 method.
 
+### Supervised models with a `transform` method
+
+A supervised model may optionally implement a `transform` method,
+whose signature is the same as `predict`. In that case the
+implementation should define a value for the `output_scitype` trait. A
+declaration
+
+```julia
+output_scitype(::Type{<:SomeSupervisedModel}) = T 
+``` 
+
+is an assurance that `scitype(transform(model, Xnew, fitresult)) <: T`
+always holds, for any `model` of type `SomeSupervisedModel`.
+
+A use-case for a `transform` method for a supervised model is a neural
+network that learns *feature embeddings* for categorical input
+features as part of overall training. Such a model becomes a
+transformer that other supervised models can use to transform the
+categorical features (instead of applying the higher-dimensional one-hot
+encoding representations).
+
 
 ## Unsupervised models
 
-TODO
+Unsupervised models implement the MLJ model interface in a very
+similar fashion. The main differences are:
 
-This is basically the same but with no target `y` appearing in the
-signatures, and no `target_scitype` trait to declare. Instead, one
-declares an `output_scitype` trait. Instead of implementing a
-`predict` methods, one implements a `transform` operation, and an
-optional `inverse_transform` operation.
+- The `fit` method has only one training argument `X`, as in
+  `MLJModelInterface.fit(model, verbosity::Int, X)`. However, it has
+  the same return value `(fitresult, cache, report)`. An `update`
+  method (e.g., for iterative models) can be optionally implemented in
+  the same way.
+  
+- A `transform` method is compulsory and has the same signature as
+  `predict`, as in `MLJModelInterface.transform(model, Xnew, fitresult)`. 
+  
+- Instead of defining the `target_scitype` trait, one declares an
+  `output_scitype` trait (see above for the meaning).
+
+- An `inverse_transform` can be optionally implemented. The signature
+  is the same as `transform`, as in
+  `MLJModelInterface.inverse_transform(model, Xout, fitresult)`, which:
+      
+   - must make sense for any `Xout` for which `scitype(Xout) <:
+     output_scitype(SomeSupervisedModel)` (see below); and
+  
+   - must return an object `Xin` satisfying `scitype(Xin) <:
+     input_scitype(SomeSupervisedModel)`.
+  
+- A `predict` method may be optionally implemented, and has the same
+  signature as for supervised models, as in
+  `MLJModelInterface.predict(model, Xnew, fitresult)`. A use-case is
+  clustering algorithms that `predict` labels and `transform` new
+  input features into a space of lower-dimension. See [Transformers
+  that also predict](@ref) for an example.
+  
+
+## Models that learn a probability distribution
+
+!!! warning "Experimental"
+
+    The following API is experimental 
+
+Models that learn a probability distribution, or more generally a
+"sampler" object, should be regarded as `Supervised` models that fit a
+distribution to the target `y`, given a *void* input feature, `X =
+nothing`. Here is a working implementation of a model to fit any
+distribution from the
+[Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
+package to some data `y`, illustrating the idea (trait declarations
+omitted):
+
+```julia
+
+# Implmentation:
+
+mutable struct DistributionFitter{D<:Distributions.Distribution} <: Supervised
+    distribution::D
+end
+DistributionFitter(; distribution=Distributions.Normal()) =
+    DistributionFitter(distribution)
+
+
+function MLJModelInterface.fit(model::DistributionFitter{D},
+                               verbosity::Int,
+                               ::Nothing,
+                               y) where D
+
+    fitresult = Distributions.fit(D, y)
+    report = (params=Distributions.params(fitresult),)
+    cache = nothing
+
+    verbosity > 0 && @info "Fitted a $fitresult"
+
+return fitresult, cache, report
+end
+
+MLJModelInterface.predict(model::DistributionFitter,
+                          fitresult,
+                          ::Nothing) = fitresult
+
+# Example use:
+
+yhat = randn(100)
+mach = MLJBase.Machine(DistributionFitter(), nothing, y) |> fit!
+yhat = predict(mach, nothing)
+@assert yhat isa Distributions.Normal
+```
 
 
 ## Convenience methods
@@ -823,7 +922,7 @@ registration. If changes are made, lodge an new issue at
 [MLJ](https://github.com/alan-turing-institute/MLJ) requesting your
 changes to be updated.
 
-### How add models to the MLJ model registry?
+### How to add models to the MLJ model registry?
 
 The MLJ model registry is located in the [MLJModels.jl
 repository](https://github.com/alan-turing-institute/MLJModels.jl). To
@@ -832,8 +931,8 @@ add a model, you need to follow these steps
 - Ensure your model conforms to the interface defined above
 
 - Raise an issue at
-  https://github.com/alan-turing-institute/MLJModels.jl/issues and
-  point out where the MLJ-interface implementation is, e.g. by
+  [MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl/issues)
+  and point out where the MLJ-interface implementation is, e.g. by
   providing a link to the code.
 
 - An administrator will then review your implementation and work with
