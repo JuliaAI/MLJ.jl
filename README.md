@@ -152,12 +152,14 @@ the most up-to-date list, run `using MLJ; models()`.
 [DecisionTree.jl] | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier | high | †
 [EvoTrees.jl] | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian | low | gradient boosting models
 [GLM.jl] | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium | †
+[LightGBM.jl] | LightGBMClassifier, LightGBMRegressor | high | 
 [LIBSVM.jl] | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
-[MLJModels.jl] (builtins) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ConstantRegressor, ConstantClassifier | medium |
+[MLJModels.jl] (builtins) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ContinuousEncoder, ConstantRegressor, ConstantClassifier | medium |
 [MLJLinearModels.jl] | LinearRegressor, RidgeRegressor, LassoRegressor, ElasticNetRegressor, QuantileRegressor, HuberRegressor, RobustRegressor, LADRegressor, LogisticClassifier, MultinomialClassifier | experimental |
 [MultivariateStats.jl] | RidgeRegressor, PCA, KernelPCA, ICA, LDA, BayesianLDA, SubspaceLDA, BayesianSubspaceLDA | high | †
 [NaiveBayes.jl] | GaussianNBClassifier, MultinomialNBClassifier, HybridNBClassifier | low |
 [NearestNeighbors.jl] | KNNClassifier, KNNRegressor | high |
+[ParallelKMeans.jl] | KMeans | experimental | 
 [ScikitLearn.jl] | ARDRegressor, AdaBoostClassifier, AdaBoostRegressor, AffinityPropagation, AgglomerativeClustering, BaggingClassifier, BaggingRegressor, BayesianLDA, BayesianQDA, BayesianRidgeRegressor, BernoulliNBClassifier, Birch, ComplementNBClassifier, DBSCAN, DummyClassifier, DummyRegressor, ElasticNetCVRegressor, ElasticNetRegressor, ExtraTreesClassifier, ExtraTreesRegressor, FeatureAgglomeration, GaussianNBClassifier, GaussianProcessClassifier, GaussianProcessRegressor, GradientBoostingClassifier, GradientBoostingRegressor, HuberRegressor, KMeans, KNeighborsClassifier, KNeighborsRegressor, LarsCVRegressor, LarsRegressor, LassoCVRegressor, LassoLarsCVRegressor, LassoLarsICRegressor, LassoLarsRegressor, LassoRegressor, LinearRegressor, LogisticCVClassifier, LogisticClassifier, MeanShift, MiniBatchKMeans, MultiTaskElasticNetCVRegressor, MultiTaskElasticNetRegressor, MultiTaskLassoCVRegressor, MultiTaskLassoRegressor, MultinomialNBClassifier, OPTICS, OrthogonalMatchingPursuitCVRegressor, OrthogonalMatchingPursuitRegressor, PassiveAggressiveClassifier, PassiveAggressiveRegressor, PerceptronClassifier, ProbabilisticSGDClassifier, RANSACRegressor, RandomForestClassifier, RandomForestRegressor, RidgeCVClassifier, RidgeCVRegressor, RidgeClassifier, RidgeRegressor, SGDClassifier, SGDRegressor, SVMClassifier, SVMLClassifier, SVMLRegressor, SVMNuClassifier, SVMNuRegressor, SVMRegressor, SpectralClustering, TheilSenRegressor | high | †
 [XGBoost.jl] | XGBoostRegressor, XGBoostClassifier, XGBoostCount | high |
 
@@ -169,6 +171,7 @@ the most up-to-date list, run `using MLJ; models()`.
 [GaussianProcesses.jl]: https://github.com/STOR-i/GaussianProcesses.jl
 [GLM.jl]: https://github.com/JuliaStats/GLM.jl
 [LIBSVM.jl]: https://github.com/mpastell/LIBSVM.jl
+[LightGBM.jl]: https://github.com/IQVIA-ML/LightGBM.jl
 [MLJ.jl]: https://github.com/alan-turing-institute/MLJ.jl
 [MLJTutorials.jl]: https://github.com/alan-turing-institute/MLJTutorials.jl
 [MLJBase.jl]: https://github.com/alan-turing-institute/MLJBase.jl
@@ -178,6 +181,7 @@ the most up-to-date list, run `using MLJ; models()`.
 [MLJLinearModels.jl]: https://github.com/alan-turing-institute/MLJLinearModels.jl
 [MLJFlux.jl]: https://github.com/alan-turing-institute/MLJFlux.jl
 [MLJScientificTypes.jl]: https://github.com/alan-turing-institute/MLJScientificTypes.jl
+[ParallelKMeans.jl]: https://github.com/PyDataBlog/ParallelKMeans.jl
 [ScientificTypes.jl]: https://github.com/alan-turing-institute/ScientificTypes.jl
 [MultivariateStats.jl]: https://github.com/JuliaStats/MultivariateStats.jl
 [NaiveBayes.jl]: https://github.com/dfdx/NaiveBayes.jl
