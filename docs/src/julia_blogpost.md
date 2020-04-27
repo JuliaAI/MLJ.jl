@@ -1,8 +1,15 @@
+!!! warning "Old post"
+
+    This post is quite old. For a newer overview of the design of MLJ, see [here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/paper/paper.md)
+
+
 # Beyond machine learning pipelines with MLJ
 
 Anthony Blaom, Diego Arenas, Franz Kiraly, Yiannis Simillides, Sebastian Vollmer
 
 **May 1st, 2019.** Blog post also posted on the [Julia Language Blog](https://julialang.org/blog/2019/05/beyond-ml-pipelines-with-mlj)
+
+
 
 
 ![](img/learningcurves.png) | ![](img/heatmap.png)
@@ -33,11 +40,7 @@ composition.
 
 - Video from [London Julia User Group meetup in March 2019](https://www.youtube.com/watch?v=CfHkjNmj1eE) (skip to [demo at 21'39](https://youtu.be/CfHkjNmj1eE?t=21m39s)) &nbsp;
 
-- The MLJ [tour](https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/tour.ipynb)
-
-- Building a [self-tuning random forest](https://github.com/alan-turing-institute/MLJ.jl/blob/master/examples/random_forest.ipynb)
-
-- An MLJ [docker image](https://github.com/ysimillides/mlj-docker) (including tour)
+- [MLJ Tutorials](https://alan-turing-institute.github.io/MLJTutorials/)
 
 - Implementing the MLJ interface for a [new model](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/)
 
