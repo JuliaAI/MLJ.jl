@@ -7,3 +7,6 @@
 .DS_Store
 sandbox/
 docs/build
+paper/auto
+*.aux
+*.bbl
