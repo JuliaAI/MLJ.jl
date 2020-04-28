@@ -8,6 +8,10 @@ addprocs(2)
     using Random
 end
 
+@testset "version" begin
+    @test include("version.jl")
+end
+
 @testset "ensembles" begin
     @test include("ensembles.jl")
 end
