@@ -78,6 +78,12 @@ fitted_params(mach)
 report(mach)
 ```
 
+```@docs
+fitted_params
+report
+```
+
+
 ## Saving machines
 
 To save a machine to file, use the [`MLJ.save`](@ref) command:

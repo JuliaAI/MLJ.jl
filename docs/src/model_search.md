@@ -54,10 +54,6 @@ conjunctively.
 
 ## Matching models to data
 
-!!! note
-    The `matching` method described below is experimental and may
-    break in subsequent MLJ releases.
-
 Common searches are streamlined with the help of the `matching`
 command, defined as follows:
 

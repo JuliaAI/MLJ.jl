@@ -19,19 +19,17 @@ for "RidgeRegresssor", which is provided by multiple packages
 
 `models(x -> x.is_supervised && x.is_pure_julia)` lists all supervised models written in pure julia.
 
-**experimental:**
 `models(matching(X))` lists all unsupervised models compatible with input `X`.
 
-**experimental!**
 `models(matching(X, y))` lists all supervised modesl compatible with input/target `X/y`.
 
-**experimental!** With additional conditions:
+With additional conditions:
 
 ```julia
 models() do model
-    matching(model, X, y)) &&
+    matching(model, X, y) &&
     model.prediction_type == :probabilistic &&
-	model.is_pure_julia
+        model.is_pure_julia
 end
 ```
 
@@ -45,7 +43,7 @@ instantiates a model provided by multiple packages
 
 ## Scitypes and coercion
 
-`scitype(x)` is the scientific type of `x`. For example `scitype(2.4) = Continuous`
+`scitype(x)` is the scientific type of `x`. For example `scitype(2.4) == Continuous`
 
 ![scitypes.png](img/scitypes_small.png)
 
@@ -55,13 +53,15 @@ type                                       | scitype
 `Integer`                                  | `Count`
 `CategoricalValue` and `CategoricalString` | `Multiclass` or `OrderedFactor`
 
-*Figure and Table for scalar scitypes*
+*Figure and Table for common scalar scitypes*
 
 Use `schema(X)` to get the column scitypes of a table `X`
 
 `coerce(y, Multiclass)` attempts coercion of all elements of `y` into scitype `Multiclass`
 
 `coerce(X, :x1 => Continuous, :x2 => OrderedFactor)` to coerce columns `:x1` and `:x2` of table `X`.
+
+`coerce(X, Count => Continuous)` to coerce all columns with `Count` scitype to `Continuous`.
 
 
 ## Ingesting data
@@ -74,15 +74,31 @@ channing = dataset("boot", "channing")
 y, X =  unpack(channing,
                ==(:Exit),            # y is the :Exit column
                !=(:Time);            # X is the rest, except :Time
-               :Exit=>Continuous,    # correct wrong scitypes
+               :Exit=>Continuous,    # correcting wrong scitypes (optional)
                :Entry=>Continuous,
                :Cens=>Multiclass)
 ```
+*Warning.* Before julia 1.2 use `col -> col != :Time` insead of `!=(:Time)`.
 
 Splitting row indices into train/validation/test:
 
 `train, valid, test = partition(eachindex(y), 0.7, 0.2, shuffle=true, rng=1234)` for 70:20:10 ratio
 
+For a stratified split:
+
+`train, test = partition(eachindex(y), 0.8, stratify=y)`
+
+Getting data from [OpenML](https://www.openml.org):
+
+`table = openML.load(91)`
+
+Creating synthetic classification data:
+
+`X, y = make_blobs(100, 2)` (also: `make_moons`, `make_circles`)
+
+Creating synthetic regression data:
+
+`X, y = make_regression(100, 2)`
 
 ## Machine construction
 
@@ -114,79 +130,112 @@ Unsupervised case: `transform(mach, rows=1:100)` or `inverse_transform(mach, row
 
 `params(model)` gets nested-tuple of all hyperparameters, even nested ones
 
-`info(ConstantRegresssor())`, `info("PCA")`, `info("RidgeRegressor",
+`info(ConstantRegressor())`, `info("PCA")`, `info("RidgeRegressor",
 pkg="MultivariateStats")` gets all properties (aka traits) of registered models
 
 `info(rms)` gets all properties of a performance measure
 
 `schema(X)` get column names, types and scitypes, and nrows, of a table `X`
 
-`scitype(model)`, `scitype(rms)`, `scitype(X)` gets scientific type of a model, measure or table (encoding key properties)
+`scitype(X)` gets scientific type of a table
 
 `fitted_params(mach)` gets learned parameters of fitted machine
 
 `report(mach)` gets other training results (e.g. feature rankings)
 
-## Resampling strategies
+`fitted_params(mach).fitted_params_given_machine` returns a dictionary if `mach` is a composite (eg, wraps a `@pipeline` model)
 
-`Holdout(fraction_train=…, shuffle=false)` for simple holdout
+`report(mach).report_given_machine` returns a dictionary if `mach` is a composite (eg, wraps a `@pipeline` model)
 
-`CV(nfolds=6, shuffle=false)` for cross-validation
+
+## Saving and retrieving machines
+
+`MLJ.save("trained_for_five_days.jlso", mach)` to save machine `mach`
+
+`predict_only_mach = machine("trained_for_five_days.jlso")` to deserialize.
+
+
+## Performance estimation
+
+`evaluate(model, X, y, resampling=CV(), measure=rms, operation=predict, weights=..., verbosity=1)`
+
+`evaluate!(mach, resampling=Holdout(), measure=[rms, mav], operation=predict, weights=..., verbosity=1)`
+
+`evaluate!(mach, resampling=[(fold1, fold2), (fold2, fold1)], measure=rms)`
+
+## Resampling strategies (`resampling=...`)
+
+`Holdout(fraction_train=0.7, rng=1234)` for simple holdout
+
+`CV(nfolds=6, rng=1234)` for cross-validation
+
+`StratifiedCV(nfolds=6, rng=1234)` for stratified cross-validation
 
 or a list of pairs of row indices:
 
 `[(train1, eval1), (train2, eval2), ... (traink, evalk)]`
 
-## Performance estimation
-
-`evaluate(model, X, y, resampling=CV(), measure=rms, operation=predict, weights=..., verbosity=1)`
-`evaluate!(mach, resampling=Holdout(), measure=[rms, mav], operation=predict, weights=..., verbosity=1)`
-`evaluate!(mach, resampling=[(fold1, fold2), (fold2, fold1)], measure=rms)`
-
 ## Tuning
-
-### Ranges for tuning
-
-If `r = range(KNNRegressor(), :K, lower=1, upper = 20, scale=:log)` then `iterator(r, 6) = [1, 2, 3, 6, 11, 20]`
-
-Non-numeric ranges: `r = range(model, :parameter, values=…)`.
-
-Nested ranges: Use dot syntax, as in `r = range(EnsembleModel(atom=tree), :(atom.max_depth), ...)`
-
-### Tuning strategies
-
-`Grid(resolution=10)` for grid search
 
 ### Tuning model wrapper
 
-`tuned_model = TunedModel(model=…, tuning=Grid(), resampling=Holdout(), measure=…, operation=predict, ranges=…, minimize=true, full_report=true)`
+`tuned_model = TunedModel(model=…, tuning=RandomSearch(), resampling=Holdout(), measure=…, operation=predict, range=…)`
+
+### Ranges for tuning (`range=...`)
+
+If `r = range(KNNRegressor(), :K, lower=1, upper = 20, scale=:log)`
+
+then `Grid()` search uses `iterator(r, 6) == [1, 2, 3, 6, 11, 20]`.
+
+`lower=-Inf` and `upper=Inf` are allowed.
+
+Non-numeric ranges: `r = range(model, :parameter, values=…)`
+
+Nested ranges: Use dot syntax, as in `r = range(EnsembleModel(atom=tree), :(atom.max_depth), ...)`
+
+Can specify multiple ranges, as in `range=[r1, r2, r3]`. For more range options do `?Grid` or `?RandomSearch`
+
+
+### Tuning strategies
+
+`Grid(resolution=10)` or `Grid(goal=50)` for basic grid search
+
+`RandomSearch(rng=1234)` for basic random search
 
 
 #### Learning curves
 
-`curve = learning_curve!(mach, resolution=30, resampling=Holdout(), measure=…, operation=predict, range=…, n=1)`
+For generating plot of performance against parameter specified by `range`:
+
+`curve = learning_curve(mach, resolution=30, resampling=Holdout(), measure=…, operation=predict, range=…, n=1)`
+
+`curve = learning_curve(model, X, y, resolution=30, resampling=Holdout(), measure=…, operation=predict, range=…, n=1)`
 
 If using Plots.jl:
 
 `plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)`
 
 
-## Built-in performance measures
+## Performance measures (metrics)
 
-`l1`, `l2`, `mav`, `rms`, `rmsl`, `rmslp1`, `rmsp`, `misclassification_rate`, `cross_entropy`
+`area_under_curve`, `accuracy`, `balanced_accuracy`, `cross_entropy`, `FScore`, `false_discovery_rate`, `false_negative`, `false_negative_rate`, `false_positive`, `false_positive_rate`, `l1`, `l2`, `mae`, `matthews_correlation`, `misclassification_rate`, `negative_predictive_value`, `positive_predictive_value`, `rms`, `rmsl`, `rmslp1`, `rmsp`, `true_negative`, `true_negative_rate`, `true_positive`, `true_positive_rate`, `BrierScore()`, `confusion_matrix`
+
+Available after doing `using LossFunctions`:
+
+`DWDMarginLoss()`, `ExpLoss()`, `L1HingeLoss()`, `L2HingeLoss()`, `L2MarginLoss()`, `LogitMarginLoss()`, `ModifiedHuberLoss()`, `PerceptronLoss()`, `SigmoidLoss()`, `SmoothedL1HingeLoss()`, `ZeroOneLoss()`, `HuberLoss()`, `L1EpsilonInsLoss()`, `L2EpsilonInsLoss()`, `LPDistLoss()`, `LogitDistLoss()`, `PeriodicLoss()`, `QuantileLoss()`
+
+`measures()` to get full list
 
 `info(rms)` to list properties (aka traits) of the `rms` measure
-
-`using LossFunctions` to use more measures
 
 
 ## Transformers
 
-Built-ins include: `Standardizer`, `OneHotEncoder`, `UnivariateBoxCoxTransformer`, `FeatureSelector`, `UnivariateStandardizer`
+Built-ins include: `Standardizer`, `OneHotEncoder`, `UnivariateBoxCoxTransformer`, `FeatureSelector`, `FillImputer`, `UnivariateDiscretizer`, `UnivariateStandardizer`, `ContinuousEncoder`
 
 Externals include: `PCA` (in MultivariateStats), `KMeans`, `KMedoids` (in Clustering).
 
-Full list: do `models(m -> !m[:is_supervised])`
+`models(m -> !m.is_supervised)` to get full list
 
 
 ## Ensemble model wrapper
@@ -196,14 +245,15 @@ Full list: do `models(m -> !m[:is_supervised])`
 
 ## Pipelines
 
-With point predictions:
+With deterministic (point) predictions:
 
 `pipe = @pipeline MyPipe(hot=OneHotEncoder(), knn=KNNRegressor(K=3), target=UnivariateStandardizer())`
 
+`pipe = @pipeline MyPipe(hot=OneHotEncoder(), knn=KNNRegressor(K=3), target=v->log.(V), inverse=v->exp.(v))`
 
 With probabilistic-predictions:
 
-`pipe = @pipeline MyPipe(hot=OneHotEncoder(), knn=KNNRegressor(K=3), target=v->log.(V), inverse=v->exp.(v)) is_probabilistic=true`
+`pipe = @pipeline MyPipe(hot=OneHotEncoder(), tree=DecisionTreeClassifier()) is_probabilistic=true`)
 
 Unsupervised:
 

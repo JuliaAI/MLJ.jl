@@ -490,17 +490,13 @@ year = {2015}
 }
 
 @article{Gressmann2018,
-abstract = {Predictive modelling and supervised learning are central to modern data science. With predictions from an ever-expanding number of supervised black-box strategies - e.g., kernel methods, random forests, deep learning aka neural networks - being employed as a basis for decision making processes, it is crucial to understand the statistical uncertainty associated with these predictions. As a general means to approach the issue, we present an overarching framework for black-box prediction strategies that not only predict the target but also their own predictions' uncertainty. Moreover, the framework allows for fair assessment and comparison of disparate prediction strategies. For this, we formally consider strategies capable of predicting full distributions from feature variables, so-called probabilistic supervised learning strategies. Our work draws from prior work including Bayesian statistics, information theory, and modern supervised machine learning, and in a novel synthesis leads to (a) new theoretical insights such as a probabilistic bias-variance decomposition and an entropic formulation of prediction, as well as to (b) new algorithms and meta-algorithms, such as composite prediction strategies, probabilistic boosting and bagging, and a probabilistic predictive independence test. Our black-box formulation also leads (c) to a new modular interface view on probabilistic supervised learning and a modelling workflow API design, which we have implemented in the newly released skpro machine learning toolbox, extending the familiar modelling interface and meta-modelling functionality of sklearn. The skpro package provides interfaces for construction, composition, and tuning of probabilistic supervised learning strategies, together with orchestration features for validation and comparison of any such strategy - be it frequentist, Bayesian, or other.},
-archivePrefix = {arXiv},
-arxivId = {1801.00753},
-author = {Gressmann, Frithjof and Kir{\'{a}}ly, Franz J. and Mateen, Bilal and Oberhauser, Harald},
-eprint = {1801.00753},
-file = {:Users/mloning/Library/Application Support/Mendeley Desktop/Downloaded/Gressmann et al. - 2018 - Probabilistic supervised learning.pdf:pdf},
-journal = {arXiv preprint arXiv:1801.00753},
-title = {{Probabilistic supervised learning}},
-Adsurl = {http://arxiv.org/abs/1801.00753},
-year = {2018}
+    title={Probabilistic supervised learning},
+    author={Frithjof Gressmann and Franz J. Király and Bilal Mateen and Harald Oberhauser},
+    year={2018},
+    journal= {ArXiv},
+    volume={1801.00753}
 }
+
 @book{Kleinbaum2012,
 abstract = {3rd ed. This book is available on the World Wide Web. Access is restricted to computers located within Mount Sinai or to those users eligible for remote access services.},
 author = {Kleinbaum, David G. and Klein, Mitchel.},
@@ -595,13 +591,13 @@ Adsurl = {https://dl.acm.org/citation.cfm?id=2078195},
 volume = {12},
 year = {2011}
 }
-@article{Buitinck2013,abstract = {scikit-learn is an increasingly popular machine learning library. Written in Python, it is designed to be simple and efficient, accessible to non-experts, and reusable in various contexts. In this paper, we present and discuss our design choices for the application programming interface (API) of the project. In particular, we describe the simple and elegant interface shared by all learning and processing units in the library and then discuss its advantages in terms of composition and reusabil-ity. The paper also comments on implementation details specific to the Python ecosystem and analyzes obstacles faced by users and developers of the library.},
-author = {Buitinck, Lars and Louppe, Gilles and Blondel, Mathieu and Pedregosa, Fabian and M{\"{u}}ller, Andreas C and Grisel, Olivier and Niculae, Vlad and Prettenhofer, Peter and Gramfort, Alexandre and Grobler, Jaques and Layton, Robert and Vanderplas, Jake and Joly, Arnaud and Holt, Brian and Varoquaux, Ga{\"{e}}l},
-file = {:Users/mloning/Library/Application Support/Mendeley Desktop/Downloaded/Buitinck et al. - 2013 - API design for machine learning software experiences from the scikit-learn project.pdf:pdf},
-journal = {ArXiv e-prints},
-title = {{API design for machine learning software: experiences from the scikit-learn project}},
-Adsurl = {https://github.com/scikit-learn},
-year = {2013}
+
+@article{Buitinck2013,
+  title={API design for machine learning software: experiences from the scikit-learn project},
+  author={Lars Buitinck and Gilles Louppe and Mathieu Blondel and Fabian Pedregosa and Andreas Mueller and Olivier Grisel and Vlad Niculae and Peter Prettenhofer and Alexandre Gramfort and Jaques Grobler and Robert Layton and Jacob VanderPlas and Arnaud Joly and Brian Holt and Ga{\"e}l Varoquaux},
+  journal={ArXiv},
+  year={2013},
+  volume={abs/1309.0238}
 }
 
 @article{behnel2011cython, 
@@ -1713,7 +1709,7 @@ year = "2013"
                   Richard Reeve and
                   Kai Xu and
                   David Widmann},
-  title        = {JuliaStats/Distributions.jl: v0.23.2},
+  title        = {Distributions.jl: {A} {J}ulia package for probability distributions and associated functions},
   month        = mar,
   year         = 2020,
   publisher    = {Zenodo},
@@ -1723,8 +1719,8 @@ year = "2013"
 }
 
 @misc{CategoricalArrays,
-    author = {NN},
-    title = {JuliaData/CategoricalArrays.jl},
+    author = {Bouchet-Valat, Milan et al.},
+    title = {{CategoricalArrays.jl}: {A}rrays for working with categorical data},
     year = {2014},
     publisher = {​GitHub},
     journal = {​GitHub repository},
@@ -1732,8 +1728,8 @@ year = "2013"
 }
 
 @misc{MLJ,
-    author = {Blaom, Anthony and collaborators},
-    title = {MLJ: A machine learning framework for Julia},
+    author = {Blaom, Anthony et al.},
+    title = {{MLJ: {A} machine learning framework for {J}ulia}},
     year = {2019},
     publisher = {​GitHub},
     journal = {​GitHub repository},
@@ -1742,7 +1738,7 @@ year = "2013"
 
 @misc{MLJdocs,
     author = {Blaom, Anthony},
-    title = {MLJ documentation},
+    title = {{MLJ} Documentation},
     year = {2020},
     publisher = {​GitHub},
     journal = {​GitHub pages},
@@ -1751,7 +1747,7 @@ year = "2013"
 
 @misc{MLJTuning,
     author = {Blaom, Anthony and collaborators},
-    title = {Hyperparameter optimization algorithms for use in the MLJ machine learning framework},
+    title = {Hyperparameter optimization algorithms for use in the {MLJ} machine learning framework},
     year = {2020},
     publisher = {​GitHub},
     journal = {​GitHub repository},
@@ -1760,7 +1756,7 @@ year = "2013"
 
 @misc{MLJtutorials,
     author = {Lienart, Thibaut and Blaom, Anthony and collaborators},
-    title = {Data Analysis and Machine Learning in Julia},
+    title = {Data Analysis and Machine Learning in {J}ulia},
     year = {2020},
     publisher = {​GitHub},
     journal = {​GitHub pages},
@@ -1769,7 +1765,7 @@ year = "2013"
 
 @misc{Rackauckas2017,
     author = {C. Rackauckas},
-    title = {A Comparison Between Differential Equation Solver Suites In MATLAB, R, Julia, Python, C, Mathematica, Maple, and Fortran},
+    title = {A Comparison Between Differential Equation Solver Suites In {MATLAB}, {R}, {J}ulia, {P}ython, {C}, {M}athematica, {M}aple, and {F}ortran},
     year = {2017},
     publisher = {​C. Rackauckas},
     journal = {​Stochastic Lifestyle (blog)},
@@ -1779,7 +1775,7 @@ year = "2013"
 @article{RackauckasNie2017,
     author = {C. Rackauckas and Q. Nie},
     year = {2017},
-    title = {DifferentialEquations.jl – A Performant and Feature-Rich Ecosystem for Solving Differential Equations in Julia},
+    title = {{DifferentialEquations.jl – A} Performant and Feature-Rich Ecosystem for Solving Differential Equations in {J}ulia},
     journal = {Journal of Open Research Software},
     volume = 5,
     number = 1,
@@ -1789,7 +1785,7 @@ year = "2013"
 
 @misc{Quinn,
     author = {J. Quinn},
-    title = {Tables.jl: An interface for tables in Julia},
+    title = {Tables.jl: {A}n interface for tables in {J}ulia},
     year = {2020},
     publisher = {​GitHub},
     journal = {​GitHub repository},

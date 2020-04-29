@@ -33,7 +33,7 @@ export nrows, nfeatures, color_off, color_on,
     selectrows, selectcols, restrict, corestrict, complement,
     SupervisedTask, UnsupervisedTask, MLJTask,
     Deterministic, Probabilistic, Unsupervised, Supervised, Static,
-    DeterministicNetwork, ProbabilisticNetwork,
+    DeterministicNetwork, ProbabilisticNetwork, UnsupervisedNetwork,
     target_scitype, input_scitype, output_scitype,
     predict, predict_mean, predict_median, predict_mode,
     transform, inverse_transform, evaluate, fitted_params, params,
@@ -132,19 +132,10 @@ import MLJScientificTypes
 const srcdir = dirname(@__FILE__)
 const CategoricalElement = Union{CategoricalString,CategoricalValue}
 
-# FIXME replace with either Pkg.installed()["MLJ"] or uuid =
-# Pkg.project().dependencies["MLJ"] version =
-# Pkg.dependencies()[uuid].version --- this is currently messy because
-# it's been enacted then reverted see
-# https://github.com/JuliaLang/julia/pull/33410 and
-# https://github.com/JuliaLang/Pkg.jl/pull/1086/commits/996c6b9b69ef0c058e0105427983622b7cc8cb1d
-toml = Pkg.TOML.parsefile(joinpath(dirname(dirname(pathof(MLJ))),
-                                  "Project.toml"))
-const MLJ_VERSION = toml["version"]
-
 
 ## INCLUDE FILES
 
+include("version.jl")       # defines MLJ_VERSION constant
 include("ensembles.jl")     # homogeneous ensembles
 include("model_matching.jl")# inferring model search criterion from data
 include("scitypes.jl")      # extensions to ScientificTypes.scitype

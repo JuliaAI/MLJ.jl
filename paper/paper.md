@@ -12,7 +12,7 @@ authors:
     orcid: 0000-0001-6689-886X
     affiliation: "1, 2, 3"
   - name: Franz Kiraly
-    orcid: 0000-0003-0872-7098
+    orcid: ????-????-????-????
     affiliation: "3, 4"
   - name: Thibaut Lienart
     orcid: 0000-0003-0872-7098
@@ -64,14 +64,14 @@ MLJ (Machine Learning in Julia) [@MLJ] is a toolbox written in Julia
 that provides a common interface and meta-algorithms for selecting,
 tuning, evaluating, composing and comparing machine model
 implementations written in Julia and other languages. More broadly,
-the MLJ project hopes bring cohesion and focus to a number of emerging
+the MLJ project hopes to bring cohesion and focus to a number of emerging
 and existing, but previously disconnected, machine learning algorithms
 and tools of high quality, written in Julia. A welcome corollary of
 this activity will be increased cohesion and synergy within the
 talent-rich communities developing these tools. 
 
 In addition to
-other novelties outlined below, MLJ aims to provide first-in-its-class
+other novelties outlined below, MLJ aims to provide first-in-class
 model composition capabilities.  Guiding goals of the MLJ project have
 been usability, interoperability, extensibility, code transparency,
 and reproducibility.
@@ -80,13 +80,16 @@ and reproducibility.
 
 Nowadays, even technically competent users of scientific software will
 prototype solutions using a high-level language such as python, R, or
-MATLAB. However, to achieve satisfactory performance, such code typically
-wraps performance critical algorithms written in a second low-level language,
-such as C or FORTRAN. Through its use of an extensible, hierarchical
-system of abstract types, just-in-time compilation, and by replacing
-object-orientation with multiple dispatch, Julia solves the
-ubiquituous "two language problem" [@BezansonEtal2017],
-dramatically shrinking the innovation cycle.
+MATLAB. However, to achieve satisfactory performance, such code
+typically wraps performance critical algorithms written in a second
+low-level language, such as C or FORTRAN. Through its use of an
+extensible, hierarchical system of abstract types, just-in-time
+compilation, and by replacing object-orientation with multiple
+dispatch, Julia solves the ubiquitous "two language problem"
+[@BezansonEtal2017]. With less technical programming knowledge,
+experts in a domain of application can get "under the hood" of machine
+learning software to broaden its applicability, and innovation can be
+accelerated through a dramatically reduced software development cycle.
 
 As an example of the productivity boost provided by the
 single-language paradigm, we cite the DifferentialEquations.jl package
@@ -160,8 +163,8 @@ To the scientific types, MLJ adds a specific *convention* specifying a
 scientific type for every Julia object. The convention is expressed
 through a single method `scitype`.  A `coerce` method to recasts
 machine types so that they have the desired scientific type
-(interpretation), and a `schema` summmarizes the machine and scientfic
-types of tabular data.
+(interpretation), and a `schema` method summmarizes the machine and
+scientfic types of tabular data.
 
 ```julia
 using MLJ, CategoricalArrays
@@ -492,15 +495,16 @@ for the purposes of testing the learning network as it is built.
 <!-- ![Specifying prediction and training flows in a simple learning network. The network shown combines a ridge regressor with a learned target transformation (Box Cox).\label{fig2}](target_transformer.svg) -->
 ![Specifying prediction and training flows in a simple learning network. The network shown combines a ridge regressor with a learned target transformation (Box Cox).\label{fig2}](target_transformer.png)
 
-The left side of \autoref{fig2} illustrates a simple learning network
-in which a continuous target `y` is "normalized" using a learned Box
-Cox transformation, producing `z`. Ridge regression is applied to
-input features `X` to make a target prediction `ẑ`, which is not the
-final overall prediction of the network, as the ridge regressor is to
-be trained using the *transformed* target `z` (see right). Rather, the
-final prediction `ŷ` is the inverse Box Cox transform of `z`.
+The upper panel of \autoref{fig2} illustrates a simple learning
+network in which a continuous target `y` is "normalized" using a
+learned Box Cox transformation, producing `z`. Ridge regression is
+applied to input features `X` to make a target prediction `ẑ`, which
+is not the final overall prediction of the network, as the ridge
+regressor is to be trained using the *transformed* target `z` (see the
+lower panel).  Rather, the final prediction `ŷ` is the inverse Box Cox
+transform of `z`.
 
-The right "training" side of the figure shows the two machines which
+The lower "training" panel of the figure shows the two machines which
 will store the parameters learned in training - the Box Cox exponent
 and shift (`machine1`) and the ridge model coefficients
 (`machine2`). The diagram additionally indicates where the machines
