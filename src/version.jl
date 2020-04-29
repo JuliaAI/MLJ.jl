@@ -1,16 +1,18 @@
+import Pkg
+
 @static if VERSION >= v"1.4.0"
-    function installed()
-        @warn "Pkg.installed() is deprecated"
-        deps = Pkg.dependencies()
-        installs = Dict{String, VersionNumber}()
-        for (uuid, dep) in deps
-            dep.is_direct_dep || continue
-            dep.version === nothing && continue
-            installs[dep.name] = dep.version
+    function _get_package_version(name)
+        for (uuid, dep) in Pkg.dependencies()
+            if dep.name == name
+                return dep.version
+            end
         end
-        return installs
+        return nothing
     end
 else
-    const installed = Pkg.installed
+    function _get_package_version(name)
+        return get(Pkg.installed(), name, nothing)
+    end
 end
-const MLJ_VERSION = installed()["MLJ"]
+
+const MLJ_VERSION = _get_package_version("MLJ")
