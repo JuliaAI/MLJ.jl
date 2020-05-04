@@ -85,9 +85,8 @@ export Grid, RandomSearch, Explicit, TunedModel,
 # re-export from MLJModels:
 export models, localmodels, @load, load, info,
     ConstantRegressor, ConstantClassifier,     # builtins/Constant.jl
-    StaticTransformer, FeatureSelector,        # builtins/Transformers.jl
-    UnivariateStandardizer, Standardizer,
-    UnivariateBoxCoxTransformer,
+    FeatureSelector, UnivariateStandardizer,   # builtins/Transformers.jl
+    Standardizer, UnivariateBoxCoxTransformer,
     OneHotEncoder, ContinuousEncoder, UnivariateDiscretizer,
     FillImputer
 
