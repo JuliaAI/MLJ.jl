@@ -10,9 +10,6 @@ model `update` method is implemented, calls to `fit!` can avoid
 redundant calculations for certain kinds of model mutations (eg,
 increasing the number of epochs in a neural network).
 
-The interested reader can learn more on machine internals by examining
-the simplified code excerpt in [Internals](internals.md).
-
 ```@example machines
 using MLJ; color_off() # hide
 forest = EnsembleModel(atom=(@load DecisionTreeClassifier), n=10);
@@ -58,6 +55,7 @@ fit!(mach, rows=1:100);
 ```@repl machines
 fit!(mach, rows=1:100);
 ```
+
 
 ## Inspecting machines
 
@@ -111,6 +109,28 @@ fit!(mach3)
 ```
 
 
+## Constructing machines
+
+A machine is constructed with the syntax `machine(model, args...)`
+where the possibilities for `args` (called *training arguments*) are
+summarized in table below. Here `X`, `y`, `w` represent inputs, target
+and per-sample weights, respectively, and `Xout` the output of a
+`transform` call. 
+
+`model` supertype   | `machine` constructor calls | operation calls (first compulsory)
+--------------------|-----------------------------|--------------------------------------
+`Deterministic <: Supervised`    | `machine(model, X, y)`, `machine(model, X, y, w)` | `predict(model, X)`, `transform(model, X)`, `inverse_transform(model, Xout)`
+`Probabilistic <: Supervised`    | `machine(model, X, y)`, `machine(model, X, y, w)` | `predict(model, X)`, `predict_mean(model, X)`, `predict_median(model, X)`, `predict_mode(model, X)`, `transform(model, X)`, `inverse_transform(model, Xout)`
+`Unsupervised` (except `Static`) | `machine(model, X)` | `transform(model, X)`, `inverse_transform(model, Xout)`, `predict(model, X)`
+`Static`                        | `machine(model)`    | `transform(model, X1, X2, X3, ...)`, `inverse_transform(Xout)`
+
+For more on `Static` transformers (which have no training arguments)
+see [Static transformers](@ref). A machine is reconstructed from a
+file using the syntax `machine("my_machine.jlso")`, or
+`machine("my_machine.jlso", args...)` if retraining using new
+data. See [Saving machines](@ref) above.
+
+
 ## Internals
 
 For a supervised machine the `predict` method calls a lower-level
@@ -120,7 +140,7 @@ unsupervised cousins `transform` and `inverse_transform`, see
 [Getting Started](index.md).
 
 The fields of a `Machine` instance (which should not generally be
-accessed byt the user) are:
+accessed by the user) are:
 
 - `model` - the struct containing the hyperparameters to be used in
   calls to `fit!`
@@ -142,6 +162,9 @@ Instead of data `X` and `y`, the `machine` constructor can be provided
 `NodalMachine`, rather than a regular `Machine` object, which has the
 fields listed above and some others. See [Composing
 Models](composing_models.md) for more on this advanced feature.
+
+The interested reader can learn more on machine internals by examining
+the simplified code excerpt in [Internals](internals.md).
 
 
 ## API Reference
