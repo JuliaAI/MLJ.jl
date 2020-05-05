@@ -835,7 +835,7 @@ MLJModelInterface.predict(model::DistributionFitter,
 # Example use:
 
 yhat = randn(100)
-mach = MLJBase.Machine(DistributionFitter(), nothing, y) |> fit!
+mach = machine(DistributionFitter(), nothing, y) |> fit!
 yhat = predict(mach, nothing)
 @assert yhat isa Distributions.Normal
 ```
