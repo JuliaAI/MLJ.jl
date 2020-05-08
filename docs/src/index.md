@@ -326,7 +326,7 @@ are the key features of that convention:
   `x.pool.ordered`.
 
 - `String`s and `Char`s are *not* interpreted as `Multiclass` or
-  `OrderedFactor (they have scitypes `Textual` and `Unknown`
+  `OrderedFactor` (they have scitypes `Textual` and `Unknown`
   respectively). 
   
 - In particular, *integers* (including `Bool`s) *cannot be used to
