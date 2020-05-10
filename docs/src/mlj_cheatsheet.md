@@ -21,7 +21,7 @@ for "RidgeRegresssor", which is provided by multiple packages
 
 `models(matching(X))` lists all unsupervised models compatible with input `X`.
 
-`models(matching(X, y))` lists all supervised modesl compatible with input/target `X/y`.
+`models(matching(X, y))` lists all supervised models compatible with input/target `X/y`.
 
 With additional conditions:
 
