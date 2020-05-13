@@ -45,7 +45,7 @@ DecisionTreeClassifier(
     post_prune = false,
     merge_purity_threshold = 1.0,
     pdf_smoothing = 0.0,
-    display_depth = 5) @ 2…81</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model can be evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
+    display_depth = 5) @ 5…03</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model can be evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
                 resampling=CV(shuffle=true), measure=cross_entropy, verbosity=0)
 ERROR: UndefVarError: X not defined</code></pre><p>Evaluating against multiple performance measures is also possible. See <a href="evaluating_model_performance/">Evaluating Model Performance</a> for details.</p><h2 id="A-preview-of-data-type-specification-in-MLJ-1"><a class="docs-heading-anchor" href="#A-preview-of-data-type-specification-in-MLJ-1">A preview of data type specification in MLJ</a><a class="docs-heading-anchor-permalink" href="#A-preview-of-data-type-specification-in-MLJ-1" title="Permalink"></a></h2><p>The target <code>y</code> above is a categorical vector, which is appropriate because our model is a decision tree <em>classifier</em>:</p><pre><code class="language-julia-repl">julia&gt; typeof(y)
 ERROR: UndefVarError: y not defined</code></pre><p>However, MLJ models do not actually prescribe the machine types for the data they operate on. Rather, they specify a <em>scientific type</em>, which refers to the way data is to be <em>interpreted</em>, as opposed to how it is <em>encoded</em>:</p><pre><code class="language-julia">julia&gt; info(&quot;DecisionTreeClassifier&quot;).target_scitype
@@ -84,14 +84,14 @@ ERROR: UndefVarError: test not defined</code></pre><p>Unsupervised models have a
  4
 
 julia&gt; stand_model = UnivariateStandardizer()
-UnivariateStandardizer() @ 1…77
+UnivariateStandardizer() @ 3…48
 
 julia&gt; stand = machine(stand_model, v)
-Machine{UnivariateStandardizer} @ 2…95
+Machine{UnivariateStandardizer} @ 1…69
 
 julia&gt; fit!(stand)
-[ Info: Training Machine{UnivariateStandardizer} @ 2…95.
-Machine{UnivariateStandardizer} @ 2…95
+[ Info: Training Machine{UnivariateStandardizer} @ 1…69.
+Machine{UnivariateStandardizer} @ 1…69
 
 julia&gt; w = transform(stand, v)
 WARNING: both RDatasets and MLJ export &quot;transform&quot;; uses of it in module ex-doda must be qualified
@@ -187,4 +187,4 @@ julia&gt; XY
 julia&gt; Z
 2-element Array{Float64,1}:
  10.0
- 20.0</code></pre></div></section></article></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="common_mlj_workflows/">Common MLJ Workflows »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 13 May 2020 05:40">Wednesday 13 May 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 20.0</code></pre></div></section></article></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="common_mlj_workflows/">Common MLJ Workflows »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 13 May 2020 05:43">Wednesday 13 May 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
