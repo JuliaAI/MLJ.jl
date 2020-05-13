@@ -125,7 +125,6 @@ import MLJScientificTypes
 ## CONSTANTS
 
 const srcdir = dirname(@__FILE__)
-const CategoricalElement = Union{CategoricalString,CategoricalValue}
 
 
 ## INCLUDE FILES
