@@ -491,24 +491,25 @@ work-flow for single models. There is no need for the user to provide
 production training data in this process. A dummy data set suffices,
 for the purposes of testing the learning network as it is built.
 
-<!-- ![Specifying prediction and training flows in a simple learning network. The network shown combines a ridge regressor with a learned target transformation (Box Cox).\label{fig2}](target_transformer.svg) -->
-![Specifying prediction and training flows in a simple learning network. The network shown combines a ridge regressor with a learned target transformation (Box Cox).\label{fig2}](target_transformer.png)
+<!-- ![Specifying prediction and training flows in a simple learning network. The network shown combines a ridge regressor with a learned target transformation (Box Cox).\label{fig2}](target_transformerVERTICAL.svg) -->
+![Specifying prediction and training flows in a simple learning network. The network shown combines a ridge regressor with a learned target transformation (Box Cox).\label{fig2}](target_transformerVERTICAL.png)
 
 The upper panel of \autoref{fig2} illustrates a simple learning
 network in which a continuous target `y` is "normalized" using a
-learned Box Cox transformation, producing `z`. Ridge regression is
-applied to input features `X` to make a target prediction `ẑ`, which
-is not the final overall prediction of the network, as the ridge
-regressor is to be trained using the *transformed* target `z` (see the
-lower panel).  Rather, the final prediction `ŷ` is the inverse Box Cox
-transform of `z`.
+learned Box Cox transformation, producing `z`, while PCA dimension
+reduction is applied to some features `X`, to obtain `Xr`. A Ridge
+regressor, trained using data from `Xr` and `z`, is then applied to
+`Xr` to make a target prediction `ẑ`. To obtain a final prediction
+`ŷ`, we apply the *inverse* of the Box Cox transform, learned
+previously, to `ẑ`.
 
 The lower "training" panel of the figure shows the two machines which
 will store the parameters learned in training - the Box Cox exponent
-and shift (`machine1`) and the ridge model coefficients
-(`machine2`). The diagram additionally indicates where the machines
-should look for training data, and where to accesses model
-hyper-parameters (stored in `box_cox` and `ridge_regressor`).
+and shift (`machine1`), the PCA projection (`machine2`) and the ridge
+model coefficients and intercept (`machine3`). The diagram
+additionally indicates where machines should look for training data,
+and where to accesses model hyper-parameters (stored in `box_cox`,
+`PCA` and `ridge_regressor`).
 
 The only syntactic difference between composing "by hand" and building
 a learning network is that the training data must be wrapped in
