@@ -15,7 +15,7 @@ julia&gt; transform(fit!(machine(stand1, X)), X)
  ordinal2 = CategoricalValue{Symbol,UInt32}[:x, :y, :x],
  ordinal3 = [-1.0, 0.0, 1.0],
  ordinal4 = [1.0, 0.0, -1.0],
- nominal = CategoricalString{UInt32}[&quot;Your father&quot;, &quot;he&quot;, &quot;is&quot;],)
+ nominal = CategoricalVale{String,UInt32}[&quot;Your father&quot;, &quot;he&quot;, &quot;is&quot;],)
 
 julia&gt; stand2 = Standardizer(features=[:ordinal3, ], ignore=true, count=true);
 
@@ -25,7 +25,7 @@ julia&gt; transform(fit!(machine(stand2, X)), X)
  ordinal2 = CategoricalValue{Symbol,UInt32}[:x, :y, :x],
  ordinal3 = [10.0, 20.0, 30.0],
  ordinal4 = [1.0, 0.0, -1.0],
- nominal = CategoricalString{UInt32}[&quot;Your father&quot;, &quot;he&quot;, &quot;is&quot;],)</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModels.OneHotEncoder" href="#MLJModels.OneHotEncoder"><code>MLJModels.OneHotEncoder</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">OneHotEncoder(; features=Symbol[],
+ nominal = CategoricalValue{String,UInt32}[&quot;Your father&quot;, &quot;he&quot;, &quot;is&quot;],)</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModels.OneHotEncoder" href="#MLJModels.OneHotEncoder"><code>MLJModels.OneHotEncoder</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">OneHotEncoder(; features=Symbol[],
                 ignore=false,
                 ordered_factor=true,
                 drop_last=false)</code></pre><p>Unsupervised model for one-hot encoding the <code>Finite</code> features (columns) of some table. If <code>features</code> is unspecified all features with <code>Finite</code> element scitype are encoded. Otherwise, encoding is applied to all <code>Finite</code> features named in <code>features</code> (<code>ignore=false</code>) or all <code>Finite</code> features not named in features (<code>ignore=true</code>).</p><p>If <code>ordered_factor=false</code> then the above holds with <code>Finite</code> replaced with <code>Multiclass</code>, ie <code>OrderedFactor</code> features are not transformed.</p><p>Specify <code>drop_last=true</code> if the column for the last level of each categorical feature is to be dropped.</p><p>New data to be transformed may lack features present in the fit data, but no <em>new</em> features can be present.</p><p><em>Warning:</em> This transformer assumes that <code>levels(col)</code> for any <code>Multiclass</code> or <code>OrderedFactor</code> column is the same in new data being transformed as it is in the data used to fit the transformer.</p><p><strong>Example</strong></p><pre><code class="language-julia">X = (name=categorical([&quot;Danesh&quot;, &quot;Lee&quot;, &quot;Mary&quot;, &quot;John&quot;]),
@@ -37,7 +37,7 @@ schema(X)
 ┌───────────┬─────────────────────────────────┬──────────────────┐
 │ _.names   │ _.types                         │ _.scitypes       │
 ├───────────┼─────────────────────────────────┼──────────────────┤
-│ name      │ CategoricalString{UInt32}       │ Multiclass{4}    │
+│ name      │ CategoricalValue{String,UInt32} │ Multiclass{4}    │
 │ grade     │ CategoricalValue{Symbol,UInt32} │ OrderedFactor{3} │
 │ height    │ Float64                         │ Continuous       │
 │ n_devices │ Int64                           │ Count            │
@@ -71,7 +71,7 @@ schema(X)
 ┌───────────┬─────────────────────────────────┬──────────────────┐
 │ _.names   │ _.types                         │ _.scitypes       │
 ├───────────┼─────────────────────────────────┼──────────────────┤
-│ name      │ CategoricalString{UInt32}       │ Multiclass{4}    │
+│ name      │ CategoricalValue{String,UInt32} │ Multiclass{4}    │
 │ grade     │ CategoricalValue{Symbol,UInt32} │ OrderedFactor{3} │
 │ height    │ Float64                         │ Continuous       │
 │ n_devices │ Int64                           │ Count            │
@@ -210,4 +210,4 @@ compare[101:108]
  (2, &quot;virginica&quot;)
  (2, &quot;virginica&quot;)
  (3, &quot;virginica&quot;)
- (2, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../learning_curves/">« Learning Curves</a><a class="docs-footer-nextpage" href="../composing_models/">Composing Models »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 30 April 2020 00:02">Thursday 30 April 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ (2, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../learning_curves/">« Learning Curves</a><a class="docs-footer-nextpage" href="../composing_models/">Composing Models »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 13 May 2020 05:40">Wednesday 13 May 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
