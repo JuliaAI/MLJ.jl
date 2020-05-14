@@ -56,8 +56,8 @@ such as sckit-learn [@Pedregosa2001; @Buitinck2013] (Python); Weka
 deployment-ready models. They do this by providing a common interface
 to atomic components, from an ever-growing model zoo, and by providing
 the means to incorporate these into complex work-flows. Practitioners
-are able to build increasingly more sophisticated composite models, as
-exemplified in the strategies of top contestants in Machine Learning
+are able to build increasingly sophisticated composite models, as
+exemplified in the strategies of top contestants in machine learning
 competitions such as Kaggle.
 
 MLJ (Machine Learning in Julia) [@MLJ] is a toolbox written in Julia
@@ -87,7 +87,7 @@ extensible, hierarchical system of abstract types, just-in-time
 compilation, and by replacing object-orientation with multiple
 dispatch, Julia solves the ubiquitous "two language problem"
 [@BezansonEtal2017]. With less technical programming knowledge,
-experts in a domain of application can get "under the hood" of machine
+experts in a domain of application can get under the hood of machine
 learning software to broaden its applicability, and innovation can be
 accelerated through a dramatically reduced software development cycle.
 
@@ -127,14 +127,14 @@ of probabilities, are avoided.
 A user can connect models directly to tabular data in a manifold of
 in-memory and out-of-memory formats, and usability is enhanced through
 the introduction of "_scientific types_" allowing the user to focus
-on the intended purpose of data ("continous", "ordered factor", etc)
+on the intended purpose of data ("continuArous", "ordered factor", etc)
 rather than particular machine type representations.
 
-Finally, with the help of scientific types and the CategoricalArrays
+Finally, with the help of scientific types and the CategoricalArrays.jl
 package [@CategoricalArrays], users are guided to create safe
 representations of categorical data, in which the complete pool of
-possible classes is embedded in the data representation (and
-classifiers preserve this information when making predictions!). This
+possible classes is embedded in the data representation, and
+classifiers preserve this information when making predictions!. This
 avoids a pain-point familiar in environments that simply recast
 categorical data using integers (e.g., scikit-learn): evaluating a
 classifier on the test target, only to find the test data includes
@@ -243,8 +243,7 @@ all supervised models making probabilistic predictions, compatible
 with input data `X` and target `y`, one defines a filter
 
 ```julia
-task(model) = matching(model, X, y) && model.prediction_type ==
-:probabilistic models(task) 
+task(model) = matching(model, X, y) && model.prediction_type == :probabilistic models(task) 
 
 ```
 
@@ -307,10 +306,10 @@ footing. Unlike most most frameworks, a supervised model is either
 *probablistic* - meaning it's `predict` method returns a sampler
 object - *or* it is *deterministic* - meaning it returns objects of
 the same scientific type as the training observations. To use a
-probabilistic model to make deterministic predictions one can easily
-wrap the model in a pipeline with an appropriate post-processing
-function, or use additional `predict_mean`, `predict_mean`,
-`predict_mode` methods to deal with the common use-cases.
+probabilistic model to make deterministic predictions one can wrap the
+model in a pipeline with an appropriate post-processing function, or
+use additional `predict_mean`, `predict_mean`, `predict_mode` methods
+to deal with the common use-cases.
 
 The "sampler" objects returned by a probabilistic predictor are
 objects that can be sampled using Julia's `rand` method. Where
@@ -492,24 +491,25 @@ work-flow for single models. There is no need for the user to provide
 production training data in this process. A dummy data set suffices,
 for the purposes of testing the learning network as it is built.
 
-<!-- ![Specifying prediction and training flows in a simple learning network. The network shown combines a ridge regressor with a learned target transformation (Box Cox).\label{fig2}](target_transformer.svg) -->
-![Specifying prediction and training flows in a simple learning network. The network shown combines a ridge regressor with a learned target transformation (Box Cox).\label{fig2}](target_transformer.png)
+<!-- ![Specifying prediction and training flows in a simple learning network. The network shown combines a ridge regressor with a learned target transformation (Box Cox).\label{fig2}](target_transformerVERTICAL.svg) -->
+![Specifying prediction and training flows in a simple learning network. The network shown combines a ridge regressor with a learned target transformation (Box Cox).\label{fig2}](target_transformerVERTICAL.png)
 
 The upper panel of \autoref{fig2} illustrates a simple learning
 network in which a continuous target `y` is "normalized" using a
-learned Box Cox transformation, producing `z`. Ridge regression is
-applied to input features `X` to make a target prediction `ẑ`, which
-is not the final overall prediction of the network, as the ridge
-regressor is to be trained using the *transformed* target `z` (see the
-lower panel).  Rather, the final prediction `ŷ` is the inverse Box Cox
-transform of `z`.
+learned Box Cox transformation, producing `z`, while PCA dimension
+reduction is applied to some features `X`, to obtain `Xr`. A Ridge
+regressor, trained using data from `Xr` and `z`, is then applied to
+`Xr` to make a target prediction `ẑ`. To obtain a final prediction
+`ŷ`, we apply the *inverse* of the Box Cox transform, learned
+previously, to `ẑ`.
 
 The lower "training" panel of the figure shows the two machines which
 will store the parameters learned in training - the Box Cox exponent
-and shift (`machine1`) and the ridge model coefficients
-(`machine2`). The diagram additionally indicates where the machines
-should look for training data, and where to accesses model
-hyper-parameters (stored in `box_cox` and `ridge_regressor`).
+and shift (`machine1`), the PCA projection (`machine2`) and the ridge
+model coefficients and intercept (`machine3`). The diagram
+additionally indicates where machines should look for training data,
+and where to accesses model hyper-parameters (stored in `box_cox`,
+`PCA` and `ridge_regressor`).
 
 The only syntactic difference between composing "by hand" and building
 a learning network is that the training data must be wrapped in
@@ -554,7 +554,7 @@ training and "prediction" modes of operation, as in stacking.
 ## Export
 
 In the second step of model composition, the learning network is
-"exported" as new stand-alone composite model type, with the component
+"exported" as a new stand-alone composite model type, with the component
 models appearing in the learning network becoming default values for
 corresponding hyper-parameters (whose values are themselves
 models). This new type (which is unattached to any particular data)

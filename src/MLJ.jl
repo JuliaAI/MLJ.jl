@@ -5,9 +5,6 @@ module MLJ
 
 export MLJ_VERSION
 
-# utilities.jl:
-export @curve, @pcurve
-
 # ensembles.jl:
 export EnsembleModel
 
@@ -29,9 +26,8 @@ export scitype, scitype_union, elscitype, nonmissing, trait
 export coerce, coerce!, autotype, schema, info
 
 # re-export from MLJBase:
-export nrows, nfeatures, color_off, color_on,
+export nrows, color_off, color_on,
     selectrows, selectcols, restrict, corestrict, complement,
-    SupervisedTask, UnsupervisedTask, MLJTask,
     Deterministic, Probabilistic, Unsupervised, Supervised, Static,
     DeterministicNetwork, ProbabilisticNetwork, UnsupervisedNetwork,
     target_scitype, input_scitype, output_scitype,
@@ -80,7 +76,7 @@ export measures,
     tpr, tnr, fpr, fnr,
     falsediscovery_rate, false_discovery_rate, fdr, npv, ppv,
     recall, sensitivity, hit_rate, miss_rate,
-    specificity, selectivity, f1score, f1, fallout
+    specificity, selectivity, f1score, fallout
 
 # re-export from MLJTuning:
 export Grid, RandomSearch, Explicit, TunedModel,
@@ -89,9 +85,8 @@ export Grid, RandomSearch, Explicit, TunedModel,
 # re-export from MLJModels:
 export models, localmodels, @load, load, info,
     ConstantRegressor, ConstantClassifier,     # builtins/Constant.jl
-    StaticTransformer, FeatureSelector,        # builtins/Transformers.jl
-    UnivariateStandardizer, Standardizer,
-    UnivariateBoxCoxTransformer,
+    FeatureSelector, UnivariateStandardizer,   # builtins/Transformers.jl
+    Standardizer, UnivariateBoxCoxTransformer,
     OneHotEncoder, ContinuousEncoder, UnivariateDiscretizer,
     FillImputer
 
@@ -130,7 +125,6 @@ import MLJScientificTypes
 ## CONSTANTS
 
 const srcdir = dirname(@__FILE__)
-const CategoricalElement = Union{CategoricalString,CategoricalValue}
 
 
 ## INCLUDE FILES
