@@ -4,8 +4,8 @@
 
 ```@example workflows
 using MLJ; color_off() #hide
-using RDatasets
-channing = dataset("boot", "channing")
+import RDatasets
+channing = RDatasets.dataset("boot", "channing")
 first(channing, 4)
 ```
 
@@ -116,8 +116,8 @@ evaluate(model, X, y, resampling=CV(nfolds=5), measure=[rms, mav])
 [Evaluating Model Performance](evaluating_model_performance.md), [Performance Measures](performance_measures.md)
 
 ```@example workflows
-using RDatasets
-vaso = dataset("robustbase", "vaso"); # a DataFrame
+import RDatasets
+vaso = RDatasets.dataset("robustbase", "vaso"); # a DataFrame
 first(vaso, 3)
 ```
 
@@ -371,7 +371,7 @@ predict(tuned, Xnew)
 
 *Reference:*   [Composing Models](composing_models.md)
 
-Constructing a linear (unbranching) pipeline with a learned target
+Constructing a linear (unbranching) pipeline with a *learned* target
 transformation/inverse transformation:
 
 ```@example workflows
@@ -391,7 +391,21 @@ pipe.hot.drop_last = true
 evaluate(pipe, X, y, resampling=Holdout(), measure=rms, verbosity=2)
 ```
 
-Constructing a linear (unbranching) pipeline with a static (unlearned)
+Inspecting the learned parameters in a pipeline:
+
+```@example workflows
+mach = machine(pipe, X, y) |> fit!
+F = fitted_params(mach)
+F.machines
+```
+```@example workflows
+F.fitted_params_given_machine
+```
+```@example workflows
+F.fitted_params_given_machine[F.machines[2]]
+```
+
+Constructing a linear (unbranching) pipeline with a *static* (unlearned)
 target transformation/inverse transformation:
 
 ```@example workflows
