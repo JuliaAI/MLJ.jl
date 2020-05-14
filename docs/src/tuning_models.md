@@ -107,7 +107,7 @@ self_tuning_forest_model = TunedModel(model=forest_model,
                                       range=[r1, r2],
                                       measure=rms);
 self_tuning_forest = machine(self_tuning_forest_model, X, y);
-fit!(self_tuning_forest)
+fit!(self_tuning_forest, verbosity=0)
 ```
 
 In this two-parameter case, a plot of the grid search results is also
@@ -136,7 +136,7 @@ self_tuning_forest_model = TunedModel(model=forest_model,
                                       range=[(r1, 3), r2],
                                       measure=rms,
                                       n=25);
-fit!(machine(self_tuning_forest_model, X, y), verbosity=1)
+fit!(machine(self_tuning_forest_model, X, y), verbosity=0)
 ```
 
 For more options for a grid search, see [`Grid`](@ref) below.
@@ -159,7 +159,7 @@ self_tuning_forest_model = TunedModel(model=forest_model,
                                       measure=rms,
                                       n=25);
 self_tuning_forest = machine(self_tuning_forest_model, X, y);
-fit!(self_tuning_forest, verbosity=1)
+fit!(self_tuning_forest, verbosity=0)
 ```
 
 ```julia

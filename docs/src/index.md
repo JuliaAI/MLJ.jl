@@ -1,7 +1,12 @@
-### [Installation](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md) | [Cheatsheet](mlj_cheatsheet.md) | [Workflows](common_mlj_workflows.md)
+### [Installation](https://github.com/alan-turing-institute/MLJ.jl#using-mlj) | [Cheatsheet](mlj_cheatsheet.md) | [Workflows](common_mlj_workflows.md) | [Tutorials](https://alan-turing-institute.github.io/MLJTutorials/) | [Home Page](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md) 
 
+# THE MLJ USER MANUAL
 
 # Getting Started
+
+For an outline of MLJ's **goals**, **features** and **installation**
+advice, consult the MLJ [Home
+Page](https://github.com/alan-turing-institute/MLJ.jl).
 
 
 ```@setup doda
@@ -18,8 +23,8 @@ To load some demonstration data, add
 [RDatasets](https://github.com/JuliaStats/RDatasets.jl) to your load
 path and enter
 ```@repl doda
-using RDatasets
-iris = dataset("datasets", "iris"); # a DataFrame
+import RDatasets
+iris = RDatasets.dataset("datasets", "iris"); # a DataFrame
 ```
 and then split the data into input and target parts:
 
