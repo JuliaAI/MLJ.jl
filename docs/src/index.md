@@ -1,4 +1,4 @@
-### [Installation](https://github.com/alan-turing-institute/MLJ.jl#using-mlj) | [Cheatsheet](mlj_cheatsheet.md) | [Workflows](common_mlj_workflows.md) | [Tutorials](https://alan-turing-institute.github.io/MLJTutorials/) | [Home Page](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md) 
+### [Installation](https://github.com/alan-turing-institute/MLJ.jl#using-mlj) | [Cheatsheet](mlj_cheatsheet.md) | [Workflows](common_mlj_workflows.md) | [Tutorials](https://alan-turing-institute.github.io/MLJTutorials/) | [Repo](https://github.com/alan-turing-institute/MLJ.jl). 
 
 # THE MLJ USER MANUAL
 
@@ -6,7 +6,7 @@
 
 For an outline of MLJ's **goals**, **features** and **installation**
 advice, consult the MLJ [Home
-Page](https://github.com/alan-turing-institute/MLJ.jl).
+Page](https://github.com/alan-turing-institute/MLJ.jl/blob/master/README.md)
 
 
 ```@setup doda

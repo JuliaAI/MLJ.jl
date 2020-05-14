@@ -73,7 +73,7 @@ julia> using Pkg; Pkg.activate("My_MLJ_env", shared=true)
 Installing MLJ is also done with the package manager:
 
 ```julia
-julia> Pkg.add(["MLJ", "MLJModels"])
+julia> Pkg.add("MLJ")
 ```
 
 It is important to note that MLJ is essentially a big wrapper
