@@ -540,7 +540,7 @@ machine2 = machine(PCA, X)
 Xr = transform(machine2, X)
 
 machine3 = machine(ridge_regressor, Xr, z)
-ẑ = predict(machine2, Xr)
+ẑ = predict(machine3, Xr)
 
 ŷ = inverse_transform(machine1, ẑ)
 
