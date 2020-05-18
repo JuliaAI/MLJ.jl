@@ -536,8 +536,12 @@ y = source(y_dummy, kind=:target)  # or just source(kind=:target)
 machine1 = machine(box_cox, y)
 z = transform(machine1, y)
 
-machine2 = machine(ridge_regressor, X, z)
-ẑ = predict(machine2, X)
+machine2 = machine(PCA, X)
+Xr = transform(machine2, X)
+
+machine3 = machine(ridge_regressor, Xr, z)
+ẑ = predict(machine2, Xr)
+
 ŷ = inverse_transform(machine1, ẑ)
 
 fit!(ŷ)  # to test training on the dummy data
