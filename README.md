@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://github.com/alan-turing-institute/MLJ.jl/blob/master/material/MLJLogo2.svg" alt="MLJ" width="200">
+    <img src="material/MLJLogo2.svg" alt="MLJ" width="200">
 </div>
 
 <h2 align="center">A Machine Learning Framework for Julia
@@ -29,12 +29,6 @@ convenient way to use and combine tools and models available in the
 Julia ML/Stats ecosystem.  MLJ is released under the MIT licensed and
 sponsored by the [Alan Turing Institute](https://www.turing.ac.uk/).
 
-**The starting point for the general MLJ user** is MLJ's
-[documentation](https://alan-turing-institute.github.io/MLJ.jl/stable/). This
-README contains information for developers of MLJ and related packages
-in the Julia machine learning eco-system.
-
----
 <br>
 <p align="center">
 <a href="#the-mlj-universe">MLJ Universe</a> &nbsp;•&nbsp; 
@@ -43,6 +37,11 @@ in the Julia machine learning eco-system.
 <a href="#citing-mlj">Citing MLJ</a> 
 </p>
 </br>
+
+**The starting point for the general MLJ user** is MLJ's
+[documentation](https://alan-turing-institute.github.io/MLJ.jl/stable/). This
+README contains information for developers of MLJ and related packages
+in the Julia machine learning eco-system.
 
 
 ### The MLJ Universe
@@ -54,7 +53,7 @@ illustrated in the dependency chart below.
 <p align="center">
 <a href="CONTRIBUTING.md">Contributing</a> &nbsp;•&nbsp; 
 <a href="ORGANIZATION.md">Code Organization</a> &nbsp;•&nbsp;
-<a href="ROADMAP.md">Road Map</a>  &nbsp;•&nbsp;
+<a href="ROADMAP.md">Road Map</a> 
 </br>
 <br>
   <a href="https://github.com/alan-turing-institute/MLJ">MLJ</a> &nbsp;•&nbsp;
