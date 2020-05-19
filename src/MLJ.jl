@@ -46,7 +46,8 @@ export nrows, color_off, color_on,
     ResamplingStrategy, Holdout, CV,
     StratifiedCV, evaluate!, Resampler, iterator,
     default_resource, pretty,
-    OpenML
+    OpenML,
+    make_blobs, make_moons, make_circles, make_regression
 
 export measures,
     orientation, reports_each_observation,
