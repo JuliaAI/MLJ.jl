@@ -35,7 +35,8 @@ julia = "1"
 
 [extras]
 NearestNeighbors = "b8a86587-4115-5ab1-83bc-aa920d37bbce"
+StableRNGs = "860ef19b-820b-49d6-a774-d7a799459cd3"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["NearestNeighbors", "Test"]
+test = ["NearestNeighbors", "StableRNGs", "Test"]
