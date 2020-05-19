@@ -17,7 +17,7 @@ Anthony Blaom, Diego Arenas, Franz Kiraly, Yiannis Simillides, Sebastian Vollmer
 ![](img/wrapped_ridge.png)  | ![](img/MLPackages.png)
 
 
-## Introduction
+## Introducing MLJ
 
 [MLJ](https://github.com/alan-turing-institute/MLJ.jl) is an
 open-source machine learning toolbox written in pure Julia. It

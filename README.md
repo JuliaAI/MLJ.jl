@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://alan-turing-institute.github.io/MLJTutorials/assets/infra/MLJLogo2.svg" alt="MLJ" width="200">
+    <img src="material/MLJLogo2.svg" alt="MLJ" width="200">
 </div>
 
 <h2 align="center">A Machine Learning Framework for Julia
@@ -24,118 +24,62 @@
 </p>
 </h2>
 
-MLJ is a machine learning framework for Julia aiming to provide a convenient way to use and combine a multitude of tools and models available in the Julia ML/Stats ecosystem.
-MLJ is released under the MIT licensed and sponsored by the [Alan Turing Institute](https://www.turing.ac.uk/).
+MLJ is a machine learning framework for Julia aiming to provide a
+convenient way to use and combine tools and models available in the
+Julia ML/Stats ecosystem.  MLJ is released under the MIT licensed and
+sponsored by the [Alan Turing Institute](https://www.turing.ac.uk/).
 
 <br>
 <p align="center">
-  <a href="#using-mlj">Using MLJ</a> •
-  <a href="#available-models">Models Available</a> •
-  <a href="#the-mlj-universe">MLJ Universe</a> •
-  <a href="CONTRIBUTING.md">Contributing</a> •
-  <a href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/mlj_cheatsheet.md">MLJ Cheatsheet</a> •
-  <a href="#citing-mlj">Citing MLJ</a>
+<a href="#the-mlj-universe">MLJ Universe</a> &nbsp;•&nbsp; 
+<a href="#list-of-wrapped-models">List of Wrapped Models</a> &nbsp;•&nbsp;
+<a href="#known-issues">Known Issues</a> &nbsp;•&nbsp;
+<a href="#citing-mlj">Citing MLJ</a> 
 </p>
+</br>
 
-To deal with **MKL errors** encountered on MacOS, see
-[here](#known-issues-using-scitlearn-models-with-macos).
-
-### Key goals
-
-* Offer a consistent way to use, compose and tune machine learning models in Julia,
-* Promote the improvement of the Julia ML/Stats ecosystem by making it easier to use models from a wide range of packages,
-* Unlock performance gains by exploiting Julia's support for parallelism, automatic differentiation, GPU, optimisation etc.
-
-### Key features
-
-* Data agnostic, train models on any data supported by the [Tables.jl](https://github.com/JuliaData/Tables.jl) interface,
-* Extensive support for model composition (*pipelines* and *learning networks*),
-* Convenient syntax to tune and evaluate (composite) models.
-* Consistent interface to handle probabilistic predictions.
-* Extensible [tuning
-  interface](https://github.com/alan-turing-institute/MLJTuning.jl),
-  to support growing number of optimization strategies, and designed to
-  play well with model composition.
-
----
-
-### Using MLJ
-
-Initially it is recommended that MLJ and associated packages be
-installed in a new
-[environment](https://julialang.github.io/Pkg.jl/v1/environments/) to
-avoid package conflicts. You can do this with
-
-```julia
-julia> using Pkg; Pkg.activate("My_MLJ_env", shared=true)
-```
-
-Installing MLJ is also done with the package manager:
-
-```julia
-julia> Pkg.add("MLJ")
-```
-
-It is important to note that MLJ is essentially a big wrapper
-providing a unified access to _model providing packages_ and so you
-will also need to make sure these packages are available in your
-environment.  For instance, if you want to use a **Decision Tree
-Classifier**, you need to have
-[DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl)
-installed:
-
-```julia
-julia> Pkg.add("DecisionTree");
-julia> using MLJ;
-julia> @load DecisionTreeClassifier
-```
-
-For a list of models and their packages see the [table below](#available-models), or run
-
-```julia
-using MLJ
-models()
-```
-
-We recommend you start with models marked as coming from _mature_ packages such as _DecisionTree_, _ScikitLearn_ or _XGBoost_.
-
-MLJ is supported by a number of satelite packages (MLJTuning,
-MLJModelInterface, etc) which the general user is *not* required to
-install directly. Developers can learn more about these
-[here](ORGANIZATION.md).
+**The starting point for the general MLJ user** is MLJ's
+[documentation](https://alan-turing-institute.github.io/MLJ.jl/stable/). This
+README contains information for developers of MLJ and related packages
+in the Julia machine learning eco-system.
 
 
-#### Tutorials
+### The MLJ Universe
 
-The best place to get started with MLJ is to go the [MLJ
-Tutorials](https://alan-turing-institute.github.io/MLJTutorials/)
-website.  Each of the tutorial can be downloaded as a notebook or
-Julia script to facilitate experimentation with the packages. For more
-comprehensive documentation, see the user
-[manual](https://alan-turing-institute.github.io/MLJ.jl/stable/).
+The functionality of MLJ is distributed over a number of repositories
+illustrated in the dependency chart below.
 
-You're also welcome to join the `#mlj` Julia slack channel to ask
-questions and make suggestions.
+<br>
+<p align="center">
+<a href="CONTRIBUTING.md">Contributing</a> &nbsp;•&nbsp; 
+<a href="ORGANIZATION.md">Code Organization</a> &nbsp;•&nbsp;
+<a href="ROADMAP.md">Road Map</a> 
+</br>
+<br>
+  <a href="https://github.com/alan-turing-institute/MLJ">MLJ</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJBase.jl">MLJBase</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJModelInterface.jl">MLJModelInterface</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJModels.jl">MLJModels</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJTuning.jl">MLJTuning</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJLinearModels.jl">MLJLinearModels</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJFlux.jl">MLJFlux</a>
+  <br>
+  <a href="https://github.com/alan-turing-institute/MLJTutorials">MLJTutorials</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJScientificTypes.jl">MLJScientificTypes</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes</a>
+</p>
+<p></p>
+    <br>
+<p></p>
 
+<div align="center">
+    <img src="material/MLJ_stack.svg" alt="Dependency Chart">
+</div>
 
-#### Known issues using ScitLearn models with MacOS
+*Dependency chart for MLJ repositories. Repositories with dashed
+connections do not currently exist but are planned/proposed.*
 
-For users of Mac OS using Julia 1.3 or higher, using ScikitLearn
-models can lead to unexpected MKL errors due to an issue not related
-to MLJ. See
-[this Julia Discourse discussion](https://discourse.julialang.org/t/julia-1-3-1-4-on-macos-and-intel-mkl-error/36469/2) 
-and
-[this issue](https://github.com/JuliaPackaging/BinaryBuilder.jl/issues/700)
-for context. 
-
-A temporary workaround for this issue is to force the installation of
-an older version of the `OpenSpecFun_jll` library. To install an
-appropriate version, activate your MLJ environment and run `using Pkg;
-Pkg.develop(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))`.
-
----
-
-### Available Models 
+### List of Wrapped Models
 
 MLJ provides access to to a wide variety of machine learning models.
 We are always looking for [help](CONTRIBUTING.md) adding new models or
@@ -189,45 +133,22 @@ the most up-to-date list, run `using MLJ; models()`.
 [ScikitLearn.jl]: https://github.com/cstjean/ScikitLearn.jl
 [XGBoost.jl]: https://github.com/dmlc/XGBoost.jl
 
----
 
-### The MLJ Universe
+### Known Issues
 
-The functionality of MLJ is distributed over a number of repositories
-illustrated in the dependency chart below. Click on the appropriate
-link for further information:
+For users of Mac OS using Julia 1.3 or higher, using ScikitLearn
+models can lead to unexpected MKL errors due to an issue not related
+to MLJ. See
+[this Julia Discourse discussion](https://discourse.julialang.org/t/julia-1-3-1-4-on-macos-and-intel-mkl-error/36469/2) 
+and
+[this issue](https://github.com/JuliaPackaging/BinaryBuilder.jl/issues/700)
+for context. 
 
-<br>
-<p align="center">
-  <a href="ORGANIZATION.md">Code Organization</a> &nbsp;•&nbsp;
-  <a href="ROADMAP.md">Road Map</a>  &nbsp;•&nbsp;
-  <a href="CONTRIBUTING.md">Contributing</a>
-</p>
-<p align="center">
-  <a href="https://github.com/alan-turing-institute/MLJ">MLJ</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJBase.jl">MLJBase</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJModelInterface.jl">MLJModelInterface</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJModels.jl">MLJModels</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJTuning.jl">MLJTuning</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJLinearModels.jl">MLJLinearModels</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJFlux.jl">MLJFlux</a>
-  <br>
-  <a href="https://github.com/alan-turing-institute/MLJTutorials">MLJTutorials</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJScientificTypes.jl">MLJScientificTypes</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes</a>
-</p>
-<p></p>
-    <br>
-<p></p>
+A temporary workaround for this issue is to force the installation of
+an older version of the `OpenSpecFun_jll` library. To install an
+appropriate version, activate your MLJ environment and run `using Pkg;
+Pkg.develop(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))`.
 
-<div align="center">
-    <img src="material/MLJ_stack.svg" alt="Dependency Chart">
-</div>
-
-*Dependency chart for MLJ repositories. Repositories with dashed
-connections do not currently exist but are planned/proposed.*
-
----
 
 ### Citing MLJ
 
