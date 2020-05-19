@@ -62,7 +62,7 @@ competitions such as Kaggle.
 
 MLJ (Machine Learning in Julia) [@MLJ] is a toolbox written in Julia
 that provides a common interface and meta-algorithms for selecting,
-tuning, evaluating, composing and comparing machine model
+tuning, evaluating, composing and comparing machine learning model 
 implementations written in Julia and other languages. More broadly,
 the MLJ project hopes to bring cohesion and focus to a number of emerging
 and existing, but previously disconnected, machine learning algorithms
