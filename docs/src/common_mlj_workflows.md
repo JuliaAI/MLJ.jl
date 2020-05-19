@@ -44,7 +44,7 @@ selectrows(X, 1:4) # selectrows works for any Tables.jl table
 y[1:4]
 ```
 
-## Model search (**experimental**)
+## Model search
 
 *Reference:*   [Model Search](model_search.md)
 

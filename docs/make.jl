@@ -21,7 +21,8 @@ const MMI = MLJModelInterface
 #                   codefence = "```@example workflows" => "```")
 
 pages = [
-    "Getting Started" => "index.md",
+    "Introduction" => "index.md",
+    "Getting Started" => "getting_started.md",
     "Common MLJ Workflows" => "common_mlj_workflows.md",
     "Model Search" => "model_search.md",
     "Machines" => "machines.md",
