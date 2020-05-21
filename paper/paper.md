@@ -503,7 +503,7 @@ regressor, trained using data from `Xr` and `z`, is then applied to
 `ŷ`, we apply the *inverse* of the Box Cox transform, learned
 previously, to `ẑ`.
 
-The lower "training" panel of the figure shows the two machines which
+The lower "training" panel of the figure shows the three machines which
 will store the parameters learned in training - the Box Cox exponent
 and shift (`machine1`), the PCA projection (`machine2`) and the ridge
 model coefficients and intercept (`machine3`). The diagram
