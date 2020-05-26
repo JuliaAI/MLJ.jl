@@ -1,12 +1,17 @@
-### [Installation](@ref) | [Cheatsheet](mlj_cheatsheet.md) | [Workflows](common_mlj_workflows.md) | [Tutorials](https://alan-turing-institute.github.io/MLJTutorials/) | [For Developers](https://github.com/alan-turing-institute/MLJ.jl)
-
 ```@raw html
-<div align="center">
-    <img src="img/MLJLogo2.svg" alt="MLJ" width="200">
+<span style="color:darkslateblue;font-size:2.25em;font-style:italic;">
+A Machine Learning Framework for Julia
+</span>
+<br>
+<br>
+<div style="font-size:1.25em;font-weight:bold;">
+  <a href="#Installation-1">Installation</a>    &nbsp;|&nbsp;
+  <a href="mlj_cheatsheet">Cheatsheet</a>       &nbsp;|&nbsp;
+  <a href="common_mlj_workflows">Workflows</a>  &nbsp;|&nbsp;
+  <a href="https://alan-turing-institute.github.io/DataScienceTutorials.jl/">Tutorials</a>       &nbsp;|&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJ.jl/">Repository</a>
 </div>
 ```
-
-A Machine Learning Framework for Julia
 
 # Introduction
 
