@@ -2,7 +2,7 @@
 
 ```@raw html
 <div align="center">
-    <img src="https://raw.githubusercontent.com/alan-turing-institute/MLJ.jl/master/material/MLJLogo2.svg" alt="MLJ" width="200">
+    <img src="img/MLJLogo2.svg" alt="MLJ" width="200">
 </div>
 ```
 
