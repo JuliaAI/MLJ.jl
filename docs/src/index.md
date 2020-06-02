@@ -1,4 +1,4 @@
-### [Installation](@ref) | [Cheatsheet](mlj_cheatsheet.md) | [Workflows](common_mlj_workflows.md) | [Tutorials](https://alan-turing-institute.github.io/MLJTutorials/) | [For Developers](https://github.com/alan-turing-institute/MLJ.jl)
+### [Installation](@ref) | [Cheatsheet](mlj_cheatsheet.md) | [Workflows](common_mlj_workflows.md) | [Tutorials](https://alan-turing-institute.github.io/DataScienceTutorials.jl/) | [For Developers](https://github.com/alan-turing-institute/MLJ.jl)
 
 ![MLJ logo](https://github.com/alan-turing-institute/MLJ.jl/blob/master/material/MLJLogo2.svg)
 
