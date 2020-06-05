@@ -127,7 +127,7 @@ of probabilities, are avoided.
 A user can connect models directly to tabular data in a manifold of
 in-memory and out-of-memory formats, and usability is enhanced through
 the introduction of "_scientific types_" allowing the user to focus
-on the intended purpose of data ("continuArous", "ordered factor", etc)
+on the intended purpose of data ("continuous", "ordered factor", etc)
 rather than particular machine type representations.
 
 Finally, with the help of scientific types and the CategoricalArrays.jl
