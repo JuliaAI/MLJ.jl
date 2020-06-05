@@ -161,10 +161,10 @@ elsewhere) are shown in \autoref{fig1}.
 
 To the scientific types, MLJ adds a specific *convention* specifying a
 scientific type for every Julia object. The convention is expressed
-through a single method `scitype`.  A `coerce` method to recasts
-machine types so that they have the desired scientific type
-(interpretation), and a `schema` method summmarizes the machine and
-scientfic types of tabular data.
+through a single method `scitype`.  A `coerce` method recasts machine
+types to have the desired scientific type (interpretation), and a
+`schema` method summmarizes the machine and scientfic types of tabular
+data.
 
 ```julia
 using MLJ, CategoricalArrays
@@ -417,7 +417,7 @@ use-cases are:
   methods.
 
 In the future MLJ will add an `update_data` method to support
-models that can cary out on-line learning.
+models that can carry out on-line learning.
 
 ## The machine interface
 
@@ -591,7 +591,7 @@ A more comprehensive road map is linked from the MLJ repository [@MLJ].
 # Acknowledgements
 
 We acknowledge valuable conversations with Avik Sengupta, Mike Innes,
-mlj author Bernd Bischl, and IQVIA's Yaqub Alwan and Gwyn Jones. Seed
+mlr author Bernd Bischl, and IQVIA's Yaqub Alwan and Gwyn Jones. Seed
 funding for the MLJ project has been provided by the Alan Turing
 Institute's Tools, Practicies Systems programme, with special thanks
 to Dr James Hethering, its former Programme Director, and Katrina
