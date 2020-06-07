@@ -150,6 +150,7 @@ package can be applied to such distributions:
 
 ```@repl doda
 broadcast(pdf, yhat[3:5], "virginica") # predicted probabilities of virginica
+broadcast(pdf, yhat, y[test])[3:5] # predicted probability of observed class
 mode.(yhat[3:5])
 ```
 
@@ -158,6 +159,15 @@ Or, one can explicitly get modes by using `predict_mode` instead of
 
 ```@repl doda
 predict_mode(tree, rows=test[3:5])
+```
+
+**(MLJ v0.2.7 and higher )** Finally, we note that `pdf()` is
+overloaded to allow the retrieval of probabilities for all levels at
+once:
+
+```@repl doda
+L = levels(y)
+pdf(yhat[3:5], L)
 ```
 
 Unsupervised models have a `transform` method instead of `predict`,
