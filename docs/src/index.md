@@ -1,8 +1,17 @@
-### [Installation](@ref) | [Cheatsheet](mlj_cheatsheet.md) | [Workflows](common_mlj_workflows.md) | [Tutorials](https://alan-turing-institute.github.io/DataScienceTutorials.jl/) | [For Developers](https://github.com/alan-turing-institute/MLJ.jl)
-
-![MLJ logo](https://github.com/alan-turing-institute/MLJ.jl/blob/master/material/MLJLogo2.svg)
-
+```@raw html
+<span style="color:darkslateblue;font-size:2.25em;font-style:italic;">
 A Machine Learning Framework for Julia
+</span>
+<br>
+<br>
+<div style="font-size:1.25em;font-weight:bold;">
+  <a href="#Installation-1">Installation</a>    &nbsp;|&nbsp;
+  <a href="mlj_cheatsheet">Cheatsheet</a>       &nbsp;|&nbsp;
+  <a href="common_mlj_workflows">Workflows</a>  &nbsp;|&nbsp;
+  <a href="https://alan-turing-institute.github.io/DataScienceTutorials.jl/">Tutorials</a>       &nbsp;|&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJ.jl/">Repository</a>
+</div>
+```
 
 # Introduction
 
@@ -144,6 +153,3 @@ of the following:
   url          = {https://doi.org/10.5281/zenodo.3541506}
 }
 ```
-
-
-
