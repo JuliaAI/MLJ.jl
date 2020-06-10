@@ -12,7 +12,7 @@ authors:
     orcid: 0000-0001-6689-886X
     affiliation: "1, 2, 3"
   - name: Franz Kiraly
-    orcid: ????-????-????-????
+    orcid: 0000-0002-9254-793X
     affiliation: "3, 4"
   - name: Thibaut Lienart
     orcid: 0000-0003-0872-7098
@@ -127,7 +127,7 @@ of probabilities, are avoided.
 A user can connect models directly to tabular data in a manifold of
 in-memory and out-of-memory formats, and usability is enhanced through
 the introduction of "_scientific types_" allowing the user to focus
-on the intended purpose of data ("continuArous", "ordered factor", etc)
+on the intended purpose of data ("continuous", "ordered factor", etc)
 rather than particular machine type representations.
 
 Finally, with the help of scientific types and the CategoricalArrays.jl
@@ -161,10 +161,10 @@ elsewhere) are shown in \autoref{fig1}.
 
 To the scientific types, MLJ adds a specific *convention* specifying a
 scientific type for every Julia object. The convention is expressed
-through a single method `scitype`.  A `coerce` method to recasts
-machine types so that they have the desired scientific type
-(interpretation), and a `schema` method summmarizes the machine and
-scientfic types of tabular data.
+through a single method `scitype`.  A `coerce` method recasts machine
+types to have the desired scientific type (interpretation), and a
+`schema` method summmarizes the machine and scientfic types of tabular
+data.
 
 ```julia
 using MLJ, CategoricalArrays
@@ -417,7 +417,7 @@ use-cases are:
   methods.
 
 In the future MLJ will add an `update_data` method to support
-models that can cary out on-line learning.
+models that can carry out on-line learning.
 
 ## The machine interface
 
@@ -591,7 +591,7 @@ A more comprehensive road map is linked from the MLJ repository [@MLJ].
 # Acknowledgements
 
 We acknowledge valuable conversations with Avik Sengupta, Mike Innes,
-mlj author Bernd Bischl, and IQVIA's Yaqub Alwan and Gwyn Jones. Seed
+mlr author Bernd Bischl, and IQVIA's Yaqub Alwan and Gwyn Jones. Seed
 funding for the MLJ project has been provided by the Alan Turing
 Institute's Tools, Practicies Systems programme, with special thanks
 to Dr James Hethering, its former Programme Director, and Katrina

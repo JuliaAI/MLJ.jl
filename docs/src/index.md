@@ -1,8 +1,17 @@
-### [Installation](@ref) | [Cheatsheet](mlj_cheatsheet.md) | [Workflows](common_mlj_workflows.md) | [Tutorials](https://alan-turing-institute.github.io/MLJTutorials/) | [For Developers](https://github.com/alan-turing-institute/MLJ.jl)
-
-![MLJ logo](https://github.com/alan-turing-institute/MLJ.jl/blob/master/material/MLJLogo2.svg)
-
+```@raw html
+<span style="color:darkslateblue;font-size:2.25em;font-style:italic;">
 A Machine Learning Framework for Julia
+</span>
+<br>
+<br>
+<div style="font-size:1.25em;font-weight:bold;">
+  <a href="#Installation-1">Installation</a>    &nbsp;|&nbsp;
+  <a href="mlj_cheatsheet">Cheatsheet</a>       &nbsp;|&nbsp;
+  <a href="common_mlj_workflows">Workflows</a>  &nbsp;|&nbsp;
+  <a href="https://alan-turing-institute.github.io/DataScienceTutorials.jl/">Tutorials</a>       &nbsp;|&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJ.jl/">Repository</a>
+</div>
+```
 
 # Introduction
 
@@ -112,7 +121,7 @@ The present document, although littered with examples, is primarily
 intended as a complete reference. For a lightning introduction to MLJ
 read the [Getting Started](@ref) section of this manual. For more
 leisurely and extensive tutorials, we highly recommend the [MLJ
-Tutorials](https://alan-turing-institute.github.io/MLJTutorials/)
+Tutorials](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
 website.  Each tutorial can be downloaded as a notebook or Julia
 script to facilitate experimentation.
 
@@ -144,6 +153,3 @@ of the following:
   url          = {https://doi.org/10.5281/zenodo.3541506}
 }
 ```
-
-
-
