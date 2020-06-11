@@ -31,7 +31,8 @@ n=length(ensemble)
 atomic_weights = fill(1/n, n) # ignored by predict below
 wens = MLJ.WrappedEnsemble(atom, ensemble)
 X = MLJ.table(rand(3,5))
-@test predict(wens, atomic_weights, X) == categorical(vcat(['j','j','j'],L))[1:3]
+@test predict(wens, atomic_weights, X) ==
+    categorical(vcat(['j','j','j'],L))[1:3]
 
 # target is :deterministic :continuous false:
 atom = MLJModels.DeterministicConstantRegressor()
@@ -44,8 +45,10 @@ wens = MLJ.WrappedEnsemble(atom, ensemble)
 atom = ConstantClassifier()
 L = categorical(['a', 'b', 'j'])
 d1 = UnivariateFinite(L, [0.1, 0.2, 0.7])
+fitresult1 = (L, pdf([d1, ], L))
 d2 = UnivariateFinite(L, [0.2, 0.3, 0.5])
-ensemble = [d2,  d1, d2, d2]
+fitresult2 = (L, pdf([d2, ], L))
+ensemble = [fitresult2, fitresult1, fitresult2, fitresult2]
 atomic_weights = [0.1, 0.5, 0.2, 0.2]
 wens = MLJ.WrappedEnsemble(atom, ensemble)
 X = MLJ.table(rand(2,5))
