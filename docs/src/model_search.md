@@ -9,10 +9,10 @@ methods, as detailed below.
 
 ## Model metadata
 
-*Terminology.* In this section the word "model" refers to the metadata
-entry in the registry of an actual model `struct`, as appearing
-elsewhere in the manual. One can obtain such an entry with the `info`
-command:
+*Terminology.* In this section the word "model" refers to a metadata
+entry in the model registry, as opposed to an actual model `struct`
+that such an entry represents. One can obtain such an entry with the
+`info` command:
 
 ```@setup tokai
 using MLJ
@@ -38,14 +38,20 @@ localmodels()
 localmodels()[2]
 ```
 
-If `models` is passed any `Bool`-valued function `test`, it returns every `model` for which `test(model)` is true, as in
+One can search for models containing specified strings or regular expressions in their `docstring` attributes, as in
+
+```@repl tokai 
+models("forest")
+```
+
+or by specifying a filter (`Bool`-valued function):
 
 ```@repl tokai
-test(model) = model.is_supervised &&
+filter(model) = model.is_supervised &&
                 model.input_scitype >: MLJ.Table(Continuous) &&
                 model.target_scitype >: AbstractVector{<:Multiclass{3}} &&
                 model.prediction_type == :deterministic
-models(test)
+models(filter)
 ```
 
 Multiple test arguments may be passed to `models`, which are applied

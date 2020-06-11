@@ -177,9 +177,11 @@ feature rankings). See more on this below.
 
 #### Classifier
 
-For a classifier, the steps are fairly similar to a regressor with two particularities:
+For a classifier, the steps are fairly similar to a regressor with these differences:
 
-1. `y` will be a categorical vector and you will typically want to use the integer encoding of `y` instead of the raw labels; use `MLJModelInterface.int` for this,
+1. `y` will be a categorical vector and you will typically want to use
+   the integer encoding of `y` instead of `CategoricalValue`s; use
+   `MLJModelInterface.int` for this.
 1.  You will need to pass the full pool of target labels (not just
    those observed in the training data) and additionally, in the
    `Deterministic` case, the encoding, to make these available to
@@ -189,6 +191,15 @@ For a classifier, the steps are fairly similar to a regressor with two particula
    method for recovering categorical elements from their integer
    representations (e.g., `d(2)` is the categorical element with `2`
    as encoding).
+2. In the case of a *probabilistic* classifier you should pass all
+   probabilities simultaneously to the `UnivariateFinite` constructor
+   to get an abstract `UnivariateFinite` vector (type
+   `UnivariateFiniteArray`) rather than use comprehension or
+   broadcasting to get a vanilla vector. This is for performance
+   reasons.
+   
+If implementing a classifier, you should probably consult the more
+detailed instructions at [The predict method](@ref).
 
 **Examples**:
 

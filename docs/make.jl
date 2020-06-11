@@ -24,6 +24,7 @@ pages = [
     "Introduction" => "index.md",
     "Getting Started" => "getting_started.md",
     "Common MLJ Workflows" => "common_mlj_workflows.md",
+    "Working with Categorical Data" => "working_with_categorical_data.md",
     "Model Search" => "model_search.md",
     "Machines" => "machines.md",
     "Evaluating Model Performance" => "evaluating_model_performance.md",

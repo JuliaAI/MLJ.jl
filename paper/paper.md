@@ -303,7 +303,7 @@ support for both distributed and multi-threaded parallelism.
 
 MLJ puts probabilistic models and deterministic models on equal
 footing. Unlike most most frameworks, a supervised model is either
-*probablistic* - meaning it's `predict` method returns a sampler
+*probablistic* - meaning it's `predict` method returns a distribution
 object - *or* it is *deterministic* - meaning it returns objects of
 the same scientific type as the training observations. To use a
 probabilistic model to make deterministic predictions one can wrap the
@@ -311,14 +311,14 @@ model in a pipeline with an appropriate post-processing function, or
 use additional `predict_mean`, `predict_mean`, `predict_mode` methods
 to deal with the common use-cases.
 
-The "sampler" objects returned by a probabilistic predictor are
-objects that can be sampled using Julia's `rand` method. Where
-possible the object is in fact a `Distribution` object from the
-Distributions.jl package [@LinEtal2020], for which an additional `pdf`
-method for evaluating the distribution's probability density or mass
-function is implemented, and which will generally implement a `mode`
-method or `mean` and `median` or methods (allowing MLJ's
-fallbacks for `predict_mean`, etc, to work). 
+A "distribution" object returned by a probabilistic predictor is one
+that can be sampled (using Julia's `rand` method) and queried for
+properties. Where possible the object is in fact a `Distribution`
+object from the Distributions.jl package [@LinEtal2020], for which an
+additional `pdf` method for evaluating the distribution's probability
+density or mass function will be implemented, and in addition to
+`mode`, `mean` and `median` methods (allowing MLJ's fallbacks for
+`predict_mean`, etc, to work).
 
 One important distribution *not* provided by Distributions.jl is a
 distribution for finite *labeled* data (called `UnivariateFinite`)

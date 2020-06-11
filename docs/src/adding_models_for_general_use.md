@@ -1,5 +1,8 @@
-
 # Adding Models for General Use
+
+!!! warning
+
+    Models implementing the MLJ model interface according to the instructions given here should import MLJModelInterface version 0.3 or higher. This is	enforced with a statement such as `MLJModelInterface = "^0.3" ` under `[compat]` in the Project.toml file of the package containing the implementation.
 
 This guide outlines the specification of the MLJ model interface
 and provides detailed guidelines for implementing the interface for
@@ -408,7 +411,7 @@ ordering of these integers being consistent with that of the pool),
 integers back into `CategoricalValue`/`CategoricalString` objects),
 and `classes`, for extracting all the `CategoricalValue` or
 `CategoricalString` objects sharing the pool of a particular
-value/string. Refer to [Convenience methods](@ref) below for important
+value. Refer to [Convenience methods](@ref) below for important
 details.
 
 Note that a decoder created during `fit` may need to be bundled with
@@ -456,68 +459,77 @@ must be an `AbstractVector` whose elements are distributions (one distribution
 per row of `Xnew`).
 
 Presently, a *distribution* is any object `d` for which
-`MMI.isdistribution(::d) = true`, which is currently restricted to
-objects subtyping `Distributions.Sampleable` from the package
-Distributions.jl.
+`MMI.isdistribution(::d) = true`, which is the case for objects of
+type `Distributions.Sampleable`.
 
-Use the distribution `MMI.UnivariateFinite` for `Probabilistic`
-models predicting a target with `Finite` scitype (classifiers). In
-this case each element of the training target `y` is a
-`CategoricalValue` or `CategoricalString`, as in this contrived example:
+Use the distribution `MMI.UnivariateFinite` for `Probabilistic` models
+predicting a target with `Finite` scitype (classifiers). In this case
+the eltype of the training target `y` will be a `CategoricalValue`.
 
-```julia
-using CategoricalArrays
-y = Any[categorical([:yes, :no, :no, :maybe, :maybe])...]
-```
+For efficiency, one should not construct `UnivariateDistribution`
+instances one at a time. Rather, once a probability vector or matrix
+is known, construct an instance of `UnivariateFiniteVector <:
+AbstractArray{<:UnivariateFinite},1}` to return. Both `UnivariateFinite`
+and `UnivariateFiniteVector` objects are constructed using the single
+`UnivariateFinite` function.
 
-Note that, as in this case, we cannot assume `y` is a
-`CategoricalVector`, and we rely on elements for pool information (if
-we need it); this is accessible using the convenience method
-`MLJ.classes`:
+For example, suppose the target `y` arrives as a subsample of some
+`ybig` and is missing some classes:
 
 ```julia
-julia> yes = y[1]
-julia> levels = MMI.classes(yes)
-3-element Array{CategoricalValue{Symbol,UInt32},1}:
- :maybe
- :no
- :yes
+ybig = categorical([:a, :b, :a, :a, :b, :a, :rare, :a, :b])
+y = ybig[1:6]
 ```
 
-Now supposing that, for some new input pattern, the elements `yes =
-y[1]` and `no = y[2]` are to be assigned respective probabilities of
-0.2 and 0.8. Then the corresponding distribution `d` is constructed as
-follows:
+Your fit method has bundled the first element of `y` with the
+`fitresult` to make it available to `predict` for purposes of tracking
+the complete pool of classes. Let's call this `an_element =
+y[1]`. Then, supposing the corresponding probabilities of the observed
+classes `[:a, :b]` are in an `n x 2` matrix `probs` (where `n` the number of
+rows of `Xnew`) then you return
 
 ```julia
-julia> d = MMI.UnivariateFinite([yes, no], [0.2, 0.8])
-UnivariateFinite(:yes=>0.2, :maybe=>0.0, :no=>0.8)
-
-julia> pdf(d, yes)
-0.2
-
-julia> maybe = y[4]; pdf(d, maybe)
-0.0
+yhat = UnivariateFinite([:a, :b], probs, pool=an_element)
 ```
 
-Alternatively, a dictionary can be passed to the constructor.
+This object automatically assigns zero-probability to the unseen class
+`:rare` (i.e., `pdf.(yhat, :rare)` works and returns a zero
+vector). If you would like to assign `:rare` non-zero probabilities,
+simply add it to the first vector (the *support*) and supply a larger
+`probs` matrix. 
+
+If instead of raw labels `[:a, :b]` you have the corresponding
+`CategoricalElement`s (from, e.g., `filter(cv->cv in unique(y),
+classes(y))`) then you can use these instead and drop the `pool`
+specifier.
+
+In a binary classification problem it suffices to specify a single
+vector of probabilities, provided you specify `augment=true`, as in
+the following example, *and note carefully that these probablities are
+associated with the* **last** *(second) class you specify in the
+constructor:*
+
+```julia
+y = categorical([:TRUE, :FALSE, :FALSE, :TRUE, :TRUE])
+an_element = y[1]
+probs = rand(10)
+yhat = UnivariateFinite([:FALSE, :TRUE], probs, augment=true, pool=an_element)
+```
+
+The constructor has a lot of options, including passing a dictionary
+instead of vectors. See [`UnivariateFinite`](@ref) for details.
 
 See
 [LinearBinaryClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/GLM.jl)
 for an example of a Probabilistic classifier implementation.
-
-
-```@docs
-UnivariateFinite
-```
 
 *Important note on binary classifiers.* There is no "Binary" scitype
 distinct from `Multiclass{2}` or `OrderedFactor{2}`; `Binary` is just
 an alias for `Union{Multiclass{2},OrderedFactor{2}}`. The
 `target_scitype` of a binary classifier will generally be
 `AbstractVector{<:Binary}` and according to the *mlj* scitype
-convention, elements of `y` have type `CategoricalValue` or
-`CategoricalString`, and *not* `Bool`. See
+convention, elements of `y` have type `CategoricalValue`, and *not*
+`Bool`. See
 [BinaryClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/GLM.jl)
 for an example.
 
@@ -558,8 +570,7 @@ MMI.input_scitype(::Type{<:DecisionTreeClassifier}) = Table(Union{Continuous,Mis
 ```
 
 Similarly, to ensure the target is an AbstractVector whose elements
-have `Finite` scitype (and hence `CategoricalValue` or
-`CategoricalString` machine type) we declare
+have `Finite` scitype (and hence `CategoricalValue` machine type) we declare
 
 ```julia
 MMI.target_scitype(::Type{<:DecisionTreeClassifier}) = AbstractVector{<:Finite}
@@ -584,8 +595,7 @@ restricts to tables with continuous or binary (ordered or unordered)
 columns.
 
 For predicting variable length sequences of, say, binary values
-(`CategoricalValue`s or `CategoricalString`s with some common size-two
-pool) we declare
+(`CategoricalValue`s) with some common size-two pool) we declare
 
 ```julia
 target_scitype(SomeSupervisedModel) = AbstractVector{<:NTuple{<:Finite{2}}}
@@ -874,6 +884,11 @@ MLJModelInterface.selectrows
 ```@docs
 MLJModelInterface.selectcols
 ```
+
+```@docs
+UnivariateFinite
+```
+
 
 
 ### Where to place code implementing new models
