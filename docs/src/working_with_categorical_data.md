@@ -105,7 +105,7 @@ levels(X.outcome)
     The order of levels should generally be changed
     early in your data science work-flow and then not again. Similar
     remarks apply to *adding* levels (which is possible; see the
-    [CategorialArrays.jl documentation](https://juliadata.github.io/CategoricalArrays.jl/stable/). MLJ supervised and unsupervised models assume levels
+    [CategorialArrays.jl documentation](https://juliadata.github.io/CategoricalArrays.jl/stable/)). MLJ supervised and unsupervised models assume levels
     and their order do not change.
 
 Coercing all remaining types simultaneously:
@@ -150,20 +150,21 @@ there which were not seen during training.
 
 ## Under the hood: CategoricalValue and CategoricalArray
 
-In MLJ the atomic objects with `OrderedFactor` or `Multiclass`
-scientific are `CategoricalValue`s, from the [CategoricalArrays.jl]
+In MLJ the objects with `OrderedFactor` or `Multiclass` scientific
+type have machine type `CategoricalValue`, from the
+[CategoricalArrays.jl]
 (https://juliadata.github.io/CategoricalArrays.jl/stable/) package.
 In some sense `CategoricalValue`s are an implementation detail users
-can ignore for the most part, as shown above. However, you may
-want some basic understanding of these types, and those implementing
-MLJ's model interface for new algorithms will have to understand
-them. For the complete API, see the CategoricalArrays.jl
+can ignore for the most part, as shown above. However, you may want
+some basic understanding of these types, and those implementing MLJ's
+model interface for new algorithms will have to understand them. For
+the complete API, see the CategoricalArrays.jl
 [documentation](https://juliadata.github.io/CategoricalArrays.jl/stable/). Here
-are the very basics:
+are the basics:
 
 
-To construct an `OrderedFactor` or `Multiclass` vector from raw
-labels, one uses `categorical`:
+To construct an `OrderedFactor` or `Multiclass` vector directly from
+raw labels, one uses `categorical`:
 
 ```@example hut
 using CategoricalArrays # hide
@@ -171,12 +172,18 @@ v = categorical([:A, :B, :A, :A, :C])
 typeof(v)
 ```
 
+(Equivalent to the idiomatically MLJ `v = coerce([:A, :B, :A, :A,
+:C]), Multiclass)`.)
+
 ```@example hut
 scitype(v)
 ```
 
 ```@example hut
-v = categorical([:A, :B, :A, :A, :C], ordered=true)
+v = categorical([:A, :B, :A, :A, :C], ordered=true, compress=true)
+```
+
+```@example hut
 scitype(v)
 ```
 
@@ -228,8 +235,8 @@ d = UnivariateFinite([:no, :yes], [0.9, 0.1], pool=missing)
 levels(d)
 ```
 
-To construct a whole *vector* of `UnivariateFinite` distributions, simply give
-the constructor a matrix of probablities:
+To construct a whole *vector* of `UnivariateFinite` distributions,
+simply give the constructor a matrix of probabilities:
 
 ```@example hut
 yes_probs = rand(5)
@@ -239,8 +246,8 @@ d_vec = UnivariateFinite([:no, :yes], probs, pool=v)
 
 Or, equivalently:
 
-```@example hut
+```@julia
 d_vec = UnivariateFinite([:no, :yes], yes_probs, augment=true, pool=v)
 ```
 
-For more options, see [UnivariateFinite](@ref). 
+For more options, see [`UnivariateFinite`](@ref). 
