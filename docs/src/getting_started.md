@@ -1,7 +1,7 @@
 # Getting Started
 
 For an outline of MLJ's **goals** and **features**, see the
-[Introduction](@ref). 
+[Introduction](@ref).
 
 This section introduces the most basic MLJ operations and concepts. It
 assumes MJL has been successfully installed. See [Installation](@ref)
@@ -20,12 +20,12 @@ seed!(1234)
 
 To load some demonstration data, add
 [RDatasets](https://github.com/JuliaStats/RDatasets.jl) to your load
-path and enter 
+path and enter
 
-```@repl doda 
-import RDatasets 
-iris = RDatasets.dataset("datasets", "iris"); # a DataFrame 
-``` 
+```@repl doda
+import RDatasets
+iris = RDatasets.dataset("datasets", "iris"); # a DataFrame
+```
 
 and then split the data into input and target parts:
 
@@ -43,7 +43,7 @@ models()
 ```
 
 In MLJ a *model* is a struct storing the hyperparameters of the
-learning algorithm indicated by the struct name.  
+learning algorithm indicated by the struct name.
 
 Assuming the DecisionTree.jl package is in your load path, we can use
 `@load` to load the code defining the `DecisionTreeClassifier` model
@@ -161,7 +161,7 @@ Or, one can explicitly get modes by using `predict_mode` instead of
 predict_mode(tree, rows=test[3:5])
 ```
 
-**(MLJ v0.2.7 and higher )** Finally, we note that `pdf()` is
+*(MLJ v0.2.7 and higher)* Finally, we note that `pdf()` is
 overloaded to allow the retrieval of probabilities for all levels at
 once:
 
@@ -343,11 +343,11 @@ are the key features of that convention:
 
 - `String`s and `Char`s are *not* interpreted as `Multiclass` or
   `OrderedFactor` (they have scitypes `Textual` and `Unknown`
-  respectively). 
-  
+  respectively).
+
 - In particular, *integers* (including `Bool`s) *cannot be used to
   represent categorical data.* Use the preceding `coerce` operations
-  to coerce to a `Finite` scitype. 
+  to coerce to a `Finite` scitype.
 
 Use `coerce(v, OrderedFactor)` or `coerce(v, Multiclass)` to coerce a
 vector `v` of integers, strings or characters to a vector with an
