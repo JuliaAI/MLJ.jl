@@ -24,6 +24,8 @@
 </p>
 </h2>
 
+**New to MLJ? Start [here](https://alan-turing-institute.github.io/MLJ.jl/stable/)**. 
+
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
 tuning, evaluating, composing and comparing machine learning models written in Julia and other languages.  MLJ is released
@@ -38,11 +40,6 @@ Institute](https://www.turing.ac.uk/).
 <a href="#citing-mlj">Citing MLJ</a> 
 </p>
 </br>
-
-**The starting point for the general MLJ user** is MLJ's
-[documentation](https://alan-turing-institute.github.io/MLJ.jl/stable/). This
-page contains information for developers of MLJ and related packages
-in the Julia machine learning eco-system.
 
 
 ### The MLJ Universe

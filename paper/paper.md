@@ -12,7 +12,7 @@ authors:
     orcid: 0000-0001-6689-886X
     affiliation: "1, 2, 3"
   - name: Franz Kiraly
-    orcid: ????-????-????-????
+    orcid: 0000-0002-9254-793X
     affiliation: "3, 4"
   - name: Thibaut Lienart
     orcid: 0000-0003-0872-7098
@@ -127,7 +127,7 @@ of probabilities, are avoided.
 A user can connect models directly to tabular data in a manifold of
 in-memory and out-of-memory formats, and usability is enhanced through
 the introduction of "_scientific types_" allowing the user to focus
-on the intended purpose of data ("continuArous", "ordered factor", etc)
+on the intended purpose of data ("continuous", "ordered factor", etc)
 rather than particular machine type representations.
 
 Finally, with the help of scientific types and the CategoricalArrays.jl
@@ -161,10 +161,10 @@ elsewhere) are shown in \autoref{fig1}.
 
 To the scientific types, MLJ adds a specific *convention* specifying a
 scientific type for every Julia object. The convention is expressed
-through a single method `scitype`.  A `coerce` method to recasts
-machine types so that they have the desired scientific type
-(interpretation), and a `schema` method summmarizes the machine and
-scientfic types of tabular data.
+through a single method `scitype`.  A `coerce` method recasts machine
+types to have the desired scientific type (interpretation), and a
+`schema` method summmarizes the machine and scientfic types of tabular
+data.
 
 ```julia
 using MLJ, CategoricalArrays
@@ -303,7 +303,7 @@ support for both distributed and multi-threaded parallelism.
 
 MLJ puts probabilistic models and deterministic models on equal
 footing. Unlike most most frameworks, a supervised model is either
-*probablistic* - meaning it's `predict` method returns a sampler
+*probablistic* - meaning it's `predict` method returns a distribution
 object - *or* it is *deterministic* - meaning it returns objects of
 the same scientific type as the training observations. To use a
 probabilistic model to make deterministic predictions one can wrap the
@@ -311,14 +311,14 @@ model in a pipeline with an appropriate post-processing function, or
 use additional `predict_mean`, `predict_mean`, `predict_mode` methods
 to deal with the common use-cases.
 
-The "sampler" objects returned by a probabilistic predictor are
-objects that can be sampled using Julia's `rand` method. Where
-possible the object is in fact a `Distribution` object from the
-Distributions.jl package [@LinEtal2020], for which an additional `pdf`
-method for evaluating the distribution's probability density or mass
-function is implemented, and which will generally implement a `mode`
-method or `mean` and `median` or methods (allowing MLJ's
-fallbacks for `predict_mean`, etc, to work). 
+A "distribution" object returned by a probabilistic predictor is one
+that can be sampled (using Julia's `rand` method) and queried for
+properties. Where possible the object is in fact a `Distribution`
+object from the Distributions.jl package [@LinEtal2020], for which an
+additional `pdf` method for evaluating the distribution's probability
+density or mass function will be implemented, and in addition to
+`mode`, `mean` and `median` methods (allowing MLJ's fallbacks for
+`predict_mean`, etc, to work).
 
 One important distribution *not* provided by Distributions.jl is a
 distribution for finite *labeled* data (called `UnivariateFinite`)
@@ -417,7 +417,7 @@ use-cases are:
   methods.
 
 In the future MLJ will add an `update_data` method to support
-models that can cary out on-line learning.
+models that can carry out on-line learning.
 
 ## The machine interface
 
@@ -503,7 +503,7 @@ regressor, trained using data from `Xr` and `z`, is then applied to
 `ŷ`, we apply the *inverse* of the Box Cox transform, learned
 previously, to `ẑ`.
 
-The lower "training" panel of the figure shows the two machines which
+The lower "training" panel of the figure shows the three machines which
 will store the parameters learned in training - the Box Cox exponent
 and shift (`machine1`), the PCA projection (`machine2`) and the ridge
 model coefficients and intercept (`machine3`). The diagram
@@ -591,7 +591,7 @@ A more comprehensive road map is linked from the MLJ repository [@MLJ].
 # Acknowledgements
 
 We acknowledge valuable conversations with Avik Sengupta, Mike Innes,
-mlj author Bernd Bischl, and IQVIA's Yaqub Alwan and Gwyn Jones. Seed
+mlr author Bernd Bischl, and IQVIA's Yaqub Alwan and Gwyn Jones. Seed
 funding for the MLJ project has been provided by the Alan Turing
 Institute's Tools, Practicies Systems programme, with special thanks
 to Dr James Hethering, its former Programme Director, and Katrina
