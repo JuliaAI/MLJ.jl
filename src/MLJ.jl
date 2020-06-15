@@ -56,7 +56,7 @@ export measures,
     default_measure, value,
     mav, mae, mape, rms, rmsl, rmslp1, rmsp, l1, l2,
     confusion_matrix, confmat,
-    cross_entropy, BrierScore, brier_score
+    cross_entropy, BrierScore, brier_score,
     misclassification_rate, mcr, accuracy,
     balanced_accuracy, bacc, bac,
     matthews_correlation, mcc,
