@@ -1,6 +1,6 @@
 # Adding Models for General Use
 
-!!! warning
+!!! note
 
     Models implementing the MLJ model interface according to the instructions given here should import MLJModelInterface version 0.3 or higher. This is	enforced with a statement such as `MLJModelInterface = "^0.3" ` under `[compat]` in the Project.toml file of the package containing the implementation.
 
@@ -146,6 +146,9 @@ function RidgeRegressor(; lambda=0.0)
     return model
 end
 ```
+
+*Important.* The clean method must have the property that
+`clean!(clean!(model)) == clean!(model)` for any instance `model`. 
 
 An alternative to declaring the model struct, clean! method and keyword
 constructor, is to use the `@mlj_model` macro, as in the following example:

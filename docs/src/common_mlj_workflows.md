@@ -145,7 +145,7 @@ Fit on train and evaluate on test:
 
 ```@example workflows
 fit!(tree, rows=train)
-yhat = predict(tree, rows=test);
+yhat = predict(tree, X[test,:])
 mean(cross_entropy(yhat, y[test]))
 ```
 
@@ -377,17 +377,17 @@ transformation/inverse transformation:
 ```@example workflows
 X, y = @load_reduced_ames
 @load KNNRegressor
-pipe = @pipeline MyPipe(X -> coerce(X, :age=>Continuous),
-                               hot = OneHotEncoder(),
-                               knn = KNNRegressor(K=3),
-                               target = UnivariateStandardizer())
+pipe = @pipeline(X -> coerce(X, :age=>Continuous),
+                 OneHotEncoder,
+                 KNNRegressor(K=3),
+                 target = UnivariateStandardizer)
 ```
 
 Evaluating the pipeline (just as you would any other model):
 
 ```@example workflows
-pipe.knn.K = 2
-pipe.hot.drop_last = true
+pipe.knn_regressor.K = 2
+pipe.one_hot_encoder.drop_last = true
 evaluate(pipe, X, y, resampling=Holdout(), measure=rms, verbosity=2)
 ```
 
@@ -396,13 +396,7 @@ Inspecting the learned parameters in a pipeline:
 ```@example workflows
 mach = machine(pipe, X, y) |> fit!
 F = fitted_params(mach)
-F.machines
-```
-```@example workflows
-F.fitted_params_given_machine
-```
-```@example workflows
-F.fitted_params_given_machine[F.machines[2]]
+F.one_hot_encoder
 ```
 
 Constructing a linear (unbranching) pipeline with a *static* (unlearned)
@@ -410,11 +404,11 @@ target transformation/inverse transformation:
 
 ```@example workflows
 @load DecisionTreeRegressor
-pipe2 = @pipeline MyPipe2(X -> coerce(X, :age=>Continuous),
-                               hot = OneHotEncoder(),
-                               tree = DecisionTreeRegressor(max_depth=4),
-                               target = y -> log.(y),
-                               inverse = z -> exp.(z))
+pipe2 = @pipeline(X -> coerce(X, :age=>Continuous),
+                  OneHotEncoder,
+                  DecisionTreeRegressor(max_depth=4),
+                  target = y -> log.(y),
+                  inverse = z -> exp.(z))
 ```
 
 ## Creating a homogeneous ensemble of models
