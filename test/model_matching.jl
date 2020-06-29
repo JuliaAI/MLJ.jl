@@ -7,9 +7,9 @@ X = (a = rand(5), b = categorical(1:5))
 y = rand(5)
 w = rand(5)
 
-@test matching(X) == MLJ.ModelChecker{false,false,scitype(X),missing}()
-@test matching(X, y) == MLJ.ModelChecker{true,false,scitype(X),scitype(y)}()
-@test matching(X, y, w) == MLJ.ModelChecker{true,true,scitype(X),scitype(y)}()
+@test matching(X) == MLJ.Checker{false,false,scitype(X),missing}()
+@test matching(X, y) == MLJ.Checker{true,false,scitype(X),scitype(y)}()
+@test matching(X, y, w) == MLJ.Checker{true,true,scitype(X),scitype(y)}()
 
 @test !matching("RidgeRegressor", pkg="MultivariateStats", X)
 @test matching("FeatureSelector", X)

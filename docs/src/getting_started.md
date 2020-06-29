@@ -44,7 +44,7 @@ models(matching(X,y))
 ```
 
 In MLJ a *model* is a struct storing the hyperparameters of the
-learning algorithm indicated by the struct name.
+learning algorithm indicated by the struct name (and nothing else).
 
 Assuming the DecisionTree.jl package is in your load path, we can use
 `@load` to load the code defining the `DecisionTreeClassifier` model
@@ -62,7 +62,8 @@ learning algorithms for use in MLJ are not MLJ dependencies. If such a
 package is not in your load path you will receive an error explaining
 how to add the package to your current environment.
 
-Once loaded, a model can be evaluated with the `evaluate` method:
+Once loaded, a model's performance can be evaluated with the
+`evaluate` method:
 
 ```@repl doda
 evaluate(tree_model, X, y,
@@ -115,10 +116,11 @@ yint = Int.(y.refs);
 scitype(yint)
 ```
 
-and using `yint` in place of `y` in classification problems will fail.
+and using `yint` in place of `y` in classification problems will
+fail. See also [Working with Categorical Data](@ref).
 
 For more on scientific types, see [Data containers and scientific
-types](@ref) below.
+types](@ref) below. 
 
 
 ## Fit and predict
@@ -212,20 +214,10 @@ evaluate!(tree, resampling=Holdout(fraction_train=0.7, shuffle=true),
 ## Next steps
 
 To learn a little more about what MLJ can do, browse [Common MLJ
-Workflows](common_mlj_workflows.md) or MLJ's
-[tutorials](https://alan-turing-institute.github.io/MLJTutorials/),
+Workflows](common_mlj_workflows.md) or [Data Science Tutorials in
+Julia](https://alan-turing-institute.github.io/DataScienceTutorials.jl/),
 returning to the manual as needed. *Read at least the remainder of
 this page before considering serious use of MLJ.*
-
-
-## Prerequisites
-
-MLJ assumes some familiarity with
-[CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl),
-used here for representing arrays of categorical data. For
-probabilistic predictors, a basic acquaintance with
-[Distributions.jl](https://github.com/JuliaStats/Distributions.jl) is
-also assumed.
 
 
 ## Data containers and scientific types

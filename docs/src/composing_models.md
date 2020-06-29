@@ -32,11 +32,12 @@ MLJ.color_off()
 using MLJ
 X = (age    = [23, 45, 34, 25, 67],
      gender = categorical(['m', 'm', 'f', 'm', 'f']));
-height = [67.0, 81.5, 55.6, 90.0, 61.1];
+height = [67.0, 81.5, 55.6, 90.0, 61.1]
+nothing # hide
 ```
 
-The code below creates a new pipeline model type called `MyPipe` for
-performing the following operations:
+The code below defines a new model type, and an *instance* of that
+type called `pipe`, for performing the following operations:
 
 - standardize the target variable `:height` to have mean zero and
   standard deviation one
@@ -47,62 +48,57 @@ performing the following operations:
 - restore the predictions of the KNN model to the original `:height`
   scale (i.e., invert the standardization)
 
-The code also creates an instance of the new pipeline model type,
-called `pipe`, whose hyperparameters `hot`, `knn`, and `stand` are the
-component model instances specified in the macro expression:
-
-```@example 7
-@load KNNRegressor # hide
+```@setup 7
+@load KNNRegressor
 ```
 
-```julia
-julia> pipe = @pipeline MyPipe(X -> coerce(X, :age=>Continuous),
-                               hot = OneHotEncoder(),
-                               regressor = KNNRegressor(K=3),
-                               target = UnivariateStandardizer())
+```julia>
+pipe = @pipeline(X -> coerce(X, :age=>Continuous),
+                 OneHotEncoder,
+                 KNNRegressor(K=3),
+                 target = UnivariateStandardizer())
 
-MyPipe(hot = OneHotEncoder(features = Symbol[],
-                           drop_last = false,
-                           ordered_factor = true,),
-       regressor = KNNRegressor(K = 3,
-                          metric = MLJModels.KNN.euclidean,
-                          kernel = MLJModels.KNN.reciprocal,),
-       target = UnivariateStandardizer(),) @ 1…16
+Pipeline406(
+    one_hot_encoder = OneHotEncoder(
+            features = Symbol[],
+            drop_last = false,
+            ordered_factor = true,
+            ignore = false),
+    knn_regressor = KNNRegressor(
+            K = 3,
+            algorithm = :kdtree,
+            metric = Distances.Euclidean(0.0),
+            leafsize = 10,
+            reorder = true,
+            weights = :uniform),
+    target = UnivariateStandardizer()) @719
+
 ```
 
-We can, for example, evaluate the pipeline like we would any other model:
+Notice that field names for the composite are automatically generated
+based on the component model type names. The automatically generated
+name of the new model composite model type, `Pipeline406`, can be
+replaced with a user-defined one by specifying, say, `name=MyPipe`.
+
+The new model can be used just like any other non-composite model:
 
 ```julia
-julia> pipe.regressor.K = 2
-julia> pipe.hot.drop_last = true
-julia> evaluate(pipe, X, height, resampling=Holdout(), measure=rms, verbosity=2)
+pipe.knn_regressor.K = 2
+pipe.one_hot_encoder.drop_last = true
+evaluate(pipe, X, height, resampling=Holdout(), measure=l2, verbosity=2)
 
-[ Info: Training Machine{MyPipe} @ 4…44.
-[ Info: Training NodalMachine{OneHotEncoder} @ 1…16.
+[ Info: Training Machine{Pipeline406} @959.
+[ Info: Training Machine{UnivariateStandardizer} @422.
+[ Info: Training Machine{OneHotEncoder} @745.
 [ Info: Spawning 1 sub-features to one-hot encode feature :gender.
-[ Info: Training NodalMachine{UnivariateStandardizer} @ 5…65.
-[ Info: Training NodalMachine{KNNRegressor} @ 1…49.
-(measure = MLJBase.RMS[rms],
- measurement = [10.0336],
- per_fold = Array{Float64,1}[[10.0336]],
- per_observation = Missing[missing],)
-```
+[ Info: Training Machine{KNNRegressor} @005.
+┌───────────┬───────────────┬────────────┐
+│ _.measure │ _.measurement │ _.per_fold │
+├───────────┼───────────────┼────────────┤
+│ l2        │ 55.5          │ [55.5]     │
+└───────────┴───────────────┴────────────┘
+_.per_observation = [[[55.502499999999934]]]
 
-Incidentally, there is nothing preventing the user from replacing the
-regressor component in this pipeline with different deterministic
-regressor:
-
-```julia
-julia> pipe.regressor = @load RidgeRegressor pkg=MultivariateStats
-julia> pipe
-```
-
-```julia
-MyPipe(hot = OneHotEncoder(features = Symbol[],
-                           drop_last = false,
-                           ordered_factor = true,),
-       regressor = RidgeRegressor(lambda = 1.0,),
-       target = UnivariateStandardizer(),) @ 1…16
 ```
 
 For important details on including target transformations, see below.
@@ -152,12 +148,12 @@ composite model, like any other model, is not associated with any data
 until wrapped in a machine.
 
 In MLJ learning networks treat the flow of information during training
-and predicting separately. Also, different nodes may use the same
-parameters (fitresult) learned during the training of some model (that
-is, point to a common *nodal machine*; see below). For these reasons,
-simple examples may appear more slightly more complicated than in
-other frameworks. However, in more sophisticated applications, the
-extra flexibility is essential.
+and prediction/transforming separately. Also, different nodes may use
+the same parameters (fitresult) learned during the training of some
+model (that is, point to a common machine; see below). For
+these reasons, simple examples may appear more slightly more
+complicated than in other frameworks. However, in more sophisticated
+applications, the extra flexibility is essential.
 
 
 ### Building a simple learning network
@@ -181,34 +177,41 @@ this regressor can be changed to a different one (e.g.,
 
 For testing purposes, we'll use a small synthetic data set:
 
-```@example 7
-using Statistics, DataFrames
-@load RidgeRegressor pkg=MultivariateStats # hide
-```
-
 ```julia
+using Statistics
+import DataFrames
+
 x1 = rand(300)
 x2 = rand(300)
 x3 = rand(300)
 y = exp.(x1 - x2 -2x3 + 0.1*rand(300))
-X = DataFrame(x1=x1, x2=x2, x3=x3)
+X = DataFrames.DataFrame(x1=x1, x2=x2, x3=x3)
 
 train, test  = partition(eachindex(y), 0.8)
-
-Xs = source(X)
-ys = source(y, kind=:target)
 ```
+Step one is to wrap the data in *source nodes*:
 
-```julia
-Source @ 3…40
+```
+Xs = source(X)
+ys = source(y)
 ```
 
 *Note.* One can omit the specification of data at the source nodes (by
-writing instead `Xs = source()` and `ys = source(kind=:target)`) and
+writing instead `Xs = source()` and `ys = source()`) and
 still export the resulting network as a stand-alone model using the
 @from_network macro described later; see the example under [Static
 operations on nodes](@ref). However, one will be unable to fit
 or call network nodes, as illustrated below.
+
+The contents of a source node can be recovered by simply calling the
+node with no arguments:
+
+```julia
+julia> ys()[1:2]
+2-element Array{Float64,1}:
+ 0.12350299813414874
+ 0.29425920370829295
+```
 
 We label the nodes that we will define according to their outputs in
 the diagram. Notice that the nodes `z` and `yhat` use the same
@@ -221,21 +224,19 @@ that it will use to transform inputs.
 stand_model = Standardizer()
 stand = machine(stand_model, Xs)
 ```
-
-```julia
-NodalMachine @ 6…82 = machine(Standardizer{} @ 1…82, 3…40)
-```
-
 Because `Xs` is a node, instead of concrete data, we can call
 `transform` on the machine without first training it, and the result
 is the new node `W`, instead of concrete transformed data:
 
 ```julia
-W = transform(stand, Xs)
-```
-
-```julia
-Node @ 1…67 = transform(6…82, 3…40)
+julia> W = transform(stand, Xs)
+Node{Machine{Standardizer}} @325
+  args:
+    1:  Source @085
+  formula:
+    transform(
+        Machine{Standardizer} @709,
+        Source @085)
 ```
 
 To get actual transformed data we *call* the node appropriately, which
@@ -252,11 +253,11 @@ W(X[3:4,:])   # transform any data, new or old
 
 ```julia
 2×3 DataFrame
-│ Row │ x1        │ x2       │ x3        │
-│     │ Float64   │ Float64  │ Float64   │
-├─────┼───────────┼──────────┼───────────┤
-│ 1   │ -0.516373 │ 0.675257 │ 1.27734   │
-│ 2   │ 0.63249   │ -1.70306 │ 0.0479891 │
+│ Row │ x1       │ x2        │ x3        │
+│     │ Float64  │ Float64   │ Float64   │
+├─────┼──────────┼───────────┼───────────┤
+│ 1   │ 0.113486 │ 0.732189  │ 1.4783    │
+│ 2   │ 0.783227 │ -0.425371 │ -0.113503 │
 ```
 
 If you like, you can think of `W` (and the other nodes we will define)
@@ -267,6 +268,8 @@ the outcome of training events.
 The other nodes of our network are defined similarly:
 
 ```julia
+@load RidgeRegressor pkg=MultivariateStats
+
 box_model = UnivariateBoxCoxTransformer()  # for making data look normally-distributed
 box = machine(box_model, ys)
 z = transform(box, ys)
@@ -276,12 +279,8 @@ ridge =machine(ridge_model, W, z)
 zhat = predict(ridge, W)
 
 yhat = inverse_transform(box, zhat)
-```
 
-```julia
-Node @ 1…07 = inverse_transform(1…09, predict(2…66, transform(6…82, 3…40)))
 ```
-
 We are ready to train and evaluate the completed network. Notice that
 the standardizer, `stand`, is *not* retrained, as MLJ remembers that
 it was trained earlier:
@@ -292,10 +291,9 @@ fit!(yhat, rows=train)
 ```
 
 ```julia
-[ Info: Not retraining NodalMachine{Standardizer} @ 6…82. It is up-to-date.
-[ Info: Training NodalMachine{UnivariateBoxCoxTransformer} @ 1…09.
-[ Info: Training NodalMachine{RidgeRegressor} @ 2…66.
-Node @ 1…07 = inverse_transform(1…09, predict(2…66, transform(6…82, 3…40)))
+[ Info: Not retraining Machine{Standardizer} @ 6…82. It is up-to-date.
+[ Info: Training Machine{UnivariateBoxCoxTransformer} @ 1…09.
+[ Info: Training Machine{RidgeRegressor} @ 2…66.
 ```
 
 ```julia
@@ -314,9 +312,9 @@ fit!(yhat, rows=train)
 ```
 
 ```julia
-[ Info: Not retraining NodalMachine{UnivariateBoxCoxTransformer} @ 1…09. It is up-to-date.
-[ Info: Not retraining NodalMachine{Standardizer} @ 6…82. It is up-to-date.
-[ Info: Updating NodalMachine{RidgeRegressor} @ 2…66.
+[ Info: Not retraining Machine{UnivariateBoxCoxTransformer} @ 1…09. It is up-to-date.
+[ Info: Not retraining Machine{Standardizer} @ 6…82. It is up-to-date.
+[ Info: Updating Machine{RidgeRegressor} @ 2…66.
 Node @ 1…07 = inverse_transform(1…09, predict(2…66, transform(6…82, 3…40)))
 ```
 
@@ -327,13 +325,57 @@ rms(y[test], yhat(rows=test))
 0.039410306910269116
 ```
 
-> **Notable feature.** The machine, `ridge::NodalMachine{RidgeRegressor}`, is retrained, because its underlying model has been mutated. However, since the outcome of this training has no effect on the training inputs of the machines `stand` and `box`, these transformers are left untouched. (During construction, each node and machine in a learning network determines and records all machines on which it depends.) This behavior, which extends to exported learning networks, means we can tune our wrapped regressor (using a holdout set) without re-computing transformations each time the hyperparameter is changed.
+> **Notable feature.** The machine, `ridge::Machine{RidgeRegressor}`, is retrained, because its underlying model has been mutated. However, since the outcome of this training has no effect on the training inputs of the machines `stand` and `box`, these transformers are left untouched. (During construction, each node and machine in a learning network determines and records all machines on which it depends.) This behavior, which extends to exported learning networks, means we can tune our wrapped regressor (using a holdout set) without re-computing transformations each time the hyperparameter is changed.
 
-### Learning networks with sample weights
 
-To build an exportable learning network supporting sample weights,
-create a source node with `ws = source(w; kind=:weights)` or `ws =
-source(; kind=weights)`.
+### Learning network machines
+
+As we show next, a learning network needs to be exported to create a
+new stand-alone model type. Instances of that type can be bound with
+data in a machine, which can then be evaluated, for example. Somewhat
+paradoxically, one can wrap a learning network in a certain kind of
+machine, called a *learning network machine*, *before* exporting it,
+and in fact, the export process actually requires us to do so. Since a
+composite model type does not yet exist, one constructs the machine
+using a "surrogate" model, whose name indicates the ultimate model
+supertype (`Deterministic`, `Probabilistic`, `Unsupervised` or
+`Static`). This surrogate model has no fields.
+
+Continuing with the example above:
+
+```julia
+julia> surrogate = Deterministic()
+DeterministicSurrogate() @047
+
+mach = machine(surrogate, Xs, ys; predict=yhat)
+```
+
+Notice that a key-word argument declares which node is for making
+predictions, and the arguments `Xs` and `ys` declare which source
+nodes receive the input and target data. With `mach` constructed in
+this way, the code
+
+```julia
+fit!(mach)
+predict(mach, X[test,:])
+```
+
+is equivalent to
+
+```julia
+fit!(yhat)
+yhat(X[test,:])
+```
+
+While it's main purpose is for export (see below), this machine can
+actually be evaluated:
+
+```julia
+evaluate!(mach, resampling=CV(nfolds=3), measure=l2)
+```
+
+For more on constructing learning network machines, see
+[`machine`](@ref).
 
 
 ## Exporting a learning network as a stand-alone model
@@ -344,66 +386,54 @@ data, we are ready to export it as a stand-alone model.
 
 ### Method I: The @from_network macro
 
-The following call simultaneously defines a new model subtype
-`WrappedRegressor <: Supervised` and returns an instance of this type,
-bound to `wrapped_regressor`:
+Having defined a learning network machine, `mach`, as above, the
+following code defines a new model subtype `WrappedRegressor <:
+Supervised` with a single field `regressor`:
 
 ```julia
-wrapped_regressor = @from_network WrappedRegressor(regressor=ridge_model) <= yhat
+@from_network mach begin
+    mutable struct WrappedRegressor
+        regressor=ridge_model
+    end
+end
 ```
 
+Note the declaration of the default value `ridge_model`, *which must
+refer to an actual model appearing in the learning network*. It can be
+typed, as in the alternative declaration below, which also declares
+some traits for the type (as shown by `info(WrappedRegressor)`; see
+also [Trait declarations](@ref)).
+
 ```julia
-WrappedRegressor(regressor = RidgeRegressor(lambda = 1.0,),) @ 2…63
+@from_network mach begin
+    mutable struct WrappedRegressor
+        regressor::Deterministic=ridge_model
+    end
+    input_scitype = Table(Continuous,Finite)
+    target_scitype = AbstractVector{<:Continuous}
+end
+
 ```
 
-Any MLJ work-flow can be applied to this composite model:
+We can now create an instance of this type and apply the meta-algorithms that apply to any MLJ model:
 
 ```julia
-X, y = @load_boston
-evaluate(wrapped_regressor, X, y, resampling=CV(), measure=rms, verbosity=0)
+julia> composite = WrappedRegressor()
+WrappedRegressor(
+    regressor = RidgeRegressor(
+            lambda = 0.01))
+
+X, y = @load_boston;
+evaluate(composite, X, y, resampling=CV(), measure=l2, verbosity=0)
 ```
 
-```julia
-(measure = MLJBase.RMS[rms],
- measurement = [5.26949],
- per_fold = Array{Float64,1}[[3.02163, 4.75385, 5.01146, 4.22582, 8.93383, 3.47707]],
- per_observation = Missing[missing],)
+Since our new type is mutable, we can swap the `RidgeRegressor` out
+for any other regressor:
+
 ```
-
-*Notes:*
-
-- A deep copy of the original learning network `ridge_model` has
-  become the default value for the field `regressor` of the new
-  `WrappedRegressor` struct.
-
-- It is important to have labeled the target source, as in `ys = source(y,
-  kind=:target)`, to ensure the network is exported as a *supervised*
-  model.
-
-- One can can also use the `@from_network` to export unsupervised
-  learning networks and the syntax is the same. For example:
-
-```julia
-langs_composite = @from_network LangsComposite(pca=network_pca) <= Xout
-```
-
-- For a supervised network making *probabilistic* predictions, one
-must add `prediction_type=:probabilistic` to the end of the `@from
-network` call. For example:
-
-```julia
-petes_composite = @from_network PetesComposite(tree_classifier=network_tree) prediction_type=:probabilistic
-```
-
-Returning to the `WrappedRegressor` model, we can change the regressor
-being wrapped if so desired:
-
-```julia
-wrapped_rgs.regressor = KNNRegressor(K=7)
-wrapped_rgs
-```
-
-```julia
+@load KNNRegressor
+composite.regressor = KNNRegressor(K=7)
+julia> composite
 WrappedRegressor(regressor = KNNRegressor(K = 7,
                                           algorithm = :kdtree,
                                           metric = Distances.Euclidean(0.0),
@@ -415,8 +445,8 @@ WrappedRegressor(regressor = KNNRegressor(K = 7,
 
 ### Method II: Finer control (advanced)
 
-This section described an advanced feature that can be
-skipped on a first reading.
+This section describes an advanced feature that can be skipped on a
+first reading.
 
 In Method I above, only models appearing in the network will appear as
 hyperparameters of the exported composite model. There is a second
@@ -431,16 +461,16 @@ macros. The two steps required are:
 We now demonstrate this second method to the preceding example. To
 see how to use the method to expose user-specified hyperparameters
 that are not component models, see
-[here](https://alan-turing-institute.github.io/MLJTutorials/pub/end-to-end/AMES.html#tuning_the_model).
+[here](https://alan-turing-institute.github.io/DataScienceTutorials.jl/end-to-end/AMES/#tuning_the_model).
 
 All learning networks that make deterministic (respectively,
 probabilistic) predictions export to models of subtype
-`DeterministicNetwork` (respectively, `ProbabilisticNetwork`),
-Unsupervised learning networks export to `UnsupervisedNetwork` model
+`DeterministicComposite` (respectively, `ProbabilisticComposite`),
+Unsupervised learning networks export to `UnsupervisedComposite` model
 subtypes. So our `mutable struct` definition looks like this:
 
 ```@example 7
-mutable struct WrappedRegressor2 <: DeterministicNetwork
+mutable struct WrappedRegressor2 <: DeterministicComposite
     regressor
 end
 
@@ -455,10 +485,9 @@ internally dispatch model `fit` methods on the data bound to the
 machine):
 
 ```@example 7
-import MLJBase
-function MLJBase.fit(model::WrappedRegressor2, verbosity::Integer, X, y)
+function MLJ.fit(model::WrappedRegressor2, verbosity::Integer, X, y)
     Xs = source(X)
-    ys = source(y, kind=:target)
+    ys = source(y)
 
     stand_model = Standardizer()
     stand = machine(stand_model, Xs)
@@ -473,30 +502,29 @@ function MLJBase.fit(model::WrappedRegressor2, verbosity::Integer, X, y)
     zhat = predict(ridge, W)
 
     yhat = inverse_transform(box, zhat)
-    fit!(yhat, verbosity=0)
 
-    return fitresults(yhat)
+    mach = machine(Deterministic(), Xs, ys; predict=yhat)
+    fit!(mach, verbosity=verbosity - 1)
+
+    return mach()
 end
 ```
 
-The line marked `###`, where the new exported model's hyperparameter
-`regressor` is spliced into the network, is the only modification. This
-completes the export process.
+This completes the export process.
 
-> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding *machine* `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the terminating node of the network built in `fit` on the data supplied. The expression `fitresults(yhat)` bundles the terminal node `yhat` with reports (one for each machine in the network) and moves training data out to a bundled cache object. This ensures machines wrapping exported model instances do not contain actual training data in their `fitresult` fields.
+Notes:
 
-```julia
-X, y = @load_boston
-wrapped_regressor2 = WrappedRegressor2()
-evaluate(wrapped_regressor2, X, y, resampling=CV(), measure=rms, verbosity=0)
-```
+- The line marked `###`, where the new exported model's hyperparameter
+  `regressor` is spliced into the network, is the only modification to
+  the previous code.
 
-```julia
-(measure = MLJBase.RMS[rms],
- measurement = [5.26287],
- per_fold = Array{Float64,1}[[3.01228, 4.73544, 5.01316, 4.21653, 8.9335, 3.45975]],
- per_observation = Missing[missing],)
-```
+- After defining the network there is the additional step of
+  constructing and fitting a learning network machine (see above).
+
+- The return value is this machine *called* with no arguments: `mach()`.
+
+> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding *machine* `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the `predict` on the learning network machine created in the `fit` method.
+
 
 ## Static operations on nodes
 
@@ -510,7 +538,6 @@ parameters. Here we address the simpler case of ordinary functions. For
 the parametric case, see "Static transformers" in [Transformers and
 other unsupervised models](@ref)
 
-
 Let us first give a demonstration of operations that work
 out-of-the-box. These include:
 
@@ -518,7 +545,7 @@ out-of-the-box. These include:
 
 - `exp`, `log`, `vcat`, `hcat`
 
-- tabularization (`MLJ.table`) and matrixification (`MLJ.matrix`) 
+- tabularization (`MLJ.table`) and matrixification (`MLJ.matrix`)
 
 As a demonstration of some of these, consider the learning network
 below that: (i) One-hot encodes the input table `X`; (ii) Log
@@ -535,7 +562,7 @@ combine several static node operations.
 @load KNNRegressor
 
 Xs = source()
-ys = source(kind=:target)
+ys = source()
 
 hot = machine(OneHotEncoder(), Xs)
 
@@ -560,20 +587,27 @@ yhat = exp(zhat)
 Exporting this learning network as a stand-alone model:
 
 ```julia
-julia> @from_network DoubleRegressor1(regressor1=model1, regressor2=model2) <= yhat
-DoubleRegressor1(regressor1 = RidgeRegressor(lambda = 0.1,),
-                 regressor2 = KNNRegressor(K = 7,
-                                           algorithm = :kdtree,
-                                           metric = Distances.Euclidean(0.0),
-                                           leafsize = 10,
-                                           reorder = true,
-                                           weights = :uniform,),) @ 1…93
+@from_network machine(Deterministic(), Xs, ys; predict=yhat) begin
+    mutable struct DoubleRegressor
+        regressor1=model1
+        regressor2=model2
+    end
+end
 ```
 
 To deal with operations on nodes not supported out-of-the box, one
-uses the `nodes` method. Supposing, in the preceding example, we
+can use the `@node` macro. Supposing, in the preceding example, we
 wanted the geometric mean rather than arithmetic mean. Then, the
 definition of `zhat` above can be replaced with
+
+```julia
+yhat1 = predict(mach1, W)
+yhat2 = predict(mach2, W)
+gmean(y1, y2) = sqrt.(y1.*y2)
+zhat = @node gmean(yhat1, yhat2)
+```
+
+There is also a `node` function, which would achieve the same in this way:
 
 ```julia
 zhat = node((y1, y2)->sqrt.(y1.*y2), predict(mach1, W), predict(mach2, W))
@@ -581,9 +615,8 @@ zhat = node((y1, y2)->sqrt.(y1.*y2), predict(mach1, W), predict(mach2, W))
 
 ### More `node` examples
 
-A `node` method allows us to overload a given function to
-node arguments.  Here are some examples taken from MLJ source
-(at work in the example above):
+Here are some examples taken from MLJ source
+(at work in the example above) for overloading common operations for nodes:
 
 ```julia
 Base.log(v::Vector{<:Number}) = log.(v)
@@ -597,53 +630,41 @@ import Base.+
 
 Here `AbstractNode` is the common super-type of `Node` and `Source`.
 
-As a final example, here's how to extend row shuffling to nodes:
+And a final example, using the `@node` macro to row-shuffle a table:
 
 ```julia
 using Random
-Random.shuffle(X::AbstractNode) = node(Y -> MLJ.selectrows(Y, Random.shuffle(1:nrows(Y))), X)
-X = (x1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-     x2 = [:one, :two, :three, :four, :five, :six, :seven, :eight, :nine, :ten])
+X = (x1 = [1, 2, 3, 4, 5],
+     x2 = [:one, :two, :three, :four, :five])
+rows(X) = 1:nrows(X)
+
 Xs = source(X)
-W = shuffle(Xs)
-```
+rs  = @node rows(Xs)
+W = @node selectrows(Xs, @node shuffle(rs))
 
-```julia
-Node @ 9…86 = #4(6…62)
-```
+julia> W()
+(x1 = [5, 1, 3, 2, 4],
+ x2 = Symbol[:five, :one, :three, :two, :four],)
 
-```julia
-W()
-```
-
-```julia
-(x1 = [1, 4, 3, 6, 8, 5, 7, 2, 9, 10],
- x2 = Symbol[:one, :four, :three, :six, :eight, :five, :seven, :two, :nine, :ten],)
 ```
 
 
 ## The learning network API
 
-Three julia types are part of learning networks: `Source`, `Node` and
-`NodalMachine`. A `NodalMachine` is returned by the `machine`
-constructor when given nodal arguments instead of concrete data.
-
-The definitions of `Node` and `NodalMachine` are coupled because every
-`NodalMachine` has `Node` objects in its `args` field (the *training
-arguments* specified in the constructor) and every `Node` must specify
-a `NodalMachine`, unless it is static (see below).
+Two new julia types are part of learning networks: `Source` and `Node`.
 
 Formally, a learning network defines *two* labeled directed acyclic
 graphs (DAG's) whose nodes are `Node` or `Source` objects, and whose
-labels are `NodalMachine` objects. We obtain the first DAG from
-directed edges of the form $N1 -> N2$ whenever $N1$ is an *argument*
-of $N2$ (see below). Only this DAG is relevant when calling a node, as
+labels are `Machine` objects. We obtain the first DAG from directed
+edges of the form $N1 -> N2$ whenever $N1$ is an *argument* of $N2$
+(see below). Only this DAG is relevant when calling a node, as
 discussed in examples above and below. To form the second DAG
 (relevant when calling or calling `fit!` on a node) one adds edges for
 which $N1$ is *training argument* of the the machine which labels
-$N1$. We call the second, larger DAG, the *complete learning network*
-below (but note only edges of the smaller network are explicitly drawn
-in diagrams, for simplicity).
+$N1$. We call the second, larger DAG, the *completed learning network*
+(but note only edges of the smaller network are explicitly drawn in
+diagrams, for simplicity).
+
 
 ### Source nodes
 
@@ -657,44 +678,26 @@ sources
 origins
 ```
 
-### Nodal machines
-
-The key components of a `NodalMachine` object are:
-
-- A *model*,  specifying a learning algorithm and hyperparameters.
-
-- Training *arguments*, which specify the nodes acting as proxies for
-  training data on calls to `fit!`.
-
-- A *fitresult*, for storing the outcomes of calls to `fit!`.
-
-A nodal machine is trained in the same way as a regular machine with
-one difference: Instead of training the model on the wrapped data
-*indexed* on `rows`, it is trained on the wrapped nodes *called* on
-`rows`, with calling being a recursive operation on nodes within a
-learning network (see below).
-
-
 ### Nodes
 
 The key components of a `Node` are:
 
 - An *operation*, which will either be *static* (a fixed function) or
-  *dynamic* (such as `predict` or `transform`, dispatched on a nodal
-  machine `NodalMachine`).
+  *dynamic* (such as `predict` or `transform`, dispatched on a machine).
 
-- A nodal *machine* on which to dispatch the operation (void if the
-  operation is static).
+- A *machine* on which to dispatch the operation (void if the
+  operation is static). The training arguments of the machine are
+  generally other nodes.
 
 - Upstream connections to other nodes (including source nodes)
   specified by *arguments* (one for each argument of the operation).
 
-- A dependency *tape*, listing of all upstream nodes in the complete
-  learning network, with an order consistent with the learning network
-  as a DAG.
-
 ```@docs
 node
+```
+
+```@docs
+@node
 ```
 
 ```@docs
@@ -702,9 +705,14 @@ fit!(N::Node; rows=nothing, verbosity=1, force=false)
 ```
 
 ```@docs
-fit!(mach::MLJ.AbstractMachine; rows=nothing, verbosity=1, force=false)
+fit!(mach::Machine; rows=nothing, verbosity=1, force=false)
+```
+
+```@docs
+fit_only!(mach::Machine; rows=nothing, verbosity=1, force=false)
 ```
 
 ```@docs
 @from_network
 ```
+
