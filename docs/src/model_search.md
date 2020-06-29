@@ -108,5 +108,4 @@ end
 ```@docs
 models
 localmodels
-matching
 ```

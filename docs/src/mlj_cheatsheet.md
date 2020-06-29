@@ -143,10 +143,6 @@ pkg="MultivariateStats")` gets all properties (aka traits) of registered models
 
 `report(mach)` gets other training results (e.g. feature rankings)
 
-`fitted_params(mach).fitted_params_given_machine` returns a dictionary if `mach` is a composite (eg, wraps a `@pipeline` model)
-
-`report(mach).report_given_machine` returns a dictionary if `mach` is a composite (eg, wraps a `@pipeline` model)
-
 
 ## Saving and retrieving machines
 
@@ -247,23 +243,19 @@ Externals include: `PCA` (in MultivariateStats), `KMeans`, `KMedoids` (in Cluste
 
 With deterministic (point) predictions:
 
-`pipe = @pipeline MyPipe(hot=OneHotEncoder(), knn=KNNRegressor(K=3), target=UnivariateStandardizer())`
+`pipe = @pipeline OneHotEncoder KNNRegressor(K=3) target=UnivariateStandardizer`
 
-`pipe = @pipeline MyPipe(hot=OneHotEncoder(), knn=KNNRegressor(K=3), target=v->log.(V), inverse=v->exp.(v))`
-
-With probabilistic-predictions:
-
-`pipe = @pipeline MyPipe(hot=OneHotEncoder(), tree=DecisionTreeClassifier()) is_probabilistic=true`)
+`pipe = @pipeline OneHotEncoder KNNRegressor(K=3) target=v->log.(V) inverse=v->exp.(v))`
 
 Unsupervised:
 
-`pipe = @pipeline MyPipe(stand=Standardizer(), hot=OneHotEncoder())`
+`pipe = @pipeline Standardizer OneHotEncoder`
 
 
 ## Define a supervised learning network:
 
 `Xs = source(X)`
-`ys = source(y, kind=:target)`
+`ys = source(y)`
 
 ... define further nodal machines and nodes ...
 
@@ -274,14 +266,34 @@ Unsupervised:
 
 Supervised, with final node `yhat` returning point-predictions:
 
-`@from_network Composite(pca=network_pca, knn=network_knn) <= yhat`
+```julia
+@from_network machine(Deterministic(), Xs, ys; predict=yhat) begin
+    mutable struct Composite
+	    reducer=network_pca
+		regressor=network_knn
+    end
+```
 
+Here `network_pca` and `network_knn` are models appearing in the
+learning network.
 
 Supervised, with `yhat` final node returning probabilistic predictions:
 
-`@from_network Composite(knn=network_knn) <= yhat is_probabilistic=true`
-
+```julia
+@from_network machine(Probabilistic(), Xs, ys; predict=yhat) begin
+    mutable struct Composite
+        reducer=network_pca
+        classifier=network_tree
+    end
+```
 
 Unsupervised, with final node `Xout`:
 
-`@from_network Composite(pca=network_pca) <= Xout`
+```julia
+@from_network machine(Unsupervised(), Xs; transform=Xout) begin
+    mutable struct Composite
+	    reducer1=network_pca
+		reducer2=clusterer
+    end
+end
+```
