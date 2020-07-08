@@ -161,7 +161,7 @@ Or, one can explicitly get modes by using `predict_mode` instead of
 `predict`:
 
 ```@repl doda
-predict_mode(tree, rows=test[3:5])
+predict_mode(tree, X[test[3:5],:])
 ```
 
 Finally, we note that `pdf()` is overloaded to allow the retrieval of
