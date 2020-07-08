@@ -164,9 +164,8 @@ Or, one can explicitly get modes by using `predict_mode` instead of
 predict_mode(tree, rows=test[3:5])
 ```
 
-*(MLJ v0.2.7 and higher)* Finally, we note that `pdf()` is
-overloaded to allow the retrieval of probabilities for all levels at
-once:
+Finally, we note that `pdf()` is overloaded to allow the retrieval of
+probabilities for all levels at once:
 
 ```@repl doda
 L = levels(y)
