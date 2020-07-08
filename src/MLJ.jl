@@ -1,5 +1,18 @@
 module MLJ
 
+## MNIST Data from Flux
+import Flux
+import Flux: Flux.Data.MNIST.images
+"""Load the well-known MNIST data from Flux."""
+macro load_mnist()
+    quote
+        y, X = Flux.Data.MNIST.labels(), Flux.Data.MNIST.images()
+        (X, y)
+    end
+end
+# X, y = @load_mnist
+
+
 
 ## METHOD EXPORT
 
