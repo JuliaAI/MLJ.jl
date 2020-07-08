@@ -26,6 +26,11 @@ MLJ is released under the MIT licensed and sponsored by the [Alan
 Turing Institute](https://www.turing.ac.uk/).
 
 
+Try out MLJ in the following
+[notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb)
+on Binder. No installation required. 
+
+
 ## Key goals
 
 * Offer a consistent way to use, compose and tune machine learning
