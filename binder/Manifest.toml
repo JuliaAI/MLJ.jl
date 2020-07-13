@@ -99,9 +99,9 @@ uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 
 [[DecisionTree]]
 deps = ["DelimitedFiles", "Distributed", "LinearAlgebra", "Random", "ScikitLearnBase", "Statistics", "Test"]
-git-tree-sha1 = "9c2125bc1b4aa8bfe9a8654bf0b814acd725f9c8"
+git-tree-sha1 = "97de68273321c2d89af4a3456117e63e9d37707a"
 uuid = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
-version = "0.10.5"
+version = "0.10.6"
 
 [[DelimitedFiles]]
 deps = ["Mmap"]
@@ -154,9 +154,9 @@ version = "0.9.4"
 
 [[FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays"]
-git-tree-sha1 = "4783bbbeade37f2a8bd82af6c112510fde78e532"
+git-tree-sha1 = "be4180bdb27a11188d694ee3773122f4921f1a62"
 uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
-version = "0.8.12"
+version = "0.8.13"
 
 [[FixedPointNumbers]]
 deps = ["Statistics"]
@@ -262,9 +262,9 @@ version = "0.12.0"
 
 [[MLJBase]]
 deps = ["CategoricalArrays", "ComputationalResources", "Dates", "DelimitedFiles", "Distributed", "Distributions", "HTTP", "InteractiveUtils", "InvertedIndices", "JLSO", "JSON", "LinearAlgebra", "LossFunctions", "MLJModelInterface", "MLJScientificTypes", "Missings", "OrderedCollections", "Parameters", "PrettyTables", "ProgressMeter", "Random", "ScientificTypes", "Statistics", "StatsBase", "Tables"]
-git-tree-sha1 = "2c5ca5601b660d76ff0baec03ed1ace073f320af"
+git-tree-sha1 = "8daa5f28e74bd7edce07b3c2ede0bcf156afd326"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
-version = "0.14.2"
+version = "0.14.3"
 
 [[MLJModelInterface]]
 deps = ["Random", "ScientificTypes"]
@@ -340,9 +340,9 @@ uuid = "6f286f6a-111f-5878-ab1e-185364afe411"
 version = "0.7.0"
 
 [[NaNMath]]
-git-tree-sha1 = "928b8ca9b2791081dc71a51c55347c27c618760f"
+git-tree-sha1 = "c84c576296d0e2fbb3fc134d3e09086b3ea617cd"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
-version = "0.3.3"
+version = "0.3.4"
 
 [[OpenBLAS_jll]]
 deps = ["CompilerSupportLibraries_jll", "Libdl", "Pkg"]
