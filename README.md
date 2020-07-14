@@ -21,6 +21,10 @@
   <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3541506.svg"
        alt="Cite MLJ">
   </a>
+  <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">
+  <img src="https://mybinder.org/badge_logo.svg"
+       alt="Binder">
+  </a>
 </p>
 </h2>
 

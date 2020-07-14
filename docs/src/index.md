@@ -9,7 +9,8 @@ A Machine Learning Framework for Julia
   <a href="mlj_cheatsheet">Cheatsheet</a>       &nbsp;|&nbsp;
   <a href="common_mlj_workflows">Workflows</a>  &nbsp;|&nbsp;
   <a href="https://alan-turing-institute.github.io/DataScienceTutorials.jl/">Tutorials</a>       &nbsp;|&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJ.jl/">Repository</a>
+  <a href="https://github.com/alan-turing-institute/MLJ.jl/">Repository</a>       &nbsp;|&nbsp;
+  <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">Binder</a>
 </div>
 ```
 
@@ -23,6 +24,11 @@ number of [scikit-learn](https://scikit-learn.org/stable/) models.
 
 MLJ is released under the MIT licensed and sponsored by the [Alan
 Turing Institute](https://www.turing.ac.uk/).
+
+
+Try out MLJ in the following
+[notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb)
+on Binder. No installation required. 
 
 
 ## Key goals
@@ -126,6 +132,8 @@ leisurely and extensive tutorials, we highly recommend the [MLJ
 Tutorials](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
 website.  Each tutorial can be downloaded as a notebook or Julia
 script to facilitate experimentation.
+
+You can use MLJ in the following [notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb) on Binder.
 
 Users are also welcome to join the `#mlj` Julia slack channel to ask
 questions and make suggestions.
