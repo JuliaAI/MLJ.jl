@@ -1,5 +1,5 @@
 ---
-title: 'MLJ: A Julia package for composable Machine Learning'
+title: 'MLJ: A Julia package for composable machine learning'
 tags:
   - Julia
   - Machine Learning
