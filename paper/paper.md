@@ -530,8 +530,8 @@ The syntax, then, for specifying the learning network shown
 \autoref{fig2} looks like this:
 
 ```julia
-X = source(X_dummy)                # or just source()
-y = source(y_dummy, kind=:target)  # or just source(kind=:target)
+X = source(X_dummy)        # or just source()
+y = source(y_dummy)        # or just source()
 
 machine1 = machine(box_cox, y)
 z = transform(machine1, y)
