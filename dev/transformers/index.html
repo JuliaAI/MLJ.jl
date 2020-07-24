@@ -115,7 +115,7 @@ transform(mach, [1, 2, 3], [3, 2, 1])
  2.0
  2.0
  2.0</code></pre><p>Let&#39;s see how we can include our <code>Averager</code> in a learning network (see <a href="../composing_models/#Composing-Models-1">Composing Models</a>) to mix the predictions of two regressors, with one-hot encoding of the inputs:</p><pre><code class="language-julia">X = source()
-y = source(kind=:target)
+y = source() #MLJ will automatically infer this a target node 
 
 ridge = @load RidgeRegressor pkg=MultivariateStats
 knn = @load KNNRegressor
@@ -130,10 +130,22 @@ y1 = predict(ridgeM, W)
 knnM = machine(knn, W, y)
 y2 = predict(knnM, W)
 
-mach = machine(averager)
-yhat = transform(mach, y1, y2)</code></pre><p>Now we export to obtain a composite model instance</p><pre><code class="language-julia">composite = @from_network(DoubleRegressor(regressor1=ridge,
-                                          regressor2=knn,
-                                          averager=averager) &lt;= yhat)
+mach= machine(averager)
+yhat = transform(averagerM, y1, y2)</code></pre><p>Now we export to obtain a <code>Deterministic</code> composite model and then  instantiate composite model</p><pre><code class="language-julia">learning_mach = machine(Deterministic(), X, y; predict=yhat)
+Machine{DeterministicSurrogate} @772 trained 0 times.
+  args: 
+    1:	Source @415 ⏎ `Unknown`
+    2:	Source @389 ⏎ `Unknown`
+
+
+@from_network learning_mach struct DoubleRegressor
+       regressor1=ridge
+       regressor2=knn
+       averager=averager
+       end
+       
+composite = DoubleRegressor()
+julia&gt; composite = DoubleRegressor()
 DoubleRegressor(
     regressor1 = RidgeRegressor(
             lambda = 1.0),
@@ -145,7 +157,8 @@ DoubleRegressor(
             reorder = true,
             weights = :uniform),
     averager = Averager(
-            mix = 0.5)) @ 1…66</code></pre><p>which can be can be evaluated like any other model:</p><pre><code class="language-julia">composite.averager.mix = 0.25 # adjust mix from default of 0.5
+            mix = 0.5)) @301
+</code></pre><p>which can be can be evaluated like any other model:</p><pre><code class="language-julia">composite.averager.mix = 0.25 # adjust mix from default of 0.5
 evaluate(composite, (@load_reduced_ames)..., measure=rms)
 julia&gt; evaluate(composite, (@load_reduced_ames)..., measure=rms)
 Evaluating over 6 folds: 100%[=========================] Time: 0:00:00
@@ -210,4 +223,4 @@ compare[101:108]
  (2, &quot;virginica&quot;)
  (2, &quot;virginica&quot;)
  (3, &quot;virginica&quot;)
- (2, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../learning_curves/">« Learning Curves</a><a class="docs-footer-nextpage" href="../composing_models/">Composing Models »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 23 July 2020 19:11">Thursday 23 July 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ (2, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../learning_curves/">« Learning Curves</a><a class="docs-footer-nextpage" href="../composing_models/">Composing Models »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 24 July 2020 22:59">Friday 24 July 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
