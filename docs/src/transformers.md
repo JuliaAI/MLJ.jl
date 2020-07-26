@@ -83,7 +83,7 @@ with one-hot encoding of the inputs:
 
 ```julia
 X = source()
-y = source(kind=:target)
+y = source() #MLJ will automatically infer this a target node 
 
 ridge = @load RidgeRegressor pkg=MultivariateStats
 knn = @load KNNRegressor
@@ -98,16 +98,29 @@ y1 = predict(ridgeM, W)
 knnM = machine(knn, W, y)
 y2 = predict(knnM, W)
 
-mach = machine(averager)
-yhat = transform(mach, y1, y2)
+averagerM= machine(averager)
+yhat = transform(averagerM, y1, y2)
 ```
 
-Now we export to obtain a composite model instance
+Now we export to obtain a `Deterministic` composite model and then 
+instantiate composite model
 
 ```julia
-composite = @from_network(DoubleRegressor(regressor1=ridge,
-                                          regressor2=knn,
-                                          averager=averager) <= yhat)
+learning_mach = machine(Deterministic(), X, y; predict=yhat)
+Machine{DeterministicSurrogate} @772 trained 0 times.
+  args: 
+    1:	Source @415 ⏎ `Unknown`
+    2:	Source @389 ⏎ `Unknown`
+
+
+@from_network learning_mach struct DoubleRegressor
+       regressor1=ridge
+       regressor2=knn
+       averager=averager
+       end
+       
+composite = DoubleRegressor()
+julia> composite = DoubleRegressor()
 DoubleRegressor(
     regressor1 = RidgeRegressor(
             lambda = 1.0),
@@ -119,7 +132,8 @@ DoubleRegressor(
             reorder = true,
             weights = :uniform),
     averager = Averager(
-            mix = 0.5)) @ 1…66
+            mix = 0.5)) @301
+
 ```
 
 which can be can be evaluated like any other model:
@@ -209,3 +223,4 @@ compare[101:108]
  (3, "virginica")
  (2, "virginica")
 ```
+
