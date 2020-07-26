@@ -98,7 +98,7 @@ y1 = predict(ridgeM, W)
 knnM = machine(knn, W, y)
 y2 = predict(knnM, W)
 
-mach= machine(averager)
+averagerM= machine(averager)
 yhat = transform(averagerM, y1, y2)
 ```
 
