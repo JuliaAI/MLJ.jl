@@ -141,25 +141,16 @@ questions and make suggestions.
 
 ## Citing MLJ
 
-An MLJ [design
-paper](https://github.com/alan-turing-institute/MLJ.jl/blob/master/paper/paper.md)
-is under review. In the meantime, please cite the software using one
-of the following:
+When presenting work that uses MLJ, please cite the [MLJ design
+paper](https://arxiv.org/abs/2007.12285). Here is the relevant bibtex entry:
 
-[https://doi.org/10.5281/zenodo.3541506](https://doi.org/10.5281/zenodo.3541506)
-
-```bibtex
-@software{anthony_blaom_2019_3541506,
-  author       = {Anthony Blaom and
-                  Franz Kiraly and
-                  Thibaut Lienart and
-                  Sebastian Vollmer},
-  title        = {alan-turing-institute/MLJ.jl: v0.5.3},
-  month        = nov,
-  year         = 2019,
-  publisher    = {Zenodo},
-  version      = {v0.5.3},
-  doi          = {10.5281/zenodo.3541506},
-  url          = {https://doi.org/10.5281/zenodo.3541506}
+```bitex
+@misc{blaom2020mlj,
+    title={MLJ: A Julia package for composable machine learning},
+    author={Anthony D. Blaom and Franz Kiraly and Thibaut Lienart and Yiannis Simillides and Diego Arenas and Sebastian J. Vollmer},
+    year={2020},
+    eprint={2007.12285},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
 }
 ```
