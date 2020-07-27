@@ -17,14 +17,19 @@
          alt="Documentation">
   </a>
   </a>
-  <a href="https://doi.org/10.5281/zenodo.3541506">
-  <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3541506.svg"
-       alt="Cite MLJ">
-  </a>
+  <!-- <a href="https://doi.org/10.5281/zenodo.3541506"> -->
+  <!-- <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3541506.svg" -->
+  <!--      alt="Cite MLJ"> -->
+  <!-- </a> -->
   <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">
   <img src="https://mybinder.org/badge_logo.svg"
        alt="Binder">
   </a>
+  <a href="https://arxiv.org/abs/2007.12285">
+    <img src="https://img.shields.io/badge/cite-arXiv-blue"
+       alt="Cite MLJ">
+  </a>
+
 </p>
 </h2>
 
@@ -155,24 +160,40 @@ Pkg.develop(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))`.
 
 ### Citing MLJ
 
-<a href="https://doi.org/10.5281/zenodo.3541506">
-  <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3541506.svg"
+<!-- <a href="https://doi.org/10.5281/zenodo.3541506"> -->
+<!--   <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3541506.svg" -->
+<!--        alt="Cite MLJ"> -->
+<!-- </a> -->
+
+<a href="https://arxiv.org/abs/2007.12285">
+  <img src="https://img.shields.io/badge/cite-arXiv-blue"
        alt="Cite MLJ">
 </a>
 
-```bibtex
-@software{anthony_blaom_2019_3541506,
-  author       = {Anthony Blaom and
-                  Franz Kiraly and
-                  Thibaut Lienart and
-                  Sebastian Vollmer},
-  title        = {alan-turing-institute/MLJ.jl: v0.5.3},
-  month        = nov,
-  year         = 2019,
-  publisher    = {Zenodo},
-  version      = {v0.5.3},
-  doi          = {10.5281/zenodo.3541506},
-  url          = {https://doi.org/10.5281/zenodo.3541506}
+<!-- ```bibtex -->
+<!-- @software{anthony_blaom_2019_3541506, -->
+<!--   author       = {Anthony Blaom and -->
+<!--                   Franz Kiraly and -->
+<!--                   Thibaut Lienart and -->
+<!--                   Sebastian Vollmer}, -->
+<!--   title        = {alan-turing-institute/MLJ.jl: v0.5.3}, -->
+<!--   month        = nov, -->
+<!--   year         = 2019, -->
+<!--   publisher    = {Zenodo}, -->
+<!--   version      = {v0.5.3}, -->
+<!--   doi          = {10.5281/zenodo.3541506}, -->
+<!--   url          = {https://doi.org/10.5281/zenodo.3541506} -->
+<!-- } -->
+<!-- ``` -->
+
+```bitex
+@misc{blaom2020mlj,
+    title={MLJ: A Julia package for composable machine learning},
+    author={Anthony D. Blaom and Franz Kiraly and Thibaut Lienart and Yiannis Simillides and Diego Arenas and Sebastian J. Vollmer},
+    year={2020},
+    eprint={2007.12285},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
 }
 ```
 
