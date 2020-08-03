@@ -131,9 +131,15 @@ read the [Getting Started](@ref) section of this manual. For more
 leisurely and extensive tutorials, we highly recommend the [MLJ
 Tutorials](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
 website.  Each tutorial can be downloaded as a notebook or Julia
-script to facilitate experimentation.
+script to facilitate experimentation. Finally, you may like to
+checkout the [JuliaCon2020
+Workshop](https://github.com/ablaom/MachineLearningInJulia2020) on MLJ
+(recorded
+[here](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title)).
 
-You can use MLJ in the following [notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb) on Binder.
+You can try also MLJ out in the following
+[notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb)
+on Binder, without installing Julia or MLJ.
 
 Users are also welcome to join the `#mlj` Julia slack channel to ask
 questions and make suggestions.
