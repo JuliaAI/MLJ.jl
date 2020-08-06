@@ -34,6 +34,7 @@ pages = [
     "Transformers and other unsupervised models" => "transformers.md",
     "Composing Models" => "composing_models.md",
     "Homogeneous Ensembles" => "homogeneous_ensembles.md",
+    "Generating Synthetic Data" => "generating_synthetic_data.md",
     "OpenML Integration" => "openml_integration.md",
     "Simple User Defined Models" => "simple_user_defined_models.md",
     "Quick-Start Guide to Adding Models" => "quick_start_guide_to_adding_models.md",
