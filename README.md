@@ -12,7 +12,7 @@
     <img src="https://img.shields.io/badge/chat-on%20slack-yellow.svg"
          alt="#mlj">
   </a>
-  <a href="https://alan-turing-institute.github.io/MLJ.jl/stable/">
+  <a href="https://alan-turing-institute.github.io/MLJ.jl/dev/">
     <img src="https://img.shields.io/badge/docs-stable-blue.svg"
          alt="Documentation">
   </a>
@@ -33,7 +33,7 @@
 </p>
 </h2>
 
-**New to MLJ? Start [here](https://alan-turing-institute.github.io/MLJ.jl/stable/)**. 
+**New to MLJ? Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/)**. 
 
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
