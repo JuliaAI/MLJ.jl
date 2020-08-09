@@ -89,8 +89,9 @@ will then do by default) or directly predict "point" estimates, for each
 new input pattern:
 
 ```julia
-abstract type Probabilistic <: Supervised end
-abstract type Deterministic <: Supervised end
+abstract type      Probabilistic <: Supervised end
+abstract type JointProbabilistic <: Supervised end
+abstract type      Deterministic <: Supervised end
 ```
 
 Further division of model types is realized through [Trait declarations](@ref).
@@ -455,7 +456,7 @@ for `SVMClassifier`.
 Of course, if you are coding a learning algorithm from scratch, rather
 than wrapping an existing one, these extra measures may be unnecessary.
 
-#### Prediction types for probabilistic responses
+#### Prediction types for `Probabilistic` models
 
 In the case of `Probabilistic` models with univariate targets, `yhat`
 must be an `AbstractVector` whose elements are distributions (one distribution
@@ -536,6 +537,19 @@ convention, elements of `y` have type `CategoricalValue`, and *not*
 [BinaryClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/GLM.jl)
 for an example.
 
+#### Prediction types for `JointProbabilistic` models
+
+In the case of `JointProbabilistic` models, `yhat`
+must be a distribution
+
+A distribution is any object `d` for which
+`MMI.isdistribution(::d) = true`, which is the case for objects of
+type `Distributions.Sampleable`.
+
+Therefore:
+```julia
+MMI.predict(model::JointProbabilisticExample, fitresult, Xnew) -> yhat::Distributions.Sampleable
+```
 
 ### Trait declarations
 
@@ -766,6 +780,60 @@ transformer that other supervised models can use to transform the
 categorical features (instead of applying the higher-dimensional one-hot
 encoding representations).
 
+##
+
+!!! warning "Experimental"
+
+    The following API is experimental 
+
+## Example: Models that learn a probability distribution
+
+One example of `JointProbabilistic` models are 
+models that learn a probability distribution, or more generally a
+"sampler" object. These are models that 
+fit a
+distribution to the target `y`, given a *void* input feature, `X =
+nothing`. Here is a working implementation of a model to fit any
+distribution from the
+[Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
+package to some data `y`, illustrating the idea (trait declarations
+omitted):
+
+```julia
+
+# Implmentation:
+
+mutable struct DistributionFitter{D<:Distributions.Distribution} <: JointProbabilistic
+    distribution::D
+end
+DistributionFitter(; distribution=Distributions.Normal()) =
+    DistributionFitter(distribution)
+
+function MLJModelInterface.fit(model::DistributionFitter{D},
+                               verbosity::Int,
+                               ::Nothing,
+                               y) where D
+
+    fitresult = Distributions.fit(D, y)
+    report = (params=Distributions.params(fitresult),)
+    cache = nothing
+
+    verbosity > 0 && @info "Fitted a $fitresult"
+
+return fitresult, cache, report
+end
+
+MLJModelInterface.predict(model::DistributionFitter,
+                          fitresult,
+                          ::Nothing) = fitresult
+
+# Example use:
+
+yhat = randn(100)
+mach = machine(DistributionFitter(), nothing, y) |> fit!
+yhat = predict(mach, nothing)
+@assert yhat isa Distributions.Normal
+```
 
 ## Unsupervised models
 
@@ -801,59 +869,6 @@ similar fashion. The main differences are:
   input features into a space of lower-dimension. See [Transformers
   that also predict](@ref) for an example.
   
-
-## Models that learn a probability distribution
-
-!!! warning "Experimental"
-
-    The following API is experimental 
-
-Models that learn a probability distribution, or more generally a
-"sampler" object, should be regarded as `Supervised` models that fit a
-distribution to the target `y`, given a *void* input feature, `X =
-nothing`. Here is a working implementation of a model to fit any
-distribution from the
-[Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
-package to some data `y`, illustrating the idea (trait declarations
-omitted):
-
-```julia
-
-# Implmentation:
-
-mutable struct DistributionFitter{D<:Distributions.Distribution} <: Supervised
-    distribution::D
-end
-DistributionFitter(; distribution=Distributions.Normal()) =
-    DistributionFitter(distribution)
-
-function MLJModelInterface.fit(model::DistributionFitter{D},
-                               verbosity::Int,
-                               ::Nothing,
-                               y) where D
-
-    fitresult = Distributions.fit(D, y)
-    report = (params=Distributions.params(fitresult),)
-    cache = nothing
-
-    verbosity > 0 && @info "Fitted a $fitresult"
-
-return fitresult, cache, report
-end
-
-MLJModelInterface.predict(model::DistributionFitter,
-                          fitresult,
-                          ::Nothing) = fitresult
-
-# Example use:
-
-yhat = randn(100)
-mach = machine(DistributionFitter(), nothing, y) |> fit!
-yhat = predict(mach, nothing)
-@assert yhat isa Distributions.Normal
-```
-
-
 ## Convenience methods
 
 ```@docs
