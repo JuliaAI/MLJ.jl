@@ -154,8 +154,11 @@ for context.
 
 A temporary workaround for this issue is to force the installation of
 an older version of the `OpenSpecFun_jll` library. To install an
-appropriate version, activate your MLJ environment and run `using Pkg;
-Pkg.develop(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))`.
+appropriate version, activate your MLJ environment and run
+```julia
+using Pkg;
+Pkg.develop(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))
+```
 
 
 ### Citing MLJ
@@ -186,7 +189,7 @@ Pkg.develop(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))`.
 <!-- } -->
 <!-- ``` -->
 
-```bitex
+```bibtex
 @misc{blaom2020mlj,
     title={MLJ: A Julia package for composable machine learning},
     author={Anthony D. Blaom and Franz Kiraly and Thibaut Lienart and Yiannis Simillides and Diego Arenas and Sebastian J. Vollmer},
