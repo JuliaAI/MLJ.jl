@@ -756,7 +756,7 @@ declaration
 output_scitype(::Type{<:SomeSupervisedModel}) = T 
 ``` 
 
-is an assurance that `scitype(transform(model, Xnew, fitresult)) <: T`
+is an assurance that `scitype(transform(model, fitresult, Xnew)) <: T`
 always holds, for any `model` of type `SomeSupervisedModel`.
 
 A use-case for a `transform` method for a supervised model is a neural
@@ -779,14 +779,14 @@ similar fashion. The main differences are:
   the same way.
   
 - A `transform` method is compulsory and has the same signature as
-  `predict`, as in `MLJModelInterface.transform(model, Xnew, fitresult)`. 
+  `predict`, as in `MLJModelInterface.transform(model, fitresult, Xnew)`. 
   
 - Instead of defining the `target_scitype` trait, one declares an
   `output_scitype` trait (see above for the meaning).
 
 - An `inverse_transform` can be optionally implemented. The signature
   is the same as `transform`, as in
-  `MLJModelInterface.inverse_transform(model, Xout, fitresult)`, which:
+  `MLJModelInterface.inverse_transform(model, fitresult, Xout)`, which:
       
    - must make sense for any `Xout` for which `scitype(Xout) <:
      output_scitype(SomeSupervisedModel)` (see below); and
@@ -796,7 +796,7 @@ similar fashion. The main differences are:
   
 - A `predict` method may be optionally implemented, and has the same
   signature as for supervised models, as in
-  `MLJModelInterface.predict(model, Xnew, fitresult)`. A use-case is
+  `MLJModelInterface.predict(model, fitresult, Xnew)`. A use-case is
   clustering algorithms that `predict` labels and `transform` new
   input features into a space of lower-dimension. See [Transformers
   that also predict](@ref) for an example.
