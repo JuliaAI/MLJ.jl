@@ -172,7 +172,7 @@ the field `a` is a `Float64`, takes `0.5` as default value, and
 expects its value to be positive.
 
 You cannot use the `@mlj_model` macro if your model struct has type
-parameters.
+parameters.  Although not essential, try to avoid Union types for model fields. For example, a field declaration features::Vector{Symbol} with a default of Symbol[] (detected with isempty) is preferred to features::Union{Vector{Symbol}, Nothing} with a default of nothing.
 
 
 ## Supervised models
