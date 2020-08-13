@@ -150,6 +150,13 @@ end
 *Important.* The clean method must have the property that
 `clean!(clean!(model)) == clean!(model)` for any instance `model`. 
 
+Although not essential, try to avoid `Union` types for model
+fields. For example, a field declaration `features::Vector{Symbol}`
+with a default of `Symbol[]` (detected with `isempty` method) is
+preferred to `features::Union{Vector{Symbol}, Nothing}` with a default
+of `nothing`.
+
+
 An alternative to declaring the model struct, clean! method and keyword
 constructor, is to use the `@mlj_model` macro, as in the following example:
 
@@ -173,7 +180,6 @@ expects its value to be positive.
 
 You cannot use the `@mlj_model` macro if your model struct has type
 parameters.
-
 
 ## Supervised models
 
