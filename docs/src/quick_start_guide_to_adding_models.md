@@ -128,6 +128,8 @@ end
 
 - Your model may have 0 fields, that's fine.
 
+- Although not essential, try to avoid Union types for model fields. For example, a field declaration features::Vector{Symbol} with a default of Symbol[] (detected with isempty) is preferred to features::Union{Vector{Symbol}, Nothing} with a default of nothing.
+
 **Examples**:
 
 - [KNNClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/NearestNeighbors.jl#L62-L69) which uses `@mlj_model`,
