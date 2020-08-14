@@ -92,9 +92,8 @@ do not exist in MLJ:
   both a `predict` and `transform` method (as in clustering models) or
   both a `transform` and `inverse_transform` method.
   
-Some of these features are demonstrated in this notebook:
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ablaom/MachineLearningInJulia2020/master?filepath=https%3A%2F%2Fgithub.com%2Fablaom%2FMachineLearningInJulia2020%2Fblob%2Fmaster%2Fwow.ipynb)
-
+Some of these features are demonstrated in [this
+notebook](https://github.com/ablaom/MachineLearningInJulia2020/blob/master/wow.ipynb)
 
 For more information see the [MLJ design
 paper](https://github.com/alan-turing-institute/MLJ.jl/blob/master/paper/paper.md)
