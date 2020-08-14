@@ -48,8 +48,9 @@ on Binder. No installation required.
 * Data agnostic, train models on any data supported by the
   [Tables.jl](https://github.com/JuliaData/Tables.jl) interface,
 
-* Extensive support for model composition (*pipelines* and *learning
-  networks*),
+* Extensive, state-of-the art, support for model composition
+  (*pipelines* and *learning networks*) (see more
+  [below](#model-composability)),
 
 * Convenient syntax to tune and evaluate (composite) models.
 
@@ -61,7 +62,39 @@ on Binder. No installation required.
   to play well with model composition.
 
 
-More information is available from the [MLJ design paper](https://github.com/alan-turing-institute/MLJ.jl/blob/master/paper/paper.md)
+## Model composability
+
+The generic model composition API's provided by other toolboxes we
+have surveyed share one or more of the following shortcomings, which
+do not exist in MLJ:
+
+- Composite models do not inherit all the behavior of ordinary
+  models.
+
+- Composition is limited to linear (non-branching) pipelines.
+
+- Supervised components in a linear pipeline can only occur at the
+  end of the pipeline.
+
+- Only static (unlearned) target transformations/inverse
+  transformations are supported.
+
+- Hyper-parameters in homogeneous model ensembles cannot be coupled.
+
+- Model stacking, with out-of-sample predictions for base learners,
+  cannot be implemented (using the generic API alone).
+
+- Hyper-parameters and/or learned parameters of component models are
+  not easily inspected or manipulated (by tuning algorithms, for
+  example)
+  
+- Composite models cannot implement multiple opertations, for example,
+  both a `predict` and `transform` method (as in clustering models) or
+  both a `transform` and `inverse_transform` method.
+
+
+More information is available from the [MLJ design
+paper](https://github.com/alan-turing-institute/MLJ.jl/blob/master/paper/paper.md)
 
 
 ## Reporting problems
