@@ -91,9 +91,12 @@ do not exist in MLJ:
 - Composite models cannot implement multiple opertations, for example,
   both a `predict` and `transform` method (as in clustering models) or
   both a `transform` and `inverse_transform` method.
+  
+Some of these features are demonstrated in this notebook:
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ablaom/MachineLearningInJulia2020/master?filepath=https%3A%2F%2Fgithub.com%2Fablaom%2FMachineLearningInJulia2020%2Fblob%2Fmaster%2Fwow.ipynb)
 
 
-More information is available from the [MLJ design
+For more information see the [MLJ design
 paper](https://github.com/alan-turing-institute/MLJ.jl/blob/master/paper/paper.md)
 
 
@@ -155,6 +158,18 @@ MLJModelInterface, etc) which the general user is *not* required to
 install directly. Developers can learn more about these
 [here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/ORGANIZATION.md)
 
+
+## Learning Julia
+
+If you have experience in programming in another language but are new
+to Julia, then we highly recommend Aaron Christinson's tutorial
+[Dispatching Design
+Patterns](https://github.com/ninjaaron/dispatching-design-patterns)
+which is nicely compressed in his [half-hour
+video presentation](https://live.juliacon.org/talk/JYNERU).
+
+However, one doesn't need to be able to program in Julia to start
+using MLJ.
 
 ## Learning to use MLJ
 
