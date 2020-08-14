@@ -120,7 +120,8 @@ end
 
 **Additional notes**:
 
-- Please annotate all fields with concrete types, if possible, using type parameters if necessary.
+- Please annotate all fields with concrete types, if possible, using
+  type parameters if necessary.
 
 - Please prefer `Symbol` over `String` if you can (e.g. to pass the name of a solver).
 
@@ -128,7 +129,12 @@ end
 
 - Your model may have 0 fields, that's fine.
 
-- Although not essential, try to avoid Union types for model fields. For example, a field declaration features::Vector{Symbol} with a default of Symbol[] (detected with isempty) is preferred to features::Union{Vector{Symbol}, Nothing} with a default of nothing.
+- Although not essential, try to avoid Union types for model
+  fields. For example, a field declaration `features::Vector{Symbol}`
+  with a default of `Symbol[]` (detected with the `isempty` method) is
+  preferred to `features::Union{Vector{Symbol}, Nothing}` with a default
+  of `nothing`.
+
 
 **Examples**:
 
