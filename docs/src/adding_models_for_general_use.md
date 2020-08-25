@@ -2,7 +2,7 @@
 
 !!! note
 
-    Models implementing the MLJ model interface according to the instructions given here should import MLJModelInterface version 0.3 or higher. This is	enforced with a statement such as `MLJModelInterface = "^0.3" ` under `[compat]` in the Project.toml file of the package containing the implementation.
+    Models implementing the MLJ model interface according to the instructions given here should import MLJModelInterface version 0.3.5 or higher. This is enforced with a statement such as `MLJModelInterface = "^0.3.5" ` under `[compat]` in the Project.toml file of the package containing the implementation.
 
 This guide outlines the specification of the MLJ model interface
 and provides detailed guidelines for implementing the interface for
@@ -848,26 +848,26 @@ function MLJModelInterface.fit(model::UnivariateFiniteFitter,
     return fitresult, cache, report
 end
 
-MLJModelInterface.predict(model::DistributionFitter,
+MLJModelInterface.predict(model::UnivariateFiniteFitter,
                           fitresult,
                           X) = fill(fitresult, length(X))
 
+
+MLJModelInterface.input_scitype(::Type{<:UnivariateFiniteFitter}) =
+    AbstractVector{Nothing}
+MLJModelInterface.target_scitype(::Type{<:UnivariateFiniteFitter}) =
+    AbstractVector{<:Finite}
 
 # Demonstration:
 
 y = coerce(collect("aabbccaa"), Multiclass)
 X = fill(nothing, length(y))
-model = DistributionFitter(distribution_type=UnivariateFinite)
+model = UnivariateFiniteFitter()
 mach = machine(model, X, y) |> fit!
 
 ytest = y[1:3]
 yhat = predict(mach, fill(nothing, 3))
 @test cross_entropy(yhat, ytest) ≈ [-log(1/2), -log(1/2), -log(1/4)]
-
-MLJModelInterface.input_scitype(::Type{<:DistributionFitter} =
-    AbstractVector{Nothing}
-MLJModelInterface.target_scitype(::Type{<:DistributionFitter} =
-    AbstractVector{<:Finite}
 
 ```
 
