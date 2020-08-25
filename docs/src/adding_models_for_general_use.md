@@ -148,7 +148,7 @@ end
 ```
 
 *Important.* The clean method must have the property that
-`clean!(clean!(model)) == clean!(model)` for any instance `model`. 
+`clean!(clean!(model)) == clean!(model)` for any instance `model`.
 
 Although not essential, try to avoid `Union` types for model
 fields. For example, a field declaration `features::Vector{Symbol}`
@@ -505,7 +505,7 @@ This object automatically assigns zero-probability to the unseen class
 `:rare` (i.e., `pdf.(yhat, :rare)` works and returns a zero
 vector). If you would like to assign `:rare` non-zero probabilities,
 simply add it to the first vector (the *support*) and supply a larger
-`probs` matrix. 
+`probs` matrix.
 
 If instead of raw labels `[:a, :b]` you have the corresponding
 `CategoricalElement`s (from, e.g., `filter(cv->cv in unique(y),
@@ -653,7 +653,7 @@ For example, a three parameter model of the form
 ```julia
 mutable struct MyModel{D} <: Deterministic
     alpha::Float64
-	beta::Int
+        beta::Int
     distribution::D
 end
 ```
@@ -662,8 +662,8 @@ you might declare (order matters):
 ```julia
 MMI.hyperparameter_ranges(::Type{<:MyModel}) =
     (range(Float64, :alpha, lower=0, upper=1, scale=:log),
-	 range(Int, :beta, lower=1, upper=Inf, origin=100, unit=50, scale=:log),
-	 nothing)
+         range(Int, :beta, lower=1, upper=Inf, origin=100, unit=50, scale=:log),
+         nothing)
 ```
 
 Here is the complete list of trait function declarations for `DecisionTreeClassifier`
@@ -685,7 +685,7 @@ Alternatively these traits can also be declared using `MMI.metadata_pkg` and `MM
 MMI.metadata_pkg(DecisionTreeClassifier,name="DecisionTree",
                      uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
                      url="https://github.com/bensadeghi/DecisionTree.jl",
-                     julia=true)   
+                     julia=true)
 
 MMI.metadata_model(DecisionTreeClassifier,
                         input=MMI.Table(MMI.Continuous),
@@ -693,7 +693,7 @@ MMI.metadata_model(DecisionTreeClassifier,
                         path="MLJModels.DecisionTree_.DecisionTreeClassifier")
 ```
 
-*Important.* Do not omit the `path` specifcation. 
+*Important.* Do not omit the `path` specifcation.
 
 ```@docs
 MMI.metadata_pkg
@@ -759,8 +759,8 @@ implementation should define a value for the `output_scitype` trait. A
 declaration
 
 ```julia
-output_scitype(::Type{<:SomeSupervisedModel}) = T 
-``` 
+output_scitype(::Type{<:SomeSupervisedModel}) = T
+```
 
 is an assurance that `scitype(transform(model, fitresult, Xnew)) <: T`
 always holds, for any `model` of type `SomeSupervisedModel`.
@@ -783,82 +783,93 @@ similar fashion. The main differences are:
   the same return value `(fitresult, cache, report)`. An `update`
   method (e.g., for iterative models) can be optionally implemented in
   the same way.
-  
+
 - A `transform` method is compulsory and has the same signature as
-  `predict`, as in `MLJModelInterface.transform(model, fitresult, Xnew)`. 
-  
+  `predict`, as in `MLJModelInterface.transform(model, fitresult, Xnew)`.
+
 - Instead of defining the `target_scitype` trait, one declares an
   `output_scitype` trait (see above for the meaning).
 
 - An `inverse_transform` can be optionally implemented. The signature
   is the same as `transform`, as in
   `MLJModelInterface.inverse_transform(model, fitresult, Xout)`, which:
-      
+
    - must make sense for any `Xout` for which `scitype(Xout) <:
      output_scitype(SomeSupervisedModel)` (see below); and
-  
+
    - must return an object `Xin` satisfying `scitype(Xin) <:
      input_scitype(SomeSupervisedModel)`.
-  
+
 - A `predict` method may be optionally implemented, and has the same
   signature as for supervised models, as in
   `MLJModelInterface.predict(model, fitresult, Xnew)`. A use-case is
   clustering algorithms that `predict` labels and `transform` new
   input features into a space of lower-dimension. See [Transformers
   that also predict](@ref) for an example.
-  
+
 
 ## Models that learn a probability distribution
 
 !!! warning "Experimental"
 
-    The following API is experimental 
+    The following API is experimental
 
-Models that learn a probability distribution, or more generally a
-"sampler" object, should be regarded as `Supervised` models that fit a
-distribution to the target `y`, given a *void* input feature, `X =
-nothing`. Here is a working implementation of a model to fit any
-distribution from the
-[Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
-package to some data `y`, illustrating the idea (trait declarations
-omitted):
+Models that fit a probability distribution to some `data` should be
+regarded as `Probablisitic <: Supervised` models with target `y=data`
+and `X` a vector of `Nothing` instances of the same length. So, for
+example, if one is fitting a `UnivariateFinite` distribution to
+`data=categorical([:yes, :no, :yes])`, then the input provided would
+be `X = [nothing, nothing, nothing] = fill(nothing, length(y))`.
+
+If `d` is the distribution fit, then `yhat = predict(fill(nothing,
+n))` returns `fill(d, n)`. Then, if `m` is a probabilistic measure
+(e.g., `m = cross_entropy`) then `m(yhat, ytest)` is defined for any
+new observations `ytest` of the same length `n`.
+
+Here is a working implementation of a model to fit a
+`UnivariateFinite` distribution to some categorical data (some trait
+declarations omitted):
 
 ```julia
 
-# Implmentation:
+mutable struct UnivariateFiniteFitter <: Probabilistic end
 
-mutable struct DistributionFitter{D<:Distributions.Distribution} <: Supervised
-    distribution::D
-end
-DistributionFitter(; distribution=Distributions.Normal()) =
-    DistributionFitter(distribution)
+# Implementation:
 
-function MLJModelInterface.fit(model::DistributionFitter{D},
-                               verbosity::Int,
-                               ::Nothing,
-                               y) where D
+function MLJModelInterface.fit(model::UnivariateFiniteFitter,
+                               verbosity::Int, X, y)
 
-    fitresult = Distributions.fit(D, y)
+    fitresult = Distributions.fit(UnivariateFinite, y)
     report = (params=Distributions.params(fitresult),)
     cache = nothing
 
     verbosity > 0 && @info "Fitted a $fitresult"
 
-return fitresult, cache, report
+    return fitresult, cache, report
 end
 
 MLJModelInterface.predict(model::DistributionFitter,
                           fitresult,
-                          ::Nothing) = fitresult
+                          X) = fill(fitresult, length(X))
 
-# Example use:
 
-yhat = randn(100)
-mach = machine(DistributionFitter(), nothing, y) |> fit!
-yhat = predict(mach, nothing)
-@assert yhat isa Distributions.Normal
+# Demonstration:
+
+y = coerce(collect("aabbccaa"), Multiclass)
+X = fill(nothing, length(y))
+model = DistributionFitter(distribution_type=UnivariateFinite)
+mach = machine(model, X, y) |> fit!
+
+ytest = y[1:3]
+yhat = predict(mach, fill(nothing, 3))
+@test cross_entropy(yhat, ytest) ≈ [-log(1/2), -log(1/2), -log(1/4)]
+
+MLJModelInterface.input_scitype(::Type{<:DistributionFitter} =
+    AbstractVector{Nothing}
+MLJModelInterface.target_scitype(::Type{<:DistributionFitter} =
+    AbstractVector{<:Finite}
+
 ```
-
 
 ## Convenience methods
 
