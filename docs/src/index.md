@@ -18,17 +18,69 @@ A Machine Learning Framework for Julia
 
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
-tuning, evaluating, composing and comparing machine learning models
-written in Julia and other languages. In particular MLJ wraps a large
-number of [scikit-learn](https://scikit-learn.org/stable/) models. 
+tuning, evaluating, composing and comparing over 140 machine learning
+models written in Julia and other languages. In particular MLJ wraps a
+large number of [scikit-learn](https://scikit-learn.org/stable/)
+models.
 
 MLJ is released under the MIT licensed and sponsored by the [Alan
 Turing Institute](https://www.turing.ac.uk/).
 
 
-Try out MLJ in the following
+## Sneak preview
+
+```julia
+using MLJ
+
+using Random
+Random.seed!(123)
+
+# load selection of features and labels from Ames House Price dataset:
+X, y = @load_reduced_ames;
+
+# load and instantiate a gradient tree-boosting model:
+booster = @load EvoTreeRegressor
+booster.max_depth = 2
+booster.nrounds=50
+
+# combine with categorical feature encoding:
+pipe = @pipeline ContinuousEncoder booster
+
+# define a hyper-parameter range for optimization:
+max_depth_range = range(pipe,
+                        :(evo_tree_regressor.max_depth),
+                        lower = 1,
+                        upper = 10)
+
+# wrap the pipeline model in an optimization strategy:
+self_tuning_pipe = TunedModel(model=pipe,
+                              tuning=RandomSearch(),
+                              ranges = max_depth_range,
+                              resampling=CV(nfolds=3, rng=456),
+                              measure=l1,
+                              acceleration=CPUThreads(),
+                              n=50)
+p
+# evaluate the "self-tuning" pipeline model's performance (implies nested resampling):
+julia> evaluate(self_tuning_pipe, X, y,
+                measures=[l1, l2],
+                resampling=CV(nfolds=6, rng=123),
+                acceleration=CPUProcesses(), verbosity=2)
+┌───────────┬───────────────┬────────────────────────────────────────────────────────┐
+│ _.measure │ _.measurement │ _.per_fold                                             │
+├───────────┼───────────────┼────────────────────────────────────────────────────────┤
+│ l1        │ 16700.0       │ [16100.0, 16400.0, 14500.0, 17000.0, 16400.0, 19500.0] │
+│ l2        │ 6.43e8        │ [5.88e8, 6.81e8, 4.35e8, 6.35e8, 5.98e8, 9.18e8]       │
+└───────────┴───────────────┴────────────────────────────────────────────────────────┘
+_.per_observation = [[[29100.0, 9990.0, ..., 103.0], [12100.0, 1330.0, ..., 13200.0], [6490.0, 22000.0, ..., 13800.0], [9090.0, 9530.0, ..., 13900.0], [50800.0, 22700.0, ..., 1550.0], [32800.0, 4940.0, ..., 1110.0]], [[8.45e8, 9.98e7, ..., 10500.0], [1.46e8, 1.77e6, ..., 1.73e8], [4.22e7, 4.86e8, ..., 1.9e8], [8.26e7, 9.09e7, ..., 1.93e8], [2.58e9, 5.13e8, ..., 2.42e6], [1.07e9, 2.44e7, ..., 1.24e6]]]
+_.fitted_params_per_fold = [ … ]
+_.report_per_fold = [ … ]
+
+```
+
+Try out MLJ yourself in the following
 [notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb)
-on Binder. No installation required. 
+on Binder. No installation required.
 
 
 ## Key goals
