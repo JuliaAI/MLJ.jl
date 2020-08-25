@@ -1,0 +1,11 @@
+name: PullRequestBaseBranch
+on:
+  pull_request:
+    types: [closed, edited, locked, opened, ready_for_review, reopened, synchronize, unlocked]
+jobs:
+  PullRequestBaseBranch:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "The base branch is ${{ github.base_ref }}."
+      - if: github.base_ref == 'master'
+        run: echo "ERROR. The base branch is master. Please open your pull request against the dev branch instead." && exit 1
