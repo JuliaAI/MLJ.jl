@@ -34,3 +34,7 @@ inspect the current default, use `MLJ.default_resource()`.
 
     The `CPUThreads()` resource is only available when running a version of
     Julia with `Threads.@spawn` available.
+
+!!! note
+
+    You cannot use `CPUThreads()` with models wrapping python code.
