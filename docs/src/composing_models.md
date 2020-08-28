@@ -504,9 +504,7 @@ function MLJ.fit(model::WrappedRegressor2, verbosity::Integer, X, y)
     yhat = inverse_transform(box, zhat)
 
     mach = machine(Deterministic(), Xs, ys; predict=yhat)
-    fit!(mach, verbosity=verbosity - 1)
-
-    return mach()
+    return!(mach, model, verbosity)
 end
 ```
 
@@ -521,9 +519,12 @@ Notes:
 - After defining the network there is the additional step of
   constructing and fitting a learning network machine (see above).
 
-- The return value is this machine *called* with no arguments: `mach()`.
+- The last call in the function `return!(mach, model, verbosity)`
+  calls `fit!` on the learning network machine `mach` and splits it
+  into various pieces, as required by the MLJ model interface. See
+  also the [`return!`](@ref) doc-string.
 
-> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding *machine* `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the `predict` on the learning network machine created in the `fit` method.
+> **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding *machine* `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the `predict` on the learning network machine created in the `fit` method. 
 
 
 ## Static operations on nodes
@@ -716,3 +717,6 @@ fit_only!(mach::Machine; rows=nothing, verbosity=1, force=false)
 @from_network
 ```
 
+```@docs
+return!
+```
