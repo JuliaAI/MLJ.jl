@@ -458,10 +458,8 @@ macros. The two steps required are:
 
 - Wrap the learning network code in a model `fit` method.
 
-We now demonstrate this second method to the preceding example. To
-see how to use the method to expose user-specified hyperparameters
-that are not component models, see
-[here](https://alan-turing-institute.github.io/DataScienceTutorials.jl/end-to-end/AMES/#tuning_the_model).
+Let's start with an elementary illustration in the learning network we
+just exported using Method I.
 
 All learning networks that make deterministic (respectively,
 probabilistic) predictions export to models of subtype
@@ -526,6 +524,50 @@ Notes:
 
 > **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding *machine* `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the `predict` on the learning network machine created in the `fit` method. 
 
+We now give a more complicated example of a composite model which
+exposes some parameters used in the network that are not simply
+component models. The model combines a clustering model (e.g.,
+`KMeans()`) for dimension reduction with ridge regression, but has the
+following "coupling" of the hyper parameters: The ridge regularization
+depends on the number of clusters used (less regularization for a
+greater number of clusters) and a user-specified "coupling"
+coefficient `K`.
+
+```julia
+@load RidgeRegressor pkg=MLJLinearModels
+
+mutable struct MyComposite <: DeterministicComposite
+    clusterer     # the clustering model (e.g., KMeans())
+    ridge_solver  # a ridge regression parameter we want to expose
+    K::Float64    # a "coupling" coefficient
+end
+
+function MLJ.fit(composite::Composite, verbosity, X, y)
+
+    Xs = source(X)
+    ys = source(y)
+
+    clusterer = composite.clusterer
+    k = clusterer.k
+
+    clustererM = machine(clusterer, Xs)
+    Xsmall = transform(clustererM, Xs)
+
+    # the coupling: ridge regularization depends on number of
+    # clusters (and the specified coefficient `K`):
+    lambda = exp(-composite.K/clusterer.k)
+
+    ridge = RidgeRegressor(lambda=lambda, solver=composite.ridge_solver)
+    ridgeM = machine(ridge, Xsmall, ys)
+
+    yhat = predict(ridgeM, Xsmall)
+
+    mach = machine(Deterministic(), Xs, ys; predict=yhat)
+    return!(mach, composite, verbosity)
+
+end
+
+```
 
 ## Static operations on nodes
 
