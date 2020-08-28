@@ -181,6 +181,27 @@ expects its value to be positive.
 You cannot use the `@mlj_model` macro if your model struct has type
 parameters.
 
+### Known issue with @mlj_macro
+
+Defaults with negative values can trip up the `@mlj_macro` (see [this
+issue](https://github.com/alan-turing-institute/MLJBase.jl/issues/68)). So,
+for example, this does not work:
+
+```julia
+@mlj_model mutable struct Bar
+    a::Int = -1::(_ > -2)
+end
+```
+
+But this does:
+
+```julia
+@mlj_model mutable struct Bar
+    a::Int = (-)(1)::(_ > -2)
+end
+```
+
+
 ## Supervised models
 
 ### Mathematical assumptions
