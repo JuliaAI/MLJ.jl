@@ -595,7 +595,7 @@ for an example.
 
 !!! warning "Experimental"
 
-    The following API is experimental
+    The following API is experimental. It is subject to breaking changes during minor or major releases without warning.
 	
 ```julia
 MMI.predict_joint(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
@@ -849,7 +849,7 @@ encoding representations).
 
 !!! warning "Experimental"
 
-    The following API is experimental
+    The following API is experimental. It is subject to breaking changes during minor or major releases without warning.
 
 Models that fit a probability distribution to some `data` should be
 regarded as `Probablisitic <: Supervised` models with target `y=data`
