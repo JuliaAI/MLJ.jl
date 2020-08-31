@@ -1,13 +1,13 @@
 # Machines
 
 Under the hood, calling `fit!` on a machine calls either `MLJBase.fit`
-or `MLJBase.update`, depending on the machine's internal state, as
-recorded in additional fields `previous_model` and
-`previous_rows`. These lower-level `fit` and `update` methods (which
-are not ordinarily directly by the user) dispatch on the model and a
-view of the data defined by the optional `rows` keyword argument of
-`fit!` (all rows by default). In this way, if a model `update` method
-has been implemented for the model, calls to `fit!` can avoid
+or `MLJBase.update`, depending on the machine's internal state (as
+recorded in private fields `previous_model` and
+`previous_rows`). These lower-level `fit` and `update` methods (which
+are not ordinarily called directly by the user) dispatch on the model
+and a view of the data defined by the optional `rows` keyword argument
+of `fit!` (all rows by default). In this way, if a model `update`
+method has been implemented for the model, calls to `fit!` can avoid
 redundant calculations for certain kinds of model mutations (eg,
 increasing the number of epochs in a neural network).
 
@@ -87,19 +87,23 @@ report
 
 A machine is constructed with the syntax `machine(model, args...)`
 where the possibilities for `args` (called *training arguments*) are
-summarized in table below. Here `X`, `y`, `w` represent inputs, target
-and per-sample weights, respectively, and `Xout` the output of a
-`transform` call.
+summarized in table below. Here `X` and `y` represent inputs and
+target, respectively, and `Xout` the output of a `transform` call.
+Machines for supervised models may have additional training arguments,
+such as a vector of per-observation weights (in which case
+`supports_weights(model) == true`).
 
 `model` supertype   | `machine` constructor calls | operation calls (first compulsory)
 --------------------|-----------------------------|--------------------------------------
-`Deterministic <: Supervised`    | `machine(model, X, y)`, `machine(model, X, y, w)` | `predict(model, X)`, `transform(model, X)`, `inverse_transform(model, Xout)`
-`Probabilistic <: Supervised`    | `machine(model, X, y)`, `machine(model, X, y, w)` | `predict(model, X)`, `predict_mean(model, X)`, `predict_median(model, X)`, `predict_mode(model, X)`, `transform(model, X)`, `inverse_transform(model, Xout)`
-`Unsupervised` (except `Static`) | `machine(model, X)` | `transform(model, X)`, `inverse_transform(model, Xout)`, `predict(model, X)`
-`Static`                        | `machine(model)`    | `transform(model, X1, X2, X3, ...)`, `inverse_transform(Xout)`
+`Deterministic <: Supervised`    | `machine(model, X, y, extras...)` | `predict(model, Xnew)`, `transform(model, Xnew)`, `inverse_transform(model, Xout)`
+`Probabilistic <: Supervised`    | `machine(model, X, y, extras...)` | `predict(model, Xnew)`, `predict_mean(model, Xnew)`, `predict_median(model, Xnew)`, `predict_mode(model, Xnew)`, `transform(model, Xnew)`, `inverse_transform(model, Xout)`
+`Unsupervised` (except `Static`) | `machine(model, X)` | `transform(model, Xnew)`, `inverse_transform(model, Xout)`, `predict(model, Xnew)`
+`Static`                        | `machine(model)`    | `transform(model, Xnews...)`, `inverse_transform(Xout)`
 
-For more on `Static` transformers (which have no training arguments)
-see [Static transformers](@ref).
+All operations (`predict`, `transform`, etc) have exactly one argument
+apart from `model`, with the exception of `Static` models which can
+have any number. For more on `Static` transformers (which have no
+training arguments) see [Static transformers](@ref).
 
 A machine is reconstructed from a file using the syntax
 `machine("my_machine.jlso")`, or `machine("my_machine.jlso", args...)`
@@ -107,7 +111,7 @@ if retraining using new data. See [Saving machines](@ref) below.
 
 ### Constructing machines in learning networks
 
-Instead of data `X`, `y`, `w`, the `machine` constructor is provided
+Instead of data `X`, `y`, etc,  the `machine` constructor is provided
 `Node` or `Source` objects ("dynamic data") when building a learning
 network. See [Composing Models](composing_models.md) for more on this
 advanced feature. One also uses `machine` to wrap a machine

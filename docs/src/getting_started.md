@@ -221,13 +221,15 @@ this page before considering serious use of MLJ.*
 
 ## Data containers and scientific types
 
-The MLJ user should acquaint themselves with some
-basic assumptions about the form of data expected by MLJ, as outlined
-below.
+The MLJ user should acquaint themselves with some basic assumptions
+about the form of data expected by MLJ, as outlined below. The basic
+`machine` constructions look like this (see also [Constructing
+machines](@ref)):
 
 ```
-machine(model::Supervised, X, y)
+machine(model::Supervised, X, y) 
 machine(model::Unsupervised, X)
+
 ```
 
 Each supervised model in MLJ declares the permitted *scientific type*
@@ -245,8 +247,8 @@ assigning a specific scientific type (interpretation) to each julia
 object (see the `scitype` examples below).
 
 The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
-`OrderedFactor{N}` and `Count`. Be sure you read [Container element
-types](@ref) below to be guarantee your scalar data is interpreted
+`OrderedFactor{N}` and `Count`. Be sure you read [Scalar
+scientific types](@ref) below to be guarantee your scalar data is interpreted
 correctly. Tools exist to coerce the data to have the appropriate
 scientfic type; see
 [MLJScientificTypes.jl](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/)
@@ -269,12 +271,13 @@ X = (x1=x1, x2=rand(4), x3=rand(4))  # a "column table"
 scitype(X)
 ```
 
-### Tabular data
+### Two-dimensional data
 
+Generally, two-dimensional data in MLJ is expected to be *tabular*.
 All data containers compatible with the
 [Tables.jl](https://github.com/JuliaData/Tables.jl) interface (which
-includes all source formats listed
-[here](https://github.com/queryverse/IterableTables.jl)) have the
+includes all source formats listed [here](
+[list](https://github.com/JuliaData/Tables.jl/blob/master/INTEGRATIONS.md))
 scientific type `Table{K}`, where `K` depends on the scientific types
 of the columns, which can be individually inspected using `schema`:
 
@@ -282,14 +285,43 @@ of the columns, which can be individually inspected using `schema`:
 schema(X)
 ```
 
+#### Non-tabular data
+
+Most MLJ models do not accept matrix in lieu of a table, but you can
+wrap a matrix as a table:
+
+```julia
+matrix_table = MLJ.table(rand(2,3))
+schema(matrix_table)
+```
+
+```
+┌─────────┬─────────┬────────────┐
+│ _.names │ _.types │ _.scitypes │
+├─────────┼─────────┼────────────┤
+│ x1      │ Float64 │ Continuous │
+│ x2      │ Float64 │ Continuous │
+│ x3      │ Float64 │ Continuous │
+└─────────┴─────────┴────────────┘
+_.nrows = 2
+
+```
+
+The matrix is *not* copied, only wrapped.  To manifest a table as a
+matrix, use `MLJ.matrix(table)`.
+
+```@docs
+MLJBase.table
+MLJBase.matrix
+```
+
+
 ### Inputs
 
 Since an MLJ model only specifies the scientific type of data, if that
 type is `Table` - which is the case for the majority of MLJ models -
 then any [Tables.jl](https://github.com/JuliaData/Tables.jl) format is
-permitted. However, the Tables.jl API excludes matrices. If `Xmatrix`
-is a matrix, convert it to a column table using `X =
-MLJ.table(Xmatrix)`.
+permitted. 
 
 Specifically, the requirement for an arbitrary model's input is `scitype(X)
 <: input_scitype(model)`.
@@ -302,11 +334,12 @@ The target `y` expected by MLJ models is generally an
 Specifically, the type requirement for a model target is `scitype(y) <:
 target_scitype(model)`.
 
+
 ### Querying a model for acceptable data types
 
 Given a model instance, one can inspect the admissible scientific
 types of its input and target, and without loading the code defining
-the model:
+the model;
 
 ```@setup doda
 tree = @load DecisionTreeClassifier
@@ -318,7 +351,9 @@ i.input_scitype
 i.target_scitype
 ```
 
-### Container element types
+But see also [Model Search](@ref). 
+
+### Scalar scientific types
 
 Models in MLJ will always apply the `MLJ` convention described in
 [MLJScientificTypes.jl](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/)
@@ -340,19 +375,19 @@ are the key features of that convention:
 - In particular, *integers* (including `Bool`s) *cannot be used to
   represent categorical data.* Use the preceding `coerce` operations
   to coerce to a `Finite` scitype.
+  
+- The scientific types of `nothing` and `missing` are `Nothing` and
+  `Missing`, native types we also regard as scientific.
 
 Use `coerce(v, OrderedFactor)` or `coerce(v, Multiclass)` to coerce a
 vector `v` of integers, strings or characters to a vector with an
-appropriate `Finite` (categorical) scitype. For more on scitype
-coercion of arrays and tables, see `coerce`, `autotype` and `unpack`
-below.
+appropriate `Finite` (categorical) scitype.  See [Working with Categorical Data](@ref)).
 
-To designate an intrinsic "true" class for binary data (for purposes
-of applying MLJ measures, such as `truepositive`), data should be
-represented by an ordered `CategoricalValue` or
-`CategoricalString`. This data will have scitype `OrderedFactor{2}`
-and the "true" class is understood to be the *second* class in the
-ordering.
+For more on scitype coercion of arrays and tables, see `coerce`,
+`autotype` and `unpack` below and the examples at
+[MLJScientificTypes.jl](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/).
+
+
 
 ```@docs
 coerce
