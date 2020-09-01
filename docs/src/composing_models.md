@@ -743,10 +743,6 @@ node
 ```
 
 ```@docs
-fit_only!(mach::Machine; rows=nothing, verbosity=1, force=false)
-```
-
-```@docs
 @from_network
 ```
 

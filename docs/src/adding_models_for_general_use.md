@@ -219,7 +219,7 @@ described below should be the output of the model under the i.i.d
 assumption.
 
 In the future newer methods may be introduced to handle weaker
-assumptions (see, e.g., [Predicting joint distributions](@ref) below).
+assumptions (see, e.g., [The predict_joint method](@ref) below).
 
 
 ### Summary of methods
