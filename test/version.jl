@@ -1,2 +1,2 @@
-#@test MLJ_VERSION isa VersionNumber
+@test MLJ_VERSION isa VersionNumber
 true
