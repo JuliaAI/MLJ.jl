@@ -94,6 +94,11 @@ Further to the last point, `a::Float64 = 0.5::(_ > 0)` indicates that
 the field `a` is a `Float64`, takes `0.5` as default value, and
 expects its value to be positive.
 
+Please see [this
+issue](https://github.com/alan-turing-institute/MLJBase.jl/issues/68)
+for a known issue and workaround relating to the use of `@mlj_model`
+with negative defaults.
+
 If you decide **not** to use the `@mlj_model` macro (e.g. in the case
 of a parametric type), you will need to write a keyword constructor
 and a `clean!` method:
@@ -140,6 +145,7 @@ end
 
 - [KNNClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/NearestNeighbors.jl#L62-L69) which uses `@mlj_model`,
 - [XGBoostRegressor](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/XGBoost.jl#L17-L161) which does not.
+
 
 ### Fit
 

@@ -2,7 +2,7 @@
 
 !!! note
 
-    Models implementing the MLJ model interface according to the instructions given here should import MLJModelInterface version 0.3 or higher. This is	enforced with a statement such as `MLJModelInterface = "^0.3" ` under `[compat]` in the Project.toml file of the package containing the implementation.
+    Models implementing the MLJ model interface according to the instructions given here should import MLJModelInterface version 0.3.5 or higher. This is enforced with a statement such as `MLJModelInterface = "^0.3.5" ` under `[compat]` in the Project.toml file of the package containing the implementation.
 
 This guide outlines the specification of the MLJ model interface
 and provides detailed guidelines for implementing the interface for
@@ -148,7 +148,7 @@ end
 ```
 
 *Important.* The clean method must have the property that
-`clean!(clean!(model)) == clean!(model)` for any instance `model`. 
+`clean!(clean!(model)) == clean!(model)` for any instance `model`.
 
 Although not essential, try to avoid `Union` types for model
 fields. For example, a field declaration `features::Vector{Symbol}`
@@ -181,15 +181,53 @@ expects its value to be positive.
 You cannot use the `@mlj_model` macro if your model struct has type
 parameters.
 
+### Known issue with @mlj_macro
+
+Defaults with negative values can trip up the `@mlj_macro` (see [this
+issue](https://github.com/alan-turing-institute/MLJBase.jl/issues/68)). So,
+for example, this does not work:
+
+```julia
+@mlj_model mutable struct Bar
+    a::Int = -1::(_ > -2)
+end
+```
+
+But this does:
+
+```julia
+@mlj_model mutable struct Bar
+    a::Int = (-)(1)::(_ > -2)
+end
+```
+
+
 ## Supervised models
+
+### Mathematical assumptions
+
+At present, MLJ's performance estimate functionality (resampling using
+`evaluate`/`evaluate!`) tacitly assumes that feature-label pairs of
+observations `(X1, y1), (X2, y2), (X2, y2), ...` are being modelled as
+identically independent random variables (i.i.d.), and constructs some
+kind of representation of an estimate of the conditional probablility
+`p(y | X)` (`y` and `X` single observations). It may be that a model
+implementing the MLJ interface has the potential to make predictions
+under weaker assumptions (e.g., time series forecasting
+models). However the output of the compulsory `predict` method
+described below should be the output of the model under the i.i.d
+assumption.
+
+In the future newer methods may be introduced to handle weaker
+assumptions (see, e.g., [Predicting joint distributions](@ref) below).
+
+
+### Summary of methods
 
 The compulsory and optional methods to be implemented for each
 concrete type `SomeSupervisedModel <: MMI.Supervised` are
 summarized below. An `=` indicates the return value for a fallback
 version of the method.
-
-
-### Summary of methods
 
 Compulsory:
 
@@ -304,9 +342,11 @@ more specific form, then `fit` will need to coerce the table into the
 form desired (and the same coercions applied to `X` will have to be
 repeated for `Xnew` in `predict`). To assist with common cases, MLJ
 provides the convenience method
-`MMI.matrix`. `MMI.matrix(Xtable)` has type `Matrix{T}` where
+[`MMI.matrix`](@ref). `MMI.matrix(Xtable)` has type `Matrix{T}` where
 `T` is the tightest common type of elements of `Xtable`, and `Xtable`
-is any table.
+is any table. (If `Xtable` is itself just a wrapped matrix,
+`Xtable=Tables.table(A)`, then `A=MMI.table(Xtable)` will be returned
+without any copying.)
 
 Other auxiliary methods provided by MLJModelInterface for handling tabular data
 are: `selectrows`, `selectcols`, `select` and `schema` (for extracting
@@ -393,17 +433,27 @@ The fallback is to return `(fitresult=fitresult,)`.
 ### The predict method
 
 A compulsory `predict` method has the form
+
 ```julia
 MMI.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
 ```
 
-Here `Xnew` will have the same form as the `X` passed to `fit`.
+Here `Xnew` will have the same form as the `X` passed to
+`fit`. 
+
+Note that while `Xnew` generally consists of multiple observations
+(e.g., has multiple rows in the case of a table) it is assumed, in view of
+the i.i.d assumption recalled above, that calling `predict(..., Xnew)`
+is equivalent to broadcasting some method `predict_one(..., x)` over
+the individual observations `x` in `Xnew` (a method implementing the
+probablility distribution `p(X |y)` above).
+
 
 #### Prediction types for deterministic responses.
 
 In the case of `Deterministic` models, `yhat` should have the same
 scitype as the `y` passed to `fit` (see above). Any `CategoricalValue`
-or `CategoricalString` elements of `yhat` **must have a pool == to the
+elements of `yhat` **must have a pool == to the
 pool of the target `y` presented in training**, even if not all levels
 appear in the training data or prediction itself. For example, in the
 case of a univariate target, such as `scitype(y) <:
@@ -412,14 +462,13 @@ MLJ.classes(y[j])` for all admissible `i` and `j`. (The method
 `classes` is described under [Convenience methods](@ref) below).
 
 Unfortunately, code not written with the preservation of categorical
-levels in mind poses special problems. To help with this, MLJModelInterface
-provides three utility methods: `int` (for converting a
-`CategoricalValue` or `CategoricalString` into an integer, the
-ordering of these integers being consistent with that of the pool),
-`decoder` (for constructing a callable object that decodes the
-integers back into `CategoricalValue`/`CategoricalString` objects),
-and `classes`, for extracting all the `CategoricalValue` or
-`CategoricalString` objects sharing the pool of a particular
+levels in mind poses special problems. To help with this,
+MLJModelInterface provides three utility methods: `int` (for
+converting a `CategoricalValue` into an integer, the ordering of these
+integers being consistent with that of the pool), `decoder` (for
+constructing a callable object that decodes the integers back into
+`CategoricalValue` objects), and `classes`, for extracting all the
+`CategoricalValue` objects sharing the pool of a particular
 value. Refer to [Convenience methods](@ref) below for important
 details.
 
@@ -460,6 +509,7 @@ for `SVMClassifier`.
 
 Of course, if you are coding a learning algorithm from scratch, rather
 than wrapping an existing one, these extra measures may be unnecessary.
+
 
 #### Prediction types for probabilistic responses
 
@@ -505,7 +555,7 @@ This object automatically assigns zero-probability to the unseen class
 `:rare` (i.e., `pdf.(yhat, :rare)` works and returns a zero
 vector). If you would like to assign `:rare` non-zero probabilities,
 simply add it to the first vector (the *support*) and supply a larger
-`probs` matrix. 
+`probs` matrix.
 
 If instead of raw labels `[:a, :b]` you have the corresponding
 `CategoricalElement`s (from, e.g., `filter(cv->cv in unique(y),
@@ -543,6 +593,30 @@ convention, elements of `y` have type `CategoricalValue`, and *not*
 for an example.
 
 
+### The predict_joint method
+
+!!! warning "Experimental"
+
+    The following API is experimental. It is subject to breaking changes during minor or major releases without warning.
+	
+```julia
+MMI.predict_joint(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
+```
+
+Any `Probabilistic` model type `SomeModel`may optionally implement a
+`predict_joint` method, which has the same signature as `predict`, but
+whose predictions are a single distribution (rather than a vector of
+per-observation distributions). 
+
+Specifically, the output `yhat` of `predict_joint` should be an
+instance of `Distributions.Sampleable{<:Multivariate,V}`, where
+`sctype(V) = target_scitype(SomeModel)` and samples have length `n`,
+where `n` is the number of observations in `Xnew`.
+
+If a new model type subtypes `JointProbablistic <: Probabilistic` then
+implementation of `predict_joint` is compulsory.
+
+
 ### Trait declarations
 
 Two trait functions allow the implementer to restrict the types of
@@ -557,8 +631,9 @@ scientific data types as values. We assume here familiarity with
 (see [Getting Started](index.md) for the basics).
 
 For example, to ensure that the `X` presented to the
-`DecisionTreeClassifier` `fit` method is a table whose columns all have `Continuous` element type
-(and hence `AbstractFloat` machine type), one declares
+`DecisionTreeClassifier` `fit` method is a table whose columns all
+have `Continuous` element type (and hence `AbstractFloat` machine
+type), one declares
 
 ```julia
 MMI.input_scitype(::Type{<:DecisionTreeClassifier}) = MMI.Table(MMI.Continuous)
@@ -653,7 +728,7 @@ For example, a three parameter model of the form
 ```julia
 mutable struct MyModel{D} <: Deterministic
     alpha::Float64
-	beta::Int
+        beta::Int
     distribution::D
 end
 ```
@@ -662,8 +737,8 @@ you might declare (order matters):
 ```julia
 MMI.hyperparameter_ranges(::Type{<:MyModel}) =
     (range(Float64, :alpha, lower=0, upper=1, scale=:log),
-	 range(Int, :beta, lower=1, upper=Inf, origin=100, unit=50, scale=:log),
-	 nothing)
+         range(Int, :beta, lower=1, upper=Inf, origin=100, unit=50, scale=:log),
+         nothing)
 ```
 
 Here is the complete list of trait function declarations for `DecisionTreeClassifier`
@@ -685,7 +760,7 @@ Alternatively these traits can also be declared using `MMI.metadata_pkg` and `MM
 MMI.metadata_pkg(DecisionTreeClassifier,name="DecisionTree",
                      uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
                      url="https://github.com/bensadeghi/DecisionTree.jl",
-                     julia=true)   
+                     julia=true)
 
 MMI.metadata_model(DecisionTreeClassifier,
                         input=MMI.Table(MMI.Continuous),
@@ -693,7 +768,7 @@ MMI.metadata_model(DecisionTreeClassifier,
                         path="MLJModels.DecisionTree_.DecisionTreeClassifier")
 ```
 
-*Important.* Do not omit the `path` specifcation. 
+*Important.* Do not omit the `path` specifcation.
 
 ```@docs
 MMI.metadata_pkg
@@ -759,8 +834,8 @@ implementation should define a value for the `output_scitype` trait. A
 declaration
 
 ```julia
-output_scitype(::Type{<:SomeSupervisedModel}) = T 
-``` 
+output_scitype(::Type{<:SomeSupervisedModel}) = T
+```
 
 is an assurance that `scitype(transform(model, fitresult, Xnew)) <: T`
 always holds, for any `model` of type `SomeSupervisedModel`.
@@ -772,6 +847,86 @@ transformer that other supervised models can use to transform the
 categorical features (instead of applying the higher-dimensional one-hot
 encoding representations).
 
+## Models that learn a probability distribution
+
+
+!!! warning "Experimental"
+
+    The following API is experimental. It is subject to breaking changes during minor or major releases without warning.
+
+Models that fit a probability distribution to some `data` should be
+regarded as `Probablisitic <: Supervised` models with target `y=data`
+and `X` a vector of `Nothing` instances of the same length. So, for
+example, if one is fitting a `UnivariateFinite` distribution to
+`y=categorical([:yes, :no, :yes])`, then the input provided would
+be `X = [nothing, nothing, nothing] = fill(nothing, length(y))`.
+
+If `d` is the distribution fit, then `yhat = predict(fill(nothing,
+n))` returns `fill(d, n)`. Then, if `m` is a probabilistic measure
+(e.g., `m = cross_entropy`) then `m(yhat, ytest)` is defined for any
+new observations `ytest` of the same length `n`.
+
+Here is a working implementation of a model to fit a
+`UnivariateFinite` distribution to some categorical data using
+[Laplace smoothing](https://en.wikipedia.org/wiki/Additive_smoothing)
+controlled by a hyper-parameter `alpha`:
+
+```julia
+import Distributions
+
+mutable struct UnivariateFiniteFitter <: MLJModelInterface.Probabilistic
+    alpha::Float64
+end
+UnivariateFiniteFitter(;alpha=1.0) = UnivariateFiniteFitter(alpha)
+
+function MLJModelInterface.fit(model::UnivariateFiniteFitter,
+                               verbosity::Int, X, y)
+
+    α = model.alpha
+    N = length(y)
+    _classes = classes(y)
+    d = length(_classes)
+
+    frequency_given_class = Distributions.countmap(y)
+    prob_given_class =
+        Dict(c => (frequency_given_class[c] + α)/(N + α*d) for c in _classes)
+
+    fitresult = UnivariateFinite(prob_given_class)
+
+    report = (params=Distributions.params(fitresult),)
+    cache = nothing
+
+    verbosity > 0 && @info "Fitted a $fitresult"
+
+    return fitresult, cache, report
+end
+
+MLJModelInterface.predict(model::UnivariateFiniteFitter,
+                          fitresult,
+                          X) = fill(fitresult, length(X))
+
+
+MLJModelInterface.input_scitype(::Type{<:UnivariateFiniteFitter}) =
+    AbstractVector{Nothing}
+MLJModelInterface.target_scitype(::Type{<:UnivariateFiniteFitter}) =
+    AbstractVector{<:Finite}
+```
+
+And a demonstration (zero smoothing):
+
+
+```julia
+using MLJBase
+y = coerce(collect("aabbccaa"), Multiclass)
+X = fill(nothing, length(y))
+model = UnivariateFiniteFitter(alpha=0)
+mach = machine(model, X, y) |> fit!
+
+ytest = y[1:3]
+yhat = predict(mach, fill(nothing, 3))
+julia> @assert cross_entropy(yhat, ytest) ≈ [-log(1/2), -log(1/2), -log(1/4)]
+true
+```
 
 ## Unsupervised models
 
@@ -783,84 +938,37 @@ similar fashion. The main differences are:
   the same return value `(fitresult, cache, report)`. An `update`
   method (e.g., for iterative models) can be optionally implemented in
   the same way.
-  
+
 - A `transform` method is compulsory and has the same signature as
-  `predict`, as in `MLJModelInterface.transform(model, fitresult, Xnew)`. 
-  
+  `predict`, as in `MLJModelInterface.transform(model, fitresult, Xnew)`.
+
 - Instead of defining the `target_scitype` trait, one declares an
   `output_scitype` trait (see above for the meaning).
 
 - An `inverse_transform` can be optionally implemented. The signature
   is the same as `transform`, as in
   `MLJModelInterface.inverse_transform(model, fitresult, Xout)`, which:
-      
+
    - must make sense for any `Xout` for which `scitype(Xout) <:
      output_scitype(SomeSupervisedModel)` (see below); and
-  
+
    - must return an object `Xin` satisfying `scitype(Xin) <:
      input_scitype(SomeSupervisedModel)`.
-  
+
 - A `predict` method may be optionally implemented, and has the same
   signature as for supervised models, as in
   `MLJModelInterface.predict(model, fitresult, Xnew)`. A use-case is
   clustering algorithms that `predict` labels and `transform` new
   input features into a space of lower-dimension. See [Transformers
   that also predict](@ref) for an example.
-  
-
-## Models that learn a probability distribution
-
-!!! warning "Experimental"
-
-    The following API is experimental 
-
-Models that learn a probability distribution, or more generally a
-"sampler" object, should be regarded as `Supervised` models that fit a
-distribution to the target `y`, given a *void* input feature, `X =
-nothing`. Here is a working implementation of a model to fit any
-distribution from the
-[Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
-package to some data `y`, illustrating the idea (trait declarations
-omitted):
-
-```julia
-
-# Implmentation:
-
-mutable struct DistributionFitter{D<:Distributions.Distribution} <: Supervised
-    distribution::D
-end
-DistributionFitter(; distribution=Distributions.Normal()) =
-    DistributionFitter(distribution)
-
-function MLJModelInterface.fit(model::DistributionFitter{D},
-                               verbosity::Int,
-                               ::Nothing,
-                               y) where D
-
-    fitresult = Distributions.fit(D, y)
-    report = (params=Distributions.params(fitresult),)
-    cache = nothing
-
-    verbosity > 0 && @info "Fitted a $fitresult"
-
-return fitresult, cache, report
-end
-
-MLJModelInterface.predict(model::DistributionFitter,
-                          fitresult,
-                          ::Nothing) = fitresult
-
-# Example use:
-
-yhat = randn(100)
-mach = machine(DistributionFitter(), nothing, y) |> fit!
-yhat = predict(mach, nothing)
-@assert yhat isa Distributions.Normal
-```
 
 
 ## Convenience methods
+
+```@docs
+MLJBase.table
+MLJBase.matrix
+```
 
 ```@docs
 MLJModelInterface.int
@@ -872,14 +980,6 @@ MLJModelInterface.classes
 
 ```@docs
 MLJModelInterface.decoder
-```
-
-```@docs
-MLJModelInterface.matrix
-```
-
-```@docs
-MLJModelInterface.table
 ```
 
 ```@docs
