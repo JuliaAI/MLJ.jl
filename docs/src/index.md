@@ -29,7 +29,7 @@ Turing Institute](https://www.turing.ac.uk/).
 
 ## Lightning tour
 
-Load a selection of features and labels from Ames House Price dataset:
+Load a selection of features and labels from the Ames House Price dataset:
 
 ```julia
 using MLJ
@@ -44,7 +44,7 @@ booster.max_depth = 2
 booster.nrounds=50
 ```
 
-Combine with categorical feature encoding:
+Combine the model with categorical feature encoding:
 
 ```julia
 pipe = @pipeline ContinuousEncoder booster
@@ -90,9 +90,9 @@ _.report_per_fold = [ … ]
 
 ```
 
-Try out MLJ yourself in the following
-[notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb)
-on Binder. No installation required.
+Try out MLJ yourself in the following batteries-included Binder
+[notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb). No
+installation required.
 
 
 ## Key goals
