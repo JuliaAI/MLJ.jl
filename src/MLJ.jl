@@ -20,8 +20,8 @@ export pdf, mode, median, mean, shuffle!, categorical, shuffle,
 
 # re-exports from (MLJ)ScientificTypes via MLJBase
 export Scientific, Found, Unknown, Known, Finite, Infinite,
-       OrderedFactor, Multiclass, Count, Continuous, Textual,
-       Binary, ColorImage, GrayImage, Image, Table
+    OrderedFactor, Multiclass, Count, Continuous, Textual,
+    Binary, ColorImage, GrayImage, Image, Table
 export scitype, scitype_union, elscitype, nonmissing, trait
 export coerce, coerce!, autotype, schema, info
 
@@ -53,7 +53,7 @@ export nrows, color_off, color_on,
     default_resource, pretty,
     OpenML,
     make_blobs, make_moons, make_circles, make_regression,
-    fit_only!
+    fit_only!, return!, int, decoder
 
 export measures,
     orientation, reports_each_observation,

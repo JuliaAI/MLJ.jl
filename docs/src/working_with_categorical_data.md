@@ -148,6 +148,26 @@ models on an evaluation set, only to crash your code because classes appear
 there which were not seen during training.
 
 
+## Extracting an integer representation of Finite data
+
+Occasionally, you may really want an integer representation of data
+that currently has scitype `Finite`. For example, you are developer
+wrapping an algorithm from an external package for use in MLJ, and
+that algorithm uses integer representations. Use the `int` method for
+this purpose, and use `decoder` to construct decoders for reversing
+the transformation:
+
+```@example hut
+v = coerce([:one, :two, :three, :one], OrderedFactor);
+levels!(v, [:one, :two, :three]);
+v_int = int(v)
+```
+
+```@example hut
+d = decoder(v); # or decoder(v[1])
+d.(v_int)
+```
+
 ## Under the hood: CategoricalValue and CategoricalArray
 
 In MLJ the objects with `OrderedFactor` or `Multiclass` scientific
