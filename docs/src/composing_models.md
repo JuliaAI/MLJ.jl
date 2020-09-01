@@ -566,7 +566,6 @@ function MLJ.fit(composite::Composite, verbosity, X, y)
     return!(mach, composite, verbosity)
 
 end
-
 ```
 
 ## Static operations on nodes
@@ -756,3 +755,4 @@ return!
 ```
 
 See more on fitting nodes at [`fit!`](@ref) and [`fit_only!](@ref). 
+

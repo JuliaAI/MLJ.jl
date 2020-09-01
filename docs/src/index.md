@@ -33,7 +33,6 @@ Load a selection of features and labels from Ames House Price dataset:
 
 ```julia
 using MLJ
-
 X, y = @load_reduced_ames;
 ```
 

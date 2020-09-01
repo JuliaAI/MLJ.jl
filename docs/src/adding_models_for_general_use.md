@@ -849,6 +849,7 @@ encoding representations).
 
 ## Models that learn a probability distribution
 
+
 !!! warning "Experimental"
 
     The following API is experimental. It is subject to breaking changes during minor or major releases without warning.
@@ -871,7 +872,6 @@ Here is a working implementation of a model to fit a
 controlled by a hyper-parameter `alpha`:
 
 ```julia
-
 import Distributions
 
 mutable struct UnivariateFiniteFitter <: MLJModelInterface.Probabilistic
@@ -961,7 +961,6 @@ similar fashion. The main differences are:
   clustering algorithms that `predict` labels and `transform` new
   input features into a space of lower-dimension. See [Transformers
   that also predict](@ref) for an example.
-
 
 
 ## Convenience methods
