@@ -53,7 +53,7 @@ export nrows, color_off, color_on,
     default_resource, pretty,
     OpenML,
     make_blobs, make_moons, make_circles, make_regression,
-    fit_only!
+    fit_only!, return!, int, decoder
 
 export measures,
     orientation, reports_each_observation,

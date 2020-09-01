@@ -2,9 +2,9 @@
 
 Under the hood, calling `fit!` on a machine calls either `MLJBase.fit`
 or `MLJBase.update`, depending on the machine's internal state (as
-recorded in private fields `previous_model` and
-`previous_rows`). These lower-level `fit` and `update` methods (which
-are not ordinarily called directly by the user) dispatch on the model
+recorded in private fields `old_model` and
+`old_rows`). These lower-level `fit` and `update` methods, which
+are not ordinarily called directly by the user, dispatch on the model
 and a view of the data defined by the optional `rows` keyword argument
 of `fit!` (all rows by default). In this way, if a model `update`
 method has been implemented for the model, calls to `fit!` can avoid
@@ -101,9 +101,10 @@ such as a vector of per-observation weights (in which case
 `Static`                        | `machine(model)`    | `transform(model, Xnews...)`, `inverse_transform(Xout)`
 
 All operations (`predict`, `transform`, etc) have exactly one argument
-apart from `model`, with the exception of `Static` models which can
-have any number. For more on `Static` transformers (which have no
-training arguments) see [Static transformers](@ref).
+after argument, `Xnew` or `Xout`, after `model`, with the exception of
+`Static` models which can have any number of arguments. For more on
+`Static` transformers (which have no *training* arguments) see [Static
+transformers](@ref).
 
 A machine is reconstructed from a file using the syntax
 `machine("my_machine.jlso")`, or `machine("my_machine.jlso", args...)`
@@ -182,7 +183,7 @@ the simplified code excerpt in [Internals](internals.md).
 
 ```@docs
 MLJBase.machine
-fit!(machine::Machine)
+fit!
 fit_only!
 MLJBase.save
 ```

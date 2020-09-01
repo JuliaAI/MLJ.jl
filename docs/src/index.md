@@ -27,32 +27,42 @@ MLJ is released under the MIT licensed and sponsored by the [Alan
 Turing Institute](https://www.turing.ac.uk/).
 
 
-## Sneak preview
+## Lightning tour
+
+Load a selection of features and labels from Ames House Price dataset:
 
 ```julia
 using MLJ
 
-using Random
-Random.seed!(123)
-
-# load selection of features and labels from Ames House Price dataset:
 X, y = @load_reduced_ames;
+```
 
-# load and instantiate a gradient tree-boosting model:
+Load and instantiate a gradient tree-boosting model:
+
+```julia
 booster = @load EvoTreeRegressor
 booster.max_depth = 2
 booster.nrounds=50
+```
 
-# combine with categorical feature encoding:
+Combine with categorical feature encoding:
+
+```julia
 pipe = @pipeline ContinuousEncoder booster
+```
 
-# define a hyper-parameter range for optimization:
+Define a hyper-parameter range for optimization:
+
+```julia
 max_depth_range = range(pipe,
                         :(evo_tree_regressor.max_depth),
                         lower = 1,
                         upper = 10)
+```
 
-# wrap the pipeline model in an optimization strategy:
+Wrap the pipeline model in an optimization strategy:
+
+```julia
 self_tuning_pipe = TunedModel(model=pipe,
                               tuning=RandomSearch(),
                               ranges = max_depth_range,
@@ -60,8 +70,11 @@ self_tuning_pipe = TunedModel(model=pipe,
                               measure=l1,
                               acceleration=CPUThreads(),
                               n=50)
-p
-# evaluate the "self-tuning" pipeline model's performance (implies nested resampling):
+```
+
+Evaluate the "self-tuning" pipeline model's performance (implies nested resampling):
+
+```julia
 julia> evaluate(self_tuning_pipe, X, y,
                 measures=[l1, l2],
                 resampling=CV(nfolds=6, rng=123),

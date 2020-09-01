@@ -342,9 +342,11 @@ more specific form, then `fit` will need to coerce the table into the
 form desired (and the same coercions applied to `X` will have to be
 repeated for `Xnew` in `predict`). To assist with common cases, MLJ
 provides the convenience method
-`MMI.matrix`. `MMI.matrix(Xtable)` has type `Matrix{T}` where
+[`MMI.matrix`](@ref). `MMI.matrix(Xtable)` has type `Matrix{T}` where
 `T` is the tightest common type of elements of `Xtable`, and `Xtable`
-is any table.
+is any table. (If `Xtable` is itself just a wrapped matrix,
+`Xtable=Tables.table(A)`, then `A=MMI.table(Xtable)` will be returned
+without any copying.)
 
 Other auxiliary methods provided by MLJModelInterface for handling tabular data
 are: `selectrows`, `selectcols`, `select` and `schema` (for extracting
@@ -845,7 +847,7 @@ transformer that other supervised models can use to transform the
 categorical features (instead of applying the higher-dimensional one-hot
 encoding representations).
 
-### Models that learn a probability distribution
+## Models that learn a probability distribution
 
 !!! warning "Experimental"
 
@@ -869,8 +871,6 @@ Here is a working implementation of a model to fit a
 controlled by a hyper-parameter `alpha`:
 
 ```julia
-
-# Implementation:
 
 import Distributions
 
@@ -910,9 +910,12 @@ MLJModelInterface.input_scitype(::Type{<:UnivariateFiniteFitter}) =
     AbstractVector{Nothing}
 MLJModelInterface.target_scitype(::Type{<:UnivariateFiniteFitter}) =
     AbstractVector{<:Finite}
+```
 
-# Demonstration:
+And a demonstration (zero smoothing):
 
+
+```julia
 using MLJBase
 y = coerce(collect("aabbccaa"), Multiclass)
 X = fill(nothing, length(y))
@@ -921,8 +924,8 @@ mach = machine(model, X, y) |> fit!
 
 ytest = y[1:3]
 yhat = predict(mach, fill(nothing, 3))
-@assert cross_entropy(yhat, ytest) ≈ [-log(1/2), -log(1/2), -log(1/4)]
-
+julia> @assert cross_entropy(yhat, ytest) ≈ [-log(1/2), -log(1/2), -log(1/4)]
+true
 ```
 
 ## Unsupervised models
@@ -964,6 +967,11 @@ similar fashion. The main differences are:
 ## Convenience methods
 
 ```@docs
+MLJBase.table
+MLJBase.matrix
+```
+
+```@docs
 MLJModelInterface.int
 ```
 
@@ -973,14 +981,6 @@ MLJModelInterface.classes
 
 ```@docs
 MLJModelInterface.decoder
-```
-
-```@docs
-MLJModelInterface.matrix
-```
-
-```@docs
-MLJModelInterface.table
 ```
 
 ```@docs

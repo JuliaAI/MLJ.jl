@@ -461,11 +461,7 @@ macros. The two steps required are:
 Let's start with an elementary illustration in the learning network we
 just exported using Method I.
 
-All learning networks that make deterministic (respectively,
-probabilistic) predictions export to models of subtype
-`DeterministicComposite` (respectively, `ProbabilisticComposite`),
-Unsupervised learning networks export to `UnsupervisedComposite` model
-subtypes. So our `mutable struct` definition looks like this:
+The `mutable struct` definition looks like this:
 
 ```@example 7
 mutable struct WrappedRegressor2 <: DeterministicComposite
@@ -477,10 +473,12 @@ WrappedRegressor2(; regressor=RidgeRegressor()) = WrappedRegressor2(regressor)
 nothing #hide
 ```
 
+The other supertype options are `ProbabilisticComposite`,
+`IntervalComposite`, `UnsupervisedComposite` and `StaticComposite`.
+
 We now simply cut and paste the code defining the learning network
-into a model `fit` method (as opposed to machine `fit!` methods, which
-internally dispatch model `fit` methods on the data bound to the
-machine):
+into a model `fit` method (as opposed to a machine `fit!` method):
+
 
 ```@example 7
 function MLJ.fit(model::WrappedRegressor2, verbosity::Integer, X, y)
@@ -524,12 +522,14 @@ Notes:
 
 > **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding *machine* `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the `predict` on the learning network machine created in the `fit` method. 
 
+#### A composite model coupling component model hyper-parameters
+
 We now give a more complicated example of a composite model which
 exposes some parameters used in the network that are not simply
 component models. The model combines a clustering model (e.g.,
 `KMeans()`) for dimension reduction with ridge regression, but has the
 following "coupling" of the hyper parameters: The ridge regularization
-depends on the number of clusters used (less regularization for a
+depends on the number of clusters used (with less regularization for a
 greater number of clusters) and a user-specified "coupling"
 coefficient `K`.
 
@@ -744,14 +744,6 @@ node
 ```
 
 ```@docs
-fit!(N::Node; rows=nothing, verbosity=1, force=false)
-```
-
-```@docs
-fit!(mach::Machine; rows=nothing, verbosity=1, force=false)
-```
-
-```@docs
 fit_only!(mach::Machine; rows=nothing, verbosity=1, force=false)
 ```
 
@@ -762,3 +754,5 @@ fit_only!(mach::Machine; rows=nothing, verbosity=1, force=false)
 ```@docs
 return!
 ```
+
+See more on fitting nodes at [`fit!`](@ref) and [`fit_only!](@ref). 

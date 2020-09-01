@@ -19,7 +19,7 @@ seed!(1234)
 ## Choosing and evaluating a model
 
 To load some demonstration data, add
-[RDatasets](https://github.com/JuliaStats/RDatasets.jl) to your load
+[RDatasets.jl](https://github.com/JuliaStats/RDatasets.jl) to your load
 path and enter
 
 ```@repl doda
@@ -214,9 +214,15 @@ evaluate!(tree, resampling=Holdout(fraction_train=0.7, shuffle=true),
 
 To learn a little more about what MLJ can do, browse [Common MLJ
 Workflows](common_mlj_workflows.md) or [Data Science Tutorials in
-Julia](https://alan-turing-institute.github.io/DataScienceTutorials.jl/),
-returning to the manual as needed. *Read at least the remainder of
-this page before considering serious use of MLJ.*
+Julia](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
+or try the [JuliaCon2020
+Workshop](https://github.com/ablaom/MachineLearningInJulia2020) on MLJ
+(recorded
+[here](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title)) 
+returning to the manual as needed. 
+
+*Read at least the remainder of this page before considering serious
+use of MLJ.*
 
 
 ## Data containers and scientific types
@@ -241,7 +247,7 @@ unsupervised model.
 Scientific types are julia types defined in the package
 [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl);
 the package
-[MLJScientificTypes](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/)
+[MLJScientificTypes.jl](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/)
 implements the particular convention used in the MLJ universe for
 assigning a specific scientific type (interpretation) to each julia
 object (see the `scitype` examples below).
@@ -276,19 +282,21 @@ scitype(X)
 Generally, two-dimensional data in MLJ is expected to be *tabular*.
 All data containers compatible with the
 [Tables.jl](https://github.com/JuliaData/Tables.jl) interface (which
-includes all source formats listed [here](
-[list](https://github.com/JuliaData/Tables.jl/blob/master/INTEGRATIONS.md))
-scientific type `Table{K}`, where `K` depends on the scientific types
-of the columns, which can be individually inspected using `schema`:
+includes all source formats listed
+[here](https://github.com/JuliaData/Tables.jl/blob/master/INTEGRATIONS.md))
+have the scientific type `Table{K}`, where `K` depends on the
+scientific types of the columns, which can be individually inspected
+using `schema`:
 
 ```@repl doda
 schema(X)
 ```
 
-#### Non-tabular data
+#### Matrix data
 
-Most MLJ models do not accept matrix in lieu of a table, but you can
-wrap a matrix as a table:
+MLJ models expecting a table do not generally accept a matrix
+instead. However, a matrix can be wrapped as a table, using
+[`MLJ.table`](@ref):
 
 ```julia
 matrix_table = MLJ.table(rand(2,3))
@@ -308,12 +316,7 @@ _.nrows = 2
 ```
 
 The matrix is *not* copied, only wrapped.  To manifest a table as a
-matrix, use `MLJ.matrix(table)`.
-
-```@docs
-MLJBase.table
-MLJBase.matrix
-```
+matrix, use [`MLJ.matrix`](@ref)`. 
 
 
 ### Inputs
