@@ -243,9 +243,9 @@ using MLJ.
 ## Learning to use MLJ
 
 The present document, although littered with examples, is primarily
-intended as a complete reference. For a lightning introduction to MLJ
-read the [Getting Started](@ref) section of this manual. For more
-leisurely and extensive tutorials, we highly recommend the [MLJ
+intended as a complete reference. For a short introduction to basic
+MLJ functionality, read the [Getting Started](@ref) section of this
+manual. For extensive tutorials, we recommend the [MLJ
 Tutorials](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
 website.  Each tutorial can be downloaded as a notebook or Julia
 script to facilitate experimentation. Finally, you may like to
