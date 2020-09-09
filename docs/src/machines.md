@@ -95,15 +95,16 @@ such as a vector of per-observation weights (in which case
 
 `model` supertype   | `machine` constructor calls | operation calls (first compulsory)
 --------------------|-----------------------------|--------------------------------------
-`Deterministic <: Supervised`    | `machine(model, X, y, extras...)` | `predict(model, Xnew)`, `transform(model, Xnew)`, `inverse_transform(model, Xout)`
-`Probabilistic <: Supervised`    | `machine(model, X, y, extras...)` | `predict(model, Xnew)`, `predict_mean(model, Xnew)`, `predict_median(model, Xnew)`, `predict_mode(model, Xnew)`, `transform(model, Xnew)`, `inverse_transform(model, Xout)`
-`Unsupervised` (except `Static`) | `machine(model, X)` | `transform(model, Xnew)`, `inverse_transform(model, Xout)`, `predict(model, Xnew)`
-`Static`                        | `machine(model)`    | `transform(model, Xnews...)`, `inverse_transform(Xout)`
+`Deterministic <: Supervised`    | `machine(model, X, y, extras...)` | `predict(mach, Xnew)`, `transform(mach, Xnew)`, `inverse_transform(mach, Xout)`
+`Probabilistic <: Supervised`    | `machine(model, X, y, extras...)` | `predict(mach, Xnew)`, `predict_mean(mach, Xnew)`, `predict_median(mach, Xnew)`, `predict_mode(mach, Xnew)`, `transform(mach, Xnew)`, `inverse_transform(mach, Xout)`
+`Unsupervised` (except `Static`) | `machine(model, X)` | `transform(mach, Xnew)`, `inverse_transform(mach, Xout)`, `predict(mach, Xnew)`
+`Static`                        | `machine(model)`    | `transform(mach, Xnews...)`, `inverse_transform(mach, Xout)`
 
-All operations (`predict`, `transform`, etc) have exactly one argument
-after argument, `Xnew` or `Xout`, after `model`, with the exception of
-`Static` models which can have any number of arguments. For more on
-`Static` transformers (which have no *training* arguments) see [Static
+All operations on machines (`predict`, `transform`, etc) have exactly
+one argument (`Xnew` or `Xout` above) after `mach`, the machine
+instance. An exception is a machine bound to a `Static` model, which
+can have any number of arguments after `mach`. For more on `Static`
+transformers (which have no *training* arguments) see [Static
 transformers](@ref).
 
 A machine is reconstructed from a file using the syntax
