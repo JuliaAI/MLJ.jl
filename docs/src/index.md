@@ -32,8 +32,8 @@ Turing Institute](https://www.turing.ac.uk/).
 This tour assumes that the MLJ, MLJModels and EvoTrees packages are in the
 user's julia environment. See [Installation](@ref) below. 
 
-*For a more elementary introduction to MLJ usage see [Getting
-Started](@ref).*
+***For a more elementary introduction to MLJ usage see [Getting
+Started](@ref).***
 
 Load a selection of features and labels from the Ames House Price dataset:
 
@@ -77,10 +77,17 @@ self_tuning_pipe = TunedModel(model=pipe,
                               n=50)
 ```
 
+Bind the pipeline model (just a container for hyper-parameters) to
+data in a *machine* (which will additionally store *learned* parameters):
+
+```julia
+mach = machine(self_tuning_pipe, X, y)
+```
+
 Evaluate the "self-tuning" pipeline model's performance (implies nested resampling):
 
 ```julia
-julia> evaluate(self_tuning_pipe, X, y,
+julia> evaluate!(mach,
                 measures=[l1, l2],
                 resampling=CV(nfolds=6, rng=123),
                 acceleration=CPUProcesses(), verbosity=2)
