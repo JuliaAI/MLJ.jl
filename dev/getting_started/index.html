@@ -49,7 +49,7 @@ DecisionTreeClassifier(
     post_prune = false,
     merge_purity_threshold = 1.0,
     pdf_smoothing = 0.0,
-    display_depth = 5) @189</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model&#39;s performance can be evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
+    display_depth = 5) @210</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model&#39;s performance can be evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
                 resampling=CV(shuffle=true), measure=cross_entropy, verbosity=0)
 ┌───────────────┬───────────────┬──────────────────────────────────────────────┐
 │ _.measure     │ _.measurement │ _.per_fold                                   │
@@ -68,13 +68,13 @@ AbstractArray{Multiclass{3},1}</code></pre><p>and <code>Multiclass{3} &lt;: Fini
 
 julia&gt; scitype(yint)
 AbstractArray{Count,1}</code></pre><p>and using <code>yint</code> in place of <code>y</code> in classification problems will fail. See also <a href="../working_with_categorical_data/#Working-with-Categorical-Data-1">Working with Categorical Data</a>.</p><p>For more on scientific types, see <a href="#Data-containers-and-scientific-types-1">Data containers and scientific types</a> below. </p><h2 id="Fit-and-predict-1"><a class="docs-heading-anchor" href="#Fit-and-predict-1">Fit and predict</a><a class="docs-heading-anchor-permalink" href="#Fit-and-predict-1" title="Permalink"></a></h2><p>To illustrate MLJ&#39;s fit and predict interface, let&#39;s perform our performance evaluations by hand, but using a simple holdout set, instead of cross-validation.</p><p>Wrapping the model in data creates a <em>machine</em> which will store training outcomes:</p><pre><code class="language-julia-repl">julia&gt; tree = machine(tree_model, X, y)
-Machine{DecisionTreeClassifier} @786 trained 0 times.
+Machine{DecisionTreeClassifier} @256 trained 0 times.
   args:
-    1:	Source @527 ⏎ `Table{AbstractArray{Continuous,1}}`
-    2:	Source @994 ⏎ `AbstractArray{Multiclass{3},1}`</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
+    1:	Source @456 ⏎ `Table{AbstractArray{Continuous,1}}`
+    2:	Source @290 ⏎ `AbstractArray{Multiclass{3},1}`</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
 
 julia&gt; fit!(tree, rows=train);
-[ Info: Training Machine{DecisionTreeClassifier} @786.
+[ Info: Training Machine{DecisionTreeClassifier} @256.
 
 julia&gt; yhat = predict(tree, X[test,:]);
 
@@ -123,18 +123,18 @@ julia&gt; pdf(yhat[3:5], L)
  4
 
 julia&gt; stand_model = UnivariateStandardizer()
-UnivariateStandardizer() @250
+UnivariateStandardizer() @173
 
 julia&gt; stand = machine(stand_model, v)
-Machine{UnivariateStandardizer} @884 trained 0 times.
+Machine{UnivariateStandardizer} @691 trained 0 times.
   args:
-    1:	Source @347 ⏎ `AbstractArray{Count,1}`
+    1:	Source @076 ⏎ `AbstractArray{Count,1}`
 
 julia&gt; fit!(stand)
-[ Info: Training Machine{UnivariateStandardizer} @884.
-Machine{UnivariateStandardizer} @884 trained 1 time.
+[ Info: Training Machine{UnivariateStandardizer} @691.
+Machine{UnivariateStandardizer} @691 trained 1 time.
   args:
-    1:	Source @347 ⏎ `AbstractArray{Count,1}`
+    1:	Source @076 ⏎ `AbstractArray{Count,1}`
 
 julia&gt; w = transform(stand, v)
 4-element Array{Float64,1}:
@@ -266,4 +266,4 @@ julia&gt; XY
 julia&gt; Z
 2-element Array{Float64,1}:
  10.0
- 20.0</code></pre></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Introduction</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 9 September 2020 23:41">Wednesday 9 September 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 20.0</code></pre></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Introduction</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 9 September 2020 23:44">Wednesday 9 September 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
