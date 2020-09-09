@@ -32,8 +32,7 @@ Turing Institute](https://www.turing.ac.uk/).
 This tour assumes that the MLJ, MLJModels and EvoTrees packages are in the
 user's julia environment. See [Installation](@ref) below. 
 
-***For a more elementary introduction to MLJ usage see [Getting
-Started](@ref).***
+*For a more elementary introduction to MLJ usage see [Getting Started](@ref).*
 
 Load a selection of features and labels from the Ames House Price dataset:
 
