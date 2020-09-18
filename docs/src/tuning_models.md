@@ -1,5 +1,10 @@
 # Tuning models
 
+Below we illustrate tuning model hyperparameters by grid and random
+searches. For a complete list of available and planned tuning
+strategies, see the [MLJTuning
+page](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here)
+
 In MLJ tuning is implemented as a model wrapper. After wrapping a
 model in a tuning strategy and binding the wrapped model to data in a
 machine, `mach`, calling `fit!(mach)` instigates a search for optimal
@@ -8,11 +13,6 @@ uses all supplied data to train the best model. To predict using the
 optimal model, one just calls `predict(mach, Xnew)`. In this way the
 wrapped model may be viewed as a "self-tuning" version of the
 unwrapped model.
-
-Below we illustrate tuning by grid and random searches. For a complete
-list of available and planned tuning strategies, see the [MLJTuning
-page](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here)
-
 
 ## Tuning a single hyperparameter using a grid search
 
