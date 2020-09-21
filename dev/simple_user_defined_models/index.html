@@ -21,13 +21,13 @@ MLJBase.predict(::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew) * fitresu
 
 julia&gt; model = MyRegressor(lambda=1.0)
 MyRegressor(
-    lambda = 1.0) @634
+    lambda = 1.0) @687
 
 julia&gt; regressor = machine(model, X, y)
-Machine{MyRegressor} @299 trained 0 times.
+Machine{MyRegressor} @390 trained 0 times.
   args:
-    1:	Source @022 ⏎ `Table{AbstractArray{Continuous,1}}`
-    2:	Source @189 ⏎ `AbstractArray{Continuous,1}`
+    1:	Source @563 ⏎ `Table{AbstractArray{Continuous,1}}`
+    2:	Source @573 ⏎ `AbstractArray{Continuous,1}`
 
 julia&gt; evaluate!(regressor, resampling=CV(), measure=rms, verbosity=0)
 ┌───────────┬───────────────┬──────────────────────────────────────┐
