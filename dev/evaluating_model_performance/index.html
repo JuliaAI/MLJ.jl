@@ -7,47 +7,47 @@ julia&gt; y = X.a + 2X.b + 0.05*rand(12);
 
 julia&gt; model = @load RidgeRegressor pkg=MultivariateStats
 RidgeRegressor(
-    lambda = 1.0) @997
+    lambda = 1.0) @591
 
 julia&gt; cv=CV(nfolds=3)
 CV(
     nfolds = 3,
     shuffle = false,
-    rng = MersenneTwister(UInt32[0x7e021d8a, 0xa7527608, 0xab6d31be, 0x969dd26c]) @ 548) @410
+    rng = MersenneTwister(UInt32[0xa0741c76, 0xa023096b, 0x704f2953, 0xd33c941a]) @ 697) @801
 
 julia&gt; evaluate(model, X, y, resampling=cv, measure=l2, verbosity=0)
-┌───────────┬───────────────┬──────────────────────┐
-│ _.measure │ _.measurement │ _.per_fold           │
-├───────────┼───────────────┼──────────────────────┤
-│ l2        │ 0.181         │ [0.16, 0.185, 0.198] │
-└───────────┴───────────────┴──────────────────────┘
-_.per_observation = [[[0.122, 0.383, ..., 0.13], [0.0481, 0.105, ..., 0.0734], [0.129, 0.0457, ..., 0.574]]]
+┌───────────┬───────────────┬────────────────────────┐
+│ _.measure │ _.measurement │ _.per_fold             │
+├───────────┼───────────────┼────────────────────────┤
+│ l2        │ 0.149         │ [0.0496, 0.201, 0.196] │
+└───────────┴───────────────┴────────────────────────┘
+_.per_observation = [[[0.0137, 0.158, ..., 0.0233], [0.229, 0.135, ..., 0.289], [0.000283, 0.0209, ..., 0.505]]]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]</code></pre><p>Alternatively, instead of applying <code>evaluate</code> to a model + data, one may call <code>evaluate!</code> on an existing machine wrapping the model in data:</p><pre><code class="language-julia-repl">julia&gt; mach = machine(model, X, y)
-Machine{RidgeRegressor} @064 trained 0 times.
+Machine{RidgeRegressor} @230 trained 0 times.
   args:
-    1:	Source @758 ⏎ `Table{AbstractArray{Continuous,1}}`
-    2:	Source @767 ⏎ `AbstractArray{Continuous,1}`
+    1:	Source @809 ⏎ `Table{AbstractArray{Continuous,1}}`
+    2:	Source @927 ⏎ `AbstractArray{Continuous,1}`
 
 julia&gt; evaluate!(mach, resampling=cv, measure=l2, verbosity=0)
-┌───────────┬───────────────┬──────────────────────┐
-│ _.measure │ _.measurement │ _.per_fold           │
-├───────────┼───────────────┼──────────────────────┤
-│ l2        │ 0.181         │ [0.16, 0.185, 0.198] │
-└───────────┴───────────────┴──────────────────────┘
-_.per_observation = [[[0.122, 0.383, ..., 0.13], [0.0481, 0.105, ..., 0.0734], [0.129, 0.0457, ..., 0.574]]]
+┌───────────┬───────────────┬────────────────────────┐
+│ _.measure │ _.measurement │ _.per_fold             │
+├───────────┼───────────────┼────────────────────────┤
+│ l2        │ 0.149         │ [0.0496, 0.201, 0.196] │
+└───────────┴───────────────┴────────────────────────┘
+_.per_observation = [[[0.0137, 0.158, ..., 0.0233], [0.229, 0.135, ..., 0.289], [0.000283, 0.0209, ..., 0.505]]]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]</code></pre><p>(The latter call is a mutating call as the learned parameters stored in the machine potentially change. )</p><h2 id="Multiple-measures-1"><a class="docs-heading-anchor" href="#Multiple-measures-1">Multiple measures</a><a class="docs-heading-anchor-permalink" href="#Multiple-measures-1" title="Permalink"></a></h2><pre><code class="language-julia-repl">julia&gt; evaluate!(mach,
                  resampling=cv,
                  measure=[l1, rms, rmslp1], verbosity=0)
-┌───────────┬───────────────┬───────────────────────┐
-│ _.measure │ _.measurement │ _.per_fold            │
-├───────────┼───────────────┼───────────────────────┤
-│ l1        │ 0.373         │ [0.35, 0.383, 0.386]  │
-│ rms       │ 0.426         │ [0.4, 0.43, 0.445]    │
-│ rmslp1    │ 0.172         │ [0.177, 0.196, 0.137] │
-└───────────┴───────────────┴───────────────────────┘
-_.per_observation = [[[0.35, 0.619, ..., 0.361], [0.219, 0.323, ..., 0.271], [0.359, 0.214, ..., 0.757]], missing, missing]
+┌───────────┬───────────────┬────────────────────────┐
+│ _.measure │ _.measurement │ _.per_fold             │
+├───────────┼───────────────┼────────────────────────┤
+│ l1        │ 0.323         │ [0.181, 0.444, 0.345]  │
+│ rms       │ 0.386         │ [0.223, 0.449, 0.442]  │
+│ rmslp1    │ 0.191         │ [0.0868, 0.213, 0.238] │
+└───────────┴───────────────┴────────────────────────┘
+_.per_observation = [[[0.117, 0.398, ..., 0.153], [0.479, 0.368, ..., 0.538], [0.0168, 0.144, ..., 0.71]], missing, missing]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]</code></pre><h2 id="Custom-measures-and-weighted-measures-1"><a class="docs-heading-anchor" href="#Custom-measures-and-weighted-measures-1">Custom measures and weighted measures</a><a class="docs-heading-anchor-permalink" href="#Custom-measures-and-weighted-measures-1" title="Permalink"></a></h2><pre><code class="language-julia-repl">julia&gt; my_loss(yhat, y) = maximum((yhat - y).^2);
 
@@ -67,7 +67,7 @@ julia&gt; holdout = Holdout(fraction_train=0.8)
 Holdout(
     fraction_train = 0.8,
     shuffle = false,
-    rng = MersenneTwister(UInt32[0x7e021d8a, 0xa7527608, 0xab6d31be, 0x969dd26c]) @ 548) @343
+    rng = MersenneTwister(UInt32[0xa0741c76, 0xa023096b, 0x704f2953, 0xd33c941a]) @ 697) @774
 
 julia&gt; weights = [1, 1, 2, 1, 1, 2, 3, 1, 1, 2, 3, 1];
 
@@ -81,12 +81,12 @@ julia&gt; evaluate!(mach,
 ┌─────────────────────────┬───────────────┬───────────────────────┐
 │ _.measure               │ _.measurement │ _.per_fold            │
 ├─────────────────────────┼───────────────┼───────────────────────┤
-│ my_loss                 │ 0.49          │ [0.383, 0.514, 0.574] │
-│ my_per_observation_loss │ 0.373         │ [0.35, 0.383, 0.386]  │
-│ my_weighted_score       │ 3.52          │ [3.0, 4.15, 3.42]     │
-│ l1                      │ 0.578         │ [0.367, 0.822, 0.545] │
+│ my_loss                 │ 0.317         │ [0.158, 0.289, 0.505] │
+│ my_per_observation_loss │ 0.323         │ [0.181, 0.444, 0.345] │
+│ my_weighted_score       │ 4.61          │ [5.97, 3.3, 4.56]     │
+│ l1                      │ 0.52          │ [0.195, 0.73, 0.634]  │
 └─────────────────────────┴───────────────┴───────────────────────┘
-_.per_observation = [missing, [[0.35, 0.619, ..., 0.361], [0.219, 0.323, ..., 0.271], [0.359, 0.214, ..., 0.757]], missing, [[0.35, 0.619, ..., 0.361], [0.219, 0.647, ..., 0.271], [0.359, 0.427, ..., 0.757]]]
+_.per_observation = [missing, [[0.117, 0.398, ..., 0.153], [0.479, 0.368, ..., 0.538], [0.0168, 0.144, ..., 0.71]], missing, [[0.117, 0.398, ..., 0.153], [0.479, 0.736, ..., 0.538], [0.0168, 0.289, ..., 0.71]]]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]</code></pre><h2 id="User-specified-train/test-sets-1"><a class="docs-heading-anchor" href="#User-specified-train/test-sets-1">User-specified train/test sets</a><a class="docs-heading-anchor-permalink" href="#User-specified-train/test-sets-1" title="Permalink"></a></h2><p>Users can either provide their own list of train/test pairs of row indices for resampling, as in this example:</p><pre><code class="language-julia-repl">julia&gt; fold1 = 1:6; fold2 = 7:12;
 
@@ -96,10 +96,10 @@ julia&gt; evaluate!(mach,
 ┌───────────┬───────────────┬────────────────┐
 │ _.measure │ _.measurement │ _.per_fold     │
 ├───────────┼───────────────┼────────────────┤
-│ l1        │ 0.413         │ [0.505, 0.321] │
-│ l2        │ 0.22          │ [0.305, 0.136] │
+│ l1        │ 0.387         │ [0.44, 0.333]  │
+│ l2        │ 0.202         │ [0.243, 0.161] │
 └───────────┴───────────────┴────────────────┘
-_.per_observation = [[[0.754, 0.43, ..., 0.863], [0.324, 0.65, ..., 0.337]], [[0.569, 0.185, ..., 0.745], [0.105, 0.423, ..., 0.114]]]
+_.per_observation = [[[0.434, 0.577, ..., 0.783], [0.357, 0.549, ..., 0.297]], [[0.188, 0.332, ..., 0.613], [0.127, 0.301, ..., 0.0885]]]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]</code></pre><p>Or define their own re-usable <code>ResamplingStrategy</code> objects, - see <a href="#Custom-resampling-strategies-1">Custom resampling strategies</a> below.</p><h2 id="Built-in-resampling-strategies-1"><a class="docs-heading-anchor" href="#Built-in-resampling-strategies-1">Built-in resampling strategies</a><a class="docs-heading-anchor-permalink" href="#Built-in-resampling-strategies-1" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="MLJBase.Holdout" href="#MLJBase.Holdout"><code>MLJBase.Holdout</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">holdout = Holdout(; fraction_train=0.7,
                      shuffle=nothing,
