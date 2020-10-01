@@ -78,7 +78,9 @@ Pipeline406(
 Notice that field names for the composite are automatically generated
 based on the component model type names. The automatically generated
 name of the new model composite model type, `Pipeline406`, can be
-replaced with a user-defined one by specifying, say, `name=MyPipe`.
+replaced with a user-defined one by specifying, say,
+`name=MyPipe`. **If you are planning on serializing (saving) a
+pipeline-machine, you will need to specify a name.**.
 
 The new model can be used just like any other non-composite model:
 
@@ -519,6 +521,9 @@ Notes:
   calls `fit!` on the learning network machine `mach` and splits it
   into various pieces, as required by the MLJ model interface. See
   also the [`return!`](@ref) doc-string.
+  
+- **Important note** An MLJ `fit` method is not allowed to mutate its
+  `model` argument. 
 
 > **What's going on here?** MLJ's machine interface is built atop a more primitive *[model](simple_user_defined_models.md)* interface, implemented for each algorithm. Each supervised model type (eg, `RidgeRegressor`) requires model `fit` and `predict` methods, which are called by the corresponding *machine* `fit!` and `predict` methods. We don't need to define a  model `predict` method here because MLJ provides a fallback which simply calls the `predict` on the learning network machine created in the `fit` method. 
 
@@ -750,5 +755,5 @@ node
 return!
 ```
 
-See more on fitting nodes at [`fit!`](@ref) and [`fit_only!](@ref). 
+See more on fitting nodes at [`fit!`](@ref) and [`fit_only!`](@ref). 
 
