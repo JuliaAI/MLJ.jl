@@ -65,7 +65,7 @@ see
 [here](https://github.com/alan-turing-institute/ScientificTypes.jl#more-on-the-table-type).)
 
 ```@example hut
-using DataFrames
+import DataFrames.DataFrame
 X = DataFrame(
                  name       = ["Siri", "Robo", "Alexa", "Cortana"],
                  gender     = ["male", "male", "Female", "female"],
@@ -146,6 +146,72 @@ By tracking all classes in this way, MLJ
 avoids common pain points around categorical data, such as evaluating
 models on an evaluation set, only to crash your code because classes appear
 there which were not seen during training.
+
+By drawing test, validation and training data from a common data
+structure (as described in [Getting Started](@ref), for example) one
+ensures that all possible classes of categorical variables are tracked
+at all times. However, this does not mitigate problems with new
+*production* data, if categorical features there are missing classes
+or contain previously unseen classes.
+
+
+## New or missing levels in production data
+
+!!! warning 
+
+    Unpredictable behaviour may result whenever `Finite` categorical data presents in a production set with different classes (levels) from those presented in training
+
+Consider, for example, the following naive workflow:
+
+```@example hut
+# train a one-hot encoder on some data:
+x = coerce(["black", "white", "white", "black"], Multiclass)
+X = DataFrame(x=x)
+
+model = OneHotEncoder()
+mach = machine(model, X) |> fit!
+
+# one-hot encode new data with missing classes:
+xproduction = coerce(["white", "white"], Multiclass)
+Xproduction = DataFrame(x=xproduction)
+Xproduction == X[2:3,:] # true
+transform(mach, Xproduction) == transform(mach, X[2:3,:])
+```
+
+The problem here is that `levels(X.x)` and `levels(Xproduction.x)` are different:
+
+```@example hut
+levels(X.x)
+```
+
+```@example hut
+levels(Xproduction.x)
+```
+
+This could be anticipated by the fact that the training and production
+data have different schema:
+
+```@example hut
+schema(X)
+```
+
+```@example hut
+schema(Xproduction)
+```
+
+One fix is to manually correct the levels of the production data:
+
+```@example hut
+levels!(Xproduction.x, levels(x))
+transform(mach, Xproduction) == transform(mach, X[2:3,:])
+```
+
+Another solution is to pack all production data with dummy rows based
+on the training data (subsequently dropped) to ensure there are no
+missing classes. Currently MLJ contains no general tooling to check
+and fix categorical levels in production data (although one can check
+that training data and production data have the same schema, to ensure
+the *number* of classes in categorical data is consistent).
 
 
 ## Extracting an integer representation of Finite data
@@ -270,4 +336,4 @@ Or, equivalently:
 d_vec = UnivariateFinite([:no, :yes], yes_probs, augment=true, pool=v)
 ```
 
-For more options, see [`UnivariateFinite`](@ref). 
+For more options, see [`UnivariateFinite`](@ref).
