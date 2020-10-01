@@ -78,7 +78,9 @@ Pipeline406(
 Notice that field names for the composite are automatically generated
 based on the component model type names. The automatically generated
 name of the new model composite model type, `Pipeline406`, can be
-replaced with a user-defined one by specifying, say, `name=MyPipe`.
+replaced with a user-defined one by specifying, say,
+`name=MyPipe`. **If you are planning on serializing (saving) a
+pipeline-machine, you will need to specify a name.**.
 
 The new model can be used just like any other non-composite model:
 
