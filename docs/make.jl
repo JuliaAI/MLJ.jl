@@ -42,11 +42,11 @@ pages = [
     "Benchmarking" => "benchmarking.md",
     "Internals" => "internals.md",
     "Glossary" => "glossary.md",
-    # "API" => "api.md", # NOTE: commented as currently empty
     "MLJ Cheatsheet" => "mlj_cheatsheet.md",
     "FAQ" => "frequently_asked_questions.md",
     "Julia BlogPost" => "julia_blogpost.md",
-    "Acceleration and Parallelism" => "acceleration_and_parallelism.md"
+    "Acceleration and Parallelism" => "acceleration_and_parallelism.md",
+    "API" => "api.md", 
     ]
 
 for (k, v) in pages
