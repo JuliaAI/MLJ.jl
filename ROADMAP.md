@@ -52,7 +52,7 @@ external contributions in any area.
 
 -   Feature engineering (python featuretools?, recursive feature
     elimination?)
-    [#426](https://github.com/alan-turing-institute/MLJ.jl/issues/426)
+    [#426](https://github.com/alan-turing-institute/MLJ.jl/issues/426) [MLJModels #314](https://github.com/alan-turing-institute/MLJModels.jl/issues/314)
 	
 
 ### Enhancing core functionality
