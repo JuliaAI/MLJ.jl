@@ -9,8 +9,8 @@ A Machine Learning Framework for Julia
   <a href="mlj_cheatsheet">Cheatsheet</a>       &nbsp;|&nbsp;
   <a href="common_mlj_workflows">Workflows</a>  &nbsp;|&nbsp;
   <a href="https://alan-turing-institute.github.io/DataScienceTutorials.jl/">Tutorials</a>       &nbsp;|&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJ.jl/">Repository</a>       &nbsp;|&nbsp;
-  <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">Binder</a>
+  <a href="https://github.com/alan-turing-institute/MLJ.jl/">For Developers</a> &nbsp;|&nbsp;
+  <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">Live Demo</a>
 </div>
 ```
 
@@ -29,10 +29,22 @@ Turing Institute](https://www.turing.ac.uk/).
 
 ## Lightning tour
 
-This tour assumes that the MLJ, MLJModels and EvoTrees packages are in the
-user's julia environment. See [Installation](@ref) below. 
-
 *For a more elementary introduction to MLJ usage see [Getting Started](@ref).*
+
+The code below starts by creating a new Julia environment `MLJ_tour` and
+installing just those packages needed for the tour. See
+[Installation](@ref) for more on creating a Julia environment for use
+with MLJ.
+
+Instantiating a new environment:
+
+```julia
+using Pkg
+Pkg.activate("MLJ_tour", shared=true)
+Pkg.add("MLJ")
+Pkg.add("MLJModels")
+Pkg.add("EvoTrees")
+```
 
 Load a selection of features and labels from the Ames House Price dataset:
 
@@ -76,8 +88,9 @@ self_tuning_pipe = TunedModel(model=pipe,
                               n=50)
 ```
 
-Bind the pipeline model (just a container for hyper-parameters) to
-data in a *machine* (which will additionally store *learned* parameters):
+Bind the "self-tuning" pipeline model (just a container for
+hyper-parameters) to data in a *machine* (which will additionally
+store *learned* parameters):
 
 ```julia
 mach = machine(self_tuning_pipe, X, y)
@@ -194,7 +207,7 @@ installed in a new
 avoid package conflicts. You can do this with
 
 ```julia
-julia> using Pkg; Pkg.activate("My_MLJ_env", shared=true)
+julia> using Pkg; Pkg.activate("my_MLJ_env", shared=true)
 ```
 
 Installing MLJ is also done with the package manager:
@@ -203,6 +216,12 @@ Installing MLJ is also done with the package manager:
 julia> Pkg.add("MLJ")
 ```
 
+**Optional:** To test your installation, run
+
+```julia
+julia> Pkg.test("MLJ")
+```
+       
 It is important to note that MLJ is essentially a big wrapper
 providing a unified access to _model providing packages_ and so you
 will also need to make sure these packages are available in your

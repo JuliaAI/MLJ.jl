@@ -62,7 +62,7 @@ term:
   *all* possible classes). Generally scikit-learn models deal with
   this by requiring data to be relabeled as integers. However, the
   naive user trains a model on relabeled categorical data only to
-  discover that evaluation on a test set crashes his code because a
+  discover that evaluation on a test set crashes their code because a
   categorical feature takes on a value not observed in training. MLJ
   mitigates such issues by insisting on the use of categorical data
   types, and by insisting that MLJ model implementations preserve the

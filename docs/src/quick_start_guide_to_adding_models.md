@@ -152,7 +152,7 @@ end
 The implementation of `fit` will look like
 
 ```julia
-function MLJModelInterface.fit(m::YourModel, verbosity::Int, X, y, w=nothing)
+function MLJModelInterface.fit(m::YourModel, verbosity, X, y, w=nothing)
     # body ...
     return (fitresult, cache, report)
 end

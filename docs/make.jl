@@ -41,12 +41,13 @@ pages = [
     "Adding Models for General Use" => "adding_models_for_general_use.md",
     "Benchmarking" => "benchmarking.md",
     "Internals" => "internals.md",
+    "List of Supported Models" => "list_of_supported_models.md",
     "Glossary" => "glossary.md",
-    # "API" => "api.md", # NOTE: commented as currently empty
     "MLJ Cheatsheet" => "mlj_cheatsheet.md",
     "FAQ" => "frequently_asked_questions.md",
     "Julia BlogPost" => "julia_blogpost.md",
-    "Acceleration and Parallelism" => "acceleration_and_parallelism.md"
+    "Acceleration and Parallelism" => "acceleration_and_parallelism.md",
+    "API" => "api.md",
     ]
 
 for (k, v) in pages

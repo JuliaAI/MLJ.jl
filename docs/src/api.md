@@ -1,9 +1,5 @@
-# API
+# Index 
 
-## Functions
+```@index
+```
 
-TODO
-
-## Index
-
-TODO
