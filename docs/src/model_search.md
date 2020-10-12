@@ -7,7 +7,7 @@ machine learning task. The task itself is specified with the help of
 the `matching` method, and the search executed with the `models`
 methods, as detailed below. 
 
-A periodically updated table of all models is also given at [List of
+A table of all models is also given at [List of Supported
 Models](@ref).
 
 

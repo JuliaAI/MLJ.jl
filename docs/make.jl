@@ -58,7 +58,7 @@ end
 makedocs(
     sitename = "MLJ",
     format   = Documenter.HTML(),
-    modules  = [MLJ, MLJBase, MLJTuning, MLJModels, MLJScientificTypes, MLJModelInterface],
+    modules  = [MLJ, MLJBase, MLJTuning, MLJModels, MLJScientificTypes, MLJModelInterface, ScientificTypes],
     pages    = pages)
 
 # By default Documenter does not deploy docs just for PR

@@ -31,12 +31,13 @@ Turing Institute](https://www.turing.ac.uk/).
 
 *For a more elementary introduction to MLJ usage see [Getting Started](@ref).*
 
-The code below starts by creating a new Julia environment `MLJ_tour` and
-installing just those packages needed for the tour. See
+The first code snippet below creates a new Julia environment
+`MLJ_tour` and installs just those packages needed for the tour. See
 [Installation](@ref) for more on creating a Julia environment for use
 with MLJ.
 
-Instantiating a new environment:
+Julia installation instructions are
+[here](https://julialang.org/downloads/).
 
 ```julia
 using Pkg
@@ -243,7 +244,7 @@ using MLJ
 models()
 ```
 
-or refer to [List of Models](@ref).
+or refer to [List of Supported Models](@ref)
 
 It is recommended that you start with models marked as coming from mature
 packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.
