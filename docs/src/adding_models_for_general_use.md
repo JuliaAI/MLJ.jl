@@ -610,7 +610,7 @@ per-observation distributions).
 
 Specifically, the output `yhat` of `predict_joint` should be an
 instance of `Distributions.Sampleable{<:Multivariate,V}`, where
-`sctype(V) = target_scitype(SomeModel)` and samples have length `n`,
+`scitype(V) = target_scitype(SomeModel)` and samples have length `n`,
 where `n` is the number of observations in `Xnew`.
 
 If a new model type subtypes `JointProbablistic <: Probabilistic` then

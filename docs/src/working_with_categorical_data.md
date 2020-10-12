@@ -111,10 +111,10 @@ levels(X.outcome)
 Coercing all remaining types simultaneously:
 
 ```@example hut
-Xnew = coerce(X, :gender    => Multiclass,
-                 :like_soup => OrderedFactor,
-                 :height    => Continuous,
-                 :rating    => OrderedFactor)
+Xnew = coerce(X, :gender     => Multiclass,
+                 :likes_soup => OrderedFactor,
+                 :height     => Continuous,
+                 :rating     => OrderedFactor)
 schema(Xnew)
 ```
 
