@@ -36,8 +36,8 @@
 **New to MLJ? Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/)**. 
 
 **Wanting to integrate an existing machine learning model into the MLJ
-framework?** Start
-[here](https://alan-turing-institute.github.io/MLJ.jl/dev/quick_start_guide_to_adding_models/).
+framework? Start
+[here](https://alan-turing-institute.github.io/MLJ.jl/dev/quick_start_guide_to_adding_models/)**.
 
 The remaining information on this page will be of interest primarily
 to developers interested in contributing to core packages in the MLJ
