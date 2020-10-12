@@ -386,13 +386,14 @@ Use `coerce(v, OrderedFactor)` or `coerce(v, Multiclass)` to coerce a
 vector `v` of integers, strings or characters to a vector with an
 appropriate `Finite` (categorical) scitype.  See [Working with Categorical Data](@ref)).
 
-For more on scitype coercion of arrays and tables, see `coerce`,
-`autotype` and `unpack` below and the examples at
+For more on scitype coercion of arrays and tables, see [`coerce`](@ref),
+[`autotype`](@ref) and [`unpack`](@ref) below and the examples at
 [MLJScientificTypes.jl](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/).
 
 
 
 ```@docs
+scitype
 coerce
 autotype
 unpack

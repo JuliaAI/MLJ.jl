@@ -36,17 +36,18 @@
 **New to MLJ? Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/)**. 
 
 **Wanting to integrate an existing machine learning model into the MLJ
-framework?** Start
-[here](https://alan-turing-institute.github.io/MLJ.jl/dev/quick_start_guide_to_adding_models/).
+framework? Start
+[here](https://alan-turing-institute.github.io/MLJ.jl/dev/quick_start_guide_to_adding_models/)**.
 
-The remainining information on this page will be of interest primarily
-to developers interested in constributing to core packages in the MLJ
+The remaining information on this page will be of interest primarily
+to developers interested in contributing to core packages in the MLJ
 ecosystem, whose organization is described further below.
 
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
-tuning, evaluating, composing and comparing machine learning models written in Julia and other languages.  MLJ is released
-under the MIT licensed and sponsored by the [Alan Turing
+tuning, evaluating, composing and comparing machine learning models
+written in Julia and other languages.  MLJ is released under the MIT
+licensed and sponsored by the [Alan Turing
 Institute](https://www.turing.ac.uk/).
 
 <br>
@@ -115,7 +116,7 @@ appropriate version, activate your MLJ environment and run
 ```
 
 
-### Customizing behaviour
+### Customizing behavior
 
 To customize behaviour of MLJ you will need to clone the relevant
 component package (e.g., MLJBase.jl) - or a fork thereof - and modify

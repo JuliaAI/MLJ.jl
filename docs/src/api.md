@@ -1,4 +1,4 @@
-# Index 
+# Index of Methods
 
 ```@index
 ```

@@ -5,7 +5,11 @@ properties, without loading all the packages containing model code. In
 turn, this allows one to efficiently find all models solving a given
 machine learning task. The task itself is specified with the help of
 the `matching` method, and the search executed with the `models`
-methods, as detailed below.
+methods, as detailed below. 
+
+A table of all models is also given at [List of Supported
+Models](@ref).
+
 
 ## Model metadata
 

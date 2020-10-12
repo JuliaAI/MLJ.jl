@@ -10,6 +10,7 @@ import MLJTuning
 import MLJModels
 import MLJScientificTypes
 import MLJModelInterface
+import ScientificTypes
 import Distributions
 using CategoricalArrays # avoid types like CategoricalArrays.Categorica
 using LossFunctions
@@ -47,7 +48,7 @@ pages = [
     "FAQ" => "frequently_asked_questions.md",
     "Julia BlogPost" => "julia_blogpost.md",
     "Acceleration and Parallelism" => "acceleration_and_parallelism.md",
-    "API" => "api.md",
+    "Index of Methods" => "api.md",
     ]
 
 for (k, v) in pages
@@ -57,7 +58,7 @@ end
 makedocs(
     sitename = "MLJ",
     format   = Documenter.HTML(),
-    modules  = [MLJ, MLJBase, MLJTuning, MLJModels, MLJScientificTypes, MLJModelInterface],
+    modules  = [MLJ, MLJBase, MLJTuning, MLJModels, MLJScientificTypes, MLJModelInterface, ScientificTypes],
     pages    = pages)
 
 # By default Documenter does not deploy docs just for PR
