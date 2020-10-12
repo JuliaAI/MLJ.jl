@@ -29,10 +29,22 @@ Turing Institute](https://www.turing.ac.uk/).
 
 ## Lightning tour
 
-This tour assumes that the MLJ, MLJModels and EvoTrees packages are in the
-user's julia environment. See [Installation](@ref) below. 
-
 *For a more elementary introduction to MLJ usage see [Getting Started](@ref).*
+
+The code below starts by creating a new Julia environment `MLJTour` and
+installing just those packages needed for the tour. See
+[Installation](@ref) for more on creating a Julia environment for use
+with MLJ.
+
+Instantiating a new environment:
+
+```julia
+using Pkg
+Pkg.activate("MLJTour", shared=true)
+Pkg.add("MLJ")
+Pkg.add("MLJModels")
+Pkg.add("EvoTrees")
+```
 
 Load a selection of features and labels from the Ames House Price dataset:
 
@@ -76,8 +88,9 @@ self_tuning_pipe = TunedModel(model=pipe,
                               n=50)
 ```
 
-Bind the pipeline model (just a container for hyper-parameters) to
-data in a *machine* (which will additionally store *learned* parameters):
+Bind the "self-tuning" pipeline model (just a container for
+hyper-parameters) to data in a *machine* (which will additionally
+store *learned* parameters):
 
 ```julia
 mach = machine(self_tuning_pipe, X, y)
