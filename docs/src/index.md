@@ -242,7 +242,8 @@ For a list of models and their packages run
 using MLJ
 models()
 ```
-or refer to [this table](https://github.com/alan-turing-institute/MLJ.jl#list-of-wrapped-models).
+
+or refer to [List of Models](@ref).
 
 It is recommended that you start with models marked as coming from mature
 packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.
