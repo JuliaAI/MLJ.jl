@@ -9,7 +9,7 @@ A Machine Learning Framework for Julia
   <a href="mlj_cheatsheet">Cheatsheet</a>       &nbsp;|&nbsp;
   <a href="common_mlj_workflows">Workflows</a>  &nbsp;|&nbsp;
   <a href="https://alan-turing-institute.github.io/DataScienceTutorials.jl/">Tutorials</a>       &nbsp;|&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJ.jl/">Repository</a>       &nbsp;|&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJ.jl/">For Developers</a> &nbsp;|&nbsp;
   <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">Binder</a>
 </div>
 ```

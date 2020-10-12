@@ -35,6 +35,14 @@
 
 **New to MLJ? Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/)**. 
 
+**Wanting to integrate an existing machine learning model into the MLJ
+framework?** Start
+[here](https://alan-turing-institute.github.io/MLJ.jl/dev/quick_start_guide_to_adding_models/).
+
+The remainining information on this page will be of interest primarily
+to developers interested in constributing to core packages in the MLJ
+ecosystem, whose organization is described further below.
+
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
 tuning, evaluating, composing and comparing machine learning models written in Julia and other languages.  MLJ is released
@@ -44,8 +52,8 @@ Institute](https://www.turing.ac.uk/).
 <br>
 <p align="center">
 <a href="#the-mlj-universe">MLJ Universe</a> &nbsp;•&nbsp; 
-<a href="#list-of-wrapped-models">List of Wrapped Models</a> &nbsp;•&nbsp;
 <a href="#known-issues">Known Issues</a> &nbsp;•&nbsp;
+<a href="#customizing-behavior">Customizing Behavior</a> &nbsp;•&nbsp;
 <a href="#citing-mlj">Citing MLJ</a> 
 </p>
 </br>
@@ -86,61 +94,6 @@ illustrated in the dependency chart below.
 *Dependency chart for MLJ repositories. Repositories with dashed
 connections do not currently exist but are planned/proposed.*
 
-### List of Wrapped Models
-
-MLJ provides access to to a wide variety of machine learning models.
-We are always looking for [help](CONTRIBUTING.md) adding new models or
-test existing ones.  Currently available models are listed below; for
-the most up-to-date list, run `using MLJ; models()`.
-
-* *experimental*: indicates the package is fairly new and/or is under active development; you can help by testing these packages and making them more robust,
-* *medium*: indicates the package is fairly mature but may benefit from optimisations and/or extra features; you can help by suggesting either,
-* *high*: indicates the package is very mature and functionalities are expected to have been fairly optimised and tested.
-
-| Package | Models | Maturity | Note
-| ------- | ------ | -------- | ----
-[Clustering.jl] | KMeans, KMedoids | high | †
-[DecisionTree.jl] | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier | high | †
-[EvoTrees.jl] | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian | medium | gradient boosting models
-[GLM.jl] | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium | †
-[LIBSVM.jl] | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
-[LightGBM.jl] | LightGBMClassifier, LightGBMRegressor | high | 
-[MLJFlux.jl] | NeuralNetworkRegressor, NeuralNetworkClassifier, MultitargetNeuralNetworkRegressor, ImageClassifier | experimental |
-[MLJLinearModels.jl] | LinearRegressor, RidgeRegressor, LassoRegressor, ElasticNetRegressor, QuantileRegressor, HuberRegressor, RobustRegressor, LADRegressor, LogisticClassifier, MultinomialClassifier | experimental |
-[MLJModels.jl] (builtins) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ContinuousEncoder, ConstantRegressor, ConstantClassifier | medium |
-[MultivariateStats.jl] | RidgeRegressor, PCA, KernelPCA, ICA, LDA, BayesianLDA, SubspaceLDA, BayesianSubspaceLDA | high | †
-[NaiveBayes.jl] | GaussianNBClassifier, MultinomialNBClassifier, HybridNBClassifier | experimental |
-[NearestNeighbors.jl] | KNNClassifier, KNNRegressor | high |
-[ParallelKMeans.jl] | KMeans | experimental | 
-[ScikitLearn.jl] | ARDRegressor, AdaBoostClassifier, AdaBoostRegressor, AffinityPropagation, AgglomerativeClustering, BaggingClassifier, BaggingRegressor, BayesianLDA, BayesianQDA, BayesianRidgeRegressor, BernoulliNBClassifier, Birch, ComplementNBClassifier, DBSCAN, DummyClassifier, DummyRegressor, ElasticNetCVRegressor, ElasticNetRegressor, ExtraTreesClassifier, ExtraTreesRegressor, FeatureAgglomeration, GaussianNBClassifier, GaussianProcessClassifier, GaussianProcessRegressor, GradientBoostingClassifier, GradientBoostingRegressor, HuberRegressor, KMeans, KNeighborsClassifier, KNeighborsRegressor, LarsCVRegressor, LarsRegressor, LassoCVRegressor, LassoLarsCVRegressor, LassoLarsICRegressor, LassoLarsRegressor, LassoRegressor, LinearRegressor, LogisticCVClassifier, LogisticClassifier, MeanShift, MiniBatchKMeans, MultiTaskElasticNetCVRegressor, MultiTaskElasticNetRegressor, MultiTaskLassoCVRegressor, MultiTaskLassoRegressor, MultinomialNBClassifier, OPTICS, OrthogonalMatchingPursuitCVRegressor, OrthogonalMatchingPursuitRegressor, PassiveAggressiveClassifier, PassiveAggressiveRegressor, PerceptronClassifier, ProbabilisticSGDClassifier, RANSACRegressor, RandomForestClassifier, RandomForestRegressor, RidgeCVClassifier, RidgeCVRegressor, RidgeClassifier, RidgeRegressor, SGDClassifier, SGDRegressor, SVMClassifier, SVMLClassifier, SVMLRegressor, SVMNuClassifier, SVMNuRegressor, SVMRegressor, SpectralClustering, TheilSenRegressor | high | †
-[XGBoost.jl] | XGBoostRegressor, XGBoostClassifier, XGBoostCount | high |
-
-**Note** (†): some models are missing, your help is welcome to complete the interface. Get in touch with Thibaut Lienart on Slack if you would like to help, thanks!
-
-[Clustering.jl]: https://github.com/JuliaStats/Clustering.jl
-[DecisionTree.jl]: https://github.com/bensadeghi/DecisionTree.jl
-[EvoTrees.jl]: https://github.com/Evovest/EvoTrees.jl
-[GaussianProcesses.jl]: https://github.com/STOR-i/GaussianProcesses.jl
-[GLM.jl]: https://github.com/JuliaStats/GLM.jl
-[LIBSVM.jl]: https://github.com/mpastell/LIBSVM.jl
-[LightGBM.jl]: https://github.com/IQVIA-ML/LightGBM.jl
-[MLJ.jl]: https://github.com/alan-turing-institute/MLJ.jl
-[MLJTutorials.jl]: https://github.com/alan-turing-institute/MLJTutorials.jl
-[MLJBase.jl]: https://github.com/alan-turing-institute/MLJBase.jl
-[MLJModelInterface.jl]: https://github.com/alan-turing-institute/MLJModelInterface.jl
-[MLJModels.jl]: https://github.com/alan-turing-institute/MLJModels.jl
-[MLJTuning.jl]: https://github.com/alan-turing-institute/MLJTuning.jl
-[MLJLinearModels.jl]: https://github.com/alan-turing-institute/MLJLinearModels.jl
-[MLJFlux.jl]: https://github.com/alan-turing-institute/MLJFlux.jl
-[MLJScientificTypes.jl]: https://github.com/alan-turing-institute/MLJScientificTypes.jl
-[ParallelKMeans.jl]: https://github.com/PyDataBlog/ParallelKMeans.jl
-[ScientificTypes.jl]: https://github.com/alan-turing-institute/ScientificTypes.jl
-[MultivariateStats.jl]: https://github.com/JuliaStats/MultivariateStats.jl
-[NaiveBayes.jl]: https://github.com/dfdx/NaiveBayes.jl
-[NearestNeighbors.jl]: https://github.com/KristofferC/NearestNeighbors.jl
-[ScikitLearn.jl]: https://github.com/cstjean/ScikitLearn.jl
-[XGBoost.jl]: https://github.com/dmlc/XGBoost.jl
-
 
 ### Known Issues
 
@@ -160,6 +113,29 @@ appropriate version, activate your MLJ environment and run
   using Pkg;
   Pkg.develop(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))
 ```
+
+
+### Customizing behaviour
+
+To customize behaviour of MLJ you will need to clone the relevant
+component package (e.g., MLJBase.jl) - or a fork thereof - and modify
+your local julia environment to use your local clone in place of the
+official release. For example, you might proceed something like this:
+
+```julia
+using Pkg
+Pkg.activate("my_MLJ_enf", shared=true)
+Pkg.develop("path/to/my/local/MLJBase")
+```
+
+To test your local clone, do
+
+```julia
+Pkg.test("MLJBase")
+```
+
+For more on package management, see https://julialang.github.io/Pkg.jl/v1/ .
+
 
 
 ### Citing MLJ
