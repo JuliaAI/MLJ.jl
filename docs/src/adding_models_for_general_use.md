@@ -232,7 +232,7 @@ version of the method.
 Compulsory:
 
 ```julia
-MMI.fit(model::SomeSupervisedModel, verbosity::Integer, X, y) -> fitresult, cache, report
+MMI.fit(model::SomeSupervisedModel, verbosity, X, y) -> fitresult, cache, report
 MMI.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
 ```
 
@@ -302,7 +302,7 @@ MMI.package_license(::Type{<:SomeSupervisedModel}) = "unknown"
 If `SomeSupervisedModel` supports sample weights, then instead of the `fit` above, one implements
 
 ```julia
-MMI.fit(model::SomeSupervisedModel, verbosity::Integer, X, y, w=nothing) -> fitresult, cache, report
+MMI.fit(model::SomeSupervisedModel, verbosity, X, y, w=nothing) -> fitresult, cache, report
 ```
 
 and, if appropriate
@@ -368,7 +368,7 @@ coefficients.
 A compulsory `fit` method returns three objects:
 
 ```julia
-MMI.fit(model::SomeSupervisedModel, verbosity::Int, X, y) -> fitresult, cache, report
+MMI.fit(model::SomeSupervisedModel, verbosity, X, y) -> fitresult, cache, report
 ```
 
 *Note.* The `Int` typing of `verbosity` cannot be omitted.
@@ -409,7 +409,7 @@ generally avoid doing any of its own logging.
 above `fit`:
 
 ```julia
-MMI.fit(model::SomeSupervisedModel, verbosity::Int, X, y, w=nothing) -> fitresult, cache, report
+MMI.fit(model::SomeSupervisedModel, verbosity, X, y, w=nothing) -> fitresult, cache, report
 ```
 
 
@@ -880,7 +880,7 @@ end
 UnivariateFiniteFitter(;alpha=1.0) = UnivariateFiniteFitter(alpha)
 
 function MLJModelInterface.fit(model::UnivariateFiniteFitter,
-                               verbosity::Int, X, y)
+                               verbosity, X, y)
 
     α = model.alpha
     N = length(y)
@@ -934,7 +934,7 @@ Unsupervised models implement the MLJ model interface in a very
 similar fashion. The main differences are:
 
 - The `fit` method has only one training argument `X`, as in
-  `MLJModelInterface.fit(model, verbosity::Int, X)`. However, it has
+  `MLJModelInterface.fit(model, verbosity, X)`. However, it has
   the same return value `(fitresult, cache, report)`. An `update`
   method (e.g., for iterative models) can be optionally implemented in
   the same way.
