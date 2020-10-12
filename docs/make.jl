@@ -10,6 +10,7 @@ import MLJTuning
 import MLJModels
 import MLJScientificTypes
 import MLJModelInterface
+import ScientificTypes
 import Distributions
 using CategoricalArrays # avoid types like CategoricalArrays.Categorica
 using LossFunctions
