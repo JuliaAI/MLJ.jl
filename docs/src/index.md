@@ -31,7 +31,7 @@ Turing Institute](https://www.turing.ac.uk/).
 
 *For a more elementary introduction to MLJ usage see [Getting Started](@ref).*
 
-The code below starts by creating a new Julia environment `MLJTour` and
+The code below starts by creating a new Julia environment `MLJ_tour` and
 installing just those packages needed for the tour. See
 [Installation](@ref) for more on creating a Julia environment for use
 with MLJ.
@@ -40,7 +40,7 @@ Instantiating a new environment:
 
 ```julia
 using Pkg
-Pkg.activate("MLJTour", shared=true)
+Pkg.activate("MLJ_tour", shared=true)
 Pkg.add("MLJ")
 Pkg.add("MLJModels")
 Pkg.add("EvoTrees")
@@ -207,7 +207,7 @@ installed in a new
 avoid package conflicts. You can do this with
 
 ```julia
-julia> using Pkg; Pkg.activate("My_MLJ_env", shared=true)
+julia> using Pkg; Pkg.activate("my_MLJ_env", shared=true)
 ```
 
 Installing MLJ is also done with the package manager:
@@ -216,6 +216,12 @@ Installing MLJ is also done with the package manager:
 julia> Pkg.add("MLJ")
 ```
 
+**Optional:** To test your installation, run
+
+```julia
+julia> Pkg.test("MLJ")
+```
+       
 It is important to note that MLJ is essentially a big wrapper
 providing a unified access to _model providing packages_ and so you
 will also need to make sure these packages are available in your
