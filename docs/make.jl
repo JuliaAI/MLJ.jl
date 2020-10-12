@@ -47,7 +47,7 @@ pages = [
     "FAQ" => "frequently_asked_questions.md",
     "Julia BlogPost" => "julia_blogpost.md",
     "Acceleration and Parallelism" => "acceleration_and_parallelism.md",
-    "Index of methods" => "api.md",
+    "Index of Methods" => "api.md",
     ]
 
 for (k, v) in pages
