@@ -181,7 +181,7 @@ expects its value to be positive.
 You cannot use the `@mlj_model` macro if your model struct has type
 parameters.
 
-### Known issue with @mlj_macro
+#### Known issue with @mlj_macro
 
 Defaults with negative values can trip up the `@mlj_macro` (see [this
 issue](https://github.com/alan-turing-institute/MLJBase.jl/issues/68)). So,
@@ -320,7 +320,8 @@ Additionally, if `SomeSupervisedModel` supports sample weights, one must declare
 MMI.supports_weights(model::Type{<:SomeSupervisedModel}) = true
 ```
 
-Optionally, to support serialization of machines, overload
+Optionally, to customized support for serialization of machines (see
+[Serialization](@ref)), overload
 
 ```julia
 MMI.save(filename, model::SomeModel, fitresult; kwargs...) = fitresult

@@ -123,7 +123,7 @@ machines](@ref).
 
 ## Saving machines
 
-To save a machine to file, use the [`MLJ.save`](@ref) command:
+To save a machine to file, use the `MLJ.save` command:
 
 ```julia
 tree = @load DecisionTreeClassifier
