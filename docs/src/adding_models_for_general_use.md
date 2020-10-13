@@ -181,7 +181,7 @@ expects its value to be positive.
 You cannot use the `@mlj_model` macro if your model struct has type
 parameters.
 
-### Known issue with @mlj_macro
+#### Known issue with @mlj_macro
 
 Defaults with negative values can trip up the `@mlj_macro` (see [this
 issue](https://github.com/alan-turing-institute/MLJBase.jl/issues/68)). So,
@@ -226,8 +226,10 @@ assumptions (see, e.g., [The predict_joint method](@ref) below).
 
 The compulsory and optional methods to be implemented for each
 concrete type `SomeSupervisedModel <: MMI.Supervised` are
-summarized below. An `=` indicates the return value for a fallback
-version of the method.
+summarized below. 
+
+An `=` indicates the return value for a fallback version of the
+method.
 
 Compulsory:
 
@@ -317,6 +319,21 @@ Additionally, if `SomeSupervisedModel` supports sample weights, one must declare
 ```julia
 MMI.supports_weights(model::Type{<:SomeSupervisedModel}) = true
 ```
+
+Optionally, to customized support for serialization of machines (see
+[Serialization](@ref)), overload
+
+```julia
+MMI.save(filename, model::SomeModel, fitresult; kwargs...) = fitresult
+```
+
+and possibly
+
+```julia
+MMI.restore(filename, model::SomeModel, serializable_fitresult) -> serializable_fitresult
+```
+
+These last two are unlikely to be needed if wrapping pure Julia code.
 
 
 ### The form of data for fitting and predicting
@@ -926,6 +943,116 @@ ytest = y[1:3]
 yhat = predict(mach, fill(nothing, 3))
 julia> @assert cross_entropy(yhat, ytest) ≈ [-log(1/2), -log(1/2), -log(1/4)]
 true
+```
+
+
+### Serialization 
+
+!!! warning "Experimental"
+
+    The following API is experimental. It is subject to breaking changes during minor or major releases without warning.
+
+The MLJ user can serialize and deserialize a *machine*, which means
+serializing/deserializing:
+
+- the associated `Model` object (storing hyperparameters)
+- the `fitresult` (learned parameters)
+- the `report` generating during training
+
+These are bundled into a single file or `IO` stream specified by the
+user using the package `JLSO`. There are two scenarios in which a new
+MLJ model API implementation will want to overload two additional
+methods `save` and `restore` to support serialization:
+
+1. The algorithm-providing package already has it's own serialization
+  format for learned parameters and/or hyper-parameters, which users
+  may want to access. In that case *the implementation overloads* `save`.
+  
+2. The `fitresult` is not a sufficiently persistent object; for
+  example, it is a pointer passed from wrapped C code. In that case
+  *the implementation overloads* `save` *and* `restore`.
+  
+In case 2, 1 presumably holds also, for otherwise MLJ serialization is
+probably not going to be possible without changes to the
+algorithm-providing package. An example is given below.
+
+Note that in case 1, MLJ will continue to create it's own
+self-contained serialization of the machine. Below `filename` refers
+to the corresponding serialization file name, as specified by the
+user, but with any final extension (e.g., ".jlso", ".gz") removed. If
+the user has alternatively specified an `IO` object for serialization,
+then `filename` is a randomly generated numeric string.
+
+
+#### The save method
+
+```julia
+MMI.save(filename, model::SomeModel, fitresult; kwargs...) -> serializable_fitresult
+```
+
+Implement this method to serialize using a format specific to models
+of type `SomeModel`. The `fitresult` is the first return value of
+`MMI.fit` for such model types; `kwargs` is a list of keyword
+arguments specified by the user and understood to relate to a some
+model-specific serialization (cannot be `format=...` or
+`compression=...`). The value of `serializable_fitresult` should be a
+persistent representation of `fitresult`, from which a correct and
+valid `fitresult` can be reconstructed using `restore` (see
+below). 
+
+The fallback of `save` performs no action and returns `fitresult`.
+
+
+#### The restore method
+
+```julia
+MMI.restore(filename, model::SomeModel, serializable_fitresult) -> fitresult
+```
+
+Implement this method to reconstruct a `fitresult` (as returned by
+`MMI.fit`) from a persistent representation constructed using
+`MMI.save` as described above. 
+
+The fallback of `restore` returns `serializable_fitresult`.
+
+#### Example
+
+Below is an example drawn from MLJ's XGBoost wrapper. In this example
+the `fitresult` returned by `MMI.fit` is a tuple `(booster,
+a_target_element)` where `booster` is the `XGBoost.jl` object storing
+the learned parameters (essentially a pointer to some object created
+by C code) and `a_target_element` is an ordinary `CategoricalValue`
+used to track the target classes (a persistent object, requiring no
+special treatment).
+
+```julia
+function MLJModelInterface.save(filename,
+                                ::XGBoostClassifier,
+                                fitresult;
+                                kwargs...)
+    booster, a_target_element = fitresult
+
+    xgb_filename = string(filename, ".xgboost.model")
+    XGBoost.save(booster, xgb_filename)
+    persistent_booster = read(xgb_filename)
+    @info "Additional XGBoost serialization file \"$xgb_filename\" generated. "
+    return (persistent_booster, a_target_element)
+end
+
+function MLJModelInterface.restore(filename,
+                                   ::XGBoostClassifier,
+                                   serializable_fitresult)
+    persistent_booster, a_target_element = serializable_fitresult
+
+    xgb_filename = string(filename, ".tmp")
+    open(xgb_filename, "w") do file
+        write(file, persistent_booster)
+    end
+    booster = XGBoost.Booster(model_file=xgb_filename)
+    rm(xgb_filename)
+    fitresult = (booster, a_target_element)
+    return fitresult
+end
 ```
 
 ## Unsupervised models
