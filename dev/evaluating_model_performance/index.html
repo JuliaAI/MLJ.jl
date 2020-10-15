@@ -15,7 +15,7 @@ julia&gt; cv=CV(nfolds=3)
 CV(
     nfolds = 3,
     shuffle = false,
-    rng = MersenneTwister(UInt32[0x27e1de44, 0xbbb2f4b9, 0x05c83415, 0x1e1085f3]) @ 833) @487
+    rng = MersenneTwister(UInt32[0x78fdea7b, 0xae4120d3, 0x39b8e18f, 0xe649ed4e]) @ 656) @721
 
 julia&gt; evaluate(model, X, y, resampling=cv, measure=l2, verbosity=0)
 ERROR: UndefVarError: model not defined</code></pre><p>Alternatively, instead of applying <code>evaluate</code> to a model + data, one may call <code>evaluate!</code> on an existing machine wrapping the model in data:</p><pre><code class="language-julia-repl">julia&gt; mach = machine(model, X, y)
@@ -43,7 +43,7 @@ julia&gt; holdout = Holdout(fraction_train=0.8)
 Holdout(
     fraction_train = 0.8,
     shuffle = false,
-    rng = MersenneTwister(UInt32[0x27e1de44, 0xbbb2f4b9, 0x05c83415, 0x1e1085f3]) @ 833) @834
+    rng = MersenneTwister(UInt32[0x78fdea7b, 0xae4120d3, 0x39b8e18f, 0xe649ed4e]) @ 656) @510
 
 julia&gt; weights = [1, 1, 2, 1, 1, 2, 3, 1, 1, 2, 3, 1];
 
