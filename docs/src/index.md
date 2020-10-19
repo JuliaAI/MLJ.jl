@@ -18,10 +18,10 @@ A Machine Learning Framework for Julia
 
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
-tuning, evaluating, composing and comparing over 140 machine learning
-models written in Julia and other languages. In particular MLJ wraps a
-large number of [scikit-learn](https://scikit-learn.org/stable/)
-models.
+tuning, evaluating, composing and comparing [over 150 machine learning
+models](@ref model_list) written in Julia and other languages. In
+particular MLJ wraps a large number of
+[scikit-learn](https://scikit-learn.org/stable/) models.
 
 MLJ is released under the MIT licensed and sponsored by the [Alan
 Turing Institute](https://www.turing.ac.uk/).
@@ -244,7 +244,7 @@ using MLJ
 models()
 ```
 
-or refer to [List of Supported Models](@ref)
+or refer to [List of Supported Models](@ref models_list)
 
 It is recommended that you start with models marked as coming from mature
 packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.

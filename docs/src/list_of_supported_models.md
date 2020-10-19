@@ -1,4 +1,4 @@
-# List of Supported Models
+# [List of Supported Models](@id model_list)
 
 MLJ provides access to to a wide variety of machine learning models.
 We are always looking for
@@ -26,11 +26,12 @@ models()`.
 [LightGBM.jl](https://github.com/IQVIA-ML/LightGBM.jl) | LightGBMClassifier, LightGBMRegressor | high | 
 [MLJFlux.jl](https://github.com/alan-turing-institute/MLJFlux.jl) | NeuralNetworkRegressor, NeuralNetworkClassifier, MultitargetNeuralNetworkRegressor, ImageClassifier | experimental |
 [MLJLinearModels.jl](https://github.com/alan-turing-institute/MLJLinearModels.jl) | LinearRegressor, RidgeRegressor, LassoRegressor, ElasticNetRegressor, QuantileRegressor, HuberRegressor, RobustRegressor, LADRegressor, LogisticClassifier, MultinomialClassifier | experimental |
-[MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl) (built-in) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ContinuousEncoder, ConstantRegressor, ConstantClassifier | medium |
-[MultivariateStats.jl](https://github.com/JuliaStats/MultivariateStats.jl) | RidgeRegressor, PCA, KernelPCA, ICA, LDA, BayesianLDA, SubspaceLDA, BayesianSubspaceLDA | high | †
+[MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl) (built-in) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ContinuousEncoder, ConstantRegressor, ConstantClassifier, BinaryThreshholdPredictor | medium |
+[MultivariateStats.jl](https://github.com/JuliaStats/MultivariateStats.jl) | LinearRegressor, RidgeRegressor, PCA, KernelPCA, ICA, LDA, BayesianLDA, SubspaceLDA, BayesianSubspaceLDA, FactorAnalysis, PPCA | high | 
 [NaiveBayes.jl](https://github.com/dfdx/NaiveBayes.jl) | GaussianNBClassifier, MultinomialNBClassifier, HybridNBClassifier | experimental |
 [NearestNeighbors.jl](https://github.com/KristofferC/NearestNeighbors.jl) | KNNClassifier, KNNRegressor | high |
-[ParallelKMeans.jl](https://github.com/PyDataBlog/ParallelKMeans.jl) | KMeans | experimental | 
+[ParallelKMeans.jl](https://github.com/PyDataBlog/ParallelKMeans.jl) | KMeans | experimental |
+[PartialLeastSquaresRegressor.jl](https://github.com/lalvim/PartialLeastSquaresRegressor.jl) | PLSRegressor, KPLSRegressor | experimental |
 [ScikitLearn.jl](https://github.com/cstjean/ScikitLearn.jl) | ARDRegressor, AdaBoostClassifier, AdaBoostRegressor, AffinityPropagation, AgglomerativeClustering, BaggingClassifier, BaggingRegressor, BayesianLDA, BayesianQDA, BayesianRidgeRegressor, BernoulliNBClassifier, Birch, ComplementNBClassifier, DBSCAN, DummyClassifier, DummyRegressor, ElasticNetCVRegressor, ElasticNetRegressor, ExtraTreesClassifier, ExtraTreesRegressor, FeatureAgglomeration, GaussianNBClassifier, GaussianProcessClassifier, GaussianProcessRegressor, GradientBoostingClassifier, GradientBoostingRegressor, HuberRegressor, KMeans, KNeighborsClassifier, KNeighborsRegressor, LarsCVRegressor, LarsRegressor, LassoCVRegressor, LassoLarsCVRegressor, LassoLarsICRegressor, LassoLarsRegressor, LassoRegressor, LinearRegressor, LogisticCVClassifier, LogisticClassifier, MeanShift, MiniBatchKMeans, MultiTaskElasticNetCVRegressor, MultiTaskElasticNetRegressor, MultiTaskLassoCVRegressor, MultiTaskLassoRegressor, MultinomialNBClassifier, OPTICS, OrthogonalMatchingPursuitCVRegressor, OrthogonalMatchingPursuitRegressor, PassiveAggressiveClassifier, PassiveAggressiveRegressor, PerceptronClassifier, ProbabilisticSGDClassifier, RANSACRegressor, RandomForestClassifier, RandomForestRegressor, RidgeCVClassifier, RidgeCVRegressor, RidgeClassifier, RidgeRegressor, SGDClassifier, SGDRegressor, SVMClassifier, SVMLClassifier, SVMLRegressor, SVMNuClassifier, SVMNuRegressor, SVMRegressor, SpectralClustering, TheilSenRegressor | high | †
 [XGBoost.jl](https://github.com/dmlc/XGBoost.jl) | XGBoostRegressor, XGBoostClassifier, XGBoostCount | high |
 
