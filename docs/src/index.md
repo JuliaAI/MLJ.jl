@@ -244,7 +244,7 @@ using MLJ
 models()
 ```
 
-or refer to [List of Supported Models](@ref models_list)
+or refer to [List of Supported Models](@ref model_list)
 
 It is recommended that you start with models marked as coming from mature
 packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.
