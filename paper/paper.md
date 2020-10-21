@@ -60,7 +60,7 @@ are wanting to build increasingly sophisticated composite models, as
 exemplified in the strategies of top contestants in machine learning
 competitions such as Kaggle.
 
-MLJ (Machine Learning in Julia) [@MLJ] is a toolbox written in
+MLJ (Machine Learning in Julia) [@MLJdocs] is a toolbox written in
 Julia that provides a common interface and meta-algorithms for
 selecting, tuning, evaluating, composing and comparing machine model
 implementations written in Julia and other languages. More broadly,
