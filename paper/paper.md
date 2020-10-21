@@ -47,34 +47,34 @@ bibliography: paper.bib
 
 # Introduction
 
-Statistical modelling, and the building of complex modelling
-pipelines, is a cornerstone of modern data science. Most experienced
-data scientists rely on high-level open source modelling toolboxes -
+Statistical modeling, and the building of complex modeling pipelines,
+is a cornerstone of modern data science. Most experienced
+data scientists rely on high-level open source modeling toolboxes -
 such as sckit-learn [@Pedregosa2001; @Buitinck2013] (Python); Weka
 [@Holmes1994] (Java); mlr [@BischlEtal2016] and caret [@Kuhn2008]
 (R) - for quick blueprinting, testing, and creation of
-deployment-ready models. They do this by providing a common interface
+deployment-ready models.  They do this by providing a common interface
 to atomic components, from an ever-growing model zoo, and by providing
 the means to incorporate these into complex work-flows. Practitioners
-are able to build increasingly sophisticated composite models, as
+are wanting to build increasingly sophisticated composite models, as
 exemplified in the strategies of top contestants in machine learning
 competitions such as Kaggle.
 
-MLJ (Machine Learning in Julia) [@MLJ] is a toolbox written in Julia
-that provides a common interface and meta-algorithms for selecting,
-tuning, evaluating, composing and comparing machine learning model 
+MLJ (Machine Learning in Julia) [@MLJ] is a toolbox written in
+Julia that provides a common interface and meta-algorithms for
+selecting, tuning, evaluating, composing and comparing machine model
 implementations written in Julia and other languages. More broadly,
-the MLJ project hopes to bring cohesion and focus to a number of emerging
-and existing, but previously disconnected, machine learning algorithms
-and tools of high quality, written in Julia. A welcome corollary of
-this activity will be increased cohesion and synergy within the
-talent-rich communities developing these tools. 
+the MLJ project hopes to bring cohesion and focus to a number of
+emerging and existing, but previously disconnected, machine learning
+algorithms and tools of high quality, written in Julia. A welcome
+corollary of this activity will be increased cohesion and synergy
+within the talent-rich communities developing these tools.
 
-In addition to
-other novelties outlined below, MLJ aims to provide first-in-class
-model composition capabilities.  Guiding goals of the MLJ project have
-been usability, interoperability, extensibility, code transparency,
-and reproducibility.
+In addition to other novelties outlined below, MLJ aims to provide
+first-in-class model composition capabilities. Guiding goals of the
+MLJ project have been usability, interoperability, extensibility, code
+transparency, and reproducibility.
+
 
 ## Why Julia?
 
@@ -93,168 +93,105 @@ accelerated through a dramatically reduced software development cycle.
 
 As an example of the productivity boost provided by the
 single-language paradigm, we cite the DifferentialEquations.jl package
-[@RackauckasNie2017], which, in a few short years of
-development by a small team of domain experts, became the best package
-in its class [@Rackauckas2017].
+[@RackauckasNie2017], which, in a few short years of development
+by a small team of domain experts, became the best package in its
+class [@Rackauckas2017].
 
-Another major advantange of a single-language solution is the ability to
-automatically differentiate (AD) functions from their code
+Another major advantage of a single-language solution is the ability
+to automatically differentiate (AD) functions from their code
 representations. The Flux.jl package [@Innes2018], for example,
 already makes use of AD to allow unparalleled flexibility in neural
-network design .
+network design.
 
 As a new language, Julia is high-performance computing-ready, and its
-superlative metaprogramming features allow developers to create
-domain-specific syntax for user interaction. 
+superlative meta-programming features allow developers to create
+domain-specific syntax for user interaction.
+
 
 ## Novelties
 
-In line with current trends in "auto-ML", MLJ's design is largely
-predicated on the importance of model composability. Composite models
-share all the behaviour of regular models, constructed using a new
-flexible "learning networks" syntax. Unlike the toolboxes cited above,
-MLJ's composition syntax is flexible enough to define stacked models,
-with out-of-sample predictions for the base learners, as well as more
-routine linear pipelines, which can include target transformations
-that are learned. As in mlr, hyper-parameter tuning is implemented as
-a model wrapper.
+**Composability.** In line with current trends in "auto-ML",
+MLJ's design is largely predicated on the importance of model
+composability. Composite models share all the behavior of regular
+models, constructed using a new flexible "learning networks"
+syntax. Unlike the toolboxes cited above, MLJ's composition syntax is
+flexible enough to define stacked models, with out-of-sample
+predictions for the base learners, as well as more routine linear
+pipelines, which can include target transformations that are
+learned. As in mlr, hyper-parameter tuning is implemented as a model
+wrapper.
 
-In MLJ, probabilistic prediction is treated as a first class feature,
-leveraging Julia's type sytem. In particular, unnecessary
-case-distinctions, and ambiguous conventions regarding the representation
-of probabilities, are avoided.
+**A unified approach to probabilistic predictions.** In MLJ,
+probabilistic prediction is treated as a first class feature,
+leveraging Julia's type system. In particular, unnecessary
+case-distinctions, and ambiguous conventions regarding the
+representation of probabilities, are avoided.
 
-A user can connect models directly to tabular data in a manifold of
-in-memory and out-of-memory formats, and usability is enhanced through
-the introduction of "_scientific types_" allowing the user to focus
-on the intended purpose of data ("continuous", "ordered factor", etc)
-rather than particular machine type representations.
+**Scientific types** To help users focus less on data representation
+(e.g., `Float32`, `DataFrame`) and more on the intended *purpose* or
+*interpretation* of data, MLJ articulates model data requirements
+using *scientific types* [@ScientificTypes], such as "continuous",
+"ordered factor" or "table".
 
-Finally, with the help of scientific types and the CategoricalArrays.jl
-package [@CategoricalArrays], users are guided to create safe
+**Connecting models directly to arbitrary data containers**. A
+user can connect models directly to tabular data in a manifold of
+in-memory and out-of-memory formats by using a universal table
+interface provided by the Tables.jl package [@Quinn].
+
+**Finding the right model.** A model registry gives the user access to
+model metadata without the need to actually load code defining the
+model implementation. This metadata includes the model's data
+requirements, for example, as well as a load path to enable MLJ to
+locate the model interface code. Users can readily match models to
+machine learning tasks, facilitating searches for an optimal model, a
+search that can be readily automated.
+
+**Tracking classes of categorical variables.** Finally, with
+the help of scientific types and the CategoricalArrays.jl package
+[@CategoricalArrays], users are guided to create safe
 representations of categorical data, in which the complete pool of
 possible classes is embedded in the data representation, and
-classifiers preserve this information when making predictions!. This
-avoids a pain-point familiar in environments that simply recast
-categorical data using integers (e.g., scikit-learn): evaluating a
-classifier on the test target, only to find the test data includes
-classes not seen in the training data. Preservation of the original
-labels for these classes also facilitates exploratory data anaysis and
-interpretability.
+classifiers preserve this information when making predictions. This
+avoids a pain-point familiar in frameworks that simply recast
+categorical data using integers: evaluating a classifier on the test
+target, only to find the test data includes classes not seen in the
+training data. Preservation of the original labels for these classes
+also facilitates exploratory data analysis and interpretability.
+
 
 # Scientific types
 
-To help users focus less on data representation (e.g., `Float32`,
-`CategoricalValue{Char,UInt8}` or `DataFrame`) and more on intended
-*interpretation* (such as, "continuous", "ordered factor" and
-"table") MLJ articulates model data requirements, as well as data
-pre-processing tasks, using *scientific types*. A scientific type is
-an ordinary Julia type (generally without instances) reserved for
-indicating how some data should be interpreted.
-
-
-Some of these types (provided by an external package for re-use
-elsewhere) are shown in \autoref{fig1}.
+A scientific type is an ordinary Julia type (generally without
+instances) reserved for indicating how some data should be
+interpreted. Some of these types are shown in \autoref{fig1}.
 
 <!-- ![Part of the scientific type hierarchy.\label{fig1}](scitypesII.svg) -->
 ![Part of the scientific type hierarchy.\label{fig1}](scitypesII.png)
 
 To the scientific types, MLJ adds a specific *convention* specifying a
 scientific type for every Julia object. The convention is expressed
-through a single method `scitype`.  A `coerce` method recasts machine
-types to have the desired scientific type (interpretation), and a
-`schema` method summmarizes the machine and scientfic types of tabular
-data.
-
-```julia
-using MLJ, CategoricalArrays
-scitype(1.2)
-```
-```
-Continuous
-```
-
-```julia
-table = (age=[20, 13, 48], attempts=[10, 5, 6], query=["why", "what", "whom"])
-schema(table)
-```
-```
-┌──────────┬─────────┬────────────┐
-│ _.names  │ _.types │ _.scitypes │
-├──────────┼─────────┼────────────┤
-│ age      │ Int64   │ Count      │
-│ attempts │ Int64   │ Count      │
-│ query    │ String  │ Textual    │
-└──────────┴─────────┴────────────┘
-_.nrows = 3
-```
-
-```julia
-fixed_table = coerce(column_table, :age=>Continuous, :query=>Multiclass)
-schema(fixed_table)
-```
-```
-┌──────────┬───────────────────────────┬───────────────┐
-│ _.names  │ _.types                   │ _.scitypes    │
-├──────────┼───────────────────────────┼───────────────┤
-│ age      │ Float64                   │ Continuous    │
-│ attempts │ Int64                     │ Count         │
-│ query    │ CategoricalString{UInt32} │ Multiclass{3} │
-└──────────┴───────────────────────────┴───────────────┘
-_.nrows = 3
-```
+through a single method `scitype`. So, for example, `scitype(x)`
+returns `Continuous` whenever the type of `x` is a subtype of Julia's
+`AbstractFloat` type, as in `scitype(3.14) == Continuous`. A tabular
+data structure satisfying the Tables.jl interface, will always have
+type `Table{K}`, where the type parameter `K` is the union of all
+column scientific types.  A `coerce` method recasts machine types to
+have the desired scientific type (interpretation), and a `schema`
+method summarizes the machine and scientific types of tabular data.
 
 Since scientific types are also Julia types, Julia's advanced type
-system means scientific types can be organized in a type hierarchy,
-and it is straightforward to check the compatibility of data with a
+system means scientific types can be organized in a type hierarchy.
+It is straightforward to check the compatibility of data with a
 model's scientific requirements and methods can be dispatched on
 scientific type just as they would on ordinary types.
 
-# Connecting models directly to arbitrary data containers
-
-MLJ models generally expect features (and multivariate target data) to
-be tabular (rather than a raw matrix, for example). While there are
-many options for storing tabular data in Julia, both in memory or on
-disk, these can be accessed using a common interface provided by the
-Tables.jl package [@Quinn]. In MLJ, any Tables.jl-compatible table has
-scientific type `Table{K}`, where the type parameter `K` is the union
-of the column scientific types; most models allow scientific type for
-input features to be some subtype of `Table`.
-
-While internally many models convert tabular data to matrices, a
-lightweight table wrapper for matrices provided by Tables.jl means
-that type coercion is skipped by the compiler in the case of matrix input
-(as readily verified using Julia's code inspection macro
-`@code_llvm`).
-
-# Finding the right model
-
-A model registry gives the user access to model metadata without the
-need to actually load code defining the model implementation. This
-metadata includes the model's data requirements (framed in terms of
-scientific types), the names and types of hyper-parameters, a brief
-document string, the url for the providing package, open source
-license and a load path to enable MLJ to locate the model interface
-code.
-
-Such information allows users to match models to machine learning
-tasks, facilitating searches for an optimal model. For example, to find
-all supervised models making probabilistic predictions, compatible
-with input data `X` and target `y`, one defines a filter
-
-```julia
-task(model) = matching(model, X, y) && model.prediction_type == :probabilistic models(task) 
-
-```
-
-and lists the models with `models(task)`. 
-
 # Flexible and compact work-flows for performance evaluation and tuning
 
-Evaluating the performance of some `model` object (specifying the
-hyper-parameters of some supervised learning algorithm) using some
-specified `resampling` strategy, and measured against some battery of
-performance `measures`, looks like this:
+Evaluating the performance of some `model` object (specifying
+the hyper-parameters of some supervised learning algorithm) using some
+specified `resampling` strategy, and measured against some
+battery of performance `measures`, looks like this:
+
 
 ```julia
 evaluate(model, X, y, resampling=CV(nfolds=6), measures=[L2HingeLoss(), BrierScore()])
@@ -270,9 +207,9 @@ evaluate(model, X, y, resampling=CV(nfolds=6), measures=[L2HingeLoss(), BrierSco
 As in mlr, hyper-parameter optimization is realized as a model
 wrapper, which transforms a base model into a "self-tuning" version of
 that model. That is, tuning is is abstractly specified before being
-executed. This allows tuning to be integrated into work-flows (learning
-networks) in multiple ways. A well-documented tuning interface
-[@MLJTuning] allows developers to easily extend available
+executed. This allows tuning to be integrated into work-flows
+(learning networks) in multiple ways. A well-documented tuning
+interface [@MLJTuning] allows developers to easily extend available
 hyper-parameter tuning strategies.
 
 We now give an example of syntax for wrapping a model called
@@ -303,107 +240,66 @@ support for both distributed and multi-threaded parallelism.
 
 MLJ puts probabilistic models and deterministic models on equal
 footing. Unlike most most frameworks, a supervised model is either
-*probablistic* - meaning it's `predict` method returns a distribution
-object - *or* it is *deterministic* - meaning it returns objects of
-the same scientific type as the training observations. To use a
-probabilistic model to make deterministic predictions one can wrap the
-model in a pipeline with an appropriate post-processing function, or
-use additional `predict_mean`, `predict_mean`, `predict_mode` methods
-to deal with the common use-cases.
+*probabilistic* - meaning it's `predict` method returns a distribution
+object - *or* it is *deterministic* - meaning it returns
+objects of the same scientific type as the training observations. To
+use a probabilistic model to make deterministic predictions one can
+wrap the model in a pipeline with an appropriate post-processing
+function, or use additional `predict_mean`, `predict_median`,
+`predict_mode` methods to deal with the common use-cases.
 
 A "distribution" object returned by a probabilistic predictor is one
-that can be sampled (using Julia's `rand` method) and queried for
-properties. Where possible the object is in fact a `Distribution`
-object from the Distributions.jl package [@LinEtal2020], for which an
-additional `pdf` method for evaluating the distribution's probability
-density or mass function will be implemented, and in addition to
-`mode`, `mean` and `median` methods (allowing MLJ's fallbacks for
+that can be sampled (using Julia's `rand` method) and queried
+for properties. Where possible the object is in fact a
+`Distribution` object from the Distributions.jl package
+[@LinEtal2020], for which an additional `pdf` method for
+evaluating the distribution's probability density or mass function
+will be implemented, in addition to `mode`, `mean`
+and `median` methods (allowing MLJ's fallbacks for
 `predict_mean`, etc, to work).
 
 One important distribution *not* provided by Distributions.jl is a
-distribution for finite *labeled* data (called `UnivariateFinite`)
-which additionally tracks all possible classes of the categorical
-variable it is modelling, and not just those observed in training
-data.
+distribution for finite sample spaces with *labeled* elements (called
+`UnivariateFinite`) which additionally tracks all possible classes of
+the categorical variable it is modeling, and not just those observed
+in training data.
 
-By predicting distributions, instead of raw probablities or
+By predicting distributions, instead of raw probabilities or
 parameters, MLJ avoids a common pain point, namely deciding and
 agreeing upon a convention about how these should be represented:
 Should a binary classifier predict one probability or two? Are we
-using the standard deviation or the variance here? What's the
-protocol for deciding the order of (unordered) classes? How should
-multi-target predictions be combined?, etc.
+using the standard deviation or the variance here? What's the protocol
+for deciding the order of (unordered) classes? How should multi-target
+predictions be combined?, etc.
 
 A case-in-point concerns performance measures (metrics) for
 probabilistic models, such as cross-entropy and Brier loss. All
-built-in probablisitic measures provided by MLJ are passed
-a distribution in their prediction slot.
+built-in probabilistic measures provided by MLJ are passed a
+distribution in their prediction slot.
 
 For an overview on probabilistic supervised learning we refer to
 [@Gressmann2018].
 
+
 # Model interfaces
-
-MLJ provides a basic `fit/update/predict` interface to be implemented
-by new supervised models. For unsupervised models `predict` is
-replaced with `transform` and an optional `inverse_transform`
-method. These methods operate on *models* which are mutable structs
-storing hyper-parameters, and nothing else. This *model interface* is
-purely functional for maximum flexibility. Presently the general MLJ
-user is encouraged to interact through a *machine interface* sitting
-on top. See more on this below.
-
-## The model interface
 
 In MLJ a *model* is just a struct storing the hyper-parameters
 associated with some learning algorithm suggested by the struct name
-(e.g., `DecisionTreeClassifier`), and that is all. In the low-level,
-functional-style, model interface *learned parameters* are not stored,
-only passed around. Learned parameters *are* stored in machines (which
-additionally *point* to the hyperparameters stored in a model); see
-below.  The separation of hyper-parameters and learned parameters is
-essential to flexible model composition.
+(e.g., `DecisionTreeClassifier`) and that is all.  MLJ provides a
+basic *model interface*, to be implemented by new machine learning
+models, which is functional in style, for simplicity and maximal
+flexibility. In addition to a `fit` and optional `update` method, one
+implements one or more operations, such as `predict`, `transform` and
+`inverse_transform`, acting on the learned parameters returned by
+`fit`.
 
-For supervised models the `fit` method has this signature:
-
-```julia
-fit(model, verbosity, X, y)
-```
-
-where `X` is training input and `y` the training target. The method
-outputs a triple, typically denoted `(fitresult, cache,
-report)`.
-
-The `fitresult` stores the learned parameters, which must
-include everything needed by `predict` to make predictions, apart
-from `model` and new input data:
-
-```julia
-predict(model, fitresult, X)
-```
-
-The purpose of `cache` is to pass on "state" not included in the
-`fitresult` to an `update` method that the model implementer may
-optionally overload:
-
-```julia
-update(model, verbosity, fitresult, cache, X, y)
-```
-
-This method is to be called instead of `fit` (and passed the
-`fitresult` and `cache` returned by the `fit` call) when retraining
-using identical data. (The data `X`, `y`, are included for implementer
-convenience.)  It provides an opportunity for the model implementer to
-avoid unnecessary repetition of code execution. The three main
-use-cases are:
+The optional `update` method allows one to avoid unnecessary
+repetition of code execution (warm restart). The three main use-cases
+are:
 
 - **Iterative models.** If the only change to a random forest model is
   an increase in the number of trees by ten, for example, then not all
-  trees need to be retrained; only ten new trees need to be
-  trained. If a "self-tuning" model has been fit (i.e., tuned) using
-  70 iterations of Tree Parzen optimization, then adding 20 more
-  iterations should build on the existing surrogate objective
-  function, not ignore the existing tuning history.
+  trees need to be retrained; only ten new trees need to be trained.
 
 - **Data preprocessing.** Avoid overheads associated with data
   preprocessing, such as coercion of data into an algorithm-specific
@@ -411,7 +307,7 @@ use-cases are:
 
 - **Smart training of composite models.** When tuning a simple
   transformer-predictor pipeline model using a holdout set, for
-  example, it is unecessary to retrain the transformer if only the
+  example, it is unnecessary to retrain the transformer if only the
   predictor hyper-parameters change. MLJ implements "smart" retraining
   of composite models like this by defining appropriate `update`
   methods.
@@ -419,27 +315,21 @@ use-cases are:
 In the future MLJ will add an `update_data` method to support
 models that can carry out on-line learning.
 
-## The machine interface
+Presently, the general MLJ user is encouraged to interact through a
+*machine interface* which sits on top of the model
+interface. This makes some work-flows more convenient but, more
+significantly, introduces a syntax which is more natural in the
+context of model composition (see below). A *machine* is a
+mutable struct that binds a model to data at construction, as in
+`mach = machine(model, data)`, and which stores learned
+parameters after the user calls `fit!(mach, rows=...)`. To
+retrain with new hyper-parameters, the user can mutate `model`
+and repeat the `fit!` call.
 
-The general MLJ user trains models through its machine interface. This
-makes some work-flows more convenient, but more significantly,
-introduces a syntax closely aligned with that for model composition
-(see below).
+The operations `predict`, `transform`, etc are overloaded for
+machines, which is how the user typically uses them, as in the call
+`predict(mach, Xnew)`.
 
-A *machine* is a mutable struct that binds a model to data at construction
-
-```julia
-mach = machine(model, X, y)
-```
-
-When the user calls `fit!(mach, rows=...)` the `fitresult`, `cache`
-and `report` variables generated by lower-level calls to `fit` or
-`update`, are stored or updated in the machine struct, `mach`, with
-the training being optionally restricted to the specified rows of
-data.  To retrain with new hyper-parameters, the user simply mutates
-`model` and repeats the `fit!` call.
-
-Syntax for predicting using a machine is `predict(mach, Xnew)`.
 
 # Flexible model composition
 
@@ -468,6 +358,11 @@ following shortcomings, which do not exist in MLJ:
 - Hyper-parameters and/or learned parameters of component models are
   not easily inspected or manipulated (in tuning algorithms, for
   example)
+  
+- Composite models cannot implement multiple operations, for example,
+  both a `predict` and `transform` method (as in clustering models) or
+  both a `transform` and `inverse_transform` method.
+
 
 We now sketch MLJ's composition API, referring the reader to
 [@Blaom_I] for technical details, and to the MLJ documentation
@@ -494,7 +389,7 @@ for the purposes of testing the learning network as it is built.
 <!-- ![Specifying prediction and training flows in a simple learning network. The network shown combines a ridge regressor with a learned target transformation (Box Cox).\label{fig2}](target_transformerVERTICAL.svg) -->
 ![Specifying prediction and training flows in a simple learning network. The network shown combines a ridge regressor with a learned target transformation (Box Cox).\label{fig2}](target_transformerVERTICAL.png)
 
-The upper panel of \autoref{fig2} illustrates a simple learning
+The upper panel of Figure \autoref{fig2} illustrates a simple learning
 network in which a continuous target `y` is "normalized" using a
 learned Box Cox transformation, producing `z`, while PCA dimension
 reduction is applied to some features `X`, to obtain `Xr`. A Ridge
@@ -503,23 +398,25 @@ regressor, trained using data from `Xr` and `z`, is then applied to
 `ŷ`, we apply the *inverse* of the Box Cox transform, learned
 previously, to `ẑ`.
 
-The lower "training" panel of the figure shows the three machines which
-will store the parameters learned in training - the Box Cox exponent
-and shift (`machine1`), the PCA projection (`machine2`) and the ridge
-model coefficients and intercept (`machine3`). The diagram
-additionally indicates where machines should look for training data,
-and where to accesses model hyper-parameters (stored in `box_cox`,
-`PCA` and `ridge_regressor`).
+The lower "training" panel of the figure shows the three machines
+which will store the parameters learned in training - the Box Cox
+exponent and shift (`machine1`), the PCA projection
+(`machine2`) and the ridge model coefficients and intercept
+(`machine3`). The diagram additionally indicates where machines
+should look for training data, and where to accesses model
+hyper-parameters (stored in `box_cox`, `PCA` and
+`ridge_regressor`).
 
 The only syntactic difference between composing "by hand" and building
 a learning network is that the training data must be wrapped in
-"source nodes" (which can be empty if testing is not required). Each
-data "variable" in the manual workflow becomes instead a node of a
-directed acyclic graph encoding the composite model
-architecture. Nodes are callable, with a node call triggering lazy
-evaluation of the `predict`, `transform` and other operations in the
-network. Instead of calling `fit!` on every machine, a single call to
-`fit!` on a *node* triggers training of all machines needed to call
+"source nodes" (which can be empty if testing is not required) and the
+`fit!` calls can be omitted, as training is now lazy. Each data
+"variable" in the manual work-flow is now a node of a directed acyclic
+graph encoding the composite model architecture. Nodes are callable,
+with a node call triggering lazy evaluation of the `predict`,
+`transform` and other operations in the network. Instead of
+calling `fit!` on every machine, a single call to `fit!`
+on a *node* triggers training of all machines needed to call
 that node, in appropriate order. As mentioned earlier, training such a
 node is "smart" in the sense that hyper-parameter changes to a model
 only trigger retraining of necessary machines. So, for example, there
@@ -549,18 +446,18 @@ fit!(ŷ)  # to test training on the dummy data
 ```
 
 Note that the machine syntax is a mechanism allowing for multiple
-nodes to point to the same learned parameters of a model, as in
-the learned target transformation/inverse transformation above. They
-also allow multiple nodes to share the same model (hyper-parameters) as
-in homogeneous ensembles. And different nodes can be accessed during
+nodes to point to the same learned parameters of a model, as in the
+learned target transformation/inverse transformation above. They also
+allow multiple nodes to share the same model (hyper-parameters) as in
+homogeneous ensembles. And different nodes can be accessed during
 training and "prediction" modes of operation, as in stacking.
 
 ## Export
 
 In the second step of model composition, the learning network is
-"exported" as a new stand-alone composite model type, with the component
-models appearing in the learning network becoming default values for
-corresponding hyper-parameters (whose values are themselves
+"exported" as a new stand-alone composite model type, with the
+component models appearing in the learning network becoming default
+values for corresponding hyper-parameters (whose values are themselves
 models). This new type (which is unattached to any particular data)
 can be instantiated and used just like any other MLJ model (tuned,
 evaluated, etc). Under the hood, training such a model builds a
@@ -571,33 +468,23 @@ executed by the user with a simple macro call.
 
 # Future directions
 
-Here is a selection of future work planned or in progress:
+There are plans to: (i) grow the number of models; (ii) enhance core
+functionality, particularly around hyper-parameter optimization
+[@MLJTuning]; and (iii) broaden scope, particularly around
+probabilistic programming models, time series, sparse data and natural
+language processing. A more comprehensive road map is linked from the
+MLJ repository [@MLJ].
 
-- **Supporting more models**. Proofs of concept already exist for
-  interfacing pure-Julia deep learning and probabilistic programming models.
-
-- **Enhancing core functionality.** Add more tuning
-   strategies, in particular, Bayesian methods and AD-powered gradient
-   descent.
-
-- **Broadening Scope.** Adding resampling strategies and tools for
-   dealing with time series data, and for dealing with sparse data
-   relevant in natural language processing.
-
-- **Scalability.** Add DAG scheduling for learning network training
-
-A more comprehensive road map is linked from the MLJ repository [@MLJ].
-
-# Acknowledgements
+# Acknowledgments
 
 We acknowledge valuable conversations with Avik Sengupta, Mike Innes,
 mlr author Bernd Bischl, and IQVIA's Yaqub Alwan and Gwyn Jones. Seed
 funding for the MLJ project has been provided by the Alan Turing
-Institute's Tools, Practicies Systems programme, with special thanks
+Institute's Tools, Practices Systems programme, with special thanks
 to Dr James Hethering, its former Programme Director, and Katrina
 Payne. Mathematics for Real-World Systems Centre for Doctoral Training
 at the University of Warwick provided funding for students exploring
-the Julia ML ecosystem, who created an intial proof-of-concept.
+the Julia ML ecosystem, who created an initial proof-of-concept.
 
 **Code contributors.** D. Aluthge, D. Arenas, E. Barp, C. Bieganek,
 A. Blaom, G. Bohner, M. K. Borregaard, D. Buchaca, V. Churavy,
@@ -606,3 +493,4 @@ Z. Nugent, S. Okon, P. Oleśkiewicz, J. Samaroo, A. Shridar,
 Y. Simillides, A. Stechemesser, S. Vollmer
 
 # References
+> 
