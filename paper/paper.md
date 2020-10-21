@@ -187,10 +187,10 @@ scientific type just as they would on ordinary types.
 
 # Flexible and compact work-flows for performance evaluation and tuning
 
-Evaluating the performance of some `model` object (specifying
+To evaluate the performance of some `model` object (specifying
 the hyper-parameters of some supervised learning algorithm) using some
 specified `resampling` strategy, and measured against some
-battery of performance `measures`, looks like this:
+battery of performance `measures`,  one runs:
 
 
 ```julia
@@ -199,7 +199,7 @@ evaluate(model, X, y,
 		 measures=[L2HingeLoss(), BrierScore()])
 ```
 
-with (truncated) output 
+which has (truncated) output
 
  `measure` | `measurement` | `per_fold` 
 -------------|-----------------|-------------
@@ -233,8 +233,8 @@ self_tuning_forest_model = TunedModel(model=forest_model,
                                       n=25)
 ```
 
-In this random search example default priors are assigned to each
-hyper-parameter but options exist to customize these. Both resampling
+In this random search example, default priors are assigned to each
+hyper-parameter, but options exist to customize these. Both resampling
 and tuning have options for parallelization; Julia has first class
 support for both distributed and multi-threaded parallelism.
 
@@ -405,7 +405,7 @@ which will store the parameters learned in training - the Box Cox
 exponent and shift (`machine1`), the PCA projection
 (`machine2`) and the ridge model coefficients and intercept
 (`machine3`). The diagram additionally indicates where machines
-should look for training data, and where to accesses model
+should look for training data, and where to access model
 hyper-parameters (stored in `box_cox`, `PCA` and
 `ridge_regressor`).
 
@@ -459,14 +459,14 @@ training and "prediction" modes of operation, as in stacking.
 In the second step of model composition, the learning network is
 "exported" as a new stand-alone composite model type, with the
 component models appearing in the learning network becoming default
-values for corresponding hyper-parameters (whose values are themselves
-models). This new type (which is unattached to any particular data)
-can be instantiated and used just like any other MLJ model (tuned,
-evaluated, etc). Under the hood, training such a model builds a
-learning network, so that training is "smart". Defining a new
-composite model type requires generating and evaluating code, but this
-is readily implemented using Julia's meta-programming tools, i.e.,
-executed by the user with a simple macro call.
+values for corresponding hyper-parameters of the composite. This new
+type (which is unattached to any particular data) can be instantiated
+and used just like any other MLJ model (tuned, evaluated, etc). Under
+the hood, training such a model builds a learning network, so that
+training is "smart". Defining a new composite model type requires
+generating and evaluating code, but this is readily implemented using
+Julia's meta-programming tools, i.e., executed by the user with a
+simple macro call.
 
 # Future directions
 
@@ -482,7 +482,7 @@ MLJ repository [@MLJ].
 We acknowledge valuable conversations with Avik Sengupta, Mike Innes,
 mlr author Bernd Bischl, and IQVIA's Yaqub Alwan and Gwyn Jones. Seed
 funding for the MLJ project has been provided by the Alan Turing
-Institute's Tools, Practices Systems programme, with special thanks
+Institute's Tools, Practices and Systems programme, with special thanks
 to Dr James Hethering, its former Programme Director, and Katrina
 Payne. Mathematics for Real-World Systems Centre for Doctoral Training
 at the University of Warwick provided funding for students exploring
