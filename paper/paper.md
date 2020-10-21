@@ -195,14 +195,14 @@ battery of performance `measures`, looks like this:
 
 ```julia
 evaluate(model, X, y, resampling=CV(nfolds=6), measures=[L2HingeLoss(), BrierScore()])
-
-┌──────────────────────────────┬───────────────┬────────────────────────────────────────────────┐
-│ _.measure                    │ _.measurement │ _.per_fold                                     │
-├──────────────────────────────┼───────────────┼────────────────────────────────────────────────┤
-│ L2HingeLoss                  │ 1.4           │ [0.485, 1.58, 2.06, 1.09, 2.18, 1.03]          │
-│ BrierScore{UnivariateFinite} │ -0.702        │ [-0.242, -0.788, -1.03, -0.545, -1.09, -0.514] │
-└──────────────────────────────┴───────────────┴────────────────────────────────────────────────┘
 ```
+
+with (truncated) output 
+
+ `measure` | `measurement` | `per_fold` 
+-------------|-----------------|-------------
+L2HingeLoss  | 1.4             | [0.485, 1.58, 2.06, 1.09, 2.18, 1.03]
+BrierScore{UnivariateFinite} | -0.702 | [-0.242, -0.788, -1.03, -0.545, -1.09, -0.514] 
 
 As in mlr, hyper-parameter optimization is realized as a model
 wrapper, which transforms a base model into a "self-tuning" version of
