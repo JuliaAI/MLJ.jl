@@ -194,7 +194,9 @@ battery of performance `measures`, looks like this:
 
 
 ```julia
-evaluate(model, X, y, resampling=CV(nfolds=6), measures=[L2HingeLoss(), BrierScore()])
+evaluate(model, X, y, 
+         resampling=CV(nfolds=6), 
+		 measures=[L2HingeLoss(), BrierScore()])
 ```
 
 with (truncated) output 
