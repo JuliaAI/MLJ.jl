@@ -2,7 +2,7 @@
 
 Contributions to MLJ are most welcome. Queries can be made through
 issues or the Julia [slack
-channel](https://slackinvite.julialang.org), #MLJ. 
+channel](https://julialang.org/slack/), #MLJ. 
 
 - [Road map](ROADMAP.md)
 
