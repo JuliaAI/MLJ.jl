@@ -100,6 +100,8 @@ connections do not currently exist but are planned/proposed.*
 
 ### Known Issues
 
+#### ScikitLearn/MKL issue
+
 For users of Mac OS using Julia 1.3 or higher, using ScikitLearn
 models can lead to unexpected MKL errors due to an issue not related
 to MLJ. See
@@ -116,6 +118,13 @@ appropriate version, activate your MLJ environment and run
   using Pkg;
   Pkg.develop(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))
 ```
+
+#### Serialization for composite models with component models with custom serialization
+
+See
+[here](https://github.com/alan-turing-institute/MLJ.jl/issues/678). Workaround:
+Instead of `XGBoost` models (the chief known case) use models from the
+pure Julia package `EvoTrees`.
 
 
 ### Customizing behavior
