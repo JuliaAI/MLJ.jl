@@ -8,35 +8,35 @@ julia&gt; y = X.a + 2X.b + 0.05*rand(12);
 julia&gt; model = @load RidgeRegressor pkg=MultivariateStats
 RidgeRegressor(
     lambda = 1.0,
-    bias = true) @351
+    bias = true) @668
 
 julia&gt; cv=CV(nfolds=3)
 CV(
     nfolds = 3,
     shuffle = false,
-    rng = MersenneTwister(UInt32[0xaa46c460, 0x09c90ceb, 0xd6cb2277, 0xffdaed52]) @ 848) @973
+    rng = MersenneTwister(UInt32[0xf8a68b72, 0x7313e0c3, 0x0e14ed54, 0xcdd48d59]) @ 529) @277
 
 julia&gt; evaluate(model, X, y, resampling=cv, measure=l2, verbosity=0)
-┌───────────┬───────────────┬──────────────────────┐
-│ _.measure │ _.measurement │ _.per_fold           │
-├───────────┼───────────────┼──────────────────────┤
-│ l2        │ 0.213         │ [0.25, 0.187, 0.203] │
-└───────────┴───────────────┴──────────────────────┘
-_.per_observation = [[[0.0304, 0.0658, ..., 0.849], [0.109, 0.113, ..., 0.123], [0.101, 0.517, ..., 0.00312]]]
+┌───────────┬───────────────┬───────────────────────┐
+│ _.measure │ _.measurement │ _.per_fold            │
+├───────────┼───────────────┼───────────────────────┤
+│ l2        │ 0.267         │ [0.0559, 0.234, 0.51] │
+└───────────┴───────────────┴───────────────────────┘
+_.per_observation = [[[0.173, 0.034, ..., 0.000418], [0.07, 0.263, ..., 0.595], [0.282, 0.55, ..., 0.0079]]]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]</code></pre><p>Alternatively, instead of applying <code>evaluate</code> to a model + data, one may call <code>evaluate!</code> on an existing machine wrapping the model in data:</p><pre><code class="language-julia-repl">julia&gt; mach = machine(model, X, y)
-Machine{RidgeRegressor} @973 trained 0 times.
+Machine{RidgeRegressor} @900 trained 0 times.
   args:
-    1:	Source @482 ⏎ `Table{AbstractArray{Continuous,1}}`
-    2:	Source @896 ⏎ `AbstractArray{Continuous,1}`
+    1:	Source @789 ⏎ `Table{AbstractArray{Continuous,1}}`
+    2:	Source @909 ⏎ `AbstractArray{Continuous,1}`
 
 julia&gt; evaluate!(mach, resampling=cv, measure=l2, verbosity=0)
-┌───────────┬───────────────┬──────────────────────┐
-│ _.measure │ _.measurement │ _.per_fold           │
-├───────────┼───────────────┼──────────────────────┤
-│ l2        │ 0.213         │ [0.25, 0.187, 0.203] │
-└───────────┴───────────────┴──────────────────────┘
-_.per_observation = [[[0.0304, 0.0658, ..., 0.849], [0.109, 0.113, ..., 0.123], [0.101, 0.517, ..., 0.00312]]]
+┌───────────┬───────────────┬───────────────────────┐
+│ _.measure │ _.measurement │ _.per_fold            │
+├───────────┼───────────────┼───────────────────────┤
+│ l2        │ 0.267         │ [0.0559, 0.234, 0.51] │
+└───────────┴───────────────┴───────────────────────┘
+_.per_observation = [[[0.173, 0.034, ..., 0.000418], [0.07, 0.263, ..., 0.595], [0.282, 0.55, ..., 0.0079]]]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]</code></pre><p>(The latter call is a mutating call as the learned parameters stored in the machine potentially change. )</p><h2 id="Multiple-measures-1"><a class="docs-heading-anchor" href="#Multiple-measures-1">Multiple measures</a><a class="docs-heading-anchor-permalink" href="#Multiple-measures-1" title="Permalink"></a></h2><pre><code class="language-julia-repl">julia&gt; evaluate!(mach,
                  resampling=cv,
@@ -44,11 +44,11 @@ _.report_per_fold = [ … ]</code></pre><p>(The latter call is a mutating call a
 ┌───────────┬───────────────┬───────────────────────┐
 │ _.measure │ _.measurement │ _.per_fold            │
 ├───────────┼───────────────┼───────────────────────┤
-│ l1        │ 0.397         │ [0.396, 0.413, 0.382] │
-│ rms       │ 0.462         │ [0.5, 0.432, 0.451]   │
-│ rmslp1    │ 0.175         │ [0.209, 0.167, 0.143] │
+│ l1        │ 0.404         │ [0.187, 0.411, 0.614] │
+│ rms       │ 0.517         │ [0.236, 0.484, 0.714] │
+│ rmslp1    │ 0.266         │ [0.125, 0.16, 0.414]  │
 └───────────┴───────────────┴───────────────────────┘
-_.per_observation = [[[0.174, 0.256, ..., 0.921], [0.33, 0.336, ..., 0.351], [0.317, 0.719, ..., 0.0559]], missing, missing]
+_.per_observation = [[[0.416, 0.184, ..., 0.0204], [0.265, 0.513, ..., 0.771], [0.531, 0.742, ..., 0.0889]], missing, missing]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]</code></pre><h2 id="Custom-measures-and-weighted-measures-1"><a class="docs-heading-anchor" href="#Custom-measures-and-weighted-measures-1">Custom measures and weighted measures</a><a class="docs-heading-anchor-permalink" href="#Custom-measures-and-weighted-measures-1" title="Permalink"></a></h2><pre><code class="language-julia-repl">julia&gt; my_loss(yhat, y) = maximum((yhat - y).^2);
 
@@ -68,7 +68,7 @@ julia&gt; holdout = Holdout(fraction_train=0.8)
 Holdout(
     fraction_train = 0.8,
     shuffle = false,
-    rng = MersenneTwister(UInt32[0xaa46c460, 0x09c90ceb, 0xd6cb2277, 0xffdaed52]) @ 848) @327
+    rng = MersenneTwister(UInt32[0xf8a68b72, 0x7313e0c3, 0x0e14ed54, 0xcdd48d59]) @ 529) @386
 
 julia&gt; weights = [1, 1, 2, 1, 1, 2, 3, 1, 1, 2, 3, 1];
 
@@ -82,25 +82,25 @@ julia&gt; evaluate!(mach,
 ┌─────────────────────────┬───────────────┬───────────────────────┐
 │ _.measure               │ _.measurement │ _.per_fold            │
 ├─────────────────────────┼───────────────┼───────────────────────┤
-│ my_loss                 │ 0.59          │ [0.849, 0.404, 0.517] │
-│ my_per_observation_loss │ 0.397         │ [0.396, 0.413, 0.382] │
-│ my_weighted_score       │ 3.59          │ [2.84, 3.81, 4.11]    │
-│ l1                      │ 0.683         │ [0.454, 0.815, 0.781] │
+│ my_loss                 │ 0.656         │ [0.173, 0.595, 1.2]   │
+│ my_per_observation_loss │ 0.404         │ [0.187, 0.411, 0.614] │
+│ my_weighted_score       │ 3.66          │ [6.28, 3.08, 1.61]    │
+│ l1                      │ 0.718         │ [0.219, 0.586, 1.35]  │
 └─────────────────────────┴───────────────┴───────────────────────┘
-_.per_observation = [missing, [[0.174, 0.256, ..., 0.921], [0.33, 0.336, ..., 0.351], [0.317, 0.719, ..., 0.0559]], missing, [[0.174, 0.256, ..., 0.921], [0.33, 0.672, ..., 0.351], [0.317, 1.44, ..., 0.0559]]]
+_.per_observation = [missing, [[0.416, 0.184, ..., 0.0204], [0.265, 0.513, ..., 0.771], [0.531, 0.742, ..., 0.0889]], missing, [[0.416, 0.184, ..., 0.0204], [0.265, 1.03, ..., 0.771], [0.531, 1.48, ..., 0.0889]]]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]</code></pre><h2 id="User-specified-train/test-sets-1"><a class="docs-heading-anchor" href="#User-specified-train/test-sets-1">User-specified train/test sets</a><a class="docs-heading-anchor-permalink" href="#User-specified-train/test-sets-1" title="Permalink"></a></h2><p>Users can either provide their own list of train/test pairs of row indices for resampling, as in this example:</p><pre><code class="language-julia-repl">julia&gt; fold1 = 1:6; fold2 = 7:12;
 
 julia&gt; evaluate!(mach,
                  resampling = [(fold1, fold2), (fold2, fold1)],
                  measure=[l1, l2], verbosity=0)
-┌───────────┬───────────────┬────────────────┐
-│ _.measure │ _.measurement │ _.per_fold     │
-├───────────┼───────────────┼────────────────┤
-│ l1        │ 0.413         │ [0.485, 0.341] │
-│ l2        │ 0.238         │ [0.295, 0.182] │
-└───────────┴───────────────┴────────────────┘
-_.per_observation = [[[0.569, 0.58, ..., 0.0655], [0.151, 0.261, ..., 0.254]], [[0.324, 0.337, ..., 0.00429], [0.0227, 0.0679, ..., 0.0648]]]
+┌───────────┬───────────────┬─────────────────┐
+│ _.measure │ _.measurement │ _.per_fold      │
+├───────────┼───────────────┼─────────────────┤
+│ l1        │ 0.437         │ [0.687, 0.187]  │
+│ l2        │ 0.315         │ [0.571, 0.0581] │
+└───────────┴───────────────┴─────────────────┘
+_.per_observation = [[[0.314, 0.901, ..., 0.238], [0.392, 0.148, ..., 0.371]], [[0.0985, 0.811, ..., 0.0569], [0.154, 0.0218, ..., 0.137]]]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]</code></pre><p>Or define their own re-usable <code>ResamplingStrategy</code> objects, - see <a href="#Custom-resampling-strategies-1">Custom resampling strategies</a> below.</p><h2 id="Built-in-resampling-strategies-1"><a class="docs-heading-anchor" href="#Built-in-resampling-strategies-1">Built-in resampling strategies</a><a class="docs-heading-anchor-permalink" href="#Built-in-resampling-strategies-1" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="MLJBase.Holdout" href="#MLJBase.Holdout"><code>MLJBase.Holdout</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">holdout = Holdout(; fraction_train=0.7,
                      shuffle=nothing,
@@ -149,4 +149,4 @@ end</code></pre><h2 id="API-1"><a class="docs-heading-anchor" href="#API-1">API<
           force=false,
           verbosity=1,
           check_measure=true)</code></pre><p>Estimate the performance of a machine <code>mach</code> wrapping a supervised model in data, using the specified <code>resampling</code> strategy (defaulting to 6-fold cross-validation) and <code>measure</code>, which can be a single measure or vector.</p><p>Do <code>subtypes(MLJ.ResamplingStrategy)</code> to obtain a list of available resampling strategies. If <code>resampling</code> is not an object of type <code>MLJ.ResamplingStrategy</code>, then a vector of pairs (of the form <code>(train_rows, test_rows)</code> is expected. For example, setting</p><pre><code class="language-none">resampling = [(1:100), (101:200)),
-               (101:200), (1:100)]</code></pre><p>gives two-fold cross-validation using the first 200 rows of data.</p><p>The resampling strategy is applied repeatedly (Monte Carlo resampling) if <code>repeats &gt; 1</code>. For example, if <code>repeats = 10</code>, then <code>resampling = CV(nfolds=5, shuffle=true)</code>, generates a total of 50 <code>(train, test)</code> pairs for evaluation and subsequent aggregation.</p><p>If <code>resampling isa MLJ.ResamplingStrategy</code> then one may optionally restrict the data used in evaluation by specifying <code>rows</code>.</p><p>An optional <code>weights</code> vector may be passed for measures that support sample weights (<code>MLJ.supports_weights(measure) == true</code>), which is ignored by those that don&#39;t. These weights are not to be confused with any any weights <code>w</code> bound to <code>mach</code> (as in <code>mach = machine(model, X, y, w)</code>). To pass these to the performance evaluation measures you must explictly specify <code>weights=w</code> in the <code>evaluate!</code> call.</p><p>User-defined measures are supported; see the manual for details.</p><p>If no measure is specified, then <code>default_measure(mach.model)</code> is used, unless this default is <code>nothing</code> and an error is thrown.</p><p>The <code>acceleration</code> keyword argument is used to specify the compute resource (a subtype of <code>ComputationalResources.AbstractResource</code>) that will be used to accelerate/parallelize the resampling operation.</p><p>Although evaluate! is mutating, <code>mach.model</code> and <code>mach.args</code> are untouched.</p><p><strong>Summary of key-word arguments</strong></p><ul><li><p><code>resampling</code> - resampling strategy (default is <code>CV(nfolds=6)</code>)</p></li><li><p><code>measure</code>/<code>measures</code> - measure or vector of measures (losses, scores, etc)</p></li><li><p><code>rows</code> - vector of observation indices from which both train and test folds are constructed (default is all observations)</p></li><li><p><code>weights</code> - per-sample weights for measures (not to be confused with weights used in training)</p></li><li><p><code>operation</code> - <code>predict</code>, <code>predict_mean</code>, <code>predict_mode</code> or <code>predict_median</code>; <code>predict</code> is the default but cannot be used with a deterministic measure if <code>model isa Probabilistic</code></p></li><li><p><code>repeats</code> - default is 1; set to a higher value for repeated (Monte Carlo) resampling</p></li><li><p><code>acceleration</code> - parallelization option; currently supported  options are instances of <code>CPU1</code> (single-threaded computation)  <code>CPUThreads</code> (multi-threaded computation) and <code>CPUProcesses</code>  (multi-process computation); default is <code>default_resource()</code>.</p></li><li><p><code>force</code> - default is <code>false</code>; set to <code>true</code> for force cold-restart of each training event</p></li><li><p><code>verbosity</code> level, an integer defaulting to 1.</p></li><li><p><code>check_measure</code> - default is <code>true</code></p></li></ul><p><strong>Return value</strong></p><p>A property-accessible object of type <code>PerformanceEvaluation</code> with these properties:</p><ul><li><p><code>measure</code>: the vector of specified measures</p></li><li><p><code>measurements</code>: the corresponding measurements, aggregated across the test folds using the aggregation method defined for each measure (do <code>aggregation(measure)</code> to inspect)</p></li><li><p><code>per_fold</code>: a vector of vectors of individual test fold evaluations (one vector per measure)</p></li><li><p><code>per_observation</code>: a vector of vectors of individual observation evaluations of those measures for which <code>reports_each_observation(measure)</code> is true, which is otherwise reported <code>missing</code></p></li></ul><p>-<code>fitted_params_per_fold</code>: a vector containing <code>fitted pamarms(mach)</code> for each   machine <code>mach</code> trained during resampling.</p><ul><li><code>report_per_fold</code>: a vector containing <code>report(mach)</code> for each  machine <code>mach</code> training in resampling</li></ul></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModelInterface.evaluate" href="#MLJModelInterface.evaluate"><code>MLJModelInterface.evaluate</code></a> — <span class="docstring-category">Function</span></header><section><div><p>some meta-models may choose to implement the <code>evaluate</code> operations</p></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../machines/">« Machines</a><a class="docs-footer-nextpage" href="../performance_measures/">Performance Measures »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 28 October 2020 06:35">Wednesday 28 October 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+               (101:200), (1:100)]</code></pre><p>gives two-fold cross-validation using the first 200 rows of data.</p><p>The resampling strategy is applied repeatedly (Monte Carlo resampling) if <code>repeats &gt; 1</code>. For example, if <code>repeats = 10</code>, then <code>resampling = CV(nfolds=5, shuffle=true)</code>, generates a total of 50 <code>(train, test)</code> pairs for evaluation and subsequent aggregation.</p><p>If <code>resampling isa MLJ.ResamplingStrategy</code> then one may optionally restrict the data used in evaluation by specifying <code>rows</code>.</p><p>An optional <code>weights</code> vector may be passed for measures that support sample weights (<code>MLJ.supports_weights(measure) == true</code>), which is ignored by those that don&#39;t. These weights are not to be confused with any any weights <code>w</code> bound to <code>mach</code> (as in <code>mach = machine(model, X, y, w)</code>). To pass these to the performance evaluation measures you must explictly specify <code>weights=w</code> in the <code>evaluate!</code> call.</p><p>User-defined measures are supported; see the manual for details.</p><p>If no measure is specified, then <code>default_measure(mach.model)</code> is used, unless this default is <code>nothing</code> and an error is thrown.</p><p>The <code>acceleration</code> keyword argument is used to specify the compute resource (a subtype of <code>ComputationalResources.AbstractResource</code>) that will be used to accelerate/parallelize the resampling operation.</p><p>Although evaluate! is mutating, <code>mach.model</code> and <code>mach.args</code> are untouched.</p><p><strong>Summary of key-word arguments</strong></p><ul><li><p><code>resampling</code> - resampling strategy (default is <code>CV(nfolds=6)</code>)</p></li><li><p><code>measure</code>/<code>measures</code> - measure or vector of measures (losses, scores, etc)</p></li><li><p><code>rows</code> - vector of observation indices from which both train and test folds are constructed (default is all observations)</p></li><li><p><code>weights</code> - per-sample weights for measures (not to be confused with weights used in training)</p></li><li><p><code>operation</code> - <code>predict</code>, <code>predict_mean</code>, <code>predict_mode</code> or <code>predict_median</code>; <code>predict</code> is the default but cannot be used with a deterministic measure if <code>model isa Probabilistic</code></p></li><li><p><code>repeats</code> - default is 1; set to a higher value for repeated (Monte Carlo) resampling</p></li><li><p><code>acceleration</code> - parallelization option; currently supported  options are instances of <code>CPU1</code> (single-threaded computation)  <code>CPUThreads</code> (multi-threaded computation) and <code>CPUProcesses</code>  (multi-process computation); default is <code>default_resource()</code>.</p></li><li><p><code>force</code> - default is <code>false</code>; set to <code>true</code> for force cold-restart of each training event</p></li><li><p><code>verbosity</code> level, an integer defaulting to 1.</p></li><li><p><code>check_measure</code> - default is <code>true</code></p></li></ul><p><strong>Return value</strong></p><p>A property-accessible object of type <code>PerformanceEvaluation</code> with these properties:</p><ul><li><p><code>measure</code>: the vector of specified measures</p></li><li><p><code>measurements</code>: the corresponding measurements, aggregated across the test folds using the aggregation method defined for each measure (do <code>aggregation(measure)</code> to inspect)</p></li><li><p><code>per_fold</code>: a vector of vectors of individual test fold evaluations (one vector per measure)</p></li><li><p><code>per_observation</code>: a vector of vectors of individual observation evaluations of those measures for which <code>reports_each_observation(measure)</code> is true, which is otherwise reported <code>missing</code></p></li></ul><p>-<code>fitted_params_per_fold</code>: a vector containing <code>fitted pamarms(mach)</code> for each   machine <code>mach</code> trained during resampling.</p><ul><li><code>report_per_fold</code>: a vector containing <code>report(mach)</code> for each  machine <code>mach</code> training in resampling</li></ul></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModelInterface.evaluate" href="#MLJModelInterface.evaluate"><code>MLJModelInterface.evaluate</code></a> — <span class="docstring-category">Function</span></header><section><div><p>some meta-models may choose to implement the <code>evaluate</code> operations</p></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../machines/">« Machines</a><a class="docs-footer-nextpage" href="../performance_measures/">Performance Measures »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 28 October 2020 10:49">Wednesday 28 October 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
