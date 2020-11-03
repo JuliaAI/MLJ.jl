@@ -27,11 +27,11 @@ authors:
     orcid: 0000-0002-9025-0753
     affiliation: "3, 5"
 affiliations:
- - name: University of Auckland
+ - name: University of Auckland, New Zealand
    index: 1
  - name: New Zealand eScience Infrastructure
    index: 2
- - name: Alan Turing Institute
+ - name: Alan Turing Institute, London
    index: 3
  - name: University College London
    index: 4
