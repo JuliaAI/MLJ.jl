@@ -37,7 +37,7 @@ affiliations:
    index: 4
  - name: University of Warwick, United Kingdom
    index: 5
- - name: University of St Andrews, Fife, United Kingdom
+ - name: University of St Andrews, St Andrews, United Kingdom
    index: 6
  - name: Imperial College London, United Kingdom
    index: 7
