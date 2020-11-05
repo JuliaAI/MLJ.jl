@@ -29,17 +29,17 @@ authors:
 affiliations:
  - name: University of Auckland, New Zealand
    index: 1
- - name: New Zealand eScience Infrastructure
+ - name: New Zealand eScience Infrastructure, New Zealand
    index: 2
- - name: Alan Turing Institute, London
+ - name: Alan Turing Institute, London, United Kingdom
    index: 3
- - name: University College London
+ - name: University College London, United Kingdom
    index: 4
- - name: University of Warwick
+ - name: University of Warwick, United Kingdom
    index: 5
- - name: University of St Andrews
+ - name: University of St Andrews, Fife, United Kingdom
    index: 6
- - name: Imperial College London
+ - name: Imperial College London, United Kingdom
    index: 7
 date: XX April 2020
 bibliography: paper.bib
