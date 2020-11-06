@@ -173,6 +173,53 @@ The prior distributions used for sampling each hyperparameter can be
 customized, as can the global fallbacks. See the
 [`RandomSearch`](@ref) doc-string below for details.
 
+## Tuning using latin hypercube sampling
+
+We can also tune the hyperparameters using `LatinHypercube`. This 
+method instantiates a grid-based hyperparameter tuning strategy 
+by using a genetic based optimization algorithm based on the 
+inverse of the Audze-Eglais function, using the library 
+`LatinHypercubeSampling.jl`.
+Let's instatiate the tuning strategy:
+```@repl goof
+latin_minimal = LatinHypercube(nGenerations=2,popSize= 120)
+```
+Where nGenerations is the number of generations to run the 
+optimisation for and popSize is the population size in 
+the genetic algorithm. 
+```@repl goof
+self_tuning_forest_model = TunedModel(model=forest_model,
+                                      tuning=latin_minimal,
+                                      resampling=CV(nfolds=6),
+                                      range=[r1, r2],
+                                      measure=rms,
+                                      n=25);
+self_tuning_forest = machine(self_tuning_forest_model, X, y);
+fit!(self_tuning_forest, verbosity=0)
+```
+Toggling every parameters of the tuning strategy would result
+in something like this:
+```@repl goof
+latin_minimal = LatinHypercube(nGenerations=2,
+                               popSize= 120,
+                               nTournament = 2,
+                               pTournament = 0.3,
+                               interSampleWeight = 0.7,
+                               ae_power = 1
+                               periodic_ae = True,
+                               rng = 1234)
+```
+Where nTournament is the number of samples selected for 
+tournament, pTournament is the probability for 
+tournament selection, interSampleWeight is the sampling 
+weight, ae_power is the norm used in the Audze-Eglais 
+function and periodic_ae is a boolean which allos the 
+possibility of using a periodic version of the Audze-Eglais 
+which reduces clustering along the boundaries of the
+sampling plan. You can dive deeper into the inner working 
+of the actual algorithm by looking at 
+[LatinHypercubeSampling.jl](https://github.com/MrUrq/LatinHypercubeSampling.jl)
+
 
 ## API
 
