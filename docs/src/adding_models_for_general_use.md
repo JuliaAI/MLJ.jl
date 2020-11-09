@@ -964,16 +964,12 @@ user using the package `JLSO`. There are two scenarios in which a new
 MLJ model API implementation will want to overload two additional
 methods `save` and `restore` to support serialization:
 
-1. The algorithm-providing package already has it's own serialization
-  format for learned parameters and/or hyper-parameters, which users
-  may want to access. In that case *the implementation overloads* `save`.
+1. The algorithm-providing package already has it's own serialization format for learned parameters and/or hyper-parameters, which users may want to access. In that case *the implementation overloads* `save`.
   
-2. The `fitresult` is not a sufficiently persistent object; for
-  example, it is a pointer passed from wrapped C code. In that case
-  *the implementation overloads* `save` *and* `restore`.
+2. The `fitresult` is not a sufficiently persistent object; for example, it is a pointer passed from wrapped C code. In that case *the implementation overloads* `save` *and* `restore`.
   
-In case 2, 1 presumably holds also, for otherwise MLJ serialization is
-probably not going to be possible without changes to the
+In case 2, 1 presumably applies also, for otherwise MLJ serialization
+is probably not going to be possible without changes to the
 algorithm-providing package. An example is given below.
 
 Note that in case 1, MLJ will continue to create it's own
