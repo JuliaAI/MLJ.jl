@@ -1,9 +1,9 @@
 # Tuning models
 
-Below we illustrate tuning model hyperparameters by grid and random
-searches. For a complete list of available and planned tuning
-strategies, see the [MLJTuning
-page](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here)
+Below we illustrate hyperparameter optimisation using the [`Grid`](@ref),
+[`RandomSearch`](@ref) and [`LatinHypercube`](@ref) tuning strategies. 
+Also available is the [tree Parzen]() strategy;  for a complete list, 
+see [here](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here).
 
 In MLJ tuning is implemented as a model wrapper. After wrapping a
 model in a tuning strategy and binding the wrapped model to data in a
@@ -184,9 +184,15 @@ Let's instatiate the tuning strategy:
 ```@repl goof
 latin_minimal = LatinHypercube(nGenerations=2,popSize= 120)
 ```
-Where nGenerations is the number of generations to run the 
-optimisation for and popSize is the population size in 
-the genetic algorithm. 
+Where `nGenerations` is the number of generations to run the 
+optimisation for and `popSize` is the population size in 
+the genetic algorithm. Pay attention that these parameters
+have nothing to do with the ones specified in the `TunedModel` 
+construction. They are used by 
+[LatinHypercubeSampling.jl](https://github.com/MrUrq/LatinHypercubeSampling.jl)
+to instantiate the genetic algorithm that creates
+the grid of hyperparameters to evaluate the models on. 
+
 ```@repl goof
 self_tuning_forest_model = TunedModel(model=forest_model,
                                       tuning=latin_minimal,
@@ -209,11 +215,11 @@ latin_minimal = LatinHypercube(nGenerations=2,
                                periodic_ae = True,
                                rng = 1234)
 ```
-Where nTournament is the number of samples selected for 
-tournament, pTournament is the probability for 
-tournament selection, interSampleWeight is the sampling 
-weight, ae_power is the norm used in the Audze-Eglais 
-function and periodic_ae is a boolean which allos the 
+Where `nTournament` is the number of samples selected for 
+tournament, `pTournament` is the probability for 
+tournament selection, `interSampleWeight` is the sampling 
+weight, `ae_power` is the norm used in the Audze-Eglais 
+function and `periodic_ae` is a boolean which allows the 
 possibility of using a periodic version of the Audze-Eglais 
 which reduces clustering along the boundaries of the
 sampling plan. You can dive deeper into the inner working 
