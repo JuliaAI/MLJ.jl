@@ -187,8 +187,8 @@ latin_minimal = LatinHypercube(nGenerations=2,popSize= 120)
 Where `nGenerations` is the number of generations to run the 
 optimisation for and `popSize` is the population size in 
 the genetic algorithm. Pay attention that these parameters
-have nothing to do with the ones specified in the `TunedModel` 
-construction. They are used by 
+have nothing to do with the iteration parameter `n` in the 
+`TunedModel` construction. They are used by 
 [LatinHypercubeSampling.jl](https://github.com/MrUrq/LatinHypercubeSampling.jl)
 to instantiate the genetic algorithm that creates
 the grid of hyperparameters to evaluate the models on. 
