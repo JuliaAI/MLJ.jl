@@ -87,18 +87,18 @@ ERROR: UndefVarError: yhat not defined</code></pre><p>Unsupervised models have a
  4
 
 julia&gt; stand_model = UnivariateStandardizer()
-UnivariateStandardizer() @583
+UnivariateStandardizer() @656
 
 julia&gt; stand = machine(stand_model, v)
-Machine{UnivariateStandardizer} @890 trained 0 times.
+Machine{UnivariateStandardizer} @627 trained 0 times.
   args:
-    1:	Source @796 ⏎ `AbstractArray{Count,1}`
+    1:	Source @712 ⏎ `AbstractArray{Count,1}`
 
 julia&gt; fit!(stand)
-[ Info: Training Machine{UnivariateStandardizer} @890.
-Machine{UnivariateStandardizer} @890 trained 1 time.
+[ Info: Training Machine{UnivariateStandardizer} @627.
+Machine{UnivariateStandardizer} @627 trained 1 time.
   args:
-    1:	Source @796 ⏎ `AbstractArray{Count,1}`
+    1:	Source @712 ⏎ `AbstractArray{Count,1}`
 
 julia&gt; w = transform(stand, v)
 4-element Array{Float64,1}:
@@ -228,4 +228,4 @@ julia&gt; XY
 julia&gt; Z
 2-element Array{Float64,1}:
  10.0
- 20.0</code></pre></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Introduction</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 19 November 2020 23:54">Thursday 19 November 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 20.0</code></pre></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Introduction</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 23 November 2020 07:44">Monday 23 November 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
