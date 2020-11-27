@@ -243,10 +243,10 @@ Y = @node selectrows(X, 3:4)
 julia&gt; Y()
 3:4
 
-julia&gt; Y([:one, :two, :three, :four])
+julia&gt; Y([&quot;one&quot;, &quot;two&quot;, &quot;three&quot;, &quot;four&quot;])
 2-element Array{Symbol,1}:
- :three
- :four
+ &quot;three&quot;
+ &quot;four&quot;
 
 X1 = source(4)
 X2 = source(5)
@@ -294,4 +294,4 @@ function MLJBase.fit(model::MyComposite, verbosity, X, y)
 
     mach = machine(Deterministic(), Xs, ys; predict=yhat)
     return!(mach, model, verbosity)
-end</code></pre></div></section></article><p>See more on fitting nodes at <a href="../machines/#StatsBase.fit!"><code>fit!</code></a> and <a href="../machines/#MLJBase.fit_only!"><code>fit_only!</code></a>. </p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../transformers/">« Transformers and other unsupervised models</a><a class="docs-footer-nextpage" href="../homogeneous_ensembles/">Homogeneous Ensembles »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 23 November 2020 07:51">Monday 23 November 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+end</code></pre></div></section></article><p>See more on fitting nodes at <a href="../machines/#StatsBase.fit!"><code>fit!</code></a> and <a href="../machines/#MLJBase.fit_only!"><code>fit_only!</code></a>. </p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../transformers/">« Transformers and other unsupervised models</a><a class="docs-footer-nextpage" href="../homogeneous_ensembles/">Homogeneous Ensembles »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 27 November 2020 19:56">Friday 27 November 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
