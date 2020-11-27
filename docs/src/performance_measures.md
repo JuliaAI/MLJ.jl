@@ -8,7 +8,7 @@ library, overloaded to behave the same way as the built-in measures.
 
 To see list all measures, run `measures()`.  Further measures for
 probabilistic predictors, such as proper scoring rules, and for
-constructing multi-target product measures, is planned.  If you'd like
+constructing multi-target product measures, are planned.  If you'd like
 to see measure added to MLJ, post a comment
 [here](https://github.com/alan-turing-institute/MLJBase.jl/issues/299)
 
@@ -50,9 +50,10 @@ ŷ = [d, d, d];
 log_loss(ŷ, y)
 ```
 
-The measures `rms` and `l1` are actually instances of measure
-*type*. For, example, `l2 = LPLoss(p=2)` and `log_loss = LogLoss() =
-LogLoss(tol=eps())`. Common aliases are provided:
+The measures `rms`, `l2` and `log_loss` illustrated here are actually
+	instances of measure *types*. For, example, `l2 = LPLoss(p=2)` and
+`log_loss = LogLoss() = LogLoss(tol=eps())`. Common aliases are
+provided:
 
 ```@repl losses_and_scores
 cross_entropy
@@ -149,14 +150,18 @@ predictions, while the "marginal losses" apply to probabilistic
 predictions.
 
 
-## Built-in measures
+## List of measures
+
+```@setup losses_and_scores
+using DataFrames
+```
 
 ```@example losses_and_scores
 ms = measures()
 types = map(ms) do m m.name end
 instance = map(ms) do m m.instances end
 t = (type=types, instances=instance)
-pretty(t)
+DataFrame(t)
 ```
 
 

@@ -224,8 +224,8 @@ this purpose, and use `decoder` to construct decoders for reversing
 the transformation:
 
 ```@example hut
-v = coerce([:one, :two, :three, :one], OrderedFactor);
-levels!(v, [:one, :two, :three]);
+v = coerce(["one", "two", "three", "one"], OrderedFactor);
+levels!(v, ["one", "two", "three"]);
 v_int = int(v)
 ```
 
@@ -254,19 +254,19 @@ raw labels, one uses `categorical`:
 
 ```@example hut
 using CategoricalArrays # hide
-v = categorical([:A, :B, :A, :A, :C])
+v = categorical(['A', 'B', 'A', 'A', 'C'])
 typeof(v)
 ```
 
-(Equivalent to the idiomatically MLJ `v = coerce([:A, :B, :A, :A,
-:C]), Multiclass)`.)
+(Equivalent to the idiomatically MLJ `v = coerce(['A', 'B', 'A', 'A',
+'C']), Multiclass)`.)
 
 ```@example hut
 scitype(v)
 ```
 
 ```@example hut
-v = categorical([:A, :B, :A, :A, :C], ordered=true, compress=true)
+v = categorical(['A', 'B', 'A', 'A', 'C'], ordered=true, compress=true)
 ```
 
 ```@example hut
@@ -282,8 +282,8 @@ Despite the distinction that exists between a value (element) and a
 label, the two are the same, from the point of `==` and `in`:
 
 ```@julia
-v[1] == :A # true
-:A in v    # true
+v[1] == 'A' # true
+'A' in v    # true
 ```
 
 
@@ -295,29 +295,29 @@ probabilities (which are instead accessed using the `pdf` method.)
 Here's how to construct such a distribution yourself:
 
 ```@example hut
-v = coerce([:yes, :no, :yes, :yes, :maybe], Multiclass)
+v = coerce(["yes", "no", "yes", "yes", "maybe"], Multiclass)
 d = UnivariateFinite([v[1], v[2]], [0.9, 0.1])
 ```
 
 Or, equivalently,
 
 ```@example hut
-d = UnivariateFinite([:no, :yes], [0.9, 0.1], pool=v)
+d = UnivariateFinite(["no", "yes"], [0.9, 0.1], pool=v)
 ```
 
 This distribution tracks *all* levels, not just the ones to which you
 have assigned probabilities:
 
 ```@example hut
-pdf(d, :maybe)
+pdf(d, "maybe")
 ```
 
-However, `pdf(d, :dunno)` will throw an error.
+However, `pdf(d, "dunno")` will throw an error.
 
-You can declare `pool=missing`, but then `:maybe` will not be tracked:
+You can declare `pool=missing`, but then `"maybe"` will not be tracked:
 
 ```@example hut
-d = UnivariateFinite([:no, :yes], [0.9, 0.1], pool=missing)
+d = UnivariateFinite(["no", "yes"], [0.9, 0.1], pool=missing)
 levels(d)
 ```
 
@@ -327,13 +327,13 @@ simply give the constructor a matrix of probabilities:
 ```@example hut
 yes_probs = rand(5)
 probs = hcat(1 .- yes_probs, yes_probs)
-d_vec = UnivariateFinite([:no, :yes], probs, pool=v)
+d_vec = UnivariateFinite(["no", "yes"], probs, pool=v)
 ```
 
 Or, equivalently:
 
 ```@julia
-d_vec = UnivariateFinite([:no, :yes], yes_probs, augment=true, pool=v)
+d_vec = UnivariateFinite(["no", "yes"], yes_probs, augment=true, pool=v)
 ```
 
 For more options, see [`UnivariateFinite`](@ref).
