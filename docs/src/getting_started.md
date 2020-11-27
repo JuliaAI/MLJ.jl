@@ -271,7 +271,7 @@ vectors, matrices and tables - have a scientific type.
 ```@repl doda
 scitype(4.6)
 scitype(42)
-x1 = categorical(["yes", "no", "yes", "maybe"]);
+x1 = coerce(["yes", "no", "yes", "maybe"], Multiclass);
 scitype(x1)
 X = (x1=x1, x2=rand(4), x3=rand(4))  # a "column table"
 scitype(X)
@@ -367,9 +367,8 @@ are the key features of that convention:
 
 - Any `Integer` is interpreted as `Count`.
 
-- Any `CategoricalValue` or `CategoricalString`, `x`, is interpreted
-  as `Multiclass` or `OrderedFactor`, depending on the value of
-  `x.pool.ordered`.
+- Any `CategoricalValue` `x`, is interpreted as `Multiclass` or
+  `OrderedFactor`, depending on the value of `x.pool.ordered`.
 
 - `String`s and `Char`s are *not* interpreted as `Multiclass` or
   `OrderedFactor` (they have scitypes `Textual` and `Unknown`

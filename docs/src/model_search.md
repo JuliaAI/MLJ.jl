@@ -8,7 +8,7 @@ the `matching` method, and the search executed with the `models`
 methods, as detailed below. 
 
 A table of all models is also given at [List of Supported
-Models](@ref).
+Models](@ref model_list).
 
 
 ## Model metadata

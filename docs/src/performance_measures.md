@@ -1,17 +1,20 @@
 # Performance Measures
 
-In MLJ loss functions, scoring rules, sensitivities, and so on, are collectively referred
-to as *measures*. Presently, MLJ includes a few built-in measures,
-provides support for the loss functions in the
-[LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl) library,
-and allows for users to define their own custom measures.
+In MLJ loss functions, scoring rules, sensitivities, and so on, are
+collectively referred to as *measures*. These include re-exported loss
+functions from the
+[LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl)
+library, overloaded to behave the same way as the built-in measures.
 
-Providing further measures for probabilistic predictors, such as
-proper scoring rules, and for constructing multi-target product
-measures, is a work in progress.
+To see list all measures, run `measures()`.  Further measures for
+probabilistic predictors, such as proper scoring rules, and for
+constructing multi-target product measures, are planned.  If you'd like
+to see measure added to MLJ, post a comment
+[here](https://github.com/alan-turing-institute/MLJBase.jl/issues/299)
 
-*Note for developers:* The measures interface and the built-in measures
- described here are defined in MLJBase.
+*Note for developers:* The measures interface and the built-in
+measures described here are defined in MLJBase, but will ultimately live
+in a separate package.
 
 
 ## Using built-in measures
@@ -31,7 +34,8 @@ measure(ŷ, y, w)
 where `y` iterates over observations of some target variable, and `ŷ`
 iterates over predictions (`Distribution` or `Sampler` objects in the
 probabilistic case). Here `w` is an optional vector of sample weights,
-which can be provided when the measure supports this.
+or a dictionary of class weights, when these are supported by the
+measure.
 
 ```@repl losses_and_scores
 using MLJ
@@ -39,12 +43,20 @@ y = [1, 2, 3, 4];
 ŷ = [2, 3, 3, 3];
 w = [1, 2, 2, 1];
 rms(ŷ, y) # reports an aggregrate loss
-l1(ŷ, y, w) # reports per observation losses
-y = categorical(["male", "female", "female"])
-male = y[1]; female = y[2];
-d = UnivariateFinite([male, female], [0.55, 0.45]);
+l2(ŷ, y, w) # reports per observation losses
+y = coerce(["male", "female", "female"], Multiclass)
+d = UnivariateFinite(["male", "female"], [0.55, 0.45], pool=y);
 ŷ = [d, d, d];
-cross_entropy(ŷ, y)
+log_loss(ŷ, y)
+```
+
+The measures `rms`, `l2` and `log_loss` illustrated here are actually
+	instances of measure *types*. For, example, `l2 = LPLoss(p=2)` and
+`log_loss = LogLoss() = LogLoss(tol=eps())`. Common aliases are
+provided:
+
+```@repl losses_and_scores
+cross_entropy
 ```
 
 ## Traits and custom measures
@@ -58,9 +70,18 @@ method:
 info(l1)
 ```
 
-Use `measures()` to list all measures and `measures(conditions...)` to
+Query the doc-string for a measure using the name of its type:
+
+```@repl losses_and_scores
+rms
+@doc RootMeanSquaredError # same as `?RootMeanSqauredError
+```
+
+Use `measures()` to list all measures, and `measures(conditions...)` to
 search for measures with given traits (as you would [query
-models](model_search.md)).
+models](model_search.md)). The trait `instances` list the actual
+callable instances of a given measure type (typically aliases for the
+default instance).
 
 ```@docs
 measures(conditions...)
@@ -118,160 +139,39 @@ dispatched.
 
 The [LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl)
 package includes "distance loss" functions for `Continuous` targets,
-and "marginal loss" functions for `Binary` targets. While the
-LossFunctions,jl interface differs from the present one (for, example
-`Binary` observations must be +1 or -1), one can safely pass the loss
-functions defined there to any MLJ algorithm, which re-interprets it
-under the hood. Note that the "distance losses" in the package apply
-to deterministic predictions, while the "marginal losses" apply to
-probabilistic predictions.
+and "marginal loss" functions for `Finite{2}` (binary) targets. While the
+LossFunctions.jl interface differs from the present one (for, example
+binary observations must be +1 or -1), MLJ has overloaded instances
+of the LossFunctions.jl types to behave the same as the built-in
+types.
 
-```@repl losses_and_scores
-using LossFunctions
-X = (x1=rand(5), x2=rand(5)); y = categorical(["y", "y", "y", "n", "y"]); w = [1, 2, 1, 2, 3];
-mach = machine(ConstantClassifier(), X, y);
-holdout = Holdout(fraction_train=0.6);
-evaluate!(mach,
-          measure=[ZeroOneLoss(), L1HingeLoss(), L2HingeLoss(), SigmoidLoss()],
-          resampling=holdout,
-          operation=predict,
-          weights=w,
-          verbosity=0)
+Note that the "distance losses" in the package apply to deterministic
+predictions, while the "marginal losses" apply to probabilistic
+predictions.
+
+
+## List of measures
+
+```@setup losses_and_scores
+using DataFrames
 ```
 
-*Note:* Although `ZeroOneLoss(ŷ, y)` makes no sense (neither `ŷ` nor
-`y` have a type expected by LossFunctions.jl), one can instead use the
-adaptor `MLJ.value` as discussed above:
-
-```@repl losses_and_scores
-ŷ = predict(mach, X);
-loss = MLJ.value(ZeroOneLoss(), ŷ, X, y, w) # X is ignored here
-mean(loss) ≈ misclassification_rate(mode.(ŷ), y, w)
+```@example losses_and_scores
+ms = measures()
+types = map(ms) do m m.name end
+instance = map(ms) do m m.instances end
+t = (type=types, instances=instance)
+DataFrame(t)
 ```
-
-
-## Built-in measures 
-
-
-```@docs
-area_under_curve
-```
-
-```@docs
-accuracy
-```
-
-```@docs
-balanced_accuracy
-```
-
-```@docs
-BrierScore
-```
-
-```@docs
-cross_entropy
-```
-
-```@docs
-FScore
-```
-
-```@docs
-false_discovery_rate
-```
-
-```@docs
-false_negative
-```
-
-```@docs
-false_negative_rate
-```
-
-```@docs
-false_positive
-```
-
-```@docs
-false_positive_rate
-```
-
-```@docs
-l1
-```
-
-```@docs
-l2
-```
-
-```@docs
-mae
-```
-
-```@docs
-matthews_correlation
-```
-
-```@docs
-misclassification_rate
-```
-
-```@docs
-negative_predictive_value
-```
-
-```@docs
-positive_predictive_value
-```
-
-```@docs
-rms
-```
-
-```@docs
-rmsl
-```
-
-```@docs
-rmslp1
-```
-
-```@docs
-rmsp
-```
-
-```@docs
-true_negative
-```
-
-```@docs
-true_negative_rate
-```
-
-```@docs
-true_positive
-```
-
-```@docs
-true_positive_rate
-```
-
-## List of LossFunctions.jl measures
-
-`DWDMarginLoss()`, `ExpLoss()`, `L1HingeLoss()`, `L2HingeLoss()`,
-`L2MarginLoss()`, `LogitMarginLoss()`, `ModifiedHuberLoss()`,
-`PerceptronLoss()`, `ScaledMarginLoss()`, `SigmoidLoss()`,
-`SmoothedL1HingeLoss()`, `ZeroOneLoss()`, `HuberLoss()`,
-`L1EpsilonInsLoss()`, `L2EpsilonInsLoss()`, `LPDistLoss()`,
-`LogitDistLoss()`, `PeriodicLoss()`, `QuantileLoss()`,
-`ScaledDistanceLoss()`.
 
 
 ## Other performance related tools
 
+In MLJ one computes a confusion matrix by calling an instance of the
+`ConfusionMatrix` measure type on the data:
+
 ```@docs
-confusion_matrix
+ConfusionMatrix
 ```
 
 ```@docs

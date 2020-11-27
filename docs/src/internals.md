@@ -36,7 +36,7 @@ machine(model::M, Xtable, y) = Machine{M}(model, Xtable, y)
 ### fit! and predict/transform
 
 ````julia
-function fit!(machine::Machine; rows=nothing, force=false, verbosity=1)
+function fit!(mach::Machine; rows=nothing, force=false, verbosity=1)
 
     warning = clean!(mach.model)
     isempty(warning) || verbosity < 0 || @warn warning
