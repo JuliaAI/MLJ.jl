@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Composing Models · MLJ</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.svg" alt="MLJ logo"/></a><div class="docs-package-name"><span class="docs-autofit">MLJ</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Introduction</a></li><li><a class="tocitem" href="../getting_started/">Getting Started</a></li><li><a class="tocitem" href="../common_mlj_workflows/">Common MLJ Workflows</a></li><li><a class="tocitem" href="../working_with_categorical_data/">Working with Categorical Data</a></li><li><a class="tocitem" href="../model_search/">Model Search</a></li><li><a class="tocitem" href="../machines/">Machines</a></li><li><a class="tocitem" href="../evaluating_model_performance/">Evaluating Model Performance</a></li><li><a class="tocitem" href="../performance_measures/">Performance Measures</a></li><li><a class="tocitem" href="../tuning_models/">Tuning Models</a></li><li><a class="tocitem" href="../learning_curves/">Learning Curves</a></li><li><a class="tocitem" href="../transformers/">Transformers and other unsupervised models</a></li><li class="is-active"><a class="tocitem" href>Composing Models</a><ul class="internal"><li><a class="tocitem" href="#Linear-pipelines-1"><span>Linear pipelines</span></a></li><li><a class="tocitem" href="#Homogeneous-Ensembles-1"><span>Homogeneous Ensembles</span></a></li><li><a class="tocitem" href="#Learning-Networks-1"><span>Learning Networks</span></a></li><li><a class="tocitem" href="#Exporting-a-learning-network-as-a-stand-alone-model-1"><span>Exporting a learning network as a stand-alone model</span></a></li><li><a class="tocitem" href="#Static-operations-on-nodes-1"><span>Static operations on nodes</span></a></li><li><a class="tocitem" href="#The-learning-network-API-1"><span>The learning network API</span></a></li></ul></li><li><a class="tocitem" href="../homogeneous_ensembles/">Homogeneous Ensembles</a></li><li><a class="tocitem" href="../generating_synthetic_data/">Generating Synthetic Data</a></li><li><a class="tocitem" href="../openml_integration/">OpenML Integration</a></li><li><a class="tocitem" href="../simple_user_defined_models/">Simple User Defined Models</a></li><li><a class="tocitem" href="../quick_start_guide_to_adding_models/">Quick-Start Guide to Adding Models</a></li><li><a class="tocitem" href="../adding_models_for_general_use/">Adding Models for General Use</a></li><li><a class="tocitem" href="../benchmarking/">Benchmarking</a></li><li><a class="tocitem" href="../internals/">Internals</a></li><li><a class="tocitem" href="../list_of_supported_models/">List of Supported Models</a></li><li><a class="tocitem" href="../glossary/">Glossary</a></li><li><a class="tocitem" href="../mlj_cheatsheet/">MLJ Cheatsheet</a></li><li><a class="tocitem" href="../frequently_asked_questions/">FAQ</a></li><li><a class="tocitem" href="../julia_blogpost/">Julia BlogPost</a></li><li><a class="tocitem" href="../acceleration_and_parallelism/">Acceleration and Parallelism</a></li><li><a class="tocitem" href="../api/">Index of Methods</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Composing Models</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Composing Models</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/composing_models.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Composing-Models-1"><a class="docs-heading-anchor" href="#Composing-Models-1">Composing Models</a><a class="docs-heading-anchor-permalink" href="#Composing-Models-1" title="Permalink"></a></h1><p>MLJ has a flexible interface for composing multiple machine learning elements to form a <em>learning network</em>, whose complexity can extend beyond the &quot;pipelines&quot; of other machine learning toolboxes. While these learning networks can be applied directly to learning tasks, they are more commonly used to specify new re-usable, stand-alone, composite model types, that behave like any other model type. The main novelty of composite models is that they include other models as hyper-parameters.</p><p>That said, MLJ also provides dedicated syntax for the most common composition use-cases, which are described first below. A description of the general framework begins at <a href="#Learning-Networks-1">Learning Networks</a>.</p><h2 id="Linear-pipelines-1"><a class="docs-heading-anchor" href="#Linear-pipelines-1">Linear pipelines</a><a class="docs-heading-anchor-permalink" href="#Linear-pipelines-1" title="Permalink"></a></h2><p>In MLJ a <em>pipeline</em> is a composite model in which models are chained together in a linear (non-branching) chain. Pipelines can include learned or static target transformations, if one of the models is supervised.</p><p>To illustrate basic construction of a pipeline, consider the following toy data:</p><pre><code class="language-julia">using MLJ
+X = (age    = [23, 45, 34, 25, 67],
+     gender = categorical([&#39;m&#39;, &#39;m&#39;, &#39;f&#39;, &#39;m&#39;, &#39;f&#39;]));
+height = [67.0, 81.5, 55.6, 90.0, 61.1]</code></pre><p>The code below defines a new model type, and an <em>instance</em> of that type called <code>pipe</code>, for performing the following operations:</p><ul><li>standardize the target variable <code>:height</code> to have mean zero and standard deviation one</li><li>coerce the <code>:age</code> field to have <code>Continuous</code> scitype</li><li>one-hot encode the categorical feature <code>:gender</code></li><li>train a K-nearest neighbor model on the transformed inputs and transformed target</li><li>restore the predictions of the KNN model to the original <code>:height</code> scale (i.e., invert the standardization)</li></ul><pre><code class="language-julia">pipe = @pipeline(X -&gt; coerce(X, :age=&gt;Continuous),
+                 OneHotEncoder,
+                 KNNRegressor(K=3),
+                 target = UnivariateStandardizer())
+
+Pipeline406(
+    one_hot_encoder = OneHotEncoder(
+            features = Symbol[],
+            drop_last = false,
+            ordered_factor = true,
+            ignore = false),
+    knn_regressor = KNNRegressor(
+            K = 3,
+            algorithm = :kdtree,
+            metric = Distances.Euclidean(0.0),
+            leafsize = 10,
+            reorder = true,
+            weights = :uniform),
+    target = UnivariateStandardizer()) @719
+</code></pre><p>Notice that field names for the composite are automatically generated based on the component model type names. The automatically generated name of the new model composite model type, <code>Pipeline406</code>, can be replaced with a user-defined one by specifying, say, <code>name=MyPipe</code>. <strong>If you are planning on serializing (saving) a pipeline-machine, you will need to specify a name.</strong>.</p><p>The new model can be used just like any other non-composite model:</p><pre><code class="language-julia">pipe.knn_regressor.K = 2
+pipe.one_hot_encoder.drop_last = true
+evaluate(pipe, X, height, resampling=Holdout(), measure=l2, verbosity=2)
+
+[ Info: Training Machine{Pipeline406} @959.
+[ Info: Training Machine{UnivariateStandardizer} @422.
+[ Info: Training Machine{OneHotEncoder} @745.
+[ Info: Spawning 1 sub-features to one-hot encode feature :gender.
+[ Info: Training Machine{KNNRegressor} @005.
+┌───────────┬───────────────┬────────────┐
+│ _.measure │ _.measurement │ _.per_fold │
+├───────────┼───────────────┼────────────┤
+│ l2        │ 55.5          │ [55.5]     │
+└───────────┴───────────────┴────────────┘
+_.per_observation = [[[55.502499999999934]]]
+</code></pre><p>For important details on including target transformations, see below.</p><article class="docstring"><header><a class="docstring-binding" id="MLJBase.@pipeline" href="#MLJBase.@pipeline"><code>MLJBase.@pipeline</code></a> — <span class="docstring-category">Macro</span></header><section><div><pre><code class="language-julia">@pipeline model1 model2 ... modelk</code></pre><p>Create an instance of an automatically generated composite model type, in which the specified models are composed in order. This means <code>model1</code> receives inputs, whose output is passed to <code>model2</code>, and so forth. Model types or instances may be specified.</p><p><strong>Important.</strong> By default a new model <em>type</em> name is automatically generated. To specify a different name add a keyword argument such as <code>name=MyPipeType</code>. This is necessary if serializing the pipeline; see <a href="@ref"><code>MLJ.save</code></a>.</p><p>At most one of the models may be a supervised model, but this model can appear in any position.</p><p>The <code>@pipeline</code> macro accepts several key-word arguments discussed further below.</p><p>Static (unlearned) transformations - that is, ordinary functions - may also be inserted in the pipeline as shown in the following example:</p><pre><code class="language-none">@pipeline X-&gt;coerce(X, :age=&gt;Continuous) OneHotEncoder ConstantClassifier</code></pre><p><strong>Target transformation and inverse transformation</strong></p><p>A learned target transformation (such as standardization) can also be specified, using the key-word <code>target</code>, provided the transformer provides an <code>inverse_transform</code> method:</p><pre><code class="language-none">@pipeline OneHotEncoder KNNRegressor target=UnivariateTransformer</code></pre><p>A static transformation can be specified instead, but then an <code>inverse</code> must also be given:</p><pre><code class="language-none">@pipeline(OneHotEncoder, KNNRegressor,
+          target = v -&gt; log.(v),
+          inverse = v -&gt; exp.(v))</code></pre><p><em>Important.</em> By default, the target inversion is applied <em>immediately  following</em> the (unique) supervised model in the pipeline. To apply  at the end of the pipeline, specify <code>invert_last=true</code>.</p><p><strong>Optional key-word arguments</strong></p><ul><li><p><code>target=...</code>  -  any <code>Unsupervised</code> model or <code>Function</code></p></li><li><p><code>inverse=...</code>  -  any <code>Function</code> (unspecified if <code>target</code> is <code>Unsupervised</code>)</p></li><li><p><code>invert_last</code>  -  set to <code>true</code> to delay target inversion to end of pipeline (default=<code>true</code>)</p></li><li><p><code>prediction_type</code>  -  prediction type of the pipeline; possible values: <code>:deterministic</code>, <code>:probabilistic</code>, <code>:interval</code> (default=<code>:deterministic</code> if not inferable)</p></li><li><p><code>operation</code> - operation applied to the supervised component model, when present; possible values: <code>predict</code>, <code>predict_mean</code>, <code>predict_median</code>, <code>predict_mode</code> (default=<code>predict</code>)</p></li><li><p><code>name</code> - new composite model type name; can be any name not already in current global namespace (autogenerated by default(</p></li></ul><p>See also: <a href="#MLJBase.@from_network"><code>@from_network</code></a></p></div></section></article><h2 id="Homogeneous-Ensembles-1"><a class="docs-heading-anchor" href="#Homogeneous-Ensembles-1">Homogeneous Ensembles</a><a class="docs-heading-anchor-permalink" href="#Homogeneous-Ensembles-1" title="Permalink"></a></h2><p>For performance reasons, creating a large ensemble of models sharing a common set of hyperparameters is achieved in MLJ through a model wrapper, rather than through the learning networks API. See the separate <a href="../homogeneous_ensembles/">Homogeneous Ensembles</a> section for details.</p><h2 id="Learning-Networks-1"><a class="docs-heading-anchor" href="#Learning-Networks-1">Learning Networks</a><a class="docs-heading-anchor-permalink" href="#Learning-Networks-1" title="Permalink"></a></h2><p>Hand-crafting a learning network, as outlined below, is a relatively advanced MLJ feature, assuming familiarity with the basics outlined in <a href="../">Getting Started</a>. The syntax for building a learning network is essentially an extension of the basic syntax but with data containers replaced with nodes (&quot;dynamic data&quot;).</p><p>In MLJ, a <em>learning network</em> is a directed acyclic graph whose nodes apply an operation, such as <code>predict</code> or <code>transform</code>, using a fixed machine (requiring training) - or which, alternatively, applies a regular (untrained) mathematical operation, such as <code>+</code>, <code>log</code> or <code>vcat</code>, to its input(s). In practice, a learning network works with fixed sources for its training/evaluation data, but can be built and tested in stages. By contrast, an <em>exported learning network</em> is a learning network exported as a stand-alone, re-usable <code>Model</code> object, to which all the MLJ <code>Model</code> meta-algorithms can be applied (ensembling, systematic tuning, etc).</p><p>Different nodes can point to the same machine (i.e., can access a common set of learned parameters) and different machines can wrap a common model (allowing for hyperparameters in different machines to be coupled).</p><p>By specifying data at the source nodes of a learning network, one can use and test the learning network as it is defined, which is also a good way to understand how learning networks work under the hood. This data, if specified, is ignored in the export process, for the exported composite model, like any other model, is not associated with any data until wrapped in a machine.</p><p>In MLJ learning networks treat the flow of information during training and prediction/transforming separately. Also, different nodes may use the same parameters (fitresult) learned during the training of some model (that is, point to a common machine; see below). For these reasons, simple examples may appear more slightly more complicated than in other frameworks. However, in more sophisticated applications, the extra flexibility is essential.</p><h3 id="Building-a-simple-learning-network-1"><a class="docs-heading-anchor" href="#Building-a-simple-learning-network-1">Building a simple learning network</a><a class="docs-heading-anchor-permalink" href="#Building-a-simple-learning-network-1" title="Permalink"></a></h3><p><img src="../img/wrapped_ridge.png" alt/></p><p>The diagram above depicts a learning network which standardizes the input data <code>X</code>, learns an optimal Box-Cox transformation for the target <code>y</code>, predicts new target values using ridge regression, and then inverse-transforms those predictions, for later comparison with the original test data. The machines, labeled in yellow, are where data to be used for training enters a node, and where training outcomes are stored, as in the basic fit/predict scenario.</p><p>Looking ahead, we note that the new composite model type we will create later will be assigned a single hyperparameter <code>regressor</code>, and the learning network model <code>RidgeRegressor(lambda=0.1)</code> will become this parameter&#39;s default value. Since model hyperparameters are mutable, this regressor can be changed to a different one (e.g., <code>HuberRegressor()</code>).</p><p>For testing purposes, we&#39;ll use a small synthetic data set:</p><pre><code class="language-julia">using Statistics
+import DataFrames
+
+x1 = rand(300)
+x2 = rand(300)
+x3 = rand(300)
+y = exp.(x1 - x2 -2x3 + 0.1*rand(300))
+X = DataFrames.DataFrame(x1=x1, x2=x2, x3=x3)
+
+train, test  = partition(eachindex(y), 0.8)</code></pre><p>Step one is to wrap the data in <em>source nodes</em>:</p><pre><code class="language-none">Xs = source(X)
+ys = source(y)</code></pre><p><em>Note.</em> One can omit the specification of data at the source nodes (by writing instead <code>Xs = source()</code> and <code>ys = source()</code>) and still export the resulting network as a stand-alone model using the @from_network macro described later; see the example under <a href="#Static-operations-on-nodes-1">Static operations on nodes</a>. However, one will be unable to fit or call network nodes, as illustrated below.</p><p>The contents of a source node can be recovered by simply calling the node with no arguments:</p><pre><code class="language-julia">julia&gt; ys()[1:2]
+2-element Array{Float64,1}:
+ 0.12350299813414874
+ 0.29425920370829295</code></pre><p>We label the nodes that we will define according to their outputs in the diagram. Notice that the nodes <code>z</code> and <code>yhat</code> use the same machine, namely <code>box</code>, for different operations.</p><p>To construct the <code>W</code> node we first need to define the machine <code>stand</code> that it will use to transform inputs.</p><pre><code class="language-julia">stand_model = Standardizer()
+stand = machine(stand_model, Xs)</code></pre><p>Because <code>Xs</code> is a node, instead of concrete data, we can call <code>transform</code> on the machine without first training it, and the result is the new node <code>W</code>, instead of concrete transformed data:</p><pre><code class="language-julia">julia&gt; W = transform(stand, Xs)
+Node{Machine{Standardizer}} @325
+  args:
+    1:  Source @085
+  formula:
+    transform(
+        Machine{Standardizer} @709,
+        Source @085)</code></pre><p>To get actual transformed data we <em>call</em> the node appropriately, which will require we first train the node. Training a node, rather than a machine, triggers training of <em>all</em> necessary machines in the network.</p><pre><code class="language-julia">fit!(W, rows=train)
+W()           # transform all data
+W(rows=test ) # transform only test data
+W(X[3:4,:])   # transform any data, new or old</code></pre><pre><code class="language-julia">2×3 DataFrame
+│ Row │ x1       │ x2        │ x3        │
+│     │ Float64  │ Float64   │ Float64   │
+├─────┼──────────┼───────────┼───────────┤
+│ 1   │ 0.113486 │ 0.732189  │ 1.4783    │
+│ 2   │ 0.783227 │ -0.425371 │ -0.113503 │</code></pre><p>If you like, you can think of <code>W</code> (and the other nodes we will define) as &quot;dynamic data&quot;: <code>W</code> is <em>data</em>, in the sense that it an be called (&quot;indexed&quot;) on rows, but <em>dynamic</em>, in the sense the result depends on the outcome of training events.</p><p>The other nodes of our network are defined similarly:</p><pre><code class="language-julia">@load RidgeRegressor pkg=MultivariateStats
+
+box_model = UnivariateBoxCoxTransformer()  # for making data look normally-distributed
+box = machine(box_model, ys)
+z = transform(box, ys)
+
+ridge_model = RidgeRegressor(lambda=0.1)
+ridge =machine(ridge_model, W, z)
+zhat = predict(ridge, W)
+
+yhat = inverse_transform(box, zhat)
+</code></pre><p>We are ready to train and evaluate the completed network. Notice that the standardizer, <code>stand</code>, is <em>not</em> retrained, as MLJ remembers that it was trained earlier:</p><pre><code class="language-julia">fit!(yhat, rows=train)</code></pre><pre><code class="language-julia">[ Info: Not retraining Machine{Standardizer} @ 6…82. It is up-to-date.
+[ Info: Training Machine{UnivariateBoxCoxTransformer} @ 1…09.
+[ Info: Training Machine{RidgeRegressor} @ 2…66.</code></pre><pre><code class="language-julia">rms(y[test], yhat(rows=test)) # evaluate</code></pre><pre><code class="language-julia">0.022837595088079567</code></pre><p>We can change a hyperparameters and retrain:</p><pre><code class="language-julia">ridge_model.lambda = 0.01
+fit!(yhat, rows=train)</code></pre><pre><code class="language-julia">[ Info: Not retraining Machine{UnivariateBoxCoxTransformer} @ 1…09. It is up-to-date.
+[ Info: Not retraining Machine{Standardizer} @ 6…82. It is up-to-date.
+[ Info: Updating Machine{RidgeRegressor} @ 2…66.
+Node @ 1…07 = inverse_transform(1…09, predict(2…66, transform(6…82, 3…40)))</code></pre><p>And re-evaluate:</p><pre><code class="language-julia">rms(y[test], yhat(rows=test))
+0.039410306910269116</code></pre><blockquote><p><strong>Notable feature.</strong> The machine, <code>ridge::Machine{RidgeRegressor}</code>, is retrained, because its underlying model has been mutated. However, since the outcome of this training has no effect on the training inputs of the machines <code>stand</code> and <code>box</code>, these transformers are left untouched. (During construction, each node and machine in a learning network determines and records all machines on which it depends.) This behavior, which extends to exported learning networks, means we can tune our wrapped regressor (using a holdout set) without re-computing transformations each time the hyperparameter is changed.</p></blockquote><h3 id="Learning-network-machines-1"><a class="docs-heading-anchor" href="#Learning-network-machines-1">Learning network machines</a><a class="docs-heading-anchor-permalink" href="#Learning-network-machines-1" title="Permalink"></a></h3><p>As we show next, a learning network needs to be exported to create a new stand-alone model type. Instances of that type can be bound with data in a machine, which can then be evaluated, for example. Somewhat paradoxically, one can wrap a learning network in a certain kind of machine, called a <em>learning network machine</em>, <em>before</em> exporting it, and in fact, the export process actually requires us to do so. Since a composite model type does not yet exist, one constructs the machine using a &quot;surrogate&quot; model, whose name indicates the ultimate model supertype (<code>Deterministic</code>, <code>Probabilistic</code>, <code>Unsupervised</code> or <code>Static</code>). This surrogate model has no fields.</p><p>Continuing with the example above:</p><pre><code class="language-julia">julia&gt; surrogate = Deterministic()
+DeterministicSurrogate() @047
+
+mach = machine(surrogate, Xs, ys; predict=yhat)</code></pre><p>Notice that a key-word argument declares which node is for making predictions, and the arguments <code>Xs</code> and <code>ys</code> declare which source nodes receive the input and target data. With <code>mach</code> constructed in this way, the code</p><pre><code class="language-julia">fit!(mach)
+predict(mach, X[test,:])</code></pre><p>is equivalent to</p><pre><code class="language-julia">fit!(yhat)
+yhat(X[test,:])</code></pre><p>While it&#39;s main purpose is for export (see below), this machine can actually be evaluated:</p><pre><code class="language-julia">evaluate!(mach, resampling=CV(nfolds=3), measure=l2)</code></pre><p>For more on constructing learning network machines, see <a href="../machines/#MLJBase.machine"><code>machine</code></a>.</p><h2 id="Exporting-a-learning-network-as-a-stand-alone-model-1"><a class="docs-heading-anchor" href="#Exporting-a-learning-network-as-a-stand-alone-model-1">Exporting a learning network as a stand-alone model</a><a class="docs-heading-anchor-permalink" href="#Exporting-a-learning-network-as-a-stand-alone-model-1" title="Permalink"></a></h2><p>Having satisfied that our learning network works on the synthetic data, we are ready to export it as a stand-alone model.</p><h3 id="Method-I:-The-@from_network-macro-1"><a class="docs-heading-anchor" href="#Method-I:-The-@from_network-macro-1">Method I: The @from_network macro</a><a class="docs-heading-anchor-permalink" href="#Method-I:-The-@from_network-macro-1" title="Permalink"></a></h3><p>Having defined a learning network machine, <code>mach</code>, as above, the following code defines a new model subtype <code>WrappedRegressor &lt;: Supervised</code> with a single field <code>regressor</code>:</p><pre><code class="language-julia">@from_network mach begin
+    mutable struct WrappedRegressor
+        regressor=ridge_model
+    end
+end</code></pre><p>Note the declaration of the default value <code>ridge_model</code>, <em>which must refer to an actual model appearing in the learning network</em>. It can be typed, as in the alternative declaration below, which also declares some traits for the type (as shown by <code>info(WrappedRegressor)</code>; see also <a href="../adding_models_for_general_use/#Trait-declarations-1">Trait declarations</a>).</p><pre><code class="language-julia">@from_network mach begin
+    mutable struct WrappedRegressor
+        regressor::Deterministic=ridge_model
+    end
+    input_scitype = Table(Continuous,Finite)
+    target_scitype = AbstractVector{&lt;:Continuous}
+end
+</code></pre><p>We can now create an instance of this type and apply the meta-algorithms that apply to any MLJ model:</p><pre><code class="language-julia">julia&gt; composite = WrappedRegressor()
+WrappedRegressor(
+    regressor = RidgeRegressor(
+            lambda = 0.01))
+
+X, y = @load_boston;
+evaluate(composite, X, y, resampling=CV(), measure=l2, verbosity=0)</code></pre><p>Since our new type is mutable, we can swap the <code>RidgeRegressor</code> out for any other regressor:</p><pre><code class="language-none">@load KNNRegressor
+composite.regressor = KNNRegressor(K=7)
+julia&gt; composite
+WrappedRegressor(regressor = KNNRegressor(K = 7,
+                                          algorithm = :kdtree,
+                                          metric = Distances.Euclidean(0.0),
+                                          leafsize = 10,
+                                          reorder = true,
+                                          weights = :uniform,),) @ 2…63</code></pre><h3 id="Method-II:-Finer-control-(advanced)-1"><a class="docs-heading-anchor" href="#Method-II:-Finer-control-(advanced)-1">Method II: Finer control (advanced)</a><a class="docs-heading-anchor-permalink" href="#Method-II:-Finer-control-(advanced)-1" title="Permalink"></a></h3><p>This section describes an advanced feature that can be skipped on a first reading.</p><p>In Method I above, only models appearing in the network will appear as hyperparameters of the exported composite model. There is a second more flexible method for exporting the network, which allows finer control over the exported <code>Model</code> struct, and which also avoids macros. The two steps required are:</p><ul><li><p>Define a new <code>mutable struct</code> model type.</p></li><li><p>Wrap the learning network code in a model <code>fit</code> method.</p></li></ul><p>Let&#39;s start with an elementary illustration in the learning network we just exported using Method I.</p><p>The <code>mutable struct</code> definition looks like this:</p><pre><code class="language-julia">mutable struct WrappedRegressor2 &lt;: DeterministicComposite
+    regressor
+end
+
+# keyword constructor
+WrappedRegressor2(; regressor=RidgeRegressor()) = WrappedRegressor2(regressor)</code></pre><p>The other supertype options are <code>ProbabilisticComposite</code>, <code>IntervalComposite</code>, <code>UnsupervisedComposite</code> and <code>StaticComposite</code>.</p><p>We now simply cut and paste the code defining the learning network into a model <code>fit</code> method (as opposed to a machine <code>fit!</code> method):</p><pre><code class="language-julia">function MLJ.fit(model::WrappedRegressor2, verbosity::Integer, X, y)
+    Xs = source(X)
+    ys = source(y)
+
+    stand_model = Standardizer()
+    stand = machine(stand_model, Xs)
+    W = transform(stand, Xs)
+
+    box_model = UnivariateBoxCoxTransformer()
+    box = machine(box_model, ys)
+    z = transform(box, ys)
+
+    ridge_model = model.regressor        ###
+    ridge =machine(ridge_model, W, z)
+    zhat = predict(ridge, W)
+
+    yhat = inverse_transform(box, zhat)
+
+    mach = machine(Deterministic(), Xs, ys; predict=yhat)
+    return!(mach, model, verbosity)
+end</code></pre><p>This completes the export process.</p><p>Notes:</p><ul><li><p>The line marked <code>###</code>, where the new exported model&#39;s hyperparameter <code>regressor</code> is spliced into the network, is the only modification to the previous code.</p></li><li><p>After defining the network there is the additional step of constructing and fitting a learning network machine (see above).</p></li><li><p>The last call in the function <code>return!(mach, model, verbosity)</code> calls <code>fit!</code> on the learning network machine <code>mach</code> and splits it into various pieces, as required by the MLJ model interface. See also the <a href="#MLJBase.return!"><code>return!</code></a> doc-string.</p></li><li><p><strong>Important note</strong> An MLJ <code>fit</code> method is not allowed to mutate its <code>model</code> argument. </p></li></ul><blockquote><p><strong>What&#39;s going on here?</strong> MLJ&#39;s machine interface is built atop a more primitive <em><a href="../simple_user_defined_models/">model</a></em> interface, implemented for each algorithm. Each supervised model type (eg, <code>RidgeRegressor</code>) requires model <code>fit</code> and <code>predict</code> methods, which are called by the corresponding <em>machine</em> <code>fit!</code> and <code>predict</code> methods. We don&#39;t need to define a  model <code>predict</code> method here because MLJ provides a fallback which simply calls the <code>predict</code> on the learning network machine created in the <code>fit</code> method. </p></blockquote><h4 id="A-composite-model-coupling-component-model-hyper-parameters-1"><a class="docs-heading-anchor" href="#A-composite-model-coupling-component-model-hyper-parameters-1">A composite model coupling component model hyper-parameters</a><a class="docs-heading-anchor-permalink" href="#A-composite-model-coupling-component-model-hyper-parameters-1" title="Permalink"></a></h4><p>We now give a more complicated example of a composite model which exposes some parameters used in the network that are not simply component models. The model combines a clustering model (e.g., <code>KMeans()</code>) for dimension reduction with ridge regression, but has the following &quot;coupling&quot; of the hyper parameters: The ridge regularization depends on the number of clusters used (with less regularization for a greater number of clusters) and a user-specified &quot;coupling&quot; coefficient <code>K</code>.</p><pre><code class="language-julia">@load RidgeRegressor pkg=MLJLinearModels
+
+mutable struct MyComposite &lt;: DeterministicComposite
+    clusterer     # the clustering model (e.g., KMeans())
+    ridge_solver  # a ridge regression parameter we want to expose
+    K::Float64    # a &quot;coupling&quot; coefficient
+end
+
+function MLJ.fit(composite::Composite, verbosity, X, y)
+
+    Xs = source(X)
+    ys = source(y)
+
+    clusterer = composite.clusterer
+    k = clusterer.k
+
+    clustererM = machine(clusterer, Xs)
+    Xsmall = transform(clustererM, Xs)
+
+    # the coupling: ridge regularization depends on number of
+    # clusters (and the specified coefficient `K`):
+    lambda = exp(-composite.K/clusterer.k)
+
+    ridge = RidgeRegressor(lambda=lambda, solver=composite.ridge_solver)
+    ridgeM = machine(ridge, Xsmall, ys)
+
+    yhat = predict(ridgeM, Xsmall)
+
+    mach = machine(Deterministic(), Xs, ys; predict=yhat)
+    return!(mach, composite, verbosity)
+
+end</code></pre><h2 id="Static-operations-on-nodes-1"><a class="docs-heading-anchor" href="#Static-operations-on-nodes-1">Static operations on nodes</a><a class="docs-heading-anchor-permalink" href="#Static-operations-on-nodes-1" title="Permalink"></a></h2><p>Continuing to view nodes as &quot;dynamic data&quot;, we can, in addition to applying &quot;dynamic&quot; operations like <code>predict</code> and <code>transform</code> to nodes, overload ordinary &quot;static&quot; (unlearned) operations as well. These operations can be ordinary functions (with possibly multiple arguments) or they could be functions <em>with parameters</em>, such as &quot;take a weighted average of two nodes&quot;, where the weights are parameters. Here we address the simpler case of ordinary functions. For the parametric case, see &quot;Static transformers&quot; in <a href="../transformers/#Transformers-and-other-unsupervised-models-1">Transformers and other unsupervised models</a></p><p>Let us first give a demonstration of operations that work out-of-the-box. These include:</p><ul><li><p>addition and scalar multiplication</p></li><li><p><code>exp</code>, <code>log</code>, <code>vcat</code>, <code>hcat</code></p></li><li><p>tabularization (<code>MLJ.table</code>) and matrixification (<code>MLJ.matrix</code>)</p></li></ul><p>As a demonstration of some of these, consider the learning network below that: (i) One-hot encodes the input table <code>X</code>; (ii) Log transforms the continuous target <code>y</code>; (iii) Fits specified K-nearest neighbour and ridge regressor models to the data; (iv) Computes an average of the individual model predictions; and (v) Inverse transforms (exponentiates) the blended predictions.</p><p>Note, in particular, the lines defining <code>zhat</code> and <code>yhat</code>, which combine several static node operations.</p><pre><code class="language-julia">@load RidgeRegressor pkg=MultivariateStats
+@load KNNRegressor
+
+Xs = source()
+ys = source()
+
+hot = machine(OneHotEncoder(), Xs)
+
+# W, z, zhat and yhat are nodes in the network:
+
+W = transform(hot, Xs) # one-hot encode the input
+z = log(ys)            # transform the target
+
+model1 = RidgeRegressor(lambda=0.1)
+model2 = KNNRegressor(K=7)
+
+mach1 = machine(model1, W, z)
+mach2 = machine(model2, W, z)
+
+# average the predictions of the KNN and ridge models:
+zhat = 0.5*predict(mach1, W) + 0.5*predict(mach2, W)
+
+# inverse the target transformation
+yhat = exp(zhat)</code></pre><p>Exporting this learning network as a stand-alone model:</p><pre><code class="language-julia">@from_network machine(Deterministic(), Xs, ys; predict=yhat) begin
+    mutable struct DoubleRegressor
+        regressor1=model1
+        regressor2=model2
+    end
+end</code></pre><p>To deal with operations on nodes not supported out-of-the box, one can use the <code>@node</code> macro. Supposing, in the preceding example, we wanted the geometric mean rather than arithmetic mean. Then, the definition of <code>zhat</code> above can be replaced with</p><pre><code class="language-julia">yhat1 = predict(mach1, W)
+yhat2 = predict(mach2, W)
+gmean(y1, y2) = sqrt.(y1.*y2)
+zhat = @node gmean(yhat1, yhat2)</code></pre><p>There is also a <code>node</code> function, which would achieve the same in this way:</p><pre><code class="language-julia">zhat = node((y1, y2)-&gt;sqrt.(y1.*y2), predict(mach1, W), predict(mach2, W))</code></pre><h3 id="More-node-examples-1"><a class="docs-heading-anchor" href="#More-node-examples-1">More <code>node</code> examples</a><a class="docs-heading-anchor-permalink" href="#More-node-examples-1" title="Permalink"></a></h3><p>Here are some examples taken from MLJ source (at work in the example above) for overloading common operations for nodes:</p><pre><code class="language-julia">Base.log(v::Vector{&lt;:Number}) = log.(v)
+Base.log(X::AbstractNode) = node(log, X)
+
+import Base.+
++(y1::AbstractNode, y2::AbstractNode) = node(+, y1, y2)
++(y1, y2::AbstractNode) = node(+, y1, y2)
++(y1::AbstractNode, y2) = node(+, y1, y2)</code></pre><p>Here <code>AbstractNode</code> is the common super-type of <code>Node</code> and <code>Source</code>.</p><p>And a final example, using the <code>@node</code> macro to row-shuffle a table:</p><pre><code class="language-julia">using Random
+X = (x1 = [1, 2, 3, 4, 5],
+     x2 = [:one, :two, :three, :four, :five])
+rows(X) = 1:nrows(X)
+
+Xs = source(X)
+rs  = @node rows(Xs)
+W = @node selectrows(Xs, @node shuffle(rs))
+
+julia&gt; W()
+(x1 = [5, 1, 3, 2, 4],
+ x2 = Symbol[:five, :one, :three, :two, :four],)
+</code></pre><h2 id="The-learning-network-API-1"><a class="docs-heading-anchor" href="#The-learning-network-API-1">The learning network API</a><a class="docs-heading-anchor-permalink" href="#The-learning-network-API-1" title="Permalink"></a></h2><p>Two new julia types are part of learning networks: <code>Source</code> and <code>Node</code>.</p><p>Formally, a learning network defines <em>two</em> labeled directed acyclic graphs (DAG&#39;s) whose nodes are <code>Node</code> or <code>Source</code> objects, and whose labels are <code>Machine</code> objects. We obtain the first DAG from directed edges of the form <span>$N1 -&gt; N2$</span> whenever <span>$N1$</span> is an <em>argument</em> of <span>$N2$</span> (see below). Only this DAG is relevant when calling a node, as discussed in examples above and below. To form the second DAG (relevant when calling or calling <code>fit!</code> on a node) one adds edges for which <span>$N1$</span> is <em>training argument</em> of the the machine which labels <span>$N1$</span>. We call the second, larger DAG, the <em>completed learning network</em> (but note only edges of the smaller network are explicitly drawn in diagrams, for simplicity).</p><h3 id="Source-nodes-1"><a class="docs-heading-anchor" href="#Source-nodes-1">Source nodes</a><a class="docs-heading-anchor-permalink" href="#Source-nodes-1" title="Permalink"></a></h3><p>Only source nodes reference concrete data. A <code>Source</code> object has a single field, <code>data</code>.</p><article class="docstring"><header><a class="docstring-binding" id="MLJBase.source-Tuple{Any}" href="#MLJBase.source-Tuple{Any}"><code>MLJBase.source</code></a> — <span class="docstring-category">Method</span></header><section><div><pre><code class="language-julia">Xs = source(X=nothing)</code></pre><p>Define, a learning network <code>Source</code> object, wrapping some input data <code>X</code>, which can be <code>nothing</code> for purposes of exporting the network as stand-alone model. For training and testing the unexported network, appropriate vectors, tables, or other data containers are expected.</p><p>The calling behaviour of a <code>Source</code> object is this:</p><pre><code class="language-none">Xs() = X
+Xs(rows=r) = selectrows(X, r)  # eg, X[r,:] for a DataFrame
+Xs(Xnew) = Xnew</code></pre><p>See also: [<code>@from_network</code>](@ref], <a href="#MLJBase.sources"><code>sources</code></a>, <a href="#MLJBase.origins"><code>origins</code></a>, <a href="#MLJBase.node"><code>node</code></a>.</p></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJBase.rebind!" href="#MLJBase.rebind!"><code>MLJBase.rebind!</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">rebind!(s, X)</code></pre><p>Attach new data <code>X</code> to an existing source node <code>s</code>. Not a public method.</p></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJBase.sources" href="#MLJBase.sources"><code>MLJBase.sources</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">sources(N::AbstractNode)</code></pre><p>A vector of all sources referenced by calls <code>N()</code> and <code>fit!(N)</code>. These are the sources of the ancestor graph of <code>N</code> when including training edges.</p><p>Not to be confused with <code>origins(N)</code>, in which training edges are excluded.</p><p>See also: <a href="#MLJBase.origins"><code>origins</code></a>, <a href="#MLJBase.source-Tuple{Any}"><code>source</code></a>.</p></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJBase.origins" href="#MLJBase.origins"><code>MLJBase.origins</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">origins(N)</code></pre><p>Return a list of all origins of a node <code>N</code> accessed by a call <code>N()</code>. These are the source nodes of ancestor graph of <code>N</code> if edges corresponding to training arguments are excluded. A <code>Node</code> object cannot be called on new data unless it has a unique origin.</p><p>Not to be confused with <code>sources(N)</code> which refers to the same graph but without the training edge deletions.</p><p>See also: <a href="#MLJBase.node"><code>node</code></a>, <a href="#MLJBase.source-Tuple{Any}"><code>source</code></a>.</p></div></section></article><h3 id="Nodes-1"><a class="docs-heading-anchor" href="#Nodes-1">Nodes</a><a class="docs-heading-anchor-permalink" href="#Nodes-1" title="Permalink"></a></h3><p>The key components of a <code>Node</code> are:</p><ul><li><p>An <em>operation</em>, which will either be <em>static</em> (a fixed function) or <em>dynamic</em> (such as <code>predict</code> or <code>transform</code>, dispatched on a machine).</p></li><li><p>A <em>machine</em> on which to dispatch the operation (void if the operation is static). The training arguments of the machine are generally other nodes.</p></li><li><p>Upstream connections to other nodes (including source nodes) specified by <em>arguments</em> (one for each argument of the operation).</p></li></ul><article class="docstring"><header><a class="docstring-binding" id="MLJBase.node" href="#MLJBase.node"><code>MLJBase.node</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">N = node(f::Function, args...)</code></pre><p>Defines a <code>Node</code> object <code>N</code> wrapping a static operation <code>f</code> and arguments <code>args</code>. Each of the <code>n</code> elements of <code>args</code> must be a <code>Node</code> or <code>Source</code> object. The node <code>N</code> has the following calling behaviour:</p><pre><code class="language-none">N() = f(args[1](), args[2](), ..., args[n]())
+N(rows=r) = f(args[1](rows=r), args[2](rows=r), ..., args[n](rows=r))
+N(X) = f(args[1](X), args[2](X), ..., args[n](X))
+
+J = node(f, mach::Machine, args...)</code></pre><p>Defines a dynamic <code>Node</code> object <code>J</code> wrapping a dynamic operation <code>f</code> (<code>predict</code>, <code>predict_mean</code>, <code>transform</code>, etc), a nodal machine <code>mach</code> and arguments <code>args</code>. Its calling behaviour, which depends on the outcome of training <code>mach</code> (and, implicitly, on training outcomes affecting its arguments) is this:</p><pre><code class="language-none">J() = f(mach, args[1](), args[2](), ..., args[n]())
+J(rows=r) = f(mach, args[1](rows=r), args[2](rows=r), ..., args[n](rows=r))
+J(X) = f(mach, args[1](X), args[2](X), ..., args[n](X))</code></pre><p>Generally <code>n=1</code> or <code>n=2</code> in this latter case.</p><pre><code class="language-none">predict(mach, X::AbsractNode, y::AbstractNode)
+predict_mean(mach, X::AbstractNode, y::AbstractNode)
+predict_median(mach, X::AbstractNode, y::AbstractNode)
+predict_mode(mach, X::AbstractNode, y::AbstractNode)
+transform(mach, X::AbstractNode)
+inverse_transform(mach, X::AbstractNode)</code></pre><p>Shortcuts for <code>J = node(predict, mach, X, y)</code>, etc.</p><p>Calling a node is a recursive operation which terminates in the call to a source node (or nodes). Calling nodes on <em>new</em> data <code>X</code> fails unless the number of such nodes is one.</p><p>See also: <a href="#MLJBase.@node"><code>@node</code></a>, <a href="#MLJBase.source-Tuple{Any}"><code>source</code></a>, <a href="#MLJBase.origins"><code>origins</code></a>.</p></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJBase.@node" href="#MLJBase.@node"><code>MLJBase.@node</code></a> — <span class="docstring-category">Macro</span></header><section><div><pre><code class="language-julia">@node f(...)</code></pre><p>Construct a new node that applies the function <code>f</code> to some combination of nodes, sources and other arguments.</p><p><em>Important.</em> An argument not in global scope is assumed to be a node  or source.</p><p><strong>Examples</strong></p><pre><code class="language-none">X = source(π)
+W = @node sin(X)
+julia&gt; W()
+0
+
+X = source(1:10)
+Y = @node selectrows(X, 3:4)
+julia&gt; Y()
+3:4
+
+julia&gt; Y([&quot;one&quot;, &quot;two&quot;, &quot;three&quot;, &quot;four&quot;])
+2-element Array{Symbol,1}:
+ &quot;three&quot;
+ &quot;four&quot;
+
+X1 = source(4)
+X2 = source(5)
+add(a, b, c) = a + b + c
+N = @node add(X1, 1, X2)
+julia&gt; N()
+10
+</code></pre><p>See also <a href="#MLJBase.node"><code>node</code></a></p></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJBase.@from_network" href="#MLJBase.@from_network"><code>MLJBase.@from_network</code></a> — <span class="docstring-category">Macro</span></header><section><div><pre><code class="language-julia">@from_network mach [mutable] struct NewCompositeModel
+       ...
+end</code></pre><p>or</p><pre><code class="language-none">@from_network mach begin
+    [mutable] struct NewCompositeModel
+       ...
+    end
+    &lt;optional trait declarations&gt;
+end</code></pre><p>Create a new stand-alone model type called <code>NewCompositeModel</code>, using the specified learning network machine <code>mach</code> as a blueprint.</p><p>For more on learning network machines, see <a href="../machines/#MLJBase.machine"><code>machine</code></a>.</p><p><strong>Example</strong></p><p>Consider the following simple learning network for training a decision tree after one-hot encoding the inputs, and forcing the predictions to be point-predictions (rather than probabilistic):</p><pre><code class="language-julia">Xs = source()
+ys = source()
+
+hot = OneHotEncoder()
+tree = DecisionTreeClassifier()
+
+W = transform(machine(hot, Xs), Xs)
+yhat = predict_mode(machine(tree, W, ys), W)</code></pre><p>A learning network machine is defined by</p><pre><code class="language-julia">mach = machine(Deterministic(), Xs, ys; predict=yhat)</code></pre><p>To specify a new <code>Deterministic</code> composite model type <code>WrappedTree</code> we specify the model instances appearing in the network as &quot;default&quot; values in the following decorated struct definition:</p><pre><code class="language-julia">@from_network mach struct WrappedTree
+    encoder=hot
+    decision_tree=tree
+end</code></pre><p>and create a new instance with <code>WrappedTree()</code>.</p><p>To allow the second model component to be replaced by any other probabilistic model we instead make a mutable struct declaration and, if desired, annotate types appropriately.  In the following code illustration some model trait declarations have also been added:</p><pre><code class="language-julia">@from_network mach begin
+    mutable struct WrappedTree
+        encoder::OneHotEncoder=hot
+        classifier::Probabilistic=tree
+    end
+    input_scitype = Table(Continuous, Finite)
+    is_pure_julia = true
+end</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJBase.return!" href="#MLJBase.return!"><code>MLJBase.return!</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">return!(mach::Machine{&lt;:Surrogate}, model, verbosity)</code></pre><p>The last call in custom code defining the <code>MLJBase.fit</code> method for a new composite model type. Here <code>model</code> is the instance of the new type appearing in the <code>MLJBase.fit</code> signature, while <code>mach</code> is a learning network machine constructed using <code>model</code>. Not relevant when defining composite models using <code>@pipeline</code> or <code>@from_network</code>.</p><p>For usage, see the example given below. Specificlly, the call does the following:</p><ul><li>Determines which fields of <code>model</code> point to model instances in the learning network wrapped by <code>mach</code>, for recording in an object called <code>cache</code>, for passing onto the MLJ logic that handles smart updating (namely, an <code>MLJBase.update</code> fallback for composite models).</li></ul><ul><li><p>Calls <code>fit!(mach, verbosity=verbosity)</code>.</p></li><li><p>Moves any data in sources nodes of the learning network into <code>cache</code> (for data-anonymization purposes).</p></li><li><p>Records a copy of <code>model</code> in <code>cache</code>.</p></li><li><p>Returns <code>cache</code> and outcomes of training in an appropriate form (specifically, <code>(mach.fitresult, cache, mach.report)</code>; see <a href="https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/">Adding Models for General Use</a> for technical details.)</p></li></ul><p><strong>Example</strong></p><p>The following code defines, &quot;by hand&quot;, a new model type <code>MyComposite</code> for composing standardization (whitening) with a deterministic regressor:</p><pre><code class="language-none">mutable struct MyComposite &lt;: DeterministicComposite
+    regressor
+end
+
+function MLJBase.fit(model::MyComposite, verbosity, X, y)
+    Xs = source(X)
+    ys = source(y)
+
+    mach1 = machine(Standardizer(), Xs)
+    Xwhite = transform(mach1, Xs)
+
+    mach2 = machine(model.regressor, Xwhite, ys)
+    yhat = predict(mach2, Xwhite)
+
+    mach = machine(Deterministic(), Xs, ys; predict=yhat)
+    return!(mach, model, verbosity)
+end</code></pre></div></section></article><p>See more on fitting nodes at <a href="../machines/#StatsBase.fit!"><code>fit!</code></a> and <a href="../machines/#MLJBase.fit_only!"><code>fit_only!</code></a>. </p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../transformers/">« Transformers and other unsupervised models</a><a class="docs-footer-nextpage" href="../homogeneous_ensembles/">Homogeneous Ensembles »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Saturday 28 November 2020 00:07">Saturday 28 November 2020</span>. Using Julia version 1.2.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
