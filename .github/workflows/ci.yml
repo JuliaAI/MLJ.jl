@@ -3,9 +3,11 @@ on:
   pull_request:
     branches:
       - master
+      - dev
   push:
     branches:
       - master
+      - dev
     tags: '*'
 jobs:
   test:
@@ -17,7 +19,6 @@ jobs:
         version:
           - '1.0'
           - '1'
-          - 'nightly'
         os:
           - ubuntu-latest
         arch:
