@@ -51,10 +51,8 @@ Assuming the DecisionTree.jl package is in your load path, we can use
 type. This macro also returns an instance, with default
 hyperparameters.
 
-Drop the `verbosity=1` declaration for silent loading:
-
 ```@repl doda
-tree_model = @load DecisionTreeClassifier verbosity=1
+tree_model = @load DecisionTreeClassifier
 ```
 
 *Important:* DecisionTree.jl and most other packages implementing machine
