@@ -4,8 +4,8 @@
 
 <h2 align="center">A Machine Learning Framework for Julia
 <p align="center">
-  <a href="https://travis-ci.com/alan-turing-institute/MLJ.jl">
-    <img src="https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master"
+  <a href="https://github.com/alan-turing-institute/MLJ.jl/actions">
+    <img src="https://github.com/alan-turing-institute/MLJ.jl/workflows/CI/badge.svg"
          alt="Build Status">
   </a>
   <a href="https://slackinvite.julialang.org/">
