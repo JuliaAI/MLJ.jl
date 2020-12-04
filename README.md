@@ -25,7 +25,7 @@
   <img src="https://mybinder.org/badge_logo.svg"
        alt="Binder">
   </a>
-  <a href="(https://doi.org/10.21105/joss.02704">
+  <a href="https://doi.org/10.21105/joss.02704">
     <img src="https://joss.theoj.org/papers/10.21105/joss.02704/status.svg"
        alt="DOI">
   </a>
