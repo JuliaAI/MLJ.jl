@@ -1,0 +1,116 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - master
+      - dev
+  push:
+    branches:
+      - master
+      - dev
+    tags: '*'
+jobs:
+  test:
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - '1.0'
+          - '1' # automatically expands to the latest stable 1.x release of Julia.
+        os:
+          - ubuntu-latest
+        arch:
+          - x64
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ matrix.version }}
+          arch: ${{ matrix.arch }}
+      - uses: actions/cache@v1
+        env:
+          cache-name: cache-artifacts
+        with:
+          path: ~/.julia/artifacts
+          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-test-${{ env.cache-name }}-
+            ${{ runner.os }}-test-
+            ${{ runner.os }}-
+      - uses: julia-actions/julia-buildpkg@v1
+      - uses: julia-actions/julia-runtest@v1
+      - uses: julia-actions/julia-processcoverage@v1
+      - uses: codecov/codecov-action@v1
+        with:
+          file: lcov.info
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: '1'
+      - run: |
+         julia -e '
+           function set_environment_variable(name::AbstractString, value::AbstractString)
+               github_env = ENV["GITHUB_ENV"]
+               touch(github_env)
+               open(github_env, "a") do io
+                   println(io, "$(name)=$(value)")
+               end
+           end
+           event_name = "${{ github.event_name }}"
+           if event_name == "pull_request"
+               base_ref = "${{ github.base_ref }}"
+               head_ref = "${{ github.head_ref }}"
+               base_repository = "${{ github.repository }}"
+               head_repository = "${{ github.event.pull_request.head.repo.full_name }}"
+               build_docs = (base_ref == "master") && (head_ref == "dev") && (base_repository == head_repository)
+           elseif event_name == "push"
+               ref = "${{ github.ref }}"
+               build_docs = (ref == "refs/heads/master") || (startswith(ref, "refs/tags/"))
+           elseif event_name == "schedule"
+               build_docs = ref == "refs/heads/master"
+           elseif event_name == "workflow_dispatch"
+               build_docs = ref == "refs/heads/master"
+           else
+               build_docs = false
+           end
+           if build_docs
+               @info("We will build the docs")
+               set_environment_variable("BUILD_DOCS", "true")
+           else 
+               @info("We will NOT build the docs")
+               set_environment_variable("BUILD_DOCS", "false")
+           end'
+      - run: |
+          julia --project=docs -e '
+            if ENV["BUILD_DOCS"] == "true"
+                using Pkg
+                Pkg.develop(PackageSpec(path=pwd()))
+                Pkg.instantiate()
+            end'
+      - run: |
+          julia --project=docs -e '
+            if ENV["BUILD_DOCS"] == "true"
+                using Documenter: doctest
+                using MLJ
+                @info "attempting to run the doctests"
+                doctest(MLJ)
+            else
+                @info "skipping the doctests"
+            end'
+      - run: julia --project=docs -e '
+            if ENV["BUILD_DOCS"] == "true"
+                @info "attempting to build the docs"
+                run(`julia --project=docs docs/make.jl`)
+                @info "successfully built the docs"
+            else
+                @info "skipping the docs build"
+            end'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}

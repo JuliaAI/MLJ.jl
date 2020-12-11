@@ -291,16 +291,22 @@ questions and make suggestions.
 
 ## Citing MLJ
 
-When presenting work that uses MLJ, please cite the [MLJ design
-paper](https://arxiv.org/abs/2007.12285). Here is the relevant bibtex entry:
+When presenting work that uses MLJ, please cite the MLJ design
+paper:
 
-```bitex
-@misc{blaom2020mlj,
-    title={MLJ: A Julia package for composable machine learning},
-    author={Anthony D. Blaom and Franz Kiraly and Thibaut Lienart and Yiannis Simillides and Diego Arenas and Sebastian J. Vollmer},
-    year={2020},
-    eprint={2007.12285},
-    archivePrefix={arXiv},
-    primaryClass={cs.LG}
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.02704/status.svg)](https://doi.org/10.21105/joss.02704)
+
+```bibtex
+@article{Blaom2020,
+  doi = {10.21105/joss.02704},
+  url = {https://doi.org/10.21105/joss.02704},
+  year = {2020},
+  publisher = {The Open Journal},
+  volume = {5},
+  number = {55},
+  pages = {2704},
+  author = {Anthony D. Blaom and Franz Kiraly and Thibaut Lienart and Yiannis Simillides and Diego Arenas and Sebastian J. Vollmer},
+  title = {MLJ: A Julia package for composable machine learning},
+  journal = {Journal of Open Source Software}
 }
 ```

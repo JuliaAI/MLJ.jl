@@ -4,8 +4,8 @@
 
 <h2 align="center">A Machine Learning Framework for Julia
 <p align="center">
-  <a href="https://travis-ci.com/alan-turing-institute/MLJ.jl">
-    <img src="https://travis-ci.com/alan-turing-institute/MLJ.jl.svg?branch=master"
+  <a href="https://github.com/alan-turing-institute/MLJ.jl/actions">
+    <img src="https://github.com/alan-turing-institute/MLJ.jl/workflows/CI/badge.svg"
          alt="Build Status">
   </a>
   <a href="https://slackinvite.julialang.org/">
@@ -25,13 +25,14 @@
   <img src="https://mybinder.org/badge_logo.svg"
        alt="Binder">
   </a>
-  <a href="https://arxiv.org/abs/2007.12285">
-    <img src="https://img.shields.io/badge/cite-arXiv-blue"
-       alt="Cite MLJ">
+  <a href="https://doi.org/10.21105/joss.02704">
+    <img src="https://joss.theoj.org/papers/10.21105/joss.02704/status.svg"
+       alt="DOI">
   </a>
 
 </p>
 </h2>
+
 
 **New to MLJ? Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/)**. 
 
@@ -45,7 +46,7 @@ ecosystem, whose organization is described further below.
 
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
-tuning, evaluating, composing and comparing machine over [150 machine
+tuning, evaluating, composing and comparing over [150 machine
 learning
 models](https://alan-turing-institute.github.io/MLJ.jl/dev/list_of_supported_models/)
 written in Julia and other languages.  MLJ is released under the MIT
@@ -152,40 +153,21 @@ For more on package management, see https://julialang.github.io/Pkg.jl/v1/ .
 
 ### Citing MLJ
 
-<!-- <a href="https://doi.org/10.5281/zenodo.3541506"> -->
-<!--   <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3541506.svg" -->
-<!--        alt="Cite MLJ"> -->
-<!-- </a> -->
 
-<a href="https://arxiv.org/abs/2007.12285">
-  <img src="https://img.shields.io/badge/cite-arXiv-blue"
-       alt="Cite MLJ">
-</a>
-
-<!-- ```bibtex -->
-<!-- @software{anthony_blaom_2019_3541506, -->
-<!--   author       = {Anthony Blaom and -->
-<!--                   Franz Kiraly and -->
-<!--                   Thibaut Lienart and -->
-<!--                   Sebastian Vollmer}, -->
-<!--   title        = {alan-turing-institute/MLJ.jl: v0.5.3}, -->
-<!--   month        = nov, -->
-<!--   year         = 2019, -->
-<!--   publisher    = {Zenodo}, -->
-<!--   version      = {v0.5.3}, -->
-<!--   doi          = {10.5281/zenodo.3541506}, -->
-<!--   url          = {https://doi.org/10.5281/zenodo.3541506} -->
-<!-- } -->
-<!-- ``` -->
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.02704/status.svg)](https://doi.org/10.21105/joss.02704)
 
 ```bibtex
-@misc{blaom2020mlj,
-    title={MLJ: A Julia package for composable machine learning},
-    author={Anthony D. Blaom and Franz Kiraly and Thibaut Lienart and Yiannis Simillides and Diego Arenas and Sebastian J. Vollmer},
-    year={2020},
-    eprint={2007.12285},
-    archivePrefix={arXiv},
-    primaryClass={cs.LG}
+@article{Blaom2020,
+  doi = {10.21105/joss.02704},
+  url = {https://doi.org/10.21105/joss.02704},
+  year = {2020},
+  publisher = {The Open Journal},
+  volume = {5},
+  number = {55},
+  pages = {2704},
+  author = {Anthony D. Blaom and Franz Kiraly and Thibaut Lienart and Yiannis Simillides and Diego Arenas and Sebastian J. Vollmer},
+  title = {MLJ: A Julia package for composable machine learning},
+  journal = {Journal of Open Source Software}
 }
 ```
 
