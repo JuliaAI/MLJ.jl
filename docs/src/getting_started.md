@@ -252,7 +252,7 @@ object (see the `scitype` examples below).
 
 The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
 `OrderedFactor{N}` and `Count`. Be sure you read [Scalar
-scientific types](@ref) below to be guarantee your scalar data is interpreted
+scientific types](@ref) below to guarantee your scalar data is interpreted
 correctly. Tools exist to coerce the data to have the appropriate
 scientfic type; see
 [MLJScientificTypes.jl](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/)
