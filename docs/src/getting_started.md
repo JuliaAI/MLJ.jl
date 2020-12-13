@@ -314,7 +314,7 @@ _.nrows = 2
 ```
 
 The matrix is *not* copied, only wrapped.  To manifest a table as a
-matrix, use [`MLJ.matrix`](@ref)`. 
+matrix, use [`MLJ.matrix`](@ref). 
 
 
 ### Inputs
