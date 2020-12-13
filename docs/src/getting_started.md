@@ -46,10 +46,10 @@ models(matching(X,y))
 In MLJ a *model* is a struct storing the hyperparameters of the
 learning algorithm indicated by the struct name (and nothing else).
 
-Assuming the DecisionTree.jl package is in your load path, we can use
-`@load` to load the code defining the `DecisionTreeClassifier` model
-type. This macro also returns an instance, with default
-hyperparameters.
+Assuming the MLJDecisionTreeInterface.jl package is in your load path
+(see [Installation](@ref)) we can use `@load` to load the code
+defining the `DecisionTreeClassifier` model type. This macro also
+returns an instance, with default hyperparameters.
 
 ```@repl doda
 tree_model = @load DecisionTreeClassifier
@@ -252,7 +252,7 @@ object (see the `scitype` examples below).
 
 The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
 `OrderedFactor{N}` and `Count`. Be sure you read [Scalar
-scientific types](@ref) below to be guarantee your scalar data is interpreted
+scientific types](@ref) below to guarantee your scalar data is interpreted
 correctly. Tools exist to coerce the data to have the appropriate
 scientfic type; see
 [MLJScientificTypes.jl](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/)
@@ -314,7 +314,7 @@ _.nrows = 2
 ```
 
 The matrix is *not* copied, only wrapped.  To manifest a table as a
-matrix, use [`MLJ.matrix`](@ref)`. 
+matrix, use [`MLJ.matrix`](@ref). 
 
 
 ### Inputs
