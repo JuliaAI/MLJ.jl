@@ -224,18 +224,21 @@ julia> Pkg.test("MLJ")
 ```
        
 It is important to note that MLJ is essentially a big wrapper
-providing a unified access to _model providing packages_ and so you
-will also need to make sure these packages are available in your
-environment.  For instance, if you want to use a **Decision Tree
-Classifier**, you need to have
-[DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl)
+providing a unified access to _model providing packages_. For this
+reason, one generally needs to add further packages to your
+environment to make model-specific code available. For instance, if
+you want to use a **Decision Tree Classifier**, you need to have
+[MLJDecisionTreeInterface.jl](https://github.com/bensadeghi/DecisionTree.jl)
 installed:
 
 ```julia
-julia> Pkg.add("DecisionTree");
+julia> Pkg.add("MLJDecisionTreeInterface");
 julia> using MLJ;
 julia> @load DecisionTreeClassifier
 ```
+
+However, if you try to use `@load` without adding the required package to your
+environment, an error message will tell you what package needs adding.
 
 For a list of models and their packages run
 
