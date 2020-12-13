@@ -46,10 +46,10 @@ models(matching(X,y))
 In MLJ a *model* is a struct storing the hyperparameters of the
 learning algorithm indicated by the struct name (and nothing else).
 
-Assuming the DecisionTree.jl package is in your load path, we can use
-`@load` to load the code defining the `DecisionTreeClassifier` model
-type. This macro also returns an instance, with default
-hyperparameters.
+Assuming the MLJDecisionTreeInterface.jl package is in your load path
+(see [Installation](@ref)) we can use `@load` to load the code
+defining the `DecisionTreeClassifier` model type. This macro also
+returns an instance, with default hyperparameters.
 
 ```@repl doda
 tree_model = @load DecisionTreeClassifier
