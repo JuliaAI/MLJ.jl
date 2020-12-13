@@ -49,12 +49,12 @@ DecisionTreeClassifier(
     post_prune = false,
     merge_purity_threshold = 1.0,
     pdf_smoothing = 0.0,
-    display_depth = 5) @899</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model&#39;s performance can be evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
+    display_depth = 5) @296</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment.</p><p>Once loaded, a model&#39;s performance can be evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree_model, X, y,
                 resampling=CV(shuffle=true), measure=cross_entropy, verbosity=0)
 ┌───────────────────────┬───────────────┬───────────────────────────────────────
 │ _.measure             │ _.measurement │ _.per_fold                           ⋯
 ├───────────────────────┼───────────────┼───────────────────────────────────────
-│ LogLoss{Float64} @503 │ 1.92          │ [2.22e-16, 2.22e-16, 1.44, 2.88, 4.3 ⋯
+│ LogLoss{Float64} @939 │ 1.92          │ [2.22e-16, 2.22e-16, 1.44, 2.88, 4.3 ⋯
 └───────────────────────┴───────────────┴───────────────────────────────────────
                                                                 1 column omitted
 _.per_observation = [[[2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16], [36.0, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16]]]
@@ -69,13 +69,13 @@ AbstractArray{Multiclass{3},1}</code></pre><p>and <code>Multiclass{3} &lt;: Fini
 
 julia&gt; scitype(yint)
 AbstractArray{Count,1}</code></pre><p>and using <code>yint</code> in place of <code>y</code> in classification problems will fail. See also <a href="../working_with_categorical_data/#Working-with-Categorical-Data-1">Working with Categorical Data</a>.</p><p>For more on scientific types, see <a href="#Data-containers-and-scientific-types-1">Data containers and scientific types</a> below. </p><h2 id="Fit-and-predict-1"><a class="docs-heading-anchor" href="#Fit-and-predict-1">Fit and predict</a><a class="docs-heading-anchor-permalink" href="#Fit-and-predict-1" title="Permalink"></a></h2><p>To illustrate MLJ&#39;s fit and predict interface, let&#39;s perform our performance evaluations by hand, but using a simple holdout set, instead of cross-validation.</p><p>Wrapping the model in data creates a <em>machine</em> which will store training outcomes:</p><pre><code class="language-julia-repl">julia&gt; tree = machine(tree_model, X, y)
-Machine{DecisionTreeClassifier} @241 trained 0 times.
+Machine{DecisionTreeClassifier} @293 trained 0 times.
   args:
-    1:	Source @114 ⏎ `Table{AbstractArray{Continuous,1}}`
-    2:	Source @936 ⏎ `AbstractArray{Multiclass{3},1}`</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
+    1:	Source @545 ⏎ `Table{AbstractArray{Continuous,1}}`
+    2:	Source @762 ⏎ `AbstractArray{Multiclass{3},1}`</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
 
 julia&gt; fit!(tree, rows=train);
-[ Info: Training Machine{DecisionTreeClassifier} @241.
+[ Info: Training Machine{DecisionTreeClassifier} @293.
 
 julia&gt; yhat = predict(tree, X[test,:]);
 
@@ -124,18 +124,18 @@ julia&gt; pdf(yhat[3:5], L)
  4
 
 julia&gt; stand_model = UnivariateStandardizer()
-UnivariateStandardizer() @290
+UnivariateStandardizer() @549
 
 julia&gt; stand = machine(stand_model, v)
-Machine{UnivariateStandardizer} @359 trained 0 times.
+Machine{UnivariateStandardizer} @280 trained 0 times.
   args:
-    1:	Source @577 ⏎ `AbstractArray{Count,1}`
+    1:	Source @734 ⏎ `AbstractArray{Count,1}`
 
 julia&gt; fit!(stand)
-[ Info: Training Machine{UnivariateStandardizer} @359.
-Machine{UnivariateStandardizer} @359 trained 1 time.
+[ Info: Training Machine{UnivariateStandardizer} @280.
+Machine{UnivariateStandardizer} @280 trained 1 time.
   args:
-    1:	Source @577 ⏎ `AbstractArray{Count,1}`
+    1:	Source @734 ⏎ `AbstractArray{Count,1}`
 
 julia&gt; w = transform(stand, v)
 4-element Array{Float64,1}:
@@ -155,8 +155,8 @@ julia&gt; inverse_transform(stand, w)
 ┌───────────────────────┬───────────────┬────────────┐
 │ _.measure             │ _.measurement │ _.per_fold │
 ├───────────────────────┼───────────────┼────────────┤
-│ LogLoss{Float64} @503 │ 1.6           │ [1.6]      │
-│ BrierScore @186       │ -0.0889       │ [-0.0889]  │
+│ LogLoss{Float64} @939 │ 1.6           │ [1.6]      │
+│ BrierScore @005       │ -0.0889       │ [-0.0889]  │
 └───────────────────────┴───────────────┴────────────┘
 _.per_observation = [[[2.22e-16, 2.22e-16, ..., 2.22e-16]], [[0.0, 0.0, ..., 0.0]]]
 _.fitted_params_per_fold = [ … ]
@@ -169,8 +169,8 @@ julia&gt; evaluate!(tree, resampling=Holdout(fraction_train=0.7, shuffle=true),
 ┌───────────────────────┬───────────────┬────────────┐
 │ _.measure             │ _.measurement │ _.per_fold │
 ├───────────────────────┼───────────────┼────────────┤
-│ LogLoss{Float64} @503 │ 1.64          │ [1.64]     │
-│ BrierScore @186       │ -0.118        │ [-0.118]   │
+│ LogLoss{Float64} @939 │ 1.64          │ [1.64]     │
+│ BrierScore @005       │ -0.118        │ [-0.118]   │
 └───────────────────────┴───────────────┴────────────┘
 _.per_observation = [[[2.22e-16, 2.22e-16, ..., 2.22e-16]], [[0.0, 0.0, ..., 0.0]]]
 _.fitted_params_per_fold = [ … ]
@@ -210,7 +210,7 @@ schema(matrix_table)</code></pre><pre><code class="language-none">┌───�
 │ x3      │ Float64 │ Continuous │
 └─────────┴─────────┴────────────┘
 _.nrows = 2
-</code></pre><p>The matrix is <em>not</em> copied, only wrapped.  To manifest a table as a matrix, use <a href="../adding_models_for_general_use/#MLJModelInterface.matrix"><code>MLJ.matrix</code></a>`. </p><h3 id="Inputs-1"><a class="docs-heading-anchor" href="#Inputs-1">Inputs</a><a class="docs-heading-anchor-permalink" href="#Inputs-1" title="Permalink"></a></h3><p>Since an MLJ model only specifies the scientific type of data, if that type is <code>Table</code> - which is the case for the majority of MLJ models - then any <a href="https://github.com/JuliaData/Tables.jl">Tables.jl</a> format is permitted. </p><p>Specifically, the requirement for an arbitrary model&#39;s input is <code>scitype(X) &lt;: input_scitype(model)</code>.</p><h3 id="Targets-1"><a class="docs-heading-anchor" href="#Targets-1">Targets</a><a class="docs-heading-anchor-permalink" href="#Targets-1" title="Permalink"></a></h3><p>The target <code>y</code> expected by MLJ models is generally an <code>AbstractVector</code>. A multivariate target <code>y</code> will generally be a table.</p><p>Specifically, the type requirement for a model target is <code>scitype(y) &lt;: target_scitype(model)</code>.</p><h3 id="Querying-a-model-for-acceptable-data-types-1"><a class="docs-heading-anchor" href="#Querying-a-model-for-acceptable-data-types-1">Querying a model for acceptable data types</a><a class="docs-heading-anchor-permalink" href="#Querying-a-model-for-acceptable-data-types-1" title="Permalink"></a></h3><p>Given a model instance, one can inspect the admissible scientific types of its input and target, and without loading the code defining the model;</p><pre><code class="language-julia-repl">julia&gt; i = info(&quot;DecisionTreeClassifier&quot;)
+</code></pre><p>The matrix is <em>not</em> copied, only wrapped.  To manifest a table as a matrix, use <a href="../adding_models_for_general_use/#MLJModelInterface.matrix"><code>MLJ.matrix</code></a>. </p><h3 id="Inputs-1"><a class="docs-heading-anchor" href="#Inputs-1">Inputs</a><a class="docs-heading-anchor-permalink" href="#Inputs-1" title="Permalink"></a></h3><p>Since an MLJ model only specifies the scientific type of data, if that type is <code>Table</code> - which is the case for the majority of MLJ models - then any <a href="https://github.com/JuliaData/Tables.jl">Tables.jl</a> format is permitted. </p><p>Specifically, the requirement for an arbitrary model&#39;s input is <code>scitype(X) &lt;: input_scitype(model)</code>.</p><h3 id="Targets-1"><a class="docs-heading-anchor" href="#Targets-1">Targets</a><a class="docs-heading-anchor-permalink" href="#Targets-1" title="Permalink"></a></h3><p>The target <code>y</code> expected by MLJ models is generally an <code>AbstractVector</code>. A multivariate target <code>y</code> will generally be a table.</p><p>Specifically, the type requirement for a model target is <code>scitype(y) &lt;: target_scitype(model)</code>.</p><h3 id="Querying-a-model-for-acceptable-data-types-1"><a class="docs-heading-anchor" href="#Querying-a-model-for-acceptable-data-types-1">Querying a model for acceptable data types</a><a class="docs-heading-anchor-permalink" href="#Querying-a-model-for-acceptable-data-types-1" title="Permalink"></a></h3><p>Given a model instance, one can inspect the admissible scientific types of its input and target, and without loading the code defining the model;</p><pre><code class="language-julia-repl">julia&gt; i = info(&quot;DecisionTreeClassifier&quot;)
 CART decision tree classifier.
 → based on [DecisionTree](https://github.com/bensadeghi/DecisionTree.jl).
 → do `@load DecisionTreeClassifier pkg=&quot;DecisionTree&quot;` to use the model.
@@ -281,4 +281,4 @@ julia&gt; XY
 julia&gt; Z
 2-element Array{Float64,1}:
  10.0
- 20.0</code></pre></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Introduction</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 13 December 2020 04:02">Sunday 13 December 2020</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 20.0</code></pre></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Introduction</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 13 December 2020 04:05">Sunday 13 December 2020</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
