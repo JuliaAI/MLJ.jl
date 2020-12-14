@@ -1,12 +1,12 @@
-# Third Party Packages 
+# Third Party Packages
 
-A list of third party packages with integration with MLJ. 
+A list of third party packages with integration with MLJ.
 
 Last updated December 2020.
 
-Please post an issue at
-https://github.com/alan-turing-institute/MLJ.jl/issues is you known a
-package that should be added to this list.
+Pull requests to update this list are very welcome. Otherwise, you may
+post an issue requesting this
+[here](https://github.com/alan-turing-institute/MLJ.jl/issues).
 
 ## Packages providing models in the MLJ model registry
 
@@ -38,8 +38,3 @@ package that should be added to this list.
 - [Shapley.jl](https://gitlab.com/ExpandingMan/Shapley.jl) (feature ranking / interpretation)
 - [ShapML.jl](https://github.com/nredell/ShapML.jl) (feature ranking / interpretation)
 - [Fairness.jl](https://github.com/ashryaagr/Fairness.jl) (FAIRness metrics)
-
-
-  
-
-            
