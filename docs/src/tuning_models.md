@@ -186,11 +186,11 @@ the Audze-Eglais function, using the library
 Let's instatiate the tuning strategy:
 
 ```@repl goof
-latin = LatinHypercube(nGenerations=2, popSize= 120, n_max=25)
+latin = LatinHypercube(gens=2, popsize=120, n_max=25)
 ```
 
-Here `nGenerations` is the number of generations to run the
-optimisation for and `popSize` is the population size in the genetic
+Here `gens` is the number of generations to run the
+optimisation for and `popsize` is the population size in the genetic
 algorithm. Pay attention that these parameters have nothing to do with
 the iteration parameter `n` in the `TunedModel` construction. They are
 used by
