@@ -166,7 +166,7 @@ For more on package management, see https://julialang.github.io/Pkg.jl/v1/ .
   number = {55},
   pages = {2704},
   author = {Anthony D. Blaom and Franz Kiraly and Thibaut Lienart and Yiannis Simillides and Diego Arenas and Sebastian J. Vollmer},
-  title = {MLJ: A Julia package for composable machine learning},
+  title = {{MLJ}: A Julia package for composable machine learning},
   journal = {Journal of Open Source Software}
 }
 ```
