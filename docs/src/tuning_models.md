@@ -14,7 +14,8 @@ optimal model, one just calls `predict(mach, Xnew)`. In this way the
 wrapped model may be viewed as a "self-tuning" version of the
 unwrapped model.
 
-## Tuning a single hyperparameter using a grid search
+
+## Tuning a single hyperparameter using a grid search (Regression)
 
 ```@repl goof
 using MLJ
@@ -172,6 +173,119 @@ plot(self_tuning_forest)
 The prior distributions used for sampling each hyperparameter can be
 customized, as can the global fallbacks. See the
 [`RandomSearch`](@ref) doc-string below for details.
+
+
+## Tuning a single hyperparameter using a grid search (Classification)
+
+```@repl goof
+using MLJ, DataFrames
+X,y = @load_iris;
+X = DataFrame(MLJ.table(X));
+knn = @load KNNClassifier;
+```
+
+Let's tune `K` in the model above, using a grid-search. To do so we will use the simplest `range` object, a
+one-dimensional range object constructed using the `range` method:
+
+```@repl goof
+K_range = range(knn, :K, lower=5, upper=20);
+self_tuning_knn = TunedModel(model=knn,
+                             resampling = CV(nfolds=4),
+                             tuning = Grid(resolution=5),
+                             range = K_range,
+                             measure=misclassification_rate,
+                             check_measure=false);
+                             
+self_tuning_knn_machine = machine(self_tuning_knn, X, y)
+```
+
+We can create a train/test partition to evaluate fit the crossvalidation procedure  and then evaluate the best model
+found during crossvalidation.
+
+```@repl goof
+using Random
+Random.seed!(123)
+train_ind, test_ind = partition(1:length(y), 0.7, shuffle=true)
+fit!(self_tuning_knn_machine, rows=train_ind, verbosity=0)
+```
+The best average results achieved by the best model using crossvaludation can be found in `.best_history_entry`
+
+```@repl goof
+report(m_self_tuning_knn).best_history_entry
+```
+
+The test results of the best model fitted during crossvaludation are
+```@repl goof
+yhat_test = predict_mode(self_tuning_knn_machine, rows=test_ind);
+misclassification_rate(yhat_test, y[test_ind])
+```
+
+### TunnedModel with custom loss/score function
+
+Users might want to select models according to a different loss or score function during Cross Validation.
+This can be achieved using the `measure` attribute in the `TunedModel`.
+
+Let us assume we have a custom function `custom_accuracy` defined as follows:
+
+```@repl goof
+custom_accuracy(y,yhat) = mean(y .== yhat)
+```
+
+First we need to tell MLJ if the function is a loss or a score.
+If the function is a score, the higher the better. If the function is a loss, the lower the better.
+In this case we want our function to be treated as a score, therefore we need to set
+
+```@repl goof
+MLJ.orientation(custom_accuracy) = :score
+```
+
+Note that our `custom_accuracy` is meant to work given a pair of vectors of the same type. 
+Since the `KNNClassifier` outputs vectors contain `UnivariateFinite` elements we need to convert them to classes in order to 
+use our `custom_accuracy`. This is done with `predict_mode` and we can pass this function as `operation` in a `TunedModel`.
+
+
+```@repl goof
+
+m_knn = machine(knn, X, y)
+self_tuning_knn = TunedModel(model=knn,
+                             resampling = CV(nfolds=4),
+                             tuning = Grid(resolution=5),
+                             range = K_range,
+                             measure = custom_accuracy,
+                             operation = predict_mode);
+
+m_self_tuning_knn = machine(self_tuning_knn, X, y)
+fit!(m_self_tuning_knn, rows=train_ind, verbosity=0)
+```
+
+Now we can inspect that the measure of the tunned model was `custom_accuracy` and the model selected as best
+was the one with highest accuracy.
+
+```@repl goof
+report(m_self_tuning_knn).best_history_entry
+```
+
+The objective of this section is to showcase how to use a `TunedModel` with a user provied `measure`. Nevertheless, the previous work done with our `custom_accuracy` function could be done directly using the `accuracy` provided by MLJ. MLJ already knows this is a score function. Therefore there is no need to set `MLJ.orientation(accuracy) = :score` we could do the same process as follows:
+
+```@repl goof
+m_knn = machine(knn, X, y)
+
+self_tuning_knn = TunedModel(model=knn,
+                             resampling = CV(nfolds=4),
+                             tuning = Grid(resolution=5),
+                             range = K_range,
+                             measure = accuracy,
+                             operation=predict_mode);
+
+m_self_tuning_knn = machine(self_tuning_knn, X, y)
+fit!(m_self_tuning_knn, rows=train_ind, verbosity=0)
+```
+
+
+
+
+
+
 
 
 ## API
