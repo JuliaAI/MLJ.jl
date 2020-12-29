@@ -194,13 +194,13 @@ self_tuning_knn = TunedModel(model=knn,
                              tuning = Grid(resolution=5),
                              range = K_range,
                              measure=misclassification_rate,
+                             operation=predict_mode,
                              check_measure=false);
                              
 self_tuning_knn_machine = machine(self_tuning_knn, X, y)
 ```
 
-We can create a train/test partition to evaluate fit the crossvalidation procedure  and then evaluate the best model
-found during crossvalidation.
+We can create a train/test partition to evaluate fit the crossvalidation procedure  and then evaluate the best model found during crossvalidation.
 
 ```@repl goof
 using Random
@@ -211,7 +211,7 @@ fit!(self_tuning_knn_machine, rows=train_ind, verbosity=0)
 The best average results achieved by the best model using crossvaludation can be found in `.best_history_entry`
 
 ```@repl goof
-report(m_self_tuning_knn).best_history_entry
+report(self_tuning_knn).best_history_entry
 ```
 
 The test results of the best model fitted during crossvaludation are
@@ -219,6 +219,7 @@ The test results of the best model fitted during crossvaludation are
 yhat_test = predict_mode(self_tuning_knn_machine, rows=test_ind);
 misclassification_rate(yhat_test, y[test_ind])
 ```
+Note that 0.0381`
 
 ### TunnedModel with custom loss/score function
 
