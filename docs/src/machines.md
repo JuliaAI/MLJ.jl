@@ -1,15 +1,18 @@
 # Machines
 
-Under the hood, calling `fit!` on a machine calls either `MLJBase.fit`
-or `MLJBase.update`, depending on the machine's internal state (as
-recorded in private fields `old_model` and
-`old_rows`). These lower-level `fit` and `update` methods, which
-are not ordinarily called directly by the user, dispatch on the model
-and a view of the data defined by the optional `rows` keyword argument
-of `fit!` (all rows by default). In this way, if a model `update`
-method has been implemented for the model, calls to `fit!` can avoid
-redundant calculations for certain kinds of model mutations (eg,
-increasing the number of epochs in a neural network).
+Recall from [Getting Started](@ref) that a machine binds a model
+(i.e., a choice of algorithm + hyperparameters) to data (see more at
+[Constructing machines](@ref) below). A machine is also the object
+storing *learned* parameters.  Under the hood, calling `fit!` on a
+machine calls either `MLJBase.fit` or `MLJBase.update`, depending on
+the machine's internal state (as recorded in private fields
+`old_model` and `old_rows`). These lower-level `fit` and `update`
+methods, which are not ordinarily called directly by the user,
+dispatch on the model and a view of the data defined by the optional
+`rows` keyword argument of `fit!` (all rows by default). In this way,
+if a model `update` method has been implemented for the model, calls
+to `fit!` can avoid redundant calculations for certain kinds of model
+mutations (eg, increasing the number of epochs in a neural network).
 
 ```@example machines
 using MLJ; color_off() # hide
