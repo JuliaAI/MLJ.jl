@@ -301,7 +301,8 @@ MMI.is_pure_julia(::Type{<:SomeSupervisedModel}) = false
 MMI.package_license(::Type{<:SomeSupervisedModel}) = "unknown"
 ```
 
-If `SomeSupervisedModel` supports sample weights, then instead of the `fit` above, one implements
+If `SomeSupervisedModel` supports sample weights or class weights,
+then instead of the `fit` above, one implements
 
 ```julia
 MMI.fit(model::SomeSupervisedModel, verbosity, X, y, w=nothing) -> fitresult, cache, report
@@ -318,6 +319,19 @@ Additionally, if `SomeSupervisedModel` supports sample weights, one must declare
 
 ```julia
 MMI.supports_weights(model::Type{<:SomeSupervisedModel}) = true
+```
+
+Optionally, an implemenation may add a data front-end, for
+transforming user data (such as a table) into some model-specific
+format (such as a matrix), and for adding methods to specify how said
+format is resampled. (This alters the meaning of `X`, `y` and `w` in
+the signatures of `fit`, `update`, `predict`, etc; see [Implementing a
+data front-end](@ref) for details). This can provide the MLJ user
+certain performance advantages when fitting a machine.
+
+```julia
+    MLJModelInterface.reformat(model::SomeSupervisedModel, args...) = args
+    MLJModelInterface.selectrows(model::SomeSupervisedModel, I, data...) = data
 ```
 
 Optionally, to customized support for serialization of machines (see
@@ -409,7 +423,14 @@ MMI.fit(model::SomeSupervisedModel, verbosity, X, y) -> fitresult, cache, report
 
 It is not necessary for `fit` to provide type or dimension checks on
 `X` or `y` or to call `clean!` on the model; MLJ will carry out such
-checks.
+checks. 
+
+The types of `X` and `y` are constrained by the `input_scitype` and
+`target_scitype` trait declarations; see [Trait declarations](@ref)
+below. (That is, unless a data front-end is implemented, in which case
+these traits refer instead to the arguments of the overloaded
+`reformat` method, and the types of `X` and `y` are determined by the
+output of `reformat`.)
 
 The method `fit` should never alter hyperparameter values, the sole
 exception being fields of type `<:AbstractRNG`. If the package is able
@@ -843,7 +864,7 @@ additional information required (for example, pre-processed versions
 of `X` and `y`), as this is also passed as an argument to the `update`
 method.
 
-### Implementing a data-front
+### Implementing a data front-end
 
 ```julia
     MLJModelInterface.reformat(model, args...) -> data
@@ -859,8 +880,10 @@ transformation).
 
 The `selectrows(::Model, I, data...)` method is overloaded to specify
 how the model-specific data is to be subsampled, for some observation
-indices `I`. In this way, implementing a data front-end also allow
-more efficient resampling of data (in user calls to `evaluate!`).
+indices `I` (a colon, `:`, or instance of
+`AbstractVector{<:Integer}`). In this way, implementing a data
+front-end also allow more efficient resampling of data (in user calls
+to `evaluate!`).
 
 Here "user-supplied data" is what the MLJ user supplies when
 constructing a machine, as in `machine(models, args...)`, which

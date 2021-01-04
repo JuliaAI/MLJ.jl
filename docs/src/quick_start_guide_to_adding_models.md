@@ -32,6 +32,11 @@ still handle this; you just need to define a non-tabular
 clarify the appropriate declaration. The discussion below assumes
 input data is tabular.
 
+For simplicity, this document assumes no data front-end is to be
+defined for your model. Adding a data front-end, which offers the MLJ
+user some performances benefits, is easy to add post-facto, and is
+described in [Implementing a data front-end](@ref).
+
 ### Overview
 
 To write an interface create a file or a module in your package which
