@@ -176,27 +176,29 @@ customized, as can the global fallbacks. See the
 [`RandomSearch`](@ref) doc-string below for details.
 
 
-## Tuning using latin hypercube sampling
+## Tuning using Latin hypercube sampling
 
-One can also tune the hyperparameters using `LatinHypercube`. This
-method instantiates a grid-based hyperparameter tuning strategy by
-using a genetic based optimization algorithm based on the inverse of
-the Audze-Eglais function, using the library
+One can also tune the hyperparameters using the `LatinHypercube`
+tuning stragegy.  This method uses a genetic based optimization
+algorithm based on the inverse of the Audze-Eglais function, using the
+library
 [`LatinHypercubeSampling.jl`](https://github.com/MrUrq/LatinHypercubeSampling.jl).
-Let's instatiate the tuning strategy:
+
+We'll work with the data `X`, `y` and ranges `r1` and `r2` defined
+above and instatiate a Latin hypercube resampling strategy:
 
 ```@repl goof
-latin = LatinHypercube(gens=2, popsize=120, n_max=25)
+latin = LatinHypercube(gens=2, popsize=120)
 ```
 
-Here `gens` is the number of generations to run the
-optimisation for and `popsize` is the population size in the genetic
-algorithm. Pay attention that these parameters have nothing to do with
-the iteration parameter `n` in the `TunedModel` construction. They are
-used by
+Here `gens` is the number of generations to run the optimisation for
+and `popsize` is the population size in the genetic algorithm. For
+more on these and other `LatinHypercube` parameters, refer to the
 [LatinHypercubeSampling.jl](https://github.com/MrUrq/LatinHypercubeSampling.jl)
-to instantiate the genetic algorithm that creates the grid of
-hyperparameters on which to evaluate the models.
+documentation. Pay attention that `gens` and `popsize` are not to be
+confused with the iteration parameter `n` in the construction of a
+corresponding `TunedModel` instance, which specifies the total number
+of models to be evaluated, independent of the tuning strategy.
 
 ```@repl goof
 self_tuning_forest_model = TunedModel(model=forest_model,
