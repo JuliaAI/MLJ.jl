@@ -209,10 +209,13 @@ self_tuning_forest_model = TunedModel(model=forest_model,
                                       n=25);
 self_tuning_forest = machine(self_tuning_forest_model, X, y);
 fit!(self_tuning_forest, verbosity=0)
+```
 
+```julia
 using Plots
 plot(self_tuning_forest)
 ```
+![](img/latin_hypercube_tuning_plot.png)
 
 
 ## API

@@ -34,7 +34,7 @@
 </h2>
 
 
-**New to MLJ? Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/)**. 
+**New to MLJ? Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/)**.  
 
 **Wanting to integrate an existing machine learning model into the MLJ
 framework? Start
