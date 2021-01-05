@@ -2,7 +2,7 @@
 
 !!! note
 
-    Models implementing the MLJ model interface according to the instructions given here should import MLJModelInterface version 0.3.5 or higher. This is enforced with a statement such as `MLJModelInterface = "^0.3.5" ` under `[compat]` in the Project.toml file of the package containing the implementation.
+    Models implementing the MLJ model interface according to the instructions given here should import MLJModelInterface version 0.3.7 or higher. This is enforced with a statement such as `MLJModelInterface = "^0.3.7" ` under `[compat]` in the Project.toml file of the package containing the implementation.
 
 This guide outlines the specification of the MLJ model interface
 and provides detailed guidelines for implementing the interface for
