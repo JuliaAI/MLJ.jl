@@ -228,5 +228,5 @@ Distributions.fit(::Type{D}, ::MLJBase.NumericRange) where D<:Distributions.Dist
 MLJTuning.TunedModel
 MLJTuning.Grid
 MLJTuning.RandomSearch
-MLJTuning.LatinCube
+MLJTuning.LatinHypercube
 ```
