@@ -1,9 +1,11 @@
 # Tuning models
 
-Below we illustrate tuning model hyperparameters by grid and random
-searches. For a complete list of available and planned tuning
-strategies, see the [MLJTuning
-page](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here)
+Below we illustrate hyperparameter optimisation using the
+[`Grid`](@ref), [`RandomSearch`](@ref) and [`LatinHypercube`](@ref)
+tuning strategies.  Also available is the [tree
+Parzen](https://github.com/IQVIA-ML/TreeParzen.jl) strategy; for a
+complete list, see
+[here](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here).
 
 In MLJ tuning is implemented as a model wrapper. After wrapping a
 model in a tuning strategy and binding the wrapped model to data in a
@@ -174,6 +176,48 @@ customized, as can the global fallbacks. See the
 [`RandomSearch`](@ref) doc-string below for details.
 
 
+## Tuning using Latin hypercube sampling
+
+One can also tune the hyperparameters using the `LatinHypercube`
+tuning stragegy.  This method uses a genetic based optimization
+algorithm based on the inverse of the Audze-Eglais function, using the
+library
+[`LatinHypercubeSampling.jl`](https://github.com/MrUrq/LatinHypercubeSampling.jl).
+
+We'll work with the data `X`, `y` and ranges `r1` and `r2` defined
+above and instatiate a Latin hypercube resampling strategy:
+
+```@repl goof
+latin = LatinHypercube(gens=2, popsize=120)
+```
+
+Here `gens` is the number of generations to run the optimisation for
+and `popsize` is the population size in the genetic algorithm. For
+more on these and other `LatinHypercube` parameters, refer to the
+[LatinHypercubeSampling.jl](https://github.com/MrUrq/LatinHypercubeSampling.jl)
+documentation. Pay attention that `gens` and `popsize` are not to be
+confused with the iteration parameter `n` in the construction of a
+corresponding `TunedModel` instance, which specifies the total number
+of models to be evaluated, independent of the tuning strategy.
+
+```@repl goof
+self_tuning_forest_model = TunedModel(model=forest_model,
+                                      tuning=latin,
+                                      resampling=CV(nfolds=6),
+                                      range=[r1, r2],
+                                      measure=rms,
+                                      n=25);
+self_tuning_forest = machine(self_tuning_forest_model, X, y);
+fit!(self_tuning_forest, verbosity=0)
+```
+
+```julia
+using Plots
+plot(self_tuning_forest)
+```
+![](img/latin_hypercube_tuning_plot.png)
+
+
 ## API
 
 ```@docs
@@ -184,4 +228,5 @@ Distributions.fit(::Type{D}, ::MLJBase.NumericRange) where D<:Distributions.Dist
 MLJTuning.TunedModel
 MLJTuning.Grid
 MLJTuning.RandomSearch
+MLJTuning.LatinHypercube
 ```
