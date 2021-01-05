@@ -10,7 +10,8 @@ A Machine Learning Framework for Julia
   <a href="common_mlj_workflows">Workflows</a>  &nbsp;|&nbsp;
   <a href="https://alan-turing-institute.github.io/DataScienceTutorials.jl/">Tutorials</a>       &nbsp;|&nbsp;
   <a href="https://github.com/alan-turing-institute/MLJ.jl/">For Developers</a> &nbsp;|&nbsp;
-  <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">Live Demo</a>
+  <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">Live Demo</a> &nbsp;|&nbsp;
+  <a href="third_party_packages">3rd Party Packages</a>  
 </div>
 ```
 
@@ -309,7 +310,7 @@ paper:
   number = {55},
   pages = {2704},
   author = {Anthony D. Blaom and Franz Kiraly and Thibaut Lienart and Yiannis Simillides and Diego Arenas and Sebastian J. Vollmer},
-  title = {MLJ: A Julia package for composable machine learning},
+  title = {{MLJ}: A Julia package for composable machine learning},
   journal = {Journal of Open Source Software}
 }
 ```
