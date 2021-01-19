@@ -72,8 +72,17 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 
 -   **†** Add more tuning
 	strategies. [HyperOpt.jl](https://github.com/baggepinnen/Hyperopt.jl)
-	integration? Particular focus on ~~random search  ([#37](https://github.com/alan-turing-institute/MLJ.jl/issues/37))~~ (done), Bayesian methods (starting with Gaussian Process methods, a la PyMC3) and a POC for AD-powered gradient descent. See
-	[here](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here) for complete wish-list. [#74](https://github.com/alan-turing-institute/MLJ.jl/issues/74) [#38](https://github.com/alan-turing-institute/MLJ.jl/issues/38) [#37](https://github.com/alan-turing-institute/MLJ.jl/issues/37)
+	integration? Particular focus on ~~random search
+	([#37](https://github.com/alan-turing-institute/MLJ.jl/issues/37))~~
+	(done), Bayesian methods (starting with Gaussian Process methods,
+	a la PyMC3) and a POC for AD-powered gradient descent. See
+	[here](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here)
+	for complete
+	wish-list. [#74](https://github.com/alan-turing-institute/MLJ.jl/issues/74)
+	[#38](https://github.com/alan-turing-institute/MLJ.jl/issues/38)
+	[#37](https://github.com/alan-turing-institute/MLJ.jl/issues/37). Add
+	tuning strategies for non-Cartesian spaces of models [MLJTuning
+	#18](https://github.com/alan-turing-institute/MLJTuning.jl/issues/18)
 
 -   Systematic benchmarking, probably modeled on
 	[MLaut](https://arxiv.org/abs/1901.03678) [#69](https://github.com/alan-turing-institute/MLJ.jl/issues/74)
@@ -82,12 +91,11 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	(boosting, etc) and migrate to separate repository?
 	[#363](https://github.com/alan-turing-institute/MLJ.jl/issues/363)
 
--   **†** Enhance complex model compostition, in introduce a canned
-	stacking model
-	([POC](https://alan-turing-institute.github.io/DataScienceTutorials.jl/getting-started/stacking/))
-	Get rid of macros for creating pipelines and possibly implement
-	target transforms as wrapper [MLJBase
-	#594](https://github.com/alan-turing-institute/MLJ.jl/issues/594)
+-   **†** Enhance complex model compostition: Introduce a canned
+	stacking model wrapper
+	([POC](https://alan-turing-institute.github.io/DataScienceTutorials.jl/getting-started/stacking/)). Get rid of macros for creating pipelines and possibly implement
+	target transforms as wrapper ([MLJBase
+	#594](https://github.com/alan-turing-institute/MLJ.jl/issues/594))
 
 
 ### Broadening scope
