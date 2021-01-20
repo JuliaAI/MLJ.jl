@@ -1,7 +1,7 @@
 name = "MLJ"
 uuid = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 authors = ["Anthony D. Blaom <anthony.blaom@gmail.com>"]
-version = "0.15.1"
+version = "0.15.2"
 
 [deps]
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
