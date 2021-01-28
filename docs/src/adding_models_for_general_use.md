@@ -866,6 +866,10 @@ method.
 
 ### Implementing a data front-end
 
+!!! note
+
+    It is suggested that packages implementing MLJ's model API, that later implement a data front-end, should tag their changes in a breaking release. (The changes will not break use of models for the ordinary MLJ user, who interacts with models exlusively through the machine interface. However, it will break usage for some external packages that have chosen to depend directly on the model API.)
+
 ```julia
     MLJModelInterface.reformat(model, args...) -> data
     MLJModelInterface.selectrows(::Model, I, data...) -> sampled_data
