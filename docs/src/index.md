@@ -55,12 +55,12 @@ using MLJ
 X, y = @load_reduced_ames;
 ```
 
-Load and instantiate a gradient tree-boosting model:
+Load and instantiate a gradient tree-boosting model type:
 
 ```julia
-booster = @load EvoTreeRegressor
-booster.max_depth = 2
-booster.nrounds=50
+Booster = @load EvoTreeRegressor 
+Booster = booster(max_depth=2) # specify hyperparamter at construction
+booster.nrounds=50             # or mutate post facto
 ```
 
 Combine the model with categorical feature encoding:
@@ -227,28 +227,18 @@ julia> Pkg.test("MLJ")
 It is important to note that MLJ is essentially a big wrapper
 providing a unified access to _model providing packages_. For this
 reason, one generally needs to add further packages to your
-environment to make model-specific code available. For instance, if
-you want to use a **Decision Tree Classifier**, you need to have
-[MLJDecisionTreeInterface.jl](https://github.com/bensadeghi/DecisionTree.jl)
-installed:
+environment to make model-specific code available. This
+happens automatically when you use MLJ's interactive load command
+`@iload`, as in
 
 ```julia
-julia> Pkg.add("MLJDecisionTreeInterface");
-julia> using MLJ;
-julia> @load DecisionTreeClassifier
+julia> Tree = @iload DecisionTreeClassifier # load type
+julis> tree = Tree() # instantiate
 ```
 
-However, if you try to use `@load` without adding the required package to your
-environment, an error message will tell you what package needs adding.
-
-For a list of models and their packages run
-
-```julia
-using MLJ
-models()
-```
-
-or refer to [List of Supported Models](@ref model_list)
+For more on identifying the name of an applicable model, see [`Model
+Search`](@ref). For non-interactive loading of code (e.g., from a
+module or function) see [`Loading Model Code`](@ref).
 
 It is recommended that you start with models marked as coming from mature
 packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.
