@@ -13,12 +13,13 @@ U = scitype(FeatureSelector())
 # M = scitype(rms)
 # @test_broken M().prediction_type == :deterministic
 
-for handle in localmodels()
-    name = Symbol(handle.name)
-    eval(quote
-         scitype(($name)())
-         end)
-end
+@test scitype(OneHotEncoder()) ==
+    MLJ.UnsupervisedScitype{Table,Table}
+
+@test scitype(ConstantRegressor()) ==
+    MLJ.SupervisedScitype{Table,
+                          AbstractVector{Continuous},
+                          :probabilistic}
 
 end
 true
