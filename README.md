@@ -117,7 +117,7 @@ appropriate version, activate your MLJ environment and run
 
 ```julia
   using Pkg;
-  Pkg.develop(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))
+  Pkg.add(PackageSpec(url="https://github.com/tlienart/OpenSpecFun_jll.jl"))
 ```
 
 #### Serialization for composite models with component models with custom serialization
