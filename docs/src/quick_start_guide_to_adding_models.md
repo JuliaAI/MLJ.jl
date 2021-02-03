@@ -344,16 +344,17 @@ MLJModelInterface.metadata_pkg.(ALL_MODELS
 
 # Then for each model,
 MLJModelInterface.metadata_model(YourModel1,
-    input   = MLJModelInterface.Table(MLJModelInterface.Continuous),  # what input data is supported?
-    target  = AbstractVector{MLJModelInterface.Continuous},           # for a supervised model, what target?
-    output  = MLJModelInterface.Table(MLJModelInterface.Continuous),  # for an unsupervised, what output?
-    weights = false,                                                  # does the model support sample weights?
+    input_scitype   = MLJModelInterface.Table(MLJModelInterface.Continuous),  # what input data is supported?
+    target_scitype  = AbstractVector{MLJModelInterface.Continuous},           # for a supervised model, what target?
+    output_scitype  = MLJModelInterface.Table(MLJModelInterface.Continuous),  # for an unsupervised, what output?
+    supports_weights = false,                                                  # does the model support sample weights?
     descr   = "A short description of your model"
-	path    = "YourPackage.SubModuleContainingModelStructDefinition.YourModel1"
+	load_path    = "YourPackage.SubModuleContainingModelStructDefinition.YourModel1"
     )
 ```
 
-*Important.* Do not omit the `path` specification. 
+*Important.* Do not omit the `load_path` specification. Without a
+correct `load_path` MLJ will be unable to import your model.
 
 **Examples**:
 
@@ -370,8 +371,4 @@ MLJModelInterface.metadata_model(YourModel1,
 
 See [here](https://github.com/alan-turing-institute/MLJModels.jl/tree/master#instructions-for-updating-the-mlj-model-registry).
 
-### Does it work?
-
-1. In new julia environment add `MLJ` and `YourPackage`
-1. run `using MLJModels; @load YourModel pkg=YourPackage`
 

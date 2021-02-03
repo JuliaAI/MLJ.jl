@@ -16,7 +16,8 @@ mutations (eg, increasing the number of epochs in a neural network).
 
 ```@example machines
 using MLJ; color_off() # hide
-forest = EnsembleModel(atom=(@load DecisionTreeClassifier), n=10);
+tree = (@load DecisionTreeClassifier verbosity=0)()
+forest = EnsembleModel(atom=tree, n=10);
 X, y = @load_iris;
 mach = machine(forest, X, y)
 fit!(mach, verbosity=2);
@@ -70,7 +71,7 @@ training-related outcomes are inspected with `report(mach)`.
 
 ```@example machines
 X, y = @load_iris
-pca = @load PCA
+pca = (@load PCA verbosity=0)()
 mach = machine(pca, X)
 fit!(mach)
 ```
@@ -114,6 +115,18 @@ A machine is reconstructed from a file using the syntax
 `machine("my_machine.jlso")`, or `machine("my_machine.jlso", args...)`
 if retraining using new data. See [Saving machines](@ref) below.
 
+
+## Lowering memory demands
+
+For large data sets you may be able to save memory by suppressing data
+caching that some models perform to increase speed. To do this,
+specify `cache=false`, as in
+
+```julia
+machine(model, X, y, cache=false)
+```
+
+
 ### Constructing machines in learning networks
 
 Instead of data `X`, `y`, etc,  the `machine` constructor is provided
@@ -129,7 +142,7 @@ machines](@ref).
 To save a machine to file, use the `MLJ.save` command:
 
 ```julia
-tree = @load DecisionTreeClassifier
+tree = (@load DecisionTreeClassifier verbosity=0)()
 mach = fit!(machine(tree, X, y))
 MLJ.save("my_machine.jlso", mach)
 ```
