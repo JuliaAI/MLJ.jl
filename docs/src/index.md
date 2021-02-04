@@ -11,7 +11,7 @@ A Machine Learning Framework for Julia
   <a href="https://alan-turing-institute.github.io/DataScienceTutorials.jl/">Tutorials</a>       &nbsp;|&nbsp;
   <a href="https://github.com/alan-turing-institute/MLJ.jl/">For Developers</a> &nbsp;|&nbsp;
   <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">Live Demo</a> &nbsp;|&nbsp;
-  <a href="third_party_packages">3rd Party Packages</a>  
+  <a href="third_party_packages">3rd Party Packages</a>
 </div>
 ```
 
@@ -44,7 +44,6 @@ Julia installation instructions are
 using Pkg
 Pkg.activate("MLJ_tour", shared=true)
 Pkg.add("MLJ")
-Pkg.add("MLJModels")
 Pkg.add("EvoTrees")
 ```
 
@@ -58,8 +57,8 @@ X, y = @load_reduced_ames;
 Load and instantiate a gradient tree-boosting model type:
 
 ```julia
-Booster = @load EvoTreeRegressor 
-Booster = booster(max_depth=2) # specify hyperparamter at construction
+Booster = @load EvoTreeRegressor
+booster = Booster(max_depth=2) # specify hyperparamter at construction
 booster.nrounds=50             # or mutate post facto
 ```
 
@@ -178,11 +177,11 @@ do not exist in MLJ:
 - Hyper-parameters and/or learned parameters of component models are
   not easily inspected or manipulated (by tuning algorithms, for
   example)
-  
+
 - Composite models cannot implement multiple opertations, for example,
   both a `predict` and `transform` method (as in clustering models) or
   both a `transform` and `inverse_transform` method.
-  
+
 Some of these features are demonstrated in [this
 notebook](https://github.com/ablaom/MachineLearningInJulia2020/blob/master/wow.ipynb)
 
@@ -223,7 +222,7 @@ julia> Pkg.add("MLJ")
 ```julia
 julia> Pkg.test("MLJ")
 ```
-       
+
 It is important to note that MLJ is essentially a big wrapper
 providing a unified access to _model providing packages_. For this
 reason, one generally needs to add further packages to your
@@ -236,9 +235,9 @@ julia> Tree = @iload DecisionTreeClassifier # load type
 julis> tree = Tree() # instantiate
 ```
 
-For more on identifying the name of an applicable model, see [`Model
-Search`](@ref). For non-interactive loading of code (e.g., from a
-module or function) see [`Loading Model Code`](@ref).
+For more on identifying the name of an applicable model, see [Model
+Search](@ref). For non-interactive loading of code (e.g., from a
+module or function) see [Loading Model Code](@ref).
 
 It is recommended that you start with models marked as coming from mature
 packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.

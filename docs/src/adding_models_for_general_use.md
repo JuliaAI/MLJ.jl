@@ -330,8 +330,8 @@ data front-end](@ref) for details). This can provide the MLJ user
 certain performance advantages when fitting a machine.
 
 ```julia
-    MLJModelInterface.reformat(model::SomeSupervisedModel, args...) = args
-    MLJModelInterface.selectrows(model::SomeSupervisedModel, I, data...) = data
+MLJModelInterface.reformat(model::SomeSupervisedModel, args...) = args
+MLJModelInterface.selectrows(model::SomeSupervisedModel, I, data...) = data
 ```
 
 Optionally, to customized support for serialization of machines (see
@@ -871,8 +871,8 @@ method.
     It is suggested that packages implementing MLJ's model API, that later implement a data front-end, should tag their changes in a breaking release. (The changes will not break use of models for the ordinary MLJ user, who interacts with models exlusively through the machine interface. However, it will break usage for some external packages that have chosen to depend directly on the model API.)
 
 ```julia
-    MLJModelInterface.reformat(model, args...) -> data
-    MLJModelInterface.selectrows(::Model, I, data...) -> sampled_data
+MLJModelInterface.reformat(model, args...) -> data
+MLJModelInterface.selectrows(::Model, I, data...) -> sampled_data
 ```
 
 Models optionally overload `reformat` to define transformations of

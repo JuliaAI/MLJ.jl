@@ -26,7 +26,6 @@ curve = MLJ.learning_curve(mach;
                            resampling=CV(nfolds=3),
                            measure=MeanAbsoluteError())
 ```
-
 ```julia
 using Plots
 plot(curve.parameter_values,
@@ -57,6 +56,8 @@ curves = MLJ.learning_curve(mach;
                              verbosity=0,
                              rng_name=:rng,
                              rngs=4)
+```
+```julia
 plot(curves.parameter_values,
      curves.measurements,
      xlab=curves.parameter_name,

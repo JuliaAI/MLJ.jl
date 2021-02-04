@@ -84,7 +84,7 @@ info("RidgeRegressor", pkg="MultivariateStats") # a model type in multiple packa
 
 ## Instantiating a model
 
-*Reference:*   [Getting Started](index.md)
+*Reference:*   [Getting Started](@ref), [Loading Model Code](@ref)
 
 ```@example workflows
 Tree = @load DecisionTreeClassifier
@@ -425,7 +425,7 @@ pipe2 = @pipeline(X -> coerce(X, :age=>Continuous),
 X, y = @load_iris
 Tree = @load DecisionTreeClassifier
 tree = Tree()
-forest = EnsembleModel(atom=tree_model, bagging_fraction=0.8, n=300)
+forest = EnsembleModel(atom=tree, bagging_fraction=0.8, n=300)
 mach = machine(forest, X, y)
 evaluate!(mach, measure=LogLoss())
 ```

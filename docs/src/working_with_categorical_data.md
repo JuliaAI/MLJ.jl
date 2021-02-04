@@ -174,8 +174,14 @@ mach = machine(model, X) |> fit!
 # one-hot encode new data with missing classes:
 xproduction = coerce(["white", "white"], Multiclass)
 Xproduction = DataFrame(x=xproduction)
-Xproduction == X[2:3,:] # true
-transform(mach, Xproduction) == transform(mach, X[2:3,:])
+Xproduction == X[2:3,:]
+```
+
+So far, so good. But the following operation throws an error:
+
+```julia
+julia> transform(mach, Xproduction) == transform(mach, X[2:3,:])
+ERROR: Found category level mismatch in feature `x`. Consider using `levels!` to ensure fitted and transforming features have the same category levels.
 ```
 
 The problem here is that `levels(X.x)` and `levels(Xproduction.x)` are different:

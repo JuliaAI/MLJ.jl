@@ -14,12 +14,9 @@ composition use-cases, which are described first below.
 
 A description of the general framework begins at [Learning
 Networks](@ref). For an in-depth high-level description of learning
-networks, refer to the article linked below.
-
-<a href="https://arxiv.org/abs/2012.15505">
-  <img src="https://img.shields.io/badge/cite-arXiv-blue"
-     alt="Anthony D. Blaom and Sebastian J. Voller (2020): Flexible model composition in machine learning and its implementation in MLJ Preprint, arXiv:2012.15505">
-</a>
+networks, refer to [Anthony D. Blaom and Sebastian J. Voller (2020): Flexible model
+composition in machine learning and its implementation in MLJ.
+Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505).
 
 
 ## Linear pipelines
@@ -138,7 +135,7 @@ networks, which have been described more abstractly in the article
 [Anthony D. Blaom and Sebastian J. Voller (2020): Flexible model
 composition in machine learning and its implementation in MLJ.
 Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505).
-
+w
 Hand-crafting a learning network, as outlined below, is a relatively
 advanced MLJ feature, assuming familiarity with the basics outlined in
 [Getting Started](index.md). The syntax for building a learning
@@ -333,6 +330,7 @@ this way, the code
 ```@example 7
 fit!(mach)
 predict(mach, X[test,:]);
+nothing # hide
 ```
 
 is equivalent to
@@ -340,6 +338,7 @@ is equivalent to
 ```@example 7
 fit!(yhat)
 yhat(X[test,:]);
+nothing # hide
 ```
 
 While it's main purpose is for export (see below), this machine can
@@ -554,7 +553,7 @@ my_composite = MyComposite(kmeans, nothing, 0.5)
 ```@example 7
 evaluate(my_composite, X, y, measure=MeanAbsoluteError(), verbosity=0)
 ```
-    
+
 ## Static operations on nodes
 
 Continuing to view nodes as "dynamic data", we can, in addition to

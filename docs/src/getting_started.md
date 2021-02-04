@@ -47,8 +47,8 @@ In MLJ a *model* is a struct storing the hyperparameters of the
 learning algorithm indicated by the struct name (and nothing else).
 
 Assuming the MLJDecisionTreeInterface.jl package is in your load path
-(see [Installation](@ref)) we can use `@load` to import the 
-`DecisionTreeClassifier` model type, which we will be bind to `Tree`:
+(see [Installation](@ref)) we can use `@load` to import the
+`DecisionTreeClassifier` model type, which we will bind to `Tree`:
 
 ```@repl doda
 Tree = @load DecisionTreeClassifier
@@ -64,9 +64,9 @@ tree = Tree()
 machine learning algorithms for use in MLJ are not MLJ
 dependencies. If such a package is not in your load path you will
 receive an error explaining how to add the package to your current
-environment. Alternatively, you can use the interactive version of
-`@iload`. For more on importing model types, see [`Loading Model
-Code`](@ref).
+environment. Alternatively, you can use the interactive macro
+`@iload`. For more on importing model types, see [Loading Model
+Code](@ref).
 
 Once instantiated, a model's performance can be evaluated with the
 `evaluate` method:
@@ -126,7 +126,7 @@ and using `yint` in place of `y` in classification problems will
 fail. See also [Working with Categorical Data](@ref).
 
 For more on scientific types, see [Data containers and scientific
-types](@ref) below. 
+types](@ref) below.
 
 
 ## Fit and predict
@@ -153,8 +153,7 @@ log_loss(yhat, y[test]) |> mean
 ```
 
 Here `log_loss` (and `cross_entropy`) is an alias for `LogLoss()` or,
-more precisely, a built-in instance of the `LogLoss` type. Another
-instance is `LogLoss(tol=0.0001)`. For a list of all losses and
+more precisely, a built-in instance of the `LogLoss` type. For a list of all losses and
 scores, and their aliases, run `measures()`.
 
 Notice that `yhat` is a vector of `Distribution` objects (because
@@ -189,10 +188,10 @@ and may optionally implement an `inverse_transform` method:
 ```@repl doda
 v = [1, 2, 3, 4]
 stand = UnivariateStandardizer() # this type is built-in
-mach = machine(stand, v)
-fit!(mach)
-w = transform(mach, v)
-inverse_transform(mach, w)
+mach2 = machine(stand, v)
+fit!(mach2)
+w = transform(mach2, v)
+inverse_transform(mach2, w)
 ```
 
 [Machines](machines.md) have an internal state which allows them to
@@ -205,7 +204,7 @@ as explained in [Composing Models](composing_models.md).
 There is a version of `evaluate` for machines as well as models. This
 time we'll add a second performance measure. (An exclamation point is
 added to the method name because machines are generally mutated when
-trained):
+trained.)
 
 ```@repl doda
 evaluate!(mach, resampling=Holdout(fraction_train=0.7, shuffle=true),
@@ -215,7 +214,7 @@ evaluate!(mach, resampling=Holdout(fraction_train=0.7, shuffle=true),
 Changing a hyperparameter and re-evaluating:
 
 ```@repl doda
-tree_model.max_depth = 3
+tree.max_depth = 3
 evaluate!(mach, resampling=Holdout(fraction_train=0.7, shuffle=true),
           measures=[cross_entropy, brier_score],
           verbosity=0)
@@ -229,8 +228,8 @@ Julia](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
 or try the [JuliaCon2020
 Workshop](https://github.com/ablaom/MachineLearningInJulia2020) on MLJ
 (recorded
-[here](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title)) 
-returning to the manual as needed. 
+[here](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title))
+returning to the manual as needed.
 
 *Read at least the remainder of this page before considering serious
 use of MLJ.*
@@ -327,7 +326,7 @@ _.nrows = 2
 ```
 
 The matrix is *not* copied, only wrapped.  To manifest a table as a
-matrix, use [`MLJ.matrix`](@ref). 
+matrix, use [`MLJ.matrix`](@ref).
 
 
 ### Inputs
@@ -335,7 +334,7 @@ matrix, use [`MLJ.matrix`](@ref).
 Since an MLJ model only specifies the scientific type of data, if that
 type is `Table` - which is the case for the majority of MLJ models -
 then any [Tables.jl](https://github.com/JuliaData/Tables.jl) format is
-permitted. 
+permitted.
 
 Specifically, the requirement for an arbitrary model's input is `scitype(X)
 <: input_scitype(model)`.
@@ -365,7 +364,7 @@ i.input_scitype
 i.target_scitype
 ```
 
-But see also [Model Search](@ref). 
+But see also [Model Search](@ref).
 
 ### Scalar scientific types
 
@@ -388,7 +387,7 @@ are the key features of that convention:
 - In particular, *integers* (including `Bool`s) *cannot be used to
   represent categorical data.* Use the preceding `coerce` operations
   to coerce to a `Finite` scitype.
-  
+
 - The scientific types of `nothing` and `missing` are `Nothing` and
   `Missing`, native types we also regard as scientific.
 

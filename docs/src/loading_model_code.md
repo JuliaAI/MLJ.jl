@@ -1,9 +1,9 @@
-# Loading model code
+# Loading Model Code
 
 Once the name of a model, and the package providing that model, have
-been identified (see [`Model Search`](@ref)) one can either import the
+been identified (see [Model Search](@ref)) one can either import the
 model type interactively with `@iload`, as shown under
-[`Installation`](@ref), or use `@load` as shown below. The `@load`
+[Installation](@ref), or use `@load` as shown below. The `@load`
 macro works from within a module, a package or a function, provided
 the relevant package providing the MLJ interface has been added to
 your package environment. 
@@ -64,3 +64,10 @@ julia> tree = Tree()
 dropped, as only one package provides a model called
 `DecisionTreeClassifier`.
 
+## API
+
+```@docs
+load_path
+@load
+@iload
+```
