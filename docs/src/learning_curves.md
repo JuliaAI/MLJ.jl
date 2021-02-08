@@ -12,18 +12,21 @@ instantiating a machine. You can choose to supply all available data,
 as performance estimates are computed using a resampling strategy,
 defaulting to `Holdout(fraction_train=0.7)`.
 
-```julia
+```@example hooking
+using MLJ
 X, y = @load_boston;
 
-atom = @load RidgeRegressor pkg=MultivariateStats
+atom = (@load RidgeRegressor pkg=MLJLinearModels)()
 ensemble = EnsembleModel(atom=atom, n=1000)
 mach = machine(ensemble, X, y)
 
-r_lambda = range(ensemble, :(atom.lambda), lower=10, upper=500, scale=:log10)
+r_lambda = range(ensemble, :(atom.lambda), lower=1e-1, upper=100, scale=:log10)
 curve = MLJ.learning_curve(mach;
                            range=r_lambda,
                            resampling=CV(nfolds=3),
-                           measure=mav)
+                           measure=MeanAbsoluteError())
+```
+```julia
 using Plots
 plot(curve.parameter_values,
      curve.measurements,
@@ -44,14 +47,17 @@ generator, `rng_name`, and specify the random number generators to be
 used using `rngs=...` (an integer automatically generates the number
 specified):
 
-```julia
-atom.lambda=200
+```@example hooking
+atom.lambda= 7.3
 r_n = range(ensemble, :n, lower=1, upper=50)
 curves = MLJ.learning_curve(mach;
                              range=r_n,
+                             measure=MeanAbsoluteError(),
                              verbosity=0,
                              rng_name=:rng,
                              rngs=4)
+```
+```julia
 plot(curves.parameter_values,
      curves.measurements,
      xlab=curves.parameter_name,

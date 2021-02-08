@@ -8,9 +8,6 @@ export MLJ_VERSION
 # ensembles.jl:
 export EnsembleModel
 
-# model_matching.jl:
-export matching
-
 
 ## METHOD RE-EXPORT
 
@@ -157,12 +154,12 @@ export Grid, RandomSearch, Explicit, TunedModel, LatinHypercube,
     learning_curve!, learning_curve
 
 # re-export from MLJModels:
-export models, localmodels, @load, @loadcode, load, info,
+export models, localmodels, @load, @iload, load, info,
     ConstantRegressor, ConstantClassifier,     # builtins/Constant.jl
     FeatureSelector, UnivariateStandardizer,   # builtins/Transformers.jl
     Standardizer, UnivariateBoxCoxTransformer,
     OneHotEncoder, ContinuousEncoder, UnivariateDiscretizer,
-    FillImputer
+    FillImputer, matching
 
 # re-export from ComputaionalResources:
 export CPU1, CPUProcesses, CPUThreads
@@ -205,7 +202,6 @@ const srcdir = dirname(@__FILE__)
 
 include("version.jl")       # defines MLJ_VERSION constant
 include("ensembles.jl")     # homogeneous ensembles
-include("model_matching.jl")# inferring model search criterion from data
 include("scitypes.jl")      # extensions to ScientificTypes.scitype
 
 end # module

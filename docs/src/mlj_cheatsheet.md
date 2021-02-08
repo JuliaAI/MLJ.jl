@@ -33,12 +33,14 @@ models() do model
 end
 ```
 
-`tree = @load DecisionTreeClassifier` to load code and instantiate "DecisionTreeClassifier" model
+`Tree = @load DecisionTreeClassifier` imports "DecisionTreeClassifier" type and binds it to `Tree`
+`tree = Tree()` to instantiate a `Tree`. 
 
-`tree2  = DecisionTreeClassifier(max_depth=2)` instantiates a model type already in scope
+`tree2  = Tree(max_depth=2)` instantiates a tree with different hyperparameter
 
-`ridge = @load RidgeRegressor pkg=MultivariateStats` loads and
-instantiates a model provided by multiple packages
+`Ridge = @load RidgeRegressor pkg=MultivariateStats` imports a type for a model provided by multiple packages
+
+For interactive loading instead use `@iload`
 
 
 ## Scitypes and coercion

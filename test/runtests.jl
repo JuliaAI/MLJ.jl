@@ -17,10 +17,6 @@ end
 #    @test include("ensembles.jl")
 # end
 
-@testset "matching models to data" begin
-    @test include("model_matching.jl")
-end
-
 @testset "scitypes" begin
     @test include("scitypes.jl")
 end

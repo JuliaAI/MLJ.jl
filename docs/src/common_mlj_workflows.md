@@ -84,19 +84,19 @@ info("RidgeRegressor", pkg="MultivariateStats") # a model type in multiple packa
 
 ## Instantiating a model
 
-*Reference:*   [Getting Started](index.md)
+*Reference:*   [Getting Started](@ref), [Loading Model Code](@ref)
 
 ```@example workflows
-@load DecisionTreeClassifier
-model = DecisionTreeClassifier(min_samples_split=5, max_depth=4)
+Tree = @load DecisionTreeClassifier
+tree = Tree(min_samples_split=5, max_depth=4)
 ```
 
 or
 
 ```@julia
-model = @load DecisionTreeClassifier
-model.min_samples_split = 5
-model.max_depth = 4
+tree = (@load DecisionTreeClassifier)()
+tree.min_samples_split = 5
+tree.max_depth = 4
 ```
 
 ## Evaluating a model
@@ -106,9 +106,15 @@ model.max_depth = 4
 
 ```@example workflows
 X, y = @load_boston
-model = @load KNNRegressor
-evaluate(model, X, y, resampling=CV(nfolds=5), measure=[rms, mav])
+KNN = @load KNNRegressor
+knn = KNN()
+evaluate(knn, X, y, resampling=CV(nfolds=5), measure=[RootMeanSquaredError(), MeanAbsoluteError()])
 ```
+
+Note `RootMeanSquaredError()` has alias `rms` and `MeanAbsoluteError()` has alias `mae`.
+
+Do `measures()` to list all losses and scores and their aliases.
+
 
 ##  Basic fit/evaluate/predict by hand:
 
@@ -124,15 +130,15 @@ first(vaso, 3)
 ```@example workflows
 y, X = unpack(vaso, ==(:Y), c -> true; :Y => Multiclass)
 
-tree_model = @load DecisionTreeClassifier
-tree_model.max_depth=2; nothing # hide
+Tree = @load DecisionTreeClassifier
+tree = Tree(max_depth=2) # hide
 ```
 
 Bind the model and data together in a *machine* , which will
 additionally store the learned parameters (*fitresults*) when fit:
 
 ```@example workflows
-tree = machine(tree_model, X, y)
+mach = machine(tree, X, y)
 ```
 
 Split row indices into training and evaluation rows:
@@ -144,49 +150,49 @@ train, test = partition(eachindex(y), 0.7, shuffle=true, rng=1234); # 70:30 spli
 Fit on train and evaluate on test:
 
 ```@example workflows
-fit!(tree, rows=train)
-yhat = predict(tree, X[test,:])
-mean(cross_entropy(yhat, y[test]))
+fit!(mach, rows=train)
+yhat = predict(mach, X[test,:])
+mean(LogLoss(tol=1e-4)(yhat, y[test]))
 ```
+
+Note `LogLoss()` has aliases `log_loss` and `cross_entropy`.
+
+Run `measures()` to list all losses and scores and their aliases ("instances").
 
 Predict on new data:
 
 ```@example workflows
 Xnew = (Volume=3*rand(3), Rate=3*rand(3))
-predict(tree, Xnew)      # a vector of distributions
+predict(mach, Xnew)      # a vector of distributions
 ```
 
 ```@example workflows
-predict_mode(tree, Xnew) # a vector of point-predictions
+predict_mode(mach, Xnew) # a vector of point-predictions
 ```
 
 ## More performance evaluation examples
 
-```@example workflows
-import LossFunctions.ZeroOneLoss
-```
-
 Evaluating model + data directly:
 
 ```@example workflows
-evaluate(tree_model, X, y,
+evaluate(tree, X, y,
          resampling=Holdout(fraction_train=0.7, shuffle=true, rng=1234),
-         measure=[cross_entropy, ZeroOneLoss()])
+         measure=[LogLoss(), ZeroOneLoss()])
 ```
 
 If a machine is already defined, as above:
 
 ```@example workflows
-evaluate!(tree,
+evaluate!(mach,
           resampling=Holdout(fraction_train=0.7, shuffle=true, rng=1234),
-          measure=[cross_entropy, ZeroOneLoss()])
+          measure=[LogLoss(), ZeroOneLoss()])
 ```
 
 Using cross-validation:
 
 ```@example workflows
-evaluate!(tree, resampling=CV(nfolds=5, shuffle=true, rng=1234),
-          measure=[cross_entropy, ZeroOneLoss()])
+evaluate!(mach, resampling=CV(nfolds=5, shuffle=true, rng=1234),
+          measure=[LogLoss(), ZeroOneLoss()])
 ```
 
 With user-specified train/test pairs of row indices:
@@ -194,18 +200,18 @@ With user-specified train/test pairs of row indices:
 ```@example workflows
 f1, f2, f3 = 1:13, 14:26, 27:36
 pairs = [(f1, vcat(f2, f3)), (f2, vcat(f3, f1)), (f3, vcat(f1, f2))];
-evaluate!(tree,
+evaluate!(mach,
           resampling=pairs,
-          measure=[cross_entropy, ZeroOneLoss()])
+          measure=[LogLoss(), ZeroOneLoss()])
 ```
 
 Changing a hyperparameter and re-evaluating:
 
 ```@example workflows
-tree_model.max_depth = 3
-evaluate!(tree,
+tree.max_depth = 3
+evaluate!(mach,
           resampling=CV(nfolds=5, shuffle=true, rng=1234),
-          measure=[cross_entropy, ZeroOneLoss()])
+          measure=[LogLoss(), ZeroOneLoss()])
 ```
 
 ##  Inspecting training results
@@ -219,22 +225,22 @@ x2 = rand(100)
 X = (x1=x1, x2=x2)
 y = x1 - 2x2 + 0.1*rand(100);
 
-ols_model = @load LinearRegressor pkg=GLM
-ols =  machine(ols_model, X, y)
-fit!(ols)
+OLS = @load LinearRegressor pkg=GLM
+ols = OLS()
+mach =  machine(ols, X, y) |> fit!
 ```
 
 Get a named tuple representing the learned parameters,
 human-readable if appropriate:
 
 ```@example workflows
-fitted_params(ols)
+fitted_params(mach)
 ```
 
 Get other training-related information:
 
 ```@example workflows
-report(ols)
+report(mach)
 ```
 
 ##  Basic fit/transform for unsupervised models
@@ -249,16 +255,16 @@ train, test = partition(eachindex(y), 0.97, shuffle=true, rng=123)
 Instantiate and fit the model/machine:
 
 ```@example workflows
-@load PCA
-pca_model = PCA(maxoutdim=2)
-pca = machine(pca_model, X)
-fit!(pca, rows=train)
+PCA = @load PCA
+pca = PCA(maxoutdim=2)
+mach = machine(pca, X)
+fit!(mach, rows=train)
 ```
 
 Transform selected data bound to the machine:
 
 ```@example workflows
-transform(pca, rows=test);
+transform(mach, rows=test);
 ```
 
 Transform new data:
@@ -266,18 +272,18 @@ Transform new data:
 ```@example workflows
 Xnew = (sepal_length=rand(3), sepal_width=rand(3),
         petal_length=rand(3), petal_width=rand(3));
-transform(pca, Xnew)
+transform(mach, Xnew)
 ```
 
 ##  Inverting learned transformations
 
 ```@example workflows
 y = rand(100);
-stand_model = UnivariateStandardizer()
-stand = machine(stand_model, y)
-fit!(stand)
-z = transform(stand, y);
-@assert inverse_transform(stand, z) ≈ y # true
+stand = Standardizer()
+mach = machine(stand, y)
+fit!(mach)
+z = transform(mach, y);
+@assert inverse_transform(mach, z) ≈ y # true
 ```
 
 ## Nested hyperparameter tuning
@@ -291,40 +297,35 @@ X, y = @load_iris; nothing # hide
 Define a model with nested hyperparameters:
 
 ```@example workflows
-tree_model = @load DecisionTreeClassifier
-forest_model = EnsembleModel(atom=tree_model, n=300)
-```
-
-Inspect all hyperparameters, even nested ones (returns nested named tuple):
-
-```@example workflows
-params(forest_model)
+Tree = @load DecisionTreeClassifier
+tree = Tree()
+forest = EnsembleModel(atom=tree, n=300)
 ```
 
 Define ranges for hyperparameters to be tuned:
 
 ```@example workflows
-r1 = range(forest_model, :bagging_fraction, lower=0.5, upper=1.0, scale=:log10)
+r1 = range(forest, :bagging_fraction, lower=0.5, upper=1.0, scale=:log10)
 ```
 
 ```@example workflows
-r2 = range(forest_model, :(atom.n_subfeatures), lower=1, upper=4) # nested
+r2 = range(forest, :(atom.n_subfeatures), lower=1, upper=4) # nested
 ```
 
 Wrap the model in a tuning strategy:
 
 ```@example workflows
-tuned_forest = TunedModel(model=forest_model,
+tuned_forest = TunedModel(model=forest,
                           tuning=Grid(resolution=12),
                           resampling=CV(nfolds=6),
                           ranges=[r1, r2],
-                          measure=cross_entropy)
+                          measure=BrierScore())
 ```
 
 Bound the wrapped model to data:
 
 ```@example workflows
-tuned = machine(tuned_forest, X, y)
+mach = machine(tuned_forest, X, y)
 ```
 
 Fitting the resultant machine optimizes the hyperparameters specified
@@ -333,13 +334,13 @@ and performance `measure` (possibly a vector of measures), and
 retrains on all data bound to the machine:
 
 ```@example workflows
-fit!(tuned)
+fit!(mach)
 ```
 
 Inspecting the optimal model:
 
 ```@example workflows
-F = fitted_params(tuned)
+F = fitted_params(mach)
 ```
 
 ```@example workflows
@@ -349,14 +350,19 @@ F.best_model
 Inspecting details of tuning procedure:
 
 ```@example workflows
-report(tuned)
+r = report(mach);
+keys(r)
+```
+
+```@example workflows
+r.history[[1,end]]
 ```
 
 Visualizing these results:
 
 ```julia
 using Plots
-plot(tuned)
+plot(mach)
 ```
 
 ![](img/workflows_tuning_plot.png)
@@ -364,7 +370,7 @@ plot(tuned)
 Predicting on new data using the optimized model:
 
 ```@example workflows
-predict(tuned, Xnew)
+predict(mach, Xnew)
 ```
 
 ## Constructing a linear pipeline
@@ -376,11 +382,11 @@ transformation/inverse transformation:
 
 ```@example workflows
 X, y = @load_reduced_ames
-@load KNNRegressor
+KNN = @load KNNRegressor
 pipe = @pipeline(X -> coerce(X, :age=>Continuous),
                  OneHotEncoder,
-                 KNNRegressor(K=3),
-                 target = UnivariateStandardizer)
+                 KNN(K=3),
+                 target = Standardizer)
 ```
 
 Evaluating the pipeline (just as you would any other model):
@@ -388,7 +394,7 @@ Evaluating the pipeline (just as you would any other model):
 ```@example workflows
 pipe.knn_regressor.K = 2
 pipe.one_hot_encoder.drop_last = true
-evaluate(pipe, X, y, resampling=Holdout(), measure=rms, verbosity=2)
+evaluate(pipe, X, y, resampling=Holdout(), measure=RootMeanSquaredError(), verbosity=2)
 ```
 
 Inspecting the learned parameters in a pipeline:
@@ -403,10 +409,10 @@ Constructing a linear (unbranching) pipeline with a *static* (unlearned)
 target transformation/inverse transformation:
 
 ```@example workflows
-@load DecisionTreeRegressor
+Tree = @load DecisionTreeRegressor
 pipe2 = @pipeline(X -> coerce(X, :age=>Continuous),
                   OneHotEncoder,
-                  DecisionTreeRegressor(max_depth=4),
+                  Tree(max_depth=4),
                   target = y -> log.(y),
                   inverse = z -> exp.(z))
 ```
@@ -417,10 +423,11 @@ pipe2 = @pipeline(X -> coerce(X, :age=>Continuous),
 
 ```@example workflows
 X, y = @load_iris
-tree_model = @load DecisionTreeClassifier
-forest_model = EnsembleModel(atom=tree_model, bagging_fraction=0.8, n=300)
-forest = machine(forest_model, X, y)
-evaluate!(forest, measure=cross_entropy)
+Tree = @load DecisionTreeClassifier
+tree = Tree()
+forest = EnsembleModel(atom=tree, bagging_fraction=0.8, n=300)
+mach = machine(forest, X, y)
+evaluate!(mach, measure=LogLoss())
 ```
 
 ## Performance curves
@@ -431,13 +438,13 @@ Generate a plot of performance, as a function of some hyperparameter
 Single performance curve:
 
 ```@example workflows
-r = range(forest_model, :n, lower=1, upper=1000, scale=:log10)
-curve = learning_curve(forest,
-                            range=r,
-                            resampling=Holdout(),
-                            resolution=50,
-                            measure=cross_entropy,
-                            verbosity=0)
+r = range(forest, :n, lower=1, upper=1000, scale=:log10)
+curve = learning_curve(mach,
+                       range=r,
+                       resampling=Holdout(),
+                       resolution=50,
+                       measure=LogLoss(),
+                       verbosity=0)
 ```
 
 ```julia
@@ -450,10 +457,10 @@ plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xsca
 Multiple curves:
 
 ```@example workflows
-curve = learning_curve(forest,
+curve = learning_curve(mach,
                        range=r,
                        resampling=Holdout(),
-                       measure=cross_entropy,
+                       measure=LogLoss(),
                        resolution=50,
                        rng_name=:rng,
                        rngs=4,

@@ -1,5 +1,7 @@
 ## SUPERVISED
 
+# This implementation of scitype for models and measures is highly experimental
+
 const MST = MLJScientificTypes # only used in this file
 
 struct SupervisedScitype{input_scitype, target_scitype, prediction_type} end
