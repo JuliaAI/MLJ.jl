@@ -11,7 +11,7 @@ A Machine Learning Framework for Julia
   <a href="https://alan-turing-institute.github.io/DataScienceTutorials.jl/">Tutorials</a>       &nbsp;|&nbsp;
   <a href="https://github.com/alan-turing-institute/MLJ.jl/">For Developers</a> &nbsp;|&nbsp;
   <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">Live Demo</a> &nbsp;|&nbsp;
-  <a href="third_party_packages">3rd Party Packages</a>  
+  <a href="third_party_packages">3rd Party Packages</a>
 </div>
 ```
 
@@ -44,7 +44,6 @@ Julia installation instructions are
 using Pkg
 Pkg.activate("MLJ_tour", shared=true)
 Pkg.add("MLJ")
-Pkg.add("MLJModels")
 Pkg.add("EvoTrees")
 ```
 
@@ -55,12 +54,12 @@ using MLJ
 X, y = @load_reduced_ames;
 ```
 
-Load and instantiate a gradient tree-boosting model:
+Load and instantiate a gradient tree-boosting model type:
 
 ```julia
-booster = @load EvoTreeRegressor
-booster.max_depth = 2
-booster.nrounds=50
+Booster = @load EvoTreeRegressor
+booster = Booster(max_depth=2) # specify hyperparamter at construction
+booster.nrounds=50             # or mutate post facto
 ```
 
 Combine the model with categorical feature encoding:
@@ -178,11 +177,11 @@ do not exist in MLJ:
 - Hyper-parameters and/or learned parameters of component models are
   not easily inspected or manipulated (by tuning algorithms, for
   example)
-  
+
 - Composite models cannot implement multiple opertations, for example,
   both a `predict` and `transform` method (as in clustering models) or
   both a `transform` and `inverse_transform` method.
-  
+
 Some of these features are demonstrated in [this
 notebook](https://github.com/ablaom/MachineLearningInJulia2020/blob/master/wow.ipynb)
 
@@ -223,32 +222,22 @@ julia> Pkg.add("MLJ")
 ```julia
 julia> Pkg.test("MLJ")
 ```
-       
+
 It is important to note that MLJ is essentially a big wrapper
 providing a unified access to _model providing packages_. For this
 reason, one generally needs to add further packages to your
-environment to make model-specific code available. For instance, if
-you want to use a **Decision Tree Classifier**, you need to have
-[MLJDecisionTreeInterface.jl](https://github.com/bensadeghi/DecisionTree.jl)
-installed:
+environment to make model-specific code available. This
+happens automatically when you use MLJ's interactive load command
+`@iload`, as in
 
 ```julia
-julia> Pkg.add("MLJDecisionTreeInterface");
-julia> using MLJ;
-julia> @load DecisionTreeClassifier
+julia> Tree = @iload DecisionTreeClassifier # load type
+julis> tree = Tree() # instance
 ```
 
-However, if you try to use `@load` without adding the required package to your
-environment, an error message will tell you what package needs adding.
-
-For a list of models and their packages run
-
-```julia
-using MLJ
-models()
-```
-
-or refer to [List of Supported Models](@ref model_list)
+For more on identifying the name of an applicable model, see [Model
+Search](@ref). For non-interactive loading of code (e.g., from a
+module or function) see [Loading Model Code](@ref).
 
 It is recommended that you start with models marked as coming from mature
 packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.

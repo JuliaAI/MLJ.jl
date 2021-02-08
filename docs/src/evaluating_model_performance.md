@@ -23,7 +23,7 @@ MLJ.color_off()
 using MLJ
 X = (a=rand(12), b=rand(12), c=rand(12));
 y = X.a + 2X.b + 0.05*rand(12);
-model = @load RidgeRegressor pkg=MultivariateStats
+model = (@load RidgeRegressor pkg=MultivariateStats verbosity=0)()
 cv=CV(nfolds=3)
 evaluate(model, X, y, resampling=cv, measure=l2, verbosity=0)
 ```

@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.0'
+          - '1.1'
           - '1' # automatically expands to the latest stable 1.x release of Julia.
         os:
           - ubuntu-latest
@@ -48,6 +48,8 @@ jobs:
   docs:
     name: Documentation
     runs-on: ubuntu-latest
+    env:
+      JULIA_PKG_SERVER: ""
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1

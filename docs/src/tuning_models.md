@@ -29,7 +29,8 @@ below.
 using MLJ
 X = MLJ.table(rand(100, 10));
 y = 2X.x1 - X.x2 + 0.05*rand(100);
-tree = @load DecisionTreeRegressor verbosity=0;
+Tree = @load DecisionTreeRegressor verbosity=0;
+tree = Tree()
 ```
 
 Let's tune `min_purity_increase` in the model above, using a
@@ -123,7 +124,8 @@ info("KNNClassifier").prediction_type
 
 ```@example goof
 X, y = @load_iris 
-knn = @load KNNClassifier verbosity=0
+KNN = @load KNNClassifier verbosity=0
+knn = KNN()
 ```
 
 We'll tune the hyperparameter `K` in the model above, using a
@@ -235,7 +237,7 @@ The `forest` model below has another model, namely a
 `DecisionTreeRegressor`, as a hyperparameter:
 
 ```@example goof
-tree = DecisionTreeRegressor()
+tree = Tree() # defined above
 forest = EnsembleModel(atom=tree)
 ```
 
