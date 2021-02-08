@@ -31,7 +31,7 @@ MLJTuning = "^0.6"
 ProgressMeter = "^1.1"
 StatsBase = "^0.32,^0.33"
 Tables = "^0.2,^1.0"
-julia = "1"
+julia = "^1.1"
 
 [extras]
 NearestNeighbors = "b8a86587-4115-5ab1-83bc-aa920d37bbce"
