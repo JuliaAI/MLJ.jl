@@ -232,7 +232,7 @@ happens automatically when you use MLJ's interactive load command
 
 ```julia
 julia> Tree = @iload DecisionTreeClassifier # load type
-julis> tree = Tree() # instantiate
+julis> tree = Tree() # instance
 ```
 
 For more on identifying the name of an applicable model, see [Model

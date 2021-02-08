@@ -889,6 +889,11 @@ indices `I` (a colon, `:`, or instance of
 front-end also allow more efficient resampling of data (in user calls
 to `evaluate!`).
 
+After detailing formal requirments for implementing a data front-end,
+we give a [Sample implementation](@ref). A simple implementation
+[implementation](https://github.com/Evovest/EvoTrees.jl/blob/94b58faf3042009bd609c9a5155a2e95486c2f0e/src/MLJ.jl#L23)
+also appears in the EvoTrees.jl package.
+
 Here "user-supplied data" is what the MLJ user supplies when
 constructing a machine, as in `machine(models, args...)`, which
 coincides with the arguments expected by `fit(model, verbosity,
