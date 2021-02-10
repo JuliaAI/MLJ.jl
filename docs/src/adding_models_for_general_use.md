@@ -1269,39 +1269,26 @@ to all MLJ users:
 
 1. **Native implementations** (preferred option). The implementation
    code lives in the same package that contains the learning
-   algorithms implementing the interface. In this case, it is
-   sufficient to open an issue at
-   [MLJ](https://github.com/alan-turing-institute/MLJ.jl)
-   requesting the package to be registered with MLJ. Registering a package allows
-   the MLJ user to access its models' metadata and to selectively load them.
+   algorithms implementing the interface. An example is
+   [`EvoTrees.jl`](https://github.com/Evovest/EvoTrees.jl/blob/master/src/MLJ.jl). In
+   this case, it is sufficient to open an issue at
+   [MLJ](https://github.com/alan-turing-institute/MLJ.jl) requesting
+   the package to be registered with MLJ. Registering a package allows
+   the MLJ user to access its models' metadata and to selectively load
+   them.
 
-2. **External implementations** (short-term alternative). The model
-   implementation code is necessarily separate from the package
-   `SomePkg` defining the learning algorithm being wrapped. In this
-   case, the recommended procedure is to include the implementation
-   code at
-   [MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src)
-   via a pull-request, and test code at
-   [MLJModels/test](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/test).
-   Assuming `SomePkg` is the only package imported by the
-   implementation code, one needs to: (i) register `SomePkg` with
-   MLJ as explained above; and (ii) add a corresponding
-   `@require` line in the PR to
-   [MLJModels/src/MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src/MLJModels.jl)
-   to enable lazy-loading of that package by MLJ (following the
-   pattern of existing additions). If other packages must be imported,
-   add them to the MLJModels project file after checking they are not
-   already there. If it is really necessary, packages can be also
-   added to Project.toml for testing purposes.
+2. **Separate interface package**. Implementation code lives in a
+   separate *interface package*, which has the algorithm providing
+   package as a dependency. An example is
+   [MLJDecisionTreeInterface.jl](https://github.com/alan-turing-institute/MLJDecisionTreeInterface.jl),
+   which provides the interface for models in
+   [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl).
 
 Additionally, one needs to ensure that the implementation code defines
 the `package_name` and `load_path` model traits appropriately, so that
 `MLJ`'s `@load` macro can find the necessary code (see
 [MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src)
-for examples). The `@load` command can only be tested after
-registration. If changes are made, lodge an new issue at
-[MLJ](https://github.com/alan-turing-institute/MLJ) requesting your
-changes to be updated.
+for examples).
 
 ### How to add models to the MLJ model registry?
 
@@ -1318,4 +1305,4 @@ add a model, you need to follow these steps
 
 - An administrator will then review your implementation and work with
   you to add the model to the registry
-> 
+
