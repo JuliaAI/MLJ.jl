@@ -10,17 +10,17 @@ written in Julia can also implement the ScikitLearn.jl
 API. Meta-algorithms (systematic tuning, pipelining, etc) remain
 python wrapped code, however.
 
-While ScitkiLearn.jl provides the Julia user with access to a mature
+While ScikitLearn.jl provides the Julia user with access to a mature
 and large library of machine learning models, the scikit-learn API on
 which it is modeled, dating back to 2007, is not likely to
 evolve significantly in the future. MLJ enjoys (or will enjoy) several
 features that should make it an attractive alternative in the longer
 term:
 
-- **One language.** ScikitLearn.jl wraps python code, which in turn
+- **One language.** ScikitLearn.jl wraps Python code, which in turn
   wraps C code for performance-critical routines. A Julia machine
   learning algorithm that implements the MLJ model interface is 100%
-  Julia. Writing code in Julia is almost as fast as python and
+  Julia. Writing code in Julia is almost as fast as Python and
   well-written Julia code runs almost as fast as C. Additionally, a
   single language design provides superior interoperability. For
   example, one can implement: (i) gradient-descent tuning of
