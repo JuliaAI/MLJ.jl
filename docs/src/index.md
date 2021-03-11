@@ -235,11 +235,13 @@ julia> Tree = @iload DecisionTreeClassifier # load type
 julis> tree = Tree() # instance
 ```
 
-For more on identifying the name of an applicable model, see [Model
+where you will also be asked to choose a providing package, for more
+than one provide a `DecisionTreeClassifier` model. For more on
+identifying the name of an applicable model, see [Model
 Search](@ref). For non-interactive loading of code (e.g., from a
 module or function) see [Loading Model Code](@ref).
 
-It is recommended that you start with models marked as coming from mature
+It is recommended that you start with models from more mature
 packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.
 
 MLJ is supported by a number of satelite packages (MLJTuning,
