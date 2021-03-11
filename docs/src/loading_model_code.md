@@ -60,9 +60,9 @@ julia> Tree = MLJDecisionTreeInterface.DecisionTreeClassifier()
 julia> tree = Tree()
 ```
 
-*Tip.* The specification `pkg=DecisionTree` above can actually be
-dropped, as only one package provides a model called
-`DecisionTreeClassifier`.
+*Tip.* The specification `pkg=...` above can be dropped for the many
+models that are provided by only a single package.
+
 
 ## API
 

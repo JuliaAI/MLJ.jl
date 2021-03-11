@@ -33,7 +33,7 @@ models() do model
 end
 ```
 
-`Tree = @load DecisionTreeClassifier` imports "DecisionTreeClassifier" type and binds it to `Tree`
+`Tree = @load DecisionTreeClassifier pkg=DecisionTree` imports "DecisionTreeClassifier" type and binds it to `Tree`
 `tree = Tree()` to instantiate a `Tree`. 
 
 `tree2  = Tree(max_depth=2)` instantiates a tree with different hyperparameter
