@@ -16,7 +16,7 @@ mutations (eg, increasing the number of epochs in a neural network).
 
 ```@example machines
 using MLJ; color_off() # hide
-tree = (@load DecisionTreeClassifier verbosity=0)()
+tree = (@load DecisionTreeClassifier pkg=DecisionTree verbosity=0)()
 forest = EnsembleModel(atom=tree, n=10);
 X, y = @load_iris;
 mach = machine(forest, X, y)
@@ -142,7 +142,7 @@ machines](@ref).
 To save a machine to file, use the `MLJ.save` command:
 
 ```julia
-tree = (@load DecisionTreeClassifier verbosity=0)()
+tree = (@load DecisionTreeClassifier pkg=DecisionTree verbosity=0)()
 mach = fit!(machine(tree, X, y))
 MLJ.save("my_machine.jlso", mach)
 ```

@@ -51,10 +51,12 @@ Assuming the MLJDecisionTreeInterface.jl package is in your load path
 `DecisionTreeClassifier` model type, which we will bind to `Tree`:
 
 ```@repl doda
-Tree = @load DecisionTreeClassifier
+Tree = @load DecisionTreeClassifier pkg=DecisionTree
 ```
 
-Now we can instantiate a model with default hyperparameters:
+(In this case we need to specify `pkg=...` because multiple packages
+provide a model type with name `DecisionTreeClassifier`.) Now we can
+instantiate a model with default hyperparameters:
 
 ```@repl doda
 tree = Tree()
@@ -95,7 +97,7 @@ which refers to the way data is to be *interpreted*, as opposed to how
 it is *encoded*:
 
 ```julia
-julia> info("DecisionTreeClassifier").target_scitype
+julia> info("DecisionTreeClassifier", pkg="DecisionTree").target_scitype
 AbstractArray{<:Finite, 1}
 ```
 
@@ -355,11 +357,11 @@ types of its input and target, and without loading the code defining
 the model;
 
 ```@setup doda
-tree = @load DecisionTreeClassifier
+tree = @load DecisionTreeClassifier pkg=DecisionTree
 ```
 
 ```@repl doda
-i = info("DecisionTreeClassifier")
+i = info("DecisionTreeClassifier", pkg="DecisionTree")
 i.input_scitype
 i.target_scitype
 ```

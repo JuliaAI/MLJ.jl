@@ -87,7 +87,7 @@ info("RidgeRegressor", pkg="MultivariateStats") # a model type in multiple packa
 *Reference:*   [Getting Started](@ref), [Loading Model Code](@ref)
 
 ```@example workflows
-Tree = @load DecisionTreeClassifier
+Tree = @load DecisionTreeClassifier pkg=DecisionTree
 tree = Tree(min_samples_split=5, max_depth=4)
 ```
 
@@ -130,7 +130,7 @@ first(vaso, 3)
 ```@example workflows
 y, X = unpack(vaso, ==(:Y), c -> true; :Y => Multiclass)
 
-Tree = @load DecisionTreeClassifier
+Tree = @load DecisionTreeClassifier pkg=DecisionTree
 tree = Tree(max_depth=2) # hide
 ```
 
@@ -297,7 +297,7 @@ X, y = @load_iris; nothing # hide
 Define a model with nested hyperparameters:
 
 ```@example workflows
-Tree = @load DecisionTreeClassifier
+Tree = @load DecisionTreeClassifier pkg=DecisionTree
 tree = Tree()
 forest = EnsembleModel(atom=tree, n=300)
 ```
@@ -409,7 +409,7 @@ Constructing a linear (unbranching) pipeline with a *static* (unlearned)
 target transformation/inverse transformation:
 
 ```@example workflows
-Tree = @load DecisionTreeRegressor
+Tree = @load DecisionTreeRegressor pkg=DecisionTree
 pipe2 = @pipeline(X -> coerce(X, :age=>Continuous),
                   OneHotEncoder,
                   Tree(max_depth=4),
@@ -423,7 +423,7 @@ pipe2 = @pipeline(X -> coerce(X, :age=>Continuous),
 
 ```@example workflows
 X, y = @load_iris
-Tree = @load DecisionTreeClassifier
+Tree = @load DecisionTreeClassifier pkg=DecisionTree
 tree = Tree()
 forest = EnsembleModel(atom=tree, bagging_fraction=0.8, n=300)
 mach = machine(forest, X, y)

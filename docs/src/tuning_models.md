@@ -29,7 +29,7 @@ below.
 using MLJ
 X = MLJ.table(rand(100, 10));
 y = 2X.x1 - X.x2 + 0.05*rand(100);
-Tree = @load DecisionTreeRegressor verbosity=0;
+Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0;
 tree = Tree()
 ```
 
