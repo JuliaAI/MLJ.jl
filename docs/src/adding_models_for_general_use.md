@@ -1004,81 +1004,19 @@ encoding representations).
 
 !!! warning "Experimental"
 
-    The following API is experimental. It is subject to breaking changes during minor or major releases without warning.
+    The following API is experimental. It is subject to breaking changes during minor or major releases without warning. Models implementing this interface will not work with MLJBase versions earlier than 0.17.5.
 
 Models that fit a probability distribution to some `data` should be
-regarded as `Probablisitic <: Supervised` models with target `y=data`
-and `X` a vector of `Nothing` instances of the same length. So, for
-example, if one is fitting a `UnivariateFinite` distribution to
-`y=categorical([:yes, :no, :yes])`, then the input provided would
-be `X = [nothing, nothing, nothing] = fill(nothing, length(y))`.
+regarded as `Probablisitic <: Supervised` models with target `y = data`
+and `X = nothing`. 
 
-If `d` is the distribution fit, then `yhat = predict(fill(nothing,
-n))` returns `fill(d, n)`. Then, if `m` is a probabilistic measure
-(e.g., `m = cross_entropy`) then `m(yhat, ytest)` is defined for any
-new observations `ytest` of the same length `n`.
+The `predict` method should return a single distribution. 
 
-Here is a working implementation of a model to fit a
-`UnivariateFinite` distribution to some categorical data using
-[Laplace smoothing](https://en.wikipedia.org/wiki/Additive_smoothing)
-controlled by a hyper-parameter `alpha`:
-
-```julia
-import Distributions
-
-mutable struct UnivariateFiniteFitter <: MLJModelInterface.Probabilistic
-    alpha::Float64
-end
-UnivariateFiniteFitter(;alpha=1.0) = UnivariateFiniteFitter(alpha)
-
-function MLJModelInterface.fit(model::UnivariateFiniteFitter,
-                               verbosity, X, y)
-
-    α = model.alpha
-    N = length(y)
-    _classes = classes(y)
-    d = length(_classes)
-
-    frequency_given_class = Distributions.countmap(y)
-    prob_given_class =
-        Dict(c => (frequency_given_class[c] + α)/(N + α*d) for c in _classes)
-
-    fitresult = UnivariateFinite(prob_given_class)
-
-    report = (params=Distributions.params(fitresult),)
-    cache = nothing
-
-    verbosity > 0 && @info "Fitted a $fitresult"
-
-    return fitresult, cache, report
-end
-
-MLJModelInterface.predict(model::UnivariateFiniteFitter,
-                          fitresult,
-                          X) = fill(fitresult, length(X))
-
-
-MLJModelInterface.input_scitype(::Type{<:UnivariateFiniteFitter}) =
-    AbstractVector{Nothing}
-MLJModelInterface.target_scitype(::Type{<:UnivariateFiniteFitter}) =
-    AbstractVector{<:Finite}
-```
-
-And a demonstration (zero smoothing):
-
-
-```julia
-using MLJBase
-y = coerce(collect("aabbccaa"), Multiclass)
-X = fill(nothing, length(y))
-model = UnivariateFiniteFitter(alpha=0)
-mach = machine(model, X, y) |> fit!
-
-ytest = y[1:3]
-yhat = predict(mach, fill(nothing, 3))
-julia> @assert cross_entropy(yhat, ytest) ≈ [-log(1/2), -log(1/2), -log(1/4)]
-true
-```
+A working implementation of a model that fits a `UnivariateFinite`
+distribution to some categorical data using [Laplace
+smoothing](https://en.wikipedia.org/wiki/Additive_smoothing)
+controlled by a hyper-parameter `alpha` is given
+[here](https://github.com/alan-turing-institute/MLJBase.jl/blob/d377bee1198ec179a4ade191c11fef583854af4a/test/interface/model_api.jl#L36).
 
 
 ### Serialization 
