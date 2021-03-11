@@ -22,13 +22,12 @@ variance.
  package_url = &quot;https://github.com/JuliaStats/MultivariateStats.jl&quot;,
  package_uuid = &quot;6f286f6a-111f-5878-ab1e-185364afe411&quot;,
  prediction_type = :unknown,
- supports_class_weights = false,
  supports_online = false,
  supports_weights = false,
  input_scitype = Table{_s24} where _s24&lt;:(AbstractArray{_s23,1} where _s23&lt;:Continuous),
  target_scitype = Unknown,
  output_scitype = Table{_s24} where _s24&lt;:(AbstractArray{_s23,1} where _s23&lt;:Continuous),)</code></pre><p>So a &quot;model&quot; in the present context is just a named tuple containing metadata, and not an actual model type or instance. If two models with the same name occur in different packages, the package name must be specified, as in <code>info(&quot;LinearRegressor&quot;, pkg=&quot;GLM&quot;)</code>.</p><h2 id="General-model-queries-1"><a class="docs-heading-anchor" href="#General-model-queries-1">General model queries</a><a class="docs-heading-anchor-permalink" href="#General-model-queries-1" title="Permalink"></a></h2><p>We list all models (named tuples) using <code>models()</code>, and list the models for which code is  already loaded with <code>localmodels()</code>:</p><pre><code class="language-julia-repl">julia&gt; localmodels()
-51-element Array{NamedTuple{(:name, :package_name, :is_supervised, :docstring, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :is_pure_julia, :is_wrapper, :load_path, :package_license, :package_url, :package_uuid, :prediction_type, :supports_class_weights, :supports_online, :supports_weights, :input_scitype, :target_scitype, :output_scitype),T} where T&lt;:Tuple,1}:
+51-element Array{NamedTuple{(:name, :package_name, :is_supervised, :docstring, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :is_pure_julia, :is_wrapper, :load_path, :package_license, :package_url, :package_uuid, :prediction_type, :supports_online, :supports_weights, :input_scitype, :target_scitype, :output_scitype),T} where T&lt;:Tuple,1}:
  (name = AdaBoostStumpClassifier, package_name = DecisionTree, ... )
  (name = BayesianLDA, package_name = MultivariateStats, ... )
  (name = BayesianSubspaceLDA, package_name = MultivariateStats, ... )
@@ -79,13 +78,12 @@ with a multivariate Gaussian class-conditional distribution.
  package_url = &quot;https://github.com/JuliaStats/MultivariateStats.jl&quot;,
  package_uuid = &quot;6f286f6a-111f-5878-ab1e-185364afe411&quot;,
  prediction_type = :probabilistic,
- supports_class_weights = false,
  supports_online = false,
  supports_weights = false,
  input_scitype = Table{_s24} where _s24&lt;:(AbstractArray{_s23,1} where _s23&lt;:Continuous),
  target_scitype = AbstractArray{_s54,1} where _s54&lt;:Finite,
  output_scitype = Table{_s24} where _s24&lt;:(AbstractArray{_s23,1} where _s23&lt;:Continuous),)</code></pre><p>One can search for models containing specified strings or regular expressions in their <code>docstring</code> attributes, as in</p><pre><code class="language-julia-repl">julia&gt; models(&quot;forest&quot;)
-4-element Array{NamedTuple{(:name, :package_name, :is_supervised, :docstring, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :is_pure_julia, :is_wrapper, :load_path, :package_license, :package_url, :package_uuid, :prediction_type, :supports_class_weights, :supports_online, :supports_weights, :input_scitype, :target_scitype, :output_scitype),T} where T&lt;:Tuple,1}:
+4-element Array{NamedTuple{(:name, :package_name, :is_supervised, :docstring, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :is_pure_julia, :is_wrapper, :load_path, :package_license, :package_url, :package_uuid, :prediction_type, :supports_online, :supports_weights, :input_scitype, :target_scitype, :output_scitype),T} where T&lt;:Tuple,1}:
  (name = RandomForestClassifier, package_name = DecisionTree, ... )
  (name = RandomForestClassifier, package_name = ScikitLearn, ... )
  (name = RandomForestRegressor, package_name = DecisionTree, ... )
@@ -96,7 +94,7 @@ with a multivariate Gaussian class-conditional distribution.
 filter (generic function with 1 method)
 
 julia&gt; models(filter)
-12-element Array{NamedTuple{(:name, :package_name, :is_supervised, :docstring, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :is_pure_julia, :is_wrapper, :load_path, :package_license, :package_url, :package_uuid, :prediction_type, :supports_class_weights, :supports_online, :supports_weights, :input_scitype, :target_scitype, :output_scitype),T} where T&lt;:Tuple,1}:
+12-element Array{NamedTuple{(:name, :package_name, :is_supervised, :docstring, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :is_pure_julia, :is_wrapper, :load_path, :package_license, :package_url, :package_uuid, :prediction_type, :supports_online, :supports_weights, :input_scitype, :target_scitype, :output_scitype),T} where T&lt;:Tuple,1}:
  (name = DeterministicConstantClassifier, package_name = MLJModels, ... )
  (name = LinearSVC, package_name = LIBSVM, ... )
  (name = NuSVC, package_name = LIBSVM, ... )
@@ -115,4 +113,4 @@ end</code></pre><h2 id="API-1"><a class="docs-heading-anchor" href="#API-1">API<
 localmodels(filters...; modl=Main)
 localmodels(needle::Union{AbstractString,Regex}; modl=Main)</code></pre><p>List all models currently available to the user from the module <code>modl</code> without importing a package, and which additional pass through the specified filters. Here a <em>filter</em> is a <code>Bool</code>-valued function on models.</p><p>Use <code>load_path</code> to get the path to some model returned, as in these examples:</p><pre><code class="language-none">ms = localmodels()
 model = ms[1]
-load_path(model)</code></pre><p>See also <a href="#MLJModels.models"><code>models</code></a>, <a href="../loading_model_code/#StatisticalTraits.load_path"><code>load_path</code></a>.</p></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../working_with_categorical_data/">« Working with Categorical Data</a><a class="docs-footer-nextpage" href="../loading_model_code/">Loading Model Code »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 8 February 2021 04:54">Monday 8 February 2021</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+load_path(model)</code></pre><p>See also <a href="#MLJModels.models"><code>models</code></a>, <a href="../loading_model_code/#StatisticalTraits.load_path"><code>load_path</code></a>.</p></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../working_with_categorical_data/">« Working with Categorical Data</a><a class="docs-footer-nextpage" href="../loading_model_code/">Loading Model Code »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 11 March 2021 03:25">Thursday 11 March 2021</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
