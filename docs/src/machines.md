@@ -9,10 +9,16 @@ the machine's internal state (as recorded in private fields
 `old_model` and `old_rows`). These lower-level `fit` and `update`
 methods, which are not ordinarily called directly by the user,
 dispatch on the model and a view of the data defined by the optional
-`rows` keyword argument of `fit!` (all rows by default). In this way,
-if a model `update` method has been implemented for the model, calls
-to `fit!` can avoid redundant calculations for certain kinds of model
-mutations (eg, increasing the number of epochs in a neural network).
+`rows` keyword argument of `fit!` (all rows by default). 
+
+# Warm restarts
+
+If a model `update` method has been implemented for the model, calls
+to `fit!` will avoid redundant calculations for certain kinds of model
+mutations. The main use-case is increasing an iteration parameter,
+such as the number of epochs in a neural network. To test if
+`SomeIterativeModel` supports this feature, check
+`iteration_parameter(SomeIterativeModel)` is different from `nothing`.
 
 ```@example machines
 using MLJ; color_off() # hide
@@ -60,6 +66,11 @@ fit!(mach, rows=1:100);
 ```@repl machines
 fit!(mach, rows=1:100);
 ```
+
+If an iterative model exposes it's iteration parameter as a
+hyper-parameter, and it implements the warm restart behaviour above,
+then it can be wrapped in a "control strategy", like an early stopping
+critetion. See [`Controlling Iterative Models`](@ref) for details.
 
 
 ## Inspecting machines

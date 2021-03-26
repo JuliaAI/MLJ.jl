@@ -2,8 +2,11 @@
 
 ## The machine interface, simplified
 
-The following is simplified description of the `Machine`
-interface. See also the [Glossary](glossary.md)
+The following is simplified description of the `Machine` interface. It
+predates the introduction of an optional data front-end for models
+(see [Implementing a data front-end](@ref)). See also the
+[Glossary](glossary.md)
+
 
 ### The Machine type
 

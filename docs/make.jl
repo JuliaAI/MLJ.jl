@@ -34,6 +34,7 @@ pages = [
     "Tuning Models" => "tuning_models.md",
     "Learning Curves" => "learning_curves.md",
     "Transformers and other unsupervised models" => "transformers.md",
+    "Controlling Iterative Models" => "controlling_iterative_models.md",
     "Composing Models" => "composing_models.md",
     "Homogeneous Ensembles" => "homogeneous_ensembles.md",
     "Generating Synthetic Data" => "generating_synthetic_data.md",
