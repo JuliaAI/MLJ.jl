@@ -3,13 +3,14 @@
 Iterative supervised machine learning models are usually trained until
 an out-of-sample estimate of the performance satisfies some stopping
 criterion, such as `k` consecutive deteriorations of the performance
-(see [`Patience`](@ref) below). A more sophisticated kind of control
-might dynamically mutate parameters, such as a learning rate, in
-response to the behavior of these estimates. Some iterative model
-implementations enable some form of automated control, with the method
-and options for doing so varying from model to model. But sometimes it
-is up to the user to arrange control, which in the crudest case
-reduces to manually experimenting with the iteration parameter.
+(see [`Patience`](@ref EarlyStopping.Patience) below). A more
+sophisticated kind of control might dynamically mutate parameters,
+such as a learning rate, in response to the behavior of these
+estimates. Some iterative model implementations enable some form of
+automated control, with the method and options for doing so varying
+from model to model. But sometimes it is up to the user to arrange
+control, which in the crudest case reduces to manually experimenting
+with the iteration parameter.
 
 In response to this ad hoc state of affairs, MLJ provides a uniform
 and feature-rich interface for controlling any iterative model that
@@ -46,10 +47,15 @@ iterated_model = IteratedModel(model=EvoTreeClassifier(rng=123, η=0.005),
                                          NumberLimit(100)],
                                retrain=true)
 
-mach = machine(iterated_model, X, y) |> fit!;
+mach = machine(iterated_model, X, y)
+nothing # hide
 ```
 
-As detailed under [`IteratedModel`](@ref) below, the specified
+```@repl gree
+fit!(mach)
+```
+
+As detailed under [`IteratedModel`](@ref MLJIteration.IteratedModel) below, the specified
 `controls` are repeatedly applied in sequence to a *training machine*,
 constructed under the hood, until one of the controls triggers a
 stop. Here `Step(5)` means "Compute 5 more iterations" (in this case
@@ -71,7 +77,7 @@ end
 ```
 
 Alternatively, one might wrap the self-iterating model in a tuning
-strategy, using `TunedModel`; see [Tuning Models](@ref). In this way,
+strategy, using `TunedModel`; see [Tuning models](@ref). In this way,
 the optimization of some other hyper-parameter is realized
 simultaneously with that of the iteration parameter, which will
 frequently be more efficient than a direct two-parameter search.
@@ -87,24 +93,24 @@ hyper-parameter of the wrapper.
 
 control                                              | description                                                                             | can trigger a stop
 -----------------------------------------------------|-----------------------------------------------------------------------------------------|--------------------
-[`Step`](@ref)`(n=1)`                                | Train model for `n` more iterations                                                     | no
-[`TimeLimit`](@ref)`(t=0.5)`                         | Stop after `t` hours                                                                    | yes
-[`NumberLimit`](@ref)`(n=100)`                       | Stop after `n` applications of the control                                              | yes
-[`NumberSinceBest`](@ref)`(n=6)`                     | Stop when best loss occurred `n` control applications ago                               | yes
-[`NotANumber`](@ref)`()`                             | Stop when `NaN` encountered                                                             | yes
-[`Threshold`](@ref)`(value=0.0)`                     | Stop when `loss < value`                                                                | yes
-[`GL`](@ref)`(alpha=2.0)`                            | † Stop after the "generalization loss (GL)" exceeds `alpha`                             | yes
-[`Patience`](@ref)`(n=5)`                            | † Stop after `n` consecutive loss increases                                             | yes
-[`PQ`](@ref)`(alpha=0.75, k=5)`                      | † Stop after "progress-modified GL" exceeds `alpha`                                     | yes
-[`Info`](@ref)`(f=identity)`                         | Log to `Info` the value of `f(mach)`, where `mach` is current machine                   | no
-[`Warn`](@ref)`(predicate; f="")`                    | Log to `Warn` the value of `f` or `f(mach)` if `predicate(mach)` holds                  | no
-[`Error`](@ref)`(predicate; f="")`                   | Log to `Error` the value of `f` or `f(mach)` if `predicate(mach)` holds and then stop   | yes
-[`Callback`](@ref)`(f=_->nothing)`                   | Call `f(mach)`                                                                          | yes
-[`WithNumberDo`](@ref)`(f=n->@info(n))`              | Call `f(n + 1)` where `n` is number of previous calls                                   | yes
-[`WithIterationsDo`](@ref)`(f=x->@info("loss: $x"))` | Call `f(i)`, where `i` is total number of iterations                                    | yes
-[`WithLossDo`](@ref)`(f=x->@info(x))`                | Call `f(loss)` where `loss` is the current loss                                         | yes
-[`WithTrainingLossesDo`](@ref)`(f=v->@info(v))`      | Call `f(v)` where `v` is the current batch of training losses                           | yes
-[`Save`](@ref)`(filename="machine.jlso")`            | Save current machine to `machine1.jlso`, `machine2.jslo`, etc                           | yes
+[`Step`](@ref IterationControl.Step)`(n=1)`                                | Train model for `n` more iterations                                                     | no
+[`TimeLimit`](@ref EarlyStopping.TimeLimit)`(t=0.5)`                         | Stop after `t` hours                                                                    | yes
+[`NumberLimit`](@ref EarlyStopping.NumberLimit)`(n=100)`                       | Stop after `n` applications of the control                                              | yes
+[`NumberSinceBest`](@ref EarlyStopping.NumberSinceBest)`(n=6)`                     | Stop when best loss occurred `n` control applications ago                               | yes
+[`NotANumber`](@ref EarlyStopping.NotANumber)`()`                             | Stop when `NaN` encountered                                                             | yes
+[`Threshold`](@ref EarlyStopping.Threshold)`(value=0.0)`                     | Stop when `loss < value`                                                                | yes
+[`GL`](@ref EarlyStopping.GL)`(alpha=2.0)`                            | † Stop after the "generalization loss (GL)" exceeds `alpha`                             | yes
+[`PQ`](@ref EarlyStopping.PQ)`(alpha=0.75, k=5)`                      | † Stop after "progress-modified GL" exceeds `alpha`                                     | yes
+[`Patience`](@ref EarlyStopping.Patience)`(n=5)`                            | † Stop after `n` consecutive loss increases                                             | yes
+[`Info`](@ref IterationControl.Info)`(f=identity)`                         | Log to `Info` the value of `f(mach)`, where `mach` is current machine                   | no
+[`Warn`](@ref IterationControl.Warn)`(predicate; f="")`                    | Log to `Warn` the value of `f` or `f(mach)` if `predicate(mach)` holds                  | no
+[`Error`](@ref IterationControl.Error)`(predicate; f="")`                   | Log to `Error` the value of `f` or `f(mach)` if `predicate(mach)` holds and then stop   | yes
+[`Callback`](@ref IterationControl.Callback)`(f=_->nothing)`                   | Call `f(mach)`                                                                          | yes
+[`WithNumberDo`](@ref IterationControl.WithNumberDo)`(f=n->@info(n))`              | Call `f(n + 1)` where `n` is number of previous calls                                   | yes
+[`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=x->@info("loss: $x"))` | Call `f(i)`, where `i` is total number of iterations                                    | yes
+[`WithLossDo`](@ref IterationControl.WithLossDo)`(f=x->@info(x))`                | Call `f(loss)` where `loss` is the current loss                                         | yes
+[`WithTrainingLossesDo`](@ref IterationControl.WithTrainingLossesDo)`(f=v->@info(v))`      | Call `f(v)` where `v` is the current batch of training losses                           | yes
+[`Save`](@ref MLJIteration.Save)`(filename="machine.jlso")`            | Save current machine to `machine1.jlso`, `machine2.jslo`, etc                           | yes
 
 > Table 1. Atomic controls. Some advanced options omitted.
 
@@ -122,9 +128,9 @@ There are also three control wrappers to modify a control's behavior:
 
 wrapper                                            | description
 ---------------------------------------------------|-------------------------------------------------------------------------
-`IterationControl.skip(control, predicate=1)`      | Apply `control` every `predicate` applications of the control wrapper (can also be a function; see doc-string)
-`IterationControl.debug(control)`                  | Apply `control` but also log its state to `Info` (irrespective of `verbosity` level)
-`IterationControl.composite(controls...)`          | Apply each `control` in `controls` in sequence; mostly for under-the-hood use
+[`IterationControl.skip`](@ref)`(control, predicate=1)`      | Apply `control` every `predicate` applications of the control wrapper (can also be a function; see doc-string)
+[`IterationControl.debug`](@ref)`(control)`                  | Apply `control` but also log its state to `Info` (irrespective of `verbosity` level)
+[`IterationControl.composite`](@ref)`(controls...)`          | Apply each `control` in `controls` in sequence; used internally by IterationControl.jl
 
 > Table 2. Wrapped controls
 
@@ -134,39 +140,37 @@ wrapper                                            | description
 Some iterative models report a training loss, as a byproduct of a
 `fit!` call, and these can be used in two ways:
 
-1. To supplement an out-of-sample estimate of the loss in deciding
- when to stop, as in the `PQ` stopping criterion (see [Prechelt, Lutz
- (1998)](https://link.springer.com/chapter/10.1007%2F3-540-49430-8_3)));
- or
+1. To supplement an out-of-sample estimate of the loss in deciding when to stop, as in the `PQ` stopping criterion (see [Prechelt, Lutz (1998)](https://link.springer.com/chapter/10.1007%2F3-540-49430-8_3))); or
 
-2. As a (generally less reliable) substitute for an out-of-sample
-  loss, when wishing to train excusivley on all supplied data.
+2. As a (generally less reliable) substitute for an out-of-sample loss, when wishing to train excusivley on all supplied data.
 
 To have `IteratedModel` bind all data to the training machine and use
-training losses in place of an out-of-sample loss, simply specify
+training losses in place of an out-of-sample loss, specify
 `resampling=nothing`. To check if `MyFavoriteIterativeModel` reports
 training losses, load the model code and inspect
 `supports_training_losses(MyFavoriteIterativeModel)` (or do
 `info("MyFavoriteIterativeModel")`)
 
 
-### Model tuning
+### Controlling model tuning
 
 An example of scenario 2 occurs when controlling hyper-parameter
-optimization (model tuning). Recall that MLJ's [`TunedModel`](@ref)
-wrapper is implemented as an iterative model. Moreover, this wrapper
-reports, as a training loss, the lowest value of the optimization
-objective function so far (typically the lowest value of an
-out-of-sample loss, or -1 times an out-of-sample score). One may want
-to simply end the hyper-parameter search when this value meets the
-[`NumberSinceBest`](@ref) stopping criterion discussed below, say,
-rather than introduce an extra layer of resampling to first "learn"
-the optimal value of the iteration parameter.
+optimization (model tuning). Recall that MLJ's [`TunedModel`](@ref
+MLJTuning.TunedModel) wrapper is implemented as an iterative
+model. Moreover, this wrapper reports, as a training loss, the lowest
+value of the optimization objective function so far (typically the
+lowest value of an out-of-sample loss, or -1 times an out-of-sample
+score). One may want to simply end the hyper-parameter search when
+this value meets the [`NumberSinceBest`](@ref
+EarlyStopping.NumberSinceBest) stopping criterion discussed below,
+say, rather than introduce an extra layer of resampling to first
+"learn" the optimal value of the iteration parameter.
 
-In the following example we conduct a [`RandomSearch`](@ref) for the
-optimal value of the regularization parameter `lambda` in a
-`RidgeRegressor` using 6-fold cross-validation. By wrapping our
-"self-tuning" version of the regressor as an [`IteratedModel`](@ref),
+In the following example we conduct a [`RandomSearch`](@ref
+MLJTuning.RandomSearch) for the optimal value of the regularization
+parameter `lambda` in a `RidgeRegressor` using 6-fold
+cross-validation. By wrapping our "self-tuning" version of the
+regressor as an [`IteratedModel`](@ref MLJIteration.IteratedModel),
 with `resampling=nothing` and `NumberSinceBest(20)` in the controls,
 we terminate the search when the bnumber of `lambda` values tested
 since the previous best cross-validation loss reaches 20.
@@ -187,26 +191,34 @@ self_tuning_model = TunedModel(model=model,
 iterated_model = IteratedModel(model=self_tuning_model,
                                resampling=nothing,
                                control=[Step(1), NumberSinceBest(20), NumberLimit(1000)])
-mach = machine(iterated_model, X, y);
-fit!(mach);
+mach = machine(iterated_model, X, y)
+nothing # hide
+```
+
+```@repl gree
+fit!(mach)
+```
+
+```@repl gree
 report(mach).model_report.best_model
 ```
 
 We can use `mach` here to directly obtain predictions using the
 optimal model (trained on all data), as in
 
-```@example gree
+```@repl gree
 predict(mach, selectrows(X, 1:4))
 ```
 
+
 ## Custom controls
 
-Control in MLJIteration is implemented using
+Under the hood, control in MLJIteration is implemented using
 [IterationControl.jl](https://github.com/ablaom/IterationControl.jl). Rather
 than iterating a training machine directly, we iterate a wrapped
-version of this object, which includes other information that controls may
-want to access, such the MLJ evaluation object. This information is
-summarized under [The training machine wrapper](@ref) below.
+version of this object, which includes other information that controls
+may want to access, such the MLJ evaluation object. This information
+is summarized under [The training machine wrapper](@ref) below.
 
 Controls must implement two `update!` methods, one for initializing
 the control's *state* on the first application of the control (this
@@ -318,7 +330,7 @@ supplied data and wrapped in an object called `wrapper` below. To
 train the wrapped machine for `i` more iterations, and update the
 other data in the wrapper, requires the call
 `MLJIteration.train!(wrapper, i)`. Only controls make this call (e.g.,
-`Step(...)`, or `IterateFromList` above). If we assume for simplicity
+`Step(...)`, or `IterateFromList(...)` above). If we assume for simplicity
 there is only a single control, called `control`, then training
 proceeds as follows:
 
@@ -385,28 +397,36 @@ end
 ## API Reference
 
 ```@docs
-IteratedModel
+MLJIteration.IteratedModel
 ```
 
 ### Controls
 
 ```@docs
-Step
-TimeLimit
-NumberLimit
-NumberSinceBest
-NotANumber
-Threshold
-GL
-PQ
-Info
-Warn
-Error
-Callback
-WithNumberDo
-WithIterationsDo
-WithLossDo
-WIthTrainingLossesDo
-Save
+IterationControl.Step
+EarlyStopping.TimeLimit
+EarlyStopping.NumberLimit
+EarlyStopping.NumberSinceBest
+EarlyStopping.NotANumber
+EarlyStopping.Threshold
+EarlyStopping.GL
+EarlyStopping.PQ
+EarlyStopping.Patience
+IterationControl.Info
+IterationControl.Warn
+IterationControl.Error
+IterationControl.Callback
+IterationControl.WithNumberDo
+MLJIteration.WithIterationsDo
+IterationControl.WithLossDo
+IterationControl.WithTrainingLossesDo
+MLJIteration.Save
 ```
 
+### Control wrappers
+
+```@docs
+IterationControl.skip
+IterationControl.debug
+IterationControl.composite
+```

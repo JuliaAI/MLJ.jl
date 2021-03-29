@@ -5,12 +5,14 @@ end
 using Pkg
 using Documenter
 using MLJ
+import MLJIteration
+import IterationControl
+import EarlyStopping
 import MLJBase
 import MLJTuning
 import MLJModels
 import MLJScientificTypes
 import MLJModelInterface
-import MLJIteration
 import ScientificTypes
 import Distributions
 using CategoricalArrays # avoid types like CategoricalArrays.Categorica
@@ -62,7 +64,16 @@ end
 makedocs(
     sitename = "MLJ",
     format   = Documenter.HTML(),
-    modules  = [MLJ, MLJBase, MLJTuning, MLJModels, MLJScientificTypes, MLJModelInterface, ScientificTypes, MLJIteration],
+    modules  = [MLJ,
+                MLJBase,
+                MLJTuning,
+                MLJModels,
+                MLJScientificTypes,
+                MLJModelInterface,
+                ScientificTypes,
+                MLJIteration,
+                EarlyStopping,
+                IterationControl],
     pages    = pages)
 
 # By default Documenter does not deploy docs just for PR

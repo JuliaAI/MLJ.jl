@@ -70,7 +70,7 @@ fit!(mach, rows=1:100);
 If an iterative model exposes it's iteration parameter as a
 hyper-parameter, and it implements the warm restart behaviour above,
 then it can be wrapped in a "control strategy", like an early stopping
-critetion. See [`Controlling Iterative Models`](@ref) for details.
+critetion. See [Controlling Iterative Models](@ref) for details.
 
 
 ## Inspecting machines
