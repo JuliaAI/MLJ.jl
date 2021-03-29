@@ -5,6 +5,9 @@ end
 using Pkg
 using Documenter
 using MLJ
+import MLJIteration
+import IterationControl
+import EarlyStopping
 import MLJBase
 import MLJTuning
 import MLJModels
@@ -34,6 +37,7 @@ pages = [
     "Tuning Models" => "tuning_models.md",
     "Learning Curves" => "learning_curves.md",
     "Transformers and other unsupervised models" => "transformers.md",
+    "Controlling Iterative Models" => "controlling_iterative_models.md",
     "Composing Models" => "composing_models.md",
     "Homogeneous Ensembles" => "homogeneous_ensembles.md",
     "Generating Synthetic Data" => "generating_synthetic_data.md",
@@ -60,7 +64,16 @@ end
 makedocs(
     sitename = "MLJ",
     format   = Documenter.HTML(),
-    modules  = [MLJ, MLJBase, MLJTuning, MLJModels, MLJScientificTypes, MLJModelInterface, ScientificTypes],
+    modules  = [MLJ,
+                MLJBase,
+                MLJTuning,
+                MLJModels,
+                MLJScientificTypes,
+                MLJModelInterface,
+                ScientificTypes,
+                MLJIteration,
+                EarlyStopping,
+                IterationControl],
     pages    = pages)
 
 # By default Documenter does not deploy docs just for PR

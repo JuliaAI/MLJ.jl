@@ -62,11 +62,12 @@ Internals](internals.md) for context.
 ## Overview
 
 A *model* is an object storing hyperparameters associated with some
-machine learning algorithm.  In MLJ, hyperparameters include configuration
-parameters, like the number of threads, and special instructions, such
-as "compute feature rankings", which may or may not affect the final
-learning outcome.  However, the logging level (`verbosity` below) is
-excluded.
+machine learning algorithm, and that is all. In MLJ, hyperparameters
+include configuration parameters, like the number of threads, and
+special instructions, such as "compute feature rankings", which may or
+may not affect the final learning outcome.  However, the logging level
+(`verbosity` below) is excluded. *Learned parameters* (such as the
+coefficients in a linear model) have no place in the model struct.
 
 The name of the Julia type associated with a model indicates the
 associated algorithm (e.g., `DecisionTreeClassifier`). The outcome of
@@ -379,6 +380,9 @@ is any table. (If `Xtable` is itself just a wrapped matrix,
 `Xtable=Tables.table(A)`, then `A=MMI.table(Xtable)` will be returned
 without any copying.)
 
+Alternatively, a more performant option is to implement a data
+front-end for your model; see [Implementing a data front-end](@ref).
+
 Other auxiliary methods provided by MLJModelInterface for handling tabular data
 are: `selectrows`, `selectcols`, `select` and `schema` (for extracting
 the size, names and eltypes of a table's columns). See [Convenience
@@ -402,8 +406,6 @@ A compulsory `fit` method returns three objects:
 MMI.fit(model::SomeSupervisedModel, verbosity, X, y) -> fitresult, cache, report
 ```
 
-*Note.* The `Int` typing of `verbosity` cannot be omitted.
-
 1. `fitresult` is the fitresult in the sense above (which becomes an
     argument for `predict` discussed below).
 
@@ -420,6 +422,11 @@ MMI.fit(model::SomeSupervisedModel, verbosity, X, y) -> fitresult, cache, report
 3.	The value of `cache` can be `nothing`, unless one is also defining
     an `update` method (see below). The Julia type of `cache` is not
     presently restricted.
+	
+!!! note
+
+    The  `fit` (and `update`) methods should not mutate the `model`. If necessary, `fit` can create a `deepcopy` of `model` first. 
+
 
 It is not necessary for `fit` to provide type or dimension checks on
 `X` or `y` or to call `clean!` on the model; MLJ will carry out such
