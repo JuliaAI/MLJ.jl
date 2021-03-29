@@ -103,12 +103,12 @@ control                                              | description              
 [`PQ`](@ref EarlyStopping.PQ)`(alpha=0.75, k=5)`                      | † Stop after "progress-modified GL" exceeds `alpha`                                     | yes
 [`Patience`](@ref EarlyStopping.Patience)`(n=5)`                            | † Stop after `n` consecutive loss increases                                             | yes
 [`Info`](@ref IterationControl.Info)`(f=identity)`                         | Log to `Info` the value of `f(mach)`, where `mach` is current machine                   | no
-[`Warn`](@ref IterationControl.Warn)`(predicate; f="")`                    | Log to `Warn` the value of `f` or `f(mach)` if `predicate(mach)` holds                  | no
-[`Error`](@ref IterationControl.Error)`(predicate; f="")`                   | Log to `Error` the value of `f` or `f(mach)` if `predicate(mach)` holds and then stop   | yes
-[`Callback`](@ref IterationControl.Callback)`(f=_->nothing)`                   | Call `f(mach)`                                                                          | yes
+[`Warn`](@ref IterationControl.Warn)`(predicate; f="")`                    | Log to `Warn` the value of `f` or `f(mach)`, if `predicate(mach)` holds                  | no
+[`Error`](@ref IterationControl.Error)`(predicate; f="")`                   | Log to `Error` the value of `f` or `f(mach)`, if `predicate(mach)` holds and then stop   | yes
+[`Callback`](@ref IterationControl.Callback)`(f=mach->nothing)`                   | Call `f(mach)`                                                                          | yes
 [`WithNumberDo`](@ref IterationControl.WithNumberDo)`(f=n->@info(n))`              | Call `f(n + 1)` where `n` is number of previous calls                                   | yes
-[`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=x->@info("loss: $x"))` | Call `f(i)`, where `i` is total number of iterations                                    | yes
-[`WithLossDo`](@ref IterationControl.WithLossDo)`(f=x->@info(x))`                | Call `f(loss)` where `loss` is the current loss                                         | yes
+[`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=i->@info("num iterations: $i"))` | Call `f(i)`, where `i` is total number of iterations                                    | yes
+[`WithLossDo`](@ref IterationControl.WithLossDo)`(f=x->@info("loss: $x"))`                | Call `f(loss)` where `loss` is the current loss                                         | yes
 [`WithTrainingLossesDo`](@ref IterationControl.WithTrainingLossesDo)`(f=v->@info(v))`      | Call `f(v)` where `v` is the current batch of training losses                           | yes
 [`Save`](@ref MLJIteration.Save)`(filename="machine.jlso")`            | Save current machine to `machine1.jlso`, `machine2.jslo`, etc                           | yes
 

@@ -214,6 +214,28 @@ If using Plots.jl:
 `plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)`
 
 
+## Controlling iterative models
+
+Requires: `using MLJIteration`
+
+`iterated_model = IteratedModel(model=…, resampling=Holdout(), measure=…, controls=…, retrain=false)`
+
+
+### Controls
+
+Increment training: `Step(n=1)`
+
+Stopping: `TimeLimit(t=0.5)` (in hours), `NumberLimit(n=100)`, `NumberSinceBest(n=6)`, `NotANumber()`, `Threshold(value=0.0)`, `GL(alpha=2.0)`, `PQ(alpha=0.75, k=5)`, `Patience(n=5)`
+
+Logging: `Info(f=identity)`, `Warn(f="")`, `Error(predicate, f="")`
+
+Callbacks: `Callback(f=mach->nothing)`, `WithNumberDo(f=n->@info(n))`, `WithIterationsDo(f=i->@info("num iterations: $i"))`, `WithLossDo(f=x->@info("loss: $x"))`, `WithTrainingLossesDo(f=v->@info(v))`
+
+Snapshots: `Save(filename="machine.jlso")`
+
+Wraps: `MLJIteration.skip(control, predicate=1)`, `IterationControl.debug(control)`
+
+
 ## Performance measures (metrics)
 
 `area_under_curve`, `accuracy`, `balanced_accuracy`, `cross_entropy`, `FScore`, `false_discovery_rate`, `false_negative`, `false_negative_rate`, `false_positive`, `false_positive_rate`, `l1`, `l2`, `mae`, `matthews_correlation`, `misclassification_rate`, `negative_predictive_value`, `positive_predictive_value`, `rms`, `rmsl`, `rmslp1`, `rmsp`, `true_negative`, `true_negative_rate`, `true_positive`, `true_positive_rate`, `BrierScore()`, `confusion_matrix`
