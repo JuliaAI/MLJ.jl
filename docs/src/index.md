@@ -51,22 +51,23 @@ Pkg.add("EvoTrees")
 
 In MLJ a *model* is just a container for hyper-parameters, and that's
 all. Here we will apply several kinds of model composition before
-binding the resulting "metamodel" to data in a *machine* for
+binding the resulting "meta-model" to data in a *machine* for
 evaluation using cross-validation.
 
-Load and instantiate a gradient tree-boosting model type:
+Load and instantiate a gradient tree-boosting model:
 
 ```julia
 using MLJ
-Booster = @load EvoTreeRegressor # loads code defining a model tpe
-booster = Booster(max_depth=2)   # specify hyperparamter at construction
+Booster = @load EvoTreeRegressor # loads code defining a model type
+booster = Booster(max_depth=2)   # specify hyper-parameter at construction
 booster.nrounds=50               # or mutate post facto
 ```
 
 This model is an example of an iterative model. As is stands, the
-number of iterations `nrnounds` is fixed.
+number of iterations `nrounds` is fixed.
 
-#### Composition 1: Wrapping a model to make it "self-iterating"
+
+#### Composition 1: Wrapping the model to make it "self-iterating"
 
 Create a new model that automatically learns the number of iterations,
 using the `NumberSinceBest(3)` criterion, as applied to an
@@ -89,9 +90,9 @@ Combine the model with categorical feature encoding:
 pipe = @pipeline ContinuousEncoder iterated_booster
 ```
 
-#### Composition 3: Wrapping the mode to make it "self-tuning"
+#### Composition 3: Wrapping the model to make it "self-tuning"
 
-Define a hyper-parameter range for optimization of a nested hyper-parameter:
+Define a hyper-parameter range for optimization of a (nested) hyper-parameter:
 
 ```julia
 max_depth_range = range(pipe,
@@ -100,7 +101,7 @@ max_depth_range = range(pipe,
                         upper = 10)
 ```
 
-Wrap the pipeline model in an optimization strategy:
+Wrap the pipeline model in an optimization strategy to make it "self-tuning":
 
 ```julia
 self_tuning_pipe = TunedModel(model=pipe,
@@ -121,15 +122,15 @@ House Price dataset:
 X, y = @load_reduced_ames;
 ```
 
-Bind the "self-tuning" pipeline model (just a container for
-hyper-parameters) to data in a *machine* (which will additionally
-store *learned* parameters):
+Bind the "self-tuning" pipeline model to data in a *machine* (which
+will additionally store *learned* parameters):
 
 ```julia
 mach = machine(self_tuning_pipe, X, y)
 ```
 
-Evaluate the "self-tuning" pipeline model's performance (implies nested resampling):
+Evaluate the "self-tuning" pipeline model's performance using 5-fold
+cross-validation (implies multiple layers of nested resampling):
 
 ```julia
 julia> evaluate!(mach,
@@ -162,7 +163,7 @@ installation required.
   easier to use models from a wide range of packages,
 
 * Unlock performance gains by exploiting Julia's support for
-  parallelism, automatic differentiation, GPU, optimisation etc.
+  parallelism, automatic differentiation, GPU, optimization etc.
 
 
 ## Key features
@@ -210,7 +211,7 @@ do not exist in MLJ:
   not easily inspected or manipulated (by tuning algorithms, for
   example)
 
-- Composite models cannot implement multiple opertations, for example,
+- Composite models cannot implement multiple operations, for example,
   both a `predict` and `transform` method (as in clustering models) or
   both a `transform` and `inverse_transform` method.
 
@@ -218,7 +219,9 @@ Some of these features are demonstrated in [this
 notebook](https://github.com/ablaom/MachineLearningInJulia2020/blob/master/wow.ipynb)
 
 For more information see the [MLJ design
-paper](https://github.com/alan-turing-institute/MLJ.jl/blob/master/paper/paper.md)
+paper](https://doi.org/10.21105/joss.02704) or our detailed
+[paper](https://arxiv.org/abs/2012.15505) on the composition
+interface.
 
 
 ## Reporting problems
@@ -264,7 +267,7 @@ happens automatically when you use MLJ's interactive load command
 
 ```julia
 julia> Tree = @iload DecisionTreeClassifier # load type
-julis> tree = Tree() # instance
+julia> tree = Tree() # instance
 ```
 
 where you will also be asked to choose a providing package, for more
@@ -276,7 +279,7 @@ module or function) see [Loading Model Code](@ref).
 It is recommended that you start with models from more mature
 packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.
 
-MLJ is supported by a number of satelite packages (MLJTuning,
+MLJ is supported by a number of satellite packages (MLJTuning,
 MLJModelInterface, etc) which the general user is *not* required to
 install directly. Developers can learn more about these
 [here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/ORGANIZATION.md)
@@ -342,11 +345,11 @@ please additionally cite
 
 ```bitex
 @misc{blaom2020flexible,
-          title={{Flexible model composition in machine learning and its implementation in MLJ}},
-          author={Anthony D. Blaom and Sebastian J. Vollmer},
-          year={2020},
-          eprint={2012.15505},
-          archivePrefix={arXiv},
-          primaryClass={cs.LG}
+  title={{Flexible model composition in machine learning and its implementation in MLJ}},
+  author={Anthony D. Blaom and Sebastian J. Vollmer},
+  year={2020},
+  eprint={2012.15505},
+  archivePrefix={arXiv},
+  primaryClass={cs.LG}
 }
 ```
