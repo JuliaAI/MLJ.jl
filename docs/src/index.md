@@ -54,7 +54,7 @@ all. Here we will apply several kinds of model composition before
 binding the resulting "meta-model" to data in a *machine* for
 evaluation using cross-validation.
 
-Load and instantiate a gradient tree-boosting model:
+Loading and instantiating a gradient tree-boosting model:
 
 ```julia
 using MLJ
@@ -69,7 +69,7 @@ number of iterations `nrounds` is fixed.
 
 #### Composition 1: Wrapping the model to make it "self-iterating"
 
-Create a new model that automatically learns the number of iterations,
+Let's create a new model that automatically learns the number of iterations,
 using the `NumberSinceBest(3)` criterion, as applied to an
 out-of-sample `l1` loss:
 
@@ -84,7 +84,7 @@ iterated_booster = IteratedModel(model=booster,
 
 #### Composition 2: Preprocess the input features
 
-Combine the model with categorical feature encoding:
+Combining the model with categorical feature encoding:
 
 ```julia
 pipe = @pipeline ContinuousEncoder iterated_booster
@@ -92,7 +92,8 @@ pipe = @pipeline ContinuousEncoder iterated_booster
 
 #### Composition 3: Wrapping the model to make it "self-tuning"
 
-Define a hyper-parameter range for optimization of a (nested) hyper-parameter:
+First, we define a hyper-parameter range for optimization of a
+(nested) hyper-parameter:
 
 ```julia
 max_depth_range = range(pipe,
@@ -101,7 +102,8 @@ max_depth_range = range(pipe,
                         upper = 10)
 ```
 
-Wrap the pipeline model in an optimization strategy to make it "self-tuning":
+Now we can wrap the pipeline model in an optimization strategy to make
+it "self-tuning":
 
 ```julia
 self_tuning_pipe = TunedModel(model=pipe,
@@ -115,21 +117,21 @@ self_tuning_pipe = TunedModel(model=pipe,
 
 #### Binding to data and evaluating performance
 
-Load a selection of features and labels from the Ames
+Loading a selection of features and labels from the Ames
 House Price dataset:
 
 ```julia
 X, y = @load_reduced_ames;
 ```
 
-Bind the "self-tuning" pipeline model to data in a *machine* (which
+Binding the "self-tuning" pipeline model to data in a *machine* (which
 will additionally store *learned* parameters):
 
 ```julia
 mach = machine(self_tuning_pipe, X, y)
 ```
 
-Evaluate the "self-tuning" pipeline model's performance using 5-fold
+Evaluating the "self-tuning" pipeline model's performance using 5-fold
 cross-validation (implies multiple layers of nested resampling):
 
 ```julia
