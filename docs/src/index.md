@@ -5,10 +5,10 @@ A Machine Learning Framework for Julia
 <br>
 <br>
 <div style="font-size:1.25em;font-weight:bold;">
-  <a href="#Installation-1">Installation</a>    &nbsp;|&nbsp;
+  <a href="#Installation-1" style="color: orange;">Install</a>         &nbsp;|&nbsp;
+  <a href="#Learning-to-use-MLJ-1" style="color: orange;">Learn</a>    &nbsp;|&nbsp;
   <a href="mlj_cheatsheet">Cheatsheet</a>       &nbsp;|&nbsp;
   <a href="common_mlj_workflows">Workflows</a>  &nbsp;|&nbsp;
-  <a href="https://alan-turing-institute.github.io/DataScienceTutorials.jl/">Tutorials</a>       &nbsp;|&nbsp;
   <a href="https://github.com/alan-turing-institute/MLJ.jl/">For Developers</a> &nbsp;|&nbsp;
   <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">Live Demo</a> &nbsp;|&nbsp;
   <a href="third_party_packages">3rd Party Packages</a>
@@ -30,7 +30,8 @@ Turing Institute](https://www.turing.ac.uk/).
 
 ## Lightning tour
 
-*For a more elementary introduction to MLJ usage see [Getting Started](@ref).*
+*For more elementary introductions to MLJ usage see [Basic
+introductions](@ref) below.*
 
 The first code snippet below creates a new Julia environment
 `MLJ_tour` and installs just those packages needed for the tour. See
@@ -44,40 +45,65 @@ Julia installation instructions are
 using Pkg
 Pkg.activate("MLJ_tour", shared=true)
 Pkg.add("MLJ")
+Pkg.add("MLJIteration")
 Pkg.add("EvoTrees")
 ```
 
-Load a selection of features and labels from the Ames House Price dataset:
+In MLJ a *model* is just a container for hyper-parameters, and that's
+all. Here we will apply several kinds of model composition before
+binding the resulting "meta-model" to data in a *machine* for
+evaluation using cross-validation.
+
+Loading and instantiating a gradient tree-boosting model:
 
 ```julia
 using MLJ
-X, y = @load_reduced_ames;
+Booster = @load EvoTreeRegressor # loads code defining a model type
+booster = Booster(max_depth=2)   # specify hyper-parameter at construction
+booster.nrounds=50               # or mutate post facto
 ```
 
-Load and instantiate a gradient tree-boosting model type:
+This model is an example of an iterative model. As is stands, the
+number of iterations `nrounds` is fixed.
+
+
+#### Composition 1: Wrapping the model to make it "self-iterating"
+
+Let's create a new model that automatically learns the number of iterations,
+using the `NumberSinceBest(3)` criterion, as applied to an
+out-of-sample `l1` loss:
 
 ```julia
-Booster = @load EvoTreeRegressor
-booster = Booster(max_depth=2) # specify hyperparamter at construction
-booster.nrounds=50             # or mutate post facto
+using MLJIteration
+iterated_booster = IteratedModel(model=booster,
+                                 resampling=Holdout(fraction_train=0.8),
+                                 controls=[Step(2), NumberSinceBest(3), NumberLimit(300)],
+                                 measure=l1,
+                                 retrain=true)
 ```
 
-Combine the model with categorical feature encoding:
+#### Composition 2: Preprocess the input features
+
+Combining the model with categorical feature encoding:
 
 ```julia
-pipe = @pipeline ContinuousEncoder booster
+pipe = @pipeline ContinuousEncoder iterated_booster
 ```
 
-Define a hyper-parameter range for optimization:
+#### Composition 3: Wrapping the model to make it "self-tuning"
+
+First, we define a hyper-parameter range for optimization of a
+(nested) hyper-parameter:
 
 ```julia
 max_depth_range = range(pipe,
-                        :(evo_tree_regressor.max_depth),
+                        :(deterministic_iterated_model.model.max_depth),
                         lower = 1,
                         upper = 10)
 ```
 
-Wrap the pipeline model in an optimization strategy:
+Now we can wrap the pipeline model in an optimization strategy to make
+it "self-tuning":
 
 ```julia
 self_tuning_pipe = TunedModel(model=pipe,
@@ -89,31 +115,40 @@ self_tuning_pipe = TunedModel(model=pipe,
                               n=50)
 ```
 
-Bind the "self-tuning" pipeline model (just a container for
-hyper-parameters) to data in a *machine* (which will additionally
-store *learned* parameters):
+#### Binding to data and evaluating performance
+
+Loading a selection of features and labels from the Ames
+House Price dataset:
+
+```julia
+X, y = @load_reduced_ames;
+```
+
+Binding the "self-tuning" pipeline model to data in a *machine* (which
+will additionally store *learned* parameters):
 
 ```julia
 mach = machine(self_tuning_pipe, X, y)
 ```
 
-Evaluate the "self-tuning" pipeline model's performance (implies nested resampling):
+Evaluating the "self-tuning" pipeline model's performance using 5-fold
+cross-validation (implies multiple layers of nested resampling):
 
 ```julia
 julia> evaluate!(mach,
-                measures=[l1, l2],
-                resampling=CV(nfolds=6, rng=123),
-                acceleration=CPUProcesses(), verbosity=2)
-┌───────────┬───────────────┬────────────────────────────────────────────────────────┐
-│ _.measure │ _.measurement │ _.per_fold                                             │
-├───────────┼───────────────┼────────────────────────────────────────────────────────┤
-│ l1        │ 16700.0       │ [16100.0, 16400.0, 14500.0, 17000.0, 16400.0, 19500.0] │
-│ l2        │ 6.43e8        │ [5.88e8, 6.81e8, 4.35e8, 6.35e8, 5.98e8, 9.18e8]       │
-└───────────┴───────────────┴────────────────────────────────────────────────────────┘
-_.per_observation = [[[29100.0, 9990.0, ..., 103.0], [12100.0, 1330.0, ..., 13200.0], [6490.0, 22000.0, ..., 13800.0], [9090.0, 9530.0, ..., 13900.0], [50800.0, 22700.0, ..., 1550.0], [32800.0, 4940.0, ..., 1110.0]], [[8.45e8, 9.98e7, ..., 10500.0], [1.46e8, 1.77e6, ..., 1.73e8], [4.22e7, 4.86e8, ..., 1.9e8], [8.26e7, 9.09e7, ..., 1.93e8], [2.58e9, 5.13e8, ..., 2.42e6], [1.07e9, 2.44e7, ..., 1.24e6]]]
+                 measures=[l1, l2],
+                 resampling=CV(nfolds=5, rng=123),
+                 acceleration=CPUThreads(),
+                 verbosity=2)
+┌────────────────────┬───────────────┬───────────────────────────────────────────────┐
+│ _.measure          │ _.measurement │ _.per_fold                                    │
+├────────────────────┼───────────────┼───────────────────────────────────────────────┤
+│ LPLoss{Int64} @410 │ 16900.0       │ [17000.0, 16200.0, 16200.0, 16400.0, 18600.0] │
+│ LPLoss{Int64} @632 │ 6.57e8        │ [6.38e8, 6.19e8, 5.92e8, 5.67e8, 8.7e8]       │
+└────────────────────┴───────────────┴───────────────────────────────────────────────┘
+_.per_observation = [[[20300.0, 21800.0, ..., 7910.0], [4300.0, 31900.0, ..., 12600.0], [22000.0, 91600.0, ..., 35500.0], [2980.0, 35700.0, ..., 6240.0], [9140.0, 30000.0, ..., 3050.0]], [[4.13e8, 4.74e8, ..., 6.26e7], [1.85e7, 1.02e9, ..., 1.59e8], [4.83e8, 8.38e9, ..., 1.26e9], [8.86e6, 1.28e9, ..., 3.89e7], [8.35e7, 9.01e8, ..., 9.31e6]]]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]
-
 ```
 
 Try out MLJ yourself in the following batteries-included Binder
@@ -130,7 +165,7 @@ installation required.
   easier to use models from a wide range of packages,
 
 * Unlock performance gains by exploiting Julia's support for
-  parallelism, automatic differentiation, GPU, optimisation etc.
+  parallelism, automatic differentiation, GPU, optimization etc.
 
 
 ## Key features
@@ -178,7 +213,7 @@ do not exist in MLJ:
   not easily inspected or manipulated (by tuning algorithms, for
   example)
 
-- Composite models cannot implement multiple opertations, for example,
+- Composite models cannot implement multiple operations, for example,
   both a `predict` and `transform` method (as in clustering models) or
   both a `transform` and `inverse_transform` method.
 
@@ -186,7 +221,9 @@ Some of these features are demonstrated in [this
 notebook](https://github.com/ablaom/MachineLearningInJulia2020/blob/master/wow.ipynb)
 
 For more information see the [MLJ design
-paper](https://github.com/alan-turing-institute/MLJ.jl/blob/master/paper/paper.md)
+paper](https://doi.org/10.21105/joss.02704) or our detailed
+[paper](https://arxiv.org/abs/2012.15505) on the composition
+interface.
 
 
 ## Reporting problems
@@ -232,7 +269,7 @@ happens automatically when you use MLJ's interactive load command
 
 ```julia
 julia> Tree = @iload DecisionTreeClassifier # load type
-julis> tree = Tree() # instance
+julia> tree = Tree() # instance
 ```
 
 where you will also be asked to choose a providing package, for more
@@ -244,7 +281,7 @@ module or function) see [Loading Model Code](@ref).
 It is recommended that you start with models from more mature
 packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.
 
-MLJ is supported by a number of satelite packages (MLJTuning,
+MLJ is supported by a number of satellite packages (MLJTuning,
 MLJModelInterface, etc) which the general user is *not* required to
 install directly. Developers can learn more about these
 [here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/ORGANIZATION.md)
@@ -265,20 +302,19 @@ using MLJ.
 ## Learning to use MLJ
 
 The present document, although littered with examples, is primarily
-intended as a complete reference. For a short introduction to basic
-MLJ functionality, read the [Getting Started](@ref) section of this
-manual. For extensive tutorials, we recommend the [MLJ
-Tutorials](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
-website.  Each tutorial can be downloaded as a notebook or Julia
-script to facilitate experimentation. Finally, you may like to
-checkout the [JuliaCon2020
-Workshop](https://github.com/ablaom/MachineLearningInJulia2020) on MLJ
-(recorded
-[here](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title)).
+intended as a complete reference. Resources for learning MLJ are:
 
-You can try also MLJ out in the following
-[notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb)
-on Binder, without installing Julia or MLJ.
+### Basic introductions
+
+- the [Getting Started](@ref) section of this manual
+
+- an introductory [binder notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb) (no Julia/MLJ installation required)
+
+### In depth
+
+- the MLJ JuliaCon2020 Workshop [materials](https://github.com/ablaom/MachineLearningInJulia2020) and [video recording](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title)
+
+- [Data Science Tutorials in Julia](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
 
 Users are also welcome to join the `#mlj` Julia slack channel to ask
 questions and make suggestions.
@@ -303,5 +339,19 @@ paper:
   author = {Anthony D. Blaom and Franz Kiraly and Thibaut Lienart and Yiannis Simillides and Diego Arenas and Sebastian J. Vollmer},
   title = {{MLJ}: A Julia package for composable machine learning},
   journal = {Journal of Open Source Software}
+}
+```
+
+If using the model composition features of MLJ (learning networks)
+please additionally cite
+
+```bitex
+@misc{blaom2020flexible,
+  title={{Flexible model composition in machine learning and its implementation in MLJ}},
+  author={Anthony D. Blaom and Sebastian J. Vollmer},
+  year={2020},
+  eprint={2012.15505},
+  archivePrefix={arXiv},
+  primaryClass={cs.LG}
 }
 ```

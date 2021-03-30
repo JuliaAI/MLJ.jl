@@ -172,7 +172,7 @@ parameter `lambda` in a `RidgeRegressor` using 6-fold
 cross-validation. By wrapping our "self-tuning" version of the
 regressor as an [`IteratedModel`](@ref MLJIteration.IteratedModel),
 with `resampling=nothing` and `NumberSinceBest(20)` in the controls,
-we terminate the search when the bnumber of `lambda` values tested
+we terminate the search when the number of `lambda` values tested
 since the previous best cross-validation loss reaches 20.
 
 ```@example gree
@@ -325,14 +325,15 @@ A training machine `wrapper` has these properties:
 ### The training algorithm
 
 Here now is a simplified description of the training of an
-`IteratedModel`. First, the atomic `model` is bound to a subset of the
-supplied data and wrapped in an object called `wrapper` below. To
-train the wrapped machine for `i` more iterations, and update the
-other data in the wrapper, requires the call
-`MLJIteration.train!(wrapper, i)`. Only controls make this call (e.g.,
-`Step(...)`, or `IterateFromList(...)` above). If we assume for simplicity
-there is only a single control, called `control`, then training
-proceeds as follows:
+`IteratedModel`. First, the atomic `model` is bound in a machine - the
+*training machine* above - to a subset of the supplied data, and then
+wrapped in an object called `wrapper` below. To train the training
+machine machine for `i` more iterations, and update the other data in
+the wrapper, requires the call `MLJIteration.train!(wrapper, i)`. Only
+controls can make this call (e.g., `Step(...)`, or
+`IterateFromList(...)` above). If we assume for simplicity there is
+only a single control, called `control`, then training proceeds as
+follows:
 
 ```julia
 state = update!(control, wrapper, verbosity)
