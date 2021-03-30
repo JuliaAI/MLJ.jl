@@ -5,8 +5,8 @@ A Machine Learning Framework for Julia
 <br>
 <br>
 <div style="font-size:1.25em;font-weight:bold;">
-  <a href="#Installation-1">Install</a>         &nbsp;|&nbsp;
-  <a href="#Learning-to-use-MLJ-1">Learn</a>    &nbsp;|&nbsp;
+  <a href="#Installation-1" style="color: orange;">Install</a>         &nbsp;|&nbsp;
+  <a href="#Learning-to-use-MLJ-1" style="color: orange;">Learn</a>    &nbsp;|&nbsp;
   <a href="mlj_cheatsheet">Cheatsheet</a>       &nbsp;|&nbsp;
   <a href="common_mlj_workflows">Workflows</a>  &nbsp;|&nbsp;
   <a href="https://github.com/alan-turing-institute/MLJ.jl/">For Developers</a> &nbsp;|&nbsp;
@@ -30,7 +30,8 @@ Turing Institute](https://www.turing.ac.uk/).
 
 ## Lightning tour
 
-*For a more elementary introduction to MLJ usage see [Getting Started](@ref).*
+*For more elementary introductions to MLJ usage see [Basic
+introductions](@ref) below.*
 
 The first code snippet below creates a new Julia environment
 `MLJ_tour` and installs just those packages needed for the tour. See
@@ -44,35 +45,57 @@ Julia installation instructions are
 using Pkg
 Pkg.activate("MLJ_tour", shared=true)
 Pkg.add("MLJ")
+Pkg.add("MLJIteration")
 Pkg.add("EvoTrees")
 ```
 
-Load a selection of features and labels from the Ames House Price dataset:
-
-```julia
-using MLJ
-X, y = @load_reduced_ames;
-```
+In MLJ a *model* is just a container for hyper-parameters, and that's
+all. Here we will apply several kinds of model composition before
+binding the resulting "metamodel" to data in a *machine* for
+evaluation using cross-validation.
 
 Load and instantiate a gradient tree-boosting model type:
 
 ```julia
-Booster = @load EvoTreeRegressor
-booster = Booster(max_depth=2) # specify hyperparamter at construction
-booster.nrounds=50             # or mutate post facto
+using MLJ
+Booster = @load EvoTreeRegressor # loads code defining a model tpe
+booster = Booster(max_depth=2)   # specify hyperparamter at construction
+booster.nrounds=50               # or mutate post facto
 ```
+
+This model is an example of an iterative model. As is stands, the
+number of iterations `nrnounds` is fixed.
+
+#### Composition 1: Wrapping a model to make it "self-iterating"
+
+Create a new model that automatically learns the number of iterations,
+using the `NumberSinceBest(3)` criterion, as applied to an
+out-of-sample `l1` loss:
+
+```julia
+using MLJIteration
+iterated_booster = IteratedModel(model=booster,
+                                 resampling=Holdout(fraction_train=0.8),
+                                 controls=[Step(2), NumberSinceBest(3), NumberLimit(300)],
+                                 measure=l1,
+                                 retrain=true)
+```
+
+#### Composition 2: Preprocess the input features
 
 Combine the model with categorical feature encoding:
 
 ```julia
-pipe = @pipeline ContinuousEncoder booster
+pipe = @pipeline ContinuousEncoder iterated_booster
 ```
 
-Define a hyper-parameter range for optimization:
+#### Composition 3: Wrapping the mode to make it "self-tuning"
+
+Define a hyper-parameter range for optimization of a nested hyper-parameter:
 
 ```julia
 max_depth_range = range(pipe,
-                        :(evo_tree_regressor.max_depth),
+                        :(deterministic_iterated_model.model.max_depth),
                         lower = 1,
                         upper = 10)
 ```
@@ -89,6 +112,15 @@ self_tuning_pipe = TunedModel(model=pipe,
                               n=50)
 ```
 
+#### Binding to data and evaluating performance
+
+Load a selection of features and labels from the Ames
+House Price dataset:
+
+```julia
+X, y = @load_reduced_ames;
+```
+
 Bind the "self-tuning" pipeline model (just a container for
 hyper-parameters) to data in a *machine* (which will additionally
 store *learned* parameters):
@@ -101,19 +133,19 @@ Evaluate the "self-tuning" pipeline model's performance (implies nested resampli
 
 ```julia
 julia> evaluate!(mach,
-                measures=[l1, l2],
-                resampling=CV(nfolds=6, rng=123),
-                acceleration=CPUProcesses(), verbosity=2)
-┌───────────┬───────────────┬────────────────────────────────────────────────────────┐
-│ _.measure │ _.measurement │ _.per_fold                                             │
-├───────────┼───────────────┼────────────────────────────────────────────────────────┤
-│ l1        │ 16700.0       │ [16100.0, 16400.0, 14500.0, 17000.0, 16400.0, 19500.0] │
-│ l2        │ 6.43e8        │ [5.88e8, 6.81e8, 4.35e8, 6.35e8, 5.98e8, 9.18e8]       │
-└───────────┴───────────────┴────────────────────────────────────────────────────────┘
-_.per_observation = [[[29100.0, 9990.0, ..., 103.0], [12100.0, 1330.0, ..., 13200.0], [6490.0, 22000.0, ..., 13800.0], [9090.0, 9530.0, ..., 13900.0], [50800.0, 22700.0, ..., 1550.0], [32800.0, 4940.0, ..., 1110.0]], [[8.45e8, 9.98e7, ..., 10500.0], [1.46e8, 1.77e6, ..., 1.73e8], [4.22e7, 4.86e8, ..., 1.9e8], [8.26e7, 9.09e7, ..., 1.93e8], [2.58e9, 5.13e8, ..., 2.42e6], [1.07e9, 2.44e7, ..., 1.24e6]]]
+                 measures=[l1, l2],
+                 resampling=CV(nfolds=5, rng=123),
+                 acceleration=CPUThreads(),
+                 verbosity=2)
+┌────────────────────┬───────────────┬───────────────────────────────────────────────┐
+│ _.measure          │ _.measurement │ _.per_fold                                    │
+├────────────────────┼───────────────┼───────────────────────────────────────────────┤
+│ LPLoss{Int64} @410 │ 16900.0       │ [17000.0, 16200.0, 16200.0, 16400.0, 18600.0] │
+│ LPLoss{Int64} @632 │ 6.57e8        │ [6.38e8, 6.19e8, 5.92e8, 5.67e8, 8.7e8]       │
+└────────────────────┴───────────────┴───────────────────────────────────────────────┘
+_.per_observation = [[[20300.0, 21800.0, ..., 7910.0], [4300.0, 31900.0, ..., 12600.0], [22000.0, 91600.0, ..., 35500.0], [2980.0, 35700.0, ..., 6240.0], [9140.0, 30000.0, ..., 3050.0]], [[4.13e8, 4.74e8, ..., 6.26e7], [1.85e7, 1.02e9, ..., 1.59e8], [4.83e8, 8.38e9, ..., 1.26e9], [8.86e6, 1.28e9, ..., 3.89e7], [8.35e7, 9.01e8, ..., 9.31e6]]]
 _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]
-
 ```
 
 Try out MLJ yourself in the following batteries-included Binder
@@ -275,7 +307,7 @@ intended as a complete reference. Resources for learning MLJ are:
 
 ### In depth
 
-- the MLJ JuliaCon2020 Workshop [materials](https://github.com/ablaom/MachineLearningInJulia2020) and [video recording](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title))
+- the MLJ JuliaCon2020 Workshop [materials](https://github.com/ablaom/MachineLearningInJulia2020) and [video recording](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title)
 
 - [Data Science Tutorials in Julia](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
 
@@ -310,11 +342,11 @@ please additionally cite
 
 ```bitex
 @misc{blaom2020flexible,
-      title={{Flexible model composition in machine learning and its implementation in MLJ}}, 
-      author={Anthony D. Blaom and Sebastian J. Vollmer},
-      year={2020},
-      eprint={2012.15505},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG}
+          title={{Flexible model composition in machine learning and its implementation in MLJ}},
+          author={Anthony D. Blaom and Sebastian J. Vollmer},
+          year={2020},
+          eprint={2012.15505},
+          archivePrefix={arXiv},
+          primaryClass={cs.LG}
 }
 ```
