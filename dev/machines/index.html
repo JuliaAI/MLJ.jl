@@ -3,32 +3,32 @@
 forest = EnsembleModel(atom=tree, n=10);
 X, y = @load_iris;
 mach = machine(forest, X, y)
-fit!(mach, verbosity=2);</code></pre><pre><code class="language-none">Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @414 trained 1 time; caches data
+fit!(mach, verbosity=2);</code></pre><pre><code class="language-none">Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @485 trained 1 time; caches data
   args: 
-    1:	Source @713 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @935 ⏎ `AbstractVector{Multiclass{3}}`
+    1:	Source @815 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @519 ⏎ `AbstractVector{Multiclass{3}}`
 </code></pre><p>Generally, changing a hyperparameter triggers retraining on calls to subsequent <code>fit!</code>:</p><pre><code class="language-julia-repl">julia&gt; forest.bagging_fraction=0.5
 0.5
 
 julia&gt; fit!(mach, verbosity=2);
-[ Info: Updating Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @414.
+[ Info: Updating Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @485.
 [ Info: Truncating existing ensemble.</code></pre><p>However, for this iterative model, increasing the iteration parameter only adds models to the existing ensemble:</p><pre><code class="language-julia-repl">julia&gt; forest.n=15
 15
 
 julia&gt; fit!(mach, verbosity=2);
-[ Info: Updating Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @414.
+[ Info: Updating Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @485.
 [ Info: Building on existing ensemble of length 10
 [ Info: One hash per new atom trained: 
 #####</code></pre><p>Call <code>fit!</code> again without making a change and no retraining occurs:</p><pre><code class="language-julia-repl">julia&gt; fit!(mach);
-[ Info: Not retraining Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @414. Use `force=true` to force.</code></pre><p>However, retraining can be forced:</p><pre><code class="language-julia-repl">julia&gt; fit!(mach, force=true);
-[ Info: Training Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @414.</code></pre><p>And is re-triggered if the view of the data changes:</p><pre><code class="language-julia-repl">julia&gt; fit!(mach, rows=1:100);
-[ Info: Training Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @414.</code></pre><pre><code class="language-julia-repl">julia&gt; fit!(mach, rows=1:100);
-[ Info: Not retraining Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @414. Use `force=true` to force.</code></pre><p>If an iterative model exposes it&#39;s iteration parameter as a hyper-parameter, and it implements the warm restart behaviour above, then it can be wrapped in a &quot;control strategy&quot;, like an early stopping critetion. See <a href="../controlling_iterative_models/#Controlling-Iterative-Models-1">Controlling Iterative Models</a> for details.</p><h2 id="Inspecting-machines-1"><a class="docs-heading-anchor" href="#Inspecting-machines-1">Inspecting machines</a><a class="docs-heading-anchor-permalink" href="#Inspecting-machines-1" title="Permalink"></a></h2><p>There are two methods for inspecting the outcomes of training in MLJ. To obtain a named-tuple describing the learned parameters (in a user-friendly way where possible) use <code>fitted_params(mach)</code>. All other training-related outcomes are inspected with <code>report(mach)</code>.</p><pre><code class="language-julia">X, y = @load_iris
+[ Info: Not retraining Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @485. Use `force=true` to force.</code></pre><p>However, retraining can be forced:</p><pre><code class="language-julia-repl">julia&gt; fit!(mach, force=true);
+[ Info: Training Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @485.</code></pre><p>And is re-triggered if the view of the data changes:</p><pre><code class="language-julia-repl">julia&gt; fit!(mach, rows=1:100);
+[ Info: Training Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @485.</code></pre><pre><code class="language-julia-repl">julia&gt; fit!(mach, rows=1:100);
+[ Info: Not retraining Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} @485. Use `force=true` to force.</code></pre><p>If an iterative model exposes it&#39;s iteration parameter as a hyper-parameter, and it implements the warm restart behaviour above, then it can be wrapped in a &quot;control strategy&quot;, like an early stopping critetion. See <a href="../controlling_iterative_models/#Controlling-Iterative-Models-1">Controlling Iterative Models</a> for details.</p><h2 id="Inspecting-machines-1"><a class="docs-heading-anchor" href="#Inspecting-machines-1">Inspecting machines</a><a class="docs-heading-anchor-permalink" href="#Inspecting-machines-1" title="Permalink"></a></h2><p>There are two methods for inspecting the outcomes of training in MLJ. To obtain a named-tuple describing the learned parameters (in a user-friendly way where possible) use <code>fitted_params(mach)</code>. All other training-related outcomes are inspected with <code>report(mach)</code>.</p><pre><code class="language-julia">X, y = @load_iris
 pca = (@load PCA verbosity=0)()
 mach = machine(pca, X)
-fit!(mach)</code></pre><pre><code class="language-none">Machine{PCA,…} @303 trained 1 time; caches data
+fit!(mach)</code></pre><pre><code class="language-none">Machine{PCA,…} @143 trained 1 time; caches data
   args: 
-    1:	Source @377 ⏎ `Table{AbstractVector{Continuous}}`
+    1:	Source @651 ⏎ `Table{AbstractVector{Continuous}}`
 </code></pre><pre><code class="language-julia-repl">julia&gt; fitted_params(mach)
 (projection = [-0.36158967738144976 0.6565398832858305 0.5809972798276166; 0.08226888989221415 0.7297123713264976 -0.5964180879381006; -0.8565721052905277 -0.1757674034286538 -0.07252407548696091; -0.3588439262482157 -0.07470647013503354 -0.549060910726608],)
 
@@ -109,4 +109,4 @@ io = IOBuffer()
 MLJ.save(io, mach)
 seekstart(io)
 predict_only_mach = machine(io)
-predict(predict_only_mach, X)</code></pre><div class="admonition is-warning"><header class="admonition-header">Only load files from trusted sources</header><div class="admonition-body"><p>Maliciously constructed JLSO files, like pickles, and most other general purpose serialization formats, can allow for arbitrary code execution during loading. This means it is possible for someone to use a JLSO file that looks like a serialized MLJ machine as a <a href="https://en.wikipedia.org/wiki/Trojan_horse_(computing)">Trojan horse</a>.</p></div></div></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../loading_model_code/">« Loading Model Code</a><a class="docs-footer-nextpage" href="../evaluating_model_performance/">Evaluating Model Performance »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 30 March 2021 00:35">Tuesday 30 March 2021</span>. Using Julia version 1.6.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+predict(predict_only_mach, X)</code></pre><div class="admonition is-warning"><header class="admonition-header">Only load files from trusted sources</header><div class="admonition-body"><p>Maliciously constructed JLSO files, like pickles, and most other general purpose serialization formats, can allow for arbitrary code execution during loading. This means it is possible for someone to use a JLSO file that looks like a serialized MLJ machine as a <a href="https://en.wikipedia.org/wiki/Trojan_horse_(computing)">Trojan horse</a>.</p></div></div></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../loading_model_code/">« Loading Model Code</a><a class="docs-footer-nextpage" href="../evaluating_model_performance/">Evaluating Model Performance »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 30 March 2021 04:02">Tuesday 30 March 2021</span>. Using Julia version 1.6.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
