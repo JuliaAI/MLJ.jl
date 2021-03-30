@@ -26,6 +26,7 @@ post an issue requesting this
 - [LightGBM.jl](https://github.com/IQVIA-ML/LightGBM.jl)
 - [GLM.jl](https://github.com/JuliaStats/GLM.jl)
 - [XGBoost.jl](https://github.com/dmlc/XGBoost.jl)
+- [BetaML.jl](https://github.com/sylvaticus/BetaML.jl)
 
 ## Providing unregistered models:
 
