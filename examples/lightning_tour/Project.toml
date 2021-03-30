@@ -1,0 +1,5 @@
+[deps]
+EvoTrees = "f6006082-12f8-11e9-0c9c-0d5d367ab1e5"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
+MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
+MLJIteration = "614be32b-d00c-4edb-bd02-1eb411ab5e55"
