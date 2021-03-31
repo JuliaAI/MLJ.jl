@@ -226,7 +226,7 @@ state being external to the control `struct`) and one for all
 subsequent control applications, which generally updates state
 also. There are two optional methods: `done`, for specifying
 conditions triggering a stop, and `takedown` for specifying actions to
-perform at the end of all training.
+perform at the end of controlled training.
 
 We summarize the training algorithm, as it relates to controls, after
 giving a simple example.
