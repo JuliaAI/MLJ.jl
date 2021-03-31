@@ -77,12 +77,12 @@ y = categorical(collect("asdfa"))
 train, test = partition(1:length(y), 0.8);
 ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom)
 ensemble_model.n = 10
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 atomic_weights = rand(10)
 atomic_weights = atomic_weights/sum(atomic_weights)
 ensemble_model.atomic_weights = atomic_weights
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
 p = predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 @test MLJBase.target_scitype(ensemble_model) == MLJBase.target_scitype(atom)
 
@@ -93,11 +93,11 @@ y = Float64[1.0, 2.0, 1.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
 ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom)
 ensemble_model.n = 10
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
 @test reduce(* , [x ≈ 1.0 || x ≈ 1.25 for x in fitresult.ensemble])
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 ensemble_model.bagging_fraction = 1.0
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
 @test unique(fitresult.ensemble) ≈ [1.2]
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 atomic_weights = rand(10)
@@ -115,14 +115,14 @@ train, test = partition(1:length(y), 0.8);
 ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom, rng=rng)
 ensemble_model.out_of_bag_measure = [MLJ.rms,MLJ.rmsp]
 ensemble_model.n = 10
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
 # TODO: the following test fails in distributed version (because of
 # multiple rng's ?)
 @test abs(report.oob_measurements[1] - std(y)) < 0.25
 ensemble_model = MLJ.DeterministicEnsembleModel(atom=atom,rng=Random.MersenneTwister(1))
 ensemble_model.out_of_bag_measure = MLJ.rms
 ensemble_model.n = 2
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
 
 # target is :probabilistic :multiclass false:
 atom = ConstantClassifier()
@@ -131,11 +131,11 @@ y = categorical(collect("asdfa"))
 train, test = partition(1:length(y), 0.8);
 ensemble_model = MLJ.ProbabilisticEnsembleModel(atom=atom)
 ensemble_model.n = 10
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
 fitresult.ensemble
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 ensemble_model.bagging_fraction = 1.0
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
 fitresult.ensemble
 d = predict(ensemble_model, fitresult, MLJ.selectrows(X, test))[1]
 @test pdf(d, 'a') ≈ 2/5
@@ -150,7 +150,7 @@ predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 
 # test sample weights
 w = [1,100,1,1,1]
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y, w)
+fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y, w)
 p2 = predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
 @test mode(p2[1] ) == 's'
 
@@ -161,7 +161,7 @@ y = Float64[1.0, 2.0, 2.0, 1.0, 1.0]
 train, test = partition(1:length(y), 0.8);
 ensemble_model = MLJ.ProbabilisticEnsembleModel(atom=atom)
 ensemble_model.n = 10
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
 d1 = Distributions.fit(Distributions.Normal, [1,1,2,2])
 d2 = Distributions.fit(Distributions.Normal, [1,1,1,2])
 # @test reduce(* , [d.μ ≈ d1.μ || d.μ ≈ d2.μ for d in fitresult.ensemble])
@@ -171,7 +171,7 @@ for dc in d.components
     @test pdf(dc, 1.52) ≈ pdf(d1, 1.52) || pdf(dc, 1.52) ≈ pdf(d2, 1.52)
 end
 ensemble_model.bagging_fraction = 1.0
-fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
 d = predict(ensemble_model, fitresult, MLJ.selectrows(X, test))[1]
 d3 = Distributions.fit(Distributions.Normal, y)
 @test pdf(d, 1.52) ≈ pdf(d3, 1.52)
@@ -191,29 +191,29 @@ predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
     N = 20
     X = (x = rand(rng, 3N), );
     y = categorical(rand(rng, "abbbc", 3N));
-    atom = (@load KNNClassifier)()
+    atom = (@load KNNClassifier verbosity=0)()
     ensemble_model = MLJ.ProbabilisticEnsembleModel(atom=atom,
                                                     bagging_fraction=1,
                                                     n = 5, rng=rng)
-    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+    fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
     @test predict_mode(ensemble_model, fitresult, (x = [0, ],))[1] == 'b'
     w = map(y) do η
         η == 'a' ? 100 : 1
     end
-    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y, w)
+    fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y, w)
     @test predict_mode(ensemble_model, fitresult, (x = [0, ],))[1] == 'a'
 
     ensemble_model.rng = 1234 # always start with same rng
     ensemble_model.bagging_fraction=0.6
     ensemble_model.out_of_bag_measure = [BrierScore(), cross_entropy]
-    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+    fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
     m1 = report.oob_measurements[1]
-    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
+    fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y)
     m2 = report.oob_measurements[1]
     @test m1 == m2
     # supplying sample weights should change the oob meausurements for
     # measures that support weights:
-    fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y, w)
+    fitresult, cache, report = MLJ.fit(ensemble_model, 0, X, y, w)
     m3 = report.oob_measurements[1]
     @test !(m1 ≈ m3)
 end
@@ -229,7 +229,7 @@ atom = KNNRegressor(K=7)
 ensemble_model = EnsembleModel(atom=atom)
 ensemble = machine(ensemble_model, X, y)
 train, test = partition(eachindex(y), 0.7)
-fit!(ensemble, rows=train)
+fit!(ensemble, rows=train, verbosity=0)
 @test length(ensemble.fitresult.ensemble) == ensemble_model.n
 ensemble_model.n = 15
 @test_logs((:info, r"Training"),
