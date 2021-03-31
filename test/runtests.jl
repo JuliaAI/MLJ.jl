@@ -12,6 +12,10 @@ end
     @test include("version.jl")
 end
 
+@testset "exported_names" begin
+    @test include("exported_names.jl")
+end
+
 @testset "ensembles" begin
    @test include("ensembles.jl")
 end
