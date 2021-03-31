@@ -9,7 +9,7 @@ import MLJModels
 using CategoricalArrays
 import Distributions
 
-@load KNNRegressor
+KNNRegressor = @load KNNRegressor verbosity=0
 
 ## HELPER FUNCTIONS
 
@@ -84,7 +84,6 @@ atomic_weights = atomic_weights/sum(atomic_weights)
 ensemble_model.atomic_weights = atomic_weights
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y)
 p = predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-MLJBase.info_dict(ensemble_model)
 @test MLJBase.target_scitype(ensemble_model) == MLJBase.target_scitype(atom)
 
 # target is :deterministic :continuous false:
@@ -105,7 +104,6 @@ atomic_weights = rand(10)
 atomic_weights = atomic_weights/sum(atomic_weights)
 ensemble_model.atomic_weights = atomic_weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-MLJBase.info_dict(ensemble_model)
 
 # target is :deterministic :continuous false:
 atom = MLJModels.DeterministicConstantRegressor()
@@ -149,7 +147,7 @@ atomic_weights = rand(10)
 atomic_weights = atomic_weights/sum(atomic_weights)
 ensemble_model.atomic_weights = atomic_weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-MLJBase.info_dict(ensemble_model)
+
 # test sample weights
 w = [1,100,1,1,1]
 fitresult, cache, report = MLJ.fit(ensemble_model, 1, X, y, w)
@@ -181,7 +179,7 @@ atomic_weights = rand(10)
 atomic_weights = atomic_weights/sum(atomic_weights)
 ensemble_model.atomic_weights = atomic_weights
 predict(ensemble_model, fitresult, MLJ.selectrows(X, test))
-MLJBase.info_dict(ensemble_model)
+
 # @test MLJBase.output_is(ensemble_model) == MLJBase.output_is(atom)
 
 # test generic constructor:
@@ -193,7 +191,7 @@ MLJBase.info_dict(ensemble_model)
     N = 20
     X = (x = rand(rng, 3N), );
     y = categorical(rand(rng, "abbbc", 3N));
-    atom = @load KNNClassifier
+    atom = (@load KNNClassifier)()
     ensemble_model = MLJ.ProbabilisticEnsembleModel(atom=atom,
                                                     bagging_fraction=1,
                                                     n = 5, rng=rng)
