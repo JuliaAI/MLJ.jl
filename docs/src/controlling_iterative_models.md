@@ -236,7 +236,7 @@ giving a simple example.
 
 Below we define a control, `IterateFromList(list)`, to train, on each
 application of the control, until the iteration count reaches the next
-value in a user-specified list, triggering a stop when the list is
+value in a user-specified `list`, triggering a stop when the `list` is
 exhausted. For example, to train on iteration counts on a log scale,
 one might use `IterateFromList([round(Int, 10^x) for x in range(1, 2,
 length=10)]`.
