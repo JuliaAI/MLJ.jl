@@ -34,7 +34,6 @@ iterations from the controlled training phase:
 
 ```@example gree
 using MLJ
-using MLJIteration
 
 X, y = make_moons(1000, rng=123)
 EvoTreeClassifier = @load EvoTreeClassifier verbosity=0
@@ -177,7 +176,6 @@ since the previous best cross-validation loss reaches 20.
 
 ```@example gree
 using MLJ
-using MLJIteration
 
 X, y = @load_boston;
 RidgeRegressor = @load RidgeRegressor pkg=MLJLinearModels verbosity=0
@@ -246,7 +244,7 @@ In the code, `wrapper` is an object that wraps the training machine
 
 ```julia
 
-import IterationControl # or MLJIteration.IterationControl
+import IterationControl # or MLJ.IterationControl
 
 struct IterateFromList
     list::Vector{<:Int} # list of iteration parameter values

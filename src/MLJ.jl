@@ -1,6 +1,37 @@
 module MLJ
 
 
+## METHOD IMPORT
+
+# from the Standard Library:
+import Distributed: @distributed, nworkers, pmap
+import Pkg
+import Pkg.TOML
+
+# from the MLJ universe:
+using MLJBase
+import MLJBase.save
+using MLJTuning
+using MLJModels
+using MLJIteration
+import MLJIteration.IterationControl
+
+using Tables, CategoricalArrays
+import Distributions
+import Distributions: pdf, mode
+import Statistics, StatsBase, LinearAlgebra, Random
+import Random: AbstractRNG, MersenneTwister
+using ProgressMeter
+using ComputationalResources
+using ComputationalResources: CPUProcesses
+
+# to be extended:
+import MLJBase: fit, update, clean!, fit!, predict, fitted_params,
+                show_as_constructed, ==
+import MLJModels: models
+import MLJScientificTypes
+
+
 ## METHOD EXPORT
 
 export MLJ_VERSION
@@ -161,37 +192,17 @@ export models, localmodels, @load, @iload, load, info,
     OneHotEncoder, ContinuousEncoder, UnivariateDiscretizer,
     FillImputer, matching
 
+# re-export from MLJIteration:
+export IteratedModel
+for control in MLJIteration.CONTROLS
+    eval(:(export $control))
+end
+export IterationControl
+
 # re-export from ComputaionalResources:
 export CPU1, CPUProcesses, CPUThreads
 
 
-## METHOD IMPORT
-
-# from the Standard Library:
-import Distributed: @distributed, nworkers, pmap
-import Pkg
-import Pkg.TOML
-
-# from the MLJ universe:
-using MLJBase
-import MLJBase.save
-using MLJTuning
-using MLJModels
-
-using Tables, CategoricalArrays
-import Distributions
-import Distributions: pdf, mode
-import Statistics, StatsBase, LinearAlgebra, Random
-import Random: AbstractRNG, MersenneTwister
-using ProgressMeter
-using ComputationalResources
-using ComputationalResources: CPUProcesses
-
-# to be extended:
-import MLJBase: fit, update, clean!, fit!, predict, fitted_params,
-                show_as_constructed, ==
-import MLJModels: models
-import MLJScientificTypes
 
 ## CONSTANTS
 
