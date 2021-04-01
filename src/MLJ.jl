@@ -13,6 +13,9 @@ using MLJBase
 import MLJBase.save
 using MLJTuning
 using MLJModels
+using MLJOpenML
+using MLJSerialization
+import MLJSerialization.save # but not re-exported
 using MLJIteration
 import MLJIteration.IterationControl
 
@@ -79,7 +82,6 @@ export nrows, color_off, color_on,
     ResamplingStrategy, Holdout, CV,
     StratifiedCV, evaluate!, Resampler, iterator,
     default_resource, pretty,
-    OpenML,
     make_blobs, make_moons, make_circles, make_regression,
     fit_only!, return!, int, decoder
 
@@ -198,6 +200,13 @@ for control in MLJIteration.CONTROLS
     eval(:(export $control))
 end
 export IterationControl
+
+# re-export from MLJOpenML
+const OpenML = MLJOpenML # for backwards compatibility
+export OpenML
+
+# re-export from MLJSerialization:
+export Save # control, not method
 
 # re-export from ComputaionalResources:
 export CPU1, CPUProcesses, CPUThreads

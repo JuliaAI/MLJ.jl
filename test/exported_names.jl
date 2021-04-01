@@ -11,4 +11,15 @@ IterationControl.debug(Step(2))
 
 IteratedModel
 
+
+# MLJSerialization
+
+Save()
+@test MLJ.save isa Function
+
+
+# MLJOpenML
+
+@test OpenML.load isa Function
+
 true
