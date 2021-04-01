@@ -12,10 +12,13 @@ end
     @test include("version.jl")
 end
 
-# TODO: restore after MLJNearestNeighbors #1 is resolved:
-# @testset "ensembles" begin
-#    @test include("ensembles.jl")
-# end
+@testset "exported_names" begin
+    @test include("exported_names.jl")
+end
+
+@testset "ensembles" begin
+   @test include("ensembles.jl")
+end
 
 @testset "scitypes" begin
     @test include("scitypes.jl")

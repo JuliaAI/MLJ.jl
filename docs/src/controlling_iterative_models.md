@@ -6,11 +6,13 @@ criterion, such as `k` consecutive deteriorations of the performance
 (see [`Patience`](@ref EarlyStopping.Patience) below). A more
 sophisticated kind of control might dynamically mutate parameters,
 such as a learning rate, in response to the behavior of these
-estimates. Some iterative model implementations enable some form of
-automated control, with the method and options for doing so varying
-from model to model. But sometimes it is up to the user to arrange
-control, which in the crudest case reduces to manually experimenting
-with the iteration parameter.
+estimates. 
+
+Some iterative model implementations enable some form of automated
+control, with the method and options for doing so varying from model
+to model. But sometimes it is up to the user to arrange control, which
+in the crudest case reduces to manually experimenting with the
+iteration parameter.
 
 In response to this ad hoc state of affairs, MLJ provides a uniform
 and feature-rich interface for controlling any iterative model that
@@ -34,7 +36,6 @@ iterations from the controlled training phase:
 
 ```@example gree
 using MLJ
-using MLJIteration
 
 X, y = make_moons(1000, rng=123)
 EvoTreeClassifier = @load EvoTreeClassifier verbosity=0
@@ -110,7 +111,7 @@ control                                              | description              
 [`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=i->@info("num iterations: $i"))` | Call `f(i)`, where `i` is total number of iterations                                    | yes
 [`WithLossDo`](@ref IterationControl.WithLossDo)`(f=x->@info("loss: $x"))`                | Call `f(loss)` where `loss` is the current loss                                         | yes
 [`WithTrainingLossesDo`](@ref IterationControl.WithTrainingLossesDo)`(f=v->@info(v))`      | Call `f(v)` where `v` is the current batch of training losses                           | yes
-[`Save`](@ref MLJIteration.Save)`(filename="machine.jlso")`            | Save current machine to `machine1.jlso`, `machine2.jslo`, etc                           | yes
+[`Save`](@ref MLJIteration.Save)`(filename="machine.jlso")`            | * Save current machine to `machine1.jlso`, `machine2.jslo`, etc                           | yes
 
 > Table 1. Atomic controls. Some advanced options omitted.
 
@@ -118,6 +119,9 @@ control                                              | description              
  (1998)](https://link.springer.com/chapter/10.1007%2F3-540-49430-8_3):
  "Early Stopping - But When?", in *Neural Networks: Tricks of the
  Trade*, ed. G. Orr, Springer.
+
+* If using `MLJIteration` without `MLJ`, then `Save` is not available
+  unless one is also using `MLJSerialization`.
 
 **Stopping option.** All the following controls trigger a stop if the
 provided function `f` returns `true` and `stop_if_true=true` is
@@ -177,7 +181,6 @@ since the previous best cross-validation loss reaches 20.
 
 ```@example gree
 using MLJ
-using MLJIteration
 
 X, y = @load_boston;
 RidgeRegressor = @load RidgeRegressor pkg=MLJLinearModels verbosity=0
@@ -226,7 +229,7 @@ state being external to the control `struct`) and one for all
 subsequent control applications, which generally updates state
 also. There are two optional methods: `done`, for specifying
 conditions triggering a stop, and `takedown` for specifying actions to
-perform at the end of all training.
+perform at the end of controlled training.
 
 We summarize the training algorithm, as it relates to controls, after
 giving a simple example.
@@ -236,7 +239,7 @@ giving a simple example.
 
 Below we define a control, `IterateFromList(list)`, to train, on each
 application of the control, until the iteration count reaches the next
-value in a user-specified list, triggering a stop when the list is
+value in a user-specified `list`, triggering a stop when the `list` is
 exhausted. For example, to train on iteration counts on a log scale,
 one might use `IterateFromList([round(Int, 10^x) for x in range(1, 2,
 length=10)]`.
@@ -246,7 +249,7 @@ In the code, `wrapper` is an object that wraps the training machine
 
 ```julia
 
-import IterationControl # or MLJIteration.IterationControl
+import IterationControl # or MLJ.IterationControl
 
 struct IterateFromList
     list::Vector{<:Int} # list of iteration parameter values

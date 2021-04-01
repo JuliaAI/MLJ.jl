@@ -1,7 +1,7 @@
 name = "MLJ"
 uuid = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 authors = ["Anthony D. Blaom <anthony.blaom@gmail.com>"]
-version = "0.16.0"
+version = "0.16.1"
 
 [deps]
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
@@ -10,8 +10,11 @@ Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
+MLJIteration = "614be32b-d00c-4edb-bd02-1eb411ab5e55"
 MLJModels = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
+MLJOpenML = "cbea4545-8c96-4583-ad3a-44078d60d369"
 MLJScientificTypes = "2e2323e0-db8b-457b-ae0d-bdfb3bc63afd"
+MLJSerialization = "17bed46d-0ab5-4cd4-b792-a5c4b8547c6d"
 MLJTuning = "03970b2e-30c4-11ea-3135-d1576263f10f"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
@@ -24,9 +27,12 @@ Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 CategoricalArrays = "^0.8,^0.9"
 ComputationalResources = "^0.3"
 Distributions = "^0.21,^0.22,^0.23, 0.24"
-MLJBase = "^0.17"
+MLJBase = "^0.18"
+MLJIteration = "^0.2"
 MLJModels = "^0.14"
+MLJOpenML = "^1"
 MLJScientificTypes = "^0.4.1"
+MLJSerialization = "^1.1"
 MLJTuning = "^0.6"
 ProgressMeter = "^1.1"
 StatsBase = "^0.32,^0.33"
@@ -34,9 +40,9 @@ Tables = "^0.2,^1.0"
 julia = "^1.1"
 
 [extras]
-NearestNeighbors = "b8a86587-4115-5ab1-83bc-aa920d37bbce"
+NearestNeighborModels = "636a865e-7cf4-491e-846c-de09b730eb36"
 StableRNGs = "860ef19b-820b-49d6-a774-d7a799459cd3"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["NearestNeighbors", "StableRNGs", "Test"]
+test = ["NearestNeighborModels", "StableRNGs", "Test"]
