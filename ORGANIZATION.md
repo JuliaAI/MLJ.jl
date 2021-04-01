@@ -41,20 +41,28 @@ its conventional use, are marked with a ⟂ symbol:
   detailed description of MLJBase's contents.
 
 * [MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl)
-  hosts the MLJ **registry**, which contains metadata on all the models
-  the MLJ user can search and load from MLJ. Moreover, it provides
-  the functionality for **loading model code** from MLJ on
-  demand. Finally, it furnishes **model interfaces** for a number of third
-  party model providers not implementing interfaces natively, such as
-  [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl),
-  [ScikitLearn.jl](https://github.com/cstjean/ScikitLearn.jl) or
-  [XGBoost.jl](https://github.com/dmlc/XGBoost.jl). These packages are
-  *not* imported by MLJModels and are not dependencies from the
-  point-of-view of current package management.
+  hosts the MLJ **registry**, which contains metadata on all the
+  models the MLJ user can search and load from MLJ. Moreover, it
+  provides the functionality for **loading model code** from MLJ on
+  demand. Finally, it furnishes some commonly used transformers for
+  data pre-processing, such as `ContinuousEncoder` and `Standardizer`.
 
 * [MLJTuning.jl](https://github.com/alan-turing-institute/MLJTuning.jl)
-  provides MLJ's interface for hyper-parameter tuning strategies, and
-  selected implementations, such as grid search. 
+  provides MLJ's `TunedModel` wrapper for hyper-parameter
+  optimization, including the extendable API for tuning strategies,
+  and selected in-house implementations, such as `Grid` and
+  `RandomSearch`.
+  
+* [MLJIteration.jl](https://github.com/JuliaAI/MLJIteration.jl)
+  provides the `IteratedModel` wrapper for controlling iterative
+  models (snapshots, early stopping criteria, etc)
+  
+* [MLJSerialization.jl](https://github.com/JuliaAI/MLJSerialization.jl)
+  provides functionality for saving MLJ machines to file
+  
+* [MLJOpenML.jl](https://github.com/JuliaAI/MLJOpenML.jl) provides
+  integration with the [OpenML](https://www.openml.org) data science
+  exchange platform
   
 * (⟂)
   [MLJLinearModels.jl](https://github.com/alan-turing-institute/MLJLinearModels.jl)
@@ -68,7 +76,7 @@ its conventional use, are marked with a ⟂ symbol:
   
 * (⟂)
   [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
-  is a tiny, zero-dependency package providing "scientific" types,
+  is an ultra lightweight package providing "scientific" types,
   such as `Continuous`, `OrderedFactor`, `Image` and `Table`. It's
   purpose is to formalize conventions around the scientific
   interpretation of ordinary machine types, such as `Float32` and
@@ -78,6 +86,13 @@ its conventional use, are marked with a ⟂ symbol:
   [MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
   articulates MLJ's own convention for the scientific interpretation of
   data.
+  
+* (⟂)
+  [StatisticalTraits.jl](https://github.com/alan-turing-institute/StatisticalTraits.jl)
+  An ultra lightweight package defining fall-back implementations for
+  a collection of traits possessed by statistical objects.
 
-* [MLJTutorials](https://github.com/alan-turing-institute/MLJTutorials)
-  collects tutorials on how to use MLJ. 
+* (⟂)
+  [DataScienceTutorials](https://github.com/alan-turing-institute/DataScienceTutorials.jl)
+  collects tutorials on how to use MLJ, which are deployed
+  [here](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
