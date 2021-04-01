@@ -11,6 +11,7 @@ import Pkg.TOML
 # from the MLJ universe:
 using MLJBase
 import MLJBase.save
+using MLJEnsembles
 using MLJTuning
 using MLJModels
 using MLJOpenML
@@ -38,9 +39,6 @@ import MLJScientificTypes
 ## METHOD EXPORT
 
 export MLJ_VERSION
-
-# ensembles.jl:
-export EnsembleModel
 
 
 ## METHOD RE-EXPORT
@@ -182,6 +180,9 @@ export DWDMarginLoss, ExpLoss, L1HingeLoss, L2HingeLoss, L2MarginLoss,
     L2EpsilonInsLoss, LPDistLoss, LogitDistLoss, PeriodicLoss,
     QuantileLoss
 
+# re-export from MLJEnsembles:
+export EnsembleModel
+
 # re-export from MLJTuning:
 export Grid, RandomSearch, Explicit, TunedModel, LatinHypercube,
     learning_curve!, learning_curve
@@ -221,7 +222,6 @@ const srcdir = dirname(@__FILE__)
 ## INCLUDE FILES
 
 include("version.jl")       # defines MLJ_VERSION constant
-include("ensembles.jl")     # homogeneous ensembles
 include("scitypes.jl")      # extensions to ScientificTypes.scitype
 
 end # module
