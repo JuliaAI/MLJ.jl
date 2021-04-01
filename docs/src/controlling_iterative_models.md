@@ -6,11 +6,13 @@ criterion, such as `k` consecutive deteriorations of the performance
 (see [`Patience`](@ref EarlyStopping.Patience) below). A more
 sophisticated kind of control might dynamically mutate parameters,
 such as a learning rate, in response to the behavior of these
-estimates. Some iterative model implementations enable some form of
-automated control, with the method and options for doing so varying
-from model to model. But sometimes it is up to the user to arrange
-control, which in the crudest case reduces to manually experimenting
-with the iteration parameter.
+estimates. 
+
+Some iterative model implementations enable some form of automated
+control, with the method and options for doing so varying from model
+to model. But sometimes it is up to the user to arrange control, which
+in the crudest case reduces to manually experimenting with the
+iteration parameter.
 
 In response to this ad hoc state of affairs, MLJ provides a uniform
 and feature-rich interface for controlling any iterative model that
