@@ -424,7 +424,7 @@ IterationControl.WithNumberDo
 MLJIteration.WithIterationsDo
 IterationControl.WithLossDo
 IterationControl.WithTrainingLossesDo
-MLJIteration.Save
+MLJSerialization.Save
 ```
 
 ### Control wrappers
