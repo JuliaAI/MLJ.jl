@@ -9,7 +9,7 @@ MLJ with OpenML is a work in progress.
 
 As an example, we will try to load the iris dataset using `OpenML.load(taskID)`.
 
-```@example OpenML
+```@setup OpenML
 using MLJ.MLJBase
 ```
 
