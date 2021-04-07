@@ -6,7 +6,7 @@ criterion, such as `k` consecutive deteriorations of the performance
 (see [`Patience`](@ref EarlyStopping.Patience) below). A more
 sophisticated kind of control might dynamically mutate parameters,
 such as a learning rate, in response to the behavior of these
-estimates. 
+estimates.
 
 Some iterative model implementations enable some form of automated
 control, with the method and options for doing so varying from model
@@ -56,15 +56,15 @@ nothing # hide
 fit!(mach)
 ```
 
-As detailed under [`IteratedModel`](@ref MLJIteration.IteratedModel) below, the specified
-`controls` are repeatedly applied in sequence to a *training machine*,
-constructed under the hood, until one of the controls triggers a
-stop. Here `Step(5)` means "Compute 5 more iterations" (in this case
-starting from none); `Patience(2)` means "Stop at the end of the
-control cycle if there have been 2 consecutive drops in the log loss";
-and `NumberLimit(100)` is a safeguard ensuring a stop after 100
-control cycles (500 iterations). See [Controls provided](@ref) below
-for a complete list.
+As detailed under [`IteratedModel`](@ref MLJIteration.IteratedModel)
+below, the specified `controls` are repeatedly applied in sequence to
+a *training machine*, constructed under the hood, until one of the
+controls triggers a stop. Here `Step(5)` means "Compute 5 more
+iterations" (in this case starting from none); `Patience(2)` means
+"Stop at the end of the control cycle if there have been 2 consecutive
+drops in the log loss"; and `NumberLimit(100)` is a safeguard ensuring
+a stop after 100 control cycles (500 iterations). See [Controls
+provided](@ref) below for a complete list.
 
 Because iteration is implemented as a wrapper, the "self-iterating"
 model can be evaluated using cross-validation, say, and the number of
@@ -111,7 +111,7 @@ control                                              | description              
 [`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=i->@info("num iterations: $i"))` | Call `f(i)`, where `i` is total number of iterations                                    | yes
 [`WithLossDo`](@ref IterationControl.WithLossDo)`(f=x->@info("loss: $x"))`                | Call `f(loss)` where `loss` is the current loss                                         | yes
 [`WithTrainingLossesDo`](@ref IterationControl.WithTrainingLossesDo)`(f=v->@info(v))`      | Call `f(v)` where `v` is the current batch of training losses                           | yes
-[`Save`](@ref MLJIteration.Save)`(filename="machine.jlso")`            | * Save current machine to `machine1.jlso`, `machine2.jslo`, etc                           | yes
+[`Save`](@ref MLJSerialization.Save)`(filename="machine.jlso")`            | * Save current machine to `machine1.jlso`, `machine2.jslo`, etc                           | yes
 
 > Table 1. Atomic controls. Some advanced options omitted.
 
@@ -288,7 +288,7 @@ For the sake of illustration, we'll implement a `takedown` method; its
 return value is included in the `IteratedModel` report:
 
 ```julia
-IterationControl.takedown(control::IterateFromList, verbosity, state) 
+IterationControl.takedown(control::IterateFromList, verbosity, state)
     verbosity > 1 && = @info "Stepped through these values of the "*
                               "iteration parameter: $(control.list)"
     return (iteration_values=control.list, )
@@ -306,18 +306,18 @@ A training machine `wrapper` has these properties:
 
 - `wrapper.n_cycles` - the number `IterationControl.train!(wrapper, _)` calls
   so far; generally the current control cycle count
-  
+
 - `wrapper.n_iterations` - the total number of iterations applied to the model so far
 
 - `wrapper.Δiterations` - the number of iterations applied in the last
   `IterationControl.train!(wrapper, _)` call
-  
+
 - `wrapper.loss` - the out-of-sample loss (based on the first measure in `measures`)
 
 - `wrapper.training_losses` - the last batch of training losses (if
   reported by `model`), an abstract vector of length
   `wrapper.Δiteration`.
-  
+
 - `wrapper.evaluation` - the complete MLJ performance evaluation
   object, which has the following properties: `measure`,
   `measurement`, `per_fold`, `per_observation`,
@@ -367,7 +367,7 @@ once per iteration of the model, at most.]
 For the sake of illustration, we suppose the iterative model, `model`,
 specified in the `IteratedModel` constructor, has a field called
 `:learning_parameter`, and that mutating this parameter does not
-trigger cold-restarts. 
+trigger cold-restarts.
 
 ```julia
 struct CycleLearningRate{F<:AbstractFloat}

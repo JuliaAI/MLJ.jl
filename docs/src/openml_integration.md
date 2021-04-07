@@ -10,7 +10,7 @@ MLJ with OpenML is a work in progress.
 As an example, we will try to load the iris dataset using `OpenML.load(taskID)`.
 
 ```@example OpenML
-using MLJ.MLJBase
+using MLJ
 ```
 
 ## Task ID
@@ -32,5 +32,5 @@ df2 = coerce(df, :class=>Multiclass)
 ```
 
 ```@docs
-OpenML.load
+MLJOpenML.load
 ```
