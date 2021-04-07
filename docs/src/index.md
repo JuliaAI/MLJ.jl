@@ -261,7 +261,7 @@ julia> Pkg.test("MLJ")
 ```
 
 It is important to note that MLJ is essentially a big wrapper
-providing a unified access to _model providing packages_. For this
+providing unified access to _model providing packages_. For this
 reason, one generally needs to add further packages to your
 environment to make model-specific code available. This
 happens automatically when you use MLJ's interactive load command

@@ -8,9 +8,11 @@ using MLJ
 import MLJIteration
 import IterationControl
 import EarlyStopping
+import MLJSerialization
 import MLJBase
 import MLJTuning
 import MLJModels
+import MLJOpenML
 import MLJScientificTypes
 import MLJModelInterface
 import ScientificTypes
@@ -73,6 +75,8 @@ makedocs(
                 MLJModelInterface,
                 ScientificTypes,
                 MLJIteration,
+                MLJSerialization,
+                MLJOpenML,
                 EarlyStopping,
                 IterationControl],
     pages    = pages)

@@ -8,10 +8,10 @@ complete list, see
     [here](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here).
 	
 MLJ tuning is implemented as an *iterative* procedure, which can
-accordingly be controlled using MLJ's [`IteratedModel`](@ref MLJIteration.IteratedModel)
-wrapper. After familiarizing one self with the `TunedModel` wrapper
-described below, see [Controlling model tuning](@ref) for more on this
-advanced feature.
+accordingly be controlled using MLJ's [`IteratedModel`](@ref
+MLJIteration.IteratedModel) wrapper. After familiarizing one self with
+the `TunedModel` wrapper described below, see [Controlling model
+tuning](@ref) for more on this advanced feature.
 
 In MLJ, hyperparameter optimization, also known as model *tuning*, is
 implemented as a model wrapper. After wrapping a model in a tuning

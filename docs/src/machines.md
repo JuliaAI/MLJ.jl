@@ -213,5 +213,5 @@ the simplified code excerpt in [Internals](internals.md).
 MLJBase.machine
 fit!
 fit_only!
-MLJBase.save
+MLJSerialization.save
 ```
