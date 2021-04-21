@@ -1,4 +1,6 @@
 ```@raw html
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
 <span style="color:darkslateblue;font-size:2.25em;font-style:italic;">
 A Machine Learning Framework for Julia
 </span>
@@ -13,6 +15,8 @@ A Machine Learning Framework for Julia
   <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">Live Demo</a> &nbsp;|&nbsp;
   <a href="third_party_packages">3rd Party Packages</a>
 </div>
+
+<a class="github-button" href="https://github.com/alan-turing-institute/MLJ.jl" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star alan-turing-institute/MLJ.jl on GitHub">Star</a>
 ```
 
 # Introduction
