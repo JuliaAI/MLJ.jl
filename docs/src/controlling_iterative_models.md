@@ -37,7 +37,7 @@ iterations from the controlled training phase:
 ```@example gree
 using MLJ
 
-X, y = make_moons(1000, rng=123)
+X, y = make_moons(100, rng=123, noise=0.5)
 EvoTreeClassifier = @load EvoTreeClassifier verbosity=0
 
 iterated_model = IteratedModel(model=EvoTreeClassifier(rng=123, η=0.005),
@@ -92,26 +92,26 @@ the `IteratedModel` wrapper, but trained in each iteration on a subset
 of the data, according to the value of the `resampling`
 hyper-parameter of the wrapper.
 
-control                                              | description                                                                             | can trigger a stop
------------------------------------------------------|-----------------------------------------------------------------------------------------|--------------------
-[`Step`](@ref IterationControl.Step)`(n=1)`                                | Train model for `n` more iterations                                                     | no
-[`TimeLimit`](@ref EarlyStopping.TimeLimit)`(t=0.5)`                         | Stop after `t` hours                                                                    | yes
-[`NumberLimit`](@ref EarlyStopping.NumberLimit)`(n=100)`                       | Stop after `n` applications of the control                                              | yes
-[`NumberSinceBest`](@ref EarlyStopping.NumberSinceBest)`(n=6)`                     | Stop when best loss occurred `n` control applications ago                               | yes
-[`NotANumber`](@ref EarlyStopping.NotANumber)`()`                             | Stop when `NaN` encountered                                                             | yes
-[`Threshold`](@ref EarlyStopping.Threshold)`(value=0.0)`                     | Stop when `loss < value`                                                                | yes
-[`GL`](@ref EarlyStopping.GL)`(alpha=2.0)`                            | † Stop after the "generalization loss (GL)" exceeds `alpha`                             | yes
-[`PQ`](@ref EarlyStopping.PQ)`(alpha=0.75, k=5)`                      | † Stop after "progress-modified GL" exceeds `alpha`                                     | yes
-[`Patience`](@ref EarlyStopping.Patience)`(n=5)`                            | † Stop after `n` consecutive loss increases                                             | yes
-[`Info`](@ref IterationControl.Info)`(f=identity)`                         | Log to `Info` the value of `f(mach)`, where `mach` is current machine                   | no
-[`Warn`](@ref IterationControl.Warn)`(predicate; f="")`                    | Log to `Warn` the value of `f` or `f(mach)`, if `predicate(mach)` holds                  | no
-[`Error`](@ref IterationControl.Error)`(predicate; f="")`                   | Log to `Error` the value of `f` or `f(mach)`, if `predicate(mach)` holds and then stop   | yes
-[`Callback`](@ref IterationControl.Callback)`(f=mach->nothing)`                   | Call `f(mach)`                                                                          | yes
-[`WithNumberDo`](@ref IterationControl.WithNumberDo)`(f=n->@info(n))`              | Call `f(n + 1)` where `n` is number of previous calls                                   | yes
-[`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=i->@info("num iterations: $i"))` | Call `f(i)`, where `i` is total number of iterations                                    | yes
-[`WithLossDo`](@ref IterationControl.WithLossDo)`(f=x->@info("loss: $x"))`                | Call `f(loss)` where `loss` is the current loss                                         | yes
-[`WithTrainingLossesDo`](@ref IterationControl.WithTrainingLossesDo)`(f=v->@info(v))`      | Call `f(v)` where `v` is the current batch of training losses                           | yes
-[`Save`](@ref MLJSerialization.Save)`(filename="machine.jlso")`            | * Save current machine to `machine1.jlso`, `machine2.jslo`, etc                           | yes
+control                                                        | description                                                                             | can trigger a stop
+---------------------------------------------------------------|-----------------------------------------------------------------------------------------|--------------------
+[`Step`](@ref IterationControl.Step)`(n=1)`                    | Train model for `n` more iterations                                                     | no
+[`TimeLimit`](@ref EarlyStopping.TimeLimit)`(t=0.5)`           | Stop after `t` hours                                                                    | yes
+[`NumberLimit`](@ref EarlyStopping.NumberLimit)`(n=100)`       | Stop after `n` applications of the control                                              | yes
+[`NumberSinceBest`](@ref EarlyStopping.NumberSinceBest)`(n=6)` | Stop when best loss occurred `n` control applications ago                               | yes
+[`InvalidValue`](@ref IterationControl.InvalidValue)()         | Stop when `NaN`, `Inf` or `-Inf` loss/training loss encountered                         | yes 
+[`Threshold`](@ref EarlyStopping.Threshold)`(value=0.0)`       | Stop when `loss < value`                                                                | yes
+[`GL`](@ref EarlyStopping.GL)`(alpha=2.0)`                     | † Stop after the "generalization loss (GL)" exceeds `alpha`                             | yes
+[`PQ`](@ref EarlyStopping.PQ)`(alpha=0.75, k=5)`               | † Stop after "progress-modified GL" exceeds `alpha`                                     | yes
+[`Patience`](@ref EarlyStopping.Patience)`(n=5)`               | † Stop after `n` consecutive loss increases                                             | yes
+[`Info`](@ref IterationControl.Info)`(f=identity)`             | Log to `Info` the value of `f(mach)`, where `mach` is current machine                   | no
+[`Warn`](@ref IterationControl.Warn)`(predicate; f="")`        | Log to `Warn` the value of `f` or `f(mach)`, if `predicate(mach)` holds                 | no
+[`Error`](@ref IterationControl.Error)`(predicate; f="")`      | Log to `Error` the value of `f` or `f(mach)`, if `predicate(mach)` holds and then stop  | yes
+[`Callback`](@ref IterationControl.Callback)`(f=mach->nothing)`| Call `f(mach)`                                                                          | yes
+[`WithNumberDo`](@ref IterationControl.WithNumberDo)`(f=n->@info(n))`                       | Call `f(n + 1)` where `n` is the number of complete control cycles so far | yes
+[`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=i->@info("num iterations: $i"))`| Call `f(i)`, where `i` is total number of iterations                      | yes
+[`WithLossDo`](@ref IterationControl.WithLossDo)`(f=x->@info("loss: $x"))`                  | Call `f(loss)` where `loss` is the current loss                           | yes
+[`WithTrainingLossesDo`](@ref IterationControl.WithTrainingLossesDo)`(f=v->@info(v))`       | Call `f(v)` where `v` is the current batch of training losses             | yes
+[`Save`](@ref MLJSerialization.Save)`(filename="machine.jlso")`| * Save current machine to `machine1.jlso`, `machine2.jslo`, etc                         | yes
 
 > Table 1. Atomic controls. Some advanced options omitted.
 
@@ -130,11 +130,12 @@ specified in the constructor: `Callback`, `WithNumberDo`,
 
 There are also three control wrappers to modify a control's behavior:
 
-wrapper                                            | description
----------------------------------------------------|-------------------------------------------------------------------------
-[`IterationControl.skip`](@ref)`(control, predicate=1)`      | Apply `control` every `predicate` applications of the control wrapper (can also be a function; see doc-string)
-[`IterationControl.debug`](@ref)`(control)`                  | Apply `control` but also log its state to `Info` (irrespective of `verbosity` level)
-[`IterationControl.composite`](@ref)`(controls...)`          | Apply each `control` in `controls` in sequence; used internally by IterationControl.jl
+wrapper                                                                    | description
+---------------------------------------------------------------------------|-------------------------------------------------------------------------
+[`IterationControl.skip`](@ref)`(control, predicate=1)`                    | Apply `control` every `predicate` applications of the control wrapper (can also be a function; see doc-string)
+[`IterationControl.louder`](@ref IterationControl.louder)`(control, by=1)` | Increase the verbosity level of `control` by the specified value (negative values lower verbosity)
+[`IterationControl.debug`](@ref)`(control)`                                | Apply `control` but also log its state to `Info` (irrespective of `verbosity` level)
+[`IterationControl.composite`](@ref)`(controls...)`                        | Apply each `control` in `controls` in sequence; used internally by IterationControl.jl
 
 > Table 2. Wrapped controls
 
@@ -245,7 +246,8 @@ one might use `IterateFromList([round(Int, 10^x) for x in range(1, 2,
 length=10)]`.
 
 In the code, `wrapper` is an object that wraps the training machine
-(see above).
+(see above). The variable `n` is a counter for control cycles (unused
+in this example).
 
 ```julia
 
@@ -256,14 +258,14 @@ struct IterateFromList
     IterateFromList(v) = new(unique(sort(v)))
 end
 
-function IterationControl.update!(control::IterateFromList, wrapper, verbosity)
+function IterationControl.update!(control::IterateFromList, wrapper, verbosity, n)
     Δi = control.list[1]
     verbosity > 1 && @info "Training $Δi more iterations. "
     MLJIteration.train!(wrapper, Δi) # trains the training machine
     return (index = 2, )
 end
 
-function IterationControl.update!(control::IterateFromList, wrapper, verbosity, state)
+function IterationControl.update!(control::IterateFromList, wrapper, verbosity, n, state)
     index = state.positioin_in_list
     Δi = control.list[i] - wrapper.n_iterations
     verbosity > 1 && @info "Training $Δi more iterations. "
@@ -339,12 +341,14 @@ only a single control, called `control`, then training proceeds as
 follows:
 
 ```julia
-state = update!(control, wrapper, verbosity)
+n = 1 # initialize control cycle counter
+state = update!(control, wrapper, verbosity, n)
 finished = done(control, state)
 
 # subsequent training events:
 while !finished
-    state = update!(control, wrapper, verbosity, state)
+    n += 1
+    state = update!(control, wrapper, verbosity, n, state)
     finished = done(control, state)
 end
 
@@ -386,14 +390,14 @@ end
 function IterationControl.update!(control::CycleLearningRate,
                                   wrapper,
                                   verbosity,
-                                  state = (n = 0, learning_rates=nothing))
-    n = state.n
+                                  n,
+                                  state = (learning_rates=nothing, ))
     rates = n == 0 ? one_cycle(control) : state.learning_rates
     index = mod(n, length(rates)) + 1
     r = rates[index]
     verbosity > 1 && @info "learning rate: $r"
     wrapper.model.iteration_control = r
-    return (n = n + 1, learning_rates = rates)
+    return (learning_rates = rates,)
 end
 ```
 
@@ -411,7 +415,7 @@ IterationControl.Step
 EarlyStopping.TimeLimit
 EarlyStopping.NumberLimit
 EarlyStopping.NumberSinceBest
-EarlyStopping.NotANumber
+EarlyStopping.InvalidValue
 EarlyStopping.Threshold
 EarlyStopping.GL
 EarlyStopping.PQ
@@ -431,6 +435,7 @@ MLJSerialization.Save
 
 ```@docs
 IterationControl.skip
+IterationControl.louder
 IterationControl.debug
 IterationControl.composite
 ```

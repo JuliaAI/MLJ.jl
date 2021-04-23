@@ -6,7 +6,7 @@ tuning strategies.  Also available is the [tree
 Parzen](https://github.com/IQVIA-ML/TreeParzen.jl) strategy; for a
 complete list, see
     [here](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here).
-	
+
 MLJ tuning is implemented as an *iterative* procedure, which can
 accordingly be controlled using MLJ's [`IteratedModel`](@ref
 MLJIteration.IteratedModel) wrapper. After familiarizing one self with
@@ -129,7 +129,7 @@ info("KNNClassifier").prediction_type
 ```
 
 ```@example goof
-X, y = @load_iris 
+X, y = @load_iris
 KNN = @load KNNClassifier verbosity=0
 knn = KNN()
 ```
@@ -267,7 +267,7 @@ mach = machine(self_tuning_forest, X, y);
 fit!(mach, verbosity=0);
 ```
 
-In this two-parameter case, a plot of the grid search results is also
+We can plot the grid search results is also
 available:
 
 ```julia
@@ -355,11 +355,14 @@ confused with the iteration parameter `n` in the construction of a
 corresponding `TunedModel` instance, which specifies the total number
 of models to be evaluated, independent of the tuning strategy.
 
+For this illustration we'll add a third, nominal,  hyper-parameter:
+
 ```@example goof
+r3 = range(forest, :(atom.post_prune), values=[true, false]);
 self_tuning_forest = TunedModel(model=forest,
                                       tuning=latin,
                                       resampling=CV(nfolds=6),
-                                      range=[r1, r2],
+                                      range=[r1, r2, r3],
                                       measure=rms,
                                       n=25);
 mach = machine(self_tuning_forest, X, y);
