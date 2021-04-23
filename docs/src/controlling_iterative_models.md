@@ -41,7 +41,7 @@ X, y = make_moons(1000, rng=123)
 EvoTreeClassifier = @load EvoTreeClassifier verbosity=0
 
 iterated_model = IteratedModel(model=EvoTreeClassifier(rng=123, η=0.005),
-                               resampling=Holdout(rng=123),
+                               resampling=Holdout(),
                                measures=log_loss,
                                controls=[Step(5),
                                          Patience(2),
