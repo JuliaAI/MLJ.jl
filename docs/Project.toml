@@ -30,5 +30,11 @@ ScientificTypes = "321657f4-b219-11e9-178b-2701a2544e81"
 TypedTables = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9"
 
 [compat]
-Documenter = "^0.26"
+Documenter = "0.26"
+MLJBase = "0.18"
+MLJIteration = "0.3"
+MLJModels = "0.14.4"
+MLJScientificTypes = "0.4.6"
+MLJTuning = "0.6.5"
+ScientificTypes = "1.1.1"
 julia = "1"
