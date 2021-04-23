@@ -15,7 +15,12 @@ A Machine Learning Framework for Julia
   <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">Live Demo</a> &nbsp;|&nbsp;
   <a href="third_party_packages">3rd Party Packages</a>
 </div>
+```
 
+If you like MLJ please support future development by adding a star to
+the GitHub repository linked below:
+
+```@raw html
 <a class="github-button" href="https://github.com/alan-turing-institute/MLJ.jl" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star alan-turing-institute/MLJ.jl on GitHub">Star</a>
 ```
 
