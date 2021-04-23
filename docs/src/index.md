@@ -1,7 +1,11 @@
 ```@raw html
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
 <span style="color:darkslateblue;font-size:2.25em;font-style:italic;">
 A Machine Learning Framework for Julia
-</span>
+</span>  &nbsp; &nbsp; &nbsp; &nbsp;
+<a class="github-button" href="https://github.com/alan-turing-institute/MLJ.jl" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star alan-turing-institute/MLJ.jl on GitHub">Star</a>
+
 <br>
 <br>
 <div style="font-size:1.25em;font-weight:bold;">
