@@ -192,7 +192,7 @@ export models, localmodels, @load, @iload, load, info,
     FeatureSelector, UnivariateStandardizer,   # builtins/Transformers.jl
     Standardizer, UnivariateBoxCoxTransformer,
     OneHotEncoder, ContinuousEncoder, UnivariateDiscretizer,
-    FillImputer, matching
+    FillImputer, matching, BinaryThresholdPredictor
 
 # re-export from MLJIteration:
 export IteratedModel
