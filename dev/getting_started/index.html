@@ -48,12 +48,12 @@ DecisionTreeClassifier(
     post_prune = false,
     merge_purity_threshold = 1.0,
     pdf_smoothing = 0.0,
-    display_depth = 5) @172</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment. Alternatively, you can use the interactive macro <code>@iload</code>. For more on importing model types, see <a href="../loading_model_code/#Loading-Model-Code">Loading Model Code</a>.</p><p>Once instantiated, a model&#39;s performance can be evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree, X, y,
+    display_depth = 5) @656</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment. Alternatively, you can use the interactive macro <code>@iload</code>. For more on importing model types, see <a href="../loading_model_code/#Loading-Model-Code">Loading Model Code</a>.</p><p>Once instantiated, a model&#39;s performance can be evaluated with the <code>evaluate</code> method:</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree, X, y,
                 resampling=CV(shuffle=true), measure=cross_entropy, verbosity=0)
 ┌───────────────────────┬───────────────┬───────────────────────────────────────
 │ _.measure             │ _.measurement │ _.per_fold                           ⋯
 ├───────────────────────┼───────────────┼───────────────────────────────────────
-│ LogLoss{Float64} @107 │ 1.68          │ [2.22e-16, 2.22e-16, 1.44, 1.44, 4.3 ⋯
+│ LogLoss{Float64} @017 │ 1.68          │ [2.22e-16, 2.22e-16, 1.44, 1.44, 4.3 ⋯
 └───────────────────────┴───────────────┴───────────────────────────────────────
                                                                 1 column omitted
 _.per_observation = [[[2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16], [2.22e-16, 2.22e-16, ..., 2.22e-16]]]
@@ -68,13 +68,13 @@ AbstractVector{Multiclass{3}} (alias for AbstractArray{Multiclass{3}, 1})</code>
 
 julia&gt; scitype(yint)
 AbstractVector{Count} (alias for AbstractArray{Count, 1})</code></pre><p>and using <code>yint</code> in place of <code>y</code> in classification problems will fail. See also <a href="../working_with_categorical_data/#Working-with-Categorical-Data">Working with Categorical Data</a>.</p><p>For more on scientific types, see <a href="#Data-containers-and-scientific-types">Data containers and scientific types</a> below.</p><h2 id="Fit-and-predict"><a class="docs-heading-anchor" href="#Fit-and-predict">Fit and predict</a><a id="Fit-and-predict-1"></a><a class="docs-heading-anchor-permalink" href="#Fit-and-predict" title="Permalink"></a></h2><p>To illustrate MLJ&#39;s fit and predict interface, let&#39;s perform our performance evaluations by hand, but using a simple holdout set, instead of cross-validation.</p><p>Wrapping the model in data creates a <em>machine</em> which will store training outcomes:</p><pre><code class="language-julia-repl">julia&gt; mach = machine(tree, X, y)
-Machine{DecisionTreeClassifier,…} @343 trained 0 times; caches data
+Machine{DecisionTreeClassifier,…} @140 trained 0 times; caches data
   args:
-    1:	Source @259 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @978 ⏎ `AbstractVector{Multiclass{3}}`</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
+    1:	Source @490 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @063 ⏎ `AbstractVector{Multiclass{3}}`</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
 
 julia&gt; fit!(mach, rows=train);
-[ Info: Training Machine{DecisionTreeClassifier,…} @343.
+[ Info: Training Machine{DecisionTreeClassifier,…} @140.
 
 julia&gt; yhat = predict(mach, X[test,:]);
 
@@ -123,18 +123,18 @@ julia&gt; pdf(yhat[3:5], L)
  4
 
 julia&gt; stand = UnivariateStandardizer() # this type is built-in
-UnivariateStandardizer() @650
+UnivariateStandardizer() @077
 
 julia&gt; mach2 = machine(stand, v)
-Machine{UnivariateStandardizer,…} @729 trained 0 times; caches data
+Machine{UnivariateStandardizer,…} @594 trained 0 times; caches data
   args:
-    1:	Source @230 ⏎ `AbstractVector{Count}`
+    1:	Source @850 ⏎ `AbstractVector{Count}`
 
 julia&gt; fit!(mach2)
-[ Info: Training Machine{UnivariateStandardizer,…} @729.
-Machine{UnivariateStandardizer,…} @729 trained 1 time; caches data
+[ Info: Training Machine{UnivariateStandardizer,…} @594.
+Machine{UnivariateStandardizer,…} @594 trained 1 time; caches data
   args:
-    1:	Source @230 ⏎ `AbstractVector{Count}`
+    1:	Source @850 ⏎ `AbstractVector{Count}`
 
 julia&gt; w = transform(mach2, v)
 4-element Vector{Float64}:
@@ -154,8 +154,8 @@ julia&gt; inverse_transform(mach2, w)
 ┌───────────────────────┬───────────────┬────────────┐
 │ _.measure             │ _.measurement │ _.per_fold │
 ├───────────────────────┼───────────────┼────────────┤
-│ LogLoss{Float64} @107 │ 4.0           │ [4.0]      │
-│ BrierScore @832       │ -0.222        │ [-0.222]   │
+│ LogLoss{Float64} @017 │ 4.0           │ [4.0]      │
+│ BrierScore @448       │ -0.222        │ [-0.222]   │
 └───────────────────────┴───────────────┴────────────┘
 _.per_observation = [[[2.22e-16, 2.22e-16, ..., 2.22e-16]], [[0.0, 0.0, ..., 0.0]]]
 _.fitted_params_per_fold = [ … ]
@@ -168,8 +168,8 @@ julia&gt; evaluate!(mach, resampling=Holdout(fraction_train=0.7, shuffle=true),
 ┌───────────────────────┬───────────────┬────────────┐
 │ _.measure             │ _.measurement │ _.per_fold │
 ├───────────────────────┼───────────────┼────────────┤
-│ LogLoss{Float64} @107 │ 0.832         │ [0.832]    │
-│ BrierScore @832       │ -0.0667       │ [-0.0667]  │
+│ LogLoss{Float64} @017 │ 0.832         │ [0.832]    │
+│ BrierScore @448       │ -0.0667       │ [-0.0667]  │
 └───────────────────────┴───────────────┴────────────┘
 _.per_observation = [[[2.22e-16, 2.22e-16, ..., 2.22e-16]], [[0.0, 0.0, ..., 0.0]]]
 _.fitted_params_per_fold = [ … ]
@@ -281,4 +281,4 @@ julia&gt; XY
 julia&gt; Z
 2-element Array{Float64,1}:
  10.0
- 20.0</code></pre></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Introduction</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 3 May 2021 01:57">Monday 3 May 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ 20.0</code></pre></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Introduction</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 10 May 2021 04:44">Monday 10 May 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

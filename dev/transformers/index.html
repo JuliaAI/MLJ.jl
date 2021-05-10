@@ -151,23 +151,23 @@ knnM = machine(knn, W, y)
 y2 = predict(knnM, W)
 
 averagerM= machine(averager)
-yhat = transform(averagerM, y1, y2)</code></pre><pre class="documenter-example-output">Node{Machine{Averager,…}} @732
+yhat = transform(averagerM, y1, y2)</code></pre><pre class="documenter-example-output">Node{Machine{Averager,…}} @065
   args:
-    1:	Node{Machine{RidgeRegressor,…}} @464
-    2:	Node{Machine{KNNRegressor,…}} @225
+    1:	Node{Machine{RidgeRegressor,…}} @076
+    2:	Node{Machine{KNNRegressor,…}} @418
   formula:
     transform(
-        Machine{Averager,…} @276, 
+        Machine{Averager,…} @583, 
         predict(
-            Machine{RidgeRegressor,…} @375, 
+            Machine{RidgeRegressor,…} @647, 
             transform(
-                Machine{OneHotEncoder,…} @155, 
-                Source @556)),
+                Machine{OneHotEncoder,…} @304, 
+                Source @395)),
         predict(
-            Machine{KNNRegressor,…} @908, 
+            Machine{KNNRegressor,…} @854, 
             transform(
-                Machine{OneHotEncoder,…} @155, 
-                Source @556)))</pre><p>Now we export to obtain a <code>Deterministic</code> composite model and then instantiate composite model</p><pre><code class="language-julia">learning_mach = machine(Deterministic(), X, y; predict=yhat)
+                Machine{OneHotEncoder,…} @304, 
+                Source @395)))</pre><p>Now we export to obtain a <code>Deterministic</code> composite model and then instantiate composite model</p><pre><code class="language-julia">learning_mach = machine(Deterministic(), X, y; predict=yhat)
 Machine{DeterministicSurrogate} @772 trained 0 times.
   args:
     1:	Source @415 ⏎ `Unknown`
@@ -261,4 +261,4 @@ compare[101:108]
  (2, &quot;virginica&quot;)
  (2, &quot;virginica&quot;)
  (3, &quot;virginica&quot;)
- (2, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../learning_curves/">« Learning Curves</a><a class="docs-footer-nextpage" href="../composing_models/">Composing Models »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 3 May 2021 01:57">Monday 3 May 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ (2, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../learning_curves/">« Learning Curves</a><a class="docs-footer-nextpage" href="../composing_models/">Composing Models »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 10 May 2021 04:44">Monday 10 May 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
