@@ -36,6 +36,7 @@ pages = [
     "Machines" => "machines.md",
     "Evaluating Model Performance" => "evaluating_model_performance.md",
     "Performance Measures" => "performance_measures.md",
+    "Weights" => "weights.md",
     "Tuning Models" => "tuning_models.md",
     "Learning Curves" => "learning_curves.md",
     "Transformers and other unsupervised models" => "transformers.md",
