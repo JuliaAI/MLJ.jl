@@ -75,8 +75,24 @@ Once instantiated, a model's performance can be evaluated with the
 
 ```@repl doda
 evaluate(tree, X, y,
-         resampling=CV(shuffle=true), measure=cross_entropy, verbosity=0)
+         resampling=CV(shuffle=true), measure=log_loss, verbosity=0)
 ```
+
+The measure chosen here, `log_loss`, is a *probabilistic* measure
+(`prediction_type(log_loss) == :probabilistic`) which is appropriate
+because our model makes probablistic predictions by default
+(`prediction_type(tree) == :probabilistic`). This means the model's
+`predict` operation outputs probability distributions not point
+values (see below). If you want to evaluate a probabilistic model
+using a *deterministic* measure, then add the keyword
+`operation=predict_mode` (or, for regression problems, use
+`predict_mean`/`predict_median`):
+
+```@repl doda
+evaluate(tree, X, y,
+         resampling=CV(shuffle=true), measure=accuracy, operation=predict_mode, verbosity=0)
+```
+
 
 Evaluating against multiple performance measures is also possible. See
 [Evaluating Model Performance](evaluating_model_performance.md) for details.
