@@ -78,15 +78,15 @@ evaluate(tree, X, y,
          resampling=CV(shuffle=true), measure=log_loss, verbosity=0)
 ```
 
-The measure chosen here, `log_loss`, is a *probabilistic* measure
-(`prediction_type(log_loss) == :probabilistic`) which is appropriate
-because our model makes probablistic predictions by default
-(`prediction_type(tree) == :probabilistic`). This means the model's
-`predict` operation outputs probability distributions not point
-values (see below). If you want to evaluate a probabilistic model
-using a *deterministic* measure, then add the keyword
-`operation=predict_mode` (or, for regression problems, use
-`predict_mean`/`predict_median`):
+**Using a deterministic measure.** The measure chosen here,
+`log_loss`, is a *probabilistic* measure (because `prediction_type(log_loss)
+== :probabilistic`) which is appropriate because our model makes
+probablistic predictions by default (`prediction_type(tree) ==
+:probabilistic`). This means the model's `predict` operation outputs
+probability distributions instead of classes (see below). If you want to
+evaluate a probabilistic model using a *deterministic* measure, then
+add the keyword `operation=predict_mode` (or, for regression problems,
+use `predict_mean`/`predict_median`):
 
 ```@repl doda
 evaluate(tree, X, y,
