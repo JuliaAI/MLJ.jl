@@ -154,7 +154,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	[#303](https://github.com/alan-turing-institute/MLJ.jl/issues/303),
 	[ScientificTypes #14](https://github.com/alan-turing-institute/ScientificTypes.jl/issues/14) POC is [here](https://github.com/alan-turing-institute/TimeSeriesClassification.jl)
 
-- [ ] POC for time series forecasting; probably needs [MLJBase
+- [ ] POC for time series forecasting, along lines of sktime; probably needs [MLJBase
 	#502](https://github.com/alan-turing-institute/MLJBase.jl/issues/502)
 	first, and someone to finish [PR on time series
 	CV](https://github.com/alan-turing-institute/MLJBase.jl/pull/331). See also [this proposal](https://julialang.org/jsoc/gsoc/MLJ/#time_series_forecasting_at_scale_-_speed_up_via_julia)
