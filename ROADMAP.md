@@ -42,23 +42,22 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 
 ### Adding models
 
-- [] ~~**Integrate deep learning using [Flux.jl](https://github.com/FluxML/Flux.jl.git) deep learning~~
-  [Done](https://github.com/alan-turing-institute/MLJFlux.jl) but can
+- [ ] **Integrate deep learning** using [Flux.jl](https://github.com/FluxML/Flux.jl.git) deep learning.  [Done](https://github.com/alan-turing-institute/MLJFlux.jl) but can
   improve experience by:
   
-  - [x] finishing [#139](https://github.com/alan-turing-institute/MLJ.jl/issues/139)
+  - [x] finishing iterative model wrapper [#139](https://github.com/alan-turing-institute/MLJ.jl/issues/139)
   
-  - [] improving performance by implementing data front-end after (see [MLJBase
+  - [ ] improving performance by implementing data front-end after (see [MLJBase
   #501](https://github.com/alan-turing-institute/MLJBase.jl/pull/501)) but see also [this relevant discussion](https://github.com/FluxML/MLJFlux.jl/issues/97). 
 
 
--  [ ] **†** ~~Probabilistic programming:
+-  [ ] Probabilistic programming:
    [Turing.jl](https://github.com/TuringLang/Turing.jl),
    [Gen](https://github.com/probcomp/Gen),
    [Soss.jl](https://github.com/cscherrer/Soss.jl.git)
    [#157](https://github.com/alan-turing-institute/MLJ.jl/issues/157)
    [discourse
-   thread](https://discourse.julialang.org/t/ppl-connection-to-mlj-jl/28736)~~
+   thread](https://discourse.julialang.org/t/ppl-connection-to-mlj-jl/28736)
    [done](https://github.com/tlienart/SossMLJ.jl) but experimental and
    requires:
    
@@ -74,10 +73,8 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 
 -   [x] Iterative model control [#139](https://github.com/alan-turing-institute/MLJ.jl/issues/139). [Done](https://github.com/JuliaAI/MLJIteration.jl)
 
--   **†** Add more tuning
-	strategies. [HyperOpt.jl](https://github.com/baggepinnen/Hyperopt.jl)
-	integration? 	See
-	[here](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here)
+-   [ ] **†** Add more tuning
+	strategies. See [here](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here)
 	for complete
 	wish-list. Particular focus on:
 	
@@ -100,21 +97,21 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
       here](https://alan-turing-institute.github.io/MLJ.jl/dev/controlling_iterative_models/#Using-training-losses,-and-controlling-model-tuning).
 	  
 	- [ ] Genetic algorithms
-[#38](https://github.com/alan-turing-institute/MLJ.jl/issues/38) )
+[#38](https://github.com/alan-turing-institute/MLJ.jl/issues/38)
 
 	- [ ] Particle Swarm Optization (current WIP, GSoC project @lhnguyen-vn)
 	
 	- [ ] tuning strategies for non-Cartesian spaces of models [MLJTuning
-	#18](https://github.com/alan-turing-institute/MLJTuning.jl/issues/18)
+	#18](https://github.com/alan-turing-institute/MLJTuning.jl/issues/18), architecture search, and other AutoML workflows
 
-- []  Systematic benchmarking, probably modeled on
+- [ ]  Systematic benchmarking, probably modeled on
 	[MLaut](https://arxiv.org/abs/1901.03678) [#69](https://github.com/alan-turing-institute/MLJ.jl/issues/74)
 
-- []   Give `EnsembleModel` more extendible API and extend beyond bagging
+- [ ]   Give `EnsembleModel` more extendible API and extend beyond bagging
 	(boosting, etc) and migrate to separate repository?
 	[#363](https://github.com/alan-turing-institute/MLJ.jl/issues/363)
 
-- []  **†** Enhance complex model compostition: 
+- [ ]  **†** Enhance complex model compostition: 
 
     - [ ] Introduce a canned
 	stacking model wrapper ([POC](https://alan-turing-institute.github.io/DataScienceTutorials.jl/getting-started/stacking/)). WIP @olivierlabayle
@@ -127,7 +124,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 
 ### Broadening scope
 
-- []  Spin-off a stand-alone measures (loss functions) package
+- [ ]  Spin-off a stand-alone measures (loss functions) package
 	(currently
 	[here](https://github.com/alan-turing-institute/MLJBase.jl/tree/master/src/measures)). Introduce
 	measures for multi-targets [MLJBase
@@ -140,7 +137,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	{#731](https://github.com/alan-turing-institute/MLJ.jl/issues/731). Probably
 	need a new SparseTables.jl package.
 
-- [x]  POC for implementation of time series models classification
+- [x] POC for implementation of time series models classification
 	[#303](https://github.com/alan-turing-institute/MLJ.jl/issues/303),
 	[ScientificTypes #14](https://github.com/alan-turing-institute/ScientificTypes.jl/issues/14) POC is [here](https://github.com/alan-turing-institute/TimeSeriesClassification.jl)
 
@@ -161,7 +158,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	
 	- [ ] provide visualizations that MLR3 provides via [mlr3viz](https://github.com/mlr-org/mlr3viz)
 	
-- [ ] Extend API to accomodate outlier detection, as provided by [OutlierDetection.jl](https://github.com/davnn/OutlierDetection.jl) WIP @davn and @ablaom
+- [ ] Extend API to accomodate outlier detection, as provided by [OutlierDetection.jl](https://github.com/davnn/OutlierDetection.jl) (https://github.com/alan-turing-institute/MLJ.jl/issues/780) WIP @davn and @ablaom
 
 - [ ] Add more pre-processing tools:
 
@@ -175,18 +172,18 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 
 ### Scalability
 
-- []   Roll out data front-ends for all models after  [MLJBase
+- [ ]   Roll out data front-ends for all models after  [MLJBase
   #501](https://github.com/alan-turing-institute/MLJBase.jl/pull/501)
   is merged. 
 
-- []  Online learning support and distributed data
+- [ ]  Online learning support and distributed data
 	[#60](https://github.com/alan-turing-institute/MLJ.jl/issues/60)
 
-- []  DAG scheduling for learning network training
+- [ ]  DAG scheduling for learning network training
 	[#72](https://github.com/alan-turing-institute/MLJ.jl/issues/72)
 	(multithreading first?)
 
-- []  Automated estimates of cpu/memory requirements
+- [ ]  Automated estimates of cpu/memory requirements
 	[#71](https://github.com/alan-turing-institute/MLJ.jl/issues/71)
 
 - [x] Add multithreading to tuning [MLJTuning #15](https://github.com/alan-turing-institute/MLJTuning.jl/issues/15)~~ Done.
