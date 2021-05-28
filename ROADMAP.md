@@ -130,7 +130,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	measures for multi-targets [MLJBase
 	#502](https://github.com/alan-turing-institute/MLJBase.jl/issues/502).
 
-- [] Add sparse data support and better support for NLP models; we
+- [ ] Add sparse data support and better support for NLP models; we
 	could use [NaiveBayes.jl](https://github.com/dfdx/NaiveBayes.jl)
 	as a POC (currently wrapped only for dense input) but the API
 	needs finalizing first
@@ -141,7 +141,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	[#303](https://github.com/alan-turing-institute/MLJ.jl/issues/303),
 	[ScientificTypes #14](https://github.com/alan-turing-institute/ScientificTypes.jl/issues/14) POC is [here](https://github.com/alan-turing-institute/TimeSeriesClassification.jl)
 
-- []   POC for time series forecasting; probably needs [MLJBase
+- [ ]   POC for time series forecasting; probably needs [MLJBase
 	#502](https://github.com/alan-turing-institute/MLJBase.jl/issues/502)
 	first, and someone to finish [PR on time series
 	CV](https://github.com/alan-turing-institute/MLJBase.jl/pull/331).
@@ -158,14 +158,14 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	
 	- [ ] provide visualizations that MLR3 provides via [mlr3viz](https://github.com/mlr-org/mlr3viz)
 	
-- [ ] Extend API to accomodate outlier detection, as provided by [OutlierDetection.jl](https://github.com/davnn/OutlierDetection.jl) (https://github.com/alan-turing-institute/MLJ.jl/issues/780) WIP @davn and @ablaom
+- [ ] Extend API to accomodate outlier detection, as provided by [OutlierDetection.jl](https://github.com/davnn/OutlierDetection.jl) [#780](https://github.com/alan-turing-institute/MLJ.jl/issues/780) WIP @davn and @ablaom
 
 - [ ] Add more pre-processing tools:
 
   - [x] missing value imputation using Gaussina Mixture Model. Done,
     via addition of BetaML model, `MissingImputator`.
 	
-  - [] improve `autotype` method (from MLJScientificTypes), perhaps by
+  - [ ] improve `autotype` method (from MLJScientificTypes), perhaps by
     training on large collection of datasets with manually labelled
     scitype schema.
 
@@ -186,5 +186,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 - [ ]  Automated estimates of cpu/memory requirements
 	[#71](https://github.com/alan-turing-institute/MLJ.jl/issues/71)
 
-- [x] Add multithreading to tuning [MLJTuning #15](https://github.com/alan-turing-institute/MLJTuning.jl/issues/15)~~ Done.
+- [x] Add multithreading to tuning [MLJTuning
+  #15](https://github.com/alan-turing-institute/MLJTuning.jl/issues/15)
+  [Done](https://github.com/alan-turing-institute/MLJTuning.jl/pull/42).
 
