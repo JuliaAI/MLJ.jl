@@ -50,7 +50,7 @@ tuning, evaluating, composing and comparing over [150 machine
 learning
 models](https://alan-turing-institute.github.io/MLJ.jl/dev/list_of_supported_models/)
 written in Julia and other languages.  MLJ is released under the MIT
-licensed and sponsored by the [Alan Turing
+license and sponsored by the [Alan Turing
 Institute](https://www.turing.ac.uk/).
 
 <br>
