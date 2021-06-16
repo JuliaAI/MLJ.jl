@@ -88,7 +88,9 @@ illustrated in the dependency chart below.
   <a href="https://github.com/JuliaAI/MLJEnsembles.jl">MLJEnsembles</a> &nbsp;•&nbsp;
   <a href="https://github.com/JuliaAI/MLJIteration.jl">MLJIteration</a> &nbsp;•&nbsp;
   <a href="https://github.com/JuliaAI/MLJOpenML.jl">MLJOpenML</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/MLJSerialization.jl">MLJSerialization</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJSerialization.jl">MLJSerialization</a> 
+  <br>
+  
   <a href="https://github.com/JuliaAI/MLJScientificTypes.jl">MLJScientificTypes</a> &nbsp;•&nbsp;
   <a href="https://github.com/JuliaAI/ScientificTypes.jl">ScientificTypes</a>
 </p>
