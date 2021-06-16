@@ -44,7 +44,7 @@ export MLJ_VERSION
 ## METHOD RE-EXPORT
 
 # re-export from Random, Statistics, Distributions, CategoricalArrays:
-export pdf, mode, median, mean, shuffle!, categorical, shuffle,
+export pdf, logpdf, mode, median, mean, shuffle!, categorical, shuffle,
     levels, levels!, std, support, sampler
 
 # re-exports from (MLJ)ScientificTypes via MLJBase
