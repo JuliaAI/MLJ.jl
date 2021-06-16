@@ -16,10 +16,6 @@ end
     @test include("exported_names.jl")
 end
 
-@testset "ensembles" begin
-   @test include("ensembles.jl")
-end
-
 @testset "scitypes" begin
     @test include("scitypes.jl")
 end
