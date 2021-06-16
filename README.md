@@ -81,11 +81,18 @@ illustrated in the dependency chart below.
   <a href="https://github.com/alan-turing-institute/MLJModels.jl">MLJModels</a> &nbsp;•&nbsp;
   <a href="https://github.com/alan-turing-institute/MLJTuning.jl">MLJTuning</a> &nbsp;•&nbsp;
   <a href="https://github.com/alan-turing-institute/MLJLinearModels.jl">MLJLinearModels</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJFlux.jl">MLJFlux</a>
-  <br>
+  <a href="https://github.com/FluxML/MLJFlux.jl">MLJFlux</a>
+</br>
+<br>  
   <a href="https://github.com/alan-turing-institute/MLJTutorials">MLJTutorials</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJScientificTypes.jl">MLJScientificTypes</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/ScientificTypes.jl">ScientificTypes</a>
+  <a href="https://github.com/JuliaAI/MLJEnsembles.jl">MLJEnsembles</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJIteration.jl">MLJIteration</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJOpenML.jl">MLJOpenML</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJSerialization.jl">MLJSerialization</a> 
+</br>
+<br>  
+  <a href="https://github.com/JuliaAI/MLJScientificTypes.jl">MLJScientificTypes</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/ScientificTypes.jl">ScientificTypes</a>
 </p>
 <p></p>
     <br>

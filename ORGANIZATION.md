@@ -11,9 +11,7 @@ its conventional use, are marked with a ⟂ symbol:
 * [MLJ.jl](https://github.com/alan-turing-institute/MLJ.jl) is the
   general user's point-of-entry for choosing, loading, composing,
   evaluating and tuning machine learning models. It pulls in most code
-  from other repositories described below. (A current exception is
-  [homogeneous ensembles code](src/ensembles.jl), to be migrated to
-  MLJBase or its own repository MLJEnsembles.) MLJ also hosts the [MLJ
+  from other repositories described below.  MLJ also hosts the [MLJ
   manual](src/docs) which documents functionality across the
   repositories, with the exception of ScientificTypes, and
   MLJScientific types which host their own documentation. (The MLJ
@@ -52,6 +50,10 @@ its conventional use, are marked with a ⟂ symbol:
   optimization, including the extendable API for tuning strategies,
   and selected in-house implementations, such as `Grid` and
   `RandomSearch`.
+  
+* [MLJEnsembles.jl](https://github.com/JuliaAI/MLJEnsembles.jl)
+  provides MLJ's `EnsembleModel` wrapper, for creating homogenous
+  model ensembles.
   
 * [MLJIteration.jl](https://github.com/JuliaAI/MLJIteration.jl)
   provides the `IteratedModel` wrapper for controlling iterative
