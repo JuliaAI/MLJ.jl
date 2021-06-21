@@ -66,8 +66,8 @@ schema(X_coerced)
 ```
 
 **Data transformations:** We carry out conventional data
-transformations, such as categorical feature encodings (eg,
-[`ContinuousEncoder`](@ref)):
+transformations, such as missing value imputation and feature
+encoding:
   
 ```@example poot
 imputer = FillImputer()
@@ -80,6 +80,9 @@ schema(X_imputed)
 encoder = ContinuousEncoder()
 mach = machine(encoder, X_imputed) |> fit!
 X_encoded = transform(mach, X_imputed)
+```
+
+```@example poot
 schema(X_encoded)
 ```
 
