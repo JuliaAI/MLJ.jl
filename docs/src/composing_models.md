@@ -14,7 +14,9 @@ composition use-cases, which are described first below.
 
 A description of the general framework begins at [Learning
 Networks](@ref). For an in-depth high-level description of learning
-networks, refer to [Anthony D. Blaom and Sebastian J. Voller (2020): Flexible model
+networks, refer to the following article:
+
+[Anthony D. Blaom and Sebastian J. Voller (2020): Flexible model
 composition in machine learning and its implementation in MLJ.
 Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505).
 
@@ -135,8 +137,9 @@ In a model stack, as introduced by [Wolpert
 (1992)](https://www.sciencedirect.com/science/article/abs/pii/S0893608005800231),
 an adjucating model learns the best way to combine the predictions of
 multiple base models. In MLJ, such models are constructed using the
-`Stack` constructor. (A simplified version of the implementation
-adopted here is described in a [Data Science in Julia
+`Stack` constructor. To learn more about stacking and to see how to
+construct a stack "by hand" using the [Learning Networks](@ref)
+described later, see [this Data Science in Julia
 tutorial](https://alan-turing-institute.github.io/DataScienceTutorials.jl/getting-started/stacking/))
 
 ```@docs
@@ -147,31 +150,45 @@ MLJBase.Stack
 ## Learning Networks
 
 Below is a practical guide to the MLJ implementantion of learning
-networks, which have been described more abstractly in the article
+networks, which have been described more abstractly in the article:
+
 [Anthony D. Blaom and Sebastian J. Voller (2020): Flexible model
 composition in machine learning and its implementation in MLJ.
-Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505).
+Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505)
+
 Hand-crafting a learning network, as outlined below, is a relatively
 advanced MLJ feature, assuming familiarity with the basics outlined in
 [Getting Started](index.md). The syntax for building a learning
 network is essentially an extension of the basic syntax but with data
-containers replaced with nodes ("dynamic data").
+containers replaced with nodes of a graph.
 
-In MLJ, a *learning network* is a directed acyclic graph whose nodes
-apply an operation, such as `predict` or `transform`, using a fixed
-machine (requiring training) - or which, alternatively, applies a
-regular (untrained) mathematical operation, such as `+`, `log` or
-`vcat`, to its input(s). In practice, a learning network works with
-fixed sources for its training/evaluation data, but can be built and
-tested in stages. By contrast, an *exported learning network* is a
+It is important to distinguish between *learning networks* and the
+comosite MLJ model types they are used to define.
+
+A *learning network* is a directed acyclic graph whose nodes are
+objects that can be called to obtained data, either for training a
+machine, or for using as input to an *operation*. An operation is
+either:
+
+- *static*, that is, an ordinary function, such as such as `+`, `log` or `vcat`, or
+
+- *dynamic*, that is, an operation such as `predict` or `transform`
+  which is dispatched on both data *and* a training outcome attached
+  to some machine.
+
+Since the result of calling a node depends on the outcome of
+training events (and may involve lazy evaluation) one may think of a
+node as "dynamic" data, as opposed to the "static" data appearing in
+an ordinary MLJ workflow.
+
+Different operations can dispatch on the same machine (i.e., can
+access a common set of learned parameters) and different machines
+can point to the same model (allowing for hyperparameter coupling).
+
+By contrast, an *exported learning network* is a
 learning network exported as a stand-alone, re-usable `Model` object,
 to which all the MLJ `Model` meta-algorithms can be applied
 (ensembling, systematic tuning, etc).
-
-Different nodes can point to the same machine (i.e., can access a
-common set of learned parameters) and different machines can wrap a
-common model (allowing for hyperparameters in different machines to be
-coupled).
 
 By specifying data at the source nodes of a learning network, one can
 use and test the learning network as it is defined, which is also a
@@ -181,25 +198,22 @@ composite model, like any other model, is not associated with any data
 until wrapped in a machine.
 
 In MLJ learning networks treat the flow of information during training
-and prediction/transforming separately. Also, different nodes may use
-the same parameters (fitresult) learned during the training of some
-model (that is, point to a common machine; see below). For
-these reasons, simple examples may appear more slightly more
-complicated than in other frameworks. However, in more sophisticated
-applications, the extra flexibility is essential.
+and prediction/transforming separately.
 
 
 ### Building a simple learning network
 
-![](img/target_transformer.png)
-
-The diagram above depicts a learning network which standardizes the
+The diagram below depicts a learning network which standardizes the
 input data `X`, learns an optimal Box-Cox transformation for the
 target `y`, predicts new target values using ridge regression, and
-then inverse-transforms those predictions, for later comparison with
-the original test data. The machines, labeled in yellow, are where
-data to be used for training enters a node, and where training
-outcomes are stored, as in the basic fit/predict scenario.
+then inverse-transforms those predictions to restore them to the
+original scale. Here we have only dynamic operations, labelled blue;
+the machines are in green. Notice that two operations both use
+`stand`, which stores the learned standardization scale
+parameters. The lower "Training" panel indicates which nodes are used
+to train each machine, and what model each machine is associated with.
+
+![](img/target_transformer.png)
 
 Looking ahead, we note that the new composite model type we will
 create later will be assigned a single hyperparameter `regressor`, and the
@@ -220,7 +234,7 @@ x3 = rand(300)
 y = exp.(x1 - x2 -2x3 + 0.1*rand(300))
 X = DataFrames.DataFrame(x1=x1, x2=x2, x3=x3)
 
-train, test  = partition(eachindex(y), 0.8)
+train, test  = partition(eachindex(y), 0.8); # hide
 ```
 Step one is to wrap the data in *source nodes*:
 
@@ -291,7 +305,7 @@ ridge_model = RidgeRegressor(lambda=0.1)
 ridge =machine(ridge_model, W, z)
 zhat = predict(ridge, W)
 
-yhat = inverse_transform(box, zhat);
+yhat = inverse_transform(box, zhat); 
 ```
 We are ready to train and evaluate the completed network. Notice that
 the standardizer, `stand`, is *not* retrained, as MLJ remembers that
@@ -306,7 +320,7 @@ We can change a hyperparameters and retrain:
 
 ```@example 7
 ridge_model.lambda = 0.01
-fit!(yhat, rows=train);
+fit!(yhat, rows=train); 
 ```
 And re-evaluate:
 
