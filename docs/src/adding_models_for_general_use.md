@@ -752,47 +752,15 @@ method                   | return type       | declarable return values         
 `is_pure_julia`          | `Bool`            | `true` or `false`                  | `false`
 `supports_weights`       | `Bool`            | `true` or `false`                  | `false`
 
-**New.** A final trait you can optionally implement is the
-`hyperparamter_ranges` trait. It declares default `ParamRange` objects
-for one or more of your model's hyperparameters. This is for use (in
-the future) by tuning algorithms (e.g., grid generation). It does not
-represent the full space of *allowed values*. This information is
-encoded in your `clean!` method (or `@mlj_model` call).
-
-The value returned by `hyperparamter_ranges` must be a tuple of
-`ParamRange` objects (query `?range` for details) whose length is the
-number of hyperparameters (fields of your model). Note that varying a
-hyperparameter over a specified range should not alter any type
-parameters in your model struct (this never applies to numeric
-ranges). If it doesn't make sense to provide a range for a parameter,
-a `nothing` entry is allowed. The fallback returns a tuple of
-`nothing`s.
-
-For example, a three parameter model of the form
-
-```julia
-mutable struct MyModel{D} <: Deterministic
-    alpha::Float64
-        beta::Int
-    distribution::D
-end
-```
-you might declare (order matters):
-
-```julia
-MMI.hyperparameter_ranges(::Type{<:MyModel}) =
-    (range(Float64, :alpha, lower=0, upper=1, scale=:log),
-         range(Int, :beta, lower=1, upper=Inf, origin=100, unit=50, scale=:log),
-         nothing)
-```
-
-Here is the complete list of trait function declarations for `DecisionTreeClassifier`
-([source](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/DecisionTree.jl)):
+Here is the complete list of trait function declarations for
+`DecisionTreeClassifier`, whose core algorithms are provided by
+DecisionTree.jl, but whose interface actually lives at
+[MLJDecisionTreeInterface.jl](https://github.com/alan-turing-institute/MLJDecisionTreeInterface.jl).
 
 ```julia
 MMI.input_scitype(::Type{<:DecisionTreeClassifier}) = MMI.Table(MMI.Continuous)
 MMI.target_scitype(::Type{<:DecisionTreeClassifier}) = AbstractVector{<:MMI.Finite}
-MMI.load_path(::Type{<:DecisionTreeClassifier}) = "MLJModels.DecisionTree_.DecisionTreeClassifier"
+MMI.load_path(::Type{<:DecisionTreeClassifier}) = "MLJDecisionTreeInterface.DecisionTreeClassifier"
 MMI.package_name(::Type{<:DecisionTreeClassifier}) = "DecisionTree"
 MMI.package_uuid(::Type{<:DecisionTreeClassifier}) = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
 MMI.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bensadeghi/DecisionTree.jl"
@@ -803,17 +771,19 @@ Alternatively these traits can also be declared using `MMI.metadata_pkg` and `MM
 
 ```julia
 MMI.metadata_pkg(DecisionTreeClassifier,name="DecisionTree",
-                     uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
-                     url="https://github.com/bensadeghi/DecisionTree.jl",
-                     julia=true)
+                     packge_uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
+                     package_url="https://github.com/bensadeghi/DecisionTree.jl",
+                     is_pure_julia=true)
 
 MMI.metadata_model(DecisionTreeClassifier,
-                        input=MMI.Table(MMI.Continuous),
-                        target=AbstractVector{<:MMI.Finite},
-                        path="MLJModels.DecisionTree_.DecisionTreeClassifier")
+                        input_scitype=MMI.Table(MMI.Continuous),
+                        target_scitype=AbstractVector{<:MMI.Finite},
+                        load_path="MLJDecisionTreeInterface.DecisionTreeClassifier")
 ```
 
-*Important.* Do not omit the `path` specifcation.
+*Important.* Do not omit the `load_path` specification. If unsure what
+it should be, post an issue at
+[MLJ](https://github.com/alan-turing-institute/MLJ.jl/issues).
 
 ```@docs
 MMI.metadata_pkg
@@ -822,8 +792,6 @@ MMI.metadata_pkg
 ```@docs
 MMI.metadata_model
 ```
-
-You can test all your declarations of traits by calling `MLJBase.info_dict(SomeModel)`.
 
 
 ### Iterative models and the update! method
