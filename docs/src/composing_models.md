@@ -14,7 +14,9 @@ composition use-cases, which are described first below.
 
 A description of the general framework begins at [Learning
 Networks](@ref). For an in-depth high-level description of learning
-networks, refer to [Anthony D. Blaom and Sebastian J. Voller (2020): Flexible model
+networks, refer to the following article:
+
+[Anthony D. Blaom and Sebastian J. Voller (2020): Flexible model
 composition in machine learning and its implementation in MLJ.
 Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505).
 
@@ -37,7 +39,7 @@ MLJ.color_off()
 ```@example 7
 using MLJ
 X = (age    = [23, 45, 34, 25, 67],
-     gender = categorical(['m', 'm', 'f', 'm', 'f']));
+	 gender = categorical(['m', 'm', 'f', 'm', 'f']));
 height = [67.0, 81.5, 55.6, 90.0, 61.1]
 nothing # hide
 ```
@@ -61,28 +63,28 @@ type called `pipe`, for performing the following operations:
 ```julia>
 KNNRegressor = @load KNNRegressor
 pipe = @pipeline(X -> coerce(X, :age=>Continuous),
-                 OneHotEncoder,
-                 KNNRegressor(K=3),
-                 target = Standardizer())
+				 OneHotEncoder,
+				 KNNRegressor(K=3),
+				 target = Standardizer())
 
 Pipeline326(
-    one_hot_encoder = OneHotEncoder(
-            features = Symbol[],
-            drop_last = false,
-            ordered_factor = true,
-            ignore = false),
-    knn_regressor = KNNRegressor(
-            K = 3,
-            algorithm = :kdtree,
-            metric = Distances.Euclidean(0.0),
-            leafsize = 10,
-            reorder = true,
-            weights = :uniform),
-    target = Standardizer(
-            features = Symbol[],
-            ignore = false,
-            ordered_factor = false,
-            count = false)) @287
+	one_hot_encoder = OneHotEncoder(
+			features = Symbol[],
+			drop_last = false,
+			ordered_factor = true,
+			ignore = false),
+	knn_regressor = KNNRegressor(
+			K = 3,
+			algorithm = :kdtree,
+			metric = Distances.Euclidean(0.0),
+			leafsize = 10,
+			reorder = true,
+			weights = :uniform),
+	target = Standardizer(
+			features = Symbol[],
+			ignore = false,
+			ordered_factor = false,
+			count = false)) @287
 ```
 
 Notice that field names for the composite are automatically generated
@@ -121,42 +123,72 @@ For important details on including target transformations, see below.
 
 ## Homogeneous Ensembles
 
-For performance reasons, creating a large ensemble of models sharing a
-common set of hyperparameters is achieved in MLJ through a model
-wrapper, rather than through the learning networks API. See the
-separate [Homogeneous Ensembles](homogeneous_ensembles.md) section for
-details.
+Although an ensemble of models sharing a common set of hyperparameters
+can defined using the learning network API, MLJ's `EnsembleModel`
+model wrapper is preferred, for convenience and best performance.
+
+```@docs
+MLJEnsembles.EnsembleModel
+```
+
+## Model Stacking
+
+In a model stack, as introduced by [Wolpert
+(1992)](https://www.sciencedirect.com/science/article/abs/pii/S0893608005800231),
+an adjucating model learns the best way to combine the predictions of
+multiple base models. In MLJ, such models are constructed using the
+`Stack` constructor. To learn more about stacking and to see how to
+construct a stack "by hand" using the [Learning Networks](@ref)
+described later, see [this Data Science in Julia
+tutorial](https://alan-turing-institute.github.io/DataScienceTutorials.jl/getting-started/stacking/))
+
+```@docs
+MLJBase.Stack
+```
 
 
 ## Learning Networks
 
 Below is a practical guide to the MLJ implementantion of learning
-networks, which have been described more abstractly in the article
+networks, which have been described more abstractly in the article:
+
 [Anthony D. Blaom and Sebastian J. Voller (2020): Flexible model
 composition in machine learning and its implementation in MLJ.
-Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505).
-w
+Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505)
+
 Hand-crafting a learning network, as outlined below, is a relatively
 advanced MLJ feature, assuming familiarity with the basics outlined in
 [Getting Started](index.md). The syntax for building a learning
 network is essentially an extension of the basic syntax but with data
-containers replaced with nodes ("dynamic data").
+containers replaced with nodes of a graph.
 
-In MLJ, a *learning network* is a directed acyclic graph whose nodes
-apply an operation, such as `predict` or `transform`, using a fixed
-machine (requiring training) - or which, alternatively, applies a
-regular (untrained) mathematical operation, such as `+`, `log` or
-`vcat`, to its input(s). In practice, a learning network works with
-fixed sources for its training/evaluation data, but can be built and
-tested in stages. By contrast, an *exported learning network* is a
+It is important to distinguish between *learning networks* and the
+comosite MLJ model types they are used to define.
+
+A *learning network* is a directed acyclic graph whose nodes are
+objects that can be called to obtained data, either for training a
+machine, or for using as input to an *operation*. An operation is
+either:
+
+- *static*, that is, an ordinary function, such as such as `+`, `log` or `vcat`, or
+
+- *dynamic*, that is, an operation such as `predict` or `transform`
+  which is dispatched on both data *and* a training outcome attached
+  to some machine.
+
+Since the result of calling a node depends on the outcome of
+training events (and may involve lazy evaluation) one may think of a
+node as "dynamic" data, as opposed to the "static" data appearing in
+an ordinary MLJ workflow.
+
+Different operations can dispatch on the same machine (i.e., can
+access a common set of learned parameters) and different machines
+can point to the same model (allowing for hyperparameter coupling).
+
+By contrast, an *exported learning network* is a
 learning network exported as a stand-alone, re-usable `Model` object,
 to which all the MLJ `Model` meta-algorithms can be applied
 (ensembling, systematic tuning, etc).
-
-Different nodes can point to the same machine (i.e., can access a
-common set of learned parameters) and different machines can wrap a
-common model (allowing for hyperparameters in different machines to be
-coupled).
 
 By specifying data at the source nodes of a learning network, one can
 use and test the learning network as it is defined, which is also a
@@ -166,25 +198,22 @@ composite model, like any other model, is not associated with any data
 until wrapped in a machine.
 
 In MLJ learning networks treat the flow of information during training
-and prediction/transforming separately. Also, different nodes may use
-the same parameters (fitresult) learned during the training of some
-model (that is, point to a common machine; see below). For
-these reasons, simple examples may appear more slightly more
-complicated than in other frameworks. However, in more sophisticated
-applications, the extra flexibility is essential.
+and prediction/transforming separately.
 
 
 ### Building a simple learning network
 
-![](img/wrapped_ridge.png)
-
-The diagram above depicts a learning network which standardizes the
+The diagram below depicts a learning network which standardizes the
 input data `X`, learns an optimal Box-Cox transformation for the
 target `y`, predicts new target values using ridge regression, and
-then inverse-transforms those predictions, for later comparison with
-the original test data. The machines, labeled in yellow, are where
-data to be used for training enters a node, and where training
-outcomes are stored, as in the basic fit/predict scenario.
+then inverse-transforms those predictions to restore them to the
+original scale. Here we have only dynamic operations, labelled blue;
+the machines are in green. Notice that two operations both use
+`stand`, which stores the learned standardization scale
+parameters. The lower "Training" panel indicates which nodes are used
+to train each machine, and what model each machine is associated with.
+
+![](img/target_transformer.png)
 
 Looking ahead, we note that the new composite model type we will
 create later will be assigned a single hyperparameter `regressor`, and the
@@ -205,7 +234,7 @@ x3 = rand(300)
 y = exp.(x1 - x2 -2x3 + 0.1*rand(300))
 X = DataFrames.DataFrame(x1=x1, x2=x2, x3=x3)
 
-train, test  = partition(eachindex(y), 0.8)
+train, test  = partition(eachindex(y), 0.8); # hide
 ```
 Step one is to wrap the data in *source nodes*:
 
@@ -276,7 +305,7 @@ ridge_model = RidgeRegressor(lambda=0.1)
 ridge =machine(ridge_model, W, z)
 zhat = predict(ridge, W)
 
-yhat = inverse_transform(box, zhat);
+yhat = inverse_transform(box, zhat); 
 ```
 We are ready to train and evaluate the completed network. Notice that
 the standardizer, `stand`, is *not* retrained, as MLJ remembers that
@@ -291,7 +320,7 @@ We can change a hyperparameters and retrain:
 
 ```@example 7
 ridge_model.lambda = 0.01
-fit!(yhat, rows=train);
+fit!(yhat, rows=train); 
 ```
 And re-evaluate:
 
@@ -367,9 +396,9 @@ Supervised` with a single field `regressor`:
 
 ```julia
 @from_network mach begin
-    mutable struct WrappedRegressor
-        regressor=ridge_model
-    end
+	mutable struct WrappedRegressor
+		regressor=ridge_model
+	end
 end
 ```
 
@@ -381,11 +410,11 @@ also [Trait declarations](@ref)).
 
 ```julia
 @from_network mach begin
-    mutable struct WrappedRegressor
-        regressor::Deterministic=ridge_model
-    end
-    input_scitype = Table(Continuous,Finite)
-    target_scitype = AbstractVector{<:Continuous}
+	mutable struct WrappedRegressor
+		regressor::Deterministic=ridge_model
+	end
+	input_scitype = Table(Continuous,Finite)
+	target_scitype = AbstractVector{<:Continuous}
 end
 
 ```
@@ -396,8 +425,8 @@ meta-algorithms that apply to any MLJ model:
 ```julia
 julia> composite = WrappedRegressor()
 WrappedRegressor(
-    regressor = RidgeRegressor(
-            lambda = 0.01))
+	regressor = RidgeRegressor(
+			lambda = 0.01))
 
 X, y = @load_boston;
 evaluate(composite, X, y, resampling=CV(), measure=l2, verbosity=0)
@@ -411,11 +440,11 @@ KNNRegressor = @load KNNRegressor
 composite.regressor = KNNRegressor(K=7)
 julia> composite
 WrappedRegressor(regressor = KNNRegressor(K = 7,
-                                          algorithm = :kdtree,
-                                          metric = Distances.Euclidean(0.0),
-                                          leafsize = 10,
-                                          reorder = true,
-                                          weights = :uniform,),) @ 2…63
+										  algorithm = :kdtree,
+										  metric = Distances.Euclidean(0.0),
+										  leafsize = 10,
+										  reorder = true,
+										  weights = :uniform,),) @ 2…63
 ```
 
 
@@ -441,7 +470,7 @@ The `mutable struct` definition looks like this:
 
 ```@example 7
 mutable struct WrappedRegressor2 <: DeterministicComposite
-    regressor
+	regressor
 end
 
 # keyword constructor
@@ -458,25 +487,25 @@ into a model `fit` method (as opposed to a machine `fit!` method):
 
 ```@example 7
 function MLJ.fit(model::WrappedRegressor2, verbosity::Integer, X, y)
-    Xs = source(X)
-    ys = source(y)
+	Xs = source(X)
+	ys = source(y)
 
-    stand_model = Standardizer()
-    stand = machine(stand_model, Xs)
-    W = transform(stand, Xs)
+	stand_model = Standardizer()
+	stand = machine(stand_model, Xs)
+	W = transform(stand, Xs)
 
-    box_model = UnivariateBoxCoxTransformer()
-    box = machine(box_model, ys)
-    z = transform(box, ys)
+	box_model = UnivariateBoxCoxTransformer()
+	box = machine(box_model, ys)
+	z = transform(box, ys)
 
-    ridge_model = model.regressor        ###
-    ridge =machine(ridge_model, W, z)
-    zhat = predict(ridge, W)
+	ridge_model = model.regressor        ###
+	ridge =machine(ridge_model, W, z)
+	zhat = predict(ridge, W)
 
-    yhat = inverse_transform(box, zhat)
+	yhat = inverse_transform(box, zhat)
 
-    mach = machine(Deterministic(), Xs, ys; predict=yhat)
-    return!(mach, model, verbosity)
+	mach = machine(Deterministic(), Xs, ys; predict=yhat)
+	return!(mach, model, verbosity)
 end
 ```
 
@@ -516,33 +545,33 @@ coefficient `K`.
 RidgeRegressor = @load RidgeRegressor pkg=MLJLinearModels
 
 mutable struct MyComposite <: DeterministicComposite
-    clusterer     # the clustering model (e.g., KMeans())
-    ridge_solver  # a ridge regression parameter we want to expose
-    K::Float64    # a "coupling" coefficient
+	clusterer     # the clustering model (e.g., KMeans())
+	ridge_solver  # a ridge regression parameter we want to expose
+	K::Float64    # a "coupling" coefficient
 end
 
 function MLJ.fit(composite::Composite, verbosity, X, y)
 
-    Xs = source(X)
-    ys = source(y)
+	Xs = source(X)
+	ys = source(y)
 
-    clusterer = composite.clusterer
-    k = clusterer.k
+	clusterer = composite.clusterer
+	k = clusterer.k
 
-    clustererM = machine(clusterer, Xs)
-    Xsmall = transform(clustererM, Xs)
+	clustererM = machine(clusterer, Xs)
+	Xsmall = transform(clustererM, Xs)
 
-    # the coupling: ridge regularization depends on number of
-    # clusters (and the specified coefficient `K`):
-    lambda = exp(-composite.K/clusterer.k)
+	# the coupling: ridge regularization depends on number of
+	# clusters (and the specified coefficient `K`):
+	lambda = exp(-composite.K/clusterer.k)
 
-    ridge = RidgeRegressor(lambda=lambda, solver=composite.ridge_solver)
-    ridgeM = machine(ridge, Xsmall, ys)
+	ridge = RidgeRegressor(lambda=lambda, solver=composite.ridge_solver)
+	ridgeM = machine(ridge, Xsmall, ys)
 
-    yhat = predict(ridgeM, Xsmall)
+	yhat = predict(ridgeM, Xsmall)
 
-    mach = machine(Deterministic(), Xs, ys; predict=yhat)
-    return!(mach, composite, verbosity)
+	mach = machine(Deterministic(), Xs, ys; predict=yhat)
+	return!(mach, composite, verbosity)
 
 end
 
@@ -616,10 +645,10 @@ Exporting this learning network as a stand-alone model:
 
 ```julia
 @from_network machine(Deterministic(), Xs, ys; predict=yhat) begin
-    mutable struct DoubleRegressor
-        regressor1=model1
-        regressor2=model2
-    end
+	mutable struct DoubleRegressor
+		regressor1=model1
+		regressor2=model2
+	end
 end
 ```
 
@@ -663,7 +692,7 @@ And a final example, using the `@node` macro to row-shuffle a table:
 ```julia
 using Random
 X = (x1 = [1, 2, 3, 4, 5],
-     x2 = [:one, :two, :three, :four, :five])
+	 x2 = [:one, :two, :three, :four, :five])
 rows(X) = 1:nrows(X)
 
 Xs = source(X)

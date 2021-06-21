@@ -12,6 +12,7 @@ import MLJSerialization
 import MLJBase
 import MLJTuning
 import MLJModels
+import MLJEnsembles
 import MLJOpenML
 import MLJScientificTypes
 import MLJModelInterface
@@ -39,10 +40,10 @@ pages = [
     "Weights" => "weights.md",
     "Tuning Models" => "tuning_models.md",
     "Learning Curves" => "learning_curves.md",
+    "Preparing Data" => "preparing_data.md",
     "Transformers and other unsupervised models" => "transformers.md",
     "Composing Models" => "composing_models.md",
     "Controlling Iterative Models" => "controlling_iterative_models.md",
-    "Homogeneous Ensembles" => "homogeneous_ensembles.md",
     "Generating Synthetic Data" => "generating_synthetic_data.md",
     "OpenML Integration" => "openml_integration.md",
     "Acceleration and Parallelism" => "acceleration_and_parallelism.md",
@@ -72,6 +73,7 @@ makedocs(
                 MLJBase,
                 MLJTuning,
                 MLJModels,
+                MLJEnsembles,
                 MLJScientificTypes,
                 MLJModelInterface,
                 ScientificTypes,
