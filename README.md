@@ -8,10 +8,6 @@
     <img src="https://github.com/alan-turing-institute/MLJ.jl/workflows/CI/badge.svg"
          alt="Build Status">
   </a>
-  <a href="https://slackinvite.julialang.org/">
-    <img src="https://img.shields.io/badge/chat-on%20slack-yellow.svg"
-         alt="#mlj">
-  </a>
   <a href="https://alan-turing-institute.github.io/MLJ.jl/dev/">
     <img src="https://img.shields.io/badge/docs-stable-blue.svg"
          alt="Documentation">
