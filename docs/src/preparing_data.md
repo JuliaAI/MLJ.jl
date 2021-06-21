@@ -4,7 +4,7 @@ As outlined in [Getting Started](@ref), it is important that the
 [scientific type](https://github.com/JuliaAI/ScientificTypes.jl) of
 data matches the requirements of the model of interest. For example,
 while the majority of supervised learning models require input
-features to be `Continuous`, newcomers to MLJ are nevertheless to
+features to be `Continuous`, newcomers to MLJ are sometimes
 surprised at the disappointing results of [model queries](@ref
 model_search) such as this one:
 
@@ -48,8 +48,10 @@ schema(X)
 
 - The model requires a table whose column element scitypes subtype `Continuous`, an incompatibility.
 
-There are two tools for addressing such data-model mismatches, with
-links to further documentation given below:
+## Common data preprocessing workflows
+
+There are two tools for addressing data-model type mismatches like the
+above, with links to further documentation given below:
 
 **Scientific type coercion:** We coerce machine types to obtain the
 intended scientific interpretation. If `height` in the above example
@@ -111,3 +113,9 @@ MLJ's Built-in transformers are documented at [Transformers and other
 ```julia
 MissingImputator = @load MissingImputator pkg=BetaML`.
 ```
+
+[This MLJ
+Workshop](https://github.com/ablaom/MachineLearningInJulia2020), and the "End-to-end
+examples" in [Data Science in Julia
+tutorials](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
+give further illustrations of data preprocessing in MLJ.
