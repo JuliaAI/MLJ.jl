@@ -230,12 +230,20 @@ paper](https://doi.org/10.21105/joss.02704) or our detailed
 interface.
 
 
-## Reporting problems
+## Getting help and reporting problems
 
 Users are encouraged to provide feedback on their experience using MLJ
-and to report issues. You can do so
-[here](https://github.com/alan-turing-institute/MLJ.jl/issues) or on
-the `#mlj` Julia slack channel.
+and to report issues.
+
+For a query to have maximum exposure to maintainers and users, start a
+discussion thread at [Julia Discourse Machine
+Learning](https://github.com/alan-turing-institute/MLJ.jl) and tag
+your issue "mlj". Queries can also be posted as
+[issues](https://github.com/alan-turing-institute/MLJ.jl/issues), or
+on the `#mlj` slack workspace in the Julia Slack channel.
+
+Bugs, suggestions, and feature requests can be posted
+[here](https://github.com/alan-turing-institute/MLJ.jl/issues).
 
 For known issues that are not strictly MLJ bugs, see
 [here](https://github.com/alan-turing-institute/MLJ.jl#known-issues)
@@ -313,6 +321,10 @@ intended as a complete reference. Resources for learning MLJ are:
 - the [Getting Started](@ref) section of this manual
 
 - an introductory [binder notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb) (no Julia/MLJ installation required)
+
+To get direct help from maintainers and other users, see [Getting help
+and reporting problems](@ref).
+
 
 ### In depth
 
