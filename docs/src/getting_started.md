@@ -44,7 +44,9 @@ models(matching(X,y))
 ```
 
 In MLJ a *model* is a struct storing the hyperparameters of the
-learning algorithm indicated by the struct name (and nothing else).
+learning algorithm indicated by the struct name (and nothing
+else). For common problems matching data to models, see [Model
+Search](@ref) and [Preparing Data](@ref).
 
 Assuming the MLJDecisionTreeInterface.jl package is in your load path
 (see [Installation](@ref)) we can use `@load` to import the

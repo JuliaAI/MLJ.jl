@@ -40,6 +40,7 @@ pages = [
     "Weights" => "weights.md",
     "Tuning Models" => "tuning_models.md",
     "Learning Curves" => "learning_curves.md",
+    "Preparing Data" => "preparing_data.md",
     "Transformers and other unsupervised models" => "transformers.md",
     "Composing Models" => "composing_models.md",
     "Controlling Iterative Models" => "controlling_iterative_models.md",
