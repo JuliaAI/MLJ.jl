@@ -51,7 +51,7 @@ log_loss(ŷ, y)
 ```
 
 The measures `rms`, `l2` and `log_loss` illustrated here are actually
-	instances of measure *types*. For, example, `l2 = LPLoss(p=2)` and
+        instances of measure *types*. For, example, `l2 = LPLoss(p=2)` and
 `log_loss = LogLoss() = LogLoss(tol=eps())`. Common aliases are
 provided:
 
@@ -152,13 +152,19 @@ predictions.
 
 ## List of measures
 
+All measures listed below have a doc-string associated with the measure's
+*type*. So do, for example, `?LPLoss`, and not `?l2`.
+
 ```@setup losses_and_scores
 using DataFrames
 ```
 
 ```@example losses_and_scores
 ms = measures()
-types = map(ms) do m m.name end
+types = map(ms) do m
+    name = m.name
+   "[`$name`](@ref)"
+end
 instance = map(ms) do m m.instances end
 t = (type=types, instances=instance)
 DataFrame(t)
