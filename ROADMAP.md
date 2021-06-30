@@ -152,7 +152,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 
 - [x] POC for implementation of time series models classification
 	[#303](https://github.com/alan-turing-institute/MLJ.jl/issues/303),
-	[ScientificTypes #14](https://github.com/alan-turing-institute/ScientificTypes.jl/issues/14) POC is [here](https://github.com/alan-turing-institute/TimeSeriesClassification.jl)
+	[ScientificTypesBase #14](https://github.com/alan-turing-institute/ScientificTypesBase.jl/issues/14) POC is [here](https://github.com/alan-turing-institute/TimeSeriesClassification.jl)
 
 - [ ] POC for time series forecasting, along lines of sktime; probably needs [MLJBase
 	#502](https://github.com/alan-turing-institute/MLJBase.jl/issues/502)
@@ -178,7 +178,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
   - [x] missing value imputation using Gaussina Mixture Model. Done,
 	via addition of BetaML model, `MissingImputator`.
 
-  - [ ] improve `autotype` method (from MLJScientificTypes), perhaps by
+  - [ ] improve `autotype` method (from ScientificTypes), perhaps by
 	training on large collection of datasets with manually labelled
 	scitype schema.
 	

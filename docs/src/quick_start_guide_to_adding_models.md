@@ -8,7 +8,7 @@ learning models; (ii) that you would like to interface and register
 these models with MLJ; and (iii) that you have a rough understanding
 of how things work with MLJ.  In particular you are familiar with:
 
-- what [scientific types](https://github.com/alan-turing-institute/MLJScientificTypes.jl) are
+- what [scientific types](https://github.com/alan-turing-institute/ScientificTypes.jl) are
 
 - what `Probabilistic`, `Deterministic` and `Unsupervised` models are
 

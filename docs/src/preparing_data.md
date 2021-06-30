@@ -1,7 +1,7 @@
 # Preparing Data
 
 As outlined in [Getting Started](@ref), it is important that the
-[scientific type](https://github.com/JuliaAI/ScientificTypes.jl) of
+[scientific type](https://github.com/JuliaAI/ScientificTypesBase.jl) of
 data matches the requirements of the model of interest. For example,
 while the majority of supervised learning models require input
 features to be `Continuous`, newcomers to MLJ are sometimes
@@ -93,7 +93,7 @@ Pipelines](@ref).
 ## Scientific type coercion
 
 Scientific type coercion is documented in detail at
-[ScientificTypes.jl](https://github.com/JuliaAI/ScientificTypes.jl). See
+[ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.jl). See
 also the tutorial at the [this MLJ
 Workshop](https://github.com/ablaom/MachineLearningInJulia2020)
 (specifically,

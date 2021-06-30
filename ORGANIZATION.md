@@ -13,14 +13,14 @@ its conventional use, are marked with a ⟂ symbol:
   evaluating and tuning machine learning models. It pulls in most code
   from other repositories described below.  MLJ also hosts the [MLJ
   manual](src/docs) which documents functionality across the
-  repositories, with the exception of ScientificTypes, and
+  repositories, with the exception of ScientificTypesBase, and
   MLJScientific types which host their own documentation. (The MLJ
   manual and MLJTutorials do provide overviews of scientific types.)
 
 * [MLJModelInterface.jl](https://github.com/alan-turing-institute/MLJModelInterface.jl)
   is a lightweight package imported by packages implementing
   MLJ's interface for their machine learning models. It's *sole*
-  dependency is ScientificTypes, which is a tiny package with *no*
+  dependency is ScientificTypesBase, which is a tiny package with *no*
   dependencies. 
 
 * (⟂)
@@ -77,7 +77,7 @@ its conventional use, are marked with a ⟂ symbol:
   [Flux.jl](https://github.com/FluxML/Flux.jl), in MLJ.
   
 * (⟂)
-  [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
+  [ScientificTypesBase.jl](https://github.com/alan-turing-institute/ScientificTypesBase.jl)
   is an ultra lightweight package providing "scientific" types,
   such as `Continuous`, `OrderedFactor`, `Image` and `Table`. It's
   purpose is to formalize conventions around the scientific
@@ -85,7 +85,7 @@ its conventional use, are marked with a ⟂ symbol:
   `DataFrame`.
   
 * (⟂)
-  [MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
+  [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
   articulates MLJ's own convention for the scientific interpretation of
   data.
   

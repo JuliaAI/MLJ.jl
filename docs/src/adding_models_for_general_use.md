@@ -39,7 +39,7 @@ It is assumed the reader has read [Getting Started](index.md).
 To implement the API described here, some familiarity with the
 following packages is also helpful:
 
-- [MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
+- [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
   (for specifying model requirements of data)
 
 - [Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
@@ -672,7 +672,7 @@ attempt to use your model with inappropriately typed data.
 
 The trait functions `input_scitype` and `target_scitype` take
 scientific data types as values. We assume here familiarity with
-[MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
+[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
 (see [Getting Started](index.md) for the basics).
 
 For example, to ensure that the `X` presented to the

@@ -87,8 +87,8 @@ illustrated in the dependency chart below.
   <a href="https://github.com/JuliaAI/MLJSerialization.jl">MLJSerialization</a> 
 </br>
 <br>  
-  <a href="https://github.com/JuliaAI/MLJScientificTypes.jl">MLJScientificTypes</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/ScientificTypes.jl">ScientificTypes</a>
+  <a href="https://github.com/JuliaAI/ScientificTypes.jl">ScientificTypes</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/ScientificTypesBase.jl">ScientificTypesBase</a>
 </p>
 <p></p>
     <br>
