@@ -157,9 +157,7 @@ All measures listed below have a doc-string associated with the measure's
 
 ```@setup losses_and_scores
 using DataFrames
-```
 
-```@example losses_and_scores
 ms = measures()
 types = map(ms) do m
     name = m.name
@@ -167,7 +165,7 @@ types = map(ms) do m
 end
 instance = map(ms) do m m.instances end
 t = (type=types, instances=instance)
-DataFrame(t)
+MLJ.PrettyTables.table(t)
 ```
 
 

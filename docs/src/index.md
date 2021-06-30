@@ -286,8 +286,8 @@ julia> tree = Tree() # instance
 
 where you will also be asked to choose a providing package, for more
 than one provide a `DecisionTreeClassifier` model. For more on
-identifying the name of an applicable model, see [Model
-Search](@ref). For non-interactive loading of code (e.g., from a
+identifying the name of an applicable model, see [Model Search](@ref model_search). 
+For non-interactive loading of code (e.g., from a
 module or function) see [Loading Model Code](@ref).
 
 It is recommended that you start with models from more mature

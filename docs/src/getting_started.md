@@ -259,12 +259,12 @@ use of MLJ.*
 
 The MLJ user should acquaint themselves with some basic assumptions
 about the form of data expected by MLJ, as outlined below. The basic
-`machine` constructions look like this (see also [Constructing
+`machine` constructors look like this (see also [Constructing
 machines](@ref)):
 
 ```
-machine(model::Supervised, X, y)
 machine(model::Unsupervised, X)
+machine(model::Supervised, X, y)
 ```
 
 Each supervised model in MLJ declares the permitted *scientific type*
