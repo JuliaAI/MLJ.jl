@@ -114,7 +114,7 @@ MLJ's Built-in transformers are documented at [Transformers and other
        with
 
 ```julia
-MissingImputator = @load MissingImputator pkg=BetaML`.
+MissingImputator = @load MissingImputator pkg=BetaML
 ```
 
 [This MLJ
