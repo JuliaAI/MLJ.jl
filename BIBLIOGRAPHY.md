@@ -26,7 +26,7 @@ An in-depth view of MLJ's model composition design:
 
 ```bibtex
 @misc{blaom2020flexible,
-      title={Flexible model composition in machine learning and its implementation in MLJ}, 
+      title={Flexible model composition in machine learning and its implementation in {MLJ}}, 
       author={Anthony D. Blaom and Sebastian J. Vollmer},
       year={2020},
       eprint={2012.15505},
