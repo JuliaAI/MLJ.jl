@@ -1,4 +1,4 @@
-### Citing MLJ
+# Citing MLJ
 
 An overview of MLJ design:
 

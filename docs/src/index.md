@@ -340,8 +340,8 @@ questions and make suggestions.
 
 ## Citing MLJ
 
-When presenting work that uses MLJ, please cite the MLJ design
-paper:
+An overview of MLJ design:
+
 
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.02704/status.svg)](https://doi.org/10.21105/joss.02704)
 
@@ -360,16 +360,17 @@ paper:
 }
 ```
 
-If using the model composition features of MLJ (learning networks)
-please additionally cite
+An in-depth view of MLJ's model composition design:
 
-```bitex
+[![arXiv](https://img.shields.io/badge/arXiv-2012.15505-<COLOR>.svg)](https://arxiv.org/abs/2012.15505)
+
+```bibtex
 @misc{blaom2020flexible,
-  title={{Flexible model composition in machine learning and its implementation in MLJ}},
-  author={Anthony D. Blaom and Sebastian J. Vollmer},
-  year={2020},
-  eprint={2012.15505},
-  archivePrefix={arXiv},
-  primaryClass={cs.LG}
+      title={Flexible model composition in machine learning and its implementation in MLJ}, 
+      author={Anthony D. Blaom and Sebastian J. Vollmer},
+      year={2020},
+      eprint={2012.15505},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
 }
 ```
