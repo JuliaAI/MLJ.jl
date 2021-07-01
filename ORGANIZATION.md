@@ -18,10 +18,12 @@ its conventional use, are marked with a ⟂ symbol:
   manual and MLJTutorials do provide overviews of scientific types.)
 
 * [MLJModelInterface.jl](https://github.com/JuliaAI/MLJModelInterface.jl)
-  is a lightweight package imported by packages implementing
-  MLJ's interface for their machine learning models. It's *sole*
-  dependency is ScientificTypesBase, which is a tiny package with *no*
-  dependencies. 
+  is a lightweight package imported by packages implementing MLJ's
+  interface for their machine learning models. It's only dependencies
+  are ScientificTypesBase.jl (which depends only on the standard
+  library module `Random`) and
+  [StatisticalTraits.jl](https://github.com/JuliaAI/StatisticalTraits.jl)
+  (which depends only on ScientificTypesBase.jl).
 
 * (⟂)
   [MLJBase.jl](https://github.com/JuliaAI/MLJBase.jl) is
@@ -39,7 +41,7 @@ its conventional use, are marked with a ⟂ symbol:
   detailed description of MLJBase's contents.
 
 * [MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl)
-  hosts the MLJ **registry**, which contains metadata on all the
+  hosts the *MLJ model registry*, which contains metadata on all the
   models the MLJ user can search and load from MLJ. Moreover, it
   provides the functionality for **loading model code** from MLJ on
   demand. Finally, it furnishes some commonly used transformers for
@@ -72,8 +74,9 @@ its conventional use, are marked with a ⟂ symbol:
   such as Lasso, Elastic-Net, Robust regression, LAD regression,
   etc. 
 
-* [MLJFlux.jl](https://github.com/JuliaAI/MLJFlux.jl) an
-  experimental package for using **neural-network models**, built with
+* [MLJFlux.jl](https://github.com/JuliaAI/MLJFlux.jl) an experimental
+  package for gradient-descent models, such as traditional
+  neural-networks, built with
   [Flux.jl](https://github.com/FluxML/Flux.jl), in MLJ.
   
 * (⟂)
@@ -95,6 +98,6 @@ its conventional use, are marked with a ⟂ symbol:
   a collection of traits possessed by statistical objects.
 
 * (⟂)
-  [DataScienceTutorials](https://github.com/JuliaAI/DataScienceTutorials.jl)
+  [DataScienceTutorials](https://github.com/alan-turing-institute/DataScienceTutorials.jl)
   collects tutorials on how to use MLJ, which are deployed
   [here](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
