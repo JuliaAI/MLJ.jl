@@ -33,7 +33,7 @@ using ComputationalResources: CPUProcesses
 import MLJBase: fit, update, clean!, fit!, predict, fitted_params,
                 show_as_constructed, ==
 import MLJModels: models
-import MLJScientificTypes
+import ScientificTypes
 
 
 ## METHOD EXPORT
@@ -47,7 +47,7 @@ export MLJ_VERSION
 export pdf, logpdf, mode, median, mean, shuffle!, categorical, shuffle,
     levels, levels!, std, support, sampler
 
-# re-exports from (MLJ)ScientificTypes via MLJBase
+# re-exports from (MLJ)ScientificTypesBase via MLJBase
 export Scientific, Found, Unknown, Known, Finite, Infinite,
     OrderedFactor, Multiclass, Count, Continuous, Textual,
     Binary, ColorImage, GrayImage, Image, Table
@@ -222,6 +222,6 @@ const srcdir = dirname(@__FILE__)
 ## INCLUDE FILES
 
 include("version.jl")       # defines MLJ_VERSION constant
-include("scitypes.jl")      # extensions to ScientificTypes.scitype
+include("scitypes.jl")      # extensions to ScientificTypesBase.scitype
 
 end # module

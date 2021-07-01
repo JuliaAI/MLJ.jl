@@ -40,7 +40,7 @@ composition.
 
 - Video from [London Julia User Group meetup in March 2019](https://www.youtube.com/watch?v=CfHkjNmj1eE) (skip to [demo at 21'39](https://youtu.be/CfHkjNmj1eE?t=21m39s)) &nbsp;
 
-- [MLJ Tutorials](https://alan-turing-institute.github.io/MLJTutorials/)
+- [MLJ Tutorials](https://JuliaAI.github.io/MLJTutorials/)
 
 - Implementing the MLJ interface for a [new model](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/)
 
@@ -224,4 +224,4 @@ read. In this respect we have been inspired by [On Machine Learning
 and Programming Languages](https://julialang.org/blog/2017/12/ml&pl).
 
 ## Invitation to the community
-We now invite the community to try out our newly registered packages, [MLJ](https://github.com/alan-turing-institute/MLJ.jl)alongside [MLJModels](https://github.com/alan-turing-institute/MLJModels.jl), and provide any feedback or suggestions you may have going forward. We are also particularly interested in hearing how you would use our package, and what features it may be lacking.
+We now invite the community to try out our newly registered packages, [MLJ](https://github.com/alan-turing-institute/MLJ.jl)alongside [MLJModels](https://github.com/JuliaAI/MLJModels.jl), and provide any feedback or suggestions you may have going forward. We are also particularly interested in hearing how you would use our package, and what features it may be lacking.

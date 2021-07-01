@@ -14,9 +14,9 @@ import MLJTuning
 import MLJModels
 import MLJEnsembles
 import MLJOpenML
-import MLJScientificTypes
-import MLJModelInterface
 import ScientificTypes
+import MLJModelInterface
+import ScientificTypesBase
 import Distributions
 using CategoricalArrays # avoid types like CategoricalArrays.Categorica
 using LossFunctions
@@ -51,12 +51,13 @@ pages = [
     "Quick-Start Guide to Adding Models" =>
                "quick_start_guide_to_adding_models.md",
     "Adding Models for General Use" => "adding_models_for_general_use.md",
-    "Benchmarking" => "benchmarking.md",
+    "Customizing Behavior" => "customizing_behavior.md",
     "Internals" => "internals.md",
     "List of Supported Models" => "list_of_supported_models.md",
     "Third Party Packages" => "third_party_packages.md",
     "Glossary" => "glossary.md",
     "MLJ Cheatsheet" => "mlj_cheatsheet.md",
+    "Known Issues" => "known_issues.md",
     "FAQ" => "frequently_asked_questions.md",
     "Julia BlogPost" => "julia_blogpost.md",
     "Index of Methods" => "api.md",
@@ -74,9 +75,9 @@ makedocs(
                 MLJTuning,
                 MLJModels,
                 MLJEnsembles,
-                MLJScientificTypes,
-                MLJModelInterface,
                 ScientificTypes,
+                MLJModelInterface,
+                ScientificTypesBase,
                 MLJIteration,
                 MLJSerialization,
                 MLJOpenML,

@@ -13,18 +13,20 @@ its conventional use, are marked with a ⟂ symbol:
   evaluating and tuning machine learning models. It pulls in most code
   from other repositories described below.  MLJ also hosts the [MLJ
   manual](src/docs) which documents functionality across the
-  repositories, with the exception of ScientificTypes, and
+  repositories, with the exception of ScientificTypesBase, and
   MLJScientific types which host their own documentation. (The MLJ
   manual and MLJTutorials do provide overviews of scientific types.)
 
-* [MLJModelInterface.jl](https://github.com/alan-turing-institute/MLJModelInterface.jl)
-  is a lightweight package imported by packages implementing
-  MLJ's interface for their machine learning models. It's *sole*
-  dependency is ScientificTypes, which is a tiny package with *no*
-  dependencies. 
+* [MLJModelInterface.jl](https://github.com/JuliaAI/MLJModelInterface.jl)
+  is a lightweight package imported by packages implementing MLJ's
+  interface for their machine learning models. It's only dependencies
+  are ScientificTypesBase.jl (which depends only on the standard
+  library module `Random`) and
+  [StatisticalTraits.jl](https://github.com/JuliaAI/StatisticalTraits.jl)
+  (which depends only on ScientificTypesBase.jl).
 
 * (⟂)
-  [MLJBase.jl](https://github.com/alan-turing-institute/MLJBase.jl) is
+  [MLJBase.jl](https://github.com/JuliaAI/MLJBase.jl) is
   a large repository with two main purposes: (i) to give "dummy"
   methods defined in MLJModelInterface their intended functionality
   (which depends on third party packages, such as
@@ -35,17 +37,17 @@ its conventional use, are marked with a ⟂ symbol:
   and (ii) provide functionality essential to the MLJ user that has
   not been relegated to its own "satellite" repository for some
   reason. See the [MLJBase.jl
-  readme](https://github.com/alan-turing-institute/MLJBase.jl) for a
+  readme](https://github.com/JuliaAI/MLJBase.jl) for a
   detailed description of MLJBase's contents.
 
-* [MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl)
-  hosts the MLJ **registry**, which contains metadata on all the
+* [MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl)
+  hosts the *MLJ model registry*, which contains metadata on all the
   models the MLJ user can search and load from MLJ. Moreover, it
   provides the functionality for **loading model code** from MLJ on
   demand. Finally, it furnishes some commonly used transformers for
   data pre-processing, such as `ContinuousEncoder` and `Standardizer`.
 
-* [MLJTuning.jl](https://github.com/alan-turing-institute/MLJTuning.jl)
+* [MLJTuning.jl](https://github.com/JuliaAI/MLJTuning.jl)
   provides MLJ's `TunedModel` wrapper for hyper-parameter
   optimization, including the extendable API for tuning strategies,
   and selected in-house implementations, such as `Grid` and
@@ -67,17 +69,18 @@ its conventional use, are marked with a ⟂ symbol:
   exchange platform
   
 * (⟂)
-  [MLJLinearModels.jl](https://github.com/alan-turing-institute/MLJLinearModels.jl)
+  [MLJLinearModels.jl](https://github.com/JuliaAI/MLJLinearModels.jl)
   is an experimental package for a wide range of julia-native penalized linear models
   such as Lasso, Elastic-Net, Robust regression, LAD regression,
   etc. 
 
-* [MLJFlux.jl](https://github.com/alan-turing-institute/MLJFlux.jl) an
-  experimental package for using **neural-network models**, built with
+* [MLJFlux.jl](https://github.com/JuliaAI/MLJFlux.jl) an experimental
+  package for gradient-descent models, such as traditional
+  neural-networks, built with
   [Flux.jl](https://github.com/FluxML/Flux.jl), in MLJ.
   
 * (⟂)
-  [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
+  [ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.jl)
   is an ultra lightweight package providing "scientific" types,
   such as `Continuous`, `OrderedFactor`, `Image` and `Table`. It's
   purpose is to formalize conventions around the scientific
@@ -85,12 +88,12 @@ its conventional use, are marked with a ⟂ symbol:
   `DataFrame`.
   
 * (⟂)
-  [MLJScientificTypes.jl](https://github.com/alan-turing-institute/MLJScientificTypes.jl)
+  [ScientificTypes.jl](https://github.com/JuliaAI/ScientificTypes.jl)
   articulates MLJ's own convention for the scientific interpretation of
   data.
   
 * (⟂)
-  [StatisticalTraits.jl](https://github.com/alan-turing-institute/StatisticalTraits.jl)
+  [StatisticalTraits.jl](https://github.com/JuliaAI/StatisticalTraits.jl)
   An ultra lightweight package defining fall-back implementations for
   a collection of traits possessed by statistical objects.
 

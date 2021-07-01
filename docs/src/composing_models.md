@@ -21,7 +21,7 @@ composition in machine learning and its implementation in MLJ.
 Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505).
 
 
-## Linear pipelines
+## Linear Pipelines
 
 In MLJ a *pipeline* is a composite model in which models are chained
 together in a linear (non-branching) chain. Pipelines can include

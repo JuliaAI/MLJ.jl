@@ -186,7 +186,7 @@ installation required.
 * Consistent interface to handle probabilistic predictions.
 
 * Extensible [tuning
-  interface](https://github.com/alan-turing-institute/MLJTuning.jl),
+  interface](https://github.com/JuliaAI/MLJTuning.jl),
   to support growing number of optimization strategies, and designed
   to play well with model composition.
 
@@ -245,8 +245,7 @@ on the `#mlj` slack workspace in the Julia Slack channel.
 Bugs, suggestions, and feature requests can be posted
 [here](https://github.com/alan-turing-institute/MLJ.jl/issues).
 
-For known issues that are not strictly MLJ bugs, see
-[here](https://github.com/alan-turing-institute/MLJ.jl#known-issues)
+See also, [Known Issues](@ref)
 
 
 ## Installation
@@ -286,8 +285,8 @@ julia> tree = Tree() # instance
 
 where you will also be asked to choose a providing package, for more
 than one provide a `DecisionTreeClassifier` model. For more on
-identifying the name of an applicable model, see [Model
-Search](@ref). For non-interactive loading of code (e.g., from a
+identifying the name of an applicable model, see [Model Search](@ref model_search). 
+For non-interactive loading of code (e.g., from a
 module or function) see [Loading Model Code](@ref).
 
 It is recommended that you start with models from more mature
@@ -296,7 +295,10 @@ packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.
 MLJ is supported by a number of satellite packages (MLJTuning,
 MLJModelInterface, etc) which the general user is *not* required to
 install directly. Developers can learn more about these
-[here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/ORGANIZATION.md)
+[here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/ORGANIZATION.md).
+
+See also the alternative instalation instructions for [Customizing
+Behavior](@ref).
 
 
 ## Learning Julia
@@ -338,8 +340,8 @@ questions and make suggestions.
 
 ## Citing MLJ
 
-When presenting work that uses MLJ, please cite the MLJ design
-paper:
+An overview of MLJ design:
+
 
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.02704/status.svg)](https://doi.org/10.21105/joss.02704)
 
@@ -358,16 +360,17 @@ paper:
 }
 ```
 
-If using the model composition features of MLJ (learning networks)
-please additionally cite
+An in-depth view of MLJ's model composition design:
 
-```bitex
+[![arXiv](https://img.shields.io/badge/arXiv-2012.15505-<COLOR>.svg)](https://arxiv.org/abs/2012.15505)
+
+```bibtex
 @misc{blaom2020flexible,
-  title={{Flexible model composition in machine learning and its implementation in MLJ}},
-  author={Anthony D. Blaom and Sebastian J. Vollmer},
-  year={2020},
-  eprint={2012.15505},
-  archivePrefix={arXiv},
-  primaryClass={cs.LG}
+      title={Flexible model composition in machine learning and its implementation in {MLJ}}, 
+      author={Anthony D. Blaom and Sebastian J. Vollmer},
+      year={2020},
+      eprint={2012.15505},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
 }
 ```
