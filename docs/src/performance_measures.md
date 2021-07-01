@@ -10,7 +10,7 @@ To see list all measures, run `measures()`.  Further measures for
 probabilistic predictors, such as proper scoring rules, and for
 constructing multi-target product measures, are planned.  If you'd like
 to see measure added to MLJ, post a comment
-[here](https://github.com/alan-turing-institute/MLJBase.jl/issues/299)
+[here](https://github.com/JuliaAI/MLJBase.jl/issues/299)
 
 *Note for developers:* The measures interface and the built-in
 measures described here are defined in MLJBase, but will ultimately live

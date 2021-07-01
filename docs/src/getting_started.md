@@ -274,9 +274,9 @@ as `Array{Float32, 2}`). Similar remarks apply to the input `X` of an
 unsupervised model.
 
 Scientific types are julia types defined in the package
-[ScientificTypesBase.jl](https://github.com/alan-turing-institute/ScientificTypesBase.jl);
+[ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.jl);
 the package
-[ScientificTypes.jl](https://alan-turing-institute.github.io/ScientificTypes.jl/dev/)
+[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/)
 implements the particular convention used in the MLJ universe for
 assigning a specific scientific type (interpretation) to each julia
 object (see the `scitype` examples below).
@@ -286,7 +286,7 @@ The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
 scientific types](@ref) below to guarantee your scalar data is interpreted
 correctly. Tools exist to coerce the data to have the appropriate
 scientfic type; see
-[ScientificTypes.jl](https://alan-turing-institute.github.io/ScientificTypes.jl/dev/)
+[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/)
 or run `?coerce` for details.
 
 Additionally, most data containers - such as tuples, vectors, matrices
@@ -296,7 +296,7 @@ and tables - have a scientific type.
 ![](img/scitypes.png)
 
 *Figure 1. Part of the scientific type hierarchy in*
-[ScientificTypesBase.jl](https://alan-turing-institute.github.io/ScientificTypes.jl/dev/).
+[ScientificTypesBase.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/).
 
 ```@repl doda
 scitype(4.6)
@@ -389,7 +389,7 @@ But see also [Model Search](@ref).
 ### Scalar scientific types
 
 Models in MLJ will always apply the `MLJ` convention described in
-[ScientificTypes.jl](https://alan-turing-institute.github.io/ScientificTypes.jl/dev/)
+[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/)
 to decide how to interpret the elements of your container types. Here
 are the key features of that convention:
 
@@ -417,7 +417,7 @@ appropriate `Finite` (categorical) scitype.  See [Working with Categorical Data]
 
 For more on scitype coercion of arrays and tables, see [`coerce`](@ref),
 [`autotype`](@ref) and [`unpack`](@ref) below and the examples at
-[ScientificTypes.jl](https://alan-turing-institute.github.io/ScientificTypes.jl/dev/).
+[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/).
 
 
 

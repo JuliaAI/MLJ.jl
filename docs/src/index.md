@@ -186,7 +186,7 @@ installation required.
 * Consistent interface to handle probabilistic predictions.
 
 * Extensible [tuning
-  interface](https://github.com/alan-turing-institute/MLJTuning.jl),
+  interface](https://github.com/JuliaAI/MLJTuning.jl),
   to support growing number of optimization strategies, and designed
   to play well with model composition.
 

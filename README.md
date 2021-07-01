@@ -71,16 +71,16 @@ illustrated in the dependency chart below.
 <a href="ROADMAP.md">Road Map</a> 
 </br>
 <br>
-  <a href="https://github.com/alan-turing-institute/MLJ">MLJ</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJBase.jl">MLJBase</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJModelInterface.jl">MLJModelInterface</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJModels.jl">MLJModels</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJTuning.jl">MLJTuning</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJLinearModels.jl">MLJLinearModels</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJ.jl">MLJ</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJBase.jl">MLJBase</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJModelInterface.jl">MLJModelInterface</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJModels.jl">MLJModels</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJTuning.jl">MLJTuning</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJLinearModels.jl">MLJLinearModels</a> &nbsp;•&nbsp;
   <a href="https://github.com/FluxML/MLJFlux.jl">MLJFlux</a>
 </br>
 <br>  
-  <a href="https://github.com/alan-turing-institute/MLJTutorials">MLJTutorials</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJTutorials">MLJTutorials</a> &nbsp;•&nbsp;
   <a href="https://github.com/JuliaAI/MLJEnsembles.jl">MLJEnsembles</a> &nbsp;•&nbsp;
   <a href="https://github.com/JuliaAI/MLJIteration.jl">MLJIteration</a> &nbsp;•&nbsp;
   <a href="https://github.com/JuliaAI/MLJOpenML.jl">MLJOpenML</a> &nbsp;•&nbsp;

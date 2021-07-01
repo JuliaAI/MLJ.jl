@@ -42,13 +42,13 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 
 ### Adding models
 
-- [ ] **Integrate deep learning** using [Flux.jl](https://github.com/FluxML/Flux.jl.git) deep learning.  [Done](https://github.com/alan-turing-institute/MLJFlux.jl) but can
+- [ ] **Integrate deep learning** using [Flux.jl](https://github.com/FluxML/Flux.jl.git) deep learning.  [Done](https://github.com/JuliaAI/MLJFlux.jl) but can
   improve experience by:
 
   - [x] finishing iterative model wrapper [#139](https://github.com/alan-turing-institute/MLJ.jl/issues/139)
 
   - [ ] improving performance by implementing data front-end after (see [MLJBase
-  #501](https://github.com/alan-turing-institute/MLJBase.jl/pull/501)) but see also [this relevant discussion](https://github.com/FluxML/MLJFlux.jl/issues/97).
+  #501](https://github.com/JuliaAI/MLJBase.jl/pull/501)) but see also [this relevant discussion](https://github.com/FluxML/MLJFlux.jl/issues/97).
 
 
 -  [ ] Probabilistic programming:
@@ -66,7 +66,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 
 -   [ ] Feature engineering (python featuretools?, recursive feature
 	elimination?)
-	[#426](https://github.com/alan-turing-institute/MLJ.jl/issues/426) [MLJModels #314](https://github.com/alan-turing-institute/MLJModels.jl/issues/314)
+	[#426](https://github.com/alan-turing-institute/MLJ.jl/issues/426) [MLJModels #314](https://github.com/JuliaAI/MLJModels.jl/issues/314)
 
 
 ### Enhancing core functionality
@@ -74,7 +74,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 -   [x] Iterative model control [#139](https://github.com/alan-turing-institute/MLJ.jl/issues/139). [Done](https://github.com/JuliaAI/MLJIteration.jl)
 
 -   [ ] **†** Add more tuning
-	strategies. See [here](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here)
+	strategies. See [here](https://github.com/JuliaAI/MLJTuning.jl#what-is-provided-here)
 	for complete
 	wish-list. Particular focus on:
 
@@ -83,7 +83,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	(done)
 
 	- [x] Latin hypercube
-	  [done](https://github.com/alan-turing-institute/MLJTuning.jl/pull/96)
+	  [done](https://github.com/JuliaAI/MLJTuning.jl/pull/96)
 
 	- [ ] Bayesian methods, starting with Gaussian Process methods a
 	  la PyMC3. Some preliminary research done .
@@ -102,7 +102,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	- [ ] Particle Swarm Optization (current WIP, GSoC project @lhnguyen-vn)
 
 	- [ ] tuning strategies for non-Cartesian spaces of models [MLJTuning
-	#18](https://github.com/alan-turing-institute/MLJTuning.jl/issues/18), architecture search, and other AutoML workflows
+	#18](https://github.com/JuliaAI/MLJTuning.jl/issues/18), architecture search, and other AutoML workflows
 
 - [ ]  Systematic benchmarking, probably modeled on
 	[MLaut](https://arxiv.org/abs/1901.03678) [#69](https://github.com/alan-turing-institute/MLJ.jl/issues/74)
@@ -139,9 +139,9 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 
 - [ ]  Spin-off a stand-alone measures (loss functions) package
 	(currently
-	[here](https://github.com/alan-turing-institute/MLJBase.jl/tree/master/src/measures)). Introduce
+	[here](https://github.com/JuliaAI/MLJBase.jl/tree/master/src/measures)). Introduce
 	measures for multi-targets [MLJBase
-	#502](https://github.com/alan-turing-institute/MLJBase.jl/issues/502).
+	#502](https://github.com/JuliaAI/MLJBase.jl/issues/502).
 
 - [ ] Add sparse data support and better support for NLP models; we
 	could use [NaiveBayes.jl](https://github.com/dfdx/NaiveBayes.jl)
@@ -152,12 +152,12 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 
 - [x] POC for implementation of time series models classification
 	[#303](https://github.com/alan-turing-institute/MLJ.jl/issues/303),
-	[ScientificTypesBase #14](https://github.com/alan-turing-institute/ScientificTypesBase.jl/issues/14) POC is [here](https://github.com/alan-turing-institute/TimeSeriesClassification.jl)
+	[ScientificTypesBase #14](https://github.com/JuliaAI/ScientificTypesBase.jl/issues/14) POC is [here](https://github.com/JuliaAI/TimeSeriesClassification.jl)
 
 - [ ] POC for time series forecasting, along lines of sktime; probably needs [MLJBase
-	#502](https://github.com/alan-turing-institute/MLJBase.jl/issues/502)
+	#502](https://github.com/JuliaAI/MLJBase.jl/issues/502)
 	first, and someone to finish [PR on time series
-	CV](https://github.com/alan-turing-institute/MLJBase.jl/pull/331). See also [this proposal](https://julialang.org/jsoc/gsoc/MLJ/#time_series_forecasting_at_scale_-_speed_up_via_julia)
+	CV](https://github.com/JuliaAI/MLJBase.jl/pull/331). See also [this proposal](https://julialang.org/jsoc/gsoc/MLJ/#time_series_forecasting_at_scale_-_speed_up_via_julia)
 
 - [ ]   Add tools or separate repository for visualization in MLJ.
 
@@ -165,7 +165,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	[#85](https://github.com/alan-turing-institute/MLJ.jl/issues/85)
 	(closed).
 	[#416](https://github.com/alan-turing-institute/MLJ.jl/issues/416)
-	[Done](https://github.com/alan-turing-institute/MLJTuning.jl/pull/121) but might be worth adding alternatives suggested in issue.
+	[Done](https://github.com/JuliaAI/MLJTuning.jl/pull/121) but might be worth adding alternatives suggested in issue.
 
 	- [ ] visualizing decision boundaries ? [#342](https://github.com/alan-turing-institute/MLJ.jl/issues/342)
 
@@ -190,7 +190,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 ### Scalability
 
 - [ ]   Roll out data front-ends for all models after  [MLJBase
-  #501](https://github.com/alan-turing-institute/MLJBase.jl/pull/501)
+  #501](https://github.com/JuliaAI/MLJBase.jl/pull/501)
   is merged.
 
 - [ ]  Online learning support and distributed data
@@ -204,5 +204,5 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	[#71](https://github.com/alan-turing-institute/MLJ.jl/issues/71)
 
 - [x] Add multithreading to tuning [MLJTuning
-  #15](https://github.com/alan-turing-institute/MLJTuning.jl/issues/15)
-  [Done](https://github.com/alan-turing-institute/MLJTuning.jl/pull/42).
+  #15](https://github.com/JuliaAI/MLJTuning.jl/issues/15)
+  [Done](https://github.com/JuliaAI/MLJTuning.jl/pull/42).

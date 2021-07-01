@@ -8,7 +8,7 @@ learning models; (ii) that you would like to interface and register
 these models with MLJ; and (iii) that you have a rough understanding
 of how things work with MLJ.  In particular you are familiar with:
 
-- what [scientific types](https://github.com/alan-turing-institute/ScientificTypes.jl) are
+- what [scientific types](https://github.com/JuliaAI/ScientificTypes.jl) are
 
 - what `Probabilistic`, `Deterministic` and `Unsupervised` models are
 
@@ -53,14 +53,14 @@ includes:
 
 #### Important
 
-[MLJModelInterface](https://github.com/alan-turing-institute/MLJModelInterface.jl)
+[MLJModelInterface](https://github.com/JuliaAI/MLJModelInterface.jl)
 is a very light-weight interface allowing you to *define* your
 interface, but does not provide the functionality required to use or
 test your interface; this requires
-[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl). So,
+[MLJBase](https://github.com/JuliaAI/MLJBase.jl). So,
 while you only need to add `MLJModelInterface` to your project's
 [deps], for testing purposes you need to add
-[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) to your
+[MLJBase](https://github.com/JuliaAI/MLJBase.jl) to your
 project's [extras] and [targets]. In testing, simply use `MLJBase` in
 place of `MLJModelInterface`.
 
@@ -100,7 +100,7 @@ the field `a` is a `Float64`, takes `0.5` as default value, and
 expects its value to be positive.
 
 Please see [this
-issue](https://github.com/alan-turing-institute/MLJBase.jl/issues/68)
+issue](https://github.com/JuliaAI/MLJBase.jl/issues/68)
 for a known issue and workaround relating to the use of `@mlj_model`
 with negative defaults.
 
@@ -148,8 +148,8 @@ end
 
 **Examples**:
 
-- [KNNClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/NearestNeighbors.jl#L62-L69) which uses `@mlj_model`,
-- [XGBoostRegressor](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/XGBoost.jl#L17-L161) which does not.
+- [KNNClassifier](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/NearestNeighbors.jl#L62-L69) which uses `@mlj_model`,
+- [XGBoostRegressor](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/XGBoost.jl#L17-L161) which does not.
 
 
 ### Fit
@@ -191,7 +191,7 @@ The `report` should be a `NamedTuple` with any auxiliary useful
 information that a user would want to know about the fit (e.g.,
 feature rankings). See more on this below.
 
-**Example**: GLM's [LinearRegressor](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L95-L105)
+**Example**: GLM's [LinearRegressor](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L95-L105)
 
 
 #### Classifier
@@ -222,16 +222,16 @@ detailed instructions at [The predict method](@ref).
 
 **Examples**:
 
--  GLM's [BinaryClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L119-L131) (`Probabilistic`)
+-  GLM's [BinaryClassifier](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L119-L131) (`Probabilistic`)
 
-- LIBSVM's [SVC](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/LIBSVM.jl) (`Deterministic`)
+- LIBSVM's [SVC](https://github.com/JuliaAI/MLJModels.jl/blob/master/src/LIBSVM.jl) (`Deterministic`)
 
 
 #### Transformer
 
 Nothing special for a transformer.
 
-**Example**: [FillImputer](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/builtins/Transformers.jl#L54-L64)
+**Example**: [FillImputer](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/builtins/Transformers.jl#L54-L64)
 
 
 ### Fitted parameters
@@ -254,7 +254,7 @@ function MLJModelInterface.fitted_params(model::YourModel, fitresult)
 end
 ```
 
-**Example**: for [GLM models](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L133-L137)
+**Example**: for [GLM models](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L133-L137)
 
 
 ### Summary of user interface points (or, What to put where?)
@@ -315,9 +315,9 @@ whose performance may suffice.
 
 **Examples**
 
-- Deterministic regression: [KNNRegressor](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/NearestNeighbors.jl#L124-L145)
-- Probabilistic regression: [LinearRegressor](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L154-L158) and the [`predict_mean`](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L144-L147)
-- Probabilistic classification: [LogisticClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L165-L168)
+- Deterministic regression: [KNNRegressor](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/NearestNeighbors.jl#L124-L145)
+- Probabilistic regression: [LinearRegressor](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L154-L158) and the [`predict_mean`](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L144-L147)
+- Probabilistic classification: [LogisticClassifier](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L165-L168)
 
 ### Metadata
 
@@ -359,16 +359,16 @@ correct `load_path` MLJ will be unable to import your model.
 **Examples**:
 
 - package metadata
-  - [GLM](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L179-L186)
-  - [MLJLinearModels](https://github.com/alan-turing-institute/MLJLinearModels.jl/blob/289a373a8357c4afc191711d0218aa1523e97f70/src/mlj/interface.jl#L91-L97)
+  - [GLM](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L179-L186)
+  - [MLJLinearModels](https://github.com/JuliaAI/MLJLinearModels.jl/blob/289a373a8357c4afc191711d0218aa1523e97f70/src/mlj/interface.jl#L91-L97)
 - model metadata
-  - [LinearRegressor](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L188-L193)
-  - [DecisionTree](https://github.com/alan-turing-institute/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/DecisionTree.jl#L225-L229)
-  - [A series of regressors](https://github.com/alan-turing-institute/MLJLinearModels.jl/blob/289a373a8357c4afc191711d0218aa1523e97f70/src/mlj/interface.jl#L105-L111)
+  - [LinearRegressor](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/GLM.jl#L188-L193)
+  - [DecisionTree](https://github.com/JuliaAI/MLJModels.jl/blob/3687491b132be8493b6f7a322aedf66008caaab1/src/DecisionTree.jl#L225-L229)
+  - [A series of regressors](https://github.com/JuliaAI/MLJLinearModels.jl/blob/289a373a8357c4afc191711d0218aa1523e97f70/src/mlj/interface.jl#L105-L111)
 
 
 ### Adding a model to the model registry
 
-See [here](https://github.com/alan-turing-institute/MLJModels.jl/tree/master#instructions-for-updating-the-mlj-model-registry).
+See [here](https://github.com/JuliaAI/MLJModels.jl/tree/master#instructions-for-updating-the-mlj-model-registry).
 
 

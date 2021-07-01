@@ -10,11 +10,11 @@ models intended for general use. See also the more condensed
 [Quick-Start Guide to Adding Models](@ref).
 
 For sample implementations, see
-[MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src).
+[MLJModels/src](https://github.com/JuliaAI/MLJModels.jl/tree/master/src).
 
 The machine learning tools provided by MLJ can be applied to the
 models in any package that imports the package
-[MLJModelInterface](https://github.com/alan-turing-institute/MLJModelInterface.jl) and
+[MLJModelInterface](https://github.com/JuliaAI/MLJModelInterface.jl) and
 implements the API defined there, as outlined below. For a
 quick-and-dirty implementation of user-defined models see [Simple User
 Defined Models](simple_user_defined_models.md).  To make new models
@@ -24,14 +24,14 @@ models](@ref).
 
 #### Important
 
-[MLJModelInterface](https://github.com/alan-turing-institute/MLJModelInterface.jl)
+[MLJModelInterface](https://github.com/JuliaAI/MLJModelInterface.jl)
 is a very light-weight interface allowing you to *define* your
 interface, but does not provide the functionality required to use or
 test your interface; this requires
-[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl).  So,
+[MLJBase](https://github.com/JuliaAI/MLJBase.jl).  So,
 while you only need to add `MLJModelInterface` to your project's
 [deps], for testing purposes you need to add
-[MLJBase](https://github.com/alan-turing-institute/MLJBase.jl) to your
+[MLJBase](https://github.com/JuliaAI/MLJBase.jl) to your
 project's [extras] and [targets]. In testing, simply use `MLJBase` in
 place of `MLJModelInterface`.
 
@@ -39,7 +39,7 @@ It is assumed the reader has read [Getting Started](index.md).
 To implement the API described here, some familiarity with the
 following packages is also helpful:
 
-- [ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
+- [ScientificTypes.jl](https://github.com/JuliaAI/ScientificTypes.jl)
   (for specifying model requirements of data)
 
 - [Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
@@ -185,7 +185,7 @@ parameters.
 #### Known issue with @mlj_macro
 
 Defaults with negative values can trip up the `@mlj_macro` (see [this
-issue](https://github.com/alan-turing-institute/MLJBase.jl/issues/68)). So,
+issue](https://github.com/JuliaAI/MLJBase.jl/issues/68)). So,
 for example, this does not work:
 
 ```julia
@@ -549,7 +549,7 @@ end
 ```
 
 For a concrete example, refer to the
-[code](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/ScikitLearn.jl)
+[code](https://github.com/JuliaAI/MLJModels.jl/blob/master/src/ScikitLearn.jl)
 for `SVMClassifier`.
 
 Of course, if you are coding a learning algorithm from scratch, rather
@@ -624,7 +624,7 @@ The constructor has a lot of options, including passing a dictionary
 instead of vectors. See [`UnivariateFinite`](@ref) for details.
 
 See
-[LinearBinaryClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/GLM.jl)
+[LinearBinaryClassifier](https://github.com/JuliaAI/MLJModels.jl/blob/master/src/GLM.jl)
 for an example of a Probabilistic classifier implementation.
 
 *Important note on binary classifiers.* There is no "Binary" scitype
@@ -634,7 +634,7 @@ an alias for `Union{Multiclass{2},OrderedFactor{2}}`. The
 `AbstractVector{<:Binary}` and according to the *mlj* scitype
 convention, elements of `y` have type `CategoricalValue`, and *not*
 `Bool`. See
-[BinaryClassifier](https://github.com/alan-turing-institute/MLJModels.jl/blob/master/src/GLM.jl)
+[BinaryClassifier](https://github.com/JuliaAI/MLJModels.jl/blob/master/src/GLM.jl)
 for an example.
 
 
@@ -672,7 +672,7 @@ attempt to use your model with inappropriately typed data.
 
 The trait functions `input_scitype` and `target_scitype` take
 scientific data types as values. We assume here familiarity with
-[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl)
+[ScientificTypes.jl](https://github.com/JuliaAI/ScientificTypes.jl)
 (see [Getting Started](index.md) for the basics).
 
 For example, to ensure that the `X` presented to the
@@ -755,7 +755,7 @@ method                   | return type       | declarable return values         
 Here is the complete list of trait function declarations for
 `DecisionTreeClassifier`, whose core algorithms are provided by
 DecisionTree.jl, but whose interface actually lives at
-[MLJDecisionTreeInterface.jl](https://github.com/alan-turing-institute/MLJDecisionTreeInterface.jl).
+[MLJDecisionTreeInterface.jl](https://github.com/JuliaAI/MLJDecisionTreeInterface.jl).
 
 ```julia
 MMI.input_scitype(::Type{<:DecisionTreeClassifier}) = MMI.Table(MMI.Continuous)
@@ -991,7 +991,7 @@ A working implementation of a model that fits a `UnivariateFinite`
 distribution to some categorical data using [Laplace
 smoothing](https://en.wikipedia.org/wiki/Additive_smoothing)
 controlled by a hyper-parameter `alpha` is given
-[here](https://github.com/alan-turing-institute/MLJBase.jl/blob/d377bee1198ec179a4ade191c11fef583854af4a/test/interface/model_api.jl#L36).
+[here](https://github.com/JuliaAI/MLJBase.jl/blob/d377bee1198ec179a4ade191c11fef583854af4a/test/interface/model_api.jl#L36).
 
 
 ### Serialization 
@@ -1193,26 +1193,26 @@ to all MLJ users:
 2. **Separate interface package**. Implementation code lives in a
    separate *interface package*, which has the algorithm providing
    package as a dependency. An example is
-   [MLJDecisionTreeInterface.jl](https://github.com/alan-turing-institute/MLJDecisionTreeInterface.jl),
+   [MLJDecisionTreeInterface.jl](https://github.com/JuliaAI/MLJDecisionTreeInterface.jl),
    which provides the interface for models in
    [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl).
 
 Additionally, one needs to ensure that the implementation code defines
 the `package_name` and `load_path` model traits appropriately, so that
 `MLJ`'s `@load` macro can find the necessary code (see
-[MLJModels/src](https://github.com/alan-turing-institute/MLJModels.jl/tree/master/src)
+[MLJModels/src](https://github.com/JuliaAI/MLJModels.jl/tree/master/src)
 for examples).
 
 ### How to add models to the MLJ model registry?
 
 The MLJ model registry is located in the [MLJModels.jl
-repository](https://github.com/alan-turing-institute/MLJModels.jl). To
+repository](https://github.com/JuliaAI/MLJModels.jl). To
 add a model, you need to follow these steps
 
 - Ensure your model conforms to the interface defined above
 
 - Raise an issue at
-  [MLJModels.jl](https://github.com/alan-turing-institute/MLJModels.jl/issues)
+  [MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl/issues)
   and point out where the MLJ-interface implementation is, e.g. by
   providing a link to the code.
 

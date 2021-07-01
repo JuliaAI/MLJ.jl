@@ -4,7 +4,7 @@
 
 Recall that models articulate their data requirements using scientific
 types (see [Getting Started](@ref) or the [ScientificTypes.jl
-documentation](https://alan-turing-institute.github.io/ScientificTypes.jl/dev/)). There
+documentation](https://JuliaAI.github.io/ScientificTypes.jl/dev/)). There
 are three scientific types discrete data can have: `Count`,
 `OrderedFactor` and `Multiclass`.
 
@@ -62,7 +62,7 @@ above. To inspect all column scientific types in a table
 simultaneously, use `schema`. (The `scitype(X)` of a table `X`
 contains a condensed form of this information used in type dispatch;
 see
-[here](https://github.com/alan-turing-institute/ScientificTypesBase.jl#more-on-the-table-type).)
+[here](https://github.com/JuliaAI/ScientificTypesBase.jl#more-on-the-table-type).)
 
 ```@example hut
 import DataFrames.DataFrame
