@@ -21,9 +21,9 @@
   <img src="https://mybinder.org/badge_logo.svg"
        alt="Binder">
   </a>
-  <a href="https://doi.org/10.21105/joss.02704">
-    <img src="https://joss.theoj.org/papers/10.21105/joss.02704/status.svg"
-       alt="DOI">
+  <a href="BIBLIOGRAPHY.md">
+    <img src="https://img.shields.io/badge/cite-bibtex-blue"
+       alt="bibtex">
   </a>
 
 </p>
@@ -42,16 +42,27 @@ ecosystem, whose organization is described further below.
 
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
-tuning, evaluating, composing and comparing over [150 machine
+tuning, evaluating, composing and comparing over [160 machine
 learning
 models](https://alan-turing-institute.github.io/MLJ.jl/dev/list_of_supported_models/)
 written in Julia and other languages.  
 
-MLJ is released under the MIT license. It was created as a Tools,
+MLJ was initially created as a Tools,
 Practices and Systems project at the [Alan Turing
 Institute](https://www.turing.ac.uk/) in 2019. Current funding is
 provided by a [New Zealand Strategic Science Investment
-Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/strategic-science-investment-fund/ssif-funded-programmes/university-of-auckland/). 
+Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/strategic-science-investment-fund/ssif-funded-programmes/university-of-auckland/)
+
+MLJ is released under the MIT license, and has been developed with the
+support of the following organizations:
+
+<div align="center">
+    <img src="material/Turing_logo.png" width = 100/>
+    <img src="material/UoA_logo.png" width = 100/>
+    <img src="material/IQVIA_logo.png" width = 100/>
+    <img src="material/warwick.png" width = 100/>
+    <img src="material/julia.png" width = 100/>
+</div>
 
 <br>
 <p align="center">
@@ -66,7 +77,7 @@ Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/fun
 ### The MLJ Universe
 
 The functionality of MLJ is distributed over a number of repositories
-illustrated in the dependency chart below.
+illustrated in the dependency chart below. These repositories live at the [JuliaAI umbrella](https://github.com/JuliaAI).
 
 <br>
 <p align="center">
@@ -74,29 +85,6 @@ illustrated in the dependency chart below.
 <a href="ORGANIZATION.md">Code Organization</a> &nbsp;•&nbsp;
 <a href="ROADMAP.md">Road Map</a> 
 </br>
-<br>
-  <a href="https://github.com/alan-turing-institute/MLJ.jl">MLJ</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/MLJBase.jl">MLJBase</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/MLJModelInterface.jl">MLJModelInterface</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/MLJModels.jl">MLJModels</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/MLJTuning.jl">MLJTuning</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/MLJLinearModels.jl">MLJLinearModels</a> &nbsp;•&nbsp;
-  <a href="https://github.com/FluxML/MLJFlux.jl">MLJFlux</a>
-</br>
-<br>  
-  <a href="https://github.com/JuliaAI/MLJTutorials">MLJTutorials</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/MLJEnsembles.jl">MLJEnsembles</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/MLJIteration.jl">MLJIteration</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/MLJOpenML.jl">MLJOpenML</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/MLJSerialization.jl">MLJSerialization</a> 
-</br>
-<br>  
-  <a href="https://github.com/JuliaAI/ScientificTypes.jl">ScientificTypes</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/ScientificTypesBase.jl">ScientificTypesBase</a>
-</p>
-<p></p>
-    <br>
-<p></p>
 
 <div align="center">
     <img src="material/MLJ_stack.svg" alt="Dependency Chart">
@@ -154,29 +142,11 @@ To test your local clone, do
 Pkg.test("MLJBase")
 ```
 
-For more on package management, see https://julialang.github.io/Pkg.jl/v1/ .
+For more on package management, see [here](https://julialang.github.io/Pkg.jl/v1/).
 
 
 
-### Citing MLJ
 
-
-[![DOI](https://joss.theoj.org/papers/10.21105/joss.02704/status.svg)](https://doi.org/10.21105/joss.02704)
-
-```bibtex
-@article{Blaom2020,
-  doi = {10.21105/joss.02704},
-  url = {https://doi.org/10.21105/joss.02704},
-  year = {2020},
-  publisher = {The Open Journal},
-  volume = {5},
-  number = {55},
-  pages = {2704},
-  author = {Anthony D. Blaom and Franz Kiraly and Thibaut Lienart and Yiannis Simillides and Diego Arenas and Sebastian J. Vollmer},
-  title = {{MLJ}: A Julia package for composable machine learning},
-  journal = {Journal of Open Source Software}
-}
-```
 
 #### Contributors
 
