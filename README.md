@@ -12,17 +12,16 @@
     <img src="https://img.shields.io/badge/docs-stable-blue.svg"
          alt="Documentation">
   </a>
-  </a>
-  <!-- <a href="https://doi.org/10.5281/zenodo.3541506"> -->
-  <!-- <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3541506.svg" -->
-  <!--      alt="Cite MLJ"> -->
-  <!-- </a> -->
   <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">
   <img src="https://mybinder.org/badge_logo.svg"
        alt="Binder">
   </a>
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/License-MIT-yelllow"
+       alt="bibtex">
+  </a>
   <a href="BIBLIOGRAPHY.md">
-    <img src="https://img.shields.io/badge/cite-bibtex-blue"
+    <img src="https://img.shields.io/badge/cite-BibTeX-blue"
        alt="bibtex">
   </a>
 
@@ -53,8 +52,7 @@ Institute](https://www.turing.ac.uk/) in 2019. Current funding is
 provided by a [New Zealand Strategic Science Investment
 Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/strategic-science-investment-fund/ssif-funded-programmes/university-of-auckland/).
 
-MLJ is released under the MIT license, and has been developed with the
-support of the following organizations:
+MLJ been developed with the support of the following organizations:
 
 <div align="center">
     <img src="material/Turing_logo.png" width = 100/>
@@ -93,10 +91,6 @@ connections do not currently exist but are planned/proposed.*
 <a href="ROADMAP.md">Road Map</a> 
 </br>
 
-
-
-
-
 #### Contributors
 
 *Core design*: A. Blaom, F. Kiraly, S. Vollmer
@@ -107,7 +101,3 @@ connections do not currently exist but are planned/proposed.*
 
 *Past collaborators*: D. Aluthge, E. Barp, G. Bohner, M. K. Borregaard, V. Churavy, H. Devereux, M. Giordano, M. Innes, F. Kiraly, M. Nook, Z. Nugent, P. Oleśkiewicz, A. Shridar, Y. Simillides, A. Sengupta, A. Stechemesser.
 
-#### License
-
-MLJ is supported by the Alan Turing Institute and released under the MIT "Expat" License.
-´
