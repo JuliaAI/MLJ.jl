@@ -298,7 +298,7 @@ install directly. Developers can learn more about these
 [here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/ORGANIZATION.md).
 
 See also the alternative instalation instructions for [Customizing
-Behaviour](@ref).
+Behavior](@ref).
 
 
 ## Learning Julia
