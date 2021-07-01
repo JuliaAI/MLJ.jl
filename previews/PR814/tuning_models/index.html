@@ -10,7 +10,7 @@ tree = Tree()</code></pre><pre class="documenter-example-output">DecisionTreeReg
     min_purity_increase = 0.0,
     n_subfeatures = 0,
     post_prune = false,
-    merge_purity_threshold = 1.0) @049</pre><p>Let&#39;s tune <code>min_purity_increase</code> in the model above, using a grid-search. To do so we will use the simplest <code>range</code> object, a one-dimensional range object constructed using the <code>range</code> method:</p><pre><code class="language-julia">r = range(tree, :min_purity_increase, lower=0.001, upper=1.0, scale=:log);
+    merge_purity_threshold = 1.0) @986</pre><p>Let&#39;s tune <code>min_purity_increase</code> in the model above, using a grid-search. To do so we will use the simplest <code>range</code> object, a one-dimensional range object constructed using the <code>range</code> method:</p><pre><code class="language-julia">r = range(tree, :min_purity_increase, lower=0.001, upper=1.0, scale=:log);
 self_tuning_tree = TunedModel(model=tree,
                               resampling=CV(nfolds=3),
                               tuning=Grid(resolution=10),
@@ -50,7 +50,7 @@ self_tuning_tree = TunedModel(model=tree,
     acceleration = CPU1{Nothing}(nothing),
     acceleration_resampling = CPU1{Nothing}(nothing),
     check_measure = true,
-    cache = true) @828</pre><p>Incidentally, a grid is generated internally &quot;over the range&quot; by calling the <code>iterator</code> method with an appropriate resolution:</p><pre><code class="language-julia">iterator(r, 5)</code></pre><pre class="documenter-example-output">5-element Vector{Float64}:
+    cache = true) @725</pre><p>Incidentally, a grid is generated internally &quot;over the range&quot; by calling the <code>iterator</code> method with an appropriate resolution:</p><pre><code class="language-julia">iterator(r, 5)</code></pre><pre class="documenter-example-output">5-element Vector{Float64}:
  0.0010000000000000002
  0.005623413251903492
  0.0316227766016838
@@ -60,10 +60,10 @@ r2 = range(selector, :features, values = [[:x1,], [:x1, :x2]]);
 iterator(r2)</code></pre><pre class="documenter-example-output">2-element Vector{Vector{Symbol}}:
  [:x1]
  [:x1, :x2]</pre><p>Unbounded ranges are also permitted. See the <a href="#Base.range"><code>range</code></a> and <a href="#MLJBase.iterator"><code>iterator</code></a> docstrings below for details, and the <a href="#Distributions.sampler"><code>sampler</code></a> docstring for generating random samples from one-dimensional ranges (used internally by the <a href="#MLJTuning.RandomSearch"><code>RandomSearch</code></a> strategy).</p><p>Returning to the wrapped tree model:</p><pre><code class="language-julia">mach = machine(self_tuning_tree, X, y);
-fit!(mach, verbosity=0)</code></pre><pre class="documenter-example-output">Machine{DeterministicTunedModel{Grid,…},…} @787 trained 1 time; caches data
+fit!(mach, verbosity=0)</code></pre><pre class="documenter-example-output">Machine{DeterministicTunedModel{Grid,…},…} @146 trained 1 time; caches data
   args: 
-    1:	Source @402 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @632 ⏎ `AbstractVector{Continuous}`
+    1:	Source @898 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @747 ⏎ `AbstractVector{Continuous}`
 </pre><p>We can inspect the detailed results of the grid search with <code>report(mach)</code> or just retrieve the optimal model, as here:</p><pre><code class="language-julia">fitted_params(mach).best_model</code></pre><pre class="documenter-example-output">DecisionTreeRegressor(
     max_depth = -1,
     min_samples_leaf = 5,
@@ -71,8 +71,8 @@ fit!(mach, verbosity=0)</code></pre><pre class="documenter-example-output">Machi
     min_purity_increase = 0.010000000000000004,
     n_subfeatures = 0,
     post_prune = false,
-    merge_purity_threshold = 1.0) @734</pre><p>For more detailed information, we can look at <code>report(mach)</code>, for example:</p><pre><code class="language-julia">entry = report(mach).best_history_entry</code></pre><pre class="documenter-example-output">(model = DecisionTreeRegressor @734,
- measure = [RootMeanSquaredError @117],
+    merge_purity_threshold = 1.0) @529</pre><p>For more detailed information, we can look at <code>report(mach)</code>, for example:</p><pre><code class="language-julia">entry = report(mach).best_history_entry</code></pre><pre class="documenter-example-output">(model = DecisionTreeRegressor @529,
+ measure = [RootMeanSquaredError @543],
  measurement = [0.2062890066409599],
  per_fold = [[0.2213814823823991, 0.19127703213485428, 0.20510679905501772]],)</pre><p>Predicting on new input observations using the optimal model, <em>trained on all the data</em> bound to <code>mach</code>:</p><pre><code class="language-julia">Xnew  = MLJ.table(rand(3, 10));
 predict(mach, Xnew)</code></pre><pre class="documenter-example-output">3-element Vector{Float64}:
@@ -90,17 +90,17 @@ knn = KNN()</code></pre><pre class="documenter-example-output">KNNClassifier(
     metric = Distances.Euclidean(0.0),
     leafsize = 10,
     reorder = true,
-    weights = NearestNeighborModels.Uniform()) @992</pre><p>We&#39;ll tune the hyperparameter <code>K</code> in the model above, using a grid-search once more:</p><pre><code class="language-julia">K_range = range(knn, :K, lower=5, upper=20);</code></pre><pre class="documenter-example-output">typename(MLJBase.NumericRange)(Int64, :K, ... )</pre><p>Since the model is probabilistic, we need either to: (i) use a probabilistic measure, such as <code>brier_loss</code>; or (ii) use a deterministic measure, such as <code>misclassification_rate</code>, but declare <code>operation=predict_mode</code> to ensure we are evaluating the measure on <em>point</em> predictions.</p><p><strong>Case (i) - probabilistic measure</strong>:</p><pre><code class="language-julia">self_tuning_knn = TunedModel(model=knn,
+    weights = NearestNeighborModels.Uniform()) @831</pre><p>We&#39;ll tune the hyperparameter <code>K</code> in the model above, using a grid-search once more:</p><pre><code class="language-julia">K_range = range(knn, :K, lower=5, upper=20);</code></pre><pre class="documenter-example-output">typename(MLJBase.NumericRange)(Int64, :K, ... )</pre><p>Since the model is probabilistic, we need either to: (i) use a probabilistic measure, such as <code>brier_loss</code>; or (ii) use a deterministic measure, such as <code>misclassification_rate</code>, but declare <code>operation=predict_mode</code> to ensure we are evaluating the measure on <em>point</em> predictions.</p><p><strong>Case (i) - probabilistic measure</strong>:</p><pre><code class="language-julia">self_tuning_knn = TunedModel(model=knn,
                              resampling = CV(nfolds=4, rng=1234),
                              tuning = Grid(resolution=5),
                              range = K_range,
                              measure=BrierLoss());
 
 mach = machine(self_tuning_knn, X, y);
-fit!(mach, verbosity=0);</code></pre><pre class="documenter-example-output">Machine{ProbabilisticTunedModel{Grid,…},…} @721 trained 1 time; caches data
+fit!(mach, verbosity=0);</code></pre><pre class="documenter-example-output">Machine{ProbabilisticTunedModel{Grid,…},…} @396 trained 1 time; caches data
   args: 
-    1:	Source @173 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @929 ⏎ `AbstractVector{Multiclass{3}}`
+    1:	Source @199 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @656 ⏎ `AbstractVector{Multiclass{3}}`
 </pre><p><strong>Case (ii) - deterministic measure</strong>:</p><pre><code class="language-julia">self_tuning_knn = TunedModel(model=knn,
                              resampling = CV(nfolds=4, rng=1234),
                              tuning = Grid(resolution=5),
@@ -109,12 +109,12 @@ fit!(mach, verbosity=0);</code></pre><pre class="documenter-example-output">Mach
                              operation=predict_mode);
 
 mach = machine(self_tuning_knn, X, y);
-fit!(mach, verbosity=0);</code></pre><pre class="documenter-example-output">Machine{ProbabilisticTunedModel{Grid,…},…} @627 trained 1 time; caches data
+fit!(mach, verbosity=0);</code></pre><pre class="documenter-example-output">Machine{ProbabilisticTunedModel{Grid,…},…} @344 trained 1 time; caches data
   args: 
-    1:	Source @880 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @177 ⏎ `AbstractVector{Multiclass{3}}`
-</pre><p>Let&#39;s inspect the best model and corresponding evaluation of the metric in case (ii):</p><pre><code class="language-julia">entry = report(mach).best_history_entry</code></pre><pre class="documenter-example-output">(model = KNNClassifier @199,
- measure = [MisclassificationRate @947],
+    1:	Source @168 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @010 ⏎ `AbstractVector{Multiclass{3}}`
+</pre><p>Let&#39;s inspect the best model and corresponding evaluation of the metric in case (ii):</p><pre><code class="language-julia">entry = report(mach).best_history_entry</code></pre><pre class="documenter-example-output">(model = KNNClassifier @101,
+ measure = [MisclassificationRate @470],
  measurement = [0.026849217638691324],
  per_fold = [[0.0, 0.02631578947368421, 0.0, 0.08108108108108109]],)</pre><pre><code class="language-julia">entry.model.K</code></pre><pre class="documenter-example-output">9</pre><p>Recall that fitting <code>mach</code> also retrains the optimal model on all available data. The following is therefore an optimal model prediction based on all available data:</p><pre><code class="language-julia">predict(mach, rows=148:150)</code></pre><pre class="documenter-example-output">3-element MLJBase.UnivariateFiniteVector{Multiclass{3}, String, UInt32, Float64}:
  UnivariateFinite{Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.111, virginica=&gt;0.889)
@@ -128,8 +128,8 @@ fit!(mach, verbosity=0);</code></pre><pre class="documenter-example-output">Mach
 
 mach = machine(self_tuning_knn, X, y)
 fit!(mach, verbosity=0)
-entry = report(mach).best_history_entry</code></pre><pre class="documenter-example-output">(model = KNNClassifier @649,
- measure = Any[Main.ex-goof.custom_accuracy, MulticlassFScore{Float64,…} @321],
+entry = report(mach).best_history_entry</code></pre><pre class="documenter-example-output">(model = KNNClassifier @810,
+ measure = Any[Main.ex-goof.custom_accuracy, MulticlassFScore{Float64,…} @401],
  measurement = [0.8856685633001422, 0.46576928643797944],
  per_fold = [[1.0, 0.9210526315789473, 0.918918918918919, 0.7027027027027027], [0.3333333333333333, 0.6462585034013605, 0.6083530338849488, 0.2751322751322752]],)</pre><pre><code class="language-julia">entry.model.K</code></pre><pre class="documenter-example-output">5</pre><h2 id="Tuning-multiple-nested-hyperparameters"><a class="docs-heading-anchor" href="#Tuning-multiple-nested-hyperparameters">Tuning multiple nested hyperparameters</a><a id="Tuning-multiple-nested-hyperparameters-1"></a><a class="docs-heading-anchor-permalink" href="#Tuning-multiple-nested-hyperparameters" title="Permalink"></a></h2><p>The <code>forest</code> model below has another model, namely a <code>DecisionTreeRegressor</code>, as a hyperparameter:</p><pre><code class="language-julia">tree = Tree() # defined above
 forest = EnsembleModel(atom=tree)</code></pre><pre class="documenter-example-output">DeterministicEnsembleModel(
@@ -146,7 +146,7 @@ forest = EnsembleModel(atom=tree)</code></pre><pre class="documenter-example-out
     rng = Random._GLOBAL_RNG(),
     n = 100,
     acceleration = CPU1{Nothing}(nothing),
-    out_of_bag_measure = Any[]) @539</pre><p>Ranges for nested hyperparameters are specified using dot syntax. In this case we will specify a <code>goal</code> for the total number of grid points:</p><pre><code class="language-julia">r1 = range(forest, :(atom.n_subfeatures), lower=1, upper=9);
+    out_of_bag_measure = Any[]) @423</pre><p>Ranges for nested hyperparameters are specified using dot syntax. In this case we will specify a <code>goal</code> for the total number of grid points:</p><pre><code class="language-julia">r1 = range(forest, :(atom.n_subfeatures), lower=1, upper=9);
 r2 = range(forest, :bagging_fraction, lower=0.4, upper=1.0);
 self_tuning_forest = TunedModel(model=forest,
                                       tuning=Grid(goal=30),
@@ -158,10 +158,10 @@ X = MLJ.table(rand(100, 10));
 y = 2X.x1 - X.x2 + 0.05*rand(100);
 
 mach = machine(self_tuning_forest, X, y);
-fit!(mach, verbosity=0);</code></pre><pre class="documenter-example-output">Machine{DeterministicTunedModel{Grid,…},…} @551 trained 1 time; caches data
+fit!(mach, verbosity=0);</code></pre><pre class="documenter-example-output">Machine{DeterministicTunedModel{Grid,…},…} @689 trained 1 time; caches data
   args: 
-    1:	Source @470 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @913 ⏎ `AbstractVector{Continuous}`
+    1:	Source @636 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @711 ⏎ `AbstractVector{Continuous}`
 </pre><p>We can plot the grid search results is also available:</p><pre><code class="language-julia">using Plots
 plot(mach)</code></pre><p><img src="../img/tuning_plot.png" alt/></p><p>Instead of specifying a <code>goal</code>, we can declare a global <code>resolution</code>, which is overriden for a particular parameter by pairing it&#39;s range with the resolution desired. In the next example, the default <code>resolution=100</code> is applied to the <code>r2</code> field, but a resolution of <code>3</code> is applied to the <code>r1</code> field. Additionally, we ask that the grid points be randomly traversed, and the the total number of evaluations be limited to 25.</p><pre><code class="language-julia">tuning = Grid(resolution=100, shuffle=true, rng=1234)
 self_tuning_forest = TunedModel(model=forest,
@@ -170,10 +170,10 @@ self_tuning_forest = TunedModel(model=forest,
                                       range=[(r1, 3), r2],
                                       measure=rms,
                                       n=25);
-fit!(machine(self_tuning_forest, X, y), verbosity=0);</code></pre><pre class="documenter-example-output">Machine{DeterministicTunedModel{Grid,…},…} @834 trained 1 time; caches data
+fit!(machine(self_tuning_forest, X, y), verbosity=0);</code></pre><pre class="documenter-example-output">Machine{DeterministicTunedModel{Grid,…},…} @141 trained 1 time; caches data
   args: 
-    1:	Source @995 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @214 ⏎ `AbstractVector{Continuous}`
+    1:	Source @356 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @692 ⏎ `AbstractVector{Continuous}`
 </pre><p>For more options for a grid search, see <a href="#MLJTuning.Grid"><code>Grid</code></a> below.</p><h2 id="Tuning-using-a-random-search"><a class="docs-heading-anchor" href="#Tuning-using-a-random-search">Tuning using a random search</a><a id="Tuning-using-a-random-search-1"></a><a class="docs-heading-anchor-permalink" href="#Tuning-using-a-random-search" title="Permalink"></a></h2><p>Let&#39;s attempt to tune the same hyperparameters using a <code>RandomSearch</code> tuning strategy. By default, bounded numeric ranges like <code>r1</code> and <code>r2</code> are sampled uniformly (before rounding, in the case of the integer range <code>r1</code>). Positive unbounded ranges are sampled using a Gamma distribution by default, and all others using a (truncated) normal distribution.</p><pre><code class="language-julia">self_tuning_forest = TunedModel(model=forest,
                                       tuning=RandomSearch(),
                                       resampling=CV(nfolds=6),
@@ -181,10 +181,10 @@ fit!(machine(self_tuning_forest, X, y), verbosity=0);</code></pre><pre class="do
                                       measure=rms,
                                       n=25);
 mach = machine(self_tuning_forest, X, y);
-fit!(mach, verbosity=0)</code></pre><pre class="documenter-example-output">Machine{DeterministicTunedModel{RandomSearch,…},…} @554 trained 1 time; caches data
+fit!(mach, verbosity=0)</code></pre><pre class="documenter-example-output">Machine{DeterministicTunedModel{RandomSearch,…},…} @693 trained 1 time; caches data
   args: 
-    1:	Source @894 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @101 ⏎ `AbstractVector{Continuous}`
+    1:	Source @452 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @800 ⏎ `AbstractVector{Continuous}`
 </pre><pre><code class="language-julia">using Plots
 plot(mach)</code></pre><p><img src="../img/random_search_tuning_plot.png" alt/></p><p>The prior distributions used for sampling each hyperparameter can be customized, as can the global fallbacks. See the <a href="#MLJTuning.RandomSearch"><code>RandomSearch</code></a> doc-string below for details.</p><h2 id="Tuning-using-Latin-hypercube-sampling"><a class="docs-heading-anchor" href="#Tuning-using-Latin-hypercube-sampling">Tuning using Latin hypercube sampling</a><a id="Tuning-using-Latin-hypercube-sampling-1"></a><a class="docs-heading-anchor-permalink" href="#Tuning-using-Latin-hypercube-sampling" title="Permalink"></a></h2><p>One can also tune the hyperparameters using the <code>LatinHypercube</code> tuning stragegy.  This method uses a genetic based optimization algorithm based on the inverse of the Audze-Eglais function, using the library <a href="https://github.com/MrUrq/LatinHypercubeSampling.jl"><code>LatinHypercubeSampling.jl</code></a>.</p><p>We&#39;ll work with the data <code>X</code>, <code>y</code> and ranges <code>r1</code> and <code>r2</code> defined above and instatiate a Latin hypercube resampling strategy:</p><pre><code class="language-julia">latin = LatinHypercube(gens=2, popsize=120)</code></pre><pre class="documenter-example-output">LatinHypercube(
     gens = 2,
@@ -194,7 +194,7 @@ plot(mach)</code></pre><p><img src="../img/random_search_tuning_plot.png" alt/><
     interSampleWeight = 1.0,
     ae_power = 2,
     periodic_ae = false,
-    rng = Random._GLOBAL_RNG()) @871</pre><p>Here <code>gens</code> is the number of generations to run the optimisation for and <code>popsize</code> is the population size in the genetic algorithm. For more on these and other <code>LatinHypercube</code> parameters, refer to the <a href="https://github.com/MrUrq/LatinHypercubeSampling.jl">LatinHypercubeSampling.jl</a> documentation. Pay attention that <code>gens</code> and <code>popsize</code> are not to be confused with the iteration parameter <code>n</code> in the construction of a corresponding <code>TunedModel</code> instance, which specifies the total number of models to be evaluated, independent of the tuning strategy.</p><p>For this illustration we&#39;ll add a third, nominal,  hyper-parameter:</p><pre><code class="language-julia">r3 = range(forest, :(atom.post_prune), values=[true, false]);
+    rng = Random._GLOBAL_RNG()) @009</pre><p>Here <code>gens</code> is the number of generations to run the optimisation for and <code>popsize</code> is the population size in the genetic algorithm. For more on these and other <code>LatinHypercube</code> parameters, refer to the <a href="https://github.com/MrUrq/LatinHypercubeSampling.jl">LatinHypercubeSampling.jl</a> documentation. Pay attention that <code>gens</code> and <code>popsize</code> are not to be confused with the iteration parameter <code>n</code> in the construction of a corresponding <code>TunedModel</code> instance, which specifies the total number of models to be evaluated, independent of the tuning strategy.</p><p>For this illustration we&#39;ll add a third, nominal,  hyper-parameter:</p><pre><code class="language-julia">r3 = range(forest, :(atom.post_prune), values=[true, false]);
 self_tuning_forest = TunedModel(model=forest,
                                       tuning=latin,
                                       resampling=CV(nfolds=6),
@@ -202,10 +202,10 @@ self_tuning_forest = TunedModel(model=forest,
                                       measure=rms,
                                       n=25);
 mach = machine(self_tuning_forest, X, y);
-fit!(mach, verbosity=0)</code></pre><pre class="documenter-example-output">Machine{DeterministicTunedModel{LatinHypercube,…},…} @555 trained 1 time; caches data
+fit!(mach, verbosity=0)</code></pre><pre class="documenter-example-output">Machine{DeterministicTunedModel{LatinHypercube,…},…} @243 trained 1 time; caches data
   args: 
-    1:	Source @917 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @139 ⏎ `AbstractVector{Continuous}`
+    1:	Source @394 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @351 ⏎ `AbstractVector{Continuous}`
 </pre><pre><code class="language-julia">using Plots
 plot(mach)</code></pre><p><img src="../img/latin_hypercube_tuning_plot.png" alt/></p><h2 id="API"><a class="docs-heading-anchor" href="#API">API</a><a id="API-1"></a><a class="docs-heading-anchor-permalink" href="#API" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="Base.range" href="#Base.range"><code>Base.range</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">r = range(model, :hyper; values=nothing)</code></pre><p>Define a one-dimensional <code>NominalRange</code> object for a field <code>hyper</code> of <code>model</code>. Note that <code>r</code> is not directly iterable but <code>iterator(r)</code> is.</p><p>A nested hyperparameter is specified using dot notation. For example, <code>:(atom.max_depth)</code> specifies the <code>max_depth</code> hyperparameter of the submodel <code>model.atom</code>.</p><pre><code class="language-none">r = range(model, :hyper; upper=nothing, lower=nothing,
           scale=nothing, values=nothing)</code></pre><p>Assuming <code>values</code> is not specified, define a one-dimensional <code>NumericRange</code> object for a <code>Real</code> field <code>hyper</code> of <code>model</code>.  Note that <code>r</code> is not directly iteratable but <code>iterator(r, n)</code>is an iterator of length <code>n</code>. To generate random elements from <code>r</code>, instead apply <code>rand</code> methods to <code>sampler(r)</code>. The supported scales are <code>:linear</code>,<code>:log</code>, <code>:logminus</code>, <code>:log10</code>, <code>:log2</code>, or a callable object.</p><p>Note that <code>r</code> is not directly iterable, but <code>iterator(r, n)</code> is, for given resolution (length) <code>n</code>.</p><p>By default, the behaviour of the constructed object depends on the type of the value of the hyperparameter <code>:hyper</code> at <code>model</code> <em>at the time of construction.</em> To override this behaviour (for instance if <code>model</code> is not available) specify a type in place of <code>model</code> so the behaviour is determined by the value of the specified type.</p><p>A nested hyperparameter is specified using dot notation (see above).</p><p>If <code>scale</code> is unspecified, it is set to <code>:linear</code>, <code>:log</code>, <code>:logminus</code>, or <code>:linear</code>, according to whether the interval <code>(lower, upper)</code> is bounded, right-unbounded, left-unbounded, or doubly unbounded, respectively.  Note <code>upper=Inf</code> and <code>lower=-Inf</code> are allowed.</p><p>If <code>values</code> is specified, the other keyword arguments are ignored and a <code>NominalRange</code> object is returned (see above).</p><p>See also: <a href="#MLJBase.iterator"><code>iterator</code></a>, <a href="#Distributions.sampler"><code>sampler</code></a></p></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJBase.iterator" href="#MLJBase.iterator"><code>MLJBase.iterator</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">iterator([rng, ], r::NominalRange, [,n])
@@ -273,4 +273,4 @@ range3 = (:(atom.λ), MySampler())</code></pre><p><strong>Algorithm</strong></p>
                          tuning=LatinHypercube(...),
                          range=...,
                          measures=...,
-                         n=...)</code></pre><p>(See <a href="#MLJTuning.TunedModel"><code>TunedModel</code></a> for complete options.)</p><p>To use a periodic version of the Audze-Eglais function (to reduce clustering along the boundaries) specify <code>periodic_ae = true</code>.</p><p><strong>Supported ranges:</strong></p><p>A single one-dimensional range or vector of one-dimensioinal ranges can be specified. Specifically, in <code>LatinHypercubeSampling</code> search, the <code>range</code> field of a <code>TunedModel</code> instance can be:</p><ul><li>A single one-dimensional range - ie, <code>ParamRange</code> object - <code>r</code>, constructed</li></ul><p>using the <code>range</code> method.</p><ul><li>Any vector of objects of the above form</li></ul><p>Both <code>NumericRange</code>s and <code>NominalRange</code>s are supported, and hyper-parameter values are sampled on a scale specified by the range (eg, <code>r.scale = :log</code>).</p></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../weights/">« Weights</a><a class="docs-footer-nextpage" href="../learning_curves/">Learning Curves »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 1 July 2021 06:50">Thursday 1 July 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+                         n=...)</code></pre><p>(See <a href="#MLJTuning.TunedModel"><code>TunedModel</code></a> for complete options.)</p><p>To use a periodic version of the Audze-Eglais function (to reduce clustering along the boundaries) specify <code>periodic_ae = true</code>.</p><p><strong>Supported ranges:</strong></p><p>A single one-dimensional range or vector of one-dimensioinal ranges can be specified. Specifically, in <code>LatinHypercubeSampling</code> search, the <code>range</code> field of a <code>TunedModel</code> instance can be:</p><ul><li>A single one-dimensional range - ie, <code>ParamRange</code> object - <code>r</code>, constructed</li></ul><p>using the <code>range</code> method.</p><ul><li>Any vector of objects of the above form</li></ul><p>Both <code>NumericRange</code>s and <code>NominalRange</code>s are supported, and hyper-parameter values are sampled on a scale specified by the range (eg, <code>r.scale = :log</code>).</p></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../weights/">« Weights</a><a class="docs-footer-nextpage" href="../learning_curves/">Learning Curves »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 1 July 2021 07:04">Thursday 1 July 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
