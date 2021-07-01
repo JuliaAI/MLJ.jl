@@ -113,7 +113,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 
 - [ ]  **†** Enhance complex model compostition:
 
-	- [ ] Introduce a canned
+	- [x] Introduce a canned
 	stacking model wrapper ([POC](https://alan-turing-institute.github.io/DataScienceTutorials.jl/getting-started/stacking/)). WIP @olivierlabayle
 
 	- [ ] Get rid of macros for creating pipelines and possibly

@@ -60,7 +60,8 @@ MLJ been developed with the support of the following organizations:
 ### The MLJ Universe
 
 The functionality of MLJ is distributed over a number of repositories
-illustrated in the dependency chart below. These repositories live at the [JuliaAI umbrella](https://github.com/JuliaAI).
+illustrated in the dependency chart below. These repositories live at
+the [JuliaAI](https://github.com/JuliaAI) umbrella organization.
 
 <div align="center">
     <img src="material/MLJ_stack.svg" alt="Dependency Chart">
