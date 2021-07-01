@@ -29,22 +29,16 @@
 </h2>
 
 
-**New to MLJ? Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/)**.  
-
-**Wanting to integrate an existing machine learning model into the MLJ
-framework? Start
-[here](https://alan-turing-institute.github.io/MLJ.jl/dev/quick_start_guide_to_adding_models/)**.
-
-The remaining information on this page will be of interest primarily
-to developers interested in contributing to core packages in the MLJ
-ecosystem, whose organization is described further below.
-
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
-tuning, evaluating, composing and comparing over [160 machine
-learning
+tuning, evaluating, composing and comparing over [160 machine learning
 models](https://alan-turing-institute.github.io/MLJ.jl/dev/list_of_supported_models/)
-written in Julia and other languages.  
+written in Julia and other languages.
+
+**New to MLJ?** Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/).
+
+**Integrating an existing machine learning model into the MLJ
+framework?** Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/quick_start_guide_to_adding_models/).
 
 MLJ was initially created as a Tools,
 Practices and Systems project at the [Alan Turing
@@ -61,15 +55,6 @@ MLJ been developed with the support of the following organizations:
     <img src="material/warwick.png" width = 100/>
     <img src="material/julia.png" width = 100/>
 </div>
-
-<br>
-<p align="center">
-<a href="#the-mlj-universe">MLJ Universe</a> &nbsp;•&nbsp; 
-<a href="#known-issues">Known Issues</a> &nbsp;•&nbsp;
-<a href="#customizing-behavior">Customizing Behavior</a> &nbsp;•&nbsp;
-<a href="#citing-mlj">Citing MLJ</a> 
-</p>
-</br>
 
 
 ### The MLJ Universe
@@ -95,9 +80,9 @@ connections do not currently exist but are planned/proposed.*
 
 *Core design*: A. Blaom, F. Kiraly, S. Vollmer
 
-*Active maintainers*: A. Blaom, T. Lienart, S. Okon
+*Lead contributor*: A. Blaom
 
-*Active collaborators*: D. Arenas, D. Buchaca, J. Hoffimann, S. Okon, J. Samaroo, S. Vollmer
+*Active maintainers*: A. Blaom, S. Okon, T. Lienart, D. Aluthge
 
-*Past collaborators*: D. Aluthge, E. Barp, G. Bohner, M. K. Borregaard, V. Churavy, H. Devereux, M. Giordano, M. Innes, F. Kiraly, M. Nook, Z. Nugent, P. Oleśkiewicz, A. Shridar, Y. Simillides, A. Sengupta, A. Stechemesser.
+
 
