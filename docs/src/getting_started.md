@@ -46,7 +46,7 @@ models(matching(X,y))
 In MLJ a *model* is a struct storing the hyperparameters of the
 learning algorithm indicated by the struct name (and nothing
 else). For common problems matching data to models, see [Model
-Search](@ref) and [Preparing Data](@ref).
+Search](@ref model_search) and [Preparing Data](@ref).
 
 Assuming the MLJDecisionTreeInterface.jl package is in your load path
 (see [Installation](@ref)) we can use `@load` to import the
@@ -384,7 +384,7 @@ i.input_scitype
 i.target_scitype
 ```
 
-But see also [Model Search](@ref).
+But see also [Model Search](@ref model_search).
 
 ### Scalar scientific types
 

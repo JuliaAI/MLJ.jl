@@ -153,19 +153,20 @@ predictions.
 ## List of measures
 
 All measures listed below have a doc-string associated with the measure's
-*type*. So do, for example, `?LPLoss`, and not `?l2`.
+*type*. So, for example, do `?LPLoss` not `?l2`.
 
 ```@setup losses_and_scores
 using DataFrames
+```
 
+```@example
 ms = measures()
 types = map(ms) do m
-    name = m.name
-   "[`$name`](@ref)"
+    m.name
 end
 instance = map(ms) do m m.instances end
-t = (type=types, instances=instance)
-MLJ.PrettyTables.table(t)
+table = (type=types, instances=instance)
+DataFrame(table)
 ```
 
 

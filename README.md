@@ -45,9 +45,13 @@ providing a common interface and meta-algorithms for selecting,
 tuning, evaluating, composing and comparing over [150 machine
 learning
 models](https://alan-turing-institute.github.io/MLJ.jl/dev/list_of_supported_models/)
-written in Julia and other languages.  MLJ is released under the MIT
-license and sponsored by the [Alan Turing
-Institute](https://www.turing.ac.uk/).
+written in Julia and other languages.  
+
+MLJ is released under the MIT license. It was created as a Tools,
+Practices and Systems project at the [Alan Turing
+Institute](https://www.turing.ac.uk/) in 2019. Current funding is
+provided by a [New Zealand Strategic Science Investment
+Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/strategic-science-investment-fund/ssif-funded-programmes/university-of-auckland/). 
 
 <br>
 <p align="center">
@@ -187,3 +191,4 @@ For more on package management, see https://julialang.github.io/Pkg.jl/v1/ .
 #### License
 
 MLJ is supported by the Alan Turing Institute and released under the MIT "Expat" License.
+´
