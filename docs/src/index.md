@@ -245,8 +245,7 @@ on the `#mlj` slack workspace in the Julia Slack channel.
 Bugs, suggestions, and feature requests can be posted
 [here](https://github.com/alan-turing-institute/MLJ.jl/issues).
 
-For known issues that are not strictly MLJ bugs, see
-[here](https://github.com/alan-turing-institute/MLJ.jl#known-issues)
+See also, [Known Issues](@ref)
 
 
 ## Installation
