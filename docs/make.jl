@@ -14,9 +14,9 @@ import MLJTuning
 import MLJModels
 import MLJEnsembles
 import MLJOpenML
-import MLJScientificTypes
-import MLJModelInterface
 import ScientificTypes
+import MLJModelInterface
+import ScientificTypesBase
 import Distributions
 using CategoricalArrays # avoid types like CategoricalArrays.Categorica
 using LossFunctions
@@ -74,9 +74,9 @@ makedocs(
                 MLJTuning,
                 MLJModels,
                 MLJEnsembles,
-                MLJScientificTypes,
-                MLJModelInterface,
                 ScientificTypes,
+                MLJModelInterface,
+                ScientificTypesBase,
                 MLJIteration,
                 MLJSerialization,
                 MLJOpenML,

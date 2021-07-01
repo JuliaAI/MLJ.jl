@@ -2,21 +2,21 @@
 
 # This implementation of scitype for models and measures is highly experimental
 
-const MST = MLJScientificTypes # only used in this file
+const ST = ScientificTypes # only used in this file
 
 struct SupervisedScitype{input_scitype, target_scitype, prediction_type} end
 
-MST.scitype(model::Deterministic, ::MST.MLJ) =
+ST.scitype(model::Deterministic, ::ST.DefaultConvention) =
     SupervisedScitype{input_scitype(model),
                     target_scitype(model),
                     :deterministic}
 
-MST.scitype(model::Probabilistic, ::MST.MLJ) =
+ST.scitype(model::Probabilistic, ::ST.DefaultConvention) =
     SupervisedScitype{input_scitype(model),
                     target_scitype(model),
                     :probabilistic}
 
-MST.scitype(model::Interval, ::MST.MLJ) =
+ST.scitype(model::Interval, ::ST.DefaultConvention) =
     SupervisedScitype{input_scitype(model),
                     target_scitype(model),
                     :interval}
@@ -52,7 +52,7 @@ end
 
 struct UnsupervisedScitype{input_scitype, output_scitype} end
 
-MST.scitype(model::Unsupervised, ::MST.MLJ) =
+ST.scitype(model::Unsupervised, ::ST.DefaultConvention) =
     UnsupervisedScitype{input_scitype(model),
                       MLJBase.output_scitype(model)}
 
@@ -91,7 +91,7 @@ struct MeasureScitype{target_scitype,
                is_feature_dependent,
                supports_weights} end
 
-MST.scitype(measure, ::MST.MLJ, ::Val{:measure}) =
+ST.scitype(measure, ::ST.DefaultConvention, ::Val{:measure}) =
     MeasureScitype{target_scitype(measure),
                prediction_type(measure),
                orientation(measure),

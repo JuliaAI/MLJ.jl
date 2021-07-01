@@ -45,9 +45,13 @@ providing a common interface and meta-algorithms for selecting,
 tuning, evaluating, composing and comparing over [150 machine
 learning
 models](https://alan-turing-institute.github.io/MLJ.jl/dev/list_of_supported_models/)
-written in Julia and other languages.  MLJ is released under the MIT
-license and sponsored by the [Alan Turing
-Institute](https://www.turing.ac.uk/).
+written in Julia and other languages.  
+
+MLJ is released under the MIT license. It was created as a Tools,
+Practices and Systems project at the [Alan Turing
+Institute](https://www.turing.ac.uk/) in 2019. Current funding is
+provided by a [New Zealand Strategic Science Investment
+Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/strategic-science-investment-fund/ssif-funded-programmes/university-of-auckland/). 
 
 <br>
 <p align="center">
@@ -71,24 +75,24 @@ illustrated in the dependency chart below.
 <a href="ROADMAP.md">Road Map</a> 
 </br>
 <br>
-  <a href="https://github.com/alan-turing-institute/MLJ">MLJ</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJBase.jl">MLJBase</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJModelInterface.jl">MLJModelInterface</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJModels.jl">MLJModels</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJTuning.jl">MLJTuning</a> &nbsp;•&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJLinearModels.jl">MLJLinearModels</a> &nbsp;•&nbsp;
+  <a href="https://github.com/alan-turing-institute/MLJ.jl">MLJ</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJBase.jl">MLJBase</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJModelInterface.jl">MLJModelInterface</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJModels.jl">MLJModels</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJTuning.jl">MLJTuning</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJLinearModels.jl">MLJLinearModels</a> &nbsp;•&nbsp;
   <a href="https://github.com/FluxML/MLJFlux.jl">MLJFlux</a>
 </br>
 <br>  
-  <a href="https://github.com/alan-turing-institute/MLJTutorials">MLJTutorials</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/MLJTutorials">MLJTutorials</a> &nbsp;•&nbsp;
   <a href="https://github.com/JuliaAI/MLJEnsembles.jl">MLJEnsembles</a> &nbsp;•&nbsp;
   <a href="https://github.com/JuliaAI/MLJIteration.jl">MLJIteration</a> &nbsp;•&nbsp;
   <a href="https://github.com/JuliaAI/MLJOpenML.jl">MLJOpenML</a> &nbsp;•&nbsp;
   <a href="https://github.com/JuliaAI/MLJSerialization.jl">MLJSerialization</a> 
 </br>
 <br>  
-  <a href="https://github.com/JuliaAI/MLJScientificTypes.jl">MLJScientificTypes</a> &nbsp;•&nbsp;
-  <a href="https://github.com/JuliaAI/ScientificTypes.jl">ScientificTypes</a>
+  <a href="https://github.com/JuliaAI/ScientificTypes.jl">ScientificTypes</a> &nbsp;•&nbsp;
+  <a href="https://github.com/JuliaAI/ScientificTypesBase.jl">ScientificTypesBase</a>
 </p>
 <p></p>
     <br>
@@ -187,3 +191,4 @@ For more on package management, see https://julialang.github.io/Pkg.jl/v1/ .
 #### License
 
 MLJ is supported by the Alan Turing Institute and released under the MIT "Expat" License.
+´

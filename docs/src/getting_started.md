@@ -46,7 +46,7 @@ models(matching(X,y))
 In MLJ a *model* is a struct storing the hyperparameters of the
 learning algorithm indicated by the struct name (and nothing
 else). For common problems matching data to models, see [Model
-Search](@ref) and [Preparing Data](@ref).
+Search](@ref model_search) and [Preparing Data](@ref).
 
 Assuming the MLJDecisionTreeInterface.jl package is in your load path
 (see [Installation](@ref)) we can use `@load` to import the
@@ -259,12 +259,12 @@ use of MLJ.*
 
 The MLJ user should acquaint themselves with some basic assumptions
 about the form of data expected by MLJ, as outlined below. The basic
-`machine` constructions look like this (see also [Constructing
+`machine` constructors look like this (see also [Constructing
 machines](@ref)):
 
 ```
-machine(model::Supervised, X, y)
 machine(model::Unsupervised, X)
+machine(model::Supervised, X, y)
 ```
 
 Each supervised model in MLJ declares the permitted *scientific type*
@@ -274,9 +274,9 @@ as `Array{Float32, 2}`). Similar remarks apply to the input `X` of an
 unsupervised model.
 
 Scientific types are julia types defined in the package
-[ScientificTypes.jl](https://github.com/alan-turing-institute/ScientificTypes.jl);
+[ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.jl);
 the package
-[MLJScientificTypes.jl](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/)
+[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/)
 implements the particular convention used in the MLJ universe for
 assigning a specific scientific type (interpretation) to each julia
 object (see the `scitype` examples below).
@@ -286,7 +286,7 @@ The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
 scientific types](@ref) below to guarantee your scalar data is interpreted
 correctly. Tools exist to coerce the data to have the appropriate
 scientfic type; see
-[MLJScientificTypes.jl](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/)
+[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/)
 or run `?coerce` for details.
 
 Additionally, most data containers - such as tuples, vectors, matrices
@@ -296,7 +296,7 @@ and tables - have a scientific type.
 ![](img/scitypes.png)
 
 *Figure 1. Part of the scientific type hierarchy in*
-[ScientificTypes.jl](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/).
+[ScientificTypesBase.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/).
 
 ```@repl doda
 scitype(4.6)
@@ -384,12 +384,12 @@ i.input_scitype
 i.target_scitype
 ```
 
-But see also [Model Search](@ref).
+But see also [Model Search](@ref model_search).
 
 ### Scalar scientific types
 
 Models in MLJ will always apply the `MLJ` convention described in
-[MLJScientificTypes.jl](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/)
+[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/)
 to decide how to interpret the elements of your container types. Here
 are the key features of that convention:
 
@@ -417,7 +417,7 @@ appropriate `Finite` (categorical) scitype.  See [Working with Categorical Data]
 
 For more on scitype coercion of arrays and tables, see [`coerce`](@ref),
 [`autotype`](@ref) and [`unpack`](@ref) below and the examples at
-[MLJScientificTypes.jl](https://alan-turing-institute.github.io/MLJScientificTypes.jl/dev/).
+[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/).
 
 
 

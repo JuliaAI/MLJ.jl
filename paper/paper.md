@@ -130,7 +130,7 @@ representation of probabilities, are avoided.
 **Scientific types** To help users focus less on data representation
 (e.g., `Float32`, `DataFrame`) and more on the intended *purpose* or
 *interpretation* of data, MLJ articulates model data requirements
-using *scientific types* [@ScientificTypes], such as "continuous",
+using *scientific types* [@ScientificTypesBase], such as "continuous",
 "ordered factor" or "table".
 
 **Connecting models directly to arbitrary data containers**. A

@@ -5,7 +5,7 @@ Below we illustrate hyperparameter optimisation using the
 tuning strategies.  Also available is the [tree
 Parzen](https://github.com/IQVIA-ML/TreeParzen.jl) strategy; for a
 complete list, see
-    [here](https://github.com/alan-turing-institute/MLJTuning.jl#what-is-provided-here).
+    [here](https://github.com/JuliaAI/MLJTuning.jl#what-is-provided-here).
 
 MLJ tuning is implemented as an *iterative* procedure, which can
 accordingly be controlled using MLJ's [`IteratedModel`](@ref
@@ -24,7 +24,7 @@ model may be viewed as a "self-tuning" version of the unwrapped model.
 
 For in-depth overview of tuning in MLJ, or for implementation details,
 see the [MLJTuning
-documentation](https://github.com/alan-turing-institute/MLJTuning.jl). For
+documentation](https://github.com/JuliaAI/MLJTuning.jl). For
 a complete list of options see the [`TunedModel`](@ref) doc-string
 below.
 

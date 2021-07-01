@@ -186,7 +186,7 @@ installation required.
 * Consistent interface to handle probabilistic predictions.
 
 * Extensible [tuning
-  interface](https://github.com/alan-turing-institute/MLJTuning.jl),
+  interface](https://github.com/JuliaAI/MLJTuning.jl),
   to support growing number of optimization strategies, and designed
   to play well with model composition.
 
@@ -286,8 +286,8 @@ julia> tree = Tree() # instance
 
 where you will also be asked to choose a providing package, for more
 than one provide a `DecisionTreeClassifier` model. For more on
-identifying the name of an applicable model, see [Model
-Search](@ref). For non-interactive loading of code (e.g., from a
+identifying the name of an applicable model, see [Model Search](@ref model_search). 
+For non-interactive loading of code (e.g., from a
 module or function) see [Loading Model Code](@ref).
 
 It is recommended that you start with models from more mature

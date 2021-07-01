@@ -10,7 +10,7 @@ To see list all measures, run `measures()`.  Further measures for
 probabilistic predictors, such as proper scoring rules, and for
 constructing multi-target product measures, are planned.  If you'd like
 to see measure added to MLJ, post a comment
-[here](https://github.com/alan-turing-institute/MLJBase.jl/issues/299)
+[here](https://github.com/JuliaAI/MLJBase.jl/issues/299).g
 
 *Note for developers:* The measures interface and the built-in
 measures described here are defined in MLJBase, but will ultimately live
@@ -51,7 +51,7 @@ log_loss(ŷ, y)
 ```
 
 The measures `rms`, `l2` and `log_loss` illustrated here are actually
-	instances of measure *types*. For, example, `l2 = LPLoss(p=2)` and
+        instances of measure *types*. For, example, `l2 = LPLoss(p=2)` and
 `log_loss = LogLoss() = LogLoss(tol=eps())`. Common aliases are
 provided:
 
@@ -152,16 +152,21 @@ predictions.
 
 ## List of measures
 
+All measures listed below have a doc-string associated with the measure's
+*type*. So, for example, do `?LPLoss` not `?l2`.
+
 ```@setup losses_and_scores
 using DataFrames
 ```
 
 ```@example losses_and_scores
 ms = measures()
-types = map(ms) do m m.name end
+types = map(ms) do m
+    m.name
+end
 instance = map(ms) do m m.instances end
-t = (type=types, instances=instance)
-DataFrame(t)
+table = (type=types, instances=instance)
+DataFrame(table)
 ```
 
 
