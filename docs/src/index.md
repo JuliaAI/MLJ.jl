@@ -295,7 +295,10 @@ packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.
 MLJ is supported by a number of satellite packages (MLJTuning,
 MLJModelInterface, etc) which the general user is *not* required to
 install directly. Developers can learn more about these
-[here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/ORGANIZATION.md)
+[here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/ORGANIZATION.md).
+
+See also the alternative instalation instructions for [Customizing
+Behaviour](@ref).
 
 
 ## Learning Julia

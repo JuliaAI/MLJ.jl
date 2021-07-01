@@ -51,7 +51,7 @@ MLJ was initially created as a Tools,
 Practices and Systems project at the [Alan Turing
 Institute](https://www.turing.ac.uk/) in 2019. Current funding is
 provided by a [New Zealand Strategic Science Investment
-Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/strategic-science-investment-fund/ssif-funded-programmes/university-of-auckland/)
+Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/strategic-science-investment-fund/ssif-funded-programmes/university-of-auckland/).
 
 MLJ is released under the MIT license, and has been developed with the
 support of the following organizations:
@@ -92,28 +92,6 @@ connections do not currently exist but are planned/proposed.*
 <a href="ORGANIZATION.md">Code Organization</a> &nbsp;•&nbsp;
 <a href="ROADMAP.md">Road Map</a> 
 </br>
-
-
-### Customizing behavior
-
-To customize behaviour of MLJ you will need to clone the relevant
-component package (e.g., MLJBase.jl) - or a fork thereof - and modify
-your local julia environment to use your local clone in place of the
-official release. For example, you might proceed something like this:
-
-```julia
-using Pkg
-Pkg.activate("my_MLJ_enf", shared=true)
-Pkg.develop("path/to/my/local/MLJBase")
-```
-
-To test your local clone, do
-
-```julia
-Pkg.test("MLJBase")
-```
-
-For more on package management, see [here](https://julialang.github.io/Pkg.jl/v1/).
 
 
 

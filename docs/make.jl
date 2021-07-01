@@ -51,7 +51,7 @@ pages = [
     "Quick-Start Guide to Adding Models" =>
                "quick_start_guide_to_adding_models.md",
     "Adding Models for General Use" => "adding_models_for_general_use.md",
-    "Benchmarking" => "benchmarking.md",
+    "Customizing Behavior" => "customizing_behavior",
     "Internals" => "internals.md",
     "List of Supported Models" => "list_of_supported_models.md",
     "Third Party Packages" => "third_party_packages.md",
