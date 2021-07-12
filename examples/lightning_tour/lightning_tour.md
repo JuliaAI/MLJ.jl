@@ -1,5 +1,5 @@
 ```@meta
-EditURL = "<unknown>/../../examples/lightning_tour/lightning_tour.jl"
+EditURL = "<unknown>/../../Julia7/MLJ/MLJ/examples/lightning_tour/lightning_tour.jl"
 ```
 
 # Lightning tour of MLJ
@@ -18,6 +18,8 @@ using Pkg
 Pkg.activate(@__DIR__)
 Pkg.instantiate()
 ```
+
+Assuming Julia 1.6
 
 In MLJ a *model* is just a container for hyper-parameters, and that's
 all. Here we will apply several kinds of model composition before

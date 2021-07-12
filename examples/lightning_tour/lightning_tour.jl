@@ -13,6 +13,8 @@ using Pkg
 Pkg.activate(@__DIR__)
 Pkg.instantiate()
 
+# Assuming Julia 1.6
+
 # In MLJ a *model* is just a container for hyper-parameters, and that's
 # all. Here we will apply several kinds of model composition before
 # binding the resulting "meta-model" to data in a *machine* for
