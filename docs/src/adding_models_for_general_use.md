@@ -2,7 +2,7 @@
 
 !!! note
 
-    Models implementing the MLJ model interface according to the instructions given here should import MLJModelInterface version 0.3.7 or higher. This is enforced with a statement such as `MLJModelInterface = "^0.3.7" ` under `[compat]` in the Project.toml file of the package containing the implementation.
+    Models implementing the MLJ model interface according to the instructions given here should import MLJModelInterface version 1.0.0 or higher. This is enforced with a statement such as `MLJModelInterface = "^1" ` under `[compat]` in the Project.toml file of the package containing the implementation.
 
 This guide outlines the specification of the MLJ model interface
 and provides detailed guidelines for implementing the interface for
@@ -10,7 +10,13 @@ models intended for general use. See also the more condensed
 [Quick-Start Guide to Adding Models](@ref).
 
 For sample implementations, see
-[MLJModels/src](https://github.com/JuliaAI/MLJModels.jl/tree/master/src).
+[MLJModels/src](https://github.com/JuliaAI/MLJModels.jl/tree/master/src/builtins).
+
+Interface code can be hosted by the package providing the core machine
+learning algorithm, or by a stand-alone "interface-only" package, using
+the template
+[MLJExampleInterface.jl](https://github.com/JuliaAI/MLJExampleInterface.jl)
+(see [Where to place code implementing new models](@ref) below).
 
 The machine learning tools provided by MLJ can be applied to the
 models in any package that imports the package
