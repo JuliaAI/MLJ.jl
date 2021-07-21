@@ -40,11 +40,12 @@ written in Julia and other languages.
 **Integrating an existing machine learning model into the MLJ
 framework?** Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/quick_start_guide_to_adding_models/).
 
-MLJ was initially created as a Tools,
-Practices and Systems project at the [Alan Turing
-Institute](https://www.turing.ac.uk/) in 2019. Current funding is
-provided by a [New Zealand Strategic Science Investment
-Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/strategic-science-investment-fund/ssif-funded-programmes/university-of-auckland/).
+MLJ was initially created as a Tools, Practices and Systems project at
+the [Alan Turing Institute](https://www.turing.ac.uk/)
+in 2019. Current funding is provided by a [New Zealand Strategic
+Science Investment
+Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/strategic-science-investment-fund/ssif-funded-programmes/university-of-auckland/)
+awarded to the University of Auckland.
 
 MLJ been developed with the support of the following organizations:
 
