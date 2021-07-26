@@ -33,7 +33,7 @@ following forums:
   mentioned repositories
 
 
-## Code of conduct committee
+## Steering Committee
 
 - Sebastian Vollmer: sjvollmer@gmail.com
 - Mark Gahegan: m.gahegan@auckland.ac.nz
