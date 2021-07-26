@@ -7,12 +7,12 @@ and safety.
 Formally, the [NumFOCUS Code of
 Conduct](https://numfocus.org/code-of-conduct) governs all [MLJ
 community activity](#mlj-community-participation), as defined
-below. Violations and an other complaints are not handled by NumFocus
+below. Violations and other complaints are not handled by NumFocus
 but should be reported to a member of the [Steering
 Committee](#steering-committee), whose contact details appear
 below. The Committee will respond to reports on a case-by-case basis.
 
-## MLJ communitity activity
+## MLJ community activity
 
 "MLJ community activity" includes participation in any of the
 following forums:
