@@ -203,8 +203,7 @@ end
 export IterationControl
 
 # re-export from MLJOpenML
-const OpenML = MLJOpenML # for backwards compatibility
-export OpenML
+export OpenML, MLJOpenML
 
 # re-export from MLJSerialization:
 export Save # control, not method
