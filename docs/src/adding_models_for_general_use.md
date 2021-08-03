@@ -1140,6 +1140,143 @@ similar fashion. The main differences are:
   that also predict](@ref) for an example.
 
 
+## Annotators and anomaly detection
+
+Anomaly detection in MLJ is handled by an abstraction called an
+*annotator*.
+
+### Annotators
+
+```julia
+abstract type Annotator <: Model
+```
+
+By an *annotator*, we mean a machine learning model that associates
+some kind of intrinsic label (the *annotation*) to observations `X`,
+typically a numerical score of some kind. Included in this class are
+unsupervised outlier detectors, where the score is some
+detector-specific measure of the strength of "outlierness".
+Clustering algorithms are *not* of this kind, as labels are defined
+only up re-labeling of the clusters, and so are not "intrinsic".
+
+Associated with some of the observations `X`, in training and/or
+evaluation, there may be additional data `y`, which either helps the
+annotator be more effective (in training) or allows one to evaluate
+the annotator's effectiveness (during evaluation). Unlike in
+conventional supervised/semi-supervised learning, `y` need not be a
+"target" variable, as the labels may not be "predictions" of the
+corresponding `y` values, but have some less direct connection to them.
+
+#### Methods and traits
+
+Every annotator `A <: Annotator` must have an associated `fit` method
+with this form:
+
+```julia
+MLJModelInterface.fit(model::A, verbosity, X) -> fitresult, cache, report
+```
+
+unless it is supervised or semi-supervised, in which case use
+
+```julia
+MLJModelInterface.fit(model::A, verbosity, X, y) -> fitresult, cache, report
+```
+
+In the second case one must additionally define
+
+```julia
+MLJModelInterface.is_supervised(::Type{<:A}) = :true
+```
+
+The data `X` and `y` will always contain the same number of
+observations, with missing values in `y` appearing as `missing`.
+
+Every annotator must implement an `annotate` method of this form:
+
+```julia
+MLJModelInterface.annotate(model::A, fitresult, Xnew) -> annotations
+```
+
+We expect anomaly detection is the main use case for annotators, but
+separate these into two subtypes: 
+
+- The `AnomalyDetector` subtype for "fully integrated" anomaly detection
+models. These annotate an observation as "outlier" or "inlier".
+
+- The `BareDetector` subtype, which annotates with raw scores, on the
+basis of a single detection algorithm only. 
+
+In this way, an `AnomalyDetector` model will typically consist of one
+or more `BareDetector` models as hyper-parameters, and internally
+combine these models with appropriate transformers to enable
+classification of new data as "outlier" or "inlier".
+
+
+### Bare detectors
+
+```julia
+abstract type BareDetector <: Annotator
+```
+
+The annotations returned by `annotate` should be the detector scores.
+Articulate the type of scores returned with an `output_scitype`
+declaration. For example, for a subtype `B <: BareDetector` with
+integer scores, declare
+
+
+```julia
+MLJModelInterface.output_scitype(::Type{<:B}) = AbstractVector{<:Count}
+```
+
+An `input_scitype` declaration is also expected. 
+
+The remaining compulsory requirement is that `fitted_params` return a
+property accessible object with `training_scores` as a key, and the
+training scores themselves as values:
+
+
+```julia
+MLJModelInterface.fitted_params(model::B, fitresult) -> (training_scores=..., ...)
+```
+
+### Anomaly detectors
+
+```julia
+abstract type AnomalyDetector <: Annotator
+```
+
+The `annotate` method of each new concrete model subtype `C <:
+AnomalyDetector` must label observations as either `"inlier"` or
+`"outlier"` using ordered categorical values, where `"inlier" <
+"outlier"`. To this end, the implementer may apply the utility
+function `MLJModelInterface.inlier_outlier(v)` to convert a `Bool`
+vector `v` into a categorical vector of ordered "inlier"s and
+"outlier"s, where `true` is interpreted as `"outlier"`:
+
+```julia
+MLJModelInterface.annotate(model::MyAnomalyDetector, fitresult, Xnew) -> 
+    MLJModelInterface.inlier_outlier(is_outlier_vector)
+```
+
+Additionally, to buy into MLJ's `roc` method and probabilistic
+measures for evaluating the performance of an `AnomalyDetector`, one
+is encouraged to implement a `predict` method which returns an abstract
+vector of `UnivariateFinite` distributions with categorical value
+sample space `["inlier", "outlier"]`. The same utility function can be
+used to convert raw "is outlier" probabilities into such a vector:
+
+```julia
+MLJModelInteface.predict(model::MyAnomalyDetector, fitresult, Xnew) ->
+    MLJModelInterface.inlier_outlier(is_outlier_probabilities)
+```
+
+
+
+
+
+
+
+
 ## Convenience methods
 
 ```@docs
