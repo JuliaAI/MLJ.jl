@@ -163,9 +163,40 @@ with a default of `Symbol[]` (detected with `isempty` method) is
 preferred to `features::Union{Vector{Symbol}, Nothing}` with a default
 of `nothing`.
 
+### Hyper-parameter access and mutation
 
-An alternative to declaring the model struct, clean! method and keyword
-constructor, is to use the `@mlj_model` macro, as in the following example:
+To support hyper-parameter optimization (see [Tuning models](@ref))
+any hyper-parameter to be individually controlled must be:
+
+- property-accessible; nested property access allowed, as in
+  `model.detector.K` 
+  
+- mutable 
+
+For an un-nested hyper-parameter, the requirement is that
+`getproperty(model, :param_name)` and `setproperty!(model,
+:param_name, value)` have the expected behavior. (In hyper-parameter
+tuning, recursive access is implemented using
+[`MLJBase.recursive_getproperty`](@ref)` and
+[`MLJBase.recursively_setproperty!`](@ref).)
+
+Combining hyper-parameters in a named tuple does not generally
+work, because, although property-accessible (with nesting), an
+individual value cannot be mutated. 
+
+For a suggested way to deal with hyper-parameters varying in number,
+see the
+[implementation](https://github.com/JuliaAI/MLJBase.jl/blob/dev/src/composition/models/stacking.jl)
+of `Stack`, where the model struct stores a varying number of base
+models internally as a vector, but components are named at
+construction and accessed by overloading `getproperty/setproperty!`
+appropriately.
+
+### Macro shortcut
+
+An alternative to declaring the model struct, clean! method and
+keyword constructor, is to use the `@mlj_model` macro, as in the
+following example:
 
 ```julia
 @mlj_model mutable struct YourModel <: MMI.Deterministic
@@ -1175,6 +1206,10 @@ MLJModelInterface.selectcols
 UnivariateFinite
 ```
 
+```@docs
+MLJBase.recursive_getproperty
+MLJBase.recurseive_setproperty!
+```
 
 
 ### Where to place code implementing new models
