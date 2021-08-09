@@ -2,7 +2,7 @@
 
 [OpenML](https://www.openml.org) provides an integration platform for
 carrying out and comparing machine learning solutions across a broad
-collection of public datasets and software platforms. 
+collection of public datasets and software platforms.
 
 Integration of MLJ with OpenML is a work in progress. Currently
 functionality is limited to querying and downloading datasets:
@@ -12,7 +12,7 @@ functionality is limited to querying and downloading datasets:
 - `OpenML.describe(id)`: to describe a particular dataset
 - `OpenML.load(id; parser=:csv)`: to download a dataset
 
-Docstrings are given below. 
+Docstrings are given below.
 
 ## Sample usage
 
@@ -23,10 +23,10 @@ ds = OpenML.list_datasets(
           filter = "number_instances/100..1000/number_features/1..10",
           output_format = DataFrame)
 OpenML.list_tags()
-OpenML.describe_dataset(37)
-df = OpenML.load(37, parser=:openml) |> DataFrame
+OpenML.describe_dataset(15)
+df = OpenML.load(15) |> DataFrame
 schema(df)
-df = OpenML.load(37, parser=:auto)
+df = OpenML.load(15, parser=:auto) |> DataFrame
 schema(df)
 ```
 
