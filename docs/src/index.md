@@ -37,6 +37,10 @@ Turing Institute](https://www.turing.ac.uk/).
 *For more elementary introductions to MLJ usage see [Basic
 introductions](@ref) below.*
 
+A self-contained notebook and julia script of this demonstration is
+also available
+[here](https://github.com/alan-turing-institute/MLJ.jl/tree/dev/examples/lightning_tour).
+
 The first code snippet below creates a new Julia environment
 `MLJ_tour` and installs just those packages needed for the tour. See
 [Installation](@ref) for more on creating a Julia environment for use
