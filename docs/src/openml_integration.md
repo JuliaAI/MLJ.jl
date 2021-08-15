@@ -7,9 +7,5 @@ across a broad collection of public datasets and software platforms.
 Integration with OpenML API is presently limited to querying and
 downloading datasets.
 
-```@docs
-OpenML.list_tags
-OpenML.list_datasets
-OpenML.describe_dataset
-OpenML.load
-```
+Documentation is [here](https://juliaai.github.io/OpenML.jl/stable/).
+
