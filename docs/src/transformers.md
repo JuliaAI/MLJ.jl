@@ -25,14 +25,14 @@ that learn a probability distribution](@ref) for an example.
 ## Built-in transformers
 
 ```@docs
-MLJModels.UnivariateStandardizer
 MLJModels.Standardizer
 MLJModels.OneHotEncoder
 MLJModels.ContinuousEncoder
+MLJModels.FillImputer
 MLJModels.FeatureSelector
 MLJModels.UnivariateBoxCoxTransformer
 MLJModels.UnivariateDiscretizer
-MLJModels.FillImputer
+MLJModels.UnivariateTimeTypeToContinuous
 ```
 
 
