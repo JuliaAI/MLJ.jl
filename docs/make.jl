@@ -13,7 +13,6 @@ import MLJBase
 import MLJTuning
 import MLJModels
 import MLJEnsembles
-import MLJOpenML
 import ScientificTypes
 import MLJModelInterface
 import ScientificTypesBase
@@ -80,7 +79,6 @@ makedocs(
                 ScientificTypesBase,
                 MLJIteration,
                 MLJSerialization,
-                MLJOpenML,
                 EarlyStopping,
                 IterationControl],
     pages    = pages)
