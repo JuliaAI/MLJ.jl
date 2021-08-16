@@ -41,6 +41,7 @@ pages = [
     "Learning Curves" => "learning_curves.md",
     "Preparing Data" => "preparing_data.md",
     "Transformers and other unsupervised models" => "transformers.md",
+    "More on probablistic predictors" => "more_on_probabilistic_predictors.md",
     "Composing Models" => "composing_models.md",
     "Controlling Iterative Models" => "controlling_iterative_models.md",
     "Generating Synthetic Data" => "generating_synthetic_data.md",
