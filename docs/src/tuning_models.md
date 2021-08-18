@@ -293,9 +293,6 @@ self_tuning_forest = TunedModel(model=forest,
                                       measure=rms,
                                       n=25);
 fit!(machine(self_tuning_forest, X, y), verbosity=0);
-
-history = report(mach).history
-scores = [entry.measurement[1] for entry in history]
 ```
 
 For more options for a grid search, see [`Grid`](@ref) below.
@@ -326,6 +323,9 @@ n = 25
 tmodel = TunedModel(; models, tuning, resampling, measure, n)
 mach = machine(tmodel, X, y)
 fit!(mach; verbosity=0)
+
+history = report(mach).history
+scores = [entry.measurement[1] for entry in history]
 ```
 
 ## Tuning using a random search
