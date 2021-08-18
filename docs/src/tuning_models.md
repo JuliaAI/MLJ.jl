@@ -267,8 +267,7 @@ mach = machine(self_tuning_forest, X, y);
 fit!(mach, verbosity=0);
 ```
 
-We can plot the grid search results is also
-available:
+We can plot the grid search results:
 
 ```julia
 using Plots
@@ -294,10 +293,40 @@ self_tuning_forest = TunedModel(model=forest,
                                       measure=rms,
                                       n=25);
 fit!(machine(self_tuning_forest, X, y), verbosity=0);
+
+history = report(mach).history
+scores = [entry.measurement[1] for entry in history]
 ```
 
 For more options for a grid search, see [`Grid`](@ref) below.
 
+## Tuning multiple models
+
+We can also compare multiple models via the tuning strategy. This
+can, for example, be used to run _nested cross-validation_. In summary,
+normal (k-fold) cross-validation would check one or more models and
+split the data into `k` folds. Nested cross-validation, first, splits
+the data in multiple train and test sets and, then, runs
+cross-validation for each model in order to reduce bias. To do this in
+MLJ, we use a `TunedModel`:
+
+```@example goof
+using NearestNeighborModels
+
+models = [
+    KNNClassifier(K=2),
+    KNNClassifier(K=10),
+    ConstantClassifier()
+]
+tuning = Holdout(; fraction_train=0.6)
+resampling = CV(; nfolds=6)
+measure = LogLoss()
+n = 25
+
+tmodel = TunedModel(; models, tuning, resampling, measure, n)
+mach = machine(tmodel, X, y)
+fit!(mach; verbosity=0)
+```
 
 ## Tuning using a random search
 
