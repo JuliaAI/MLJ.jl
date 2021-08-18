@@ -1208,7 +1208,7 @@ UnivariateFinite
 
 ```@docs
 MLJBase.recursive_getproperty
-MLJBase.recurseive_setproperty!
+MLJBase.recursive_setproperty!
 ```
 
 
