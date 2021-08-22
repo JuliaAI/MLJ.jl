@@ -310,8 +310,12 @@ MLJ, we use a `TunedModel`:
 ```@example goof
 tree = (@load DecisionTreeClassifier pkg=DecisionTree verbosity=0)()
 knn = (@load KNNClassifier pkg=NearestNeighborModels verbosity=0)()
+nothing # hide
+```
 
-# model equivalent to best in `models` using 3-fold CV:
+This model is equivalent to best in `models` by using 3-fold cross-validation:
+
+```@example goof
 blended = TunedModel(models=[tree, knn],
                      resampling=CV(nfolds=3),
                      measure=log_loss,
