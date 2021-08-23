@@ -267,8 +267,7 @@ mach = machine(self_tuning_forest, X, y);
 fit!(mach, verbosity=0);
 ```
 
-We can plot the grid search results is also
-available:
+We can plot the grid search results:
 
 ```julia
 using Plots
@@ -298,6 +297,62 @@ fit!(machine(self_tuning_forest, X, y), verbosity=0);
 
 For more options for a grid search, see [`Grid`](@ref) below.
 
+## Tuning multiple models
+
+We can also compare multiple models via the tuning strategy. This
+can, for example, be used to run _nested cross-validation_. In summary,
+normal (k-fold) cross-validation would check one or more models and
+split the data into `k` folds. Nested cross-validation, first, splits
+the data in multiple train and test sets and, then, runs
+cross-validation for each model in order to reduce bias. To do this in
+MLJ, we use a `TunedModel`:
+
+```@example goof
+tree = (@load DecisionTreeClassifier pkg=DecisionTree verbosity=0)()
+knn = (@load KNNClassifier pkg=NearestNeighborModels verbosity=0)()
+nothing # hide
+```
+
+This model is equivalent to best in `models` by using 3-fold cross-validation:
+
+```@example goof
+blended = TunedModel(models=[tree, knn],
+                     resampling=CV(nfolds=3),
+                     measure=log_loss,
+                     check_measure=false)
+nothing # hide
+```
+
+Evaluating `blended` implies nested cross-validation (each model
+gets evaluated 2 x 3 times):
+
+```@example goof
+X, y = make_blobs()
+
+e = evaluate(blended, X, y,
+             resampling=CV(nfolds=2),
+             measure=log_loss,
+             verbosity=6)
+```
+
+Now, for example, we can get the best model for the first fold out of the two folds:
+
+```@example goof
+e.report_per_fold[1].best_model
+```
+
+And the losses in the outer loop (these still have to be matched to the best performing model):
+
+```@example goof
+e.per_fold
+```
+
+It is also possible to get the results for the nested evaluations.
+For example, for the first fold of the outer loop and the second model:
+
+```@example goof
+e.report_per_fold[2].history[1]
+```
 
 ## Tuning using a random search
 
@@ -315,6 +370,8 @@ self_tuning_forest = TunedModel(model=forest,
                                       range=[r1, r2],
                                       measure=rms,
                                       n=25);
+X = MLJ.table(rand(100, 10));
+y = 2X.x1 - X.x2 + 0.05*rand(100);
 mach = machine(self_tuning_forest, X, y);
 fit!(mach, verbosity=0)
 ```
