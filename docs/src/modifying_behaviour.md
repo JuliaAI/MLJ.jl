@@ -1,6 +1,6 @@
-# Customizing Behavior
+# Modifying Behavior
 
-To customize behaviour of MLJ you will need to clone the relevant
+To modify behaviour of MLJ you will need to clone the relevant
 component package (e.g., MLJBase.jl) - or a fork thereof - and modify
 your local julia environment to use your local clone in place of the
 official release. For example, you might proceed something like this:
