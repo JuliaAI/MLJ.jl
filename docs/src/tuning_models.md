@@ -1,4 +1,4 @@
-# Tuning models
+# Tuning Models
 
 Below we illustrate hyperparameter optimisation using the
 [`Grid`](@ref), [`RandomSearch`](@ref) and [`LatinHypercube`](@ref)

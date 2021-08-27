@@ -1,4 +1,4 @@
-# Internals
+# [Internals](@id internals_section)
 
 ## The machine interface, simplified
 

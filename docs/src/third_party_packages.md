@@ -35,7 +35,8 @@ post an issue requesting this
 
 ## Packages providing other kinds of functionality:
 
-- [TreeParzen.jl](https://github.com/IQVIA-ML/TreeParzen.jl) (hyper-parameter optimisation strategy)
+- [MLJParticleSwarmOptimization.jl](https://github.com/JuliaAI/MLJParticleSwarmOptimization.jl) (hyper-parameter optimization strategy)
+- [TreeParzen.jl](https://github.com/IQVIA-ML/TreeParzen.jl) (hyper-parameter optimization strategy)
 - [Shapley.jl](https://gitlab.com/ExpandingMan/Shapley.jl) (feature ranking / interpretation)
 - [ShapML.jl](https://github.com/nredell/ShapML.jl) (feature ranking / interpretation)
 - [Fairness.jl](https://github.com/ashryaagr/Fairness.jl) (FAIRness metrics)

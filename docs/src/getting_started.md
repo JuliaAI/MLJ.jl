@@ -1,7 +1,7 @@
 # Getting Started
 
-For an outline of MLJ's **goals** and **features**, see the
-[Introduction](@ref).
+For an outline of MLJ's **goals** and **features**, see 
+[About MLJ](@ref).
 
 This section introduces the most basic MLJ operations and concepts. It
 assumes MJL has been successfully installed. See [Installation](@ref)

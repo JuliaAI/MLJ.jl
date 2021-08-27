@@ -1,4 +1,4 @@
-# Transformers and other unsupervised models
+# Transformers and Other Unsupervised Models
 
 Several unsupervised models used to perform common transformations,
 such as one-hot encoding, are available in MLJ out-of-the-box. These
