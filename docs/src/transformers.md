@@ -43,8 +43,7 @@ The main use-case for static transformers is for insertion into a
 Models](@ref)). If a static transformer has no hyper-parameters, it is
 tantamount to an ordinary function. An ordinary function can be
 inserted directly into a `@pipeline`; the situation for learning
-networks is only slightly more complicated; see [Static operations on
-nodes](@ref).
+networks is only slightly more complicated; see [Static operations on nodes](@ref).
 
 The following example defines a new model type `Averager` to perform
 the weighted average of two vectors (target predictions, for

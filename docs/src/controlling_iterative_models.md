@@ -22,7 +22,7 @@ implements the "warm restart" behavior described in [Machines](@ref).
 
 ## Basic use
 
-As in [Tuning models](@ref), iteration control in MLJ is implemented as
+As in [Tuning Models](@ref), iteration control in MLJ is implemented as
 a model wrapper, which allows composition with other meta-algorithms.
 Ordinarily, the wrapped model behaves just like the original model,
 but with the training occurring on a subset of the provided data (to
@@ -78,7 +78,7 @@ end
 ```
 
 Alternatively, one might wrap the self-iterating model in a tuning
-strategy, using `TunedModel`; see [Tuning models](@ref). In this way,
+strategy, using `TunedModel`; see [Tuning Models](@ref). In this way,
 the optimization of some other hyper-parameter is realized
 simultaneously with that of the iteration parameter, which will
 frequently be more efficient than a direct two-parameter search.

@@ -1,151 +1,38 @@
 # Composing Models
 
-MLJ has a flexible interface for composing multiple machine learning
-elements to form a *learning network*, whose complexity can extend
-beyond the "pipelines" of other machine learning toolboxes. While
-these learning networks can be applied directly to learning tasks,
-they are more commonly used to specify new re-usable, stand-alone,
-composite model types, that behave like any other model type. The main
-novelty of composite models is that they include other models as
-hyper-parameters.
+MLJ provides three common ways of combining multiple models together
+out of the box:
 
-MLJ also provides dedicated syntax for the most common
-composition use-cases, which are described first below.
-
-A description of the general framework begins at [Learning
-Networks](@ref). For an in-depth high-level description of learning
-networks, refer to the following article:
-
-[Anthony D. Blaom and Sebastian J. Voller (2020): Flexible model
-composition in machine learning and its implementation in MLJ.
-Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505).
-
-
-## Linear Pipelines
-
-In MLJ a *pipeline* is a composite model in which models are chained
-together in a linear (non-branching) chain. Pipelines can include
-learned or static target transformations, if one of the models is
-supervised.
-
-To illustrate basic construction of a pipeline, consider the following
-toy data:
-
-```@setup 7
-using MLJ
-MLJ.color_off()
-```
-
-```@example 7
-using MLJ
-X = (age    = [23, 45, 34, 25, 67],
-	 gender = categorical(['m', 'm', 'f', 'm', 'f']));
-height = [67.0, 81.5, 55.6, 90.0, 61.1]
-nothing # hide
-```
-
-The code below defines a new model type, and an *instance* of that
-type called `pipe`, for performing the following operations:
-
-- standardize the target variable `:height` to have mean zero and
-  standard deviation one
-- coerce the `:age` field to have `Continuous` scitype
-- one-hot encode the categorical feature `:gender`
-- train a K-nearest neighbor model on the transformed inputs and
-  transformed target
-- restore the predictions of the KNN model to the original `:height`
-  scale (i.e., invert the standardization)
-
-```@setup 7
-@load KNNRegressor
-```
-
-```julia>
-KNNRegressor = @load KNNRegressor
-pipe = @pipeline(X -> coerce(X, :age=>Continuous),
-				 OneHotEncoder,
-				 KNNRegressor(K=3),
-				 target = Standardizer())
-
-Pipeline326(
-	one_hot_encoder = OneHotEncoder(
-			features = Symbol[],
-			drop_last = false,
-			ordered_factor = true,
-			ignore = false),
-	knn_regressor = KNNRegressor(
-			K = 3,
-			algorithm = :kdtree,
-			metric = Distances.Euclidean(0.0),
-			leafsize = 10,
-			reorder = true,
-			weights = :uniform),
-	target = Standardizer(
-			features = Symbol[],
-			ignore = false,
-			ordered_factor = false,
-			count = false)) @287
-```
-
-Notice that field names for the composite are automatically generated
-based on the component model type names. The automatically generated
-name of the new model composite model type, `Pipeline406`, can be
-replaced with a user-defined one by specifying, say,
-`name=MyPipe`. **If you are planning on serializing (saving) a
-pipeline-machine, you will need to specify a name.**.
-
-The new model can be used just like any other non-composite model:
-
-```julia
-pipe.knn_regressor.K = 2
-pipe.one_hot_encoder.drop_last = true
-evaluate(pipe, X, height, resampling=Holdout(), measure=l2, verbosity=2)
-
-[ Info: Training Machine{Pipeline406} @959.
-[ Info: Training Machine{UnivariateStandardizer} @422.
-[ Info: Training Machine{OneHotEncoder} @745.
-[ Info: Spawning 1 sub-features to one-hot encode feature :gender.
-[ Info: Training Machine{KNNRegressor} @005.
-┌───────────┬───────────────┬────────────┐
-│ _.measure │ _.measurement │ _.per_fold │
-├───────────┼───────────────┼────────────┤
-│ l2        │ 55.5          │ [55.5]     │
-└───────────┴───────────────┴────────────┘
-_.per_observation = [[[55.502499999999934]]]
-
-```
-
-For important details on including target transformations, see below.
-
-```@docs
-@pipeline
-```
-
-## Homogeneous Ensembles
-
-Although an ensemble of models sharing a common set of hyperparameters
-can defined using the learning network API, MLJ's `EnsembleModel`
-model wrapper is preferred, for convenience and best performance.
-
-```@docs
-MLJEnsembles.EnsembleModel
-```
-
-## Model Stacking
-
-In a model stack, as introduced by [Wolpert
-(1992)](https://www.sciencedirect.com/science/article/abs/pii/S0893608005800231),
-an adjucating model learns the best way to combine the predictions of
-multiple base models. In MLJ, such models are constructed using the
-`Stack` constructor. To learn more about stacking and to see how to
-construct a stack "by hand" using the [Learning Networks](@ref)
-described later, see [this Data Science in Julia
-tutorial](https://alan-turing-institute.github.io/DataScienceTutorials.jl/getting-started/stacking/))
-
-```@docs
-MLJBase.Stack
-```
-
+- [Linear Pipelines](@ref) - for unbranching chains that take the
+  output of one model (e.g., dimension reduction, such as `PCA`) and
+  make it the input of the next model in the chain (e.g., a
+  classification model, such as `EvoTreeClassifier`)
+  
+- [Homogeneous Ensembles](@ref) - for blending the predictions of
+  multiple supervised models all of the same type, but which receive different
+  views of the training data to reduce overall variance. The technique
+  is known as observation
+  [bagging](https://en.wikipedia.org/wiki/Bootstrap_aggregating). Bagging
+  decision trees, like a `DecisionTreeClassifier`, gives what is known
+  as a *random forest*, although MLJ also provides several canned
+  random forest models.
+  
+- [Model Stacking](@ref) - for combining the predictions of a smaller
+  number of models of possibly *different* type, with the help of an
+  adjudicating model.
+  
+We note that composite models share all of the functionality of
+ordinary models. Their main novelty is that they include other models
+as hyper-parameters.
+  
+Finally, MLJ provides a powerful way to combine machine models in
+flexible *learning networks*. By wrapping training data in *source
+nodes* before calling functions like `machine`, `predict` and
+`transform`, a complicated user workflow which already combines
+multiple models is transformed into a blueprint for a new stand-alone
+composite model type. For example, MLJ's `Stack` model is implemented
+using a learning network. The remainder of this page is devoted to
+explaining this advanced feature.
 
 ## Learning Networks
 
@@ -224,7 +111,13 @@ this regressor can be changed to a different one (e.g.,
 
 For testing purposes, we'll use a small synthetic data set:
 
-```@example 7
+```@setup 42
+using MLJ
+MLJ.color_off()
+const KNNRegressor = @load KNNRegressor pkg=NearestNeighborModels
+```
+
+```@example 42
 using Statistics
 import DataFrames
 
@@ -238,7 +131,7 @@ train, test  = partition(eachindex(y), 0.8); # hide
 ```
 Step one is to wrap the data in *source nodes*:
 
-```@example 7
+```@example 42
 Xs = source(X)
 ys = source(y)
 ```
@@ -253,7 +146,7 @@ or call network nodes, as illustrated below.
 The contents of a source node can be recovered by simply calling the
 node with no arguments:
 
-```@example 7
+```@example 42
 ys()[1:2]
 ```
 
@@ -264,7 +157,7 @@ machine, namely `box`, for different operations.
 To construct the `W` node we first need to define the machine `stand`
 that it will use to transform inputs.
 
-```@example 7
+```@example 42
 stand_model = Standardizer()
 stand = machine(stand_model, Xs)
 ```
@@ -272,7 +165,7 @@ Because `Xs` is a node, instead of concrete data, we can call
 `transform` on the machine without first training it, and the result
 is the new node `W`, instead of concrete transformed data:
 
-```@example 7
+```@example 42
 W = transform(stand, Xs)
 ```
 
@@ -281,7 +174,7 @@ will require we first train the node. Training a node, rather than a
 machine, triggers training of *all* necessary machines in the network.
 
 
-```@example 7
+```@example 42
 fit!(W, rows=train)
 W()           # transform all data
 W(rows=test ) # transform only test data
@@ -295,7 +188,7 @@ the outcome of training events.
 
 The other nodes of our network are defined similarly:
 
-```@example 7
+```@example 42
 RidgeRegressor = @load RidgeRegressor pkg=MultivariateStats
 box_model = UnivariateBoxCoxTransformer()  # for making data look normally-distributed
 box = machine(box_model, ys)
@@ -312,19 +205,19 @@ the standardizer, `stand`, is *not* retrained, as MLJ remembers that
 it was trained earlier:
 
 
-```@example 7
+```@example 42
 fit!(yhat, rows=train);
 rms(y[test], yhat(rows=test)) # evaluate
 ```
 We can change a hyperparameters and retrain:
 
-```@example 7
+```@example 42
 ridge_model.lambda = 0.01
 fit!(yhat, rows=train); 
 ```
 And re-evaluate:
 
-```@example 7
+```@example 42
 rms(y[test], yhat(rows=test))
 ```
 
@@ -346,7 +239,7 @@ supertype (`Deterministic`, `Probabilistic`, `Unsupervised` or
 
 Continuing with the example above:
 
-```@example 7
+```@example 42
 surrogate = Deterministic()
 mach = machine(surrogate, Xs, ys; predict=yhat);
 ```
@@ -356,7 +249,7 @@ predictions, and the arguments `Xs` and `ys` declare which source
 nodes receive the input and target data. With `mach` constructed in
 this way, the code
 
-```@example 7
+```@example 42
 fit!(mach)
 predict(mach, X[test,:]);
 nothing # hide
@@ -364,7 +257,7 @@ nothing # hide
 
 is equivalent to
 
-```@example 7
+```@example 42
 fit!(yhat)
 yhat(X[test,:]);
 nothing # hide
@@ -373,7 +266,7 @@ nothing # hide
 While it's main purpose is for export (see below), this machine can
 actually be evaluated:
 
-```@example 7
+```@example 42
 
 evaluate!(mach, resampling=CV(nfolds=3), measure=LPLoss(p=2))
 ```
@@ -468,7 +361,7 @@ just exported using Method I.
 
 The `mutable struct` definition looks like this:
 
-```@example 7
+```@example 42
 mutable struct WrappedRegressor2 <: DeterministicComposite
 	regressor
 end
@@ -485,7 +378,7 @@ We now simply cut and paste the code defining the learning network
 into a model `fit` method (as opposed to a machine `fit!` method):
 
 
-```@example 7
+```@example 42
 function MLJ.fit(model::WrappedRegressor2, verbosity::Integer, X, y)
 	Xs = source(X)
 	ys = source(y)
@@ -541,7 +434,7 @@ depends on the number of clusters used (with less regularization for a
 greater number of clusters) and a user-specified "coupling"
 coefficient `K`.
 
-```@example 7
+```@example 42
 RidgeRegressor = @load RidgeRegressor pkg=MLJLinearModels
 
 mutable struct MyComposite <: DeterministicComposite
@@ -577,9 +470,9 @@ end
 
 kmeans = (@load KMeans pkg=Clustering)()
 my_composite = MyComposite(kmeans, nothing, 0.5)
-```
+``
 
-```@example 7
+```@example 42
 evaluate(my_composite, X, y, measure=MeanAbsoluteError(), verbosity=0)
 ```
 
@@ -592,8 +485,7 @@ operations can be ordinary functions (with possibly multiple
 arguments) or they could be functions *with parameters*, such as "take
 a weighted average of two nodes", where the weights are
 parameters. Here we address the simpler case of ordinary functions. For
-the parametric case, see "Static transformers" in [Transformers and
-other unsupervised models](@ref)
+the parametric case, see "Static transformers" in [Transformers and Other Unsupervised Models](@ref)
 
 Let us first give a demonstration of operations that work
 out-of-the-box. These include:
@@ -614,7 +506,7 @@ transforms (exponentiates) the blended predictions.
 Note, in particular, the lines defining `zhat` and `yhat`, which
 combine several static node operations.
 
-```@example 7
+```@example 42
 RidgeRegressor = @load RidgeRegressor pkg=MultivariateStats
 KNNRegressor = @load KNNRegressor
 

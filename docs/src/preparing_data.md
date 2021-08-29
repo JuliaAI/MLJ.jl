@@ -1,5 +1,22 @@
 # Preparing Data
 
+## Splitting data
+
+MLJ has two tools for splitting data. To split data *vertically* (that
+is to split by observations) use [`partition`](@ref). This is commonly applied to a
+vector of observation *indices*, but can also be applied to datasets
+themselves, provided they are vectors, matrices or tables.
+
+To split tabular data *horizontally* (i.e., break up a table based on
+column names) use [`unpack`](@ref).
+
+```@docs
+MLJBase.partition
+MLJBase.unpack
+```
+
+## Bridging the gap between data type and model requirements
+
 As outlined in [Getting Started](@ref), it is important that the
 [scientific type](https://github.com/JuliaAI/ScientificTypesBase.jl) of
 data matches the requirements of the model of interest. For example,
@@ -48,7 +65,7 @@ schema(X)
 
 - The model requires a table whose column element scitypes subtype `Continuous`, an incompatibility.
 
-## Common data preprocessing workflows
+### Common data preprocessing workflows
 
 There are two tools for addressing data-model type mismatches like the
 above, with links to further documentation given below:
@@ -106,8 +123,7 @@ Also relevant is the section, [Working with Categorical Data](@ref).
 
 ## Data transformation
 
-MLJ's Built-in transformers are documented at [Transformers and other
-  unsupervised models](@ref). The most relevant in the present context
+MLJ's Built-in transformers are documented at [Transformers and Other Unsupervised Models](@ref). The most relevant in the present context
   are: [`ContinuousEncoder`](@ref), [`OneHotEncoder`](@ref),
   [`FeatureSelector`](@ref) and [`FillImputer`](@ref). A Gaussian
   mixture models imputer is provided by BetaML, which can be loaded

@@ -65,6 +65,12 @@ To support MLJ development, please cite these works or star the repo:
 [Controlling Iterative Models](@ref) |
 [Learning Curves](@ref)
 
+### Composition
+[Composing Models](@ref) |
+[Linear Pipelines](@ref) |
+[Homogeneous Ensembles](@ref) |
+[Model Stacking](@ref) |
+
 ### Customization and Extension
 [Simple User Defined Models](@ref) |
 [Quick-Start Guide to Adding Models](@ref) |

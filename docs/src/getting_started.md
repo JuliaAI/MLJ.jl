@@ -27,11 +27,12 @@ import RDatasets
 iris = RDatasets.dataset("datasets", "iris"); # a DataFrame
 ```
 
-and then split the data into input and target parts:
+and then split the data into input and target parts, and specify an
+RNG seed, to force observations to be shuffled:
 
 ```@repl doda
 using MLJ
-y, X = unpack(iris, ==(:Species), colname -> true);
+y, X = unpack(iris, ==(:Species), colname -> true; rng=123);
 first(X, 3) |> pretty
 ```
 
@@ -73,31 +74,25 @@ environment. Alternatively, you can use the interactive macro
 Code](@ref).
 
 Once instantiated, a model's performance can be evaluated with the
-`evaluate` method:
+`evaluate` method. Our classifier is a *probablistic* predictor (check
+`prediction_type(tree) == :probabilistic`) which means we can specify
+a probablistic measure (metric) like `log_loss`, as well
+deterministic measures like `accuracy` (which are applied after
+computing the mode of each prediction): 
 
 ```@repl doda
 evaluate(tree, X, y,
-         resampling=CV(shuffle=true), measure=log_loss, verbosity=0)
+         resampling=CV(shuffle=true), 
+		 measures=[log_loss, accuracy], 
+		 verbosity=0)
 ```
 
-**Using a deterministic measure.** The measure chosen here,
-`log_loss`, is a *probabilistic* measure (because `prediction_type(log_loss)
-== :probabilistic`) which is appropriate because our model makes
-probablistic predictions by default (`prediction_type(tree) ==
-:probabilistic`). This means the model's `predict` operation outputs
-probability distributions instead of classes (see below). If you want to
-evaluate a probabilistic model using a *deterministic* measure, then
-add the keyword `operation=predict_mode` (or, for regression problems,
-use `predict_mean`/`predict_median`):
+Under the hood, `evaluate` calls lower level functions `predict` or
+`predict_mode` according to the type of measure, as shown in the
+output. We shall call these operations directly below.
 
-```@repl doda
-evaluate(tree, X, y,
-         resampling=CV(shuffle=true), measure=accuracy, operation=predict_mode, verbosity=0)
-```
-
-
-Evaluating against multiple performance measures is also possible. See
-[Evaluating Model Performance](evaluating_model_performance.md) for details.
+For more an performance evalutation, see [Evaluating Model
+Performance](evaluating_model_performance.md) for details.
 
 
 ## A preview of data type specification in MLJ
@@ -114,9 +109,8 @@ the data they operate on. Rather, they specify a *scientific type*,
 which refers to the way data is to be *interpreted*, as opposed to how
 it is *encoded*:
 
-```julia
-julia> info("DecisionTreeClassifier", pkg="DecisionTree").target_scitype
-AbstractArray{<:Finite, 1}
+```@repl doda
+target_scitype(tree)
 ```
 
 Here `Finite` is an example of a "scalar" scientific type with two
@@ -138,7 +132,7 @@ and `Multiclass{3} <: Finite`. If we would encode with integers
 instead, we obtain:
 
 ```@repl doda
-yint = Int.(y.refs);
+yint = int.(y);
 scitype(yint)
 ```
 
@@ -165,20 +159,21 @@ mach = machine(tree, X, y)
 Training and testing on a hold-out set:
 
 ```@repl doda
-train, test = partition(eachindex(y), 0.7, shuffle=true); # 70:30 split
+train, test = partition(eachindex(y), 0.7); # 70:30 split
 fit!(mach, rows=train);
 yhat = predict(mach, X[test,:]);
 yhat[3:5]
 log_loss(yhat, y[test]) |> mean
 ```
 
-Here `log_loss` (and `cross_entropy`) is an alias for `LogLoss()` or,
-more precisely, a built-in instance of the `LogLoss` type. For a list of all losses and
-scores, and their aliases, run `measures()`.
+Note that `log_loss` and `cross_entropy` are aliases for `LogLoss()`
+(which can be passed an optional keyword parameter, as in
+`LogLoss(tol=0.001)`). For a list of all losses and scores, and their
+aliases, run `measures()`.
 
-Notice that `yhat` is a vector of `Distribution` objects (because
-DecisionTreeClassifier makes probabilistic predictions). The methods
-of the [Distributions](https://github.com/JuliaStats/Distributions.jl)
+Notice that `yhat` is a vector of `Distribution` objects, because
+DecisionTreeClassifier makes probabilistic predictions. The methods
+of the [Distributions.jl](https://github.com/JuliaStats/Distributions.jl)
 package can be applied to such distributions:
 
 ```@repl doda
@@ -206,8 +201,8 @@ Unsupervised models have a `transform` method instead of `predict`,
 and may optionally implement an `inverse_transform` method:
 
 ```@repl doda
-v = [1, 2, 3, 4]
-stand = UnivariateStandardizer() # this type is built-in
+v = Float64[1, 2, 3, 4]
+stand = Standardizer() # this type is built-in
 mach2 = machine(stand, v)
 fit!(mach2)
 w = transform(mach2, v)
@@ -219,23 +214,23 @@ avoid redundant calculations when retrained, in certain conditions -
 for example when increasing the number of trees in a random forest, or
 the number of epochs in a neural network. The machine building syntax
 also anticipates a more general syntax for composing multiple models,
-as explained in [Composing Models](composing_models.md).
+an advanced feature explained in [Learning Networks](@ref).
 
 There is a version of `evaluate` for machines as well as models. This
-time we'll add a second performance measure. (An exclamation point is
-added to the method name because machines are generally mutated when
-trained.)
+time we'll use a simple holdout strategy as above. (An exclamation
+point is added to the method name because machines are generally
+mutated when trained.)
 
 ```@repl doda
-evaluate!(mach, resampling=Holdout(fraction_train=0.7, shuffle=true),
-                measures=[log_loss, brier_score],
+evaluate!(mach, resampling=Holdout(fraction_train=0.7),
+                measures=[log_loss, accuracy],
                 verbosity=0)
 ```
 Changing a hyperparameter and re-evaluating:
 
 ```@repl doda
 tree.max_depth = 3
-evaluate!(mach, resampling=Holdout(fraction_train=0.7, shuffle=true),
+evaluate!(mach, resampling=Holdout(fraction_train=0.7),
           measures=[cross_entropy, brier_score],
           verbosity=0)
 ```
@@ -348,6 +343,15 @@ _.nrows = 2
 The matrix is *not* copied, only wrapped.  To manifest a table as a
 matrix, use [`MLJ.matrix`](@ref).
 
+### Observations correspond to rows, not columns
+
+When supplying models with matrices, or wrapping them in tables, each
+*row* should correpsond to a different observation. That is, the
+matrix should be `n x p`, where `n` is the number of observations and
+`p` the number of features. However, *some models may perform better* if
+supplied the *adjoint* of a `p x n` matrix instead, and obervation
+resampling is always more efficient in this case.
+
 
 ### Inputs
 
@@ -384,7 +388,12 @@ i.input_scitype
 i.target_scitype
 ```
 
-But see also [Model Search](@ref model_search).
+This output indicates that any table with `Countinous`, `Count` or
+`OrderedFactor` columns is acceptable as the input `X`, and that any
+vector with elment scitype `<: Finite` is acceptable as the target
+`y`.
+
+For more on matching models to data, see [Model Search](@ref model_search).
 
 ### Scalar scientific types
 

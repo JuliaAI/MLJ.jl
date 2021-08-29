@@ -165,7 +165,7 @@ of `nothing`.
 
 ### Hyper-parameter access and mutation
 
-To support hyper-parameter optimization (see [Tuning models](@ref))
+To support hyper-parameter optimization (see [Tuning Models](@ref))
 any hyper-parameter to be individually controlled must be:
 
 - property-accessible; nested property access allowed, as in
