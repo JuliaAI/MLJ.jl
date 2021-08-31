@@ -111,16 +111,16 @@ control                                                        | description    
 [`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=i->@info("num iterations: $i"))`| Call `f(i)`, where `i` is total number of iterations                      | yes
 [`WithLossDo`](@ref IterationControl.WithLossDo)`(f=x->@info("loss: $x"))`                  | Call `f(loss)` where `loss` is the current loss                           | yes
 [`WithTrainingLossesDo`](@ref IterationControl.WithTrainingLossesDo)`(f=v->@info(v))`       | Call `f(v)` where `v` is the current batch of training losses             | yes
-[`Save`](@ref MLJSerialization.Save)`(filename="machine.jlso")`| * Save current machine to `machine1.jlso`, `machine2.jslo`, etc                         | yes
+[`Save`](@ref MLJSerialization.Save)`(filename="machine.jlso")`| ⋆ Save current machine to `machine1.jlso`, `machine2.jslo`, etc                         | yes
 
 > Table 1. Atomic controls. Some advanced options omitted.
 
-† For more these controls see [Prechelt, Lutz
+† For more on these controls see [Prechelt, Lutz
  (1998)](https://link.springer.com/chapter/10.1007%2F3-540-49430-8_3):
  "Early Stopping - But When?", in *Neural Networks: Tricks of the
  Trade*, ed. G. Orr, Springer.
 
-* If using `MLJIteration` without `MLJ`, then `Save` is not available
+⋆ If using `MLJIteration` without `MLJ`, then `Save` is not available
   unless one is also using `MLJSerialization`.
 
 **Stopping option.** All the following controls trigger a stop if the
