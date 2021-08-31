@@ -3,12 +3,12 @@
 ## Splitting data
 
 MLJ has two tools for splitting data. To split data *vertically* (that
-is to split by observations) use [`partition`](@ref). This is commonly applied to a
+is, to split by observations) use [`partition`](@ref). This is commonly applied to a
 vector of observation *indices*, but can also be applied to datasets
 themselves, provided they are vectors, matrices or tables.
 
 To split tabular data *horizontally* (i.e., break up a table based on
-column names) use [`unpack`](@ref).
+feature names) use [`unpack`](@ref).
 
 ```@docs
 MLJBase.partition

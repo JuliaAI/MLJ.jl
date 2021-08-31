@@ -434,5 +434,4 @@ For more on scitype coercion of arrays and tables, see [`coerce`](@ref),
 scitype
 coerce
 autotype
-unpack
 ```
