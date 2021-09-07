@@ -43,21 +43,20 @@ networks, which have been described more abstractly in the article:
 composition in machine learning and its implementation in MLJ.
 Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505)
 
-Hand-crafting a learning network, as outlined below, is a relatively
-advanced MLJ feature, assuming familiarity with the basics outlined in
-[Getting Started](index.md). The syntax for building a learning
-network is essentially an extension of the basic syntax but with data
-containers replaced with nodes of a graph.
+We assuming familiarity with the basics outlined in [Getting
+Started](index.md). The syntax for building a learning network is
+essentially an extension of the basic syntax but with data containers
+replaced with nodes of a graph.
 
 It is important to distinguish between *learning networks* and the
-comosite MLJ model types they are used to define.
+composite MLJ model types they are used to define.
 
 A *learning network* is a directed acyclic graph whose nodes are
 objects that can be called to obtained data, either for training a
 machine, or for using as input to an *operation*. An operation is
 either:
 
-- *static*, that is, an ordinary function, such as such as `+`, `log` or `vcat`, or
+- *static*, that is, an ordinary function, such as such as `+`, `log` or `vcat`; or
 
 - *dynamic*, that is, an operation such as `predict` or `transform`
   which is dispatched on both data *and* a training outcome attached
