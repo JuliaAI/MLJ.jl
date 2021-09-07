@@ -13,7 +13,6 @@ import MLJBase
 import MLJTuning
 import MLJModels
 import MLJEnsembles
-import MLJOpenML
 import ScientificTypes
 import MLJModelInterface
 import ScientificTypesBase
@@ -28,7 +27,8 @@ const MMI = MLJModelInterface
 #                   codefence = "```@example workflows" => "```")
 
 pages = [
-    "Introduction" => "index.md",
+    "Home" => "index.md",
+    "About MLJ" => "about_mlj.md",
     "Getting Started" => "getting_started.md",
     "Common MLJ Workflows" => "common_mlj_workflows.md",
     "Working with Categorical Data" => "working_with_categorical_data.md",
@@ -41,8 +41,12 @@ pages = [
     "Tuning Models" => "tuning_models.md",
     "Learning Curves" => "learning_curves.md",
     "Preparing Data" => "preparing_data.md",
-    "Transformers and other unsupervised models" => "transformers.md",
+    "Transformers and Other Unsupervised models" => "transformers.md",
+    "More on Probablistic Predictors" => "more_on_probabilistic_predictors.md",
     "Composing Models" => "composing_models.md",
+    "Linear Pipelines" => "linear_pipelines.md",
+    "Homogeneous Ensembles" => "homogeneous_ensembles.md",
+    "Model Stacking" => "model_stacking.md",
     "Controlling Iterative Models" => "controlling_iterative_models.md",
     "Generating Synthetic Data" => "generating_synthetic_data.md",
     "OpenML Integration" => "openml_integration.md",
@@ -51,7 +55,7 @@ pages = [
     "Quick-Start Guide to Adding Models" =>
                "quick_start_guide_to_adding_models.md",
     "Adding Models for General Use" => "adding_models_for_general_use.md",
-    "Customizing Behavior" => "customizing_behavior.md",
+    "Modifying Behavior" => "modifying_behavior.md",
     "Internals" => "internals.md",
     "List of Supported Models" => "list_of_supported_models.md",
     "Third Party Packages" => "third_party_packages.md",
@@ -80,7 +84,6 @@ makedocs(
                 ScientificTypesBase,
                 MLJIteration,
                 MLJSerialization,
-                MLJOpenML,
                 EarlyStopping,
                 IterationControl],
     pages    = pages)

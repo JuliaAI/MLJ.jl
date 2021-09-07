@@ -14,7 +14,7 @@ import MLJBase.save
 using MLJEnsembles
 using MLJTuning
 using MLJModels
-using MLJOpenML
+using OpenML
 using MLJSerialization
 import MLJSerialization.save # but not re-exported
 using MLJIteration
@@ -203,8 +203,9 @@ end
 export IterationControl
 
 # re-export from MLJOpenML
-const OpenML = MLJOpenML # for backwards compatibility
-export OpenML
+const MLJOpenML = OpenML
+
+export OpenML, MLJOpenML
 
 # re-export from MLJSerialization:
 export Save # control, not method

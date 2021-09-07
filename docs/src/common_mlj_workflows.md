@@ -2,11 +2,31 @@
 
 ## Data ingestion
 
-```@example workflows
-using MLJ; color_off() #hide
+```@setup workflows
+# to avoid RDatasets as a doc dependency:
+using MLJ; color_off()
+import DataFrames
+channing = (Sex = rand(["Male","Female"], 462),
+            Entry = rand(Int, 462),
+            Exit = rand(Int, 462),
+            Time = rand(Int, 462),
+            Cens = rand(Int, 462)) |> DataFrames.DataFrame
+coerce!(channing, :Sex => Multiclass)
+```
+
+```julia
 import RDatasets
 channing = RDatasets.dataset("boot", "channing")
-first(channing, 4)
+
+julia> first(channing, 4)
+4×5 DataFrame
+ Row │ Sex   Entry  Exit   Time   Cens
+     │ Cat…  Int32  Int32  Int32  Int32
+─────┼──────────────────────────────────
+   1 │ Male    782    909    127      1
+   2 │ Male   1020   1128    108      1
+   3 │ Male    856    969    113      1
+   4 │ Male    915    957     42      1
 ```
 
 Inspecting metadata, including column scientific types:
@@ -15,25 +35,51 @@ Inspecting metadata, including column scientific types:
 schema(channing)
 ```
 
-Unpacking data and correcting for wrong scitypes:
+Unpacking data and shuffling rows:
 
 ```@example workflows
 y, X =  unpack(channing,
                ==(:Exit),            # y is the :Exit column
-               !=(:Time);            # X is the rest, except :Time
-               :Exit=>Continuous,
-               :Entry=>Continuous,
-               :Cens=>Multiclass)
-first(X, 4)
+               !=(:Time));           # X is the rest, except :Time
+nothing # hide
 ```
 
 *Note:* Before julia 1.2, replace `!=(:Time)` with `col -> col != :Time`.
 
-```@example workflows
-y[1:4]
+```julia workflows
+julia> y[1:4]
+4-element Vector{Int32}:
+  909
+ 1128
+  969
+  957
 ```
 
+Fixing wrong scientfic types in `X`:
+
+```julia
+X = coerce(X, :Exit=>Continuous, :Entry=>Continuous, :Cens=>Multiclass)
+
+julia> schema(X)
+┌─────────┬─────────────────────────────────┬───────────────┐
+│ _.names │ _.types                         │ _.scitypes    │
+├─────────┼─────────────────────────────────┼───────────────┤
+│ Sex     │ CategoricalValue{String, UInt8} │ Multiclass{2} │
+│ Entry   │ Float64                         │ Continuous    │
+│ Cens    │ CategoricalValue{Int32, UInt32} │ Multiclass{2} │
+└─────────┴─────────────────────────────────┴───────────────┘
+_.nrows = 462
+```
+
+
 Loading a built-in supervised dataset:
+
+```@example workflows
+table = load_iris()
+schema(table)
+```
+
+Loading a built-in data set already split into `X` and `y`:
 
 ```@example workflows
 X, y = @load_iris;
@@ -122,13 +168,13 @@ Do `measures()` to list all losses and scores and their aliases.
 [Evaluating Model Performance](evaluating_model_performance.md), [Performance Measures](performance_measures.md)
 
 ```@example workflows
-import RDatasets
-vaso = RDatasets.dataset("robustbase", "vaso"); # a DataFrame
-first(vaso, 3)
+crabs = load_crabs() |> DataFrames.DataFrame
+schema(crabs)
 ```
 
 ```@example workflows
-y, X = unpack(vaso, ==(:Y), c -> true; :Y => Multiclass)
+y, X = unpack(crabs, ==(:sp), !in([:index, :sex]); rng=123)
+
 
 Tree = @load DecisionTreeClassifier pkg=DecisionTree
 tree = Tree(max_depth=2) # hide
@@ -144,7 +190,7 @@ mach = machine(tree, X, y)
 Split row indices into training and evaluation rows:
 
 ```@example workflows
-train, test = partition(eachindex(y), 0.7, shuffle=true, rng=1234); # 70:30 split
+train, test = partition(eachindex(y), 0.7); # 70:30 split
 ```
 
 Fit on train and evaluate on test:
@@ -162,7 +208,7 @@ Run `measures()` to list all losses and scores and their aliases ("instances").
 Predict on new data:
 
 ```@example workflows
-Xnew = (Volume=3*rand(3), Rate=3*rand(3))
+Xnew = (FL = rand(3), RW = rand(3), CL = rand(3), CW = rand(3), BD =rand(3))
 predict(mach, Xnew)      # a vector of distributions
 ```
 
@@ -177,7 +223,7 @@ Evaluating model + data directly:
 ```@example workflows
 evaluate(tree, X, y,
          resampling=Holdout(fraction_train=0.7, shuffle=true, rng=1234),
-         measure=[LogLoss(), ZeroOneLoss()])
+         measure=[LogLoss(), Accuracy()])
 ```
 
 If a machine is already defined, as above:
@@ -185,14 +231,14 @@ If a machine is already defined, as above:
 ```@example workflows
 evaluate!(mach,
           resampling=Holdout(fraction_train=0.7, shuffle=true, rng=1234),
-          measure=[LogLoss(), ZeroOneLoss()])
+          measure=[LogLoss(), Accuracy()])
 ```
 
 Using cross-validation:
 
 ```@example workflows
 evaluate!(mach, resampling=CV(nfolds=5, shuffle=true, rng=1234),
-          measure=[LogLoss(), ZeroOneLoss()])
+          measure=[LogLoss(), Accuracy()])
 ```
 
 With user-specified train/test pairs of row indices:
@@ -202,7 +248,7 @@ f1, f2, f3 = 1:13, 14:26, 27:36
 pairs = [(f1, vcat(f2, f3)), (f2, vcat(f3, f1)), (f3, vcat(f1, f2))];
 evaluate!(mach,
           resampling=pairs,
-          measure=[LogLoss(), ZeroOneLoss()])
+          measure=[LogLoss(), Accuracy()])
 ```
 
 Changing a hyperparameter and re-evaluating:
@@ -211,7 +257,7 @@ Changing a hyperparameter and re-evaluating:
 tree.max_depth = 3
 evaluate!(mach,
           resampling=CV(nfolds=5, shuffle=true, rng=1234),
-          measure=[LogLoss(), ZeroOneLoss()])
+          measure=[LogLoss(), Accuracy()])
 ```
 
 ##  Inspecting training results
