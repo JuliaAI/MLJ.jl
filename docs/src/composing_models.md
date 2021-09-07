@@ -470,7 +470,7 @@ end
 
 kmeans = (@load KMeans pkg=Clustering)()
 my_composite = MyComposite(kmeans, nothing, 0.5)
-``
+```
 
 ```@example 42
 evaluate(my_composite, X, y, measure=MeanAbsoluteError(), verbosity=0)
