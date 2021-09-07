@@ -118,7 +118,8 @@ in most cases. `Unsupervised` models may implement an
 
 ## New model type declarations and optional clean! method
 
-Here is an example of a concrete supervised model type declaration:
+Here is an example of a concrete supervised model type declaration,
+for a model with a single hyper-parameter:
 
 ```julia
 import MLJModelInterface
@@ -162,6 +163,16 @@ fields. For example, a field declaration `features::Vector{Symbol}`
 with a default of `Symbol[]` (detected with `isempty` method) is
 preferred to `features::Union{Vector{Symbol}, Nothing}` with a default
 of `nothing`.
+
+### Hyper-parameters for parellizatioin options
+
+The section [Acceleration and Parallelism](@ref) indicates how MLJ
+models specify an option to run an algorithm using distributed
+processing or multi-threading. A hyper-parameter specifying such an
+option should be called `acceleration`. Its value `a` should satisfy 
+`a isa AbstractResource` where `AbstractResource` is defined in the
+ComputationalResources.jl package. An option to run on a GPU is
+ordinarily indicated with the `CUDALibs()` resource.
 
 ### Hyper-parameter access and mutation
 

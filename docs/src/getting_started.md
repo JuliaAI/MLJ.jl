@@ -1,6 +1,6 @@
 # Getting Started
 
-For an outline of MLJ's **goals** and **features**, see 
+For an outline of MLJ's **goals** and **features**, see
 [About MLJ](@ref).
 
 This section introduces the most basic MLJ operations and concepts. It
@@ -18,23 +18,41 @@ seed!(1234)
 
 ## Choosing and evaluating a model
 
-To load some demonstration data, add
-[RDatasets.jl](https://github.com/JuliaStats/RDatasets.jl) to your load
-path and enter
-
-```@repl doda
-import RDatasets
-iris = RDatasets.dataset("datasets", "iris"); # a DataFrame
-```
-
-and then split the data into input and target parts, and specify an
-RNG seed, to force observations to be shuffled:
+The following code loads Fisher's famous iris data set as a named tuple of
+column vectors:
 
 ```@repl doda
 using MLJ
-y, X = unpack(iris, ==(:Species), colname -> true; rng=123);
+iris = load_iris();
+selectrows(iris, 1:3)  |> pretty
+schema(iris)
+```
+
+Because this data format is compatible with
+[Tables.jl](https://tables.juliadata.org/stable/), many MLJ methods
+(such as `selectrows`, `pretty` and `schema` used above) as well as
+many MLJ models, can work with it. However, as most new users are
+already familiar with the access methods particular to
+[DataFrames](https://dataframes.juliadata.org/stable/) (also
+compatible with Tables.jl) we'll put our data into that format here:
+
+```@example doda
+import DataFrames
+iris = DataFrames.DataFrame(iris);
+nothing # hide
+```
+
+Next, let's split the data "vertically" into input and target parts,
+and specify an RNG seed, to force observations to be shuffled:
+
+```@repl doda
+y, X = unpack(iris, ==(:target), colname -> true; rng=123);
 first(X, 3) |> pretty
 ```
+
+Notice that this call to `unpack` splits off any column with name `==`
+to `:target` into something called `y`, and all the remaining columns
+into `X` (the second filter `colname -> true` always holds).
 
 To list *all* models available in MLJ's [model
 registry](model_search.md) do `models()`. Listing the models
@@ -78,13 +96,13 @@ Once instantiated, a model's performance can be evaluated with the
 `prediction_type(tree) == :probabilistic`) which means we can specify
 a probablistic measure (metric) like `log_loss`, as well
 deterministic measures like `accuracy` (which are applied after
-computing the mode of each prediction): 
+computing the mode of each prediction):
 
 ```@repl doda
 evaluate(tree, X, y,
-         resampling=CV(shuffle=true), 
-		 measures=[log_loss, accuracy], 
-		 verbosity=0)
+         resampling=CV(shuffle=true),
+                 measures=[log_loss, accuracy],
+                 verbosity=0)
 ```
 
 Under the hood, `evaluate` calls lower level functions `predict` or
@@ -231,7 +249,7 @@ Changing a hyperparameter and re-evaluating:
 ```@repl doda
 tree.max_depth = 3
 evaluate!(mach, resampling=Holdout(fraction_train=0.7),
-          measures=[cross_entropy, brier_score],
+          measures=[log_loss, accuracy],
           verbosity=0)
 ```
 
