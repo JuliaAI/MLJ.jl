@@ -126,7 +126,7 @@ discretizer = machine(t, randn(1000))
 fit!(discretizer)
 v = rand(10)
 w = transform(discretizer, v)
-v_approx = inverse_transform(discretizer, w) # reconstruction of v from w</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModels.UnivariateTimeTypeToContinuous" href="#MLJModels.UnivariateTimeTypeToContinuous"><code>MLJModels.UnivariateTimeTypeToContinuous</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">UnivariateTimeTypeToContinuous(zero_time=nothing, step=Hour(24))</code></pre><p>Convert a <code>Date</code>, <code>DateTime</code>, and <code>Time</code> vector to <code>Float64</code> by assuming <code>0.0</code> corresponds to the <code>zero_time</code> parameter and the time increment to reach <code>1.0</code> is given by the <code>step</code> parameter. The type of <code>zero_time</code> should match the type of the column if provided. If not provided, then <code>zero_time</code> is inferred as the minimum time found in the data when <code>fit</code> is called.</p></div></section></article><h2 id="Static-transformers"><a class="docs-heading-anchor" href="#Static-transformers">Static transformers</a><a id="Static-transformers-1"></a><a class="docs-heading-anchor-permalink" href="#Static-transformers" title="Permalink"></a></h2><p>The main use-case for static transformers is for insertion into a <a href="../linear_pipelines/#MLJBase.@pipeline"><code>@pipeline</code></a> or other exported learning network (see <a href="../composing_models/#Composing-Models">Composing Models</a>). If a static transformer has no hyper-parameters, it is tantamount to an ordinary function. An ordinary function can be inserted directly into a <code>@pipeline</code>; the situation for learning networks is only slightly more complicated; see <a href="@ref">Static operations on nodes</a>.</p><p>The following example defines a new model type <code>Averager</code> to perform the weighted average of two vectors (target predictions, for example). We suppose the weighting is normalized, and therefore controlled by a single hyper-parameter, <code>mix</code>.</p><pre><code class="language-julia">mutable struct Averager &lt;: Static
+v_approx = inverse_transform(discretizer, w) # reconstruction of v from w</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModels.UnivariateTimeTypeToContinuous" href="#MLJModels.UnivariateTimeTypeToContinuous"><code>MLJModels.UnivariateTimeTypeToContinuous</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">UnivariateTimeTypeToContinuous(zero_time=nothing, step=Hour(24))</code></pre><p>Convert a <code>Date</code>, <code>DateTime</code>, and <code>Time</code> vector to <code>Float64</code> by assuming <code>0.0</code> corresponds to the <code>zero_time</code> parameter and the time increment to reach <code>1.0</code> is given by the <code>step</code> parameter. The type of <code>zero_time</code> should match the type of the column if provided. If not provided, then <code>zero_time</code> is inferred as the minimum time found in the data when <code>fit</code> is called.</p></div></section></article><h2 id="Static-transformers"><a class="docs-heading-anchor" href="#Static-transformers">Static transformers</a><a id="Static-transformers-1"></a><a class="docs-heading-anchor-permalink" href="#Static-transformers" title="Permalink"></a></h2><p>The main use-case for static transformers is for insertion into a <a href="../linear_pipelines/#MLJBase.@pipeline"><code>@pipeline</code></a> or other exported learning network (see <a href="../composing_models/#Composing-Models">Composing Models</a>). If a static transformer has no hyper-parameters, it is tantamount to an ordinary function. An ordinary function can be inserted directly into a <code>@pipeline</code>; the situation for learning networks is only slightly more complicated; see <a href="../composing_models/#Static-operations-on-nodes">Static operations on nodes</a>.</p><p>The following example defines a new model type <code>Averager</code> to perform the weighted average of two vectors (target predictions, for example). We suppose the weighting is normalized, and therefore controlled by a single hyper-parameter, <code>mix</code>.</p><pre><code class="language-julia">mutable struct Averager &lt;: Static
     mix::Float64
 end
 
@@ -151,23 +151,23 @@ knnM = machine(knn, W, y)
 y2 = predict(knnM, W)
 
 averagerM= machine(averager)
-yhat = transform(averagerM, y1, y2)</code></pre><pre class="documenter-example-output">Node{Machine{Averager,…}} @581
+yhat = transform(averagerM, y1, y2)</code></pre><pre class="documenter-example-output">Node{Machine{Averager,…}} @694
   args:
-    1:	Node{Machine{RidgeRegressor,…}} @252
-    2:	Node{Machine{KNNRegressor,…}} @992
+    1:	Node{Machine{RidgeRegressor,…}} @440
+    2:	Node{Machine{KNNRegressor,…}} @669
   formula:
     transform(
-        Machine{Averager,…} @656, 
+        Machine{Averager,…} @158, 
         predict(
-            Machine{RidgeRegressor,…} @629, 
+            Machine{RidgeRegressor,…} @313, 
             transform(
-                Machine{OneHotEncoder,…} @930, 
-                Source @885)),
+                Machine{OneHotEncoder,…} @000, 
+                Source @219)),
         predict(
-            Machine{KNNRegressor,…} @526, 
+            Machine{KNNRegressor,…} @740, 
             transform(
-                Machine{OneHotEncoder,…} @930, 
-                Source @885)))</pre><p>Now we export to obtain a <code>Deterministic</code> composite model and then instantiate composite model</p><pre><code class="language-julia">learning_mach = machine(Deterministic(), X, y; predict=yhat)
+                Machine{OneHotEncoder,…} @000, 
+                Source @219)))</pre><p>Now we export to obtain a <code>Deterministic</code> composite model and then instantiate composite model</p><pre><code class="language-julia">learning_mach = machine(Deterministic(), X, y; predict=yhat)
 Machine{DeterministicSurrogate} @772 trained 0 times.
   args:
     1:	Source @415 ⏎ `Unknown`
@@ -261,4 +261,4 @@ compare[101:108]
  (2, &quot;virginica&quot;)
  (2, &quot;virginica&quot;)
  (3, &quot;virginica&quot;)
- (2, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../preparing_data/">« Preparing Data</a><a class="docs-footer-nextpage" href="../more_on_probabilistic_predictors/">More on Probablistic Predictors »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 7 September 2021 04:49">Tuesday 7 September 2021</span>. Using Julia version 1.6.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ (2, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../preparing_data/">« Preparing Data</a><a class="docs-footer-nextpage" href="../more_on_probabilistic_predictors/">More on Probablistic Predictors »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 7 September 2021 20:12">Tuesday 7 September 2021</span>. Using Julia version 1.6.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
