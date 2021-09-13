@@ -1244,10 +1244,8 @@ to all MLJ users:
 
 2. **Separate interface package**. Implementation code lives in a
    separate *interface package*, which has the algorithm providing
-   package as a dependency. An example is
-   [MLJDecisionTreeInterface.jl](https://github.com/JuliaAI/MLJDecisionTreeInterface.jl),
-   which provides the interface for models in
-   [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl).
+   package as a dependency. See the template repository
+   [MLJExampleInterface.jl](https://github.com/JuliaAI/MLJExampleInterface.jl).
 
 Additionally, one needs to ensure that the implementation code defines
 the `package_name` and `load_path` model traits appropriately, so that
