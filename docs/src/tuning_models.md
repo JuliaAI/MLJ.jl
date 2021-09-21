@@ -1,11 +1,34 @@
 # Tuning Models
 
-Below we illustrate hyperparameter optimisation using the
+MLJ provides several built-in and third-party options for optimizing a
+model's hyper-parameters.  The quick-reference table below omits some
+advanced key-word options.
+
+tuning strategy | notes |package to import | package providing core algorithm
+----------------|-------|------------------|----------------------------------
+[`Grid`](@ref)`(goal=nothing, resolution=10)` | shuffled by default; `goal` is upper bound for number of grid points | MLJ.jl or MLJTuning.jl | [MLJTuning.jl](https://github.com/FluxML/model-zoo)
+[`RandomSearch`](@ref)`(rng=GLOBAL_RNG)` | with customizable priors |MLJ.jl or MLJTuning.jl   | [MLJTuning.jl](https://github.com/FluxML/model-zoo)
+[`LatinHypercube`](@ref)`(rng=GLOBAL_RNG)` | with discrete parameter support | MLJ.jl or MLJTuning.jl | [LatinHypercubeSampling](https://github.com/MrUrq/LatinHypercubeSampling.jl)
+[`MLJTreeParzenTuning`](@ref)`()` | See this [example](https://github.com/IQVIA-ML/TreeParzen.jl/blob/master/docs/examples/simple_mlj_demo/simple_mlj_demo.md) for usage | TreeParzen.jl | [TreeParzen.jl](https://github.com/IQVIA-ML/TreeParzen.jl) (port to Julia of [hyperopt](http://hyperopt.github.io/hyperopt/))
+[`ParticleSwarm`](@ref)`(n_particles=3, rng=GLOBAL_RNG)` | Standard Kennedy-Eberhart algorithm, plus discrete parameter support | MLJParticleSwarmOptimization.jl | [MLJParticleSwarmOptimization.jl](https://github.com/JuliaAI/MLJParticleSwarmOptimization.jl/)
+[`AdaptiveParticleSwarm`](@ref)`(n_particles=3, rng=GLOBAL_RNG)` | Zhan et al. variant with automated swarm coefficient updates, plus discrete parameter support | MLJParticleSwarmOptimization.jl | [MLJParticleSwarmOptimization.jl](https://github.com/JuliaAI/MLJParticleSwarmOptimization.jl/)
+
+
+Below we illustrate hyperparameter optimization using the
 [`Grid`](@ref), [`RandomSearch`](@ref) and [`LatinHypercube`](@ref)
-tuning strategies.  Also available is the [tree
-Parzen](https://github.com/IQVIA-ML/TreeParzen.jl) strategy; for a
-complete list, see
-    [here](https://github.com/JuliaAI/MLJTuning.jl#what-is-provided-here).
+tuning strategies. 
+
+## Overview
+
+In MLJ model tuning is implemented as a model wrapper. After wrapping
+a model in a tuning strategy and binding the wrapped model to data in
+a machine called `mach`, calling `fit!(mach)` instigates a search for
+optimal model hyperparameters, within a specified `range`, and then
+uses all supplied data to train the best model. To predict using that
+model, one then calls `predict(mach, Xnew)`. In this way the wrapped
+model may be viewed as a "self-tuning" version of the unwrapped
+model. That is, wrapping the model simply transforms certain
+hyper-parameters into *learned* parameters.
 
 MLJ tuning is implemented as an *iterative* procedure, which can
 accordingly be controlled using MLJ's [`IteratedModel`](@ref
@@ -13,14 +36,6 @@ MLJIteration.IteratedModel) wrapper. After familiarizing one self with
 the `TunedModel` wrapper described below, see [Controlling model
 tuning](@ref) for more on this advanced feature.
 
-In MLJ, hyperparameter optimization, also known as model *tuning*, is
-implemented as a model wrapper. After wrapping a model in a tuning
-strategy and binding the wrapped model to data in a machine, `mach`,
-calling `fit!(mach)` instigates a search for optimal model
-hyperparameters, within a specified `range`, and then uses all
-supplied data to train the best model. To predict using the optimal
-model, one just calls `predict(mach, Xnew)`. In this way the wrapped
-model may be viewed as a "self-tuning" version of the unwrapped model.
 
 For in-depth overview of tuning in MLJ, or for implementation details,
 see the [MLJTuning
@@ -46,10 +61,10 @@ one-dimensional range object constructed using the `range` method:
 ```@example goof
 r = range(tree, :min_purity_increase, lower=0.001, upper=1.0, scale=:log);
 self_tuning_tree = TunedModel(model=tree,
-                              resampling=CV(nfolds=3),
-                              tuning=Grid(resolution=10),
-                              range=r,
-                              measure=rms);
+							  resampling=CV(nfolds=3),
+							  tuning=Grid(resolution=10),
+							  range=r,
+							  measure=rms);
 ```
 
 Incidentally, a grid is generated internally "over the range" by calling the
@@ -141,20 +156,19 @@ grid-search once more:
 K_range = range(knn, :K, lower=5, upper=20);
 ```
 
-Since the model is probabilistic, we need either to: (i) use a
+Since the model is probabilistic, we can choose either: (i) a
 probabilistic measure, such as `brier_loss`; or (ii) use a
-deterministic measure, such as `misclassification_rate`, but declare
-`operation=predict_mode` to ensure we are evaluating the measure on *point*
-predictions.
+deterministic measure, such as `misclassification_rate` (which means
+`predict_mean` is called instead of `predict` under the hood).
 
 **Case (i) - probabilistic measure**:
 
 ```@example goof
 self_tuning_knn = TunedModel(model=knn,
-                             resampling = CV(nfolds=4, rng=1234),
-                             tuning = Grid(resolution=5),
-                             range = K_range,
-                             measure=BrierLoss());
+							 resampling = CV(nfolds=4, rng=1234),
+							 tuning = Grid(resolution=5),
+							 range = K_range,
+							 measure=BrierLoss());
 
 mach = machine(self_tuning_knn, X, y);
 fit!(mach, verbosity=0);
@@ -164,11 +178,10 @@ fit!(mach, verbosity=0);
 
 ```@example goof
 self_tuning_knn = TunedModel(model=knn,
-                             resampling = CV(nfolds=4, rng=1234),
-                             tuning = Grid(resolution=5),
-                             range = K_range,
-                             measure=MisclassificationRate(),
-                             operation=predict_mode);
+							 resampling = CV(nfolds=4, rng=1234),
+							 tuning = Grid(resolution=5),
+							 range = K_range,
+							 measure=MisclassificationRate())
 
 mach = machine(self_tuning_knn, X, y);
 fit!(mach, verbosity=0);
@@ -213,20 +226,14 @@ MLJ.orientation(::typeof(custom_accuracy)) = :score
 For full details on constructing custom measures, see [Traits and custom
 measures](@ref).
 
-Our score is deterministic; since all measures are deterministic by
-default, no further actioin is required. However, as in (ii) above, we
-must declare `operation=predict_mode` to force our probabilistic model
-to deliver point predictions. We'll add a second score,
-`MulticlassFScore`, to evaluate (which is ignored in determining the
-optimal model):
 
 ```@example goof
 self_tuning_knn = TunedModel(model=knn,
-                             resampling = CV(nfolds=4),
-                             tuning = Grid(resolution=5),
-                             range = K_range,
-                             measure = [custom_accuracy, MulticlassFScore()],
-                             operation = predict_mode);
+							 resampling = CV(nfolds=4),
+							 tuning = Grid(resolution=5),
+							 range = K_range,
+							 measure = [custom_accuracy, MulticlassFScore()],
+							 operation = predict_mode);
 
 mach = machine(self_tuning_knn, X, y)
 fit!(mach, verbosity=0)
@@ -255,10 +262,10 @@ points:
 r1 = range(forest, :(atom.n_subfeatures), lower=1, upper=9);
 r2 = range(forest, :bagging_fraction, lower=0.4, upper=1.0);
 self_tuning_forest = TunedModel(model=forest,
-                                      tuning=Grid(goal=30),
-                                      resampling=CV(nfolds=6),
-                                      range=[r1, r2],
-                                      measure=rms);
+									  tuning=Grid(goal=30),
+									  resampling=CV(nfolds=6),
+									  range=[r1, r2],
+									  measure=rms);
 
 X = MLJ.table(rand(100, 10));
 y = 2X.x1 - X.x2 + 0.05*rand(100);
@@ -287,11 +294,11 @@ be limited to 25.
 ```@example goof
 tuning = Grid(resolution=100, shuffle=true, rng=1234)
 self_tuning_forest = TunedModel(model=forest,
-                                      tuning=tuning,
-                                      resampling=CV(nfolds=6),
-                                      range=[(r1, 3), r2],
-                                      measure=rms,
-                                      n=25);
+									  tuning=tuning,
+									  resampling=CV(nfolds=6),
+									  range=[(r1, 3), r2],
+									  measure=rms,
+									  n=25);
 fit!(machine(self_tuning_forest, X, y), verbosity=0);
 ```
 
@@ -317,9 +324,9 @@ This model is equivalent to best in `models` by using 3-fold cross-validation:
 
 ```@example goof
 blended = TunedModel(models=[tree, knn],
-                     resampling=CV(nfolds=3),
-                     measure=log_loss,
-                     check_measure=false)
+					 resampling=CV(nfolds=3),
+					 measure=log_loss,
+					 check_measure=false)
 nothing # hide
 ```
 
@@ -330,9 +337,9 @@ gets evaluated 2 x 3 times):
 X, y = make_blobs()
 
 e = evaluate(blended, X, y,
-             resampling=CV(nfolds=2),
-             measure=log_loss,
-             verbosity=6)
+			 resampling=CV(nfolds=2),
+			 measure=log_loss,
+			 verbosity=6)
 ```
 
 Now, for example, we can get the best model for the first fold out of the two folds:
@@ -365,11 +372,11 @@ distribution.
 
 ```@example goof
 self_tuning_forest = TunedModel(model=forest,
-                                      tuning=RandomSearch(),
-                                      resampling=CV(nfolds=6),
-                                      range=[r1, r2],
-                                      measure=rms,
-                                      n=25);
+									  tuning=RandomSearch(),
+									  resampling=CV(nfolds=6),
+									  range=[r1, r2],
+									  measure=rms,
+									  n=25);
 X = MLJ.table(rand(100, 10));
 y = 2X.x1 - X.x2 + 0.05*rand(100);
 mach = machine(self_tuning_forest, X, y);
@@ -417,11 +424,11 @@ For this illustration we'll add a third, nominal,  hyper-parameter:
 ```@example goof
 r3 = range(forest, :(atom.post_prune), values=[true, false]);
 self_tuning_forest = TunedModel(model=forest,
-                                      tuning=latin,
-                                      resampling=CV(nfolds=6),
-                                      range=[r1, r2, r3],
-                                      measure=rms,
-                                      n=25);
+									  tuning=latin,
+									  resampling=CV(nfolds=6),
+									  range=[r1, r2, r3],
+									  measure=rms,
+									  n=25);
 mach = machine(self_tuning_forest, X, y);
 fit!(mach, verbosity=0)
 ```
