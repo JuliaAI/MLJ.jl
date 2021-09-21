@@ -125,15 +125,17 @@ julia> evaluate!(mach,
                  resampling=CV(nfolds=5, rng=123),
                  acceleration=CPUThreads(),
                  verbosity=2)
-┌────────────────────┬───────────────┬───────────────────────────────────────────────┐
-│ _.measure          │ _.measurement │ _.per_fold                                    │
-├────────────────────┼───────────────┼───────────────────────────────────────────────┤
-│ LPLoss{Int64} @410 │ 16900.0       │ [17000.0, 16200.0, 16200.0, 16400.0, 18600.0] │
-│ LPLoss{Int64} @632 │ 6.57e8        │ [6.38e8, 6.19e8, 5.92e8, 5.67e8, 8.7e8]       │
-└────────────────────┴───────────────┴───────────────────────────────────────────────┘
-_.per_observation = [[[20300.0, 21800.0, ..., 7910.0], [4300.0, 31900.0, ..., 12600.0], [22000.0, 91600.0, ..., 35500.0], [2980.0, 35700.0, ..., 6240.0], [9140.0, 30000.0, ..., 3050.0]], [[4.13e8, 4.74e8, ..., 6.26e7], [1.85e7, 1.02e9, ..., 1.59e8], [4.83e8, 8.38e9, ..., 1.26e9], [8.86e6, 1.28e9, ..., 3.89e7], [8.35e7, 9.01e8, ..., 9.31e6]]]
-_.fitted_params_per_fold = [ … ]
-_.report_per_fold = [ … ]
+PerformanceEvaluation object with these fields:
+  measure, measurement, operation, per_fold,
+  per_observation, fitted_params_per_fold,
+  report_per_fold, train_test_pairs
+Extract:
+┌────────────────────┬─────────────┬───────────┬───────────────────────────────────────────────┐
+│ measure            │ measurement │ operation │ per_fold                                      │
+├────────────────────┼─────────────┼───────────┼───────────────────────────────────────────────┤
+│ LPLoss(p = 1) @638 │ 16800.0     │ predict   │ [16500.0, 16300.0, 16300.0, 16600.0, 18600.0] │
+│ LPLoss(p = 2) @308 │ 6.65e8      │ predict   │ [6.14e8, 6.3e8, 5.98e8, 6.17e8, 8.68e8]       │
+└────────────────────┴─────────────┴───────────┴───────────────────────────────────────────────┘
 ```
 
 Try out MLJ yourself in the following batteries-included Binder
@@ -156,11 +158,11 @@ installation required.
 ## Key features
 
 * Data agnostic, train models on any data supported by the
-  [Tables.jl](https://github.com/JuliaData/Tables.jl) interface,
+  [Tables.jl](https://github.com/JuliaData/Tables.jl) interface.
 
 * Extensive, state-of-the art, support for model composition
-  (*pipelines* and *learning networks*) (see more
-  [below](#model-composability)),
+  (*pipelines*, *stacks* and, more generally, *learning networks*). See more
+  [below](#model-composability).
 
 * Convenient syntax to tune and evaluate (composite) models.
 
@@ -170,6 +172,9 @@ installation required.
   interface](https://github.com/JuliaAI/MLJTuning.jl),
   to support growing number of optimization strategies, and designed
   to play well with model composition.
+
+* Options to accelerate model evaluation and tuning with
+  multithreading and/or distributed processing.
 
 
 ## Model composability

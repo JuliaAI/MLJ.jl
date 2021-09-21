@@ -55,7 +55,7 @@ to `:target` into something called `y`, and all the remaining columns
 into `X` (the second filter `colname -> true` always holds).
 
 To list *all* models available in MLJ's [model
-registry](model_search.md) do `models()`. Listing the models
+registry](@ref model_search) do `models()`. Listing the models
 compatible with the present data:
 
 ```@repl doda
@@ -109,7 +109,7 @@ Under the hood, `evaluate` calls lower level functions `predict` or
 `predict_mode` according to the type of measure, as shown in the
 output. We shall call these operations directly below.
 
-For more an performance evalutation, see [Evaluating Model
+For more on performance evalutation, see [Evaluating Model
 Performance](evaluating_model_performance.md) for details.
 
 
@@ -440,7 +440,8 @@ are the key features of that convention:
 
 Use `coerce(v, OrderedFactor)` or `coerce(v, Multiclass)` to coerce a
 vector `v` of integers, strings or characters to a vector with an
-appropriate `Finite` (categorical) scitype.  See [Working with Categorical Data](@ref)).
+appropriate `Finite` (categorical) scitype.  See [Working with
+Categorical Data](@ref).
 
 For more on scitype coercion of arrays and tables, see [`coerce`](@ref),
 [`autotype`](@ref) and [`unpack`](@ref) below and the examples at
