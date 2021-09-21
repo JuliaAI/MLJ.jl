@@ -55,7 +55,7 @@ to `:target` into something called `y`, and all the remaining columns
 into `X` (the second filter `colname -> true` always holds).
 
 To list *all* models available in MLJ's [model
-registry](model_search.md) do `models()`. Listing the models
+registry](@ref model_search) do `models()`. Listing the models
 compatible with the present data:
 
 ```@repl doda

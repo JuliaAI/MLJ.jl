@@ -9,14 +9,14 @@ tuning strategy | notes |package to import | package providing core algorithm
 [`Grid`](@ref)`(goal=nothing, resolution=10)` | shuffled by default; `goal` is upper bound for number of grid points | MLJ.jl or MLJTuning.jl | [MLJTuning.jl](https://github.com/FluxML/model-zoo)
 [`RandomSearch`](@ref)`(rng=GLOBAL_RNG)` | with customizable priors |MLJ.jl or MLJTuning.jl   | [MLJTuning.jl](https://github.com/FluxML/model-zoo)
 [`LatinHypercube`](@ref)`(rng=GLOBAL_RNG)` | with discrete parameter support | MLJ.jl or MLJTuning.jl | [LatinHypercubeSampling](https://github.com/MrUrq/LatinHypercubeSampling.jl)
-[`MLJTreeParzenTuning`](@ref)`()` | See this [example](https://github.com/IQVIA-ML/TreeParzen.jl/blob/master/docs/examples/simple_mlj_demo/simple_mlj_demo.md) for usage | TreeParzen.jl | [TreeParzen.jl](https://github.com/IQVIA-ML/TreeParzen.jl) (port to Julia of [hyperopt](http://hyperopt.github.io/hyperopt/))
-[`ParticleSwarm`](@ref)`(n_particles=3, rng=GLOBAL_RNG)` | Standard Kennedy-Eberhart algorithm, plus discrete parameter support | MLJParticleSwarmOptimization.jl | [MLJParticleSwarmOptimization.jl](https://github.com/JuliaAI/MLJParticleSwarmOptimization.jl/)
-[`AdaptiveParticleSwarm`](@ref)`(n_particles=3, rng=GLOBAL_RNG)` | Zhan et al. variant with automated swarm coefficient updates, plus discrete parameter support | MLJParticleSwarmOptimization.jl | [MLJParticleSwarmOptimization.jl](https://github.com/JuliaAI/MLJParticleSwarmOptimization.jl/)
-
+`MLJTreeParzenTuning()` | See this [example](https://github.com/IQVIA-ML/TreeParzen.jl/blob/master/docs/examples/simple_mlj_demo/simple_mlj_demo.md) for usage | TreeParzen.jl | [TreeParzen.jl](https://github.com/IQVIA-ML/TreeParzen.jl) (port to Julia of [hyperopt](http://hyperopt.github.io/hyperopt/))
+`ParticleSwarm(n_particles=3, rng=GLOBAL_RNG)` | Standard Kennedy-Eberhart algorithm, plus discrete parameter support | MLJParticleSwarmOptimization.jl | [MLJParticleSwarmOptimization.jl](https://github.com/JuliaAI/MLJParticleSwarmOptimization.jl/)
+`AdaptiveParticleSwarm(n_particles=3, rng=GLOBAL_RNG)` | Zhan et al. variant with automated swarm coefficient updates, plus discrete parameter support | MLJParticleSwarmOptimization.jl | [MLJParticleSwarmOptimization.jl](https://github.com/JuliaAI/MLJParticleSwarmOptimization.jl/)
+`Explicit()` | For an [explicit list](@ref explicit) of models of varying type | MLJ.jl or MLJTuning.jl | [MLJTuning.jl](https://github.com/FluxML/model-zoo)
 
 Below we illustrate hyperparameter optimization using the
-[`Grid`](@ref), [`RandomSearch`](@ref) and [`LatinHypercube`](@ref)
-tuning strategies. 
+[`Grid`](@ref), [`RandomSearch`](@ref), [`LatinHypercube`](@ref) and
+`Explicit` tuning strategies.
 
 ## Overview
 
@@ -30,17 +30,24 @@ model may be viewed as a "self-tuning" version of the unwrapped
 model. That is, wrapping the model simply transforms certain
 hyper-parameters into *learned* parameters.
 
-MLJ tuning is implemented as an *iterative* procedure, which can
-accordingly be controlled using MLJ's [`IteratedModel`](@ref
-MLJIteration.IteratedModel) wrapper. After familiarizing one self with
-the `TunedModel` wrapper described below, see [Controlling model
-tuning](@ref) for more on this advanced feature.
+A corollary of the tuning-as-wrapper approach is that evaluating the
+performance of a `TunedModel` instance, using [`evaluate!`](@ref)
+implies nested resampling. This approach is inspired by
+[MLR](https://mlr.mlr-org.com/articles/tutorial/nested_resampling.html). See
+also [below](@ref explicit).
 
+In MLJ, tuning is an *iterative* procedure, with an iteration parameter
+`n`, the total number of model instances to be evaluated.
+Accordingly, tuning can be controlled using MLJ's
+[`IteratedModel`](@ref MLJIteration.IteratedModel) wrapper. After
+familiarizing oneself with the `TunedModel` wrapper described below,
+see [Controlling model tuning](@ref) for more on this advanced
+feature.
 
-For in-depth overview of tuning in MLJ, or for implementation details,
-see the [MLJTuning
-documentation](https://github.com/JuliaAI/MLJTuning.jl). For
-a complete list of options see the [`TunedModel`](@ref) doc-string
+For a more in-depth overview of tuning in MLJ, or for implementation
+details, see the [MLJTuning
+documentation](https://github.com/JuliaAI/MLJTuning.jl). For a
+complete list of options see the [`TunedModel`](@ref) doc-string
 below.
 
 
@@ -304,63 +311,6 @@ fit!(machine(self_tuning_forest, X, y), verbosity=0);
 
 For more options for a grid search, see [`Grid`](@ref) below.
 
-## Tuning multiple models
-
-We can also compare multiple models via the tuning strategy. This
-can, for example, be used to run _nested cross-validation_. In summary,
-normal (k-fold) cross-validation would check one or more models and
-split the data into `k` folds. Nested cross-validation, first, splits
-the data in multiple train and test sets and, then, runs
-cross-validation for each model in order to reduce bias. To do this in
-MLJ, we use a `TunedModel`:
-
-```@example goof
-tree = (@load DecisionTreeClassifier pkg=DecisionTree verbosity=0)()
-knn = (@load KNNClassifier pkg=NearestNeighborModels verbosity=0)()
-nothing # hide
-```
-
-This model is equivalent to best in `models` by using 3-fold cross-validation:
-
-```@example goof
-blended = TunedModel(models=[tree, knn],
-					 resampling=CV(nfolds=3),
-					 measure=log_loss,
-					 check_measure=false)
-nothing # hide
-```
-
-Evaluating `blended` implies nested cross-validation (each model
-gets evaluated 2 x 3 times):
-
-```@example goof
-X, y = make_blobs()
-
-e = evaluate(blended, X, y,
-			 resampling=CV(nfolds=2),
-			 measure=log_loss,
-			 verbosity=6)
-```
-
-Now, for example, we can get the best model for the first fold out of the two folds:
-
-```@example goof
-e.report_per_fold[1].best_model
-```
-
-And the losses in the outer loop (these still have to be matched to the best performing model):
-
-```@example goof
-e.per_fold
-```
-
-It is also possible to get the results for the nested evaluations.
-For example, for the first fold of the outer loop and the second model:
-
-```@example goof
-e.report_per_fold[2].history[1]
-```
-
 ## Tuning using a random search
 
 Let's attempt to tune the same hyperparameters using a `RandomSearch`
@@ -438,6 +388,66 @@ using Plots
 plot(mach)
 ```
 ![](img/latin_hypercube_tuning_plot.png)
+
+
+## [Comparing models of different type and nested cross-validation](@id explicit)
+
+Instead of mutating hyperparameters of a fixed model, one can instead
+optimise over an explicit list of models, whose types are allowed to
+vary. As with other tuning strategies, evaluating the resulting
+`TunedModel` itself implies nested resampling (e.g., nested
+cross-validation) which we now examine in a bit more detail.
+
+```@example goof
+tree = (@load DecisionTreeClassifier pkg=DecisionTree verbosity=0)()
+knn = (@load KNNClassifier pkg=NearestNeighborModels verbosity=0)()
+models = [tree, knn]
+nothing # hide
+```
+
+The following model is equivalent to best in `models` by using 3-fold
+cross-validation:
+
+```@example goof
+multi_model = TunedModel(models=model,
+						 resampling=CV(nfolds=3),
+						 measure=log_loss,
+						 check_measure=false)
+nothing # hide
+```
+
+Evaluating `multi_model` implies nested cross-validation (each model
+gets evaluated 2 x 3 times):
+
+```@example goof
+X, y = make_blobs()
+
+e = evaluate(multi_model, X, y,
+			 resampling=CV(nfolds=2),
+			 measure=log_loss,
+			 verbosity=6)
+```
+
+Now, for example, we can get the best model for the first fold out of
+the two folds:
+
+```@example goof
+e.report_per_fold[1].best_model
+```
+
+And the losses in the outer loop (these still have to be matched to
+the best performing model):
+
+```@example goof
+e.per_fold
+```
+
+It is also possible to get the results for the nested evaluations.
+For example, for the first fold of the outer loop and the second model:
+
+```@example goof
+e.report_per_fold[2].history[1]
+```
 
 ## API
 
