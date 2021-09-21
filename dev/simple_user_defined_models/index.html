@@ -21,13 +21,13 @@ MLJBase.predict(::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew) * fitresu
 
 julia&gt; model = MyRegressor(lambda=1.0)
 MyRegressor(
-    lambda = 1.0) @557
+    lambda = 1.0) @295
 
 julia&gt; regressor = machine(model, X, y)
-Machine{MyRegressor,…} @351 trained 0 times; caches data
+Machine{MyRegressor,…} @326 trained 0 times; caches data
   args:
-    1:	Source @357 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @893 ⏎ `AbstractVector{Continuous}`
+    1:	Source @094 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @264 ⏎ `AbstractVector{Continuous}`
 
 julia&gt; evaluate!(regressor, resampling=CV(), measure=rms, verbosity=0)
 PerformanceEvaluation object with these fields:
@@ -38,7 +38,7 @@ Extract:
 ┌─────────────────────────────┬─────────────┬───────────┬───────────────────────
 │ measure                     │ measurement │ operation │ per_fold             ⋯
 ├─────────────────────────────┼─────────────┼───────────┼───────────────────────
-│ RootMeanSquaredError() @520 │ 5.94        │ predict   │ [2.71, 4.44, 5.06, 3 ⋯
+│ RootMeanSquaredError() @852 │ 5.94        │ predict   │ [2.71, 4.44, 5.06, 3 ⋯
 └─────────────────────────────┴─────────────┴───────────┴───────────────────────
                                                                 1 column omitted</code></pre><h2 id="A-simple-probabilistic-classifier"><a class="docs-heading-anchor" href="#A-simple-probabilistic-classifier">A simple probabilistic classifier</a><a id="A-simple-probabilistic-classifier-1"></a><a class="docs-heading-anchor-permalink" href="#A-simple-probabilistic-classifier" title="Permalink"></a></h2><p>The following probabilistic model simply fits a probability distribution to the <code>MultiClass</code> training target (i.e., ignores <code>X</code>) and returns this pdf for any new pattern:</p><pre><code class="language-julia">import MLJBase
 import Distributions
@@ -62,4 +62,4 @@ julia&gt; mach = fit!(machine(MyClassifier(), X, y))
 julia&gt; predict(mach, selectrows(X, 1:2))
 2-element Array{UnivariateFinite{String,UInt32,Float64},1}:
  UnivariateFinite(setosa=&gt;0.333, versicolor=&gt;0.333, virginica=&gt;0.333)
- UnivariateFinite(setosa=&gt;0.333, versicolor=&gt;0.333, virginica=&gt;0.333)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../acceleration_and_parallelism/">« Acceleration and Parallelism</a><a class="docs-footer-nextpage" href="../quick_start_guide_to_adding_models/">Quick-Start Guide to Adding Models »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 21 September 2021 21:37">Tuesday 21 September 2021</span>. Using Julia version 1.6.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ UnivariateFinite(setosa=&gt;0.333, versicolor=&gt;0.333, virginica=&gt;0.333)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../acceleration_and_parallelism/">« Acceleration and Parallelism</a><a class="docs-footer-nextpage" href="../quick_start_guide_to_adding_models/">Quick-Start Guide to Adding Models »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 21 September 2021 23:29">Tuesday 21 September 2021</span>. Using Julia version 1.6.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
