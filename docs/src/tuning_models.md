@@ -409,15 +409,17 @@ The following model is equivalent to best in `models` by using 3-fold
 cross-validation:
 
 ```@example goof
-multi_model = TunedModel(models=model,
+multi_model = TunedModel(models=models,
 						 resampling=CV(nfolds=3),
 						 measure=log_loss,
 						 check_measure=false)
 nothing # hide
 ```
 
-Evaluating `multi_model` implies nested cross-validation (each model
-gets evaluated 2 x 3 times):
+Note that there is no need to specify a `tuning` strategy or `range`
+but we do specify `models` (plural) instead of `model`. Evaluating
+`multi_model` implies nested cross-validation (each model gets
+evaluated 2 x 3 times):
 
 ```@example goof
 X, y = make_blobs()
