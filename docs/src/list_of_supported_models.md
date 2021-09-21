@@ -18,6 +18,7 @@ models()`.
 
 | Package | Models | Maturity | Note
 | ------- | ------ | -------- | ----
+[BetaML.jl](https://github.com/sylvaticus/BetaML.jl) | DecisionTreeClassifier, DecisionTreeRegressor, KernelPerceptronClassifier, PegasosClassifier, PerceptronClassifier, RandomForestClassifier | medium |
 [Clustering.jl](https://github.com/JuliaStats/Clustering.jl) | KMeans, KMedoids | high | †
 [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl) | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier, RandomForestClassifier, RandomForestRegressor | high | 
 [EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl) | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian | medium | gradient boosting models
@@ -33,8 +34,8 @@ models()`.
 [ParallelKMeans.jl](https://github.com/PyDataBlog/ParallelKMeans.jl) | KMeans | experimental |
 [PartialLeastSquaresRegressor.jl](https://github.com/lalvim/PartialLeastSquaresRegressor.jl) | PLSRegressor, KPLSRegressor | experimental |
 [ScikitLearn.jl](https://github.com/cstjean/ScikitLearn.jl) | ARDRegressor, AdaBoostClassifier, AdaBoostRegressor, AffinityPropagation, AgglomerativeClustering, BaggingClassifier, BaggingRegressor, BayesianLDA, BayesianQDA, BayesianRidgeRegressor, BernoulliNBClassifier, Birch, ComplementNBClassifier, DBSCAN, DummyClassifier, DummyRegressor, ElasticNetCVRegressor, ElasticNetRegressor, ExtraTreesClassifier, ExtraTreesRegressor, FeatureAgglomeration, GaussianNBClassifier, GaussianProcessClassifier, GaussianProcessRegressor, GradientBoostingClassifier, GradientBoostingRegressor, HuberRegressor, KMeans, KNeighborsClassifier, KNeighborsRegressor, LarsCVRegressor, LarsRegressor, LassoCVRegressor, LassoLarsCVRegressor, LassoLarsICRegressor, LassoLarsRegressor, LassoRegressor, LinearRegressor, LogisticCVClassifier, LogisticClassifier, MeanShift, MiniBatchKMeans, MultiTaskElasticNetCVRegressor, MultiTaskElasticNetRegressor, MultiTaskLassoCVRegressor, MultiTaskLassoRegressor, MultinomialNBClassifier, OPTICS, OrthogonalMatchingPursuitCVRegressor, OrthogonalMatchingPursuitRegressor, PassiveAggressiveClassifier, PassiveAggressiveRegressor, PerceptronClassifier, ProbabilisticSGDClassifier, RANSACRegressor, RandomForestClassifier, RandomForestRegressor, RidgeCVClassifier, RidgeCVRegressor, RidgeClassifier, RidgeRegressor, SGDClassifier, SGDRegressor, SVMClassifier, SVMLClassifier, SVMLRegressor, SVMNuClassifier, SVMNuRegressor, SVMRegressor, SpectralClustering, TheilSenRegressor | high | †
+[TSVD.jl](https://github.com/JuliaLinearAlgebra/TSVD.jl) | TSVDTransformer | high | 
 [XGBoost.jl](https://github.com/dmlc/XGBoost.jl) | XGBoostRegressor, XGBoostClassifier, XGBoostCount | high |
-[BetaML.jl](https://github.com/sylvaticus/BetaML.jl) | DecisionTreeClassifier, DecisionTreeRegressor, KernelPerceptronClassifier, PegasosClassifier, PerceptronClassifier, RandomForestClassifier | medium |
 
 **Note** (†): Some models are missing and assistance is welcome to
 complete the interface. Post a message on the Julia #mlj Slack channel
