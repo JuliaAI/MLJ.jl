@@ -425,7 +425,7 @@ are the key features of that convention:
 - Any `Integer` is interpreted as `Count`.
 
 - Any `CategoricalValue` `x`, is interpreted as `Multiclass` or
-  `OrderedFactor`, depending on the value of `x.pool.ordered`.
+  `OrderedFactor`, depending on the value of `isordered(x)`.
 
 - `String`s and `Char`s are *not* interpreted as `Multiclass` or
   `OrderedFactor` (they have scitypes `Textual` and `Unknown`
