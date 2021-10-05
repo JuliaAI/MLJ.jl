@@ -10,23 +10,8 @@ post an issue requesting this
 
 ## Packages providing models in the MLJ model registry
 
-- [ScikitLearn.jl](https://github.com/cstjean/ScikitLearn.jl)
-- [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl)
-- [MultivariateStats.jl](https://github.com/JuliaStats/MultivariateStats.jl)
-- [MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl)
-- [MLJLinearModels.jl](https://github.com/JuliaAI/MLJLinearModels.jl)
-- [LIBSVM.jl](https://github.com/mpastell/LIBSVM.jl)
-- [EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl)
-- [NaiveBayes.jl](https://github.com/dfdx/NaiveBayes.jl)
-- [MLJFlux.jl](https://github.com/JuliaAI/MLJFlux.jl) (depending on [Flux.jl](https://github.com/FluxML/Flux.jl))
-- [Clustering.jl](https://github.com/JuliaStats/Clustering.jl)
-- [ParallelKMeans.jl](https://github.com/PyDataBlog/ParallelKMeans.jl)
-- [NearestNeighborModels.jl](https://github.com/JuliaAI/NearestNeighborModels.jl) (depending on [NearestNeighbors.jl](https://github.com/KristofferC/NearestNeighbors.jl))
-- [PartialLeastSquaresRegressor.jl](https://github.com/lalvim/PartialLeastSquaresRegressor.jl)
-- [LightGBM.jl](https://github.com/IQVIA-ML/LightGBM.jl)
-- [GLM.jl](https://github.com/JuliaStats/GLM.jl)
-- [XGBoost.jl](https://github.com/dmlc/XGBoost.jl)
-- [BetaML.jl](https://github.com/sylvaticus/BetaML.jl)
+See [List of Supported Models](@ref)
+
 
 ## Providing unregistered models:
 
@@ -40,3 +25,6 @@ post an issue requesting this
 - [Shapley.jl](https://gitlab.com/ExpandingMan/Shapley.jl) (feature ranking / interpretation)
 - [ShapML.jl](https://github.com/nredell/ShapML.jl) (feature ranking / interpretation)
 - [Fairness.jl](https://github.com/ashryaagr/Fairness.jl) (FAIRness metrics)
+- [OutlierDetection.jl](https://github.com/OutlierDetectionJL/OutlierDetection.jl/blob/master/src/mlj_wrappers.jl) (provides the `ProbabilisticDetector` wrapper and other outlier detection meta-functionality)
+
+
