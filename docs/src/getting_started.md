@@ -42,7 +42,7 @@ iris = DataFrames.DataFrame(iris);
 nothing # hide
 ```
 
-Next, let's split the data "vertically" into input and target parts,
+Next, let's split the data "horizotally" into input and target parts,
 and specify an RNG seed, to force observations to be shuffled:
 
 ```@repl doda
