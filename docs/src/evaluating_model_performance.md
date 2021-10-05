@@ -100,7 +100,7 @@ MLJBase.StratifiedCV
 ```
 
 ```@docs
-MLJBase.CVTimeSeries
+MLJBase.TimeSeriesCV
 ```
 
 ## Custom resampling strategies
