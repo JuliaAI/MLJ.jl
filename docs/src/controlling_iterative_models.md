@@ -108,9 +108,13 @@ control                                                        | description    
 [`Error`](@ref IterationControl.Error)`(predicate; f="")`      | Log to `Error` the value of `f` or `f(mach)`, if `predicate(mach)` holds and then stop  | yes
 [`Callback`](@ref IterationControl.Callback)`(f=mach->nothing)`| Call `f(mach)`                                                                          | yes
 [`WithNumberDo`](@ref IterationControl.WithNumberDo)`(f=n->@info(n))`                       | Call `f(n + 1)` where `n` is the number of complete control cycles so far | yes
-[`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=i->@info("num iterations: $i"))`| Call `f(i)`, where `i` is total number of iterations                      | yes
-[`WithLossDo`](@ref IterationControl.WithLossDo)`(f=x->@info("loss: $x"))`                  | Call `f(loss)` where `loss` is the current loss                           | yes
-[`WithTrainingLossesDo`](@ref IterationControl.WithTrainingLossesDo)`(f=v->@info(v))`       | Call `f(v)` where `v` is the current batch of training losses             | yes
+[`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=i->@info("iterations: $i"))`| Call `f(i)`, where `i` is total number of iterations           | yes
+[`WithLossDo`](@ref IterationControl.WithLossDo)`(f=x->@info("loss: $x"))`                  | Call `f(loss)` where `loss` is the current loss            | yes
+[`WithTrainingLossesDo`](@ref IterationControl.WithTrainingLossesDo)`(f=v->@info(v))`       | Call `f(v)` where `v` is the current batch of training losses | yes
+[`WithEvaluationDo`](@ref IterationControl.WithEvaluationDo)`(f->e->@info("evaluation: $e))`| Call `f(e)` where `e` is the current performance evaluation object | yes
+[`WithFittedParamsDo`](@ref IterationControl.WithFittedParamsDo)`(f->fp->@info("fitted_params: $fp))`| Call `f(fp)` where `fp` is fitted parameters of training machine | yes
+[`WithReportDo`](@ref IterationControl.WithReportDo)`(f->e->@info("report: $e))`| Call `f(r)` wher `r` is the training machine report                    | yes
+[`WithMachineDo`](@ref IterationControl.WithMachineDo)`(f->m->@info("report: $m))`| Call `f(m)` wher `m` is the training machine in its current state    | yes
 [`Save`](@ref MLJSerialization.Save)`(filename="machine.jlso")`| ⋆ Save current machine to `machine1.jlso`, `machine2.jslo`, etc                         | yes
 
 > Table 1. Atomic controls. Some advanced options omitted.
