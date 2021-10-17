@@ -90,7 +90,7 @@ In the table below, `mach` is the *training machine* being iterated,
 constructed by binding the supplied data to the `model` specified in
 the `IteratedModel` wrapper, but trained in each iteration on a subset
 of the data, according to the value of the `resampling`
-hyper-parameter of the wrapper.
+hyper-parameter of the wrapper (using all data if `resampling=nothing`).
 
 control                                                        | description                                                                             | can trigger a stop
 ---------------------------------------------------------------|-----------------------------------------------------------------------------------------|--------------------
@@ -111,12 +111,12 @@ control                                                        | description    
 [`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=i->@info("iterations: $i"))`| Call `f(i)`, where `i` is total number of iterations           | yes
 [`WithLossDo`](@ref IterationControl.WithLossDo)`(f=x->@info("loss: $x"))`                  | Call `f(loss)` where `loss` is the current loss            | yes
 [`WithTrainingLossesDo`](@ref IterationControl.WithTrainingLossesDo)`(f=v->@info(v))`       | Call `f(v)` where `v` is the current batch of training losses | yes
-[`WithEvaluationDo`](@ref IterationControl.WithEvaluationDo)`(f->e->@info("evaluation: $e))`| Call `f(e)` where `e` is the current performance evaluation object | yes
-[`WithFittedParamsDo`](@ref IterationControl.WithFittedParamsDo)`(f->fp->@info("fitted_params: $fp))`| Call `f(fp)` where `fp` is fitted parameters of training machine | yes
-[`WithReportDo`](@ref IterationControl.WithReportDo)`(f->e->@info("report: $e))`| Call `f(r)` wher `r` is the training machine report                    | yes
-[`WithModelDo`](@ref IterationControl.WithModelDo)`(f->m->@info("model: $m))`| Call `f(m)` where `m` is the model, which may be mutated by `f`             | yes
-[`WithMachineDo`](@ref IterationControl.WithMachineDo)`(f->mach->@info("report: $mach))`| Call `f(mach)` wher `mach` is the training machine in its current state    | yes
-[`Save`](@ref MLJSerialization.Save)`(filename="machine.jlso")`| ⋆ Save current machine to `machine1.jlso`, `machine2.jslo`, etc                         | yes
+[`WithEvaluationDo`](@ref MLJIteration.WithEvaluationDo)`(f->e->@info("evaluation: $e))`| Call `f(e)` where `e` is the current performance evaluation object | yes
+[`WithFittedParamsDo`](@ref MLJIteration.WithFittedParamsDo)`(f->fp->@info("fitted_params: $fp))`| Call `f(fp)` where `fp` is fitted parameters of training machine | yes
+[`WithReportDo`](@ref MLJIteration.WithReportDo)`(f->e->@info("report: $e))`| Call `f(r)` where `r` is the training machine report                    | yes
+[`WithModelDo`](@ref MLJIteration.WithModelDo)`(f->m->@info("model: $m))`| Call `f(m)` where `m` is the model, which may be mutated by `f`             | yes
+[`WithMachineDo`](@ref MLJIteration.WithMachineDo)`(f->mach->@info("report: $mach))`| Call `f(mach)` wher `mach` is the training machine in its current state    | yes
+[`Save`](@ref MLJSerialization.Save)`(filename="machine.jlso")`| ⋆ Save current training machine to `machine1.jlso`, `machine2.jslo`, etc                         | yes
 
 > Table 1. Atomic controls. Some advanced options omitted.
 
@@ -433,10 +433,11 @@ IterationControl.WithNumberDo
 MLJIteration.WithIterationsDo
 IterationControl.WithLossDo
 IterationControl.WithTrainingLossesDo
-IterationControl.WithFittedParamsDo
-IterationControl.WithReportDo
-IterationControl.WithModelDo
-IterationControl.WithMachineDo
+MLJIteration.WithEvaluationDo
+MLJIteration.WithFittedParamsDo
+MLJIteration.WithReportDo
+MLJIteration.WithModelDo
+MLJIteration.WithMachineDo
 MLJSerialization.Save
 ```
 
