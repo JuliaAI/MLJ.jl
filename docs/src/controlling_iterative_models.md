@@ -114,7 +114,8 @@ control                                                        | description    
 [`WithEvaluationDo`](@ref IterationControl.WithEvaluationDo)`(f->e->@info("evaluation: $e))`| Call `f(e)` where `e` is the current performance evaluation object | yes
 [`WithFittedParamsDo`](@ref IterationControl.WithFittedParamsDo)`(f->fp->@info("fitted_params: $fp))`| Call `f(fp)` where `fp` is fitted parameters of training machine | yes
 [`WithReportDo`](@ref IterationControl.WithReportDo)`(f->e->@info("report: $e))`| Call `f(r)` wher `r` is the training machine report                    | yes
-[`WithMachineDo`](@ref IterationControl.WithMachineDo)`(f->m->@info("report: $m))`| Call `f(m)` wher `m` is the training machine in its current state    | yes
+[`WithModelDo`](@ref IterationControl.WithModelDo)`(f->m->@info("model: $m))`| Call `f(m)` where `m` is the model, which may be mutated by `f`             | yes
+[`WithMachineDo`](@ref IterationControl.WithMachineDo)`(f->mach->@info("report: $mach))`| Call `f(mach)` wher `mach` is the training machine in its current state    | yes
 [`Save`](@ref MLJSerialization.Save)`(filename="machine.jlso")`| ⋆ Save current machine to `machine1.jlso`, `machine2.jslo`, etc                         | yes
 
 > Table 1. Atomic controls. Some advanced options omitted.
@@ -432,6 +433,10 @@ IterationControl.WithNumberDo
 MLJIteration.WithIterationsDo
 IterationControl.WithLossDo
 IterationControl.WithTrainingLossesDo
+IterationControl.WithFittedParamsDo
+IterationControl.WithReportDo
+IterationControl.WithModelDo
+IterationControl.WithMachineDo
 MLJSerialization.Save
 ```
 
