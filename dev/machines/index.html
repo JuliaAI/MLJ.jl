@@ -5,8 +5,8 @@ X, y = @load_iris;
 mach = machine(forest, X, y)
 fit!(mach, verbosity=2);</code></pre><pre class="documenter-example-output">Machine{ProbabilisticEnsembleModel{DecisionTreeClassifier},…} trained 1 time; caches data
   args: 
-    1:	Source @738 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @147 ⏎ `AbstractVector{Multiclass{3}}`
+    1:	Source @479 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @046 ⏎ `AbstractVector{Multiclass{3}}`
 </pre><p>Generally, changing a hyperparameter triggers retraining on calls to subsequent <code>fit!</code>:</p><pre><code class="language-julia-repl">julia&gt; forest.bagging_fraction=0.5
 0.5
 
@@ -28,7 +28,7 @@ pca = (@load PCA verbosity=0)()
 mach = machine(pca, X)
 fit!(mach)</code></pre><pre class="documenter-example-output">Machine{PCA,…} trained 1 time; caches data
   args: 
-    1:	Source @099 ⏎ `Table{AbstractVector{Continuous}}`
+    1:	Source @514 ⏎ `Table{AbstractVector{Continuous}}`
 </pre><pre><code class="language-julia-repl">julia&gt; fitted_params(mach)
 (projection = [-0.36158967738144976 0.6565398832858305 0.5809972798276166; 0.08226888989221415 0.7297123713264976 -0.5964180879381006; -0.8565721052905277 -0.1757674034286538 -0.07252407548696091; -0.3588439262482157 -0.07470647013503354 -0.549060910726608],)
 
@@ -109,4 +109,4 @@ io = IOBuffer()
 MLJ.save(io, mach)
 seekstart(io)
 predict_only_mach = machine(io)
-predict(predict_only_mach, X)</code></pre><div class="admonition is-warning"><header class="admonition-header">Only load files from trusted sources</header><div class="admonition-body"><p>Maliciously constructed JLSO files, like pickles, and most other general purpose serialization formats, can allow for arbitrary code execution during loading. This means it is possible for someone to use a JLSO file that looks like a serialized MLJ machine as a <a href="https://en.wikipedia.org/wiki/Trojan_horse_(computing)">Trojan horse</a>.</p></div></div></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../loading_model_code/">« Loading Model Code</a><a class="docs-footer-nextpage" href="../evaluating_model_performance/">Evaluating Model Performance »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 18 October 2021 00:24">Monday 18 October 2021</span>. Using Julia version 1.6.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+predict(predict_only_mach, X)</code></pre><div class="admonition is-warning"><header class="admonition-header">Only load files from trusted sources</header><div class="admonition-body"><p>Maliciously constructed JLSO files, like pickles, and most other general purpose serialization formats, can allow for arbitrary code execution during loading. This means it is possible for someone to use a JLSO file that looks like a serialized MLJ machine as a <a href="https://en.wikipedia.org/wiki/Trojan_horse_(computing)">Trojan horse</a>.</p></div></div></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../loading_model_code/">« Loading Model Code</a><a class="docs-footer-nextpage" href="../evaluating_model_performance/">Evaluating Model Performance »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 18 October 2021 00:53">Monday 18 October 2021</span>. Using Julia version 1.6.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
