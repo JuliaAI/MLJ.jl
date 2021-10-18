@@ -10,7 +10,7 @@ post an issue requesting this
 
 ## Packages providing models in the MLJ model registry
 
-See [List of Supported Models](@ref)
+See [List of Supported Models](@ref model_list)
 
 
 ## Providing unregistered models:
