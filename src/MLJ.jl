@@ -196,6 +196,7 @@ export models, localmodels, @load, @iload, load, info,
     FillImputer, matching, BinaryThresholdPredictor
 
 # re-export from MLJIteration:
+export MLJIteration
 export IteratedModel
 for control in MLJIteration.CONTROLS
     eval(:(export $control))

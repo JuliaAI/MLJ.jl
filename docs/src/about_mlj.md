@@ -293,7 +293,7 @@ to Julia, then we highly recommend Aaron Christinson's tutorial
 [Dispatching Design
 Patterns](https://github.com/ninjaaron/dispatching-design-patterns)
 which is nicely compressed in his [half-hour
-video presentation](https://live.juliacon.org/talk/JYNERU).
+video presentation](https://www.youtube.com/watch?v=n-E-1-A_rZM).
 
 However, one doesn't need to be able to program in Julia to start
 using MLJ.
