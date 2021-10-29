@@ -57,13 +57,6 @@ export coerce, coerce!, autotype, schema, info
 # re-export from MLJBase:
 export nrows, color_off, color_on,
     selectrows, selectcols, restrict, corestrict, complement,
-    Deterministic, Probabilistic, JointProbabilistic, Unsupervised, Supervised, Static,
-    DeterministicNetwork, ProbabilisticNetwork, UnsupervisedNetwork,
-    ProbabilisticComposite, JointProbabilisticComposite, DeterministicComposite,
-    IntervalComposite, UnsupervisedComposite, StaticComposite,
-    ProbabilisticSurrogate, JointProbabilisticSurrogate, DeterministicSurrogate,
-    IntervalSurrogate, UnsupervisedSurrogate, StaticSurrogate,
-    Surrogate, Composite,
     target_scitype, input_scitype, output_scitype, load_path, training_losses,
     predict, predict_mean, predict_median, predict_mode, predict_joint,
     transform, inverse_transform, evaluate, fitted_params, params,
@@ -82,6 +75,15 @@ export nrows, color_off, color_on,
     default_resource, pretty,
     make_blobs, make_moons, make_circles, make_regression,
     fit_only!, return!, int, decoder
+
+# MLJBase/composition/abstract_types.jl:
+for T in vcat(MLJBase.MLJModelInterface.ABSTRACT_MODEL_SUBTYPES, 
+    MLJBase.COMPOSITE_TYPES,
+    MLJBase.SURROGATE_TYPES)
+    @eval(export $T)
+end
+export Surrogate, Composite
+export DeterministicNetwork, ProbabilisticNetwork, UnsupervisedNetwork
 
 # MLJBase/measure/measures.jl:
 export orientation, reports_each_observation,
