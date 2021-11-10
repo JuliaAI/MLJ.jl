@@ -874,8 +874,8 @@ generally relevant use-case is iterative models, where calls to
 increase the number of iterations only restarts the iterative
 procedure if other hyperparameters have also changed. (A useful method
 for inspecting model changes in such cases is
-`MLJModelInterface.is_same_except`. ) For an example, see the MLJ [ensemble
-code](https://github.com/alan-turing-institute/MLJ.jl/blob/master/src/ensembles.jl).
+`MLJModelInterface.is_same_except`. ) For an example, see
+[MLJEnsembles.jl](https://github.com/JuliaAI/MLJEnsembles.jl).
 
 A third use-case is to avoid repeating time-consuming preprocessing of
 `X` and `y` required by some models.
