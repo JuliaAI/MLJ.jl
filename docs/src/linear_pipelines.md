@@ -22,7 +22,7 @@ nothing # hide
 ```
 
 The code below defines a new model type, and an *instance* of that
-ype called `pipe`, for performing the following operations:
+type called `pipe`, for performing the following operations:
 
 - standardize the target variable `:height` to have mean zero and
   standard deviation one
@@ -66,7 +66,7 @@ Pipeline326(
 
 Notice that field names for the composite are automatically generated
 based on the component model type names. The automatically generated
-name of the new model composite model type, `Pipeline406`, can be
+name of the new model composite model type, `Pipeline326`, can be
 replaced with a user-defined one by specifying, say,
 `name=MyPipe`. **If you are planning on serializing (saving) a
 pipeline-machine, you will need to specify a name.**.
@@ -78,7 +78,7 @@ pipe.knn_regressor.K = 2
 pipe.one_hot_encoder.drop_last = true
 evaluate(pipe, X, height, resampling=Holdout(), measure=l2, verbosity=2)
 
-[ Info: Training Machine{Pipeline406} @959.
+[ Info: Training Machine{Pipeline326} @959.
 [ Info: Training Machine{UnivariateStandardizer} @422.
 [ Info: Training Machine{OneHotEncoder} @745.
 [ Info: Spawning 1 sub-features to one-hot encode feature :gender.
