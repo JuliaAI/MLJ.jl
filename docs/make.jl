@@ -45,6 +45,7 @@ pages = [
     "More on Probablistic Predictors" => "more_on_probabilistic_predictors.md",
     "Composing Models" => "composing_models.md",
     "Linear Pipelines" => "linear_pipelines.md",
+    "Target Transformations" => "target_transformations.md",
     "Homogeneous Ensembles" => "homogeneous_ensembles.md",
     "Model Stacking" => "model_stacking.md",
     "Controlling Iterative Models" => "controlling_iterative_models.md",

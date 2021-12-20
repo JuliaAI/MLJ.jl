@@ -45,7 +45,7 @@ Loading and instantiating a gradient tree-boosting model:
 using MLJ
 Booster = @load EvoTreeRegressor # loads code defining a model type
 booster = Booster(max_depth=2)   # specify hyper-parameter at construction
-booster.nrounds=50               # or mutate post facto
+booster.nrounds=50               # or mutate afterwards
 ```
 
 This model is an example of an iterative model. As is stands, the
@@ -72,7 +72,7 @@ iterated_booster = IteratedModel(model=booster,
 Combining the model with categorical feature encoding:
 
 ```julia
-pipe = @pipeline ContinuousEncoder iterated_booster
+pipe = ContinuousEncoder() |> iterated_booster
 ```
 
 #### Composition 3: Wrapping the model to make it "self-tuning"
@@ -108,34 +108,26 @@ House Price dataset:
 ```julia
 X, y = @load_reduced_ames;
 ```
-
-Binding the "self-tuning" pipeline model to data in a *machine* (which
-will additionally store *learned* parameters):
-
-```julia
-mach = machine(self_tuning_pipe, X, y)
-```
-
 Evaluating the "self-tuning" pipeline model's performance using 5-fold
 cross-validation (implies multiple layers of nested resampling):
 
 ```julia
-julia> evaluate!(mach,
-                 measures=[l1, l2],
-                 resampling=CV(nfolds=5, rng=123),
-                 acceleration=CPUThreads(),
-                 verbosity=2)
+julia> evaluate(self_tuning_pipe, X, y,
+                measures=[l1, l2],
+                resampling=CV(nfolds=5, rng=123),
+                acceleration=CPUThreads(),
+                verbosity=2)
 PerformanceEvaluation object with these fields:
   measure, measurement, operation, per_fold,
   per_observation, fitted_params_per_fold,
   report_per_fold, train_test_pairs
 Extract:
-┌────────────────────┬─────────────┬───────────┬───────────────────────────────────────────────┐
-│ measure            │ measurement │ operation │ per_fold                                      │
-├────────────────────┼─────────────┼───────────┼───────────────────────────────────────────────┤
-│ LPLoss(p = 1) @638 │ 16800.0     │ predict   │ [16500.0, 16300.0, 16300.0, 16600.0, 18600.0] │
-│ LPLoss(p = 2) @308 │ 6.65e8      │ predict   │ [6.14e8, 6.3e8, 5.98e8, 6.17e8, 8.68e8]       │
-└────────────────────┴─────────────┴───────────┴───────────────────────────────────────────────┘
+┌───────────────┬─────────────┬───────────┬───────────────────────────────────────────────┐
+│ measure       │ measurement │ operation │ per_fold                                      │
+├───────────────┼─────────────┼───────────┼───────────────────────────────────────────────┤
+│ LPLoss(p = 1) │ 17200.0     │ predict   │ [16500.0, 17100.0, 16300.0, 17500.0, 18900.0] │
+│ LPLoss(p = 2) │ 6.83e8      │ predict   │ [6.14e8, 6.64e8, 5.98e8, 6.37e8, 9.03e8]      │
+└───────────────┴─────────────┴───────────┴───────────────────────────────────────────────┘
 ```
 
 Try out MLJ yourself in the following batteries-included Binder
@@ -271,7 +263,7 @@ julia> tree = Tree() # instance
 
 where you will also be asked to choose a providing package, for more
 than one provide a `DecisionTreeClassifier` model. For more on
-identifying the name of an applicable model, see [Model Search](@ref model_search). 
+identifying the name of an applicable model, see [Model Search](@ref model_search).
 For non-interactive loading of code (e.g., from a
 module or function) see [Loading Model Code](@ref).
 
@@ -360,7 +352,7 @@ An in-depth view of MLJ's model composition design:
 
 ```bibtex
 @misc{blaom2020flexible,
-      title={Flexible model composition in machine learning and its implementation in {MLJ}}, 
+      title={Flexible model composition in machine learning and its implementation in {MLJ}},
       author={Anthony D. Blaom and Sebastian J. Vollmer},
       year={2020},
       eprint={2012.15505},

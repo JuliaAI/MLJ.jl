@@ -1,12 +1,14 @@
 # Composing Models
 
-MLJ provides three common ways of combining multiple models together
-out of the box:
+Three common ways of combining multiple models together
+have out-of-the-box implementations in MLJ:
 
 - [Linear Pipelines](@ref) - for unbranching chains that take the
   output of one model (e.g., dimension reduction, such as `PCA`) and
   make it the input of the next model in the chain (e.g., a
-  classification model, such as `EvoTreeClassifier`)
+  classification model, such as `EvoTreeClassifier`). To include
+  transformations of the target variable in a supervised pipeline
+  model, see [Target Transformations](@ref).
   
 - [Homogeneous Ensembles](@ref) - for blending the predictions of
   multiple supervised models all of the same type, but which receive different
@@ -24,7 +26,7 @@ out of the box:
 We note that composite models share all of the functionality of
 ordinary models. Their main novelty is that they include other models
 as hyper-parameters.
-  
+
 Finally, MLJ provides a powerful way to combine machine models in
 flexible *learning networks*. By wrapping training data in *source
 nodes* before calling functions like `machine`, `predict` and

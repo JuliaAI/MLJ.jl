@@ -68,6 +68,7 @@ To support MLJ development, please cite these works or star the repo:
 ### Composition
 [Composing Models](@ref) |
 [Linear Pipelines](@ref) |
+[Target Transformations](@ref) |
 [Homogeneous Ensembles](@ref) |
 [Model Stacking](@ref) |
 
@@ -79,7 +80,7 @@ To support MLJ development, please cite these works or star the repo:
 [Internals](@ref internals_section) |
 [Modifying Behavior](@ref)
 
-### Bells and whistles
+### Miscellaneous
 [Weights](@ref) |
 [Acceleration and Parallelism](@ref) |
 [Performance Measures](@ref) 

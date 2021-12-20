@@ -1,12 +1,10 @@
 # Linear Pipelines
 
 In MLJ a *pipeline* is a composite model in which models are chained
-together in a linear (non-branching) chain. Pipelines can include
-learned or static target transformations, if one of the models is
-supervised.
+together in a linear (non-branching) chain. 
 
-To illustrate basic construction of a pipeline, consider the following
-toy data:
+For purposes of illustration, consider a supervised learning problem
+with the following toy data:
 
 ```@setup 7
 using MLJ
@@ -16,84 +14,54 @@ MLJ.color_off()
 ```@example 7
 using MLJ
 X = (age    = [23, 45, 34, 25, 67],
-	 gender = categorical(['m', 'm', 'f', 'm', 'f']));
-height = [67.0, 81.5, 55.6, 90.0, 61.1]
-nothing # hide
+     gender = categorical(['m', 'm', 'f', 'm', 'f']));
+y = [67.0, 81.5, 55.6, 90.0, 61.1]
+     nothing # hide
 ```
 
-The code below defines a new model type, and an *instance* of that
-ype called `pipe`, for performing the following operations:
+We would like to train using a a K-nearest neighbor model, but the
+model type `KNNRegressor` assumes the features are all
+`Continuous`. This can be fixed by first:
 
-- standardize the target variable `:height` to have mean zero and
-  standard deviation one
-- coerce the `:age` field to have `Continuous` scitype
-- one-hot encode the categorical feature `:gender`
-- train a K-nearest neighbor model on the transformed inputs and
-  transformed target
-- restore the predictions of the KNN model to the original `:height`
-  scale (i.e., invert the standardization)
+- coercing the `:age` feature to have `Continuous` type by replacing
+  `X` with `coerce(X, :age=>Continuous)`
+- standardizing continuous features and one-hot encoding the
+  `Multiclass` features using the `ContinuousEncoder` model
+  
+However, we can avoid separately applying these preprocessing steps
+(two of which require `fit!` steps) by combining them with the
+supervised `KKNRegressor` model into a new *pipeline* model, using
+Julia's `|>` syntax:
 
-```@setup 7
-const KNNRegressor = @load KNNRegressor pkg=NearestNeighborModels
+```@example 7
+KNNRegressor = @load KNNRegressor pkg=NearestNeighborModels
+pipe = (X -> coerce(X, :age=>Continuous)) |> ContinuousEncoder() |> KNNRegressor(K=2)
 ```
 
-```julia>
-KNNRegressor = @load KNNRegressor
-pipe = @pipeline(X -> coerce(X, :age=>Continuous),
-				 OneHotEncoder,
-				 KNNRegressor(K=3),
-				 target = Standardizer())
+We see above that `pipe` is a model whose hyperparameters are
+themselves other models or a function. (The names of these
+hyper-parameters are automatically generated. To specify your own
+names, use the explicit [`Pipeline`](@ref) constructor instead.)
 
-Pipeline326(
-	one_hot_encoder = OneHotEncoder(
-			features = Symbol[],
-			drop_last = false,
-			ordered_factor = true,
-			ignore = false),
-	knn_regressor = KNNRegressor(
-			K = 3,
-			algorithm = :kdtree,
-			metric = Distances.Euclidean(0.0),
-			leafsize = 10,
-			reorder = true,
-			weights = :uniform),
-	target = Standardizer(
-			features = Symbol[],
-			ignore = false,
-			ordered_factor = false,
-			count = false)) @287
-```
-
-Notice that field names for the composite are automatically generated
-based on the component model type names. The automatically generated
-name of the new model composite model type, `Pipeline406`, can be
-replaced with a user-defined one by specifying, say,
-`name=MyPipe`. **If you are planning on serializing (saving) a
-pipeline-machine, you will need to specify a name.**.
-
-The new model can be used just like any other non-composite model:
+The `|>` syntax can also be used to extend an existing pipeline or
+concatenate two existing pipelines. So, we could instead have defined:
 
 ```julia
-pipe.knn_regressor.K = 2
-pipe.one_hot_encoder.drop_last = true
-evaluate(pipe, X, height, resampling=Holdout(), measure=l2, verbosity=2)
-
-[ Info: Training Machine{Pipeline406} @959.
-[ Info: Training Machine{UnivariateStandardizer} @422.
-[ Info: Training Machine{OneHotEncoder} @745.
-[ Info: Spawning 1 sub-features to one-hot encode feature :gender.
-[ Info: Training Machine{KNNRegressor} @005.
-┌───────────┬───────────────┬────────────┐
-│ _.measure │ _.measurement │ _.per_fold │
-├───────────┼───────────────┼────────────┤
-│ l2        │ 55.5          │ [55.5]     │
-└───────────┴───────────────┴────────────┘
-_.per_observation = [[[55.502499999999934]]]
-
+pipe_transformer = (X -> coerce(X, :age=>Continuous)) |> ContinuousEncoder()
+pipe = pipe_transformer |> KNNRegressor(K=2)
 ```
 
-For important details on including target transformations, see below.
+A pipeline is just a model like any other. For example, we can
+evaluate it's performance on the data above:
+
+```@example 7
+evaluate(pipe, X, y, resampling=CV(nfolds=3), measure=mae)
+```
+
+To include target transformations in a pipeline, wrap the supervised
+component using [`TransformedTargetModel`](@ref).
+
 
 ```@docs
-@pipeline
+Pipeline
 ```
