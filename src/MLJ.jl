@@ -69,7 +69,7 @@ export nrows, color_off, color_on,
     Machine, machine, AbstractNode, @node,
     source, node, fit!, freeze!, thaw!, Node, sources, origins,
     machines, sources, anonymize!, @from_network, fitresults,
-    @pipeline, Stack,
+    @pipeline, Stack, Pipeline, TransformedTargetModel,
     ResamplingStrategy, Holdout, CV, TimeSeriesCV,
     StratifiedCV, evaluate!, Resampler, iterator,
     default_resource, pretty,
@@ -77,7 +77,7 @@ export nrows, color_off, color_on,
     fit_only!, return!, int, decoder
 
 # MLJBase/composition/abstract_types.jl:
-for T in vcat(MLJBase.MLJModelInterface.ABSTRACT_MODEL_SUBTYPES, 
+for T in vcat(MLJBase.MLJModelInterface.ABSTRACT_MODEL_SUBTYPES,
     MLJBase.COMPOSITE_TYPES,
     MLJBase.SURROGATE_TYPES)
     @eval(export $T)
