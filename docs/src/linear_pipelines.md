@@ -19,6 +19,7 @@ y = [67.0, 81.5, 55.6, 90.0, 61.1]
      nothing # hide
 ```
 
+
 We would like to train using a a K-nearest neighbor model, but the
 model type `KNNRegressor` assumes the features are all
 `Continuous`. This can be fixed by first:
