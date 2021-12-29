@@ -23,7 +23,7 @@ such as the number of epochs in a neural network. To test if
 ```@example machines
 using MLJ; color_off() # hide
 tree = (@load DecisionTreeClassifier pkg=DecisionTree verbosity=0)()
-forest = EnsembleModel(atom=tree, n=10);
+forest = EnsembleModel(model=tree, n=10);
 X, y = @load_iris;
 mach = machine(forest, X, y)
 fit!(mach, verbosity=2);

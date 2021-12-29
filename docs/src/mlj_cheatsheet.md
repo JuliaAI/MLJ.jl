@@ -17,6 +17,8 @@ for "RidgeRegresssor", which is provided by multiple packages
 
 `models()` lists metadata of every registered model.
 
+`models("Tree")` lists models with "Tree" in the model or package name.
+
 `models(x -> x.is_supervised && x.is_pure_julia)` lists all supervised models written in pure julia.
 
 `models(matching(X))` lists all unsupervised models compatible with input `X`.
@@ -47,13 +49,14 @@ For interactive loading instead use `@iload`
 
 `scitype(x)` is the scientific type of `x`. For example `scitype(2.4) == Continuous`
 
-![scitypes.png](img/scitypes_small.png)
+![scitypes_small.png](img/scitypes_small.png)
 
 type                                       | scitype
 -------------------------------------------|----------------------------------
 `AbstractFloat`                            | `Continuous`
 `Integer`                                  | `Count`
 `CategoricalValue` and `CategoricalString` | `Multiclass` or `OrderedFactor`
+`AbstractString`                           | `Textual`
 
 *Figure and Table for common scalar scitypes*
 
@@ -68,7 +71,16 @@ Use `schema(X)` to get the column scitypes of a table `X`
 
 ## Ingesting data
 
-Splitting any table into target and input (note semicolon):
+Split the table `channing` into target `y` (the `:Exit` column) and
+features `X` (everything else), after a seeded row shuffling:
+
+```julia
+using RDatasets
+channing = dataset("boot", "channing")
+y, X =  unpack(channing, ==(:Exit); rng=123)
+```
+
+Same as above but exclude `:Time` column from `X`:
 
 ```julia
 using RDatasets
@@ -76,23 +88,24 @@ channing = dataset("boot", "channing")
 y, X =  unpack(channing,
                ==(:Exit),            # y is the :Exit column
                !=(:Time);            # X is the rest, except :Time
-               :Exit=>Continuous,    # correcting wrong scitypes (optional)
-               :Entry=>Continuous,
-               :Cens=>Multiclass)
+               rng=123)
 ```
-*Warning.* Before julia 1.2 use `col -> col != :Time` insead of `!=(:Time)`.
 
-Splitting row indices into train/validation/test:
+Splitting row indices into train/validation/test, with seeded shuffling:
 
-`train, valid, test = partition(eachindex(y), 0.7, 0.2, shuffle=true, rng=1234)` for 70:20:10 ratio
+`train, valid, test = partition(eachindex(y), 0.7, 0.2, rng=1234)` for 70:20:10 ratio
 
 For a stratified split:
 
 `train, test = partition(eachindex(y), 0.8, stratify=y)`
 
+Split a table or matrix `X`, instead of indices:
+
+`Xtrain, Xvalid, Xtest = partition(X, 0.5, 0.3, rng=123)` 
+
 Getting data from [OpenML](https://www.openml.org):
 
-`table = openML.load(91)`
+`table = OpenML.load(91)`
 
 Creating synthetic classification data:
 
@@ -114,7 +127,7 @@ Unsupervised case:
 
 ## Fitting
 
-`fit!(mach, rows=1:100, verbosity=1, force=false)`
+`fit!(mach, rows=1:100, verbosity=1, force=false)` (defaults shown)
 
 
 ## Prediction
@@ -139,7 +152,7 @@ pkg="MultivariateStats")` gets all properties (aka traits) of registered models
 
 `schema(X)` get column names, types and scitypes, and nrows, of a table `X`
 
-`scitype(X)` gets scientific type of a table
+`scitype(X)` gets scientific type of `X`
 
 `fitted_params(mach)` gets learned parameters of fitted machine
 
@@ -169,6 +182,8 @@ pkg="MultivariateStats")` gets all properties (aka traits) of registered models
 
 `StratifiedCV(nfolds=6, rng=1234)` for stratified cross-validation
 
+`TimeSeriesSV(nfolds=4)` for time-series cross-validation
+
 or a list of pairs of row indices:
 
 `[(train1, eval1), (train2, eval2), ... (traink, evalk)]`
@@ -196,9 +211,11 @@ Can specify multiple ranges, as in `range=[r1, r2, r3]`. For more range options 
 
 ### Tuning strategies
 
+`RandomSearch(rng=1234)` for basic random search
+
 `Grid(resolution=10)` or `Grid(goal=50)` for basic grid search
 
-`RandomSearch(rng=1234)` for basic random search
+Also available: `LatinHyperCube`, `Explicit` (built-in), `MLJTreeParzenTuning`, `ParticleSwarm`, `AdaptiveParticleSwarm` (3rd-party packages)
 
 
 #### Learning curves
@@ -233,25 +250,19 @@ Callbacks: `Callback(f=mach->nothing)`, `WithNumberDo(f=n->@info(n))`, `WithIter
 
 Snapshots: `Save(filename="machine.jlso")`
 
-Wraps: `MLJIteration.skip(control, predicate=1)`, `IterationControl.debug(control)`
+Wraps: `MLJIteration.skip(control, predicate=1)`, `IterationControl.with_state_do(control)`
 
 
 ## Performance measures (metrics)
 
-`area_under_curve`, `accuracy`, `balanced_accuracy`, `cross_entropy`, `FScore`, `false_discovery_rate`, `false_negative`, `false_negative_rate`, `false_positive`, `false_positive_rate`, `l1`, `l2`, `mae`, `matthews_correlation`, `misclassification_rate`, `negative_predictive_value`, `positive_predictive_value`, `rms`, `rmsl`, `rmslp1`, `rmsp`, `true_negative`, `true_negative_rate`, `true_positive`, `true_positive_rate`, `BrierScore()`, `confusion_matrix`
-
-Available after doing `using LossFunctions`:
-
-`DWDMarginLoss()`, `ExpLoss()`, `L1HingeLoss()`, `L2HingeLoss()`, `L2MarginLoss()`, `LogitMarginLoss()`, `ModifiedHuberLoss()`, `PerceptronLoss()`, `SigmoidLoss()`, `SmoothedL1HingeLoss()`, `ZeroOneLoss()`, `HuberLoss()`, `L1EpsilonInsLoss()`, `L2EpsilonInsLoss()`, `LPDistLoss()`, `LogitDistLoss()`, `PeriodicLoss()`, `QuantileLoss()`
-
-`measures()` to get full list
+Do `measures()` to get full list.
 
 `info(rms)` to list properties (aka traits) of the `rms` measure
 
 
 ## Transformers
 
-Built-ins include: `Standardizer`, `OneHotEncoder`, `UnivariateBoxCoxTransformer`, `FeatureSelector`, `FillImputer`, `UnivariateDiscretizer`, `UnivariateStandardizer`, `ContinuousEncoder`
+Built-ins include: `Standardizer`, `OneHotEncoder`, `UnivariateBoxCoxTransformer`, `FeatureSelector`, `FillImputer`, `UnivariateDiscretizer`, `ContinuousEncoder`, `UnivariateTimeTypeToContinuous`
 
 Externals include: `PCA` (in MultivariateStats), `KMeans`, `KMedoids` (in Clustering).
 
@@ -263,17 +274,21 @@ Externals include: `PCA` (in MultivariateStats), `KMeans`, `KMedoids` (in Cluste
 `EnsembleModel(atom=…, weights=Float64[], bagging_fraction=0.8, rng=GLOBAL_RNG, n=100, parallel=true, out_of_bag_measure=[])`
 
 
+## Target transformation wrapper
+
+`TransformedTargetModel(model=ConstantClassifier(), target=Standardizer())`
+
 ## Pipelines
 
-With deterministic (point) predictions:
-
-`pipe = @pipeline OneHotEncoder KNNRegressor(K=3) target=UnivariateStandardizer`
-
-`pipe = @pipeline OneHotEncoder KNNRegressor(K=3) target=v->log.(V) inverse=v->exp.(v))`
+`pipe = (X -> coerce(X, :height=>Continuous)) |> OneHotEncoder |> KNNRegressor(K=3)` 
 
 Unsupervised:
 
-`pipe = @pipeline Standardizer OneHotEncoder`
+`pipe = Standardizer |> OneHotEncoder`
+
+Concatenation:
+
+`pipe1 |> pipe2` or `model |> pipe` or `pipe |> model`, etc
 
 
 ## Define a supervised learning network:
@@ -320,4 +335,4 @@ Unsupervised, with final node `Xout`:
 		reducer2=clusterer
     end
 end
-```
+```UnivariateTimeTypeToContinuous

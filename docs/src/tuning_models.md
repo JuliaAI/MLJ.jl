@@ -258,7 +258,7 @@ The `forest` model below has another model, namely a
 
 ```@example goof
 tree = Tree() # defined above
-forest = EnsembleModel(atom=tree)
+forest = EnsembleModel(model=tree)
 ```
 
 Ranges for nested hyperparameters are specified using dot syntax. In
@@ -266,7 +266,7 @@ this case we will specify a `goal` for the total number of grid
 points:
 
 ```@example goof
-r1 = range(forest, :(atom.n_subfeatures), lower=1, upper=9);
+r1 = range(forest, :(model.n_subfeatures), lower=1, upper=9);
 r2 = range(forest, :bagging_fraction, lower=0.4, upper=1.0);
 self_tuning_forest = TunedModel(model=forest,
 									  tuning=Grid(goal=30),
@@ -372,7 +372,7 @@ of models to be evaluated, independent of the tuning strategy.
 For this illustration we'll add a third, nominal,  hyper-parameter:
 
 ```@example goof
-r3 = range(forest, :(atom.post_prune), values=[true, false]);
+r3 = range(forest, :(model.post_prune), values=[true, false]);
 self_tuning_forest = TunedModel(model=forest,
 									  tuning=latin,
 									  resampling=CV(nfolds=6),

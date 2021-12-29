@@ -42,17 +42,17 @@ iris = DataFrames.DataFrame(iris);
 nothing # hide
 ```
 
-Next, let's split the data "horizotally" into input and target parts,
+Next, let's split the data "horizontally" into input and target parts,
 and specify an RNG seed, to force observations to be shuffled:
 
 ```@repl doda
-y, X = unpack(iris, ==(:target), colname -> true; rng=123);
+y, X = unpack(iris, ==(:target); rng=123);
 first(X, 3) |> pretty
 ```
 
-Notice that this call to `unpack` splits off any column with name `==`
+This call to `unpack` splits off any column with name `==`
 to `:target` into something called `y`, and all the remaining columns
-into `X` (the second filter `colname -> true` always holds).
+into `X`.
 
 To list *all* models available in MLJ's [model
 registry](@ref model_search) do `models()`. Listing the models
@@ -295,18 +295,19 @@ assigning a specific scientific type (interpretation) to each julia
 object (see the `scitype` examples below).
 
 The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
-`OrderedFactor{N}` and `Count`. Be sure you read [Scalar
-scientific types](@ref) below to guarantee your scalar data is interpreted
+`OrderedFactor{N}`, `Count` and `Textual`. `Missing` and `Nothing` are
+also considered scientifict types. Be sure you read [Scalar scientific
+types](@ref) below to guarantee your scalar data is interpreted
 correctly. Tools exist to coerce the data to have the appropriate
 scientfic type; see
 [ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/)
 or run `?coerce` for details.
 
 Additionally, most data containers - such as tuples, vectors, matrices
-and tables - have a scientific type.
+and tables - have a scientific type parameterized by scitype of the
+elements they contain.
 
-
-![](img/scitypes.png)
+![](img/scitypes_small.png)
 
 *Figure 1. Part of the scientific type hierarchy in*
 [ScientificTypesBase.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/).

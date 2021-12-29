@@ -545,24 +545,20 @@ probablility distribution `p(X |y)` above).
 #### Prediction types for deterministic responses.
 
 In the case of `Deterministic` models, `yhat` should have the same
-scitype as the `y` passed to `fit` (see above). Any `CategoricalValue`
-elements of `yhat` **must have a pool == to the
-pool of the target `y` presented in training**, even if not all levels
-appear in the training data or prediction itself. For example, in the
-case of a univariate target, such as `scitype(y) <:
-AbstractVector{Multiclass{3}}`, one requires `MLJ.classes(yhat[i]) ==
-MLJ.classes(y[j])` for all admissible `i` and `j`. (The method
-`classes` is described under [Convenience methods](@ref) below).
+scitype as the `y` passed to `fit` (see above). If `y` is a
+`CategoricalVector` (classification) then elements of the predition
+`yhat` **must have a pool == to the pool of the target `y` presented
+in training**, even if not all levels appear in the training data or
+prediction itself.
 
 Unfortunately, code not written with the preservation of categorical
 levels in mind poses special problems. To help with this,
-MLJModelInterface provides three utility methods: `int` (for
-converting a `CategoricalValue` into an integer, the ordering of these
-integers being consistent with that of the pool), `decoder` (for
-constructing a callable object that decodes the integers back into
-`CategoricalValue` objects), and `classes`, for extracting all the
-`CategoricalValue` objects sharing the pool of a particular
-value. Refer to [Convenience methods](@ref) below for important
+MLJModelInterface provides some utilities:
+[`MLJModelInterface.int`](@ref) (for converting a `CategoricalValue`
+into an integer, the ordering of these integers being consistent with
+that of the pool) and `MLJModelInterface.decoder` (for constructing a
+callable object that decodes the integers back into `CategoricalValue`
+objects). Refer to [Convenience methods](@ref) below for important
 details.
 
 Note that a decoder created during `fit` may need to be bundled with
@@ -574,7 +570,7 @@ may look something like this:
 ```julia
 function MMI.fit(model::SomeSupervisedModel, verbosity, X, y)
     yint = MMI.int(y)
-    a_target_element = y[1]                    # a CategoricalValue/String
+    a_target_element = y[1]                # a CategoricalValue/String
     decode = MMI.decoder(a_target_element) # can be called on integers
 
     core_fitresult = SomePackage.fit(X, yint, verbosity=verbosity)
@@ -592,7 +588,7 @@ while a corresponding deterministic `predict` operation might look like this:
 function MMI.predict(model::SomeSupervisedModel, fitresult, Xnew)
     decode, core_fitresult = fitresult
     yhat = SomePackage.predict(core_fitresult, Xnew)
-    return decode.(yhat)  # or decode(yhat) also works
+    return decode.(yhat)
 end
 ```
 
@@ -607,23 +603,43 @@ than wrapping an existing one, these extra measures may be unnecessary.
 #### Prediction types for probabilistic responses
 
 In the case of `Probabilistic` models with univariate targets, `yhat`
-must be an `AbstractVector` whose elements are distributions (one distribution
-per row of `Xnew`).
+must be an `AbstractVector` or table whose elements are distributions.
+In the common case of a vector (single target), this means one
+distribution per row of `Xnew`.
 
-Presently, a *distribution* is any object `d` for which
-`MMI.isdistribution(::d) = true`, which is the case for objects of
-type `Distributions.Sampleable`.
+A *distribution* is some object that, at the least, implements
+`Base.rng` (i.e., is something that can be sampled).  Currently, all
+performance measures (metrics) defined in MLJBase.jl additionally
+assume that a distribution is either:
 
-Use the distribution `MMI.UnivariateFinite` for `Probabilistic` models
-predicting a target with `Finite` scitype (classifiers). In this case
-the eltype of the training target `y` will be a `CategoricalValue`.
+- An instance of some subtype of `Distributions.Distribution`, an
+  abstract type defined in the
+  [`Distributions.jl`](https://juliastats.org/Distributions.jl/stable/)
+  package; or
+  
+- An instance of `CategoricalDistributions.UnivariateFinite`, from the
+  [CategoricalDistributions.jl](https://github.com/JuliaAI/CategoricalDistributions.jl)
+  package, *which should be used for all probabilistic classifiers*,
+  i.e., for predictors whose target has scientific type
+  `<:AbstractVector{<:Finite}`.
 
-For efficiency, one should not construct `UnivariateDistribution`
-instances one at a time. Rather, once a probability vector or matrix
-is known, construct an instance of `UnivariateFiniteVector <:
-AbstractArray{<:UnivariateFinite},1}` to return. Both `UnivariateFinite`
-and `UnivariateFiniteVector` objects are constructed using the single
-`UnivariateFinite` function.
+All such distributions implement the probability mass or density
+function `Distributions.pdf`. If your model's predictions cannot be
+predict objects of this form, then you will need to implement
+appropriate performance measures to buy into MLJ's performance
+evaluation apparatus.
+
+An implementation can avoid CategoricalDistributions.jl as a
+dependency by using the "dummy" constructor
+`MLJModelInterface.UnivariateFinite`, which is bound to the true one
+when MLJBase.jl is loaded.
+
+For efficiency, one should not construct `UnivariateFinite` instances
+one at a time. Rather, once a probability vector, matrix, or
+dictionary is known, construct an instance of `UnivariateFiniteVector
+<: AbstractArray{<:UnivariateFinite},1}` to return. Both
+`UnivariateFinite` and `UnivariateFiniteVector` objects are
+constructed using the single `UnivariateFinite` function.
 
 For example, suppose the target `y` arrives as a subsample of some
 `ybig` and is missing some classes:
@@ -641,7 +657,7 @@ classes `[:a, :b]` are in an `n x 2` matrix `probs` (where `n` the number of
 rows of `Xnew`) then you return
 
 ```julia
-yhat = UnivariateFinite([:a, :b], probs, pool=an_element)
+yhat = MLJModelInterface.UnivariateFinite([:a, :b], probs, pool=an_element)
 ```
 
 This object automatically assigns zero-probability to the unseen class
@@ -649,11 +665,6 @@ This object automatically assigns zero-probability to the unseen class
 vector). If you would like to assign `:rare` non-zero probabilities,
 simply add it to the first vector (the *support*) and supply a larger
 `probs` matrix.
-
-If instead of raw labels `[:a, :b]` you have the corresponding
-`CategoricalElement`s (from, e.g., `filter(cv->cv in unique(y),
-classes(y))`) then you can use these instead and drop the `pool`
-specifier.
 
 In a binary classification problem it suffices to specify a single
 vector of probabilities, provided you specify `augment=true`, as in
@@ -665,11 +676,12 @@ constructor:*
 y = categorical([:TRUE, :FALSE, :FALSE, :TRUE, :TRUE])
 an_element = y[1]
 probs = rand(10)
-yhat = UnivariateFinite([:FALSE, :TRUE], probs, augment=true, pool=an_element)
+yhat = MLJModelInterface.UnivariateFinite([:FALSE, :TRUE], probs, augment=true, pool=an_element)
 ```
 
 The constructor has a lot of options, including passing a dictionary
-instead of vectors. See [`UnivariateFinite`](@ref) for details.
+instead of vectors. See
+`CategoricalDistributions.UnivariateFinite`](@ref) for details.
 
 See
 [LinearBinaryClassifier](https://github.com/JuliaAI/MLJModels.jl/blob/master/src/GLM.jl)
@@ -1194,7 +1206,11 @@ MLJModelInterface.int
 ```
 
 ```@docs
-MLJModelInterface.classes
+CategoricalDistributions.UnivariateFinite
+```
+
+```@docs
+CategoricalDistributions.classes
 ```
 
 ```@docs
@@ -1211,10 +1227,6 @@ MLJModelInterface.selectrows
 
 ```@docs
 MLJModelInterface.selectcols
-```
-
-```@docs
-UnivariateFinite
 ```
 
 ```@docs

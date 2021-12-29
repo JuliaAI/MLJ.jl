@@ -160,8 +160,6 @@ end
 
 ```@docs
 MLJBase.evaluate!
-```
-
-```@docs
 MLJBase.evaluate
+MLJBase.PerformanceEvaluation
 ```

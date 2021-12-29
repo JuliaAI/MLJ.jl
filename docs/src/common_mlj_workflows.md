@@ -35,47 +35,41 @@ Inspecting metadata, including column scientific types:
 schema(channing)
 ```
 
-Unpacking data and shuffling rows:
+Horizontally splitting data and shuffling rows.
+
+Here `y` is the `:Exit` column and `X` everything else:
 
 ```@example workflows
-y, X =  unpack(channing,
-               ==(:Exit),            # y is the :Exit column
-               !=(:Time));           # X is the rest, except :Time
+y, X =  unpack(channing, ==(:Exit), rng=123);
 nothing # hide
 ```
 
-*Note:* Before julia 1.2, replace `!=(:Time)` with `col -> col != :Time`.
+Here `y` is the `:Exit` column and `X` everything else except `:Time`:
 
-```julia workflows
-julia> y[1:4]
-4-element Vector{Int32}:
-  909
- 1128
-  969
-  957
+```@example workflows
+y, X =  unpack(channing,
+               ==(:Exit),
+               !=(:Time);
+               rng=123);
+scitype(y)
+```
+
+```@example workflows
+schema(X)
 ```
 
 Fixing wrong scientfic types in `X`:
 
-```julia
+```@example workflows
 X = coerce(X, :Exit=>Continuous, :Entry=>Continuous, :Cens=>Multiclass)
-
-julia> schema(X)
-┌─────────┬─────────────────────────────────┬───────────────┐
-│ _.names │ _.types                         │ _.scitypes    │
-├─────────┼─────────────────────────────────┼───────────────┤
-│ Sex     │ CategoricalValue{String, UInt8} │ Multiclass{2} │
-│ Entry   │ Float64                         │ Continuous    │
-│ Cens    │ CategoricalValue{Int32, UInt32} │ Multiclass{2} │
-└─────────┴─────────────────────────────────┴───────────────┘
-_.nrows = 462
+schema(X)
 ```
 
 
 Loading a built-in supervised dataset:
 
 ```@example workflows
-table = load_iris()
+table = load_iris();
 schema(table)
 ```
 
@@ -90,6 +84,20 @@ selectrows(X, 1:4) # selectrows works for any Tables.jl table
 y[1:4]
 ```
 
+Splitting data vertically after row shuffling:
+
+```@example workflows
+channing_train, channing_test = partition(channing, 0.6, rng=123);
+nothing # hide
+```
+
+Or, if already horizontally split:
+
+```@example workflows
+(Xtrain, ytrain), (Xtest, ytest)  = partition((X, y), 0.6, multi=true,  rng=123)
+```
+
+
 ## Model search
 
 *Reference:*   [Model Search](model_search.md)
@@ -98,21 +106,26 @@ Searching for a supervised model:
 
 ```@example workflows
 X, y = @load_boston
-models(matching(X, y))
+ms = models(matching(X, y))
 ```
 
 ```@example workflows
-models(matching(X, y))[6]
+ms[6]
 ```
 
-More refined searches:
+```@example workflows
+models("Tree");
+```
+
+A more refined search:
 
 ```@example workflows
 models() do model
     matching(model, X, y) &&
     model.prediction_type == :deterministic &&
     model.is_pure_julia
-end
+end;
+nothing # hide
 ```
 
 Searching for an unsupervised model:
@@ -154,7 +167,9 @@ tree.max_depth = 4
 X, y = @load_boston
 KNN = @load KNNRegressor
 knn = KNN()
-evaluate(knn, X, y, resampling=CV(nfolds=5), measure=[RootMeanSquaredError(), MeanAbsoluteError()])
+evaluate(knn, X, y,
+         resampling=CV(nfolds=5),
+         measure=[RootMeanSquaredError(), MeanAbsoluteError()])
 ```
 
 Note `RootMeanSquaredError()` has alias `rms` and `MeanAbsoluteError()` has alias `mae`.
@@ -345,7 +360,7 @@ Define a model with nested hyperparameters:
 ```@example workflows
 Tree = @load DecisionTreeClassifier pkg=DecisionTree
 tree = Tree()
-forest = EnsembleModel(atom=tree, n=300)
+forest = EnsembleModel(model=tree, n=300)
 ```
 
 Define ranges for hyperparameters to be tuned:
@@ -355,7 +370,7 @@ r1 = range(forest, :bagging_fraction, lower=0.5, upper=1.0, scale=:log10)
 ```
 
 ```@example workflows
-r2 = range(forest, :(atom.n_subfeatures), lower=1, upper=4) # nested
+r2 = range(forest, :(model.n_subfeatures), lower=1, upper=4) # nested
 ```
 
 Wrap the model in a tuning strategy:
@@ -365,7 +380,7 @@ tuned_forest = TunedModel(model=forest,
                           tuning=Grid(resolution=12),
                           resampling=CV(nfolds=6),
                           ranges=[r1, r2],
-                          measure=BrierScore())
+                          measure=BrierLoss())
 ```
 
 Bound the wrapped model to data:
@@ -419,7 +434,7 @@ Predicting on new data using the optimized model:
 predict(mach, Xnew)
 ```
 
-## Constructing a linear pipeline
+## Constructing linear pipelines
 
 *Reference:*   [Composing Models](composing_models.md)
 
@@ -429,16 +444,13 @@ transformation/inverse transformation:
 ```@example workflows
 X, y = @load_reduced_ames
 KNN = @load KNNRegressor
-pipe = @pipeline(X -> coerce(X, :age=>Continuous),
-                 OneHotEncoder,
-                 KNN(K=3),
-                 target = Standardizer)
+knn_with_target = TransformedTargetModel(model=KNN(K=3), target=Standardizer())
+pipe = (X -> coerce(X, :age=>Continuous)) |> OneHotEncoder() |> knn_with_target
 ```
 
 Evaluating the pipeline (just as you would any other model):
 
 ```@example workflows
-pipe.knn_regressor.K = 2
 pipe.one_hot_encoder.drop_last = true
 evaluate(pipe, X, y, resampling=Holdout(), measure=RootMeanSquaredError(), verbosity=2)
 ```
@@ -448,19 +460,19 @@ Inspecting the learned parameters in a pipeline:
 ```@example workflows
 mach = machine(pipe, X, y) |> fit!
 F = fitted_params(mach)
-F.one_hot_encoder
+F.transformed_target_model_deterministic.model
 ```
 
 Constructing a linear (unbranching) pipeline with a *static* (unlearned)
 target transformation/inverse transformation:
 
 ```@example workflows
-Tree = @load DecisionTreeRegressor pkg=DecisionTree
-pipe2 = @pipeline(X -> coerce(X, :age=>Continuous),
-                  OneHotEncoder,
-                  Tree(max_depth=4),
-                  target = y -> log.(y),
-                  inverse = z -> exp.(z))
+Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0
+tree_with_target = TransformedTargetModel(model=Tree(),
+                                          target=y -> log.(y),
+                                          inverse = z -> exp.(z))
+pipe2 = (X -> coerce(X, :age=>Continuous)) |> OneHotEncoder() |> tree_with_target;
+nothing # hide
 ```
 
 ## Creating a homogeneous ensemble of models
@@ -471,7 +483,7 @@ pipe2 = @pipeline(X -> coerce(X, :age=>Continuous),
 X, y = @load_iris
 Tree = @load DecisionTreeClassifier pkg=DecisionTree
 tree = Tree()
-forest = EnsembleModel(atom=tree, bagging_fraction=0.8, n=300)
+forest = EnsembleModel(model=tree, bagging_fraction=0.8, n=300)
 mach = machine(forest, X, y)
 evaluate!(mach, measure=LogLoss())
 ```

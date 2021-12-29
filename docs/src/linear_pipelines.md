@@ -1,7 +1,9 @@
 # Linear Pipelines
 
 In MLJ a *pipeline* is a composite model in which models are chained
-together in a linear (non-branching) chain. 
+together in a linear (non-branching) chain. For other arrangements,
+including custom architectures via learning networks, see [Composing
+Models](@ref).
 
 For purposes of illustration, consider a supervised learning problem
 with the following toy data:
@@ -19,8 +21,7 @@ y = [67.0, 81.5, 55.6, 90.0, 61.1]
      nothing # hide
 ```
 
-
-We would like to train using a a K-nearest neighbor model, but the
+We would like to train using a K-nearest neighbor model, but the
 model type `KNNRegressor` assumes the features are all
 `Continuous`. This can be fixed by first:
 
@@ -31,7 +32,7 @@ model type `KNNRegressor` assumes the features are all
   
 However, we can avoid separately applying these preprocessing steps
 (two of which require `fit!` steps) by combining them with the
-supervised `KKNRegressor` model into a new *pipeline* model, using
+supervised `KKNRegressor` model in a new *pipeline* model, using
 Julia's `|>` syntax:
 
 ```@example 7

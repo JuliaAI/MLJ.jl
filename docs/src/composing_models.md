@@ -95,11 +95,13 @@ The diagram below depicts a learning network which standardizes the
 input data `X`, learns an optimal Box-Cox transformation for the
 target `y`, predicts new target values using ridge regression, and
 then inverse-transforms those predictions to restore them to the
-original scale. Here we have only dynamic operations, labelled blue;
-the machines are in green. Notice that two operations both use
-`stand`, which stores the learned standardization scale
-parameters. The lower "Training" panel indicates which nodes are used
-to train each machine, and what model each machine is associated with.
+original scale. (This represents a model we could alternatively build
+using the `TransformedTargetModel` wrapper and a pipeline.) Here we
+have only dynamic operations, labelled blue. The machines are in
+green. Notice that two operations both use `stand`, which stores the
+learned standardization scale parameters. The lower "Training" panel
+indicates which nodes are used to train each machine, and what model
+each machine is associated with.
 
 ![](img/target_transformer.png)
 
@@ -222,16 +224,16 @@ And re-evaluate:
 rms(y[test], yhat(rows=test))
 ```
 
-> **Notable feature.** The machine, `ridge::Machine{RidgeRegressor}`, is retrained, because its underlying model has been mutated. However, since the outcome of this training has no effect on the training inputs of the machines `stand` and `box`, these transformers are left untouched. (During construction, each node and machine in a learning network determines and records all machines on which it depends.) This behavior, which extends to exported learning networks, means we can tune our wrapped regressor (using a holdout set) without re-computing transformations each time the hyperparameter is changed.
+> **Notable feature.** The machine, `ridge::Machine{RidgeRegressor}`, is retrained, because its underlying model has been mutated. However, since the outcome of this training has no effect on the training inputs of the machines `stand` and `box`, these transformers are left untouched. (During construction, each node and machine in a learning network determines and records all machines on which it depends.) This behavior, which extends to exported learning networks, means we can tune our wrapped regressor (using a holdout set) without re-computing transformations each time a `ridge_model` hyperparameter is changed.
 
 
 ### Learning network machines
 
-As we show next, a learning network needs to be exported to create a
+As we show shortly, a learning network needs to be "exported" to create a
 new stand-alone model type. Instances of that type can be bound with
 data in a machine, which can then be evaluated, for example. Somewhat
 paradoxically, one can wrap a learning network in a certain kind of
-machine, called a *learning network machine*, *before* exporting it,
+machine, called a *learning network machine*, **before** exporting it,
 and in fact, the export process actually requires us to do so. Since a
 composite model type does not yet exist, one constructs the machine
 using a "surrogate" model, whose name indicates the ultimate model
@@ -250,30 +252,43 @@ predictions, and the arguments `Xs` and `ys` declare which source
 nodes receive the input and target data. With `mach` constructed in
 this way, the code
 
-```@example 42
+```@setup 42
+fit!(mach, verbosity=0)
+predict(mach, X[test,:]);
+```
+
+```julia
 fit!(mach)
 predict(mach, X[test,:]);
-nothing # hide
 ```
 
 is equivalent to
 
-```@example 42
-fit!(yhat)
+```@setup 42
+fit!(yhat, verbosity=0)
 yhat(X[test,:]);
-nothing # hide
 ```
 
-While it's main purpose is for export (see below), this machine can
-actually be evaluated:
+```julia
+fit!(yhat)
+yhat(X[test,:]);
+```
+
+Like ordinary machine, once can call `report(mach)` and
+`fitted_params(mach)`. While it's main purpose is for export (see
+below), this machine can even be evaluated:
 
 ```@example 42
-
 evaluate!(mach, resampling=CV(nfolds=3), measure=LPLoss(p=2))
 ```
 
 For more on constructing learning network machines, see
 [`machine`](@ref).
+
+A learning network machine can also include additional internal state
+in it's report (and so in the report of the corresponding exported
+model). See [Exposing internal state of a learning network](@ref) for
+this advanced feature.
 
 
 ## Exporting a learning network as a stand-alone model
@@ -598,6 +613,74 @@ julia> W()
 
 ```
 
+## Exposing internal state of a learning network 
+
+This section describes an advanced feature. 
+
+Suppose you have a learning network that you would like to export as
+a new stand-alone model type `MyModel`. Having bound `MyModel` to some
+data in a machine `mach`, you would like to arrange that
+`report(mach)` will record some additional information about the
+internal state of the learning network that was built internally, when
+you called `fit!(mach)`. This is possible by specifying the relevant
+node or nodes when constructing the associated learning network
+machine (see [Learning network machines](@ref) above) by including
+the `report` keyword argument, as in 
+
+```julia
+mach = machine(Probabilistic(), Xs, ys, predict=yhat, report=(mean=N1, stderr=N2))
+```
+
+Here, `yhat`, `N1` and `N2` are nodes in the learning network and
+`mean` and `stderr` are the desired key names for the machine's
+report. After training this machine, `report(mach).mean` will return
+the value of `N1()` when the underlying learning network was trained,
+while `report(mach).stderr` will return the value of `N2()`.
+
+
+Note that as `N1` and `N2` are called with no arguments, they do not
+see "production" data, which is a point of difference with the
+`predict` node `yhat`, which is called on the production data `Xnew`
+on a call such as `predict(mach, Xnew)`. However, this also means the
+nodes can have multiple origin nodes (query `origins` for
+details). This is indeed the case in the following dummy example,
+recording a training error in the composite model report:
+
+```julia
+using MLJ
+
+import MLJModelInterface
+
+struct MyModel <: ProbabilisticComposite
+    model
+end
+
+function MLJModelInterface.fit(composite::MyModel, verbosity, X, y)
+
+    Xs = source(X)
+    ys = source(y)
+
+    mach = machine(composite.model, Xs, ys)
+    yhat = predict(mach, Xs)
+    e = @node auc(yhat, ys)   # <------  node whose state we wish to export
+
+    network_mach = machine(Probabilistic(),
+                           Xs,
+                           ys,
+                           predict=yhat,
+                           report=(training_error=e,))  # <------ how we export additional node(s)
+
+    return!(network_mach, composite, verbosity)
+end
+
+X, y = make_moons()
+composite = MyModel(ConstantClassifier())
+mach = machine(composite, X, y) |> fit!
+err = report(mach).training_error    # <------ accesssing the node state
+
+yhat = predict(mach, rows=:);
+@assert err ≈ auc(yhat, y) # true
+```
 
 ## The learning network API
 

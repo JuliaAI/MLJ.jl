@@ -17,10 +17,10 @@ using MLJ
 X, y = @load_boston;
 
 atom = (@load RidgeRegressor pkg=MLJLinearModels)()
-ensemble = EnsembleModel(atom=atom, n=1000)
+ensemble = EnsembleModel(model=atom, n=1000)
 mach = machine(ensemble, X, y)
 
-r_lambda = range(ensemble, :(atom.lambda), lower=1e-1, upper=100, scale=:log10)
+r_lambda = range(ensemble, :(model.lambda), lower=1e-1, upper=100, scale=:log10)
 curve = MLJ.learning_curve(mach;
                            range=r_lambda,
                            resampling=CV(nfolds=3),
@@ -51,12 +51,13 @@ specified):
 atom.lambda= 7.3
 r_n = range(ensemble, :n, lower=1, upper=50)
 curves = MLJ.learning_curve(mach;
-                             range=r_n,
-                             measure=MeanAbsoluteError(),
-                             verbosity=0,
-                             rng_name=:rng,
-                             rngs=4)
+                            range=r_n,
+                            measure=MeanAbsoluteError(),
+                            verbosity=0,
+                            rng_name=:rng,
+                            rngs=4)
 ```
+
 ```julia
 plot(curves.parameter_values,
      curves.measurements,

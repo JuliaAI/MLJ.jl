@@ -19,6 +19,7 @@ import ScientificTypesBase
 import Distributions
 using CategoricalArrays # avoid types like CategoricalArrays.Categorica
 using LossFunctions
+import CategoricalDistributions
 
 const MMI = MLJModelInterface
 
@@ -86,7 +87,8 @@ makedocs(
                 MLJIteration,
                 MLJSerialization,
                 EarlyStopping,
-                IterationControl],
+                IterationControl,
+                CategoricalDistributions],
     pages    = pages)
 
 # By default Documenter does not deploy docs just for PR
