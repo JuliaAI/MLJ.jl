@@ -139,7 +139,7 @@ wrapper                                                                    | des
 ---------------------------------------------------------------------------|-------------------------------------------------------------------------
 [`IterationControl.skip`](@ref)`(control, predicate=1)`                    | Apply `control` every `predicate` applications of the control wrapper (can also be a function; see doc-string)
 [`IterationControl.louder`](@ref IterationControl.louder)`(control, by=1)` | Increase the verbosity level of `control` by the specified value (negative values lower verbosity)
-[`IterationControl.debug`](@ref)`(control)`                                | Apply `control` but also log its state to `Info` (irrespective of `verbosity` level)
+[`IterationControl.with_state_do`](@ref)`(control; f=...)`                 | Apply control *and* call `f(x)` where `x` is the internal state of control; useful for debugging. Default `f` logs state to `Info`. **Warning**: internal control state is not yet part of public API.
 [`IterationControl.composite`](@ref)`(controls...)`                        | Apply each `control` in `controls` in sequence; used internally by IterationControl.jl
 
 > Table 2. Wrapped controls
@@ -446,6 +446,6 @@ MLJSerialization.Save
 ```@docs
 IterationControl.skip
 IterationControl.louder
-IterationControl.debug
+IterationControl.with_state_do
 IterationControl.composite
 ```

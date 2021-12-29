@@ -7,7 +7,7 @@ for control in MLJ.MLJIteration.CONTROLS
 end
 
 IterationControl.skip(Step(2))
-IterationControl.debug(Step(2))
+IterationControl.with_state_do(Step(2))
 
 IteratedModel
 MLJIteration

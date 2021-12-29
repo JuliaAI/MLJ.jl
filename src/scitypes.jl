@@ -1,22 +1,25 @@
 ## SUPERVISED
 
-# This implementation of scitype for models and measures is highly experimental
+# This implementation of scitype for models and measures is highly
+# experimental and not part of the public API
 
-const ST = ScientificTypes # only used in this file
+# only used in this file
+const DefaultConvention = ScientificTypes.DefaultConvention
+const STB = ScientificTypes.ScientificTypesBase
 
 struct SupervisedScitype{input_scitype, target_scitype, prediction_type} end
 
-ST.scitype(model::Deterministic, ::ST.DefaultConvention) =
+STB.scitype(model::Deterministic, ::DefaultConvention) =
     SupervisedScitype{input_scitype(model),
                     target_scitype(model),
                     :deterministic}
 
-ST.scitype(model::Probabilistic, ::ST.DefaultConvention) =
+STB.scitype(model::Probabilistic, ::DefaultConvention) =
     SupervisedScitype{input_scitype(model),
                     target_scitype(model),
                     :probabilistic}
 
-ST.scitype(model::Interval, ::ST.DefaultConvention) =
+STB.scitype(model::Interval, ::DefaultConvention) =
     SupervisedScitype{input_scitype(model),
                     target_scitype(model),
                     :interval}
@@ -52,7 +55,7 @@ end
 
 struct UnsupervisedScitype{input_scitype, output_scitype} end
 
-ST.scitype(model::Unsupervised, ::ST.DefaultConvention) =
+STB.scitype(model::Unsupervised, ::DefaultConvention) =
     UnsupervisedScitype{input_scitype(model),
                       MLJBase.output_scitype(model)}
 
@@ -82,65 +85,3 @@ function Base.show(io::IO, ::MIME"text/plain", S::UnsupervisedScitype)
 end
 
 
-## MEASURES
-
-struct MeasureScitype{target_scitype,
-               prediction_type,
-               orientation,
-               reports_each_observation,
-               is_feature_dependent,
-               supports_weights} end
-
-ST.scitype(measure, ::ST.DefaultConvention, ::Val{:measure}) =
-    MeasureScitype{target_scitype(measure),
-               prediction_type(measure),
-               orientation(measure),
-               reports_each_observation(measure),
-               is_feature_dependent(measure),
-               supports_weights(measure)}
-
-function Base.getproperty(::MeasureScitype{target_scitype,
-               prediction_type,
-               orientation,
-               reports_each_observation,
-               is_feature_dependent,
-               supports_weights},
-                          field::Symbol) where {target_scitype,
-                                                prediction_type,
-                                                orientation,
-                                                reports_each_observation,
-                                                is_feature_dependent,
-                                                supports_weights}
-    if field === :target_scitype
-        return target_scitype
-    elseif field === :prediction_type
-        return prediction_type
-    elseif field === :orientation
-        return orientation
-    elseif field === :reports_each_observation
-        return reports_each_observation
-    elseif field === :is_feature_dependent
-        return is_feature_dependent
-    elseif field === :supports_weights
-        return supports_weights
-    else
-        throw(ArgumentError("Unsupported property. "))
-    end
-end
-
-# crashes julia:
-# MLJBase.getproperty(M::Type{<:MeasureScitype}, p::Symbol) =
-#     getproperty(M(), p)
-
-Base.propertynames(::MeasureScitype) =
-    (:target_scitype, :prediction_type, :orientation,
-     :reports_each_observation, :is_feature_dependent, :supports_weights)
-
-function _as_named_tuple(m::MeasureScitype)
-    names = propertynames(m)
-    return NamedTuple{names}(Tuple([getproperty(m, p) for p in names]))
-end
-
-function Base.show(io::IO, ::MIME"text/plain", M::MeasureScitype)
-      show(io, MIME("text/plain"), _as_named_tuple(M))
-end

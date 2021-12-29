@@ -35,19 +35,16 @@ term:
   more structured and is accessible to MLJ via a searchable model
   registry (without the models needing to be loaded).
 
-- **Flexible API for model composition.** Pipelines in scikit-learn are
-  more of an afterthought than an integral part of the original
-  design. By contrast, MLJ's user-interaction API was predicated on the
-  requirements of a flexible "learning network" API, one that allows
-  models to be connected in essentially arbitrary ways (including
-  target transforming and inverse-transforming). Networks can be built
+- **Flexible API for model composition.** Pipelines in scikit-learn
+  are more of an afterthought than an integral part of the original
+  design. By contrast, MLJ's user-interaction API was predicated on
+  the requirements of a flexible "learning network" API, one that
+  allows models to be connected in essentially arbitrary ways
+  (such as Wolpert model stacks). Networks can be built
   and tested in stages before being exported as first-class
   stand-alone models. Networks feature "smart" training (only
   necessary components are retrained after parameter changes) and will
-  eventually be trainable using a DAG scheduler. With the help of
-  Julia's meta-programming features, constructing common
-  architectures, such as linear pipelines and stacks, will be one-line
-  operations.
+  eventually be trainable using a DAG scheduler.
 
 - **Clean probabilistic API.** The scikit-learn API does not specify a
   universal standard for the form of probabilistic predictions. By

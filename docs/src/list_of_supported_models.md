@@ -28,6 +28,7 @@ models()`.
 [MLJFlux.jl](https://github.com/JuliaAI/MLJFlux.jl) | NeuralNetworkRegressor, NeuralNetworkClassifier, MultitargetNeuralNetworkRegressor, ImageClassifier | experimental |
 [MLJLinearModels.jl](https://github.com/JuliaAI/MLJLinearModels.jl) | LinearRegressor, RidgeRegressor, LassoRegressor, ElasticNetRegressor, QuantileRegressor, HuberRegressor, RobustRegressor, LADRegressor, LogisticClassifier, MultinomialClassifier | experimental |
 [MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl) (built-in) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ContinuousEncoder, ConstantRegressor, ConstantClassifier, BinaryThreshholdPredictor | medium |
+[MLJText.jl](https://github.com/JuliaAI/MLJText.jl) | TfidfTransformer, BM25Transformer, BagOfWordsTransformer | low |
 [MultivariateStats.jl](https://github.com/JuliaStats/MultivariateStats.jl) | LinearRegressor, MultitargetLinearRegressor, RidgeRegressor, MultitargetRidgeRegressor, PCA, KernelPCA, ICA, LDA, BayesianLDA, SubspaceLDA, BayesianSubspaceLDA, FactorAnalysis, PPCA | high | 
 [NaiveBayes.jl](https://github.com/dfdx/NaiveBayes.jl) | GaussianNBClassifier, MultinomialNBClassifier, HybridNBClassifier | experimental |
 [NearestNeighborModels.jl](https://github.com/JuliaAI/NearestNeighborModels.jl) | KNNClassifier, KNNRegressor, MultitargetKNNClassifier, MultitargetKNNRegressor | high |

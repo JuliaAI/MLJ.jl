@@ -19,6 +19,7 @@ import ScientificTypesBase
 import Distributions
 using CategoricalArrays # avoid types like CategoricalArrays.Categorica
 using LossFunctions
+import CategoricalDistributions
 
 const MMI = MLJModelInterface
 
@@ -45,6 +46,7 @@ pages = [
     "More on Probablistic Predictors" => "more_on_probabilistic_predictors.md",
     "Composing Models" => "composing_models.md",
     "Linear Pipelines" => "linear_pipelines.md",
+    "Target Transformations" => "target_transformations.md",
     "Homogeneous Ensembles" => "homogeneous_ensembles.md",
     "Model Stacking" => "model_stacking.md",
     "Controlling Iterative Models" => "controlling_iterative_models.md",
@@ -85,7 +87,8 @@ makedocs(
                 MLJIteration,
                 MLJSerialization,
                 EarlyStopping,
-                IterationControl],
+                IterationControl,
+                CategoricalDistributions],
     pages    = pages)
 
 # By default Documenter does not deploy docs just for PR

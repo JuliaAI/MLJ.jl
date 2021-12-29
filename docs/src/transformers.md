@@ -38,11 +38,11 @@ MLJModels.UnivariateTimeTypeToContinuous
 
 ## Static transformers
 
-The main use-case for static transformers is for insertion into a
-[`@pipeline`](@ref) or other exported learning network (see [Composing
+The main use-case for static transformers is for insertion into
+[Linear Pipelines](@ref) or other exported learning networks (see [Composing
 Models](@ref)). If a static transformer has no hyper-parameters, it is
 tantamount to an ordinary function. An ordinary function can be
-inserted directly into a `@pipeline`; the situation for learning
+inserted directly into a pipeline; the situation for learning
 networks is only slightly more complicated; see [Static operations on nodes](@ref).
 
 The following example defines a new model type `Averager` to perform
@@ -153,7 +153,7 @@ _.report_per_fold = [ … ]
 
 ## Transformers that also predict
 
-Commonly, clustering algorithms learn to label data by identifying a
+Some clustering algorithms learn to label data by identifying a
 collection of "centroids" in the training data. Any new input
 observation is labeled with the cluster to which it is closest (this
 is the output of `predict`) while the vector of all distances from the
