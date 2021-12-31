@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Transformers and Other Unsupervised models · MLJ</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.svg" alt="MLJ logo"/></a><div class="docs-package-name"><span class="docs-autofit">MLJ</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../about_mlj/">About MLJ</a></li><li><a class="tocitem" href="../getting_started/">Getting Started</a></li><li><a class="tocitem" href="../common_mlj_workflows/">Common MLJ Workflows</a></li><li><a class="tocitem" href="../working_with_categorical_data/">Working with Categorical Data</a></li><li><a class="tocitem" href="../model_search/">Model Search</a></li><li><a class="tocitem" href="../loading_model_code/">Loading Model Code</a></li><li><a class="tocitem" href="../machines/">Machines</a></li><li><a class="tocitem" href="../evaluating_model_performance/">Evaluating Model Performance</a></li><li><a class="tocitem" href="../performance_measures/">Performance Measures</a></li><li><a class="tocitem" href="../weights/">Weights</a></li><li><a class="tocitem" href="../tuning_models/">Tuning Models</a></li><li><a class="tocitem" href="../learning_curves/">Learning Curves</a></li><li><a class="tocitem" href="../preparing_data/">Preparing Data</a></li><li class="is-active"><a class="tocitem" href>Transformers and Other Unsupervised models</a><ul class="internal"><li><a class="tocitem" href="#Built-in-transformers"><span>Built-in transformers</span></a></li><li><a class="tocitem" href="#Static-transformers"><span>Static transformers</span></a></li><li><a class="tocitem" href="#Transformers-that-also-predict"><span>Transformers that also predict</span></a></li></ul></li><li><a class="tocitem" href="../more_on_probabilistic_predictors/">More on Probablistic Predictors</a></li><li><a class="tocitem" href="../composing_models/">Composing Models</a></li><li><a class="tocitem" href="../linear_pipelines/">Linear Pipelines</a></li><li><a class="tocitem" href="../target_transformations/">Target Transformations</a></li><li><a class="tocitem" href="../homogeneous_ensembles/">Homogeneous Ensembles</a></li><li><a class="tocitem" href="../model_stacking/">Model Stacking</a></li><li><a class="tocitem" href="../controlling_iterative_models/">Controlling Iterative Models</a></li><li><a class="tocitem" href="../generating_synthetic_data/">Generating Synthetic Data</a></li><li><a class="tocitem" href="../openml_integration/">OpenML Integration</a></li><li><a class="tocitem" href="../acceleration_and_parallelism/">Acceleration and Parallelism</a></li><li><a class="tocitem" href="../simple_user_defined_models/">Simple User Defined Models</a></li><li><a class="tocitem" href="../quick_start_guide_to_adding_models/">Quick-Start Guide to Adding Models</a></li><li><a class="tocitem" href="../adding_models_for_general_use/">Adding Models for General Use</a></li><li><a class="tocitem" href="../modifying_behavior/">Modifying Behavior</a></li><li><a class="tocitem" href="../internals/">Internals</a></li><li><a class="tocitem" href="../list_of_supported_models/">List of Supported Models</a></li><li><a class="tocitem" href="../third_party_packages/">Third Party Packages</a></li><li><a class="tocitem" href="../glossary/">Glossary</a></li><li><a class="tocitem" href="../mlj_cheatsheet/">MLJ Cheatsheet</a></li><li><a class="tocitem" href="../known_issues/">Known Issues</a></li><li><a class="tocitem" href="../frequently_asked_questions/">FAQ</a></li><li><a class="tocitem" href="../julia_blogpost/">Julia BlogPost</a></li><li><a class="tocitem" href="../api/">Index of Methods</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Transformers and Other Unsupervised models</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Transformers and Other Unsupervised models</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/transformers.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Transformers-and-Other-Unsupervised-Models"><a class="docs-heading-anchor" href="#Transformers-and-Other-Unsupervised-Models">Transformers and Other Unsupervised Models</a><a id="Transformers-and-Other-Unsupervised-Models-1"></a><a class="docs-heading-anchor-permalink" href="#Transformers-and-Other-Unsupervised-Models" title="Permalink"></a></h1><p>Several unsupervised models used to perform common transformations, such as one-hot encoding, are available in MLJ out-of-the-box. These are detailed in <a href="#Built-in-transformers">Built-in transformers</a> below.</p><p>A transformer is <em>static</em> if it has no learned parameters. While such a transformer is tantamount to an ordinary function, realizing it as an MLJ static transformer (subtype of <code>Static &lt;: Unsupervised</code>) can be useful, especially if the function depends on parameters the user would like to manipulate (which become <em>hyper-parameters</em> of the model). The necessary syntax for defining your own static transformers is described in <a href="#Static-transformers">Static transformers</a> below.</p><p>Some unsupervised models, such as clustering algorithms, have a <code>predict</code> method in addition to a <code>transform</code> method. We give an example of this in <a href="#Transformers-that-also-predict">Transformers that also predict</a></p><p>Finally we note that models that fit a distribution, or more generally a sampler object, to some data, which are sometimes viewed as unsupervised, are treated in MLJ as <em>supervised</em> models. See <a href="../adding_models_for_general_use/#Models-that-learn-a-probability-distribution">Models that learn a probability distribution</a> for an example.</p><h2 id="Built-in-transformers"><a class="docs-heading-anchor" href="#Built-in-transformers">Built-in transformers</a><a id="Built-in-transformers-1"></a><a class="docs-heading-anchor-permalink" href="#Built-in-transformers" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-binding" id="MLJModels.Standardizer" href="#MLJModels.Standardizer"><code>MLJModels.Standardizer</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">Standardizer(; features=Symbol[],
+               ignore=false,
+               ordered_factor=false,
+               count=false)</code></pre><p>Unsupervised model for standardizing (whitening) the columns of tabular data.  If <code>features</code> is unspecified then all columns having <code>Continuous</code> element scitype are standardized. Otherwise, the features standardized are the <code>Continuous</code> features named in <code>features</code> (<code>ignore=false</code>) or <code>Continuous</code> features not named in <code>features</code> (<code>ignore=true</code>). To allow standarization of <code>Count</code> or <code>OrderedFactor</code> features as well, set the appropriate flag to true.</p><p>Instead of supplying a features vector, a Bool-valued callable with one argument can be also be specified. For example, specifying <code>Standardizer(features = name -&gt; name in [:x1, :x3], ignore = true, count=true)</code> has the same effect as <code>Standardizer(features = [:x1, :x3], ignore = true, count=true)</code>, namely to standardise all <code>Continuous</code> and <code>Count</code> features, with the exception of <code>:x1</code> and <code>:x3</code>.</p><p>The <code>inverse_tranform</code> method is supported provided <code>count=false</code> and <code>ordered_factor=false</code> at time of fit.</p><p><strong>Example</strong></p><pre><code class="language-none">X = (ordinal1 = [1, 2, 3],
+     ordinal2 = coerce([:x, :y, :x], OrderedFactor),
+     ordinal3 = [10.0, 20.0, 30.0],
+     ordinal4 = [-20.0, -30.0, -40.0],
+     nominal = coerce([&quot;Your father&quot;, &quot;he&quot;, &quot;is&quot;], Multiclass));
+stand1 = Standardizer();
+julia&gt; transform(fit!(machine(stand1, X)), X)
+[ Info: Training Machine{Standardizer} @ 7…97.
+(ordinal1 = [1, 2, 3],
+ ordinal2 = CategoricalValue{Symbol,UInt32}[:x, :y, :x],
+ ordinal3 = [-1.0, 0.0, 1.0],
+ ordinal4 = [1.0, 0.0, -1.0],
+ nominal = CategoricalVale{String,UInt32}[&quot;Your father&quot;, &quot;he&quot;, &quot;is&quot;],)
+
+stand2 = Standardizer(features=[:ordinal3, ], ignore=true, count=true);
+julia&gt; transform(fit!(machine(stand2, X)), X)
+[ Info: Training Machine{Standardizer} @ 1…87.
+(ordinal1 = [-1.0, 0.0, 1.0],
+ ordinal2 = CategoricalValue{Symbol,UInt32}[:x, :y, :x],
+ ordinal3 = [10.0, 20.0, 30.0],
+ ordinal4 = [1.0, 0.0, -1.0],
+ nominal = CategoricalValue{String,UInt32}[&quot;Your father&quot;, &quot;he&quot;, &quot;is&quot;],)</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModels.OneHotEncoder" href="#MLJModels.OneHotEncoder"><code>MLJModels.OneHotEncoder</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">OneHotEncoder(; features=Symbol[],
+                ignore=false,
+                ordered_factor=true,
+                drop_last=false)</code></pre><p>Unsupervised model for one-hot encoding the <code>Finite</code> features (columns) of some table. If <code>features</code> is unspecified all features with <code>Finite</code> element scitype are encoded. Otherwise, encoding is applied to all <code>Finite</code> features named in <code>features</code> (<code>ignore=false</code>) or all <code>Finite</code> features not named in features (<code>ignore=true</code>).</p><p>If <code>ordered_factor=false</code> then the above holds with <code>Finite</code> replaced with <code>Multiclass</code>, ie <code>OrderedFactor</code> features are not transformed.</p><p>Specify <code>drop_last=true</code> if the column for the last level of each categorical feature is to be dropped.</p><p>New data to be transformed may lack features present in the fit data, but no <em>new</em> features can be present.</p><p><em>Warning:</em> This transformer assumes that <code>levels(col)</code> for any <code>Multiclass</code> or <code>OrderedFactor</code> column is the same in new data being transformed as it is in the data used to fit the transformer.</p><p><strong>Example</strong></p><pre><code class="language-julia">X = (name=categorical([&quot;Danesh&quot;, &quot;Lee&quot;, &quot;Mary&quot;, &quot;John&quot;]),
+     grade=categorical([:A, :B, :A, :C], ordered=true),
+     height=[1.85, 1.67, 1.5, 1.67],
+     n_devices=[3, 2, 4, 3])
+schema(X)
+
+┌───────────┬─────────────────────────────────┬──────────────────┐
+│ _.names   │ _.types                         │ _.scitypes       │
+├───────────┼─────────────────────────────────┼──────────────────┤
+│ name      │ CategoricalValue{String,UInt32} │ Multiclass{4}    │
+│ grade     │ CategoricalValue{Symbol,UInt32} │ OrderedFactor{3} │
+│ height    │ Float64                         │ Continuous       │
+│ n_devices │ Int64                           │ Count            │
+└───────────┴─────────────────────────────────┴──────────────────┘
+_.nrows = 4
+
+hot = OneHotEncoder(ordered_factor=true);
+mach = fit!(machine(hot, X))
+transform(mach, X) |&gt; schema
+
+┌──────────────┬─────────┬────────────┐
+│ _.names      │ _.types │ _.scitypes │
+├──────────────┼─────────┼────────────┤
+│ name__Danesh │ Float64 │ Continuous │
+│ name__John   │ Float64 │ Continuous │
+│ name__Lee    │ Float64 │ Continuous │
+│ name__Mary   │ Float64 │ Continuous │
+│ grade__A     │ Float64 │ Continuous │
+│ grade__B     │ Float64 │ Continuous │
+│ grade__C     │ Float64 │ Continuous │
+│ height       │ Float64 │ Continuous │
+│ n_devices    │ Int64   │ Count      │
+└──────────────┴─────────┴────────────┘
+_.nrows = 4</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModels.ContinuousEncoder" href="#MLJModels.ContinuousEncoder"><code>MLJModels.ContinuousEncoder</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">ContinuousEncoder(one_hot_ordered_factors=false, drop_last=false)</code></pre><p>Unsupervised model for arranging all features (columns) of a table to have <code>Continuous</code> element scitype, by applying the following protocol to each feature <code>ftr</code>:</p><ul><li><p>If <code>ftr</code> is already <code>Continuous</code> retain it.</p></li><li><p>If <code>ftr</code> is <code>Multiclass</code>, one-hot encode it.</p></li><li><p>If <code>ftr</code> is <code>OrderedFactor</code>, replace it with <code>coerce(ftr, Continuous)</code> (vector of floating point integers), unless <code>ordered_factors=false</code> is specified, in which case one-hot encode it.</p></li><li><p>If <code>ftr</code> is <code>Count</code>, replace it with <code>coerce(ftr, Continuous)</code>.</p></li><li><p>If <code>ftr</code> is of some other element scitype, or was not observed in fitting the encoder, drop it from the table.</p></li></ul><p>If <code>drop_last=true</code> is specified, then one-hot encoding always drops the last class indicator column.</p><p><em>Warning:</em> This transformer assumes that <code>levels(col)</code> for any <code>Multiclass</code> or <code>OrderedFactor</code> column is the same in new data being transformed as it is in the data used to fit the transformer.</p><p><strong>Example</strong></p><pre><code class="language-julia">X = (name=categorical([&quot;Danesh&quot;, &quot;Lee&quot;, &quot;Mary&quot;, &quot;John&quot;]),
+     grade=categorical([:A, :B, :A, :C], ordered=true),
+     height=[1.85, 1.67, 1.5, 1.67],
+     n_devices=[3, 2, 4, 3],
+     comments=[&quot;the force&quot;, &quot;be&quot;, &quot;with you&quot;, &quot;too&quot;])
+schema(X)
+
+┌───────────┬─────────────────────────────────┬──────────────────┐
+│ _.names   │ _.types                         │ _.scitypes       │
+├───────────┼─────────────────────────────────┼──────────────────┤
+│ name      │ CategoricalValue{String,UInt32} │ Multiclass{4}    │
+│ grade     │ CategoricalValue{Symbol,UInt32} │ OrderedFactor{3} │
+│ height    │ Float64                         │ Continuous       │
+│ n_devices │ Int64                           │ Count            │
+│ comments  │ String                          │ Textual          │
+└───────────┴─────────────────────────────────┴──────────────────┘
+_.nrows = 4
+
+cont = ContinuousEncoder(drop_last=true);
+mach = fit!(machine(cont, X))
+transform(mach, X) |&gt; schema
+
+┌──────────────┬─────────┬────────────┐
+│ _.names      │ _.types │ _.scitypes │
+├──────────────┼─────────┼────────────┤
+│ name__Danesh │ Float64 │ Continuous │
+│ name__John   │ Float64 │ Continuous │
+│ name__Lee    │ Float64 │ Continuous │
+│ grade        │ Float64 │ Continuous │
+│ height       │ Float64 │ Continuous │
+│ n_devices    │ Float64 │ Continuous │
+└──────────────┴─────────┴────────────┘
+_.nrows = 4</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModels.FillImputer" href="#MLJModels.FillImputer"><code>MLJModels.FillImputer</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">FillImputer(
+ features        = [],
+ continuous_fill = e -&gt; skipmissing(e) |&gt; median
+ count_fill      = e -&gt; skipmissing(e) |&gt; (f -&gt; round(eltype(f), median(f)))
+ finite_fill     = e -&gt; skipmissing(e) |&gt; mode</code></pre><p>Imputes missing data with a fixed value computed on the non-missing values. A different imputing function can be specified for <code>Continuous</code>, <code>Count</code> and <code>Finite</code> data. </p><p><strong>Fields</strong></p><ul><li><p><code>continuous_fill</code>: function to use on <code>Continuous</code> data, by default the median</p></li><li><p><code>count_fill</code>: function to use on <code>Count</code> data, by default the rounded median</p></li><li><p><code>finite_fill</code>: function to use on <code>Multiclass</code> and <code>OrderedFactor</code> data (including binary data), by default the mode</p></li></ul></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModels.FeatureSelector" href="#MLJModels.FeatureSelector"><code>MLJModels.FeatureSelector</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">FeatureSelector(features=Symbol[], ignore=false)</code></pre><p>An unsupervised model for filtering features (columns) of a table. Only those features encountered during fitting will appear in transformed tables if <code>features</code> is empty (the default). Alternatively, if a non-empty <code>features</code> is specified, then only the specified features encountered during fitting are used (<code>ignore=false</code>) or all features encountered during fitting which are not named in <code>features</code> are used (<code>ignore=true</code>).</p><p>Throws an error if a recorded or specified feature is not present in the transformation input.</p><p>Instead of supplying a features vector, a Bool-valued callable with one argument can be also be specified. For example, specifying <code>FeatureSelector(features = name -&gt; name in [:x1, :x3], ignore = true)</code> has the same effect as <code>FeatureSelector(features = [:x1, :x3], ignore = true)</code>, namely to select  all features, with the exception of <code>:x1</code> and <code>:x3</code>.</p><p><strong>Example</strong></p><pre><code class="language-none">julia&gt; X = (ordinal1 = [1, 2, 3],
+            ordinal2 = coerce([:x, :y, :x], OrderedFactor),
+            ordinal3 = [10.0, 20.0, 30.0],
+            ordinal4 = [-20.0, -30.0, -40.0],
+            nominal = coerce([&quot;Your father&quot;, &quot;he&quot;, &quot;is&quot;], Multiclass));
+
+julia&gt; select1 = FeatureSelector();
+
+julia&gt; transform(fit!(machine(select1, X)), X)
+[ Info: Training Machine{FeatureSelector} @811.
+(ordinal1 = [1, 2, 3],
+ ordinal2 = CategoricalValue{Symbol,UInt32}[:x, :y, :x],
+ ordinal3 = [-1.0, 0.0, 1.0],
+ ordinal4 = [1.0, 0.0, -1.0],
+ nominal = CategoricalVale{String,UInt32}[&quot;Your father&quot;, &quot;he&quot;, &quot;is&quot;],)
+
+julia&gt; select2 = FeatureSelector(features=[:ordinal3, ], ignore=true);
+
+julia&gt; transform(fit!(machine(select2, X)), X)
+[ Info: Training Machine{FeatureSelector} @721.
+(ordinal1 = [1, 2, 3],
+ ordinal2 = CategoricalValue{Symbol,UInt32}[:x, :y, :x],
+ ordinal4 = [-20.0, -30.0, -40.0],
+ nominal = CategoricalValue{String,UInt32}[&quot;Your father&quot;, &quot;he&quot;, &quot;is&quot;],)
+</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModels.UnivariateBoxCoxTransformer" href="#MLJModels.UnivariateBoxCoxTransformer"><code>MLJModels.UnivariateBoxCoxTransformer</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">UnivariateBoxCoxTransformer(; n=171, shift=false)</code></pre><p>Unsupervised model specifying a univariate Box-Cox transformation of a single variable taking non-negative values, with a possible preliminary shift. Such a transformation is of the form</p><pre><code class="language-none">x -&gt; ((x + c)^λ - 1)/λ for λ not 0
+x -&gt; log(x + c) for λ = 0</code></pre><p>On fitting to data <code>n</code> different values of the Box-Cox exponent λ (between <code>-0.4</code> and <code>3</code>) are searched to fix the value maximizing normality. If <code>shift=true</code> and zero values are encountered in the data then the transformation sought includes a preliminary positive shift <code>c</code> of <code>0.2</code> times the data mean. If there are no zero values, then no shift is applied.</p></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModels.UnivariateDiscretizer" href="#MLJModels.UnivariateDiscretizer"><code>MLJModels.UnivariateDiscretizer</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">UnivariateDiscretizer(n_classes=512)</code></pre><p>Returns an <code>MLJModel</code> for for discretizing any continuous vector <code>v</code>  (<code>scitype(v) &lt;: AbstractVector{Continuous}</code>), where <code>n_classes</code>  describes the resolution of the discretization.</p><p>Transformed output <code>w</code> is a vector of ordered factors (<code>scitype(w) &lt;:  AbstractVector{&lt;:OrderedFactor}</code>). Specifically, <code>w</code> is a  <code>CategoricalVector</code>, with element type  <code>CategoricalValue{R,R}</code>, where <code>R&lt;Unsigned</code> is optimized.</p><p>The transformation is chosen so that the vector on which the  transformer is fit has, in transformed form, an approximately uniform  distribution of values.</p><p><strong>Example</strong></p><pre><code class="language-none">using MLJ
+t = UnivariateDiscretizer(n_classes=10)
+discretizer = machine(t, randn(1000))
+fit!(discretizer)
+v = rand(10)
+w = transform(discretizer, v)
+v_approx = inverse_transform(discretizer, w) # reconstruction of v from w</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="MLJModels.UnivariateTimeTypeToContinuous" href="#MLJModels.UnivariateTimeTypeToContinuous"><code>MLJModels.UnivariateTimeTypeToContinuous</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia">UnivariateTimeTypeToContinuous(zero_time=nothing, step=Hour(24))</code></pre><p>Convert a <code>Date</code>, <code>DateTime</code>, and <code>Time</code> vector to <code>Float64</code> by assuming <code>0.0</code> corresponds to the <code>zero_time</code> parameter and the time increment to reach <code>1.0</code> is given by the <code>step</code> parameter. The type of <code>zero_time</code> should match the type of the column if provided. If not provided, then <code>zero_time</code> is inferred as the minimum time found in the data when <code>fit</code> is called.</p></div></section></article><h2 id="Static-transformers"><a class="docs-heading-anchor" href="#Static-transformers">Static transformers</a><a id="Static-transformers-1"></a><a class="docs-heading-anchor-permalink" href="#Static-transformers" title="Permalink"></a></h2><p>The main use-case for static transformers is for insertion into <a href="../linear_pipelines/#Linear-Pipelines">Linear Pipelines</a> or other exported learning networks (see <a href="../composing_models/#Composing-Models">Composing Models</a>). If a static transformer has no hyper-parameters, it is tantamount to an ordinary function. An ordinary function can be inserted directly into a pipeline; the situation for learning networks is only slightly more complicated; see <a href="../composing_models/#Static-operations-on-nodes">Static operations on nodes</a>.</p><p>The following example defines a new model type <code>Averager</code> to perform the weighted average of two vectors (target predictions, for example). We suppose the weighting is normalized, and therefore controlled by a single hyper-parameter, <code>mix</code>.</p><pre><code class="language-julia">mutable struct Averager &lt;: Static
+    mix::Float64
+end
+
+MLJ.transform(a::Averager, _, y1, y2) = (1 - a.mix)*y1 + a.mix*y2</code></pre><p><em>Important.</em> Note the sub-typing <code>&lt;: Static</code>.</p><p>Such static transformers with (unlearned) parameters can have arbitrarily many inputs, but only one output. In the single input case an <code>inverse_transform</code> can also be defined. Since they have no real learned parameters, you bind a static transformer to a machine without specifying training arguments.</p><pre><code class="language-julia">mach = machine(Averager(0.5)) |&gt; fit!
+transform(mach, [1, 2, 3], [3, 2, 1])</code></pre><pre class="documenter-example-output">3-element Vector{Float64}:
+ 2.0
+ 2.0
+ 2.0</pre><p>Let&#39;s see how we can include our <code>Averager</code> in a learning network (see <a href="../composing_models/#Composing-Models">Composing Models</a>) to mix the predictions of two regressors, with one-hot encoding of the inputs:</p><pre><code class="language-julia">X = source()
+y = source()
+
+ridge = (@load RidgeRegressor pkg=MultivariateStats)()
+knn = (@load KNNRegressor)()
+averager = Averager(0.5)
+
+hotM = machine(OneHotEncoder(), X)
+W = transform(hotM, X) # one-hot encode the input
+
+ridgeM = machine(ridge, W, y)
+y1 = predict(ridgeM, W)
+
+knnM = machine(knn, W, y)
+y2 = predict(knnM, W)
+
+averagerM= machine(averager)
+yhat = transform(averagerM, y1, y2)</code></pre><pre class="documenter-example-output">Node{Machine{Averager,…}}
+  args:
+    1:	Node{Machine{RidgeRegressor,…}}
+    2:	Node{Machine{KNNRegressor,…}}
+  formula:
+    transform(
+        Machine{Averager,…}, 
+        predict(
+            Machine{RidgeRegressor,…}, 
+            transform(
+                Machine{OneHotEncoder,…}, 
+                Source @819)),
+        predict(
+            Machine{KNNRegressor,…}, 
+            transform(
+                Machine{OneHotEncoder,…}, 
+                Source @819)))</pre><p>Now we export to obtain a <code>Deterministic</code> composite model and then instantiate composite model</p><pre><code class="language-julia">learning_mach = machine(Deterministic(), X, y; predict=yhat)
+Machine{DeterministicSurrogate} @772 trained 0 times.
+  args:
+    1:	Source @415 ⏎ `Unknown`
+    2:	Source @389 ⏎ `Unknown`
+
+
+@from_network learning_mach struct DoubleRegressor
+       regressor1=ridge
+       regressor2=knn
+       averager=averager
+       end
+
+composite = DoubleRegressor()
+julia&gt; composite = DoubleRegressor()
+DoubleRegressor(
+    regressor1 = RidgeRegressor(
+            lambda = 1.0),
+    regressor2 = KNNRegressor(
+            K = 5,
+            algorithm = :kdtree,
+            metric = Distances.Euclidean(0.0),
+            leafsize = 10,
+            reorder = true,
+            weights = :uniform),
+    averager = Averager(
+            mix = 0.5)) @301
+</code></pre><p>which can be can be evaluated like any other model:</p><pre><code class="language-julia">composite.averager.mix = 0.25 # adjust mix from default of 0.5
+julia&gt; evaluate(composite, (@load_reduced_ames)..., measure=rms)
+Evaluating over 6 folds: 100%[=========================] Time: 0:00:00
+┌───────────┬───────────────┬────────────────────────────────────────────────────────┐
+│ _.measure │ _.measurement │ _.per_fold                                             │
+├───────────┼───────────────┼────────────────────────────────────────────────────────┤
+│ rms       │ 26800.0       │ [21400.0, 23700.0, 26800.0, 25900.0, 30800.0, 30700.0] │
+└───────────┴───────────────┴────────────────────────────────────────────────────────┘
+_.per_observation = [missing]
+_.fitted_params_per_fold = [ … ]
+_.report_per_fold = [ … ]</code></pre><h2 id="Transformers-that-also-predict"><a class="docs-heading-anchor" href="#Transformers-that-also-predict">Transformers that also predict</a><a id="Transformers-that-also-predict-1"></a><a class="docs-heading-anchor-permalink" href="#Transformers-that-also-predict" title="Permalink"></a></h2><p>Some clustering algorithms learn to label data by identifying a collection of &quot;centroids&quot; in the training data. Any new input observation is labeled with the cluster to which it is closest (this is the output of <code>predict</code>) while the vector of all distances from the centroids defines a lower-dimensional representation of the observation (the output of <code>transform</code>). In the following example a K-means clustering algorithm assigns one of three labels 1, 2, 3 to the input features of the iris data set and compares them with the actual species recorded in the target (not seen by the algorithm).</p><pre><code class="language-julia">import Random.seed!
+seed!(123)
+
+X, y = @load_iris;
+KMeans = @load KMeans pkg=ParallelKMeans
+kmeans = KMeans()
+mach = machine(kmeans, X) |&gt; fit!
+
+# transforming:
+Xsmall = transform(mach);
+selectrows(Xsmall, 1:4) |&gt; pretty
+julia&gt; selectrows(Xsmall, 1:4) |&gt; pretty
+┌─────────────────────┬────────────────────┬────────────────────┐
+│ x1                  │ x2                 │ x3                 │
+│ Float64             │ Float64            │ Float64            │
+│ Continuous          │ Continuous         │ Continuous         │
+├─────────────────────┼────────────────────┼────────────────────┤
+│ 0.0215920000000267  │ 25.314260355029603 │ 11.645232464391299 │
+│ 0.19199200000001326 │ 25.882721893491123 │ 11.489658693899486 │
+│ 0.1699920000000077  │ 27.58656804733728  │ 12.674412792260142 │
+│ 0.26919199999998966 │ 26.28656804733727  │ 11.64392098898145  │
+└─────────────────────┴────────────────────┴────────────────────┘
+
+# predicting:
+yhat = predict(mach);
+compare = zip(yhat, y) |&gt; collect;
+compare[1:8]
+8-element Array{Tuple{CategoricalValue{Int64,UInt32},CategoricalString{UInt32}},1}:
+ (1, &quot;setosa&quot;)
+ (1, &quot;setosa&quot;)
+ (1, &quot;setosa&quot;)
+ (1, &quot;setosa&quot;)
+ (1, &quot;setosa&quot;)
+ (1, &quot;setosa&quot;)
+ (1, &quot;setosa&quot;)
+ (1, &quot;setosa&quot;)
+
+compare[51:58]
+8-element Array{Tuple{CategoricalValue{Int64,UInt32},CategoricalString{UInt32}},1}:
+ (2, &quot;versicolor&quot;)
+ (3, &quot;versicolor&quot;)
+ (2, &quot;versicolor&quot;)
+ (3, &quot;versicolor&quot;)
+ (3, &quot;versicolor&quot;)
+ (3, &quot;versicolor&quot;)
+ (3, &quot;versicolor&quot;)
+ (3, &quot;versicolor&quot;)
+
+compare[101:108]
+8-element Array{Tuple{CategoricalValue{Int64,UInt32},CategoricalString{UInt32}},1}:
+ (2, &quot;virginica&quot;)
+ (3, &quot;virginica&quot;)
+ (2, &quot;virginica&quot;)
+ (2, &quot;virginica&quot;)
+ (2, &quot;virginica&quot;)
+ (2, &quot;virginica&quot;)
+ (3, &quot;virginica&quot;)
+ (2, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../preparing_data/">« Preparing Data</a><a class="docs-footer-nextpage" href="../more_on_probabilistic_predictors/">More on Probablistic Predictors »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 31 December 2021 20:03">Friday 31 December 2021</span>. Using Julia version 1.7.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
