@@ -92,9 +92,9 @@ environment. Alternatively, you can use the interactive macro
 Code](@ref).
 
 Once instantiated, a model's performance can be evaluated with the
-`evaluate` method. Our classifier is a *probablistic* predictor (check
+`evaluate` method. Our classifier is a *probabilistic* predictor (check
 `prediction_type(tree) == :probabilistic`) which means we can specify
-a probablistic measure (metric) like `log_loss`, as well
+a probabilistic measure (metric) like `log_loss`, as well
 deterministic measures like `accuracy` (which are applied after
 computing the mode of each prediction):
 
@@ -109,7 +109,7 @@ Under the hood, `evaluate` calls lower level functions `predict` or
 `predict_mode` according to the type of measure, as shown in the
 output. We shall call these operations directly below.
 
-For more on performance evalutation, see [Evaluating Model
+For more on performance evaluation, see [Evaluating Model
 Performance](evaluating_model_performance.md) for details.
 
 
@@ -140,7 +140,7 @@ subtypes(Finite)
 
 We use the `scitype` function to check how MLJ is going to interpret
 given data. Our choice of encoding for `y` works for
-`DecisionTreeClassfier`, because we have:
+`DecisionTreeClassifier`, because we have:
 
 ```@repl doda
 scitype(y)
@@ -296,10 +296,10 @@ object (see the `scitype` examples below).
 
 The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
 `OrderedFactor{N}`, `Count` and `Textual`. `Missing` and `Nothing` are
-also considered scientifict types. Be sure you read [Scalar scientific
+also considered scientific types. Be sure you read [Scalar scientific
 types](@ref) below to guarantee your scalar data is interpreted
 correctly. Tools exist to coerce the data to have the appropriate
-scientfic type; see
+scientific type; see
 [ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/)
 or run `?coerce` for details.
 
@@ -365,10 +365,10 @@ matrix, use [`MLJ.matrix`](@ref).
 ### Observations correspond to rows, not columns
 
 When supplying models with matrices, or wrapping them in tables, each
-*row* should correpsond to a different observation. That is, the
+*row* should correspond to a different observation. That is, the
 matrix should be `n x p`, where `n` is the number of observations and
 `p` the number of features. However, *some models may perform better* if
-supplied the *adjoint* of a `p x n` matrix instead, and obervation
+supplied the *adjoint* of a `p x n` matrix instead, and observation
 resampling is always more efficient in this case.
 
 
@@ -407,9 +407,9 @@ i.input_scitype
 i.target_scitype
 ```
 
-This output indicates that any table with `Countinous`, `Count` or
+This output indicates that any table with `Continuous`, `Count` or
 `OrderedFactor` columns is acceptable as the input `X`, and that any
-vector with elment scitype `<: Finite` is acceptable as the target
+vector with element scitype `<: Finite` is acceptable as the target
 `y`.
 
 For more on matching models to data, see [Model Search](@ref model_search).
