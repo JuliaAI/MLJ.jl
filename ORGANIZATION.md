@@ -74,7 +74,7 @@ its conventional use, are marked with a ⟂ symbol:
   such as Lasso, Elastic-Net, Robust regression, LAD regression,
   etc. 
 
-* [MLJFlux.jl](https://github.com/JuliaAI/MLJFlux.jl) an experimental
+* [MLJFlux.jl](https://github.com/FluxML/MLJFlux.jl) an experimental
   package for gradient-descent models, such as traditional
   neural-networks, built with
   [Flux.jl](https://github.com/FluxML/Flux.jl), in MLJ.

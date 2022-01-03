@@ -42,7 +42,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 
 ### Adding models
 
-- [ ] **Integrate deep learning** using [Flux.jl](https://github.com/FluxML/Flux.jl.git) deep learning.  [Done](https://github.com/JuliaAI/MLJFlux.jl) but can
+- [ ] **Integrate deep learning** using [Flux.jl](https://github.com/FluxML/Flux.jl.git) deep learning.  [Done](https://github.com/FluxML/MLJFlux.jl) but can
   improve experience by:
 
   - [x] finishing iterative model wrapper [#139](https://github.com/alan-turing-institute/MLJ.jl/issues/139)
