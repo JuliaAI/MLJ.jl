@@ -98,7 +98,8 @@ export mav, mae, mape, rms, rmsl, rmslp1, rmsp, l1, l2, log_cosh,
     RMS, rmse, RootMeanSquaredError, root_mean_squared_error,
     RootMeanSquaredLogError, RMSL, root_mean_squared_log_error, rmsl, rmsle,
     RootMeanSquaredLogProportionalError, rmsl1, RMSLP,
-    MAPE, MeanAbsoluteProportionalError, log_cosh_loss, LogCosh, LogCoshLoss, Rsquared, rsq, rsquared 
+    MAPE, MeanAbsoluteProportionalError, log_cosh_loss, LogCosh, LogCoshLoss,
+    Rsquared, rsq, rsquared 
 
 # MLJBase/measures/confusion_matrix.jl:
 export confusion_matrix, confmat, ConfusionMatrix
