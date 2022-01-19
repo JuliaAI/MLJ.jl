@@ -13,7 +13,14 @@ variance.
  abstract_type = Unsupervised,
  deep_properties = (),
  docstring =
-     &quot;  Principal component analysis. Learns a linear transformation to\nproject the data  on a lower dimensional space while preserving most of the initial\nvariance.\n\n→ based on [MultivariateStats](https://github.com/JuliaStats/MultivariateStats.jl).\n→ do `@load PCA pkg=\&quot;MultivariateStats\&quot;` to use the model.\n→ do `?PCA` for documentation.&quot;,
+     &quot;&quot;&quot;
+       Principal component analysis. Learns a linear transformation to
+     project the data  on a lower dimensional space while preserving most of the initial
+     variance.
+
+     → based on [MultivariateStats](https://github.com/JuliaStats/MultivariateStats.jl).
+     → do `@load PCA pkg=&quot;MultivariateStats&quot;` to use the model.
+     → do `?PCA` for documentation.&quot;&quot;&quot;,
  fit_data_scitype =
      Tuple{Table{_s28} where _s28&lt;:(AbstractVector{_s29} where _s29&lt;:Continuous)},
  hyperparameter_ranges = (nothing, nothing, nothing, nothing),
@@ -86,7 +93,20 @@ with a multivariate Gaussian class-conditional distribution.
  abstract_type = Probabilistic,
  deep_properties = (),
  docstring =
-     &quot;  Bayesian Multiclass linear discriminant analysis. The algorithm\nlearns a projection matrix `P` that projects a feature matrix `Xtrain` onto a lower\ndimensional space of dimension `out_dim` such that the trace of the transformed\nbetween-class scatter matrix(`Pᵀ*Sb*P`) is maximized relative to the trace of the\ntransformed within-class scatter matrix (`Pᵀ*Sw*P`). The projection matrix is scaled \nsuch that `Pᵀ*Sw*P = n` or `Pᵀ*Σw*P=I` (Where `n` is the number of training samples \nand `Σw` is the within-class covariance matrix).\nPredicted class posterior probability distibution are derived by applying Bayes rule \nwith a multivariate Gaussian class-conditional distribution.\n\n→ based on [MultivariateStats](https://github.com/JuliaStats/MultivariateStats.jl).\n→ do `@load BayesianLDA pkg=\&quot;MultivariateStats\&quot;` to use the model.\n→ do `?BayesianLDA` for documentation.&quot;,
+     &quot;&quot;&quot;
+       Bayesian Multiclass linear discriminant analysis. The algorithm
+     learns a projection matrix `P` that projects a feature matrix `Xtrain` onto a lower
+     dimensional space of dimension `out_dim` such that the trace of the transformed
+     between-class scatter matrix(`Pᵀ*Sb*P`) is maximized relative to the trace of the
+     transformed within-class scatter matrix (`Pᵀ*Sw*P`). The projection matrix is scaled
+     such that `Pᵀ*Sw*P = n` or `Pᵀ*Σw*P=I` (Where `n` is the number of training samples
+     and `Σw` is the within-class covariance matrix).
+     Predicted class posterior probability distibution are derived by applying Bayes rule
+     with a multivariate Gaussian class-conditional distribution.
+
+     → based on [MultivariateStats](https://github.com/JuliaStats/MultivariateStats.jl).
+     → do `@load BayesianLDA pkg=&quot;MultivariateStats&quot;` to use the model.
+     → do `?BayesianLDA` for documentation.&quot;&quot;&quot;,
  fit_data_scitype =
      Tuple{Table{_s28} where _s28&lt;:(AbstractVector{_s29} where _s29&lt;:Continuous), AbstractVector{_s12043} where _s12043&lt;:Finite},
  hyperparameter_ranges =
@@ -150,4 +170,4 @@ end</code></pre><h2 id="API"><a class="docs-heading-anchor" href="#API">API</a><
 localmodels(filters...; modl=Main)
 localmodels(needle::Union{AbstractString,Regex}; modl=Main)</code></pre><p>List all models currently available to the user from the module <code>modl</code> without importing a package, and which additional pass through the specified filters. Here a <em>filter</em> is a <code>Bool</code>-valued function on models.</p><p>Use <code>load_path</code> to get the path to some model returned, as in these examples:</p><pre><code class="language-none">ms = localmodels()
 model = ms[1]
-load_path(model)</code></pre><p>See also <a href="#MLJModels.models"><code>models</code></a>, <a href="../loading_model_code/#StatisticalTraits.load_path"><code>load_path</code></a>.</p></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../working_with_categorical_data/">« Working with Categorical Data</a><a class="docs-footer-nextpage" href="../loading_model_code/">Loading Model Code »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 3 January 2022 23:50">Monday 3 January 2022</span>. Using Julia version 1.7.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+load_path(model)</code></pre><p>See also <a href="#MLJModels.models"><code>models</code></a>, <a href="../loading_model_code/#StatisticalTraits.load_path"><code>load_path</code></a>.</p></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../working_with_categorical_data/">« Working with Categorical Data</a><a class="docs-footer-nextpage" href="../loading_model_code/">Loading Model Code »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 19 January 2022 23:50">Wednesday 19 January 2022</span>. Using Julia version 1.7.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

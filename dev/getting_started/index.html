@@ -36,7 +36,27 @@ julia&gt; first(X, 3) |&gt; pretty
 │ 5.7          │ 2.8         │ 4.1          │ 1.3         │
 │ 7.2          │ 3.0         │ 5.8          │ 1.6         │
 └──────────────┴─────────────┴──────────────┴─────────────┘</code></pre><p>This call to <code>unpack</code> splits off any column with name <code>==</code> to <code>:target</code> into something called <code>y</code>, and all the remaining columns into <code>X</code>.</p><p>To list <em>all</em> models available in MLJ&#39;s <a href="../model_search/#model_search">model registry</a> do <code>models()</code>. Listing the models compatible with the present data:</p><pre><code class="language-julia-repl">julia&gt; models(matching(X,y))
-ERROR: UndefVarError: scitype not defined</code></pre><p>In MLJ a <em>model</em> is a struct storing the hyperparameters of the learning algorithm indicated by the struct name (and nothing else). For common problems matching data to models, see <a href="../model_search/#model_search">Model Search</a> and <a href="../preparing_data/#Preparing-Data">Preparing Data</a>.</p><p>Assuming the MLJDecisionTreeInterface.jl package is in your load path (see <a href="../about_mlj/#Installation">Installation</a>) we can use <code>@load</code> to import the <code>DecisionTreeClassifier</code> model type, which we will bind to <code>Tree</code>:</p><pre><code class="language-julia-repl">julia&gt; Tree = @load DecisionTreeClassifier pkg=DecisionTree
+47-element Vector{NamedTuple{(:name, :package_name, :is_supervised, :abstract_type, :deep_properties, :docstring, :fit_data_scitype, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :inverse_transform_scitype, :is_pure_julia, :is_wrapper, :iteration_parameter, :load_path, :package_license, :package_url, :package_uuid, :predict_scitype, :prediction_type, :supports_class_weights, :supports_online, :supports_training_losses, :supports_weights, :transform_scitype, :input_scitype, :target_scitype, :output_scitype)}}:
+ (name = AdaBoostClassifier, package_name = ScikitLearn, ... )
+ (name = AdaBoostStumpClassifier, package_name = DecisionTree, ... )
+ (name = BaggingClassifier, package_name = ScikitLearn, ... )
+ (name = BayesianLDA, package_name = MultivariateStats, ... )
+ (name = BayesianLDA, package_name = ScikitLearn, ... )
+ (name = BayesianQDA, package_name = ScikitLearn, ... )
+ (name = BayesianSubspaceLDA, package_name = MultivariateStats, ... )
+ (name = ConstantClassifier, package_name = MLJModels, ... )
+ (name = DecisionTreeClassifier, package_name = BetaML, ... )
+ (name = DecisionTreeClassifier, package_name = DecisionTree, ... )
+ ⋮
+ (name = RidgeCVClassifier, package_name = ScikitLearn, ... )
+ (name = RidgeClassifier, package_name = ScikitLearn, ... )
+ (name = SGDClassifier, package_name = ScikitLearn, ... )
+ (name = SVC, package_name = LIBSVM, ... )
+ (name = SVMClassifier, package_name = ScikitLearn, ... )
+ (name = SVMLinearClassifier, package_name = ScikitLearn, ... )
+ (name = SVMNuClassifier, package_name = ScikitLearn, ... )
+ (name = SubspaceLDA, package_name = MultivariateStats, ... )
+ (name = XGBoostClassifier, package_name = XGBoost, ... )</code></pre><p>In MLJ a <em>model</em> is a struct storing the hyperparameters of the learning algorithm indicated by the struct name (and nothing else). For common problems matching data to models, see <a href="../model_search/#model_search">Model Search</a> and <a href="../preparing_data/#Preparing-Data">Preparing Data</a>.</p><p>Assuming the MLJDecisionTreeInterface.jl package is in your load path (see <a href="../about_mlj/#Installation">Installation</a>) we can use <code>@load</code> to import the <code>DecisionTreeClassifier</code> model type, which we will bind to <code>Tree</code>:</p><pre><code class="language-julia-repl">julia&gt; Tree = @load DecisionTreeClassifier pkg=DecisionTree
 [ Info: For silent loading, specify `verbosity=0`. 
 import MLJDecisionTreeInterface ✔
 MLJDecisionTreeInterface.DecisionTreeClassifier</code></pre><p>(In this case we need to specify <code>pkg=...</code> because multiple packages provide a model type with name <code>DecisionTreeClassifier</code>.) Now we can instantiate a model with default hyperparameters:</p><pre><code class="language-julia-repl">julia&gt; tree = Tree()
@@ -78,8 +98,8 @@ AbstractVector{Count} (alias for AbstractArray{Count, 1})</code></pre><p>and usi
 Machine{DecisionTreeClassifier,…} trained 0 times; caches data
   model: MLJDecisionTreeInterface.DecisionTreeClassifier
   args:
-    1:	Source @220 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @403 ⏎ `AbstractVector{Multiclass{3}}`</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7); # 70:30 split
+    1:	Source @802 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @975 ⏎ `AbstractVector{Multiclass{3}}`</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7); # 70:30 split
 
 julia&gt; fit!(mach, rows=train);
 [ Info: Training Machine{DecisionTreeClassifier,…}.
@@ -141,14 +161,14 @@ julia&gt; mach2 = machine(stand, v)
 Machine{Standardizer,…} trained 0 times; caches data
   model: Standardizer
   args:
-    1:	Source @738 ⏎ `AbstractVector{Continuous}`
+    1:	Source @789 ⏎ `AbstractVector{Continuous}`
 
 julia&gt; fit!(mach2)
 [ Info: Training Machine{Standardizer,…}.
 Machine{Standardizer,…} trained 1 time; caches data
   model: Standardizer
   args:
-    1:	Source @738 ⏎ `AbstractVector{Continuous}`
+    1:	Source @789 ⏎ `AbstractVector{Continuous}`
 
 julia&gt; w = transform(mach2, v)
 4-element Vector{Float64}:
@@ -236,7 +256,11 @@ CART decision tree classifier.
  abstract_type = Probabilistic,
  deep_properties = (),
  docstring =
-     &quot;CART decision tree classifier.\n→ based on [DecisionTree](https://github.com/bensadeghi/DecisionTree.jl).\n→ do `@load DecisionTreeClassifier pkg=\&quot;DecisionTree\&quot;` to use the model.\n→ do `?DecisionTreeClassifier` for documentation.&quot;,
+     &quot;&quot;&quot;
+     CART decision tree classifier.
+     → based on [DecisionTree](https://github.com/bensadeghi/DecisionTree.jl).
+     → do `@load DecisionTreeClassifier pkg=&quot;DecisionTree&quot;` to use the model.
+     → do `?DecisionTreeClassifier` for documentation.&quot;&quot;&quot;,
  fit_data_scitype =
      Tuple{Table{_s28} where _s28&lt;:Union{AbstractVector{_s29} where _s29&lt;:Continuous, AbstractVector{_s29} where _s29&lt;:Count, AbstractVector{_s29} where _s29&lt;:OrderedFactor}, AbstractVector{_s41} where _s41&lt;:Finite},
  hyperparameter_ranges = (nothing,
@@ -333,4 +357,4 @@ Vector{Matrix{ColorTypes.RGB{Float64}}}
 
 julia&gt; scitype(v)
 AbstractVector{ColorImage{10, 10}}
-</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="ScientificTypes.autotype" href="#ScientificTypes.autotype"><code>ScientificTypes.autotype</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">autotype(X; kw...)</code></pre><p>Return a dictionary of suggested scitypes for each column of <code>X</code>, a table or an array based on rules</p><p><strong>Kwargs</strong></p><ul><li><code>only_changes=true</code>:       if true, return only a dictionary of the names for                             which applying autotype differs from just using                             the ambient convention. When coercing with                             autotype, <code>only_changes</code> should be true.</li><li><code>rules=(:few_to_finite,)</code>: the set of rules to apply.</li></ul></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../about_mlj/">« About MLJ</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 3 January 2022 23:50">Monday 3 January 2022</span>. Using Julia version 1.7.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="ScientificTypes.autotype" href="#ScientificTypes.autotype"><code>ScientificTypes.autotype</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">autotype(X; kw...)</code></pre><p>Return a dictionary of suggested scitypes for each column of <code>X</code>, a table or an array based on rules</p><p><strong>Kwargs</strong></p><ul><li><code>only_changes=true</code>:       if true, return only a dictionary of the names for                             which applying autotype differs from just using                             the ambient convention. When coercing with                             autotype, <code>only_changes</code> should be true.</li><li><code>rules=(:few_to_finite,)</code>: the set of rules to apply.</li></ul></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../about_mlj/">« About MLJ</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 19 January 2022 23:50">Wednesday 19 January 2022</span>. Using Julia version 1.7.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
