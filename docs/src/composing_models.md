@@ -98,8 +98,8 @@ then inverse-transforms those predictions to restore them to the
 original scale. (This represents a model we could alternatively build
 using the `TransformedTargetModel` wrapper and a pipeline.) Here we
 have only dynamic operations, labelled blue. The machines are in
-green. Notice that two operations both use `stand`, which stores the
-learned standardization scale parameters. The lower "Training" panel
+green. Notice that two operations both use `box`, which stores the
+learned Box-Cox parameters. The lower "Training" panel
 indicates which nodes are used to train each machine, and what model
 each machine is associated with.
 

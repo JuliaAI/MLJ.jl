@@ -13,7 +13,7 @@ using Pkg
 Pkg.activate(@__DIR__)
 Pkg.instantiate()
 
-# Assuming Julia 1.6
+# Assuming Julia 1.7
 
 # In MLJ a *model* is just a container for hyper-parameters, and that's
 # all. Here we will apply several kinds of model composition before
@@ -54,7 +54,7 @@ iterated_booster = IteratedModel(model=booster,
 
 # Combining the model with categorical feature encoding:
 
-pipe = @pipeline ContinuousEncoder iterated_booster
+pipe = ContinuousEncoder |> iterated_booster
 
 
 # ### Composition 3: Wrapping the model to make it "self-tuning"
