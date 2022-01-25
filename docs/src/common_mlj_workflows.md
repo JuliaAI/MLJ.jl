@@ -94,7 +94,7 @@ nothing # hide
 Or, if already horizontally split:
 
 ```@example workflows
-(Xtrain, ytrain), (Xtest, ytest)  = partition((X, y), 0.6, multi=true,  rng=123)
+(Xtrain, Xtest), (ytrain, ytest)  = partition((X, y), 0.6, multi=true,  rng=123)
 ```
 
 
