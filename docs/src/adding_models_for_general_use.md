@@ -1228,6 +1228,14 @@ deterministic predictions conforming to `OrderedFactor{2}`, with the first
 class being the normal class and the second class being the outlier.
 Probabilistic models predict a `UnivariateFinite` estimate of those classes.
 
+It is typically possible to automatically convert an outlier detection model
+to a probabilistic or deterministic model if the training scores are stored in
+the model's `report`. Below mentioned `OutlierDetection.jl` package, for example,
+stores the training scores under the `scores` key in the `report` returned from
+`fit`. It is then possible to use model wrappers such as 
+`OutlierDetection.ProbabilisticDetector` to automatically convert a model to
+enable predictions of the required output type.
+
 !!! note "External outlier detection packages"
 
     [OutlierDetection.jl](https://github.com/OutlierDetectionJL/OutlierDetection.jl)
