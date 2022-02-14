@@ -11,7 +11,6 @@
   <a href="mlj_cheatsheet" style="color: #9558B2;">Cheatsheet</a>       &nbsp;|&nbsp;
   <a href="common_mlj_workflows" style="color: #9558B2;">Workflows</a>  &nbsp;|&nbsp;
   <a href="https://github.com/alan-turing-institute/MLJ.jl/" style="color: #9558B2;">For Developers</a> &nbsp;|&nbsp;
-  <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb" style="color: #9558B2;">Live Demo</a> &nbsp;|&nbsp;
   <a href="third_party_packages" style="color: #9558B2;">3rd Party Packages</a>
 </div>
 
