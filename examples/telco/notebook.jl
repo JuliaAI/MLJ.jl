@@ -1,0 +1,704 @@
+# # MLJ for Data Scientists in Two Hours
+
+# An end-to-end application of the [MLJ
+# toolbox](https://alan-turing-institute.github.io/MLJ.jl/dev/) to the
+# Telco Customer Churn dataset, aimed at practicing data scientists
+# new to MLJ (Machine Learning in Julia).
+
+# MLJ is a *multi-paradigm* machine learning toolbox (i.e., not just
+# deep-learning).
+
+# **New to machine learning?**
+# Try the "Introduction to Statistical Learning" notebooks at [Data
+# Science
+# Tutorials](https://juliaai.github.io/DataScienceTutorials.jl/),
+# starting with [this
+# tutorial](https://juliaai.github.io/DataScienceTutorials.jl/isl/lab-2/).
+# Or have a look at the [Julia Data
+# Science](https://github.com/JuliaDataScience/JuliaDataScience) book.
+
+# **Want a shorter tour of key MLJ functionality?**
+# Try this [Lightning
+# Tour](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/lightning_tour/lightning_tour.ipynb).
+
+# **Something more leisurely?** See
+# [MLJTutorial](https://github.com/ablaom/MLJTutorial.jl).
+
+# **Completely new to Julia?** Browse [these
+# resources](https://julialang.org/learning/) or visit
+# [HelloJulia](https://github.com/ablaom/HelloJulia.jl).
+
+# For more end-to-end examples, see [Data Science
+# Tutorials](https://juliaai.github.io/DataScienceTutorials.jl).
+
+# **Prerequisites for this tutorial.** Previous experience building,
+# evaluating, and optimizing machine learning models using
+# scikit-learn, caret, MLR, weka, or similar tool. No previous
+# experience with MLJ. Only fairly basic familiarity with
+# Julia is required. Uses
+# [DataFrames.jl](https://dataframes.juliadata.org/stable/) but in a
+# minimal way.
+
+# **Time.** About two hours, first time through.
+
+# **Tools introduced:**
+
+# |code   | purpose|
+# |:-------|:-------------------------------------------------------|
+# |`OpenML.load(id)` | grab a dataset from [OpenML.org](https://www.openml.org)|
+# |`scitype(X)`      | inspect the scientific type (scitype) of object `X`|
+# |`schema(X)`       | inspect the column scitypes (scientific types) of a table `X`|
+# |`coerce(X, ...)`   | fix column encodings to get appropriate scitypes|
+# |`partition(data, frac1, frac2, ...; rng=...)` | vertically split `data`, which can be a table, vector or matrix|
+# |`unpack(table, f1, f2, ...)` | horizontally split `table` based on conditions `f1`, `f2`, ..., applied to column names|
+# |`@load ModelType pkg=...`           | load code defining a model type|
+# |`input_scitype(model)` | inspect the scitype that a model requires for features (inputs)|
+# |`target_scitype(model)`| inspect the scitype that a model requires for the target (labels)|
+# |`ContinuousEncoder`   | built-in model type for re-encoding all features as `Continuous`|# |`model1 |> model2` |> ...` | combine multiple models into a pipeline
+# | `measures("under curve")` | list all measures (metrics) with string "under curve" in documentation
+# | `accuracy(yhat, y)` | compute accuracy of predictions `yhat` against ground truth observations `y`
+# | `auc(yhat, y)`, `brier_loss(yhat, y)` | evaluate two probabilistic measures (`yhat` a vector of probability distributions)
+# | `machine(model, X, y)` | bind `model` to training data `X` (features) and `y` (target)
+# | `fit!(mach, rows=...)` | train machine using specified rows (observation indices)
+# | `predict(mach, rows=...)`, | make in-sample model predictions given specified rows
+# | `predict(mach, Xnew)` | make predictions given new features `Xnew`
+# | `fitted_params(mach)` | inspect learned parameters
+# | `report(mach)`        | inspect other outcomes of training
+# | `confmat(yhat, y)`    | confusion matrix for predictions `yhat` and ground truth `y`
+# | `roc(yhat, y)` | compute points on the receiver-operator Characteristic
+# | `StratifiedCV(nfolds=6)` | 6-fold stratified cross-validation resampling strategy
+# | `Holdout(fraction_train=0.7)` | holdout resampling strategy
+# | `evaluate!(mach; resampling=..., options...)` | estimate performance metrics of model bound to data
+# | `FeatureSelector()` | transformer for selecting features
+# | `Step(3)` | iteration control for stepping 3 iterations
+# | `NumberSinceBest(6)`, `TimeLimit(60/5), InvalidValue()` | iteration control stopping criteria
+# | `IteratedModel(model=..., controls=..., options...)` | wrap an iterative `model` in control strategies
+# | `range(model,  :some_hyperparam, lower=..., upper=...)` | define a numeric range
+# | `RandomSearch()` | random search tuning strategy
+# | `TunedModel(model=..., tuning=..., options...)` | wrap the supervised `model` in specified `tuning` strategy
+
+
+# ## Instantiate a Julia environment
+
+# The following code replicates precisely the set of Julia packages
+# used to develop this tutorial. If this is your first time running
+# the notebook, package instantiation and pre-compilation may take a
+# minute or so to complete.
+
+using Pkg
+Pkg.activate(@__DIR__) # get env from TOML files in same directory as this notebook
+Pkg.instantiate()
+
+
+# ## Warm up: Building a model for the iris dataset
+
+# Before turning to the Telco Customer Churn dataset, we very quickly
+# build a predictive model for Fisher's well-known iris data set, as way of
+# introducing the main actors in any MLJ workflow. Details that you
+# don't fully grasp should become clearer in the Telco study.
+
+# This section is a condensed adaption of the [Getting Started
+# example](https://alan-turing-institute.github.io/MLJ.jl/dev/getting_started/#Fit-and-predict)
+# in the MLJ documentation.
+
+# First, using the built-in iris dataset, we load and inspect the features
+# `X` (a table) and target variable `y` (a vector):
+
+using MLJ
+const X_iris, y_iris = @load_iris;
+schema(X_iris)
+
+#-
+
+y_iris[1:4]
+
+#
+
+levels(y_iris)
+
+# We load a decision tree model, from the package DecisionTree.jl:
+
+DecisionTree = @load DecisionTreeClassifier pkg=DecisionTree # model type
+model = DecisionTree(min_samples_split=5)                    # model instance
+
+# Recall that a *model* is just a container for hyper-parameters of
+# some learning algorithm. It does not store learned parameters.
+
+# Next, we bind the model together with the available data in what's
+# called a *machine*:
+
+mach = machine(model, X_iris, y_iris)
+
+# A machine is essentially just a model (ie, hyper-parameters) plus data, but
+# it additionally stores *learned parameters* (the tree) once it is
+# trained on some view of the data:
+
+train = vcat(1:60, 91:150); # some row indices (observations are rows not columns)
+fit!(mach, rows=train)
+fitted_params(mach)
+
+# A machine stores some other information enabling [warm
+# restart](https://alan-turing-institute.github.io/MLJ.jl/dev/machines/#Warm-restarts)
+# for some models, but we won't go into that here. You are allowed to
+# access and mutate the `model` parameter:
+
+mach.model.min_samples_split  = 10
+fit!(mach, rows=train) # re-train with new hyper-parameter
+
+# Now we can make predictions on some other view of the data, as in
+
+predict(mach, rows=71:73)
+
+# or on completely new data, as in
+
+Xnew = (sepal_length = [5.1, 6.3],
+        sepal_width = [3.0, 2.5],
+        petal_length = [1.4, 4.9],
+        petal_width = [0.3, 1.5])
+yhat = predict(mach, Xnew)
+
+# These are probabilistic predictions which can be manipulated using a
+# widely adopted interface defined in the Distributions.jl
+# package. For example, we can get raw probabilities like this:
+
+pdf.(yhat, "virginica")
+
+
+# We now turn to the Telco data
+
+
+# ## Getting the Telco data
+
+using MLJ
+import DataFrames
+
+data = OpenML.load(42178) # data set from OpenML.org
+df = DataFrames.DataFrame(data)
+first(df, 4)
+
+# The object of this tutorial is to build and evaluate supervised
+# learning models to predict the `:Churn` variable, a binary variable
+# measuring customer retention, based on other variables that are
+# relevant.
+
+# In the table, observations correspond to rows, and features to
+# columns, which is the convention for representing all
+# two-dimensional data in MLJ.
+
+
+# ## Type coercion
+
+# > Introduces: `scitype`, `schema`, `coerce`
+
+# A ["scientific
+# type"](https://juliaai.github.io/ScientificTypes.jl/dev/) or
+# *scitype* indicates how MLJ will *interpret* data. For example,
+# `typeof(3.14) == Float64`, while `scitype(3.14) == Continuous` and
+# also `scitype(3.14f0) == Continuous`. In MLJ, model data
+# requirements are articulated using scitypes.
+
+# Here are common "scalar" scitypes:
+
+# ![](assets/scitypes.png)
+
+# There are also container scitypes. For example, the scitype of any
+# `N`-dimensional array is `AbstractArray{S, N}`, where `S` is the scitype of the
+# elements:
+
+scitype(["cat", "mouse", "dog"])
+
+# The `schema` operator summarizes the column scitypes of a table:
+
+schema(df) |> DataFrames.DataFrame  # converted to DataFrame for better display
+
+# All of the fields being interpreted as `Textual` are really
+# something else, either `Multiclass` or, in the case of
+# `:TotalCharges`, `Continuous`. In fact, `:TotalCharges` is
+# mostly floats wrapped as strings. However, it needs special
+# treatment because some elements consist of a single space, " ",
+# which we'll treat as "0.0".
+
+fix_blanks(v) = map(v) do x
+    if x == " "
+        return "0.0"
+    else
+        return x
+    end
+end
+
+df.TotalCharges = fix_blanks(df.TotalCharges);
+
+# Coercing the `:TotalCharges` type to ensure a `Continuous` scitype:
+
+coerce!(df, :TotalCharges => Continuous);
+
+# Coercing all remaining `Textual` data to `Multiclass`:
+
+coerce!(df, Textual => Multiclass);
+
+# Finally, we'll coerce our target variable `:Churn` to be
+# `OrderedFactor`, rather than `Multiclass`, to enable a reliable
+# interpretation of metrics like "true positive rate".  By convention,
+# the first class is the negative one:
+
+coerce!(df, :Churn => OrderedFactor)
+levels(df.Churn) # to check order
+
+# Re-inspecting the scitypes:
+
+schema(df) |> DataFrames.DataFrame
+
+
+# ## Preparing a holdout set for final testing
+
+# > Introduces: `partition`
+
+# We shuffle the data and split off 30% as a
+# lock-and-throw-away-the-key holdout set:
+
+df, df_test = partition(df, 0.7, rng=123);
+
+
+# ## Splitting data into target and features
+
+# > Introduces: `unpack`
+
+# In the following call, the column with name `:Churn` is copied over
+# to a vector `y`, and every remaining column, except `:customerID`
+# (which contains no useful information) goes into a table `X`. Here
+# `:Churn` is the target variable for which we seek predictions, given
+# new versions of the features `X`.
+
+const y, X = unpack(df, ==(:Churn), !=(:customerID));
+schema(X).names
+
+#-
+
+intersect([:Churn, :customerID], schema(X).names)
+
+# We'll do the same for the holdout data:
+
+const ytest, Xtest = unpack(df_test, ==(:Churn), !=(:customerID));
+
+# ## Loading a model and checking type requirements
+
+# > Introduces: `@load`, `input_scitype`, `target_scitype`
+
+# For tools helping identify suitable models, see the [Model
+# Search](https://alan-turing-institute.github.io/MLJ.jl/dev/model_search/#model_search)
+# section of the manual. We will build a gradient tree-boosting model,
+# a popular first choice for structured data like we have here. Model
+# code is contained in a third-party package called
+# [EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl) which is
+# loaded as follows:
+
+Booster = @load EvoTreeClassifier pkg=EvoTrees
+
+# In MLJ, a *model* is just a container for some algorithm's
+# hyper-parameters. Let's create a `Booster` with default values for
+# the hyper-parameters:
+
+booster = Booster()
+
+# This model is appropriate for the kind of target variable we have because of
+# the following passing test:
+
+scitype(y) <: target_scitype(booster)
+
+# However, our features `X` cannot be directly used with `booster`:
+
+scitype(X) <: input_scitype(booster)
+
+# As it turns out, this is because `booster`, like the majority of MLJ
+# supervised models, expects the features to be `Continuous`. (With
+# some experience, this can be gleaned from `input_scitype(booster)`.)
+# So we need feature encoding, discussed next.
+
+
+# ## Building a model pipeline to incorporate feature encoding
+
+# > Introduces: `ContinuousEncoder`, pipeline operator `|>`
+
+# The built-in `ContinuousEncoder` model transforms an arbitrary table
+# to a table whose features are all `Continuous` (dropping any fields
+# it does not know how to encode). In particular, all `Multiclass`
+# features are one-hot encoded.
+
+# A *pipeline* is a stand-alone model that internally combines one or
+# more models in a linear (non-branching) pipeline. Here's a pipeline
+# that adds the `ContinuousEncoder` as a pre-processor to the
+# gradient tree-boosting model above:
+
+pipe = ContinuousEncoder() |> booster
+
+# Note that the component models appear as hyper-parameters of
+# `pipe`. Pipelines are an implementation of a more general [model
+# composition](https://alan-turing-institute.github.io/MLJ.jl/dev/composing_models/#Composing-Models)
+# interface provided by MLJ that advanced users may want to learn about.
+
+# From the above display, we see that component model hyper-parameters
+# are now *nested*, but they are still accessible (important in hyper-parameter
+# optimization):
+
+pipe.evo_tree_classifier.max_depth
+
+
+# ## Evaluating the pipeline model's performance
+
+# > Introduces: `measures` (function), **measures:** `brier_loss`, `auc`, `accuracy`;
+# > `machine`, `fit!`, `predict`, `fitted_params`, `report`, `roc`, **resampling strategy** `StratifiedCV`, `evaluate!`, `FeatureSelector`
+
+# Without touching our test set `Xtest`, `ytest`, we will estimate the
+# performance of our pipeline model, with default hyper-parameters, in
+# two different ways.
+
+# First, we'll do this "by hand" using the `fit!` and `predict`
+# workflow illustrated for the iris data set above, using a
+# holdout resampling strategy. At the same time we'll see how to
+# generate a **confusion matrix**, **ROC curve**, and inspect
+# **feature importances**.
+
+# Then we'll apply the more typical and convenient `evaluate!`
+# workflow, but using `StratifiedCV` (stratified cross-validation)
+# which is more informative.
+
+# In any case, we need to choose some measures (metrics) to quantify
+# the performance of our model. For a complete list of measures, one
+# does `measures()`. Or we also can do:
+
+measures("Brier")
+
+# We will be primarily using `brier_loss`, but also `auc` (area under
+# the ROC curve) and `accuracy`.
+
+
+# ### Evaluating by hand (with a holdout set)
+
+# Our pipeline model can be trained just like the decision tree model
+# we built for the iris data set. Binding all non-test data to the
+# pipeline model:
+
+mach = machine(pipe, X, y)
+
+# We already encountered the `partition` method above. Here we apply
+# it to row indices, instead of data containers, as `fit!` and
+# `predict` only need a *view* of the data to work.
+
+train, validation = partition(eachindex(y), 0.7)
+fit!(mach, rows=train)
+
+# We note in passing that we can access two kinds of information from a trained machine:
+
+# - The **learned parameters** (eg, coefficients of a linear model): We use `fitted_params(mach)`
+# - Other **by-products of training** (eg, feature importances): We use `report(mach)`
+
+fp = fitted_params(mach);
+keys(fp)
+
+# For example, we can check that the encoder did not actually drop any features:
+
+Set(fp.continuous_encoder.features_to_keep) == Set(schema(X).names)
+
+# And, from the report, extract feature importances:
+
+r = report(mach)
+keys(r.evo_tree_classifier)
+
+#-
+
+fi = r.evo_tree_classifier.feature_importances
+feature_importance_table =
+    (feature=Symbol.(first.(fi)), importance=last.(fi)) |> DataFrames.DataFrame
+
+# For models not reporting feature importances, we recommend the
+# [Shapley.jl](https://expandingman.gitlab.io/Shapley.jl/) package.
+
+# Returning to predictions and evaluations of our measures:
+
+yhat = predict(mach, rows=validation);
+@show brier_loss(yhat, y[validation]) |> mean
+@show auc(yhat, y[validation])
+@show accuracy(mode.(yhat), y[validation]);
+
+# Note that we need `mode` in the last case because `accuracy` expects
+# point predictions, not probabilistic ones. (One can alternatively
+# use `predict_mode` to generate the predictions.)
+
+# While we're here, lets also generate a **confusion matrix** and
+# [receiver-operator
+# characteristic](https://en.wikipedia.org/wiki/Receiver_operating_characteristic)
+# (ROC):
+
+confmat(mode.(yhat), y[validation])
+
+# Note: Importing the plotting package and calling the plotting
+# functions for the first time can take a minute or so.
+
+using Plots
+roc_curve = roc(yhat, y[validation])
+plt = scatter(roc_curve, legend=false)
+plot!(plt, xlab="false positive rate", ylab="true positive rate")
+plot!([0, 1], [0, 1], linewidth=2, linestyle=:dash, color=:black)
+
+
+# ### Automated performance evaluation (more typical workflow)
+
+# Once we have bound our model and data together in a machine (see
+# above) we can alternatively get all the performance estimates (and
+# more) with a single call. To make this more comprehensive, we set
+# `repeats=3` to make our cross-validation "Monte Carlo" (3 random
+# size-6 partitions of the observation space, for a total of 18 folds)
+# and set `acceleration=CPUThreads()` to parallelize the computation.
+
+# We choose a `StratifiedCV` resampling strategy; the complete list of options is
+# [here](https://alan-turing-institute.github.io/MLJ.jl/dev/evaluating_model_performance/#Built-in-resampling-strategies).
+
+e = evaluate!(mach,
+              resampling=StratifiedCV(nfolds=6, rng=123),
+              measures=[brier_loss, auc, accuracy],
+              repeats=3,
+              acceleration=CPUThreads())
+
+# We'll suppose we are happy to accept standard errors of cross-validation scores
+# as useful estimates of uncertainty, and define a utility function to display them:
+
+using Measurements
+function standard_errors(e)
+    measure = e.measure
+    nfolds = length(measure)
+    measurement = [e.measurement[j] ± std(e.per_fold[j])/sqrt(nfolds - 1)
+                   for j in eachindex(measure)]
+    table = (; measure, measurement)
+    return DataFrames.DataFrame(table)
+end
+
+standard_errors(e)
+
+# For more on what the `PerformanceEvaluation` object `e` records, query
+# the `evaluate!` doc-string.
+
+
+# ## Filtering out unimportant features
+
+# > Introduces: `FeatureSelector`
+
+# Before continuing, we'll modify our pipeline to drop those features
+# with low feature importance, to speed up later optimization:
+
+unimportant_features = filter(:importance => <(0.005), feature_importance_table).feature
+
+pipe2 = ContinuousEncoder() |>
+    FeatureSelector(features=unimportant_features, ignore=true) |>
+    booster
+
+# The reader can check this change makes negligible difference to the
+# model's performance.
+
+
+# ## Wrapping our model in control strategies.
+
+# > Introduces: **control strategies:** `Step`, `NumberSinceBest`, `TimeLimit`, `InvalidValue`, **model wrapper** `IteratedModel`, **resampling strategy:** `Holdout`
+
+# We want to optimize the hyper-parameters of our model. Since our
+# model is iterative, these parameters include the (nested) iteration
+# parameter `pipe.evo_tree_classifier.nrounds`. Sometimes this
+# parameter is optimized first, fixed, and then maybe optimized again
+# after the other parameters. Here we take a more principled approach,
+# **wrapping our model in a control strategy** that makes it
+# "self-iterating". The strategy applies a stopping criterion to
+# *out-of-sample* estimates of the model performance, constructed
+# using an internally constructed holdout set. In this way, we avoid
+# some data hygiene issues, and, when we subsequently optimize other
+# parameters, we will always being using an optimal number of
+# iterations.
+
+# Note that this approach can be applied to any iterative MLJ model,
+# eg, the neural network models provided by
+# [MLJFlux.jl](https://github.com/FluxML/MLJFlux.jl).
+
+# First, we select appropriate controls from [this
+# list](https://alan-turing-institute.github.io/MLJ.jl/dev/controlling_iterative_models/#Controls-provided):
+
+controls = [
+    Step(1),              # increment to iteration parameter (`pipe.nrounds`)
+    NumberSinceBest(n=6), # main stopping criterion
+    TimeLimit(0.5/60),    # don't train more than half a minute
+    InvalidValue()        # stop if NaN or ±Inf encountered
+]
+
+# Now we wrap our pipeline model using the `IteratedModel` wrapper,
+# being sure to specify the `measure` on which internal estimates of
+# the out-of-sample performance will be based:
+
+iterated_pipe = IteratedModel(model=pipe2,
+                              controls=controls,
+                              measure=brier_loss, # or BrierLoss()
+                              resampling=Holdout(fraction_train=0.7))
+
+# We've set `resampling=Holdout(fraction_train=0.7)` to arrange that
+# data attached to our model should be internally split into a train
+# set (70%) and a holdout set (30%) for determining the out-of-sample
+# estimate of the Brier loss.
+
+# For demonstration purposes, let's bind `iterated_model` to all data
+# not in our global holdout set, and train on all of that data:
+
+mach = machine(iterated_pipe, X, y)
+fit!(mach, force=true);
+
+# Note that internally this training is split into two separate steps:
+
+# - A controlled iteration step, training on the holdout set, with the total number of iterations determined by the specified stopping criteria (based on the out-of-sample performance estimates)
+# - A final step that trains the atomic model on *all* available
+#   data using the number of iterations determined in the first step. Calling `predict` on the `mach` means using the learned parameters of the second step.
+
+
+# ## Hyper-parameter optimization (model tuning)
+
+# > Introduces: `range`, **model wrapper** `TunedModel`, `RandomSearch`, `save`
+
+# Fine tuning the hyper-parameters of a gradient booster can be
+# somewhat involved. Here we settle for simultaneously optimizing two
+# key parameters: `max_depth` and `η` (learning_rate).
+
+# Like iteration control, **model optimization in MLJ is implemented as
+# a model wrapper**, called `TunedModel`. After wrapping a model in a
+# tuning strategy and binding the wrapped model to data in a machine
+# called `mach`, calling `fit!(mach)` instigates a search for optimal
+# model hyperparameters, within a specified range, and then uses all
+# supplied data to train the best model. To predict using that model,
+# one then calls `predict(mach, Xnew)`. In this way the wrapped model
+# may be viewed as a "self-tuning" version of the unwrapped
+# model. That is, wrapping the model simply transforms certain
+# hyper-parameters into learned parameters (just as `IteratedModel`
+# does for an iteration parameter).
+
+# To start with, we define ranges for the parameters of
+# interest. Since these parameters are nested, let's force a
+# display of our model to a larger depth:
+
+show(iterated_pipe, 2)
+
+#-
+
+p1 = :(model.evo_tree_classifier.max_depth)
+p2 = :(model.evo_tree_classifier.η)
+
+r1 = range(iterated_pipe, p1, lower=2, upper=5)
+r2 = range(iterated_pipe, p2, lower=-3, upper=-2, scale=x->10^x)
+
+# Nominal ranges are defined by specifying `values` instead of `lower`
+# and `upper`.
+
+# Next, we choose an optimization strategy from [this
+# list](https://alan-turing-institute.github.io/MLJ.jl/dev/tuning_models/#Tuning-Models):
+
+tuning = RandomSearch()
+
+# Then we wrap the model, specifying a `resampling` strategy and a
+# `measure`, as we did for `IteratedModel`.  In fact, we can include a
+# battery of `measures`; by default, optimization is with respect to
+# performance estimates based on the first measure, but estimates for
+# all measures can be accessed from the model's `report`.
+
+# The keyword `n` specifies the total number of models (sets of
+# hyper-parameters) to evaluate.
+
+tuned_iterated_pipe = TunedModel(model=iterated_pipe,
+                                 range=[r1, r2],
+                                 tuning=tuning,
+                                 measures=[brier_loss, auc, accuracy],
+                                 resampling=StratifiedCV(nfolds=6, rng=123),
+                                 acceleration=CPUThreads(),
+                                 n=20)
+
+# To save time, we skip the `repeats` here.
+
+# Binding our final model to data and training:
+
+mach = machine(tuned_iterated_pipe, X, y)
+fit!(mach)
+
+# As explained above, the training we have just performed was split
+# internally into two separate steps:
+
+# - A step to determine the parameter values that optimize the
+#   aggregated cross-validation scores
+# - A final step that trains the optimal model on *all* available
+#   data, the outcome which is the basis of all predictions that `mach` makes
+
+# From `report(mach)` we can extract details about the optimization
+# procedure. For example:
+
+r = report(mach);
+best_booster = r.best_model.model.evo_tree_classifier
+
+#-
+
+@show best_booster.max_depth
+@show best_booster.η;
+
+# Using the `standard_errors` function we defined earlier:
+
+e = r.best_history_entry
+standard_errors(e) |> DataFrames.DataFrame # for pretty printing
+
+# And we can visualize the optimization results:
+
+plot(mach)
+
+# Here's how to serialize our final, trained self-iterating,
+# self-tuning pipeline machine:
+
+MLJ.save("tuned_iterated_pipe.jlso", mach)
+
+# Finally, to get an even more accurate estimate of performance, we
+# can evaluate our model using stratified cross-validation and all the
+# data attached to our machine. Because this evaluation implies
+# [nested
+# resampling](https://mlr.mlr-org.com/articles/tutorial/nested_resampling.html)),
+# this computation takes quite a bit longer than the previous one
+# (which is being repeated six times, using 5/6th of the data each
+# time):
+
+e = evaluate!(mach,
+              resampling=StratifiedCV(nfolds=6, rng=123),
+              measures=[brier_loss, auc, accuracy],
+              acceleration=CPUThreads())
+
+standard_errors(e)
+
+
+# ## Testing the final model
+
+# We now determine the performance of our model on our
+# lock-and-throw-away-the-key holdout set. To demonstrate
+# deserialization, we'll pretend we're in a new Julia session (but
+# have and called `import`/`using` on the same packages). Then the
+# following should suffice to recover our trained machine:
+
+mach2 = machine("tuned_iterated_pipe.jlso")
+
+# We compute predictions on the holdout set:
+
+yhat = predict(mach2, Xtest);
+yhat[1]
+
+# And can compute the final performance measures:
+
+@show brier_loss(yhat, ytest) |> mean
+@show auc(yhat, ytest)
+@show accuracy(mode.(yhat), ytest);
+
+# For comparison, here's the performance for the bare pipeline model
+# (no feature selection and default hyperparameters, including number
+# of iterations):
+
+mach3 = machine(pipe, X, y)
+fit!(mach3, verbosity=0)
+
+yhat = predict(mach3, Xtest);
+
+@show brier_loss(yhat, ytest) |> mean
+@show auc(yhat, ytest)
+@show accuracy(mode.(yhat), ytest);
