@@ -68,7 +68,7 @@
 # | `roc(yhat, y)` | compute points on the receiver-operator Characteristic
 # | `StratifiedCV(nfolds=6)` | 6-fold stratified cross-validation resampling strategy
 # | `Holdout(fraction_train=0.7)` | holdout resampling strategy
-# | `evaluate!(mach; resampling=..., options...)` | estimate performance metrics of model bound to data
+# | `evaluate(model, X, y; resampling=..., options...)` | estimate performance metrics `model` using the data `X`, `y`
 # | `FeatureSelector()` | transformer for selecting features
 # | `Step(3)` | iteration control for stepping 3 iterations
 # | `NumberSinceBest(6)`, `TimeLimit(60/5), InvalidValue()` | iteration control stopping criteria
@@ -121,7 +121,7 @@ levels(y_iris)
 DecisionTree = @load DecisionTreeClassifier pkg=DecisionTree # model type
 model = DecisionTree(min_samples_split=5)                    # model instance
 
-# Recall that a *model* is just a container for hyper-parameters of
+# In MLJ, a *model* is just a container for hyper-parameters of
 # some learning algorithm. It does not store learned parameters.
 
 # Next, we bind the model together with the available data in what's
@@ -164,7 +164,7 @@ yhat = predict(mach, Xnew)
 pdf.(yhat, "virginica")
 
 
-# We now turn to the Telco data
+# We now turn to the Telco dataset.
 
 
 # ## Getting the Telco data
@@ -253,10 +253,16 @@ schema(df) |> DataFrames.DataFrame
 
 # > Introduces: `partition`
 
-# We shuffle the data and split off 30% as a
+# To reduce training times for the purposes of this tutorial, we're
+# going to randomly dump 80% of observations. To prevent omit this
+# step, simply delete the following line of code (or notebook cell):
+
+df, df_dumped = partition(df, 0.2, rng=123);
+
+# We shuffle the remaining data and split off 30% as a
 # lock-and-throw-away-the-key holdout set:
 
-df, df_test = partition(df, 0.7, rng=123);
+df, df_test = partition(df, 0.7, rng=456);
 
 
 # ## Splitting data into target and features
@@ -284,7 +290,7 @@ const ytest, Xtest = unpack(df_test, ==(:Churn), !=(:customerID));
 
 # > Introduces: `@load`, `input_scitype`, `target_scitype`
 
-# For tools helping identify suitable models, see the [Model
+# For tools helping us to identify suitable models, see the [Model
 # Search](https://alan-turing-institute.github.io/MLJ.jl/dev/model_search/#model_search)
 # section of the manual. We will build a gradient tree-boosting model,
 # a popular first choice for structured data like we have here. Model
@@ -294,7 +300,7 @@ const ytest, Xtest = unpack(df_test, ==(:Churn), !=(:customerID));
 
 Booster = @load EvoTreeClassifier pkg=EvoTrees
 
-# In MLJ, a *model* is just a container for some algorithm's
+# Recall that a *model* is just a container for some algorithm's
 # hyper-parameters. Let's create a `Booster` with default values for
 # the hyper-parameters:
 
@@ -346,7 +352,7 @@ pipe.evo_tree_classifier.max_depth
 # ## Evaluating the pipeline model's performance
 
 # > Introduces: `measures` (function), **measures:** `brier_loss`, `auc`, `accuracy`;
-# > `machine`, `fit!`, `predict`, `fitted_params`, `report`, `roc`, **resampling strategy** `StratifiedCV`, `evaluate!`, `FeatureSelector`
+# > `machine`, `fit!`, `predict`, `fitted_params`, `report`, `roc`, **resampling strategy** `StratifiedCV`, `evaluate`, `FeatureSelector`
 
 # Without touching our test set `Xtest`, `ytest`, we will estimate the
 # performance of our pipeline model, with default hyper-parameters, in
@@ -358,7 +364,7 @@ pipe.evo_tree_classifier.max_depth
 # generate a **confusion matrix**, **ROC curve**, and inspect
 # **feature importances**.
 
-# Then we'll apply the more typical and convenient `evaluate!`
+# Then we'll apply the more typical and convenient `evaluate`
 # workflow, but using `StratifiedCV` (stratified cross-validation)
 # which is more informative.
 
@@ -384,7 +390,7 @@ mach = machine(pipe, X, y)
 # it to row indices, instead of data containers, as `fit!` and
 # `predict` only need a *view* of the data to work.
 
-train, validation = partition(eachindex(y), 0.7)
+train, validation = partition(1:length(y), 0.7)
 fit!(mach, rows=train)
 
 # We note in passing that we can access two kinds of information from a trained machine:
@@ -443,39 +449,45 @@ plot!([0, 1], [0, 1], linewidth=2, linestyle=:dash, color=:black)
 
 # ### Automated performance evaluation (more typical workflow)
 
-# Once we have bound our model and data together in a machine (see
-# above) we can alternatively get all the performance estimates (and
-# more) with a single call. To make this more comprehensive, we set
-# `repeats=3` to make our cross-validation "Monte Carlo" (3 random
-# size-6 partitions of the observation space, for a total of 18 folds)
-# and set `acceleration=CPUThreads()` to parallelize the computation.
+# We can also get performance estimates with a single call to the
+# `evaluate` function, which also allows for more complicated
+# resampling - in this case stratified cross-validation. To make this
+# more comprehensive, we set `repeats=3` below to make our
+# cross-validation "Monte Carlo" (3 random size-6 partitions of the
+# observation space, for a total of 18 folds) and set
+# `acceleration=CPUThreads()` to parallelize the computation.
 
 # We choose a `StratifiedCV` resampling strategy; the complete list of options is
 # [here](https://alan-turing-institute.github.io/MLJ.jl/dev/evaluating_model_performance/#Built-in-resampling-strategies).
 
-e = evaluate!(mach,
-              resampling=StratifiedCV(nfolds=6, rng=123),
-              measures=[brier_loss, auc, accuracy],
-              repeats=3,
-              acceleration=CPUThreads())
+e = evaluate(pipe, X, y,
+             resampling=StratifiedCV(nfolds=6, rng=123),
+             measures=[brier_loss, auc, accuracy],
+             repeats=3,
+             acceleration=CPUThreads())
 
-# We'll suppose we are happy to accept standard errors of cross-validation scores
-# as useful estimates of uncertainty, and define a utility function to display them:
+# (There is also a version of `evaluate` for machines. Query the
+# `evaluate` and `evaluate!` doc-strings to learn more about these
+# functions and what the `PerformanceEvaluation` object `e` records.)
+
+# While [less than ideal](https://arxiv.org/abs/2104.00673), let's
+# adopt the common practice of using the standard error of a
+# cross-validation score as an estimate of the uncertainty of a
+# performance measure's expected value. Here's a utility function to
+# calculate confidence intervals for our performance estimates based
+# on this practice, and it's application to the current evaluation:
 
 using Measurements
-function standard_errors(e)
+function confidence_intervals(e)
     measure = e.measure
     nfolds = length(measure)
     measurement = [e.measurement[j] ± std(e.per_fold[j])/sqrt(nfolds - 1)
                    for j in eachindex(measure)]
-    table = (; measure, measurement)
+    table = (measure=measure, measurement=measurement)
     return DataFrames.DataFrame(table)
 end
 
-standard_errors(e)
-
-# For more on what the `PerformanceEvaluation` object `e` records, query
-# the `evaluate!` doc-string.
+const performance_basic_model = confidence_intervals(e)
 
 
 # ## Filtering out unimportant features
@@ -522,7 +534,7 @@ pipe2 = ContinuousEncoder() |>
 controls = [
     Step(1),              # increment to iteration parameter (`pipe.nrounds`)
     NumberSinceBest(n=6), # main stopping criterion
-    TimeLimit(0.5/60),    # don't train more than half a minute
+    TimeLimit(0.5/60),    # never train longer than half a minute
     InvalidValue()        # stop if NaN or ±Inf encountered
 ]
 
@@ -541,7 +553,7 @@ iterated_pipe = IteratedModel(model=pipe2,
 # estimate of the Brier loss.
 
 # For demonstration purposes, let's bind `iterated_model` to all data
-# not in our global holdout set, and train on all of that data:
+# not in our don't-touch holdout set, and train on all of that data:
 
 mach = machine(iterated_pipe, X, y)
 fit!(mach, force=true);
@@ -555,7 +567,16 @@ fit!(mach, force=true);
 
 # ## Hyper-parameter optimization (model tuning)
 
-# > Introduces: `range`, **model wrapper** `TunedModel`, `RandomSearch`, `save`
+# > Introduces: `range`, **model wrapper** `TunedModel`, `RandomSearch`
+
+# We now turn to hyper-parameter optimization. A tool not discussed
+# here is the `learning_curve` function, which can be useful when
+# wanting to visualize the effect of changes to a *single*
+# hyper-parameter (which could be an iteration parameter). See, for
+# example, [this section of the
+# manual](https://alan-turing-institute.github.io/MLJ.jl/dev/learning_curves/)
+# or [this
+# tutorial](https://github.com/ablaom/MLJTutorial.jl/blob/dev/notebooks/04_tuning/notebook.ipynb).
 
 # Fine tuning the hyper-parameters of a gradient booster can be
 # somewhat involved. Here we settle for simultaneously optimizing two
@@ -581,11 +602,11 @@ show(iterated_pipe, 2)
 
 #-
 
-p1 = :(model.evo_tree_classifier.max_depth)
-p2 = :(model.evo_tree_classifier.η)
+p1 = :(model.evo_tree_classifier.η)
+p2 = :(model.evo_tree_classifier.max_depth)
 
-r1 = range(iterated_pipe, p1, lower=2, upper=5)
-r2 = range(iterated_pipe, p2, lower=-3, upper=-2, scale=x->10^x)
+r1 = range(iterated_pipe, p2, lower=-3, upper=-2, scale=x->10^x)
+r2 = range(iterated_pipe, p1, lower=2, upper=6)
 
 # Nominal ranges are defined by specifying `values` instead of `lower`
 # and `upper`.
@@ -593,7 +614,7 @@ r2 = range(iterated_pipe, p2, lower=-3, upper=-2, scale=x->10^x)
 # Next, we choose an optimization strategy from [this
 # list](https://alan-turing-institute.github.io/MLJ.jl/dev/tuning_models/#Tuning-Models):
 
-tuning = RandomSearch()
+tuning = RandomSearch(rng=123)
 
 # Then we wrap the model, specifying a `resampling` strategy and a
 # `measure`, as we did for `IteratedModel`.  In fact, we can include a
@@ -610,7 +631,7 @@ tuned_iterated_pipe = TunedModel(model=iterated_pipe,
                                  measures=[brier_loss, auc, accuracy],
                                  resampling=StratifiedCV(nfolds=6, rng=123),
                                  acceleration=CPUThreads(),
-                                 n=20)
+                                 n=25)
 
 # To save time, we skip the `repeats` here.
 
@@ -622,10 +643,8 @@ fit!(mach)
 # As explained above, the training we have just performed was split
 # internally into two separate steps:
 
-# - A step to determine the parameter values that optimize the
-#   aggregated cross-validation scores
-# - A final step that trains the optimal model on *all* available
-#   data, the outcome which is the basis of all predictions that `mach` makes
+# - A step to determine the parameter values that optimize the aggregated cross-validation scores
+# - A final step that trains the optimal model on *all* available data. Future predictions `predict(mach, ...)` are based on this final training step.
 
 # From `report(mach)` we can extract details about the optimization
 # procedure. For example:
@@ -638,35 +657,53 @@ best_booster = r.best_model.model.evo_tree_classifier
 @show best_booster.max_depth
 @show best_booster.η;
 
-# Using the `standard_errors` function we defined earlier:
+# Using the `confidence_intervals` function we defined earlier:
 
 e = r.best_history_entry
-standard_errors(e) |> DataFrames.DataFrame # for pretty printing
+confidence_intervals(e) |> DataFrames.DataFrame # for pretty printing
 
 # And we can visualize the optimization results:
 
 plot(mach)
+
+
+# ## Saving our model
+
+# > Introduces: `MLJ.save`
 
 # Here's how to serialize our final, trained self-iterating,
 # self-tuning pipeline machine:
 
 MLJ.save("tuned_iterated_pipe.jlso", mach)
 
+
+# ## Final performance estimate
+
 # Finally, to get an even more accurate estimate of performance, we
 # can evaluate our model using stratified cross-validation and all the
 # data attached to our machine. Because this evaluation implies
 # [nested
-# resampling](https://mlr.mlr-org.com/articles/tutorial/nested_resampling.html)),
+# resampling](https://mlr.mlr-org.com/articles/tutorial/nested_resampling.html),
 # this computation takes quite a bit longer than the previous one
 # (which is being repeated six times, using 5/6th of the data each
 # time):
 
-e = evaluate!(mach,
-              resampling=StratifiedCV(nfolds=6, rng=123),
-              measures=[brier_loss, auc, accuracy],
-              acceleration=CPUThreads())
+e = evaluate(tuned_iterated_pipe, X, y,
+             resampling=StratifiedCV(nfolds=6, rng=123),
+             measures=[brier_loss, auc, accuracy])
 
-standard_errors(e)
+#-
+
+confidence_intervals(e)
+
+# For comparison, here are the confidence intervals for the basic
+# pipeline model (no feature selection and default hyperparameters):
+
+performance_basic_model
+
+# So we see a small improvement in the `brier_score` and `auc`, but
+# these are not statistically significant improvements; default
+# `booster` hyper-parameters do a pretty good job.
 
 
 # ## Testing the final model
@@ -675,7 +712,8 @@ standard_errors(e)
 # lock-and-throw-away-the-key holdout set. To demonstrate
 # deserialization, we'll pretend we're in a new Julia session (but
 # have and called `import`/`using` on the same packages). Then the
-# following should suffice to recover our trained machine:
+# following should suffice to recover our model trained under
+# "Hyper-parameter optimization" above:
 
 mach2 = machine("tuned_iterated_pipe.jlso")
 
@@ -690,9 +728,7 @@ yhat[1]
 @show auc(yhat, ytest)
 @show accuracy(mode.(yhat), ytest);
 
-# For comparison, here's the performance for the bare pipeline model
-# (no feature selection and default hyperparameters, including number
-# of iterations):
+# For comparison, here's the performance for the basic pipeline model
 
 mach3 = machine(pipe, X, y)
 fit!(mach3, verbosity=0)
@@ -702,3 +738,6 @@ yhat = predict(mach3, Xtest);
 @show brier_loss(yhat, ytest) |> mean
 @show auc(yhat, ytest)
 @show accuracy(mode.(yhat), ytest);
+
+# So, slightly better performance for the optimized model for
+# `brier_score` and `auc` (consistent with our "in-sample" analysis).
