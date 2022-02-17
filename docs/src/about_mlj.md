@@ -130,11 +130,6 @@ Extract:
 └───────────────┴─────────────┴───────────┴───────────────────────────────────────────────┘
 ```
 
-Try out MLJ yourself in the following batteries-included Binder
-[notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb). No
-installation required.
-
-
 ## Key goals
 
 * Offer a consistent way to use, compose and tune machine learning
@@ -298,8 +293,6 @@ intended as a complete reference. Resources for learning MLJ are:
 ### Basic introductions
 
 - the [Getting Started](@ref) section of this manual
-
-- an introductory [binder notebook](https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb) (no Julia/MLJ installation required)
 
 To get direct help from maintainers and other users, see [Getting help
 and reporting problems](@ref).

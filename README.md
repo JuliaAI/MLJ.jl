@@ -12,10 +12,6 @@
     <img src="https://img.shields.io/badge/docs-stable-blue.svg"
          alt="Documentation">
   </a>
-  <a href="https://mybinder.org/v2/gh/alan-turing-institute/MLJ.jl/master?filepath=binder%2FMLJ_demo.ipynb">
-  <img src="https://mybinder.org/badge_logo.svg"
-       alt="Binder">
-  </a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-yelllow"
        alt="bibtex">
