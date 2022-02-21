@@ -31,17 +31,26 @@
 # For more end-to-end examples, see [Data Science
 # Tutorials](https://juliaai.github.io/DataScienceTutorials.jl).
 
+# **Topics covered**: Grabbing and preparing a dataset, basic
+# fit/predict workflow, constructing a pipeline to include data
+# pre-processing, estimating performance metrics, ROC curves, confusion
+# matrices, feature importance, basic feature selection, controlling iterative
+# models, hyper-parameter optimization (tuning).
+
 # **Prerequisites for this tutorial.** Previous experience building,
 # evaluating, and optimizing machine learning models using
 # scikit-learn, caret, MLR, weka, or similar tool. No previous
-# experience with MLJ. Only fairly basic familiarity with
-# Julia is required. Uses
+# experience with MLJ. Only fairly basic familiarity with Julia is
+# required. Uses
 # [DataFrames.jl](https://dataframes.juliadata.org/stable/) but in a
-# minimal way.
+# minimal way ([this
+# cheatsheet](https://ahsmart.com/pub/data-wrangling-with-data-frames-jl-cheat-sheet/index.html)
+# may help).
 
 # **Time.** About two hours, first time through.
 
-# **Tools introduced:**
+
+# ## Summary of methods and types introduced
 
 # |code   | purpose|
 # |:-------|:-------------------------------------------------------|
@@ -102,9 +111,12 @@ Pkg.instantiate()
 # in the MLJ documentation.
 
 # First, using the built-in iris dataset, we load and inspect the features
-# `X` (a table) and target variable `y` (a vector):
+# `X_iris` (a table) and target variable `y_iris` (a vector):
 
 using MLJ
+
+#-
+
 const X_iris, y_iris = @load_iris;
 schema(X_iris)
 
@@ -133,8 +145,8 @@ mach = machine(model, X_iris, y_iris)
 # it additionally stores *learned parameters* (the tree) once it is
 # trained on some view of the data:
 
-train = vcat(1:60, 91:150); # some row indices (observations are rows not columns)
-fit!(mach, rows=train)
+train_rows = vcat(1:60, 91:150); # some row indices (observations are rows not columns)
+fit!(mach, rows=train_rows)
 fitted_params(mach)
 
 # A machine stores some other information enabling [warm
@@ -143,7 +155,7 @@ fitted_params(mach)
 # access and mutate the `model` parameter:
 
 mach.model.min_samples_split  = 10
-fit!(mach, rows=train) # re-train with new hyper-parameter
+fit!(mach, rows=train_rows) # re-train with new hyper-parameter
 
 # Now we can make predictions on some other view of the data, as in
 
@@ -169,12 +181,13 @@ pdf.(yhat, "virginica")
 
 # ## Getting the Telco data
 
-using MLJ
 import DataFrames
 
+#-
+
 data = OpenML.load(42178) # data set from OpenML.org
-df = DataFrames.DataFrame(data)
-first(df, 4)
+df0 = DataFrames.DataFrame(data)
+first(df0, 4)
 
 # The object of this tutorial is to build and evaluate supervised
 # learning models to predict the `:Churn` variable, a binary variable
@@ -209,7 +222,7 @@ scitype(["cat", "mouse", "dog"])
 
 # The `schema` operator summarizes the column scitypes of a table:
 
-schema(df) |> DataFrames.DataFrame  # converted to DataFrame for better display
+schema(df0) |> DataFrames.DataFrame  # converted to DataFrame for better display
 
 # All of the fields being interpreted as `Textual` are really
 # something else, either `Multiclass` or, in the case of
@@ -226,27 +239,27 @@ fix_blanks(v) = map(v) do x
     end
 end
 
-df.TotalCharges = fix_blanks(df.TotalCharges);
+df0.TotalCharges = fix_blanks(df0.TotalCharges);
 
 # Coercing the `:TotalCharges` type to ensure a `Continuous` scitype:
 
-coerce!(df, :TotalCharges => Continuous);
+coerce!(df0, :TotalCharges => Continuous);
 
 # Coercing all remaining `Textual` data to `Multiclass`:
 
-coerce!(df, Textual => Multiclass);
+coerce!(df0, Textual => Multiclass);
 
 # Finally, we'll coerce our target variable `:Churn` to be
 # `OrderedFactor`, rather than `Multiclass`, to enable a reliable
 # interpretation of metrics like "true positive rate".  By convention,
 # the first class is the negative one:
 
-coerce!(df, :Churn => OrderedFactor)
-levels(df.Churn) # to check order
+coerce!(df0, :Churn => OrderedFactor)
+levels(df0.Churn) # to check order
 
 # Re-inspecting the scitypes:
 
-schema(df) |> DataFrames.DataFrame
+schema(df0) |> DataFrames.DataFrame
 
 
 # ## Preparing a holdout set for final testing
@@ -254,15 +267,16 @@ schema(df) |> DataFrames.DataFrame
 # > Introduces: `partition`
 
 # To reduce training times for the purposes of this tutorial, we're
-# going to randomly dump 80% of observations. To prevent omit this
-# step, simply delete the following line of code (or notebook cell):
+# going to dump 90% of observations (after shuffling) and split off
+# 30% of the remainder for use as a lock-and-throw-away-the-key
+# holdout set:
 
-df, df_dumped = partition(df, 0.2, rng=123);
+df, df_test, df_dumped = partition(df0, 0.07, 0.003, # in ratios 7:3:90
+                                   stratified=df.Churn,
+                                   rng=123);
 
-# We shuffle the remaining data and split off 30% as a
-# lock-and-throw-away-the-key holdout set:
-
-df, df_test = partition(df, 0.7, rng=456);
+# The reader interested in including all data can instead do `df,
+# df_test = partition(df0, 0.7, rng=123)`.
 
 
 # ## Splitting data into target and features
@@ -384,21 +398,21 @@ measures("Brier")
 # we built for the iris data set. Binding all non-test data to the
 # pipeline model:
 
-mach = machine(pipe, X, y)
+mach_pipe = machine(pipe, X, y)
 
 # We already encountered the `partition` method above. Here we apply
 # it to row indices, instead of data containers, as `fit!` and
 # `predict` only need a *view* of the data to work.
 
 train, validation = partition(1:length(y), 0.7)
-fit!(mach, rows=train)
+fit!(mach_pipe, rows=train)
 
 # We note in passing that we can access two kinds of information from a trained machine:
 
 # - The **learned parameters** (eg, coefficients of a linear model): We use `fitted_params(mach)`
 # - Other **by-products of training** (eg, feature importances): We use `report(mach)`
 
-fp = fitted_params(mach);
+fp = fitted_params(mach_pipe);
 keys(fp)
 
 # For example, we can check that the encoder did not actually drop any features:
@@ -407,12 +421,12 @@ Set(fp.continuous_encoder.features_to_keep) == Set(schema(X).names)
 
 # And, from the report, extract feature importances:
 
-r = report(mach)
-keys(r.evo_tree_classifier)
+rpt = report(mach_pipe)
+keys(rpt.evo_tree_classifier)
 
 #-
 
-fi = r.evo_tree_classifier.feature_importances
+fi = rpt.evo_tree_classifier.feature_importances
 feature_importance_table =
     (feature=Symbol.(first.(fi)), importance=last.(fi)) |> DataFrames.DataFrame
 
@@ -421,10 +435,12 @@ feature_importance_table =
 
 # Returning to predictions and evaluations of our measures:
 
-yhat = predict(mach, rows=validation);
-@show brier_loss(yhat, y[validation]) |> mean
-@show auc(yhat, y[validation])
-@show accuracy(mode.(yhat), y[validation]);
+ŷ = predict(mach_pipe, rows=validation);
+@info("Measurements",
+      brier_loss(ŷ, y[validation]) |> mean,
+      auc(ŷ, y[validation]),
+      accuracy(mode.(ŷ), y[validation])
+      )
 
 # Note that we need `mode` in the last case because `accuracy` expects
 # point predictions, not probabilistic ones. (One can alternatively
@@ -435,13 +451,16 @@ yhat = predict(mach, rows=validation);
 # characteristic](https://en.wikipedia.org/wiki/Receiver_operating_characteristic)
 # (ROC):
 
-confmat(mode.(yhat), y[validation])
+confmat(mode.(ŷ), y[validation])
 
 # Note: Importing the plotting package and calling the plotting
 # functions for the first time can take a minute or so.
 
 using Plots
-roc_curve = roc(yhat, y[validation])
+
+#-
+
+roc_curve = roc(ŷ, y[validation])
 plt = scatter(roc_curve, legend=false)
 plot!(plt, xlab="false positive rate", ylab="true positive rate")
 plot!([0, 1], [0, 1], linewidth=2, linestyle=:dash, color=:black)
@@ -460,15 +479,15 @@ plot!([0, 1], [0, 1], linewidth=2, linestyle=:dash, color=:black)
 # We choose a `StratifiedCV` resampling strategy; the complete list of options is
 # [here](https://alan-turing-institute.github.io/MLJ.jl/dev/evaluating_model_performance/#Built-in-resampling-strategies).
 
-e = evaluate(pipe, X, y,
-             resampling=StratifiedCV(nfolds=6, rng=123),
-             measures=[brier_loss, auc, accuracy],
-             repeats=3,
-             acceleration=CPUThreads())
+e_pipe = evaluate(pipe, X, y,
+                  resampling=StratifiedCV(nfolds=6, rng=123),
+                  measures=[brier_loss, auc, accuracy],
+                  repeats=3,
+                  acceleration=CPUThreads())
 
 # (There is also a version of `evaluate` for machines. Query the
 # `evaluate` and `evaluate!` doc-strings to learn more about these
-# functions and what the `PerformanceEvaluation` object `e` records.)
+# functions and what the `PerformanceEvaluation` object `e_pipe` records.)
 
 # While [less than ideal](https://arxiv.org/abs/2104.00673), let's
 # adopt the common practice of using the standard error of a
@@ -478,6 +497,9 @@ e = evaluate(pipe, X, y,
 # on this practice, and it's application to the current evaluation:
 
 using Measurements
+
+#-
+
 function confidence_intervals(e)
     measure = e.measure
     nfolds = length(measure)
@@ -487,7 +509,7 @@ function confidence_intervals(e)
     return DataFrames.DataFrame(table)
 end
 
-const performance_basic_model = confidence_intervals(e)
+const confidence_intervals_basic_model = confidence_intervals(e_pipe)
 
 
 # ## Filtering out unimportant features
@@ -500,8 +522,7 @@ const performance_basic_model = confidence_intervals(e)
 unimportant_features = filter(:importance => <(0.005), feature_importance_table).feature
 
 pipe2 = ContinuousEncoder() |>
-    FeatureSelector(features=unimportant_features, ignore=true) |>
-    booster
+    FeatureSelector(features=unimportant_features, ignore=true) |> booster
 
 # The reader can check this change makes negligible difference to the
 # model's performance.
@@ -555,8 +576,8 @@ iterated_pipe = IteratedModel(model=pipe2,
 # For demonstration purposes, let's bind `iterated_model` to all data
 # not in our don't-touch holdout set, and train on all of that data:
 
-mach = machine(iterated_pipe, X, y)
-fit!(mach, force=true);
+mach_iterated_pipe = machine(iterated_pipe, X, y)
+fit!(mach_iterated_pipe, force=true);
 
 # Note that internally this training is split into two separate steps:
 
@@ -605,8 +626,8 @@ show(iterated_pipe, 2)
 p1 = :(model.evo_tree_classifier.η)
 p2 = :(model.evo_tree_classifier.max_depth)
 
-r1 = range(iterated_pipe, p2, lower=-3, upper=-2, scale=x->10^x)
-r2 = range(iterated_pipe, p1, lower=2, upper=6)
+r1 = range(iterated_pipe, p1, lower=-3, upper=-2, scale=x->10^x)
+r2 = range(iterated_pipe, p2, lower=2, upper=6)
 
 # Nominal ranges are defined by specifying `values` instead of `lower`
 # and `upper`.
@@ -637,8 +658,8 @@ tuned_iterated_pipe = TunedModel(model=iterated_pipe,
 
 # Binding our final model to data and training:
 
-mach = machine(tuned_iterated_pipe, X, y)
-fit!(mach)
+mach_tuned_iterated_pipe = machine(tuned_iterated_pipe, X, y)
+fit!(mach_tuned_iterated_pipe)
 
 # As explained above, the training we have just performed was split
 # internally into two separate steps:
@@ -646,25 +667,24 @@ fit!(mach)
 # - A step to determine the parameter values that optimize the aggregated cross-validation scores
 # - A final step that trains the optimal model on *all* available data. Future predictions `predict(mach, ...)` are based on this final training step.
 
-# From `report(mach)` we can extract details about the optimization
-# procedure. For example:
+# From `report(mach_tuned_iterated_pipe)` we can extract details about
+# the optimization procedure. For example:
 
-r = report(mach);
-best_booster = r.best_model.model.evo_tree_classifier
+rpt2 = report(mach_tuned_iterated_pipe);
+best_booster = rpt2.best_model.model.evo_tree_classifier
 
 #-
 
-@show best_booster.max_depth
-@show best_booster.η;
+@info "Optimal hyper-parameters:" best_booster.max_depth best_booster.η;
 
 # Using the `confidence_intervals` function we defined earlier:
 
-e = r.best_history_entry
-confidence_intervals(e) |> DataFrames.DataFrame # for pretty printing
+e_best = rpt2.best_history_entry
+confidence_intervals(e_best) |> DataFrames.DataFrame # for pretty printing
 
 # And we can visualize the optimization results:
 
-plot(mach)
+plot(mach_tuned_iterated_pipe, size=(600,450))
 
 
 # ## Saving our model
@@ -674,10 +694,12 @@ plot(mach)
 # Here's how to serialize our final, trained self-iterating,
 # self-tuning pipeline machine:
 
-MLJ.save("tuned_iterated_pipe.jlso", mach)
+MLJ.save("tuned_iterated_pipe.jlso", mach_tuned_iterated_pipe)
 
 
-# ## Final performance estimate
+# We'll deserialize this in "Testing the final model" below.
+
+# ## Final performance estimate;;;
 
 # Finally, to get an even more accurate estimate of performance, we
 # can evaluate our model using stratified cross-validation and all the
@@ -688,18 +710,18 @@ MLJ.save("tuned_iterated_pipe.jlso", mach)
 # (which is being repeated six times, using 5/6th of the data each
 # time):
 
-e = evaluate(tuned_iterated_pipe, X, y,
-             resampling=StratifiedCV(nfolds=6, rng=123),
-             measures=[brier_loss, auc, accuracy])
+e_tuned_iterated_pipe = evaluate(tuned_iterated_pipe, X, y,
+                                 resampling=StratifiedCV(nfolds=6, rng=123),
+                                 measures=[brier_loss, auc, accuracy])
 
 #-
 
-confidence_intervals(e)
+confidence_intervals(e_tuned_iterated_pipe)
 
 # For comparison, here are the confidence intervals for the basic
 # pipeline model (no feature selection and default hyperparameters):
 
-performance_basic_model
+confidence_intervals_basic_model
 
 # So we see a small improvement in the `brier_score` and `auc`, but
 # these are not statistically significant improvements; default
@@ -715,29 +737,30 @@ performance_basic_model
 # following should suffice to recover our model trained under
 # "Hyper-parameter optimization" above:
 
-mach2 = machine("tuned_iterated_pipe.jlso")
+mach_restored = machine("tuned_iterated_pipe.jlso")
 
 # We compute predictions on the holdout set:
 
-yhat = predict(mach2, Xtest);
-yhat[1]
+ŷ_tuned = predict(mach_restored, Xtest);
+ŷ_tuned[1]
 
 # And can compute the final performance measures:
 
-@show brier_loss(yhat, ytest) |> mean
-@show auc(yhat, ytest)
-@show accuracy(mode.(yhat), ytest);
+@info("Tuned model measurements on test:",
+      brier_loss(ŷ_tuned, ytest) |> mean,
+      auc(ŷ_tuned, ytest),
+      accuracy(mode.(ŷ_tuned), ytest)
+      )
 
 # For comparison, here's the performance for the basic pipeline model
 
-mach3 = machine(pipe, X, y)
-fit!(mach3, verbosity=0)
+mach_basic = machine(pipe, X, y)
+fit!(mach_basic, verbosity=0)
 
-yhat = predict(mach3, Xtest);
+ŷ_basic = predict(mach_basic, Xtest);
 
-@show brier_loss(yhat, ytest) |> mean
-@show auc(yhat, ytest)
-@show accuracy(mode.(yhat), ytest);
-
-# So, slightly better performance for the optimized model for
-# `brier_score` and `auc` (consistent with our "in-sample" analysis).
+@info("Basic model measurements on test set:",
+      brier_loss(ŷ_basic, ytest) |> mean,
+      auc(ŷ_basic, ytest),
+      accuracy(mode.(ŷ_basic), ytest)
+      )
