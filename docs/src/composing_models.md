@@ -701,10 +701,11 @@ diagrams, for simplicity).
 
 ### Source nodes
 
-Only source nodes reference concrete data. A `Source` object has a
+Only source nodes can reference concrete data. A `Source` object has a
 single field, `data`.
 
 ```@docs
+MLJBase.Source
 source(X)
 rebind!
 sources
@@ -713,19 +714,8 @@ origins
 
 ### Nodes
 
-The key components of a `Node` are:
-
-- An *operation*, which will either be *static* (a fixed function) or
-  *dynamic* (such as `predict` or `transform`, dispatched on a machine).
-
-- A *machine* on which to dispatch the operation (void if the
-  operation is static). The training arguments of the machine are
-  generally other nodes.
-
-- Upstream connections to other nodes (including source nodes)
-  specified by *arguments* (one for each argument of the operation).
-
 ```@docs
+Node
 node
 ```
 
