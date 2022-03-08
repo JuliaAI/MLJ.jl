@@ -705,7 +705,7 @@ Only source nodes can reference concrete data. A `Source` object has a
 single field, `data`.
 
 ```@docs
-Source
+MLJBase.Source
 source(X)
 rebind!
 sources
