@@ -29,6 +29,7 @@ MLJModels.Standardizer
 MLJModels.OneHotEncoder
 MLJModels.ContinuousEncoder
 MLJModels.FillImputer
+MLJModels.UnivariateFillImputer
 MLJModels.FeatureSelector
 MLJModels.UnivariateBoxCoxTransformer
 MLJModels.UnivariateDiscretizer
