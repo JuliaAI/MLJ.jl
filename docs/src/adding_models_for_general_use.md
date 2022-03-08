@@ -2,7 +2,7 @@
 
 !!! note
 
-    Models implementing the MLJ model interface according to the instructions given here should import MLJModelInterface version 1.0.0 or higher. This is enforced with a statement such as `MLJModelInterface = "^1" ` under `[compat]` in the Project.toml file of the package containing the implementation.
+	Models implementing the MLJ model interface according to the instructions given here should import MLJModelInterface version 1.0.0 or higher. This is enforced with a statement such as `MLJModelInterface = "^1" ` under `[compat]` in the Project.toml file of the package containing the implementation.
 
 This guide outlines the specification of the MLJ model interface
 and provides detailed guidelines for implementing the interface for
@@ -126,7 +126,7 @@ import MLJModelInterface
 const MMI = MLJModelInterface
 
 mutable struct RidgeRegressor <: MMI.Deterministic
-    lambda::Float64
+	lambda::Float64
 end
 ```
 
@@ -138,20 +138,20 @@ for every field, and optionally corrects invalid field values by calling a
 
 ```julia
 function MMI.clean!(model::RidgeRegressor)
-    warning = ""
-    if model.lambda < 0
-        warning *= "Need lambda ≥ 0. Resetting lambda=0. "
-        model.lambda = 0
-    end
-    return warning
+	warning = ""
+	if model.lambda < 0
+		warning *= "Need lambda ≥ 0. Resetting lambda=0. "
+		model.lambda = 0
+	end
+	return warning
 end
 
 # keyword constructor
 function RidgeRegressor(; lambda=0.0)
-    model = RidgeRegressor(lambda)
-    message = MMI.clean!(model)
-    isempty(message) || @warn message
-    return model
+	model = RidgeRegressor(lambda)
+	message = MMI.clean!(model)
+	isempty(message) || @warn message
+	return model
 end
 ```
 
@@ -169,7 +169,7 @@ of `nothing`.
 The section [Acceleration and Parallelism](@ref) indicates how MLJ
 models specify an option to run an algorithm using distributed
 processing or multi-threading. A hyper-parameter specifying such an
-option should be called `acceleration`. Its value `a` should satisfy 
+option should be called `acceleration`. Its value `a` should satisfy
 `a isa AbstractResource` where `AbstractResource` is defined in the
 ComputationalResources.jl package. An option to run on a GPU is
 ordinarily indicated with the `CUDALibs()` resource.
@@ -180,9 +180,9 @@ To support hyper-parameter optimization (see [Tuning Models](@ref))
 any hyper-parameter to be individually controlled must be:
 
 - property-accessible; nested property access allowed, as in
-  `model.detector.K` 
-  
-- mutable 
+  `model.detector.K`
+
+- mutable
 
 For an un-nested hyper-parameter, the requirement is that
 `getproperty(model, :param_name)` and `setproperty!(model,
@@ -193,7 +193,7 @@ tuning, recursive access is implemented using
 
 Combining hyper-parameters in a named tuple does not generally
 work, because, although property-accessible (with nesting), an
-individual value cannot be mutated. 
+individual value cannot be mutated.
 
 For a suggested way to deal with hyper-parameters varying in number,
 see the
@@ -211,8 +211,8 @@ following example:
 
 ```julia
 @mlj_model mutable struct YourModel <: MMI.Deterministic
-    a::Float64 = 0.5::(_ > 0)
-    b::String  = "svd"::(_ in ("svd","qr"))
+	a::Float64 = 0.5::(_ > 0)
+	b::String  = "svd"::(_ in ("svd","qr"))
 end
 ```
 
@@ -238,7 +238,7 @@ for example, this does not work:
 
 ```julia
 @mlj_model mutable struct Bar
-    a::Int = -1::(_ > -2)
+	a::Int = -1::(_ > -2)
 end
 ```
 
@@ -246,7 +246,7 @@ But this does:
 
 ```julia
 @mlj_model mutable struct Bar
-    a::Int = (-)(1)::(_ > -2)
+	a::Int = (-)(1)::(_ > -2)
 end
 ```
 
@@ -275,7 +275,7 @@ assumptions (see, e.g., [The predict_joint method](@ref) below).
 
 The compulsory and optional methods to be implemented for each
 concrete type `SomeSupervisedModel <: MMI.Supervised` are
-summarized below. 
+summarized below.
 
 An `=` indicates the return value for a fallback version of the
 method.
@@ -317,11 +317,11 @@ Optional, if `SomeSupervisedModel <: Probabilistic`:
 
 ```julia
 MMI.predict_mode(model::SomeSupervisedModel, fitresult, Xnew) =
-    mode.(predict(model, fitresult, Xnew))
+	mode.(predict(model, fitresult, Xnew))
 MMI.predict_mean(model::SomeSupervisedModel, fitresult, Xnew) =
-    mean.(predict(model, fitresult, Xnew))
+	mean.(predict(model, fitresult, Xnew))
 MMI.predict_median(model::SomeSupervisedModel, fitresult, Xnew) =
-    median.(predict(model, fitresult, Xnew))
+	median.(predict(model, fitresult, Xnew))
 ```
 
 Required, if the model is to be registered (findable by general users):
@@ -455,30 +455,30 @@ MMI.fit(model::SomeSupervisedModel, verbosity, X, y) -> fitresult, cache, report
 ```
 
 1. `fitresult` is the fitresult in the sense above (which becomes an
-    argument for `predict` discussed below).
+	argument for `predict` discussed below).
 
 2.  `report` is a (possibly empty) `NamedTuple`, for example,
-    `report=(deviance=..., dof_residual=..., stderror=..., vcov=...)`.
-    Any training-related statistics, such as internal estimates of the
-    generalization error, and feature rankings, should be returned in
-    the `report` tuple. How, or if, these are generated should be
-    controlled by hyperparameters (the fields of `model`). Fitted
-    parameters, such as the coefficients of a linear model, do not go
-    in the report as they will be extractable from `fitresult` (and
-    accessible to MLJ through the `fitted_params` method described below).
+	`report=(deviance=..., dof_residual=..., stderror=..., vcov=...)`.
+	Any training-related statistics, such as internal estimates of the
+	generalization error, and feature rankings, should be returned in
+	the `report` tuple. How, or if, these are generated should be
+	controlled by hyperparameters (the fields of `model`). Fitted
+	parameters, such as the coefficients of a linear model, do not go
+	in the report as they will be extractable from `fitresult` (and
+	accessible to MLJ through the `fitted_params` method described below).
 
 3.	The value of `cache` can be `nothing`, unless one is also defining
-    an `update` method (see below). The Julia type of `cache` is not
-    presently restricted.
-	
+	an `update` method (see below). The Julia type of `cache` is not
+	presently restricted.
+
 !!! note
 
-    The  `fit` (and `update`) methods should not mutate the `model`. If necessary, `fit` can create a `deepcopy` of `model` first. 
+	The  `fit` (and `update`) methods should not mutate the `model`. If necessary, `fit` can create a `deepcopy` of `model` first.
 
 
 It is not necessary for `fit` to provide type or dimension checks on
 `X` or `y` or to call `clean!` on the model; MLJ will carry out such
-checks. 
+checks.
 
 The types of `X` and `y` are constrained by the `input_scitype` and
 `target_scitype` trait declarations; see [Trait declarations](@ref)
@@ -532,7 +532,7 @@ MMI.predict(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
 ```
 
 Here `Xnew` will have the same form as the `X` passed to
-`fit`. 
+`fit`.
 
 Note that while `Xnew` generally consists of multiple observations
 (e.g., has multiple rows in the case of a table) it is assumed, in view of
@@ -569,16 +569,16 @@ may look something like this:
 
 ```julia
 function MMI.fit(model::SomeSupervisedModel, verbosity, X, y)
-    yint = MMI.int(y)
-    a_target_element = y[1]                # a CategoricalValue/String
-    decode = MMI.decoder(a_target_element) # can be called on integers
+	yint = MMI.int(y)
+	a_target_element = y[1]                # a CategoricalValue/String
+	decode = MMI.decoder(a_target_element) # can be called on integers
 
-    core_fitresult = SomePackage.fit(X, yint, verbosity=verbosity)
+	core_fitresult = SomePackage.fit(X, yint, verbosity=verbosity)
 
-    fitresult = (decode, core_fitresult)
-    cache = nothing
-    report = nothing
-    return fitresult, cache, report
+	fitresult = (decode, core_fitresult)
+	cache = nothing
+	report = nothing
+	return fitresult, cache, report
 end
 ```
 
@@ -586,9 +586,9 @@ while a corresponding deterministic `predict` operation might look like this:
 
 ```julia
 function MMI.predict(model::SomeSupervisedModel, fitresult, Xnew)
-    decode, core_fitresult = fitresult
-    yhat = SomePackage.predict(core_fitresult, Xnew)
-    return decode.(yhat)
+	decode, core_fitresult = fitresult
+	yhat = SomePackage.predict(core_fitresult, Xnew)
+	return decode.(yhat)
 end
 ```
 
@@ -616,7 +616,7 @@ assume that a distribution is either:
   abstract type defined in the
   [`Distributions.jl`](https://juliastats.org/Distributions.jl/stable/)
   package; or
-  
+
 - An instance of `CategoricalDistributions.UnivariateFinite`, from the
   [CategoricalDistributions.jl](https://github.com/JuliaAI/CategoricalDistributions.jl)
   package, *which should be used for all probabilistic classifiers*,
@@ -702,8 +702,8 @@ for an example.
 
 !!! warning "Experimental"
 
-    The following API is experimental. It is subject to breaking changes during minor or major releases without warning.
-	
+	The following API is experimental. It is subject to breaking changes during minor or major releases without warning.
+
 ```julia
 MMI.predict_joint(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
 ```
@@ -711,7 +711,7 @@ MMI.predict_joint(model::SomeSupervisedModel, fitresult, Xnew) -> yhat
 Any `Probabilistic` model type `SomeModel`may optionally implement a
 `predict_joint` method, which has the same signature as `predict`, but
 whose predictions are a single distribution (rather than a vector of
-per-observation distributions). 
+per-observation distributions).
 
 Specifically, the output `yhat` of `predict_joint` should be an
 instance of `Distributions.Sampleable{<:Multivariate,V}`, where
@@ -830,15 +830,16 @@ MMI.is_pure_julia(::Type{<:DecisionTreeClassifier}) = true
 Alternatively these traits can also be declared using `MMI.metadata_pkg` and `MMI.metadata_model` helper functions as:
 
 ```julia
-MMI.metadata_pkg(DecisionTreeClassifier,name="DecisionTree",
-                     packge_uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
-                     package_url="https://github.com/bensadeghi/DecisionTree.jl",
-                     is_pure_julia=true)
+MMI.metadata_pkg(DecisionTreeClassifier,
+                 name="DecisionTree",
+                 packge_uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
+                 package_url="https://github.com/bensadeghi/DecisionTree.jl",
+                 is_pure_julia=true)
 
 MMI.metadata_model(DecisionTreeClassifier,
-                        input_scitype=MMI.Table(MMI.Continuous),
-                        target_scitype=AbstractVector{<:MMI.Finite},
-                        load_path="MLJDecisionTreeInterface.DecisionTreeClassifier")
+                   input_scitype=MMI.Table(MMI.Continuous),
+                   target_scitype=AbstractVector{<:MMI.Finite},
+                   load_path="MLJDecisionTreeInterface.DecisionTreeClassifier")
 ```
 
 *Important.* Do not omit the `load_path` specification. If unsure what
@@ -903,7 +904,7 @@ method.
 
 !!! note
 
-    It is suggested that packages implementing MLJ's model API, that later implement a data front-end, should tag their changes in a breaking release. (The changes will not break use of models for the ordinary MLJ user, who interacts with models exlusively through the machine interface. However, it will break usage for some external packages that have chosen to depend directly on the model API.)
+	It is suggested that packages implementing MLJ's model API, that later implement a data front-end, should tag their changes in a breaking release. (The changes will not break use of models for the ordinary MLJ user, who interacts with models exlusively through the machine interface. However, it will break usage for some external packages that have chosen to depend directly on the model API.)
 
 ```julia
 MLJModelInterface.reformat(model, args...) -> data
@@ -915,7 +916,7 @@ user-supplied data into some model-specific representation (e.g., from
 a table to a matrix). Computational overheads associated with multiple
 `fit!`/`predict`/`transform` calls (on MLJ machines) are then avoided,
 when memory resources allow. The fallback returns `args` (no
-transformation). 
+transformation).
 
 The `selectrows(::Model, I, data...)` method is overloaded to specify
 how the model-specific data is to be subsampled, for some observation
@@ -984,10 +985,10 @@ Suppose a supervised model type `SomeSupervised` supports sample
 weights, leading to two different `fit` signatures, and that it has a
 single operation `predict`:
 
-    fit(model::SomeSupervised, verbosity, X, y)
-    fit(model::SomeSupervised, verbosity, X, y, w)
+	fit(model::SomeSupervised, verbosity, X, y)
+	fit(model::SomeSupervised, verbosity, X, y, w)
 
-    predict(model::SomeSupervised, fitresult, Xnew)
+	predict(model::SomeSupervised, fitresult, Xnew)
 
 Without a data front-end implemented, suppose `X` is expected to be a
 table and `y` a vector, but suppose the core algorithm always converts
@@ -995,19 +996,19 @@ table and `y` a vector, but suppose the core algorithm always converts
 columns in the table).  Then a new data-front end might look like
 this:
 
-    constant MMI = MLJModelInterface
+	constant MMI = MLJModelInterface
 
-    # for fit:
-    MMI.reformat(::SomeSupervised, X, y) = (MMI.matrix(X, transpose=true), y)
-    MMI.reformat(::SomeSupervised, X, y, w) = (MMI.matrix(X, transpose=true), y, w)
-    MMI.selectrows(::SomeSupervised, I, Xmatrix, y) =
-        (view(Xmatrix, :, I), view(y, I))
-    MMI.selectrows(::SomeSupervised, I, Xmatrix, y, w) =
-        (view(Xmatrix, :, I), view(y, I), view(w, I))
+	# for fit:
+	MMI.reformat(::SomeSupervised, X, y) = (MMI.matrix(X, transpose=true), y)
+	MMI.reformat(::SomeSupervised, X, y, w) = (MMI.matrix(X, transpose=true), y, w)
+	MMI.selectrows(::SomeSupervised, I, Xmatrix, y) =
+		(view(Xmatrix, :, I), view(y, I))
+	MMI.selectrows(::SomeSupervised, I, Xmatrix, y, w) =
+		(view(Xmatrix, :, I), view(y, I), view(w, I))
 
-    # for predict:
-    MMI.reformat(::SomeSupervised, X) = (MMI.matrix(X, transpose=true),)
-    MMI.selectrows(::SomeSupervised, I, Xmatrix) = view(Xmatrix, I)
+	# for predict:
+	MMI.reformat(::SomeSupervised, X) = (MMI.matrix(X, transpose=true),)
+	MMI.selectrows(::SomeSupervised, I, Xmatrix) = view(Xmatrix, I)
 
 With these additions, `fit` and `predict` are refactored, so that `X`
 and `Xnew` represent matrices with features as rows.
@@ -1039,13 +1040,13 @@ encoding representations).
 
 !!! warning "Experimental"
 
-    The following API is experimental. It is subject to breaking changes during minor or major releases without warning. Models implementing this interface will not work with MLJBase versions earlier than 0.17.5.
+	The following API is experimental. It is subject to breaking changes during minor or major releases without warning. Models implementing this interface will not work with MLJBase versions earlier than 0.17.5.
 
 Models that fit a probability distribution to some `data` should be
 regarded as `Probablisitic <: Supervised` models with target `y = data`
-and `X = nothing`. 
+and `X = nothing`.
 
-The `predict` method should return a single distribution. 
+The `predict` method should return a single distribution.
 
 A working implementation of a model that fits a `UnivariateFinite`
 distribution to some categorical data using [Laplace
@@ -1054,11 +1055,11 @@ controlled by a hyper-parameter `alpha` is given
 [here](https://github.com/JuliaAI/MLJBase.jl/blob/d377bee1198ec179a4ade191c11fef583854af4a/test/interface/model_api.jl#L36).
 
 
-### Serialization 
+### Serialization
 
 !!! warning "Experimental"
 
-    The following API is experimental. It is subject to breaking changes during minor or major releases without warning.
+	The following API is experimental. It is subject to breaking changes during minor or major releases without warning.
 
 The MLJ user can serialize and deserialize a *machine*, which means
 serializing/deserializing:
@@ -1073,9 +1074,9 @@ MLJ model API implementation will want to overload two additional
 methods `save` and `restore` to support serialization:
 
 1. The algorithm-providing package already has it's own serialization format for learned parameters and/or hyper-parameters, which users may want to access. In that case *the implementation overloads* `save`.
-  
+
 2. The `fitresult` is not a sufficiently persistent object; for example, it is a pointer passed from wrapped C code. In that case *the implementation overloads* `save` *and* `restore`.
-  
+
 In case 2, 1 presumably applies also, for otherwise MLJ serialization
 is probably not going to be possible without changes to the
 algorithm-providing package. An example is given below.
@@ -1102,7 +1103,7 @@ model-specific serialization (cannot be `format=...` or
 `compression=...`). The value of `serializable_fitresult` should be a
 persistent representation of `fitresult`, from which a correct and
 valid `fitresult` can be reconstructed using `restore` (see
-below). 
+below).
 
 The fallback of `save` performs no action and returns `fitresult`.
 
@@ -1115,7 +1116,7 @@ MMI.restore(filename, model::SomeModel, serializable_fitresult) -> fitresult
 
 Implement this method to reconstruct a `fitresult` (as returned by
 `MMI.fit`) from a persistent representation constructed using
-`MMI.save` as described above. 
+`MMI.save` as described above.
 
 The fallback of `restore` returns `serializable_fitresult`.
 
@@ -1131,43 +1132,46 @@ special treatment).
 
 ```julia
 function MLJModelInterface.save(filename,
-                                ::XGBoostClassifier,
-                                fitresult;
-                                kwargs...)
-    booster, a_target_element = fitresult
+								::XGBoostClassifier,
+								fitresult;
+								kwargs...)
+	booster, a_target_element = fitresult
 
-    xgb_filename = string(filename, ".xgboost.model")
-    XGBoost.save(booster, xgb_filename)
-    persistent_booster = read(xgb_filename)
-    @info "Additional XGBoost serialization file \"$xgb_filename\" generated. "
-    return (persistent_booster, a_target_element)
+	xgb_filename = string(filename, ".xgboost.model")
+	XGBoost.save(booster, xgb_filename)
+	persistent_booster = read(xgb_filename)
+	@info "Additional XGBoost serialization file \"$xgb_filename\" generated. "
+	return (persistent_booster, a_target_element)
 end
 
 function MLJModelInterface.restore(filename,
-                                   ::XGBoostClassifier,
-                                   serializable_fitresult)
-    persistent_booster, a_target_element = serializable_fitresult
+								   ::XGBoostClassifier,
+								   serializable_fitresult)
+	persistent_booster, a_target_element = serializable_fitresult
 
-    xgb_filename = string(filename, ".tmp")
-    open(xgb_filename, "w") do file
-        write(file, persistent_booster)
-    end
-    booster = XGBoost.Booster(model_file=xgb_filename)
-    rm(xgb_filename)
-    fitresult = (booster, a_target_element)
-    return fitresult
+	xgb_filename = string(filename, ".tmp")
+	open(xgb_filename, "w") do file
+		write(file, persistent_booster)
+	end
+	booster = XGBoost.Booster(model_file=xgb_filename)
+	rm(xgb_filename)
+	fitresult = (booster, a_target_element)
+	return fitresult
 end
 ```
 
 ### Document strings
 
-To be registered, MLJ models must include a detailed document string for
-the model type, and this must conform to the standard outlined
+To be registered, MLJ models must include a detailed document string
+for the model type, and this must conform to the standard outlined
 below. We recommend you simply adapt an existing compliant document
-string and read the requirements below if you're not sure. Here are
-examples of compliant doc-strings:
+string and read the requirements below if you're not sure, or to use
+as a checklist. Here are examples of compliant doc-strings (go to the
+end of the linked files):
 
- - Regular supervised models (classifiers and regressors): [MLJDecisionTreeInterface.jl](https://github.com/JuliaAI/MLJDecisionTreeInterface.jl/blob/master/src/MLJDecisionTreeInterface.jl) (see the end of the file)
+- Regular supervised models (classifiers and regressors): [MLJDecisionTreeInterface.jl](https://github.com/JuliaAI/MLJDecisionTreeInterface.jl/blob/master/src/MLJDecisionTreeInterface.jl) (see the end of the file)
+ 
+- Tranformers: [MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl/blob/dev/src/builtins/Transformers.jl) 
 
 A utility function is available for generating a standardized header
 for your doc-strings (but you provide most detail by hand):
@@ -1180,27 +1184,32 @@ MLJModelInterface.doc_header
 
 Your document string must include the following components, in order:
 
-- A header, closely matching the example given above.
+- A **header**, closely matching the example given above.
 
-- Instructions on how to import the model type from MLJ (because a user can already inspect the doc-string in the Model Registry, without having loaded the code-providing package).
+- A **reference describing the algorithm** or an actual description of
+  the algorithm, if necessary. Detail any non-standard aspects of the
+  implementation. Generally defer details on the role of
+  hyper-parameters to the "Hyper-parameters" section (see below).
 
-- Instructions on how to instantiate with default hyper-parameters or with keywords.
+- Instructions on **how to import the model type** from MLJ (because a user can already inspect the doc-string in the Model Registry, without having loaded the code-providing package).
 
-- A `# Training data` section: explains how to bind model to data in a machine with all possible signatures (eg, `machine(model, X, y)` but also `machine(model, X, y, w)` if, say, weights are supported);  the role and scitype requirements for each data argument should be itemized. 
+- Instructions on **how to instantiate** with default hyper-parameters or with keywords.
 
-- Instructions on how to fit the machine (in the same section).
+- A **Training data** section: explains how to bind model to data in a machine with all possible signatures (eg, `machine(model, X, y)` but also `machine(model, X, y, w)` if, say, weights are supported);  the role and scitype requirements for each data argument should be itemized.
 
-- A `# Hyper-parameters` section (unless there aren't any): an itemized list of the parameters, with defaults given.
+- Instructions on **how to fit** the machine (in the same section).
 
-- An `# Operations` section: each implemented operation (`predict`, `predict_mode`, `transform`, `inverse_transform`, etc ) is itemized and explained. This should include operations with no data arguments, such as `training_losses` and `feature_importances`.
+- A **Hyper-parameters** section (unless there aren't any): an itemized list of the parameters, with defaults given.
 
-- A `# Fitted parameters` section: To explain what is returned by `fitted_params(mach)` (the same as `MLJModelInterface.fitted_params(model, fitresult)` -  see later) with the fields of that named tuple itemized.
+- An **Operations** section: each implemented operation (`predict`, `predict_mode`, `transform`, `inverse_transform`, etc ) is itemized and explained. This should include operations with no data arguments, such as `training_losses` and `feature_importances`.
 
-- A `# Report ` section (if `report` is non-empty): To explain what, if anything, is included in the `report(mach)`  (the same as the `report` return value of `MLJModelInterface.fit`) with the fields itemized.
+- A **Fitted parameters** section: To explain what is returned by `fitted_params(mach)` (the same as `MLJModelInterface.fitted_params(model, fitresult)` -  see later) with the fields of that named tuple itemized.
 
-- An optional but highly recommended `# Examples` section, which includes MLJ examples, but which could also include others if the model type also implements a second "local" interface, i.e., defined in the same module. (Note that each module referring to a type can declare separate doc-strings which appear concatenated in doc-string queries.)
+- A **Report** section (if `report` is non-empty): To explain what, if anything, is included in the `report(mach)`  (the same as the `report` return value of `MLJModelInterface.fit`) with the fields itemized.
 
-- A closing "See also" sentence which includes a `@ref` link to the raw model type (if you are wrapping one).
+- An optional but highly recommended **Examples** section, which includes MLJ examples, but which could also include others if the model type also implements a second "local" interface, i.e., defined in the same module. (Note that each module referring to a type can declare separate doc-strings which appear concatenated in doc-string queries.)
+
+- A closing **"See also"** sentence which includes a `@ref` link to the raw model type (if you are wrapping one).
 
 
 ## Unsupervised models
@@ -1225,10 +1234,10 @@ similar fashion. The main differences are:
   `MLJModelInterface.inverse_transform(model, fitresult, Xout)`, which:
 
    - must make sense for any `Xout` for which `scitype(Xout) <:
-     output_scitype(SomeSupervisedModel)` (see below); and
+	 output_scitype(SomeSupervisedModel)` (see below); and
 
    - must return an object `Xin` satisfying `scitype(Xin) <:
-     input_scitype(SomeSupervisedModel)`.
+	 input_scitype(SomeSupervisedModel)`.
 
 - A `predict` method may be optionally implemented, and has the same
   signature as for supervised models, as in
@@ -1241,8 +1250,8 @@ similar fashion. The main differences are:
 
 !!! warning "Experimental API"
 
-    The Outlier Detection API is experimental and may change in future
-    releases of MLJ.
+	The Outlier Detection API is experimental and may change in future
+	releases of MLJ.
 
 Outlier detection or *anomaly detection* is predominantly an unsupervised
 learning task, transforming each data point to an outlier score quantifying
@@ -1265,7 +1274,7 @@ should return the raw outlier scores (`<:Continuous`) of all points in `Xnew`.
 
 Probabilistic and deterministic outlier detection models provide an additional
 option to predict a normalized estimate of outlierness or a concrete
-outlier label and thus enable evaluation of those models. All corresponding 
+outlier label and thus enable evaluation of those models. All corresponding
 supertypes have to implement (in addition to the previously described `fit`
 and `transform`) `MLJModelInterface.predict(model, fitresult, Xnew)`, with
 deterministic predictions conforming to `OrderedFactor{2}`, with the first
@@ -1276,16 +1285,16 @@ It is typically possible to automatically convert an outlier detection model
 to a probabilistic or deterministic model if the training scores are stored in
 the model's `report`. Below mentioned `OutlierDetection.jl` package, for example,
 stores the training scores under the `scores` key in the `report` returned from
-`fit`. It is then possible to use model wrappers such as 
+`fit`. It is then possible to use model wrappers such as
 `OutlierDetection.ProbabilisticDetector` to automatically convert a model to
 enable predictions of the required output type.
 
 !!! note "External outlier detection packages"
 
-    [OutlierDetection.jl](https://github.com/OutlierDetectionJL/OutlierDetection.jl)
-    provides an opinionated interface on top of MLJ for outlier detection models, 
-    standardizing things like class names, dealing with training scores, score 
-    normalization and more.
+	[OutlierDetection.jl](https://github.com/OutlierDetectionJL/OutlierDetection.jl)
+	provides an opinionated interface on top of MLJ for outlier detection models,
+	standardizing things like class names, dealing with training scores, score
+	normalization and more.
 
 ## Convenience methods
 
@@ -1373,4 +1382,3 @@ add a model, you need to follow these steps
 
 - An administrator will then review your implementation and work with
   you to add the model to the registry
-
