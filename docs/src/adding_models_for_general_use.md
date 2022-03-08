@@ -1184,32 +1184,32 @@ MLJModelInterface.doc_header
 
 Your document string must include the following components, in order:
 
-- A **header**, closely matching the example given above.
+- A *header*, closely matching the example given above.
 
-- A **reference describing the algorithm** or an actual description of
+- A *reference describing the algorithm* or an actual description of
   the algorithm, if necessary. Detail any non-standard aspects of the
   implementation. Generally defer details on the role of
   hyper-parameters to the "Hyper-parameters" section (see below).
 
-- Instructions on **how to import the model type** from MLJ (because a user can already inspect the doc-string in the Model Registry, without having loaded the code-providing package).
+- Instructions on *how to import the model type* from MLJ (because a user can already inspect the doc-string in the Model Registry, without having loaded the code-providing package).
 
-- Instructions on **how to instantiate** with default hyper-parameters or with keywords.
+- Instructions on *how to instantiate* with default hyper-parameters or with keywords.
 
-- A **Training data** section: explains how to bind model to data in a machine with all possible signatures (eg, `machine(model, X, y)` but also `machine(model, X, y, w)` if, say, weights are supported);  the role and scitype requirements for each data argument should be itemized.
+- A *Training data* section: explains how to bind model to data in a machine with all possible signatures (eg, `machine(model, X, y)` but also `machine(model, X, y, w)` if, say, weights are supported);  the role and scitype requirements for each data argument should be itemized.
 
-- Instructions on **how to fit** the machine (in the same section).
+- Instructions on *how to fit* the machine (in the same section).
 
-- A **Hyper-parameters** section (unless there aren't any): an itemized list of the parameters, with defaults given.
+- A *Hyper-parameters* section (unless there aren't any): an itemized list of the parameters, with defaults given.
 
-- An **Operations** section: each implemented operation (`predict`, `predict_mode`, `transform`, `inverse_transform`, etc ) is itemized and explained. This should include operations with no data arguments, such as `training_losses` and `feature_importances`.
+- An *Operations* section: each implemented operation (`predict`, `predict_mode`, `transform`, `inverse_transform`, etc ) is itemized and explained. This should include operations with no data arguments, such as `training_losses` and `feature_importances`.
 
-- A **Fitted parameters** section: To explain what is returned by `fitted_params(mach)` (the same as `MLJModelInterface.fitted_params(model, fitresult)` -  see later) with the fields of that named tuple itemized.
+- A *Fitted parameters* section: To explain what is returned by `fitted_params(mach)` (the same as `MLJModelInterface.fitted_params(model, fitresult)` -  see later) with the fields of that named tuple itemized.
 
-- A **Report** section (if `report` is non-empty): To explain what, if anything, is included in the `report(mach)`  (the same as the `report` return value of `MLJModelInterface.fit`) with the fields itemized.
+- A *Report* section (if `report` is non-empty): To explain what, if anything, is included in the `report(mach)`  (the same as the `report` return value of `MLJModelInterface.fit`) with the fields itemized.
 
-- An optional but highly recommended **Examples** section, which includes MLJ examples, but which could also include others if the model type also implements a second "local" interface, i.e., defined in the same module. (Note that each module referring to a type can declare separate doc-strings which appear concatenated in doc-string queries.)
+- An optional but highly recommended *Examples* section, which includes MLJ examples, but which could also include others if the model type also implements a second "local" interface, i.e., defined in the same module. (Note that each module referring to a type can declare separate doc-strings which appear concatenated in doc-string queries.)
 
-- A closing **"See also"** sentence which includes a `@ref` link to the raw model type (if you are wrapping one).
+- A closing *"See also"* sentence which includes a `@ref` link to the raw model type (if you are wrapping one).
 
 
 ## Unsupervised models
@@ -1346,7 +1346,7 @@ without causing conflicts, although an MLJ user cannot simultaneously
 There are two options for making a new model implementation available
 to all MLJ users:
 
-1. **Native implementations** (preferred option). The implementation
+1. *Native implementations* (preferred option). The implementation
    code lives in the same package that contains the learning
    algorithms implementing the interface. An example is
    [`EvoTrees.jl`](https://github.com/Evovest/EvoTrees.jl/blob/master/src/MLJ.jl). In
@@ -1356,7 +1356,7 @@ to all MLJ users:
    the MLJ user to access its models' metadata and to selectively load
    them.
 
-2. **Separate interface package**. Implementation code lives in a
+2. *Separate interface package*. Implementation code lives in a
    separate *interface package*, which has the algorithm providing
    package as a dependency. See the template repository
    [MLJExampleInterface.jl](https://github.com/JuliaAI/MLJExampleInterface.jl).
