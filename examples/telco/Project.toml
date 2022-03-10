@@ -1,0 +1,10 @@
+[deps]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+EvoTrees = "f6006082-12f8-11e9-0c9c-0d5d367ab1e5"
+MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
+MLJDecisionTreeInterface = "c6f25543-311c-4c74-83dc-3ea6d1015661"
+MLJMultivariateStatsInterface = "1b6a4a23-ba22-4f51-9698-8599985d3728"
+Measurements = "eff96d63-e80a-5855-80a2-b1b0885c5ab7"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
