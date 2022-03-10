@@ -9,28 +9,10 @@
 # MLJ is a *multi-paradigm* machine learning toolbox (i.e., not just
 # deep-learning).
 
-# **New to machine learning?**
-# Try the "Introduction to Statistical Learning" notebooks at [Data
-# Science
-# Tutorials](https://juliaai.github.io/DataScienceTutorials.jl/),
-# starting with [this
-# tutorial](https://juliaai.github.io/DataScienceTutorials.jl/isl/lab-2/).
-# Or have a look at the [Julia Data
-# Science](https://github.com/JuliaDataScience/JuliaDataScience) book.
-
-# **Want a shorter tour of key MLJ functionality?**
-# Try this [Lightning
-# Tour](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/lightning_tour/lightning_tour.ipynb).
-
-# **Something more leisurely?** See
-# [MLJTutorial](https://github.com/ablaom/MLJTutorial.jl).
-
-# **Completely new to Julia?** Browse [these
-# resources](https://julialang.org/learning/) or visit
-# [HelloJulia](https://github.com/ablaom/HelloJulia.jl).
-
-# For more end-to-end examples, see [Data Science
-# Tutorials](https://juliaai.github.io/DataScienceTutorials.jl).
+# For other MLJ learning resources see the [Learning
+# MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/learning_mlj/)
+# section of the
+# [manual](https://alan-turing-institute.github.io/MLJ.jl/dev/).
 
 # **Topics covered**: Grabbing and preparing a dataset, basic
 # fit/predict workflow, constructing a pipeline to include data
@@ -506,7 +488,7 @@ using Measurements
 
 function confidence_intervals(e)
     measure = e.measure
-    nfolds = length(measure)
+    nfolds = length(e.per_fold[1])
     measurement = [e.measurement[j] ± std(e.per_fold[j])/sqrt(nfolds - 1)
                    for j in eachindex(measure)]
     table = (measure=measure, measurement=measurement)
@@ -529,7 +511,7 @@ pipe2 = ContinuousEncoder() |>
     FeatureSelector(features=unimportant_features, ignore=true) |> booster
 
 
-# ## Wrapping our model in control strategies.
+# ## Wrapping our iterative model in control strategies
 
 # > Introduces: **control strategies:** `Step`, `NumberSinceBest`, `TimeLimit`, `InvalidValue`, **model wrapper** `IteratedModel`, **resampling strategy:** `Holdout`
 
@@ -555,8 +537,8 @@ pipe2 = ContinuousEncoder() |>
 
 controls = [
     Step(1),              # to increment iteration parameter (`pipe.nrounds`)
-    NumberSinceBest(n=6), # main stopping criterion
-    TimeLimit(0.5/60),    # never train longer than half a minute
+    NumberSinceBest(4),   # main stopping criterion
+    TimeLimit(2/3600),    # never train more than 2 sec
     InvalidValue()        # stop if NaN or ±Inf encountered
 ]
 
@@ -566,7 +548,7 @@ controls = [
 
 iterated_pipe = IteratedModel(model=pipe2,
                               controls=controls,
-                              measure=brier_loss, # or BrierLoss()
+                              measure=brier_loss,
                               resampling=Holdout(fraction_train=0.7))
 
 # We've set `resampling=Holdout(fraction_train=0.7)` to arrange that
@@ -578,7 +560,7 @@ iterated_pipe = IteratedModel(model=pipe2,
 # not in our don't-touch holdout set, and train on all of that data:
 
 mach_iterated_pipe = machine(iterated_pipe, X, y)
-fit!(mach_iterated_pipe, force=true);
+fit!(mach_iterated_pipe);
 
 # To recap, internally this training is split into two separate steps:
 
@@ -627,7 +609,7 @@ show(iterated_pipe, 2)
 p1 = :(model.evo_tree_classifier.η)
 p2 = :(model.evo_tree_classifier.max_depth)
 
-r1 = range(iterated_pipe, p1, lower=-3, upper=-2, scale=x->10^x)
+r1 = range(iterated_pipe, p1, lower=-2, upper=-0.5, scale=x->10^x)
 r2 = range(iterated_pipe, p2, lower=2, upper=6)
 
 # Nominal ranges are defined by specifying `values` instead of `lower`
@@ -653,7 +635,7 @@ tuned_iterated_pipe = TunedModel(model=iterated_pipe,
                                  measures=[brier_loss, auc, accuracy],
                                  resampling=StratifiedCV(nfolds=6, rng=123),
                                  acceleration=CPUThreads(),
-                                 n=25)
+                                 n=40)
 
 # To save time, we skip the `repeats` here.
 
@@ -683,7 +665,13 @@ best_booster = rpt2.best_model.model.evo_tree_classifier
 e_best = rpt2.best_history_entry
 confidence_intervals(e_best)
 
-# And we can visualize the optimization results:
+# Digging a little deeper, we can learn what stopping criterion was
+# applied in the case of the optimal model, and how many iterations
+# were required:
+
+rpt2.best_report.controls |> collect
+
+# Finally, we can visualize the optimization results:
 
 plot(mach_tuned_iterated_pipe, size=(600,450))
 
@@ -724,9 +712,9 @@ confidence_intervals(e_tuned_iterated_pipe)
 
 confidence_intervals_basic_model
 
-# So we see a small improvement in the `brier_score` and `auc`, but
-# these are not statistically significant improvements; default
-# `booster` hyper-parameters do a pretty good job.
+# As each pair of intervals overlap, it's doubtful the small changes
+# here can be assigned statistical significance. Default `booster`
+# hyper-parameters do a pretty good job.
 
 
 # ## Testing the final model
@@ -765,3 +753,4 @@ ŷ_basic = predict(mach_basic, Xtest);
       auc(ŷ_basic, ytest),
       accuracy(mode.(ŷ_basic), ytest)
       )
+
