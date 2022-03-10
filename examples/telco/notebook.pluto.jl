@@ -7,12 +7,13 @@ using InteractiveUtils
 # ╔═╡ f0cc864c-8b26-441f-9bca-7c69b794f8ce
 md"# MLJ for Data Scientists in Two Hours"
 
-# ╔═╡ 6842b3a9-7c80-4b8a-b795-033f6f2a0674
+# ╔═╡ 8a6670b8-96a8-4a5d-b795-033f6f2a0674
 md"""
-An end-to-end application of the [MLJ
+An application of the [MLJ
 toolbox](https://alan-turing-institute.github.io/MLJ.jl/dev/) to the
 Telco Customer Churn dataset, aimed at practicing data scientists
-new to MLJ (Machine Learning in Julia).
+new to MLJ (Machine Learning in Julia). This tutorial does not
+cover exploratory data analysis.
 """
 
 # ╔═╡ aa49e638-95dc-4249-935f-ddf6a6bfbbdd
@@ -127,12 +128,15 @@ md"""
 # ╔═╡ 7c0464a0-4114-46bf-8514-99938a2932db
 md"## Instantiate a Julia environment"
 
-# ╔═╡ 40838996-676c-4b66-a0de-1721c1bc2df2
+# ╔═╡ 256869d0-5e0c-42af-a0de-1721c1bc2df2
 md"""
 The following code replicates precisely the set of Julia packages
 used to develop this tutorial. If this is your first time running
 the notebook, package instantiation and pre-compilation may take a
-minute or so to complete.
+minute or so to complete. **This step will fail** if the [correct
+Manifest.toml and Project.toml
+files](https://github.com/alan-turing-institute/MLJ.jl/tree/dev/examples/telco)
+are not in the same directory as this notebook.
 """
 
 # ╔═╡ 60fe49c1-3434-4a77-bca8-7eec7950fd82
@@ -399,15 +403,15 @@ going to dump 90% of observations (after shuffling) and split off
 holdout set:
 """
 
-# ╔═╡ 1f6c7ad0-fe8d-44e5-a1cb-54e34396a855
-df, df_test, df_dumped = partition(df0, 0.07, 0.003, # in ratios 7:3:90
-                                   stratified=df.Churn,
+# ╔═╡ ea010966-bb7d-4c79-a1cb-54e34396a855
+df, df_test, df_dumped = partition(df0, 0.07, 0.03, # in ratios 7:3:90
+                                   stratify=df0.Churn,
                                    rng=123);
 
-# ╔═╡ 4fd341cc-fb8f-4127-8037-0de5806e1a54
+# ╔═╡ 401c6f14-1128-4df1-8037-0de5806e1a54
 md"""
-The reader interested in including all data can instead do `df,
-df_test = partition(df0, 0.7, rng=123)`.
+The reader interested in including all data can instead do
+`df, df_test = partition(df0, 0.7, rng=123)`.
 """
 
 # ╔═╡ 81aa1aa9-27d9-423f-9961-a09632c33fb0
@@ -485,12 +489,12 @@ md"However, our features `X` cannot be directly used with `booster`:"
 # ╔═╡ b139c43b-382b-415a-9608-b5032c116833
 scitype(X) <: input_scitype(booster)
 
-# ╔═╡ 91cda5db-ba6b-453e-b473-4aa968e6937a
+# ╔═╡ 90a7fe9a-934f-445a-b473-4aa968e6937a
 md"""
 As it turns out, this is because `booster`, like the majority of MLJ
 supervised models, expects the features to be `Continuous`. (With
 some experience, this can be gleaned from `input_scitype(booster)`.)
-So we need feature encoding, discussed next.
+So we need categorical feature encoding, discussed next.
 """
 
 # ╔═╡ fc97e937-66ca-4434-8d9e-644a1b3cc6b6
@@ -545,27 +549,27 @@ md"""
 > `machine`, `fit!`, `predict`, `fitted_params`, `report`, `roc`, **resampling strategy** `StratifiedCV`, `evaluate`, `FeatureSelector`
 """
 
-# ╔═╡ 4e70bf68-a78b-40dc-a38a-beb5c7157b57
+# ╔═╡ 442078e4-a695-471c-a38a-beb5c7157b57
 md"""
 Without touching our test set `Xtest`, `ytest`, we will estimate the
 performance of our pipeline model, with default hyper-parameters, in
-two different ways.
+two different ways:
 """
 
-# ╔═╡ f2f4194f-7003-43cc-81f5-507803ea9ed6
+# ╔═╡ 23fb37b0-08c1-4688-81f5-507803ea9ed6
 md"""
-First, we'll do this "by hand" using the `fit!` and `predict`
+**Evaluating by hand.** First, we'll do this "by hand" using the `fit!` and `predict`
 workflow illustrated for the iris data set above, using a
 holdout resampling strategy. At the same time we'll see how to
 generate a **confusion matrix**, **ROC curve**, and inspect
 **feature importances**.
 """
 
-# ╔═╡ 10ca41be-b6cb-4b96-9b21-6d4eb642d87e
+# ╔═╡ 1def55f5-71fc-4257-9b21-6d4eb642d87e
 md"""
-Then we'll apply the more typical and convenient `evaluate`
-workflow, but using `StratifiedCV` (stratified cross-validation)
-which is more informative.
+**Automated performance evaluation.** Next we'll apply the more
+typical and convenient `evaluate` workflow, but using `StratifiedCV`
+(stratified cross-validation) which is more informative.
 """
 
 # ╔═╡ 2c4016c6-dc7e-44ec-b98c-3df1f31879bf
@@ -613,10 +617,10 @@ end
 # ╔═╡ ceff13ba-a526-4ecb-97e3-6677afc6ca9f
 md"We note in passing that we can access two kinds of information from a trained machine:"
 
-# ╔═╡ b589fba6-2e0d-4bb2-b10e-562ce21caa04
+# ╔═╡ dcf0eb93-2368-4158-b10e-562ce21caa04
 md"""
-- The **learned parameters** (eg, coefficients of a linear model): We use `fitted_params(mach)`
-- Other **by-products of training** (eg, feature importances): We use `report(mach)`
+- The **learned parameters** (eg, coefficients of a linear model): We use `fitted_params(mach_pipe)`
+- Other **by-products of training** (eg, feature importances): We use `report(mach_pipe)`
 """
 
 # ╔═╡ 442be3e3-b2e9-499d-8f78-ab549ef1544e
@@ -782,19 +786,13 @@ begin
       FeatureSelector(features=unimportant_features, ignore=true) |> booster
 end
 
-# ╔═╡ cfc5adc0-6524-478d-806e-1bc580dc349d
-md"""
-The reader can check this change makes negligible difference to the
-model's performance.
-"""
-
-# ╔═╡ ab1bc84b-e4e3-45be-9703-288eae064e2a
+# ╔═╡ ab1bc84b-e4e3-45be-806e-1bc580dc349d
 md"## Wrapping our model in control strategies."
 
-# ╔═╡ 0b80d69c-b60c-4cf4-b2c3-413ae5867f7d
+# ╔═╡ 0b80d69c-b60c-4cf4-9703-288eae064e2a
 md"> Introduces: **control strategies:** `Step`, `NumberSinceBest`, `TimeLimit`, `InvalidValue`, **model wrapper** `IteratedModel`, **resampling strategy:** `Holdout`"
 
-# ╔═╡ 19e7e4c9-95c0-49d6-93d8-53c527b0a48c
+# ╔═╡ 19e7e4c9-95c0-49d6-b2c3-413ae5867f7d
 md"""
 We want to optimize the hyper-parameters of our model. Since our
 model is iterative, these parameters include the (nested) iteration
@@ -810,41 +808,41 @@ parameters, we will always being using an optimal number of
 iterations.
 """
 
-# ╔═╡ 6ff08b40-906f-4154-af98-8dffdf3118fc
+# ╔═╡ 6ff08b40-906f-4154-93d8-53c527b0a48c
 md"""
 Note that this approach can be applied to any iterative MLJ model,
 eg, the neural network models provided by
 [MLJFlux.jl](https://github.com/FluxML/MLJFlux.jl).
 """
 
-# ╔═╡ 8fc99d35-d8cc-455f-8620-127a8c4021ec
+# ╔═╡ 8fc99d35-d8cc-455f-af98-8dffdf3118fc
 md"""
 First, we select appropriate controls from [this
 list](https://alan-turing-institute.github.io/MLJ.jl/dev/controlling_iterative_models/#Controls-provided):
 """
 
-# ╔═╡ 2c5d0b23-3cb1-4c50-a1f6-fec4c3edfa7b
+# ╔═╡ 96c742d9-e6fe-4887-8620-127a8c4021ec
 controls = [
-    Step(1),              # increment to iteration parameter (`pipe.nrounds`)
+    Step(1),              # to increment iteration parameter (`pipe.nrounds`)
     NumberSinceBest(n=6), # main stopping criterion
     TimeLimit(0.5/60),    # never train longer than half a minute
     InvalidValue()        # stop if NaN or ±Inf encountered
 ]
 
-# ╔═╡ 9f80b5b5-95b9-4f01-82f7-021485ee0115
+# ╔═╡ 9f80b5b5-95b9-4f01-a1f6-fec4c3edfa7b
 md"""
 Now we wrap our pipeline model using the `IteratedModel` wrapper,
 being sure to specify the `measure` on which internal estimates of
 the out-of-sample performance will be based:
 """
 
-# ╔═╡ 9aa97026-ebdb-4713-9ecb-94593d972599
+# ╔═╡ 9aa97026-ebdb-4713-82f7-021485ee0115
 iterated_pipe = IteratedModel(model=pipe2,
                               controls=controls,
                               measure=brier_loss, # or BrierLoss()
                               resampling=Holdout(fraction_train=0.7))
 
-# ╔═╡ bb7a34eb-4bf1-41d9-b54b-e44bea97c579
+# ╔═╡ bb7a34eb-4bf1-41d9-9ecb-94593d972599
 md"""
 We've set `resampling=Holdout(fraction_train=0.7)` to arrange that
 data attached to our model should be internally split into a train
@@ -852,35 +850,35 @@ set (70%) and a holdout set (30%) for determining the out-of-sample
 estimate of the Brier loss.
 """
 
-# ╔═╡ 71bead68-2d38-468c-9121-4e392242994e
+# ╔═╡ 71bead68-2d38-468c-b54b-e44bea97c579
 md"""
 For demonstration purposes, let's bind `iterated_model` to all data
 not in our don't-touch holdout set, and train on all of that data:
 """
 
-# ╔═╡ f9e196d8-071c-4dd6-b221-79886442efe7
+# ╔═╡ f9e196d8-071c-4dd6-9121-4e392242994e
 begin
   mach_iterated_pipe = machine(iterated_pipe, X, y)
   fit!(mach_iterated_pipe, force=true);
 end
 
-# ╔═╡ 76867b4d-56ab-4f24-8df5-b7371beb6b3f
-md"Note that internally this training is split into two separate steps:"
+# ╔═╡ 16d8cd4e-ca20-475a-b221-79886442efe7
+md"To recap, internally this training is split into two separate steps:"
 
-# ╔═╡ a2e2a37c-5fdb-4c56-a475-d52dc8eba727
+# ╔═╡ ab59d744-51f8-4364-8df5-b7371beb6b3f
 md"""
 - A controlled iteration step, training on the holdout set, with the total number of iterations determined by the specified stopping criteria (based on the out-of-sample performance estimates)
 - A final step that trains the atomic model on *all* available
-  data using the number of iterations determined in the first step. Calling `predict` on the `mach` means using the learned parameters of the second step.
+  data using the number of iterations determined in the first step. Calling `predict` on `mach_iterated_pipe` means using the learned parameters of the second step.
 """
 
-# ╔═╡ ed9f284e-1e45-46e7-804b-89f5009710b0
+# ╔═╡ ed9f284e-1e45-46e7-a475-d52dc8eba727
 md"## Hyper-parameter optimization (model tuning)"
 
-# ╔═╡ b8b0e5ee-8468-4e02-a14a-b0adc2955e1c
+# ╔═╡ b8b0e5ee-8468-4e02-804b-89f5009710b0
 md"> Introduces: `range`, **model wrapper** `TunedModel`, `RandomSearch`"
 
-# ╔═╡ 50372dc8-bb10-4f9e-bd20-120a7a4020d0
+# ╔═╡ 50372dc8-bb10-4f9e-a14a-b0adc2955e1c
 md"""
 We now turn to hyper-parameter optimization. A tool not discussed
 here is the `learning_curve` function, which can be useful when
@@ -892,14 +890,14 @@ or [this
 tutorial](https://github.com/ablaom/MLJTutorial.jl/blob/dev/notebooks/04_tuning/notebook.ipynb).
 """
 
-# ╔═╡ 3e385eb4-0a44-40f6-93a0-9d99274137e8
+# ╔═╡ 3e385eb4-0a44-40f6-bd20-120a7a4020d0
 md"""
 Fine tuning the hyper-parameters of a gradient booster can be
 somewhat involved. Here we settle for simultaneously optimizing two
 key parameters: `max_depth` and `η` (learning_rate).
 """
 
-# ╔═╡ caa5153f-6633-41f7-af76-60dddeecbe6c
+# ╔═╡ caa5153f-6633-41f7-93a0-9d99274137e8
 md"""
 Like iteration control, **model optimization in MLJ is implemented as
 a model wrapper**, called `TunedModel`. After wrapping a model in a
@@ -914,17 +912,17 @@ hyper-parameters into learned parameters (just as `IteratedModel`
 does for an iteration parameter).
 """
 
-# ╔═╡ 0b74bfe8-bff6-469d-9074-c069a0e97d7e
+# ╔═╡ 0b74bfe8-bff6-469d-af76-60dddeecbe6c
 md"""
 To start with, we define ranges for the parameters of
 interest. Since these parameters are nested, let's force a
 display of our model to a larger depth:
 """
 
-# ╔═╡ b17f6f89-2fd4-46de-ac4a-024c5894013e
+# ╔═╡ b17f6f89-2fd4-46de-9074-c069a0e97d7e
 show(iterated_pipe, 2)
 
-# ╔═╡ 0a7ab003-9e10-44cf-82ca-0687059409ae
+# ╔═╡ 0a7ab003-9e10-44cf-ac4a-024c5894013e
 begin
   p1 = :(model.evo_tree_classifier.η)
   p2 = :(model.evo_tree_classifier.max_depth)
@@ -933,22 +931,22 @@ begin
   r2 = range(iterated_pipe, p2, lower=2, upper=6)
 end
 
-# ╔═╡ f46af08e-ddb9-4aec-9e9e-2379bd3c438e
+# ╔═╡ f46af08e-ddb9-4aec-82ca-0687059409ae
 md"""
 Nominal ranges are defined by specifying `values` instead of `lower`
 and `upper`.
 """
 
-# ╔═╡ af3023e6-920f-478d-bf9e-f9077f3deea4
+# ╔═╡ af3023e6-920f-478d-9e9e-2379bd3c438e
 md"""
 Next, we choose an optimization strategy from [this
 list](https://alan-turing-institute.github.io/MLJ.jl/dev/tuning_models/#Tuning-Models):
 """
 
-# ╔═╡ 93c17a9b-b49c-4780-9b74-5a67b6e8b15f
+# ╔═╡ 93c17a9b-b49c-4780-bf9e-f9077f3deea4
 tuning = RandomSearch(rng=123)
 
-# ╔═╡ 21f14f18-cc5a-4ed9-b1f4-bf9663e97bb7
+# ╔═╡ 21f14f18-cc5a-4ed9-9b74-5a67b6e8b15f
 md"""
 Then we wrap the model, specifying a `resampling` strategy and a
 `measure`, as we did for `IteratedModel`.  In fact, we can include a
@@ -957,13 +955,13 @@ performance estimates based on the first measure, but estimates for
 all measures can be accessed from the model's `report`.
 """
 
-# ╔═╡ 147cc2c5-f3c2-4aec-8dca-7ecb1b94fa1b
+# ╔═╡ 147cc2c5-f3c2-4aec-b1f4-bf9663e97bb7
 md"""
 The keyword `n` specifies the total number of models (sets of
 hyper-parameters) to evaluate.
 """
 
-# ╔═╡ b3bc6848-6b44-41e3-aeca-6e3d5d94d8fa
+# ╔═╡ b3bc6848-6b44-41e3-8dca-7ecb1b94fa1b
 tuned_iterated_pipe = TunedModel(model=iterated_pipe,
                                  range=[r1, r2],
                                  tuning=tuning,
@@ -972,82 +970,82 @@ tuned_iterated_pipe = TunedModel(model=iterated_pipe,
                                  acceleration=CPUThreads(),
                                  n=25)
 
-# ╔═╡ fbf15fc2-347a-432a-8aa0-20af95403dd9
+# ╔═╡ fbf15fc2-347a-432a-aeca-6e3d5d94d8fa
 md"To save time, we skip the `repeats` here."
 
-# ╔═╡ 3922d490-8018-4b8c-a120-518242409f79
+# ╔═╡ 3922d490-8018-4b8c-8aa0-20af95403dd9
 md"Binding our final model to data and training:"
 
-# ╔═╡ d59dc0af-8eb7-4ac4-bcf7-0be279ee1434
+# ╔═╡ d59dc0af-8eb7-4ac4-a120-518242409f79
 begin
   mach_tuned_iterated_pipe = machine(tuned_iterated_pipe, X, y)
   fit!(mach_tuned_iterated_pipe)
 end
 
-# ╔═╡ ed1d8575-1c50-4bc7-9df6-c78b3bed8b80
+# ╔═╡ ed1d8575-1c50-4bc7-bcf7-0be279ee1434
 md"""
 As explained above, the training we have just performed was split
 internally into two separate steps:
 """
 
-# ╔═╡ 1dc17d71-3a8f-43e2-b9cc-1427739824b3
+# ╔═╡ c392b949-7e64-4f3e-9df6-c78b3bed8b80
 md"""
 - A step to determine the parameter values that optimize the aggregated cross-validation scores
-- A final step that trains the optimal model on *all* available data. Future predictions `predict(mach, ...)` are based on this final training step.
+- A final step that trains the optimal model on *all* available data. Future predictions `predict(mach_tuned_iterated_pipe, ...)` are based on this final training step.
 """
 
-# ╔═╡ 954a354f-0a1d-4a7f-9051-24fa20a24653
+# ╔═╡ 954a354f-0a1d-4a7f-b9cc-1427739824b3
 md"""
 From `report(mach_tuned_iterated_pipe)` we can extract details about
 the optimization procedure. For example:
 """
 
-# ╔═╡ 0f9e72c1-fb6e-4ea7-ac11-6a06d822d067
+# ╔═╡ 0f9e72c1-fb6e-4ea7-9051-24fa20a24653
 begin
   rpt2 = report(mach_tuned_iterated_pipe);
   best_booster = rpt2.best_model.model.evo_tree_classifier
 end
 
-# ╔═╡ 242b8047-0508-4ce2-8d27-497b9a4e8f4b
+# ╔═╡ 242b8047-0508-4ce2-ac11-6a06d822d067
 @info "Optimal hyper-parameters:" best_booster.max_depth best_booster.η;
 
-# ╔═╡ af6d8f76-f96e-4136-a8e6-955351cd26f5
+# ╔═╡ af6d8f76-f96e-4136-8d27-497b9a4e8f4b
 md"Using the `confidence_intervals` function we defined earlier:"
 
-# ╔═╡ c0ef7138-42da-41da-bf7b-99c47ef72fd2
+# ╔═╡ ec5e230c-397a-4e07-a8e6-955351cd26f5
 begin
   e_best = rpt2.best_history_entry
-  confidence_intervals(e_best) |> DataFrames.DataFrame # for pretty printing
+  confidence_intervals(e_best)
 end
 
-# ╔═╡ 84fb98ba-cb8a-4689-9b3c-c87e36798d40
+# ╔═╡ 84fb98ba-cb8a-4689-bf7b-99c47ef72fd2
 md"And we can visualize the optimization results:"
 
-# ╔═╡ e0dba28c-5f07-4305-bc52-7a03f8a4f046
+# ╔═╡ e0dba28c-5f07-4305-9b3c-c87e36798d40
 plot(mach_tuned_iterated_pipe, size=(600,450))
 
-# ╔═╡ d92c7d6c-6eda-4083-9814-5dd23028b7dd
+# ╔═╡ d92c7d6c-6eda-4083-bc52-7a03f8a4f046
 md"## Saving our model"
 
-# ╔═╡ 7626383d-5212-4ee5-aea9-6b095d52d246
+# ╔═╡ 7626383d-5212-4ee5-9814-5dd23028b7dd
 md"> Introduces: `MLJ.save`"
 
-# ╔═╡ f38bca90-a19e-4faa-8a6a-3fad94d47b89
+# ╔═╡ f38bca90-a19e-4faa-aea9-6b095d52d246
 md"""
 Here's how to serialize our final, trained self-iterating,
 self-tuning pipeline machine:
 """
 
-# ╔═╡ 36e8600e-f5ee-4e5f-ab7f-23dfd6fe43e8
+# ╔═╡ 36e8600e-f5ee-4e5f-8a6a-3fad94d47b89
 MLJ.save("tuned_iterated_pipe.jlso", mach_tuned_iterated_pipe)
 
-# ╔═╡ 4de39bbb-e421-4e1b-873e-e6fb8e7dca1a
+# ╔═╡ 4de39bbb-e421-4e1b-ab7f-23dfd6fe43e8
 md"We'll deserialize this in \"Testing the final model\" below."
 
-# ╔═╡ c1aa36a1-a81a-4ed5-9dd4-420f3ba8803c
-md"## Final performance estimate;;;"
+# ╔═╡ cf4e89cd-998c-44d1-873e-e6fb8e7dca1a
+md"## Final performance estimate"
 
-# ╔═╡ cd043584-6881-45df-b994-ae59732958cb
+# ╔═╡ cd043584-6881-45df-9dd4-420f3ba8803c
 md"""
 Finally, to get an even more accurate estimate of performance, we
 can evaluate our model using stratified cross-validation and all the
@@ -1059,69 +1057,69 @@ this computation takes quite a bit longer than the previous one
 time):
 """
 
-# ╔═╡ 9c90d7a7-1966-4d21-9aa5-a206354b401f
+# ╔═╡ 9c90d7a7-1966-4d21-b994-ae59732958cb
 e_tuned_iterated_pipe = evaluate(tuned_iterated_pipe, X, y,
                                  resampling=StratifiedCV(nfolds=6, rng=123),
                                  measures=[brier_loss, auc, accuracy])
 
-# ╔═╡ f5058fe5-53de-43ad-b666-1307eccc221d
+# ╔═╡ f5058fe5-53de-43ad-9aa5-a206354b401f
 confidence_intervals(e_tuned_iterated_pipe)
 
-# ╔═╡ 669b492b-69a7-4d88-8f9a-f7439f35ea8f
+# ╔═╡ 669b492b-69a7-4d88-b666-1307eccc221d
 md"""
 For comparison, here are the confidence intervals for the basic
 pipeline model (no feature selection and default hyperparameters):
 """
 
-# ╔═╡ 5c1754b1-21c2-4173-a8bb-11a6d1761f50
+# ╔═╡ 5c1754b1-21c2-4173-8f9a-f7439f35ea8f
 confidence_intervals_basic_model
 
-# ╔═╡ 93bcd4ed-940c-410b-8c71-7d4e18e2f699
+# ╔═╡ 93bcd4ed-940c-410b-a8bb-11a6d1761f50
 md"""
 So we see a small improvement in the `brier_score` and `auc`, but
 these are not statistically significant improvements; default
 `booster` hyper-parameters do a pretty good job.
 """
 
-# ╔═╡ 19bb6a91-8c9d-4ed0-a590-db6dcb21b2d3
+# ╔═╡ 19bb6a91-8c9d-4ed0-8c71-7d4e18e2f699
 md"## Testing the final model"
 
-# ╔═╡ fce028bb-dd04-4d7a-bec6-3fa17d8c7b35
+# ╔═╡ fe32c8ab-2f9e-4bb4-a590-db6dcb21b2d3
 md"""
 We now determine the performance of our model on our
 lock-and-throw-away-the-key holdout set. To demonstrate
 deserialization, we'll pretend we're in a new Julia session (but
-have and called `import`/`using` on the same packages). Then the
+have called `import`/`using` on the same packages). Then the
 following should suffice to recover our model trained under
 "Hyper-parameter optimization" above:
 """
 
-# ╔═╡ 695926dd-3faf-48a0-97eb-2de8afd657be
+# ╔═╡ 695926dd-3faf-48a0-bec6-3fa17d8c7b35
 mach_restored = machine("tuned_iterated_pipe.jlso")
 
-# ╔═╡ 24ca2761-e264-4cf9-bba0-54e6f740a5b5
+# ╔═╡ 24ca2761-e264-4cf9-97eb-2de8afd657be
 md"We compute predictions on the holdout set:"
 
-# ╔═╡ 9883bd87-d70f-4fea-94c0-45caa9808777
+# ╔═╡ 9883bd87-d70f-4fea-bba0-54e6f740a5b5
 begin
   ŷ_tuned = predict(mach_restored, Xtest);
   ŷ_tuned[1]
 end
 
-# ╔═╡ 9b7a12e7-2b3c-445a-adf5-76545beae885
+# ╔═╡ 9b7a12e7-2b3c-445a-94c0-45caa9808777
 md"And can compute the final performance measures:"
 
-# ╔═╡ 7fa067b5-7e77-4dda-8715-73a20e2ae31b
+# ╔═╡ 7fa067b5-7e77-4dda-adf5-76545beae885
 @info("Tuned model measurements on test:",
       brier_loss(ŷ_tuned, ytest) |> mean,
       auc(ŷ_tuned, ytest),
       accuracy(mode.(ŷ_tuned), ytest)
       )
 
-# ╔═╡ f4dc71cf-64c8-4857-aaca-a3a0d5954313
+# ╔═╡ f4dc71cf-64c8-4857-8715-73a20e2ae31b
 md"For comparison, here's the performance for the basic pipeline model"
 
-# ╔═╡ 00257755-7145-45e6-83ea-8b0687d511d9
+# ╔═╡ 00257755-7145-45e6-aaca-a3a0d5954313
 begin
   mach_basic = machine(pipe, X, y)
   fit!(mach_basic, verbosity=0)
@@ -1135,7 +1133,7 @@ begin
         )
 end
 
-# ╔═╡ 135dac9b-0bd9-4e1d-9d1f-efc03a3fdb47
+# ╔═╡ 135dac9b-0bd9-4e1d-83ea-8b0687d511d9
 md"""
 ---
 
@@ -1144,7 +1142,7 @@ md"""
 
 # ╔═╡ Cell order:
 # ╟─f0cc864c-8b26-441f-9bca-7c69b794f8ce
-# ╟─6842b3a9-7c80-4b8a-b795-033f6f2a0674
+# ╟─8a6670b8-96a8-4a5d-b795-033f6f2a0674
 # ╟─aa49e638-95dc-4249-935f-ddf6a6bfbbdd
 # ╟─fc400b43-ced4-4953-af2a-25235e544a31
 # ╟─2e640a2f-253e-4522-8af5-148d95ea2900
@@ -1157,7 +1155,7 @@ md"""
 # ╟─28197138-d6b7-433c-8d7e-8e449afd1c48
 # ╟─39c599b2-3c1f-4292-a949-7f3bd292fe31
 # ╟─7c0464a0-4114-46bf-8514-99938a2932db
-# ╟─40838996-676c-4b66-a0de-1721c1bc2df2
+# ╟─256869d0-5e0c-42af-a0de-1721c1bc2df2
 # ╠═60fe49c1-3434-4a77-bca8-7eec7950fd82
 # ╟─e8c13e9d-7910-4a0e-9873-1b1430e635cc
 # ╟─6bf6ef98-302f-478c-b43e-d0ebe87da176
@@ -1210,8 +1208,8 @@ md"""
 # ╟─3bd753fc-163a-4b50-910b-f8a9a217eff2
 # ╟─7b12673f-cc63-4cd9-aa36-d2e8546da46a
 # ╟─3c98ab4e-47cd-4247-88a1-a2bf91434413
-# ╠═1f6c7ad0-fe8d-44e5-a1cb-54e34396a855
-# ╟─4fd341cc-fb8f-4127-8037-0de5806e1a54
+# ╠═ea010966-bb7d-4c79-a1cb-54e34396a855
+# ╟─401c6f14-1128-4df1-8037-0de5806e1a54
 # ╟─81aa1aa9-27d9-423f-9961-a09632c33fb0
 # ╟─fff47e76-d7ac-4377-b7cc-46f4ef988c68
 # ╟─f1dbbc22-9844-4e1c-90fb-7f2721f6fcc7
@@ -1229,7 +1227,7 @@ md"""
 # ╠═fdd20843-c981-41ad-9e7b-5b943cf6b560
 # ╟─2b25f9cb-d12d-4a6f-bce6-0a1379cc1259
 # ╠═b139c43b-382b-415a-9608-b5032c116833
-# ╟─91cda5db-ba6b-453e-b473-4aa968e6937a
+# ╟─90a7fe9a-934f-445a-b473-4aa968e6937a
 # ╟─fc97e937-66ca-4434-8d9e-644a1b3cc6b6
 # ╟─b1d95557-51fc-4f1e-ac0a-23ded81445da
 # ╟─38961daa-dd5f-4f97-8535-1a088a6a3228
@@ -1240,9 +1238,9 @@ md"""
 # ╠═45c2d8f9-cbf9-4cda-92c8-6db3a590d963
 # ╟─232b7775-1f79-43f7-abf5-96f457eb2bdf
 # ╟─ac84c13f-391f-405a-8a60-2e0214c059f5
-# ╟─4e70bf68-a78b-40dc-a38a-beb5c7157b57
-# ╟─f2f4194f-7003-43cc-81f5-507803ea9ed6
-# ╟─10ca41be-b6cb-4b96-9b21-6d4eb642d87e
+# ╟─442078e4-a695-471c-a38a-beb5c7157b57
+# ╟─23fb37b0-08c1-4688-81f5-507803ea9ed6
+# ╟─1def55f5-71fc-4257-9b21-6d4eb642d87e
 # ╟─2c4016c6-dc7e-44ec-b98c-3df1f31879bf
 # ╠═236c098c-0189-4a96-92b7-4ceba56e97ad
 # ╟─9ffe1654-7e32-4c4b-b122-214de244406c
@@ -1252,7 +1250,7 @@ md"""
 # ╟─e0b1bffb-dbd5-4b0a-a04e-0b76409c14a7
 # ╠═d8ad2c21-fd27-44fb-b979-3458f2f26667
 # ╟─ceff13ba-a526-4ecb-97e3-6677afc6ca9f
-# ╟─b589fba6-2e0d-4bb2-b10e-562ce21caa04
+# ╟─dcf0eb93-2368-4158-b10e-562ce21caa04
 # ╠═442be3e3-b2e9-499d-8f78-ab549ef1544e
 # ╟─f03fdd56-6c30-4d73-a8a4-a53f5149481e
 # ╠═3afbe65c-18bf-4576-8704-dbab8e09b4f1
@@ -1280,65 +1278,64 @@ md"""
 # ╟─db354064-c2dd-4e6a-a7d8-c3b94fb18495
 # ╟─3bbb26ed-7d1e-46ac-8396-93fa872d2512
 # ╠═cdfe840d-4e87-467f-a4ac-2ddb495858ce
-# ╟─cfc5adc0-6524-478d-806e-1bc580dc349d
-# ╟─ab1bc84b-e4e3-45be-9703-288eae064e2a
-# ╟─0b80d69c-b60c-4cf4-b2c3-413ae5867f7d
-# ╟─19e7e4c9-95c0-49d6-93d8-53c527b0a48c
-# ╟─6ff08b40-906f-4154-af98-8dffdf3118fc
-# ╟─8fc99d35-d8cc-455f-8620-127a8c4021ec
-# ╠═2c5d0b23-3cb1-4c50-a1f6-fec4c3edfa7b
-# ╟─9f80b5b5-95b9-4f01-82f7-021485ee0115
-# ╠═9aa97026-ebdb-4713-9ecb-94593d972599
-# ╟─bb7a34eb-4bf1-41d9-b54b-e44bea97c579
-# ╟─71bead68-2d38-468c-9121-4e392242994e
-# ╠═f9e196d8-071c-4dd6-b221-79886442efe7
-# ╟─76867b4d-56ab-4f24-8df5-b7371beb6b3f
-# ╟─a2e2a37c-5fdb-4c56-a475-d52dc8eba727
-# ╟─ed9f284e-1e45-46e7-804b-89f5009710b0
-# ╟─b8b0e5ee-8468-4e02-a14a-b0adc2955e1c
-# ╟─50372dc8-bb10-4f9e-bd20-120a7a4020d0
-# ╟─3e385eb4-0a44-40f6-93a0-9d99274137e8
-# ╟─caa5153f-6633-41f7-af76-60dddeecbe6c
-# ╟─0b74bfe8-bff6-469d-9074-c069a0e97d7e
-# ╠═b17f6f89-2fd4-46de-ac4a-024c5894013e
-# ╠═0a7ab003-9e10-44cf-82ca-0687059409ae
-# ╟─f46af08e-ddb9-4aec-9e9e-2379bd3c438e
-# ╟─af3023e6-920f-478d-bf9e-f9077f3deea4
-# ╠═93c17a9b-b49c-4780-9b74-5a67b6e8b15f
-# ╟─21f14f18-cc5a-4ed9-b1f4-bf9663e97bb7
-# ╟─147cc2c5-f3c2-4aec-8dca-7ecb1b94fa1b
-# ╠═b3bc6848-6b44-41e3-aeca-6e3d5d94d8fa
-# ╟─fbf15fc2-347a-432a-8aa0-20af95403dd9
-# ╟─3922d490-8018-4b8c-a120-518242409f79
-# ╠═d59dc0af-8eb7-4ac4-bcf7-0be279ee1434
-# ╟─ed1d8575-1c50-4bc7-9df6-c78b3bed8b80
-# ╟─1dc17d71-3a8f-43e2-b9cc-1427739824b3
-# ╟─954a354f-0a1d-4a7f-9051-24fa20a24653
-# ╠═0f9e72c1-fb6e-4ea7-ac11-6a06d822d067
-# ╠═242b8047-0508-4ce2-8d27-497b9a4e8f4b
-# ╟─af6d8f76-f96e-4136-a8e6-955351cd26f5
-# ╠═c0ef7138-42da-41da-bf7b-99c47ef72fd2
-# ╟─84fb98ba-cb8a-4689-9b3c-c87e36798d40
-# ╠═e0dba28c-5f07-4305-bc52-7a03f8a4f046
-# ╟─d92c7d6c-6eda-4083-9814-5dd23028b7dd
-# ╟─7626383d-5212-4ee5-aea9-6b095d52d246
-# ╟─f38bca90-a19e-4faa-8a6a-3fad94d47b89
-# ╠═36e8600e-f5ee-4e5f-ab7f-23dfd6fe43e8
-# ╟─4de39bbb-e421-4e1b-873e-e6fb8e7dca1a
-# ╟─c1aa36a1-a81a-4ed5-9dd4-420f3ba8803c
-# ╟─cd043584-6881-45df-b994-ae59732958cb
-# ╠═9c90d7a7-1966-4d21-9aa5-a206354b401f
-# ╠═f5058fe5-53de-43ad-b666-1307eccc221d
-# ╟─669b492b-69a7-4d88-8f9a-f7439f35ea8f
-# ╠═5c1754b1-21c2-4173-a8bb-11a6d1761f50
-# ╟─93bcd4ed-940c-410b-8c71-7d4e18e2f699
-# ╟─19bb6a91-8c9d-4ed0-a590-db6dcb21b2d3
-# ╟─fce028bb-dd04-4d7a-bec6-3fa17d8c7b35
-# ╠═695926dd-3faf-48a0-97eb-2de8afd657be
-# ╟─24ca2761-e264-4cf9-bba0-54e6f740a5b5
-# ╠═9883bd87-d70f-4fea-94c0-45caa9808777
-# ╟─9b7a12e7-2b3c-445a-adf5-76545beae885
-# ╠═7fa067b5-7e77-4dda-8715-73a20e2ae31b
-# ╟─f4dc71cf-64c8-4857-aaca-a3a0d5954313
-# ╠═00257755-7145-45e6-83ea-8b0687d511d9
-# ╟─135dac9b-0bd9-4e1d-9d1f-efc03a3fdb47
+# ╟─ab1bc84b-e4e3-45be-806e-1bc580dc349d
+# ╟─0b80d69c-b60c-4cf4-9703-288eae064e2a
+# ╟─19e7e4c9-95c0-49d6-b2c3-413ae5867f7d
+# ╟─6ff08b40-906f-4154-93d8-53c527b0a48c
+# ╟─8fc99d35-d8cc-455f-af98-8dffdf3118fc
+# ╠═96c742d9-e6fe-4887-8620-127a8c4021ec
+# ╟─9f80b5b5-95b9-4f01-a1f6-fec4c3edfa7b
+# ╠═9aa97026-ebdb-4713-82f7-021485ee0115
+# ╟─bb7a34eb-4bf1-41d9-9ecb-94593d972599
+# ╟─71bead68-2d38-468c-b54b-e44bea97c579
+# ╠═f9e196d8-071c-4dd6-9121-4e392242994e
+# ╟─16d8cd4e-ca20-475a-b221-79886442efe7
+# ╟─ab59d744-51f8-4364-8df5-b7371beb6b3f
+# ╟─ed9f284e-1e45-46e7-a475-d52dc8eba727
+# ╟─b8b0e5ee-8468-4e02-804b-89f5009710b0
+# ╟─50372dc8-bb10-4f9e-a14a-b0adc2955e1c
+# ╟─3e385eb4-0a44-40f6-bd20-120a7a4020d0
+# ╟─caa5153f-6633-41f7-93a0-9d99274137e8
+# ╟─0b74bfe8-bff6-469d-af76-60dddeecbe6c
+# ╠═b17f6f89-2fd4-46de-9074-c069a0e97d7e
+# ╠═0a7ab003-9e10-44cf-ac4a-024c5894013e
+# ╟─f46af08e-ddb9-4aec-82ca-0687059409ae
+# ╟─af3023e6-920f-478d-9e9e-2379bd3c438e
+# ╠═93c17a9b-b49c-4780-bf9e-f9077f3deea4
+# ╟─21f14f18-cc5a-4ed9-9b74-5a67b6e8b15f
+# ╟─147cc2c5-f3c2-4aec-b1f4-bf9663e97bb7
+# ╠═b3bc6848-6b44-41e3-8dca-7ecb1b94fa1b
+# ╟─fbf15fc2-347a-432a-aeca-6e3d5d94d8fa
+# ╟─3922d490-8018-4b8c-8aa0-20af95403dd9
+# ╠═d59dc0af-8eb7-4ac4-a120-518242409f79
+# ╟─ed1d8575-1c50-4bc7-bcf7-0be279ee1434
+# ╟─c392b949-7e64-4f3e-9df6-c78b3bed8b80
+# ╟─954a354f-0a1d-4a7f-b9cc-1427739824b3
+# ╠═0f9e72c1-fb6e-4ea7-9051-24fa20a24653
+# ╠═242b8047-0508-4ce2-ac11-6a06d822d067
+# ╟─af6d8f76-f96e-4136-8d27-497b9a4e8f4b
+# ╠═ec5e230c-397a-4e07-a8e6-955351cd26f5
+# ╟─84fb98ba-cb8a-4689-bf7b-99c47ef72fd2
+# ╠═e0dba28c-5f07-4305-9b3c-c87e36798d40
+# ╟─d92c7d6c-6eda-4083-bc52-7a03f8a4f046
+# ╟─7626383d-5212-4ee5-9814-5dd23028b7dd
+# ╟─f38bca90-a19e-4faa-aea9-6b095d52d246
+# ╠═36e8600e-f5ee-4e5f-8a6a-3fad94d47b89
+# ╟─4de39bbb-e421-4e1b-ab7f-23dfd6fe43e8
+# ╟─cf4e89cd-998c-44d1-873e-e6fb8e7dca1a
+# ╟─cd043584-6881-45df-9dd4-420f3ba8803c
+# ╠═9c90d7a7-1966-4d21-b994-ae59732958cb
+# ╠═f5058fe5-53de-43ad-9aa5-a206354b401f
+# ╟─669b492b-69a7-4d88-b666-1307eccc221d
+# ╠═5c1754b1-21c2-4173-8f9a-f7439f35ea8f
+# ╟─93bcd4ed-940c-410b-a8bb-11a6d1761f50
+# ╟─19bb6a91-8c9d-4ed0-8c71-7d4e18e2f699
+# ╟─fe32c8ab-2f9e-4bb4-a590-db6dcb21b2d3
+# ╠═695926dd-3faf-48a0-bec6-3fa17d8c7b35
+# ╟─24ca2761-e264-4cf9-97eb-2de8afd657be
+# ╠═9883bd87-d70f-4fea-bba0-54e6f740a5b5
+# ╟─9b7a12e7-2b3c-445a-94c0-45caa9808777
+# ╠═7fa067b5-7e77-4dda-adf5-76545beae885
+# ╟─f4dc71cf-64c8-4857-8715-73a20e2ae31b
+# ╠═00257755-7145-45e6-aaca-a3a0d5954313
+# ╟─135dac9b-0bd9-4e1d-83ea-8b0687d511d9

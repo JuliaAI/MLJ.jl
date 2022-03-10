@@ -1,9 +1,10 @@
 # # MLJ for Data Scientists in Two Hours
 
-# An end-to-end application of the [MLJ
+# An application of the [MLJ
 # toolbox](https://alan-turing-institute.github.io/MLJ.jl/dev/) to the
 # Telco Customer Churn dataset, aimed at practicing data scientists
-# new to MLJ (Machine Learning in Julia).
+# new to MLJ (Machine Learning in Julia). This tutorial does not
+# cover exploratory data analysis.
 
 # MLJ is a *multi-paradigm* machine learning toolbox (i.e., not just
 # deep-learning).
@@ -92,7 +93,10 @@
 # The following code replicates precisely the set of Julia packages
 # used to develop this tutorial. If this is your first time running
 # the notebook, package instantiation and pre-compilation may take a
-# minute or so to complete.
+# minute or so to complete. **This step will fail** if the [correct
+# Manifest.toml and Project.toml
+# files](https://github.com/alan-turing-institute/MLJ.jl/tree/dev/examples/telco)
+# are not in the same directory as this notebook.
 
 using Pkg
 Pkg.activate(@__DIR__) # get env from TOML files in same directory as this notebook
@@ -271,12 +275,12 @@ schema(df0) |> DataFrames.DataFrame
 # 30% of the remainder for use as a lock-and-throw-away-the-key
 # holdout set:
 
-df, df_test, df_dumped = partition(df0, 0.07, 0.003, # in ratios 7:3:90
-                                   stratified=df.Churn,
+df, df_test, df_dumped = partition(df0, 0.07, 0.03, # in ratios 7:3:90
+                                   stratify=df0.Churn,
                                    rng=123);
 
-# The reader interested in including all data can instead do `df,
-# df_test = partition(df0, 0.7, rng=123)`.
+# The reader interested in including all data can instead do
+# `df, df_test = partition(df0, 0.7, rng=123)`.
 
 
 # ## Splitting data into target and features
@@ -332,7 +336,7 @@ scitype(X) <: input_scitype(booster)
 # As it turns out, this is because `booster`, like the majority of MLJ
 # supervised models, expects the features to be `Continuous`. (With
 # some experience, this can be gleaned from `input_scitype(booster)`.)
-# So we need feature encoding, discussed next.
+# So we need categorical feature encoding, discussed next.
 
 
 # ## Building a model pipeline to incorporate feature encoding
@@ -370,17 +374,17 @@ pipe.evo_tree_classifier.max_depth
 
 # Without touching our test set `Xtest`, `ytest`, we will estimate the
 # performance of our pipeline model, with default hyper-parameters, in
-# two different ways.
+# two different ways:
 
-# First, we'll do this "by hand" using the `fit!` and `predict`
+# **Evaluating by hand.** First, we'll do this "by hand" using the `fit!` and `predict`
 # workflow illustrated for the iris data set above, using a
 # holdout resampling strategy. At the same time we'll see how to
 # generate a **confusion matrix**, **ROC curve**, and inspect
 # **feature importances**.
 
-# Then we'll apply the more typical and convenient `evaluate`
-# workflow, but using `StratifiedCV` (stratified cross-validation)
-# which is more informative.
+# **Automated performance evaluation.** Next we'll apply the more
+# typical and convenient `evaluate` workflow, but using `StratifiedCV`
+# (stratified cross-validation) which is more informative.
 
 # In any case, we need to choose some measures (metrics) to quantify
 # the performance of our model. For a complete list of measures, one
@@ -409,8 +413,8 @@ fit!(mach_pipe, rows=train)
 
 # We note in passing that we can access two kinds of information from a trained machine:
 
-# - The **learned parameters** (eg, coefficients of a linear model): We use `fitted_params(mach)`
-# - Other **by-products of training** (eg, feature importances): We use `report(mach)`
+# - The **learned parameters** (eg, coefficients of a linear model): We use `fitted_params(mach_pipe)`
+# - Other **by-products of training** (eg, feature importances): We use `report(mach_pipe)`
 
 fp = fitted_params(mach_pipe);
 keys(fp)
@@ -524,9 +528,6 @@ unimportant_features = filter(:importance => <(0.005), feature_importance_table)
 pipe2 = ContinuousEncoder() |>
     FeatureSelector(features=unimportant_features, ignore=true) |> booster
 
-# The reader can check this change makes negligible difference to the
-# model's performance.
-
 
 # ## Wrapping our model in control strategies.
 
@@ -553,7 +554,7 @@ pipe2 = ContinuousEncoder() |>
 # list](https://alan-turing-institute.github.io/MLJ.jl/dev/controlling_iterative_models/#Controls-provided):
 
 controls = [
-    Step(1),              # increment to iteration parameter (`pipe.nrounds`)
+    Step(1),              # to increment iteration parameter (`pipe.nrounds`)
     NumberSinceBest(n=6), # main stopping criterion
     TimeLimit(0.5/60),    # never train longer than half a minute
     InvalidValue()        # stop if NaN or ±Inf encountered
@@ -579,11 +580,11 @@ iterated_pipe = IteratedModel(model=pipe2,
 mach_iterated_pipe = machine(iterated_pipe, X, y)
 fit!(mach_iterated_pipe, force=true);
 
-# Note that internally this training is split into two separate steps:
+# To recap, internally this training is split into two separate steps:
 
 # - A controlled iteration step, training on the holdout set, with the total number of iterations determined by the specified stopping criteria (based on the out-of-sample performance estimates)
 # - A final step that trains the atomic model on *all* available
-#   data using the number of iterations determined in the first step. Calling `predict` on the `mach` means using the learned parameters of the second step.
+#   data using the number of iterations determined in the first step. Calling `predict` on `mach_iterated_pipe` means using the learned parameters of the second step.
 
 
 # ## Hyper-parameter optimization (model tuning)
@@ -665,7 +666,7 @@ fit!(mach_tuned_iterated_pipe)
 # internally into two separate steps:
 
 # - A step to determine the parameter values that optimize the aggregated cross-validation scores
-# - A final step that trains the optimal model on *all* available data. Future predictions `predict(mach, ...)` are based on this final training step.
+# - A final step that trains the optimal model on *all* available data. Future predictions `predict(mach_tuned_iterated_pipe, ...)` are based on this final training step.
 
 # From `report(mach_tuned_iterated_pipe)` we can extract details about
 # the optimization procedure. For example:
@@ -680,7 +681,7 @@ best_booster = rpt2.best_model.model.evo_tree_classifier
 # Using the `confidence_intervals` function we defined earlier:
 
 e_best = rpt2.best_history_entry
-confidence_intervals(e_best) |> DataFrames.DataFrame # for pretty printing
+confidence_intervals(e_best)
 
 # And we can visualize the optimization results:
 
@@ -699,7 +700,7 @@ MLJ.save("tuned_iterated_pipe.jlso", mach_tuned_iterated_pipe)
 
 # We'll deserialize this in "Testing the final model" below.
 
-# ## Final performance estimate;;;
+# ## Final performance estimate
 
 # Finally, to get an even more accurate estimate of performance, we
 # can evaluate our model using stratified cross-validation and all the
@@ -733,7 +734,7 @@ confidence_intervals_basic_model
 # We now determine the performance of our model on our
 # lock-and-throw-away-the-key holdout set. To demonstrate
 # deserialization, we'll pretend we're in a new Julia session (but
-# have and called `import`/`using` on the same packages). Then the
+# have called `import`/`using` on the same packages). Then the
 # following should suffice to recover our model trained under
 # "Hyper-parameter optimization" above:
 
