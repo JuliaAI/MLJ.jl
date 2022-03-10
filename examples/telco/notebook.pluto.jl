@@ -1,24 +1,8 @@
 ### A Pluto.jl notebook ###
-# v0.18.0
+# v0.16.0
 
 using Markdown
 using InteractiveUtils
-
-# ╔═╡ 60fe49c1-3434-4a77-bca8-7eec7950fd82
-begin
-  using Pkg
-  Pkg.activate(@__DIR__) # get env from TOML files in same directory as this notebook
-  Pkg.instantiate()
-end
-
-# ╔═╡ 9b7b9ade-9318-4b95-879e-dc128f3db7b3
-using MLJ
-
-# ╔═╡ 15996832-b736-45f4-b61c-748aec38e674
-using Plots
-
-# ╔═╡ 0f76a79f-8675-4ec1-946d-b124a8db5f7c
-using Measurements
 
 # ╔═╡ f0cc864c-8b26-441f-9bca-7c69b794f8ce
 md"# MLJ for Data Scientists in Two Hours"
@@ -97,8 +81,8 @@ cheatsheet](https://ahsmart.com/pub/data-wrangling-with-data-frames-jl-cheat-she
 may help).
 """
 
-# ╔═╡ 4d86d76f-05ff-4409-b1b3-dd47e367ba54
-md"**Time.** About two hours, first time through."
+# ╔═╡ 4830fc64-3d70-4869-b1b3-dd47e367ba54
+md"**Time.** Between two and three hours, first time through."
 
 # ╔═╡ 28197138-d6b7-433c-8d7e-8e449afd1c48
 md"## Summary of methods and types introduced"
@@ -151,6 +135,13 @@ the notebook, package instantiation and pre-compilation may take a
 minute or so to complete.
 """
 
+# ╔═╡ 60fe49c1-3434-4a77-bca8-7eec7950fd82
+begin
+  using Pkg
+  Pkg.activate(@__DIR__) # get env from TOML files in same directory as this notebook
+  Pkg.instantiate()
+end
+
 # ╔═╡ e8c13e9d-7910-4a0e-9873-1b1430e635cc
 md"## Warm up: Building a model for the iris dataset"
 
@@ -169,11 +160,14 @@ example](https://alan-turing-institute.github.io/MLJ.jl/dev/getting_started/#Fit
 in the MLJ documentation.
 """
 
-# ╔═╡ 4a694a0c-60f1-4eee-abd3-cb77d7a79683
+# ╔═╡ d5b8bf1d-6c9a-46c1-abd3-cb77d7a79683
 md"""
 First, using the built-in iris dataset, we load and inspect the features
-`X` (a table) and target variable `y` (a vector):
+`X_iris` (a table) and target variable `y_iris` (a vector):
 """
+
+# ╔═╡ 9b7b9ade-9318-4b95-879e-dc128f3db7b3
+using MLJ
 
 # ╔═╡ 4f3f061d-259d-4479-a367-9aa3c6cf34d0
 begin
@@ -405,8 +399,10 @@ going to dump 90% of observations (after shuffling) and split off
 holdout set:
 """
 
-# ╔═╡ 071e1fa8-6d95-4bd6-a1cb-54e34396a855
-df, df_test, df_dumped = partition(df0, 0.07, 0.003, rng=123); # in ratio 7:3:90
+# ╔═╡ 1f6c7ad0-fe8d-44e5-a1cb-54e34396a855
+df, df_test, df_dumped = partition(df0, 0.07, 0.003, # in ratios 7:3:90
+                                   stratified=df.Churn,
+                                   rng=123);
 
 # ╔═╡ 4fd341cc-fb8f-4127-8037-0de5806e1a54
 md"""
@@ -694,6 +690,9 @@ Note: Importing the plotting package and calling the plotting
 functions for the first time can take a minute or so.
 """
 
+# ╔═╡ 15996832-b736-45f4-b61c-748aec38e674
+using Plots
+
 # ╔═╡ 3c4984d2-9e1a-450b-9727-ed822e4fd85d
 begin
   roc_curve = roc(ŷ, y[validation])
@@ -745,6 +744,9 @@ performance measure's expected value. Here's a utility function to
 calculate confidence intervals for our performance estimates based
 on this practice, and it's application to the current evaluation:
 """
+
+# ╔═╡ 0f76a79f-8675-4ec1-946d-b124a8db5f7c
+using Measurements
 
 # ╔═╡ f98c1e94-50a6-424b-b582-dfcbeb05bcc5
 begin
@@ -1042,8 +1044,8 @@ MLJ.save("tuned_iterated_pipe.jlso", mach_tuned_iterated_pipe)
 # ╔═╡ 4de39bbb-e421-4e1b-873e-e6fb8e7dca1a
 md"We'll deserialize this in \"Testing the final model\" below."
 
-# ╔═╡ cf4e89cd-998c-44d1-9dd4-420f3ba8803c
-md"## Final performance estimate"
+# ╔═╡ c1aa36a1-a81a-4ed5-9dd4-420f3ba8803c
+md"## Final performance estimate;;;"
 
 # ╔═╡ cd043584-6881-45df-b994-ae59732958cb
 md"""
@@ -1151,7 +1153,7 @@ md"""
 # ╟─4769b983-89fb-4a58-9e54-3f7b3ca87ecb
 # ╟─4eb8dff4-c23a-4b41-ba1f-6363f43ec697
 # ╟─a583d175-d623-4888-95ea-2955abd45275
-# ╟─4d86d76f-05ff-4409-b1b3-dd47e367ba54
+# ╟─4830fc64-3d70-4869-b1b3-dd47e367ba54
 # ╟─28197138-d6b7-433c-8d7e-8e449afd1c48
 # ╟─39c599b2-3c1f-4292-a949-7f3bd292fe31
 # ╟─7c0464a0-4114-46bf-8514-99938a2932db
@@ -1160,7 +1162,7 @@ md"""
 # ╟─e8c13e9d-7910-4a0e-9873-1b1430e635cc
 # ╟─6bf6ef98-302f-478c-b43e-d0ebe87da176
 # ╟─33ca287e-8cba-47d1-9009-4cfb2012998f
-# ╟─4a694a0c-60f1-4eee-abd3-cb77d7a79683
+# ╟─d5b8bf1d-6c9a-46c1-abd3-cb77d7a79683
 # ╠═9b7b9ade-9318-4b95-879e-dc128f3db7b3
 # ╠═4f3f061d-259d-4479-a367-9aa3c6cf34d0
 # ╠═a546f372-4ae0-48c2-bf32-94657e65284e
@@ -1208,7 +1210,7 @@ md"""
 # ╟─3bd753fc-163a-4b50-910b-f8a9a217eff2
 # ╟─7b12673f-cc63-4cd9-aa36-d2e8546da46a
 # ╟─3c98ab4e-47cd-4247-88a1-a2bf91434413
-# ╠═071e1fa8-6d95-4bd6-a1cb-54e34396a855
+# ╠═1f6c7ad0-fe8d-44e5-a1cb-54e34396a855
 # ╟─4fd341cc-fb8f-4127-8037-0de5806e1a54
 # ╟─81aa1aa9-27d9-423f-9961-a09632c33fb0
 # ╟─fff47e76-d7ac-4377-b7cc-46f4ef988c68
@@ -1323,7 +1325,7 @@ md"""
 # ╟─f38bca90-a19e-4faa-8a6a-3fad94d47b89
 # ╠═36e8600e-f5ee-4e5f-ab7f-23dfd6fe43e8
 # ╟─4de39bbb-e421-4e1b-873e-e6fb8e7dca1a
-# ╟─cf4e89cd-998c-44d1-9dd4-420f3ba8803c
+# ╟─c1aa36a1-a81a-4ed5-9dd4-420f3ba8803c
 # ╟─cd043584-6881-45df-b994-ae59732958cb
 # ╠═9c90d7a7-1966-4d21-9aa5-a206354b401f
 # ╠═f5058fe5-53de-43ad-b666-1307eccc221d

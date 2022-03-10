@@ -47,7 +47,7 @@
 # cheatsheet](https://ahsmart.com/pub/data-wrangling-with-data-frames-jl-cheat-sheet/index.html)
 # may help).
 
-# **Time.** About two hours, first time through.
+# **Time.** Between two and three hours, first time through.
 
 
 # ## Summary of methods and types introduced
