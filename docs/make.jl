@@ -30,6 +30,7 @@ const MMI = MLJModelInterface
 pages = [
     "Home" => "index.md",
     "About MLJ" => "about_mlj.md",
+    "Learning MLJ" => "learning_mlj.md",
     "Getting Started" => "getting_started.md",
     "Common MLJ Workflows" => "common_mlj_workflows.md",
     "Working with Categorical Data" => "working_with_categorical_data.md",
