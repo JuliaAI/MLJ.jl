@@ -3,9 +3,9 @@
 For an outline of MLJ's **goals** and **features**, see
 [About MLJ](@ref).
 
-This section introduces the most basic MLJ operations and concepts. It
-assumes MJL has been successfully installed. See [Installation](@ref)
-if this is not the case.
+This section introduces only the most basic MLJ operations and
+concepts. It assumes MJL has been successfully installed. See
+[Installation](@ref) if this is not the case. 
 
 
 ```@setup doda
