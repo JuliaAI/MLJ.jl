@@ -2,7 +2,7 @@
 
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
-tuning, evaluating, composing and comparing [over 150 machine learning
+tuning, evaluating, composing and comparing [over 180 machine learning
 models](@ref model_list) written in Julia and other languages. In
 particular MLJ wraps a large number of
 [scikit-learn](https://scikit-learn.org/stable/) models.
@@ -11,8 +11,7 @@ MLJ is released under the MIT licensed.
 
 ## Lightning tour
 
-*For more elementary introductions to MLJ usage see [Basic
-introductions](@ref) below.*
+*For help learning to use MLJ, see [Learning MLJ](@ref)*.
 
 A self-contained notebook and julia script of this demonstration is
 also available
@@ -218,6 +217,9 @@ on the `#mlj` slack workspace in the Julia Slack channel.
 Bugs, suggestions, and feature requests can be posted
 [here](https://github.com/alan-turing-institute/MLJ.jl/issues).
 
+Users are also welcome to join the `#mlj` Julia slack channel to ask
+questions and make suggestions.
+
 See also, [Known Issues](@ref)
 
 
@@ -272,40 +274,6 @@ install directly. Developers can learn more about these
 
 See also the alternative instalation instructions for [Modifying Behavior](@ref).
 
-
-## Learning Julia
-
-If you have experience in programming in another language but are new
-to Julia, then we highly recommend Aaron Christinson's tutorial
-[Dispatching Design
-Patterns](https://github.com/ninjaaron/dispatching-design-patterns)
-which is nicely compressed in his [half-hour
-video presentation](https://www.youtube.com/watch?v=n-E-1-A_rZM).
-
-However, one doesn't need to be able to program in Julia to start
-using MLJ.
-
-## Learning to use MLJ
-
-The present document, although littered with examples, is primarily
-intended as a complete reference. Resources for learning MLJ are:
-
-### Basic introductions
-
-- the [Getting Started](@ref) section of this manual
-
-To get direct help from maintainers and other users, see [Getting help
-and reporting problems](@ref).
-
-
-### In depth
-
-- the MLJ JuliaCon2020 Workshop [materials](https://github.com/ablaom/MachineLearningInJulia2020) and [video recording](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title)
-
-- [Data Science Tutorials in Julia](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
-
-Users are also welcome to join the `#mlj` Julia slack channel to ask
-questions and make suggestions.
 
 ## Funding
 

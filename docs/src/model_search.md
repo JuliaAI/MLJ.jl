@@ -33,8 +33,14 @@ info("PCA")
 So a "model" in the present context is just a named tuple containing
 metadata, and not an actual model type or instance. If two models with
 the same name occur in different packages, the package name must be
-specified, as in `info("LinearRegressor", pkg="GLM")`.
+specified, as in `info("LinearRegressor", pkg="GLM")`. 
 
+Model document strings can be retreived, without importing the
+defining code, using the `doc` function:
+
+```
+doc("DecisionTreeClassifier", pkg="DecisionTree")
+```
 
 ## General model queries
 

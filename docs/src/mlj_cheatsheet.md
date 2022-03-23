@@ -15,6 +15,9 @@ MLJ_VERSION # version of MLJ for this cheatsheet
 `info("RidgeRegressor", pkg="MultivariateStats")` retrieves metadata
 for "RidgeRegresssor", which is provided by multiple packages
 
+`doc("DecisionTreeClassifier", pkg="DecisionTree")` retrieves the
+model document string for the classifier, without loading model code
+
 `models()` lists metadata of every registered model.
 
 `models("Tree")` lists models with "Tree" in the model or package name.
