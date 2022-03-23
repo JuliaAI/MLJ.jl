@@ -6,8 +6,7 @@
     style="color: #389826;">About</a>           &nbsp;|&nbsp;
   <a href="https://alan-turing-institute.github.io/MLJ.jl/dev/about_mlj/#Installation" 
     style="color: #389826;">Install</a>         &nbsp;|&nbsp;
-  <a href="https://alan-turing-institute.github.io/MLJ.jl/dev/about_mlj/#Learning-to-use-MLJ"
-    style="color: #389826;">Learn</a>    &nbsp;|&nbsp;
+  <a href="learning_mlj"   style="color: #389826;">Learn</a>            &nbsp;|&nbsp;
   <a href="mlj_cheatsheet" style="color: #9558B2;">Cheatsheet</a>       &nbsp;|&nbsp;
   <a href="common_mlj_workflows" style="color: #9558B2;">Workflows</a>  &nbsp;|&nbsp;
   <a href="https://github.com/alan-turing-institute/MLJ.jl/" style="color: #9558B2;">For Developers</a> &nbsp;|&nbsp;
