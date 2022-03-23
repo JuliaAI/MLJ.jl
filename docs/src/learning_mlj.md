@@ -1,6 +1,6 @@
 # Learning MLJ
 
-[`MLJ Cheatsheet`](@ref)
+[MLJ Cheatsheet](@ref)
 
 See also [Getting help and reporting problems](@ref).
 

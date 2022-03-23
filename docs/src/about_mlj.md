@@ -2,7 +2,7 @@
 
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
-tuning, evaluating, composing and comparing [over 150 machine learning
+tuning, evaluating, composing and comparing [over 180 machine learning
 models](@ref model_list) written in Julia and other languages. In
 particular MLJ wraps a large number of
 [scikit-learn](https://scikit-learn.org/stable/) models.
@@ -11,8 +11,7 @@ MLJ is released under the MIT licensed.
 
 ## Lightning tour
 
-*For more elementary introductions to MLJ usage see [Basic
-introductions](@ref) below.*
+*For help learning to use MLJ, see [Learning MLJ](@ref)*.
 
 A self-contained notebook and julia script of this demonstration is
 also available
