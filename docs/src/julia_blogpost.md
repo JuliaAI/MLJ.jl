@@ -40,7 +40,7 @@ composition.
 
 - Video from [London Julia User Group meetup in March 2019](https://www.youtube.com/watch?v=CfHkjNmj1eE) (skip to [demo at 21'39](https://youtu.be/CfHkjNmj1eE?t=21m39s)) &nbsp;
 
-- [MLJ Tutorials](https://JuliaAI.github.io/MLJTutorials/)
+- [Learning MLJ](@ref)
 
 - Implementing the MLJ interface for a [new model](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/)
 
