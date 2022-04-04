@@ -161,17 +161,11 @@ MLJ.save("my_machine.jlso", mach)
 To de-serialize, one uses the `machine` constructor:
 
 ```julia
-mach2 = machine("my_machine.jlso")
+mach2 = machine("my_machine.jls")
 predict(mach2, Xnew);
 ```
 
-The machine `mach2` cannot be retrained; however, by providing data to
-the constructor one can enable retraining using the saved model
-hyperparameters (which overwrites the saved learned parameters):
-
-```julia
-mach3 = machine("my_machine.jlso", Xnew, ynew)
-fit!(mach3)
+The machine `mach2` cannot be retrained.
 ```
 
 
@@ -213,5 +207,4 @@ the simplified code excerpt in [Internals](internals.md).
 MLJBase.machine
 fit!
 fit_only!
-MLJSerialization.save
 ```
