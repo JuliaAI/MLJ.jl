@@ -8,7 +8,6 @@ using MLJ
 import MLJIteration
 import IterationControl
 import EarlyStopping
-import MLJSerialization
 import MLJBase
 import MLJTuning
 import MLJModels
@@ -86,7 +85,6 @@ makedocs(
                 MLJModelInterface,
                 ScientificTypesBase,
                 MLJIteration,
-                MLJSerialization,
                 EarlyStopping,
                 IterationControl,
                 CategoricalDistributions],
