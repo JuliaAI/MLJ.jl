@@ -15,8 +15,6 @@ using MLJEnsembles
 using MLJTuning
 using MLJModels
 using OpenML
-using MLJSerialization
-import MLJSerialization.save # but not re-exported
 using MLJIteration
 import MLJIteration.IterationControl
 
@@ -147,9 +145,6 @@ export IterationControl
 const MLJOpenML = OpenML
 
 export OpenML, MLJOpenML
-
-# re-export from MLJSerialization:
-export Save # control, not method
 
 # re-export from ComputaionalResources:
 export CPU1, CPUProcesses, CPUThreads
