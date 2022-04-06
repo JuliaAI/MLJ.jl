@@ -38,6 +38,8 @@ framework?** Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/qui
 
 **Wanting to contribute?** Start [here](CONTRIBUTING.md). 
 
+**PhD and Postdoc opportunies** See [here](https://sebastian.vollmer.ms/jobs/).
+
 MLJ was initially created as a Tools, Practices and Systems project at
 the [Alan Turing Institute](https://www.turing.ac.uk/)
 in 2019. Current funding is provided by a [New Zealand Strategic
