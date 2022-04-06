@@ -842,7 +842,8 @@ MMI.metadata_model(
   DecisionTreeClassifier,
   input_scitype=MMI.Table(MMI.Continuous),
   target_scitype=AbstractVector{<:MMI.Finite},
-  load_path="MLJDecisionTreeInterface.DecisionTreeClassifier")
+  load_path="MLJDecisionTreeInterface.DecisionTreeClassifier"
+)
 ```
 
 *Important.* Do not omit the `load_path` specification. If unsure what
