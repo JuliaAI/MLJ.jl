@@ -831,15 +831,15 @@ Alternatively these traits can also be declared using `MMI.metadata_pkg` and `MM
 
 ```julia
 MMI.metadata_pkg(DecisionTreeClassifier,
-                 name="DecisionTree",
-                 packge_uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
-                 package_url="https://github.com/bensadeghi/DecisionTree.jl",
-                 is_pure_julia=true)
+				 name="DecisionTree",
+				 packge_uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
+				 package_url="https://github.com/bensadeghi/DecisionTree.jl",
+				 is_pure_julia=true)
 
 MMI.metadata_model(DecisionTreeClassifier,
-                   input_scitype=MMI.Table(MMI.Continuous),
-                   target_scitype=AbstractVector{<:MMI.Finite},
-                   load_path="MLJDecisionTreeInterface.DecisionTreeClassifier")
+				   input_scitype=MMI.Table(MMI.Continuous),
+				   target_scitype=AbstractVector{<:MMI.Finite},
+				   load_path="MLJDecisionTreeInterface.DecisionTreeClassifier")
 ```
 
 *Important.* Do not omit the `load_path` specification. If unsure what
@@ -1057,53 +1057,35 @@ controlled by a hyper-parameter `alpha` is given
 
 ### Serialization
 
-!!! warning "Experimental"
+!!! warning "New in MLJBase 0.20"
 
-	The following API is experimental. It is subject to breaking changes during minor or major releases without warning.
+	The following API is incompatible with versions of MLJBase < 0.20, even for model implementations compatible with MLJModelInterface 1^
 
-The MLJ user can serialize and deserialize a *machine*, which means
-serializing/deserializing:
 
-- the associated `Model` object (storing hyperparameters)
-- the `fitresult` (learned parameters)
-- the `report` generating during training
+This section may be occasionally relevant when wrapping models
+implemented in languages other than Julia.
 
-These are bundled into a single file or `IO` stream specified by the
-user using the package `JLSO`. There are two scenarios in which a new
-MLJ model API implementation will want to overload two additional
-methods `save` and `restore` to support serialization:
+The MLJ user can serialize and deserialize machines, as she would any
+other julia object. (This user has the option of first removing data
+from the machine. See [Saving machines](@ref) for details.) However, a
+problem can occur if a model's `fitresult` (see [The fit
+method](@ref)) is not a persistent object. For example, it might be a
+C pointer that would have no meaning in a new Julia session.
 
-1. The algorithm-providing package already has it's own serialization format for learned parameters and/or hyper-parameters, which users may want to access. In that case *the implementation overloads* `save`.
-
-2. The `fitresult` is not a sufficiently persistent object; for example, it is a pointer passed from wrapped C code. In that case *the implementation overloads* `save` *and* `restore`.
-
-In case 2, 1 presumably applies also, for otherwise MLJ serialization
-is probably not going to be possible without changes to the
-algorithm-providing package. An example is given below.
-
-Note that in case 1, MLJ will continue to create it's own
-self-contained serialization of the machine. Below `filename` refers
-to the corresponding serialization file name, as specified by the
-user, but with any final extension (e.g., ".jlso", ".gz") removed. If
-the user has alternatively specified an `IO` object for serialization,
-then `filename` is a randomly generated numeric string.
+If that is the case a model implementation needs to implement a `save`
+and `restore` method for switching between a `fitresult` and some
+persistent, serializable representation of that result.
 
 
 #### The save method
 
 ```julia
-MMI.save(filename, model::SomeModel, fitresult; kwargs...) -> serializable_fitresult
+MMI.save(model::SomeModel, fitresult; kwargs...) -> serializable_fitresult
 ```
 
-Implement this method to serialize using a format specific to models
-of type `SomeModel`. The `fitresult` is the first return value of
-`MMI.fit` for such model types; `kwargs` is a list of keyword
-arguments specified by the user and understood to relate to a some
-model-specific serialization (cannot be `format=...` or
-`compression=...`). The value of `serializable_fitresult` should be a
-persistent representation of `fitresult`, from which a correct and
-valid `fitresult` can be reconstructed using `restore` (see
-below).
+Implement this method to return a persistent serializable
+representation of the `fitresult` component of the `MMI.fit` return
+value.below).
 
 The fallback of `save` performs no action and returns `fitresult`.
 
@@ -1111,54 +1093,21 @@ The fallback of `save` performs no action and returns `fitresult`.
 #### The restore method
 
 ```julia
-MMI.restore(filename, model::SomeModel, serializable_fitresult) -> fitresult
+MMI.restore(model::SomeModel, serializable_fitresult) -> fitresult
 ```
 
-Implement this method to reconstruct a `fitresult` (as returned by
+Implement this method to reconstruct a valid `fitresult` (as would be returned by
 `MMI.fit`) from a persistent representation constructed using
 `MMI.save` as described above.
 
-The fallback of `restore` returns `serializable_fitresult`.
+The fallback of `restore` performs no action and returns `serializable_fitresult`.
+
 
 #### Example
 
-Below is an example drawn from MLJ's XGBoost wrapper. In this example
-the `fitresult` returned by `MMI.fit` is a tuple `(booster,
-a_target_element)` where `booster` is the `XGBoost.jl` object storing
-the learned parameters (essentially a pointer to some object created
-by C code) and `a_target_element` is an ordinary `CategoricalValue`
-used to track the target classes (a persistent object, requiring no
-special treatment).
+For an example, refer to the model implementations at
+[MLJXGBoostInterface.jl](https://github.com/JuliaAI/MLJXGBoostInterface.jl/blob/master/src/MLJXGBoostInterface.jl)
 
-```julia
-function MLJModelInterface.save(filename,
-								::XGBoostClassifier,
-								fitresult;
-								kwargs...)
-	booster, a_target_element = fitresult
-
-	xgb_filename = string(filename, ".xgboost.model")
-	XGBoost.save(booster, xgb_filename)
-	persistent_booster = read(xgb_filename)
-	@info "Additional XGBoost serialization file \"$xgb_filename\" generated. "
-	return (persistent_booster, a_target_element)
-end
-
-function MLJModelInterface.restore(filename,
-								   ::XGBoostClassifier,
-								   serializable_fitresult)
-	persistent_booster, a_target_element = serializable_fitresult
-
-	xgb_filename = string(filename, ".tmp")
-	open(xgb_filename, "w") do file
-		write(file, persistent_booster)
-	end
-	booster = XGBoost.Booster(model_file=xgb_filename)
-	rm(xgb_filename)
-	fitresult = (booster, a_target_element)
-	return fitresult
-end
-```
 
 ### Document strings
 
@@ -1170,8 +1119,8 @@ as a checklist. Here are examples of compliant doc-strings (go to the
 end of the linked files):
 
 - Regular supervised models (classifiers and regressors): [MLJDecisionTreeInterface.jl](https://github.com/JuliaAI/MLJDecisionTreeInterface.jl/blob/master/src/MLJDecisionTreeInterface.jl) (see the end of the file)
- 
-- Tranformers: [MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl/blob/dev/src/builtins/Transformers.jl) 
+
+- Tranformers: [MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl/blob/dev/src/builtins/Transformers.jl)
 
 A utility function is available for generating a standardized header
 for your doc-strings (but you provide most detail by hand):

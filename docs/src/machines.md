@@ -150,30 +150,50 @@ machines](@ref).
 
 ## Saving machines
 
-To save a machine to file, use the `MLJ.save` command:
+Users can save and restore MLJ machines using any external
+serialization package by suitably preparing their `Machine` object,
+and applying a post-processing step to the deserialized object. This
+is explained under [Using an arbitrary serializer](@ref) below.
 
-```julia
-tree = (@load DecisionTreeClassifier pkg=DecisionTree verbosity=0)()
-mach = fit!(machine(tree, X, y))
-MLJ.save("my_machine.jlso", mach)
+However, if a user is happy to use Julia's standard library
+Serialization module, there is a simplified workflow described first.
+
+The usual serialization provisos apply. For example, when
+deserializing you need to have all code on which the serialization
+object depended loaded at time of deserialization also. If a
+hyper-parameter happens to be a user-defined function, then that
+function must be defined at deserialization. And you should only
+deserialize objects from trusted sources.
+
+
+### Using Julia's native serializer
+
+```@docs
+MLJBase.save
 ```
 
-To de-serialize, one uses the `machine` constructor:
+### Using an arbitrary serializer
 
-```julia
-mach2 = machine("my_machine.jlso")
-predict(mach2, Xnew);
+Since machines contain training data, serializing a machine directly
+is not recommended. Also, the learned parameters of models implemented
+in a language other than Julia may not have persistent
+representations, which means serializing them is useless. To address
+these two issues, users:
+
+- Call `serializable(mach)` on a machine `mach` they wish to save (to remove data and create persistent learned parameters)
+
+- Serialize the returned object using `SomeSerializationPkg`
+
+To restore the original machine (minus training data) they:
+
+- Deserialize using `SomeSerializationPkg` to obtain a new object `mach`
+- Call `restore!(mach)` to ensure `mach` can be used to predict or transform new data.
+
+
+```@docs
+MLJBase.serializable
+MLJBase.restore!
 ```
-
-The machine `mach2` cannot be retrained; however, by providing data to
-the constructor one can enable retraining using the saved model
-hyperparameters (which overwrites the saved learned parameters):
-
-```julia
-mach3 = machine("my_machine.jlso", Xnew, ynew)
-fit!(mach3)
-```
-
 
 ## Internals
 
@@ -213,5 +233,4 @@ the simplified code excerpt in [Internals](internals.md).
 MLJBase.machine
 fit!
 fit_only!
-MLJSerialization.save
 ```
