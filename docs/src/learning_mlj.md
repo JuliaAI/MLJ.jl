@@ -14,15 +14,16 @@ intended as a complete reference.
 [Learn X in Y minutes](https://learnxinyminutes.com/docs/julia/) |
 [HelloJulia](https://github.com/ablaom/HelloJulia.jl)
 
-
-### New to machine learning?
-"Intro to Statistical Learning" at [Data Science Tutorials](https://juliaai.github.io/DataScienceTutorials.jl/) | 
+### New to data science?
 [Julia Data Science](https://github.com/JuliaDataScience/JuliaDataScience)
 
-### Know a little ML and just want MLJ basics?
-[Getting Started](@ref).
+### New to machine learning?
+[Introduction to Statistical Learning](https://www.statlearning.com) with Julia versions of  the R labs [here](https://juliaai.github.io/DataScienceTutorials.jl/)
 
-### A practicing data scientist transitioning from another platform?
+### Know some ML and just want MLJ basics?
+[Getting Started](@ref)
+
+### An ML practioner transitioning from another platform?
 [MLJ for Data Scientists in Two Hours](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/telco/notebook.ipynb) |
 [MLJTutorial](https://github.com/ablaom/MLJTutorial.jl)
 
