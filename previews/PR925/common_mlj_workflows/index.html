@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Common MLJ Workflows · MLJ</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.svg" alt="MLJ logo"/></a><div class="docs-package-name"><span class="docs-autofit">MLJ</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../about_mlj/">About MLJ</a></li><li><a class="tocitem" href="../learning_mlj/">Learning MLJ</a></li><li><a class="tocitem" href="../getting_started/">Getting Started</a></li><li class="is-active"><a class="tocitem" href>Common MLJ Workflows</a><ul class="internal"><li><a class="tocitem" href="#Data-ingestion"><span>Data ingestion</span></a></li><li><a class="tocitem" href="#Model-search"><span>Model search</span></a></li></ul></li><li><a class="tocitem" href="../working_with_categorical_data/">Working with Categorical Data</a></li><li><a class="tocitem" href="../model_search/">Model Search</a></li><li><a class="tocitem" href="../loading_model_code/">Loading Model Code</a></li><li><a class="tocitem" href="../machines/">Machines</a></li><li><a class="tocitem" href="../evaluating_model_performance/">Evaluating Model Performance</a></li><li><a class="tocitem" href="../performance_measures/">Performance Measures</a></li><li><a class="tocitem" href="../weights/">Weights</a></li><li><a class="tocitem" href="../tuning_models/">Tuning Models</a></li><li><a class="tocitem" href="../learning_curves/">Learning Curves</a></li><li><a class="tocitem" href="../preparing_data/">Preparing Data</a></li><li><a class="tocitem" href="../transformers/">Transformers and Other Unsupervised models</a></li><li><a class="tocitem" href="../more_on_probabilistic_predictors/">More on Probablistic Predictors</a></li><li><a class="tocitem" href="../composing_models/">Composing Models</a></li><li><a class="tocitem" href="../linear_pipelines/">Linear Pipelines</a></li><li><a class="tocitem" href="../target_transformations/">Target Transformations</a></li><li><a class="tocitem" href="../homogeneous_ensembles/">Homogeneous Ensembles</a></li><li><a class="tocitem" href="../model_stacking/">Model Stacking</a></li><li><a class="tocitem" href="../controlling_iterative_models/">Controlling Iterative Models</a></li><li><a class="tocitem" href="../generating_synthetic_data/">Generating Synthetic Data</a></li><li><a class="tocitem" href="../openml_integration/">OpenML Integration</a></li><li><a class="tocitem" href="../acceleration_and_parallelism/">Acceleration and Parallelism</a></li><li><a class="tocitem" href="../simple_user_defined_models/">Simple User Defined Models</a></li><li><a class="tocitem" href="../quick_start_guide_to_adding_models/">Quick-Start Guide to Adding Models</a></li><li><a class="tocitem" href="../adding_models_for_general_use/">Adding Models for General Use</a></li><li><a class="tocitem" href="../modifying_behavior/">Modifying Behavior</a></li><li><a class="tocitem" href="../internals/">Internals</a></li><li><a class="tocitem" href="../list_of_supported_models/">List of Supported Models</a></li><li><a class="tocitem" href="../third_party_packages/">Third Party Packages</a></li><li><a class="tocitem" href="../glossary/">Glossary</a></li><li><a class="tocitem" href="../mlj_cheatsheet/">MLJ Cheatsheet</a></li><li><a class="tocitem" href="../known_issues/">Known Issues</a></li><li><a class="tocitem" href="../frequently_asked_questions/">FAQ</a></li><li><a class="tocitem" href="../julia_blogpost/">Julia BlogPost</a></li><li><a class="tocitem" href="../api/">Index of Methods</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Common MLJ Workflows</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Common MLJ Workflows</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/common_mlj_workflows.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Common-MLJ-Workflows"><a class="docs-heading-anchor" href="#Common-MLJ-Workflows">Common MLJ Workflows</a><a id="Common-MLJ-Workflows-1"></a><a class="docs-heading-anchor-permalink" href="#Common-MLJ-Workflows" title="Permalink"></a></h1><h2 id="Data-ingestion"><a class="docs-heading-anchor" href="#Data-ingestion">Data ingestion</a><a id="Data-ingestion-1"></a><a class="docs-heading-anchor-permalink" href="#Data-ingestion" title="Permalink"></a></h2><pre><code class="language-julia">import RDatasets
+channing = RDatasets.dataset(&quot;boot&quot;, &quot;channing&quot;)
+
+julia&gt; first(channing, 4)
+4×5 DataFrame
+ Row │ Sex   Entry  Exit   Time   Cens
+     │ Cat…  Int32  Int32  Int32  Int32
+─────┼──────────────────────────────────
+   1 │ Male    782    909    127      1
+   2 │ Male   1020   1128    108      1
+   3 │ Male    856    969    113      1
+   4 │ Male    915    957     42      1</code></pre><p>Inspecting metadata, including column scientific types:</p><pre><code class="language-julia">schema(channing)</code></pre><pre class="documenter-example-output">┌───────┬───────────────┬──────────────────────────────────┐
+│ names │ scitypes      │ types                            │
+├───────┼───────────────┼──────────────────────────────────┤
+│ Sex   │ Multiclass{2} │ CategoricalValue{String, UInt32} │
+│ Entry │ Count         │ Int64                            │
+│ Exit  │ Count         │ Int64                            │
+│ Time  │ Count         │ Int64                            │
+│ Cens  │ Count         │ Int64                            │
+└───────┴───────────────┴──────────────────────────────────┘
+</pre><p>Horizontally splitting data and shuffling rows.</p><p>Here <code>y</code> is the <code>:Exit</code> column and <code>X</code> everything else:</p><pre><code class="language-julia">y, X =  unpack(channing, ==(:Exit), rng=123);</code></pre><p>Here <code>y</code> is the <code>:Exit</code> column and <code>X</code> everything else except <code>:Time</code>:</p><pre><code class="language-julia">y, X =  unpack(channing,
+               ==(:Exit),
+               !=(:Time);
+               rng=123);
+scitype(y)</code></pre><pre class="documenter-example-output">AbstractVector{Count} (alias for AbstractArray{Count, 1})</pre><pre><code class="language-julia">schema(X)</code></pre><pre class="documenter-example-output">┌───────┬───────────────┬──────────────────────────────────┐
+│ names │ scitypes      │ types                            │
+├───────┼───────────────┼──────────────────────────────────┤
+│ Sex   │ Multiclass{2} │ CategoricalValue{String, UInt32} │
+│ Entry │ Count         │ Int64                            │
+│ Cens  │ Count         │ Int64                            │
+└───────┴───────────────┴──────────────────────────────────┘
+</pre><p>Fixing wrong scientfic types in <code>X</code>:</p><pre><code class="language-julia">X = coerce(X, :Exit=&gt;Continuous, :Entry=&gt;Continuous, :Cens=&gt;Multiclass)
+schema(X)</code></pre><pre class="documenter-example-output">┌───────┬─────────────────┬──────────────────────────────────┐
+│ names │ scitypes        │ types                            │
+├───────┼─────────────────┼──────────────────────────────────┤
+│ Sex   │ Multiclass{2}   │ CategoricalValue{String, UInt32} │
+│ Entry │ Continuous      │ Float64                          │
+│ Cens  │ Multiclass{462} │ CategoricalValue{Int64, UInt32}  │
+└───────┴─────────────────┴──────────────────────────────────┘
+</pre><p>Loading a built-in supervised dataset:</p><pre><code class="language-julia">table = load_iris();
+schema(table)</code></pre><pre class="documenter-example-output">┌──────────────┬───────────────┬──────────────────────────────────┐
+│ names        │ scitypes      │ types                            │
+├──────────────┼───────────────┼──────────────────────────────────┤
+│ sepal_length │ Continuous    │ Float64                          │
+│ sepal_width  │ Continuous    │ Float64                          │
+│ petal_length │ Continuous    │ Float64                          │
+│ petal_width  │ Continuous    │ Float64                          │
+│ target       │ Multiclass{3} │ CategoricalValue{String, UInt32} │
+└──────────────┴───────────────┴──────────────────────────────────┘
+</pre><p>Loading a built-in data set already split into <code>X</code> and <code>y</code>:</p><pre><code class="language-julia">X, y = @load_iris;
+selectrows(X, 1:4) # selectrows works for any Tables.jl table</code></pre><pre class="documenter-example-output">(sepal_length = [5.1, 4.9, 4.7, 4.6],
+ sepal_width = [3.5, 3.0, 3.2, 3.1],
+ petal_length = [1.4, 1.4, 1.3, 1.5],
+ petal_width = [0.2, 0.2, 0.2, 0.2],)</pre><pre><code class="language-julia">y[1:4]</code></pre><pre class="documenter-example-output">4-element CategoricalArray{String,1,UInt32}:
+ &quot;setosa&quot;
+ &quot;setosa&quot;
+ &quot;setosa&quot;
+ &quot;setosa&quot;</pre><p>Splitting data vertically after row shuffling:</p><pre><code class="language-julia">channing_train, channing_test = partition(channing, 0.6, rng=123);</code></pre><p>Or, if already horizontally split:</p><pre><code class="language-julia">(Xtrain, Xtest), (ytrain, ytest)  = partition((X, y), 0.6, multi=true,  rng=123)</code></pre><pre class="documenter-example-output">(((sepal_length = [6.7, 5.7, 7.2, 4.4, 5.6, 6.5, 4.4, 6.1, 5.4, 4.9  …  6.4, 5.5, 5.4, 4.8, 6.5, 4.9, 6.5, 6.7, 5.6, 6.4], sepal_width = [3.3, 2.8, 3.0, 2.9, 2.5, 3.0, 3.0, 2.9, 3.9, 2.5  …  3.1, 2.3, 3.7, 3.1, 3.0, 2.4, 2.8, 3.3, 2.9, 2.8], petal_length = [5.7, 4.1, 5.8, 1.4, 3.9, 5.2, 1.3, 4.7, 1.7, 4.5  …  5.5, 4.0, 1.5, 1.6, 5.5, 3.3, 4.6, 5.7, 3.6, 5.6], petal_width = [2.1, 1.3, 1.6, 0.2, 1.1, 2.0, 0.2, 1.4, 0.4, 1.7  …  1.8, 1.3, 0.2, 0.2, 1.8, 1.0, 1.5, 2.5, 1.3, 2.2]), (sepal_length = [6.0, 5.8, 6.7, 5.1, 5.0, 6.3, 5.7, 6.4, 6.1, 5.0  …  6.4, 6.8, 6.9, 6.1, 6.7, 5.0, 7.6, 6.3, 5.1, 5.0], sepal_width = [2.7, 2.6, 3.0, 3.8, 3.4, 2.8, 2.5, 3.2, 2.8, 3.5  …  2.7, 3.2, 3.1, 2.8, 2.5, 3.5, 3.0, 2.5, 3.8, 3.6], petal_length = [5.1, 4.0, 5.2, 1.9, 1.5, 5.1, 5.0, 4.5, 4.7, 1.6  …  5.3, 5.9, 5.4, 4.0, 5.8, 1.3, 6.6, 5.0, 1.6, 1.4], petal_width = [1.6, 1.2, 2.3, 0.4, 0.2, 1.5, 2.0, 1.5, 1.2, 0.6  …  1.9, 2.3, 2.1, 1.3, 1.8, 0.3, 2.1, 1.9, 0.2, 0.2])), (CategoricalValue{String, UInt32}[&quot;virginica&quot;, &quot;versicolor&quot;, &quot;virginica&quot;, &quot;setosa&quot;, &quot;versicolor&quot;, &quot;virginica&quot;, &quot;setosa&quot;, &quot;versicolor&quot;, &quot;setosa&quot;, &quot;virginica&quot;  …  &quot;virginica&quot;, &quot;versicolor&quot;, &quot;setosa&quot;, &quot;setosa&quot;, &quot;virginica&quot;, &quot;versicolor&quot;, &quot;versicolor&quot;, &quot;virginica&quot;, &quot;versicolor&quot;, &quot;virginica&quot;], CategoricalValue{String, UInt32}[&quot;versicolor&quot;, &quot;versicolor&quot;, &quot;virginica&quot;, &quot;setosa&quot;, &quot;setosa&quot;, &quot;virginica&quot;, &quot;virginica&quot;, &quot;versicolor&quot;, &quot;versicolor&quot;, &quot;setosa&quot;  …  &quot;virginica&quot;, &quot;virginica&quot;, &quot;virginica&quot;, &quot;versicolor&quot;, &quot;virginica&quot;, &quot;setosa&quot;, &quot;virginica&quot;, &quot;virginica&quot;, &quot;setosa&quot;, &quot;setosa&quot;]))</pre><h2 id="Model-search"><a class="docs-heading-anchor" href="#Model-search">Model search</a><a id="Model-search-1"></a><a class="docs-heading-anchor-permalink" href="#Model-search" title="Permalink"></a></h2><p><em>Reference:</em>   <a href="../model_search/">Model Search</a></p><p>Searching for a supervised model:</p><pre><code class="language-julia">X, y = @load_boston
+ms = models(matching(X, y))</code></pre><pre class="documenter-example-output">59-element Vector{NamedTuple{(:name, :package_name, :is_supervised, :abstract_type, :deep_properties, :docstring, :fit_data_scitype, :human_name, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :inverse_transform_scitype, :is_pure_julia, :is_wrapper, :iteration_parameter, :load_path, :package_license, :package_url, :package_uuid, :predict_scitype, :prediction_type, :supports_class_weights, :supports_online, :supports_training_losses, :supports_weights, :transform_scitype, :input_scitype, :target_scitype, :output_scitype)}}:
+ (name = ARDRegressor, package_name = ScikitLearn, ... )
+ (name = AdaBoostRegressor, package_name = ScikitLearn, ... )
+ (name = BaggingRegressor, package_name = ScikitLearn, ... )
+ (name = BayesianRidgeRegressor, package_name = ScikitLearn, ... )
+ (name = ConstantRegressor, package_name = MLJModels, ... )
+ (name = DecisionTreeRegressor, package_name = BetaML, ... )
+ (name = DecisionTreeRegressor, package_name = DecisionTree, ... )
+ (name = DeterministicConstantRegressor, package_name = MLJModels, ... )
+ (name = DummyRegressor, package_name = ScikitLearn, ... )
+ (name = ElasticNetCVRegressor, package_name = ScikitLearn, ... )
+ ⋮
+ (name = RidgeRegressor, package_name = MultivariateStats, ... )
+ (name = RidgeRegressor, package_name = ScikitLearn, ... )
+ (name = RobustRegressor, package_name = MLJLinearModels, ... )
+ (name = SGDRegressor, package_name = ScikitLearn, ... )
+ (name = SVMLinearRegressor, package_name = ScikitLearn, ... )
+ (name = SVMNuRegressor, package_name = ScikitLearn, ... )
+ (name = SVMRegressor, package_name = ScikitLearn, ... )
+ (name = TheilSenRegressor, package_name = ScikitLearn, ... )
+ (name = XGBoostRegressor, package_name = XGBoost, ... )</pre><pre><code class="language-julia">ms[6]</code></pre><pre class="documenter-example-output">(name = &quot;DecisionTreeRegressor&quot;,
+ package_name = &quot;BetaML&quot;,
+ is_supervised = true,
+ abstract_type = Deterministic,
+ deep_properties = (),
+ docstring = &quot;A simple Decision Tree for regression with support...&quot;,
+ fit_data_scitype =
+     Tuple{Table{_s28} where _s28&lt;:(AbstractVector{_s29} where _s29&lt;:Union{Missing, Known}), AbstractVector{_s149} where _s149&lt;:Continuous},
+ human_name = &quot;decision tree regressor&quot;,
+ hyperparameter_ranges =
+     (nothing, nothing, nothing, nothing, nothing, nothing),
+ hyperparameter_types =
+     (&quot;Int64&quot;, &quot;Float64&quot;, &quot;Int64&quot;, &quot;Int64&quot;, &quot;Function&quot;, &quot;Random.AbstractRNG&quot;),
+ hyperparameters = (:maxDepth,
+                    :minGain,
+                    :minRecords,
+                    :maxFeatures,
+                    :splittingCriterion,
+                    :rng),
+ implemented_methods = [:fit, :predict],
+ inverse_transform_scitype = Unknown,
+ is_pure_julia = true,
+ is_wrapper = false,
+ iteration_parameter = nothing,
+ load_path = &quot;BetaML.Trees.DecisionTreeRegressor&quot;,
+ package_license = &quot;MIT&quot;,
+ package_url = &quot;https://github.com/sylvaticus/BetaML.jl&quot;,
+ package_uuid = &quot;024491cd-cc6b-443e-8034-08ea7eb7db2b&quot;,
+ predict_scitype = AbstractVector{_s149} where _s149&lt;:Continuous,
+ prediction_type = :deterministic,
+ supports_class_weights = false,
+ supports_online = false,
+ supports_training_losses = false,
+ supports_weights = false,
+ transform_scitype = Unknown,
+ input_scitype =
+     Table{_s28} where _s28&lt;:(AbstractVector{_s29} where _s29&lt;:Union{Missing, Known}),
+ target_scitype = AbstractVector{_s149} where _s149&lt;:Continuous,
+ output_scitype = Unknown)</pre><pre><code class="language-julia">models(&quot;Tree&quot;);</code></pre><pre class="documenter-example-output">18-element Vector{NamedTuple{(:name, :package_name, :is_supervised, :abstract_type, :deep_properties, :docstring, :fit_data_scitype, :human_name, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :inverse_transform_scitype, :is_pure_julia, :is_wrapper, :iteration_parameter, :load_path, :package_license, :package_url, :package_uuid, :predict_scitype, :prediction_type, :supports_class_weights, :supports_online, :supports_training_losses, :supports_weights, :transform_scitype, :input_scitype, :target_scitype, :output_scitype)}}:
+ (name = ABODDetector, package_name = OutlierDetectionNeighbors, ... )
+ (name = AdaBoostStumpClassifier, package_name = DecisionTree, ... )
+ (name = COFDetector, package_name = OutlierDetectionNeighbors, ... )
+ (name = DNNDetector, package_name = OutlierDetectionNeighbors, ... )
+ (name = DecisionTreeClassifier, package_name = BetaML, ... )
+ (name = DecisionTreeClassifier, package_name = DecisionTree, ... )
+ (name = DecisionTreeRegressor, package_name = BetaML, ... )
+ (name = DecisionTreeRegressor, package_name = DecisionTree, ... )
+ (name = EvoTreeClassifier, package_name = EvoTrees, ... )
+ (name = EvoTreeCount, package_name = EvoTrees, ... )
+ (name = EvoTreeGaussian, package_name = EvoTrees, ... )
+ (name = EvoTreeRegressor, package_name = EvoTrees, ... )
+ (name = ExtraTreesClassifier, package_name = ScikitLearn, ... )
+ (name = ExtraTreesRegressor, package_name = ScikitLearn, ... )
+ (name = KNNDetector, package_name = OutlierDetectionNeighbors, ... )
+ (name = LOFDetector, package_name = OutlierDetectionNeighbors, ... )
+ (name = RandomForestClassifier, package_name = DecisionTree, ... )
+ (name = RandomForestRegressor, package_name = DecisionTree, ... )</pre><p>A more refined search:</p><pre><code class="language-julia">models() do model
+    matching(model, X, y) &amp;&amp;
+    model.prediction_type == :deterministic &amp;&amp;
+    model.is_pure_julia
+end;</code></pre><p>Searching for an unsupervised model:</p><pre><code class="language-julia">models(matching(X))</code></pre><pre class="documenter-example-output">52-element Vector{NamedTuple{(:name, :package_name, :is_supervised, :abstract_type, :deep_properties, :docstring, :fit_data_scitype, :human_name, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :inverse_transform_scitype, :is_pure_julia, :is_wrapper, :iteration_parameter, :load_path, :package_license, :package_url, :package_uuid, :predict_scitype, :prediction_type, :supports_class_weights, :supports_online, :supports_training_losses, :supports_weights, :transform_scitype, :input_scitype, :target_scitype, :output_scitype)}}:
+ (name = ABODDetector, package_name = OutlierDetectionNeighbors, ... )
+ (name = ABODDetector, package_name = OutlierDetectionPython, ... )
+ (name = AEDetector, package_name = OutlierDetectionNetworks, ... )
+ (name = AffinityPropagation, package_name = ScikitLearn, ... )
+ (name = AgglomerativeClustering, package_name = ScikitLearn, ... )
+ (name = Birch, package_name = ScikitLearn, ... )
+ (name = CBLOFDetector, package_name = OutlierDetectionPython, ... )
+ (name = COFDetector, package_name = OutlierDetectionNeighbors, ... )
+ (name = COFDetector, package_name = OutlierDetectionPython, ... )
+ (name = COPODDetector, package_name = OutlierDetectionPython, ... )
+ ⋮
+ (name = PCA, package_name = MultivariateStats, ... )
+ (name = PCADetector, package_name = OutlierDetectionPython, ... )
+ (name = PPCA, package_name = MultivariateStats, ... )
+ (name = RODDetector, package_name = OutlierDetectionPython, ... )
+ (name = SODDetector, package_name = OutlierDetectionPython, ... )
+ (name = SOSDetector, package_name = OutlierDetectionPython, ... )
+ (name = SpectralClustering, package_name = ScikitLearn, ... )
+ (name = Standardizer, package_name = MLJModels, ... )
+ (name = TSVDTransformer, package_name = TSVD, ... )</pre><p>Getting the metadata entry for a given model type:</p><pre><code class="language-julia">info(&quot;PCA&quot;)
+info(&quot;RidgeRegressor&quot;, pkg=&quot;MultivariateStats&quot;) # a model type in multiple packages</code></pre><pre class="documenter-example-output">(name = &quot;RidgeRegressor&quot;,
+ package_name = &quot;MultivariateStats&quot;,
+ is_supervised = true,
+ abstract_type = Deterministic,
+ deep_properties = (),
+ docstring = &quot;Ridge regressor with regularization parameter lamb...&quot;,
+ fit_data_scitype =
+     Tuple{Table{_s28} where _s28&lt;:(AbstractVector{_s29} where _s29&lt;:Continuous), AbstractVector{Continuous}},
+ human_name = &quot;ridge regressor&quot;,
+ hyperparameter_ranges = (nothing, nothing),
+ hyperparameter_types = (&quot;Union{Real, AbstractVecOrMat{T} where T}&quot;, &quot;Bool&quot;),
+ hyperparameters = (:lambda, :bias),
+ implemented_methods = [:clean!, :fit, :fitted_params, :predict],
+ inverse_transform_scitype = Unknown,
+ is_pure_julia = true,
+ is_wrapper = false,
+ iteration_parameter = nothing,
+ load_path = &quot;MLJMultivariateStatsInterface.RidgeRegressor&quot;,
+ package_license = &quot;MIT&quot;,
+ package_url = &quot;https://github.com/JuliaStats/MultivariateStats.jl&quot;,
+ package_uuid = &quot;6f286f6a-111f-5878-ab1e-185364afe411&quot;,
+ predict_scitype = AbstractVector{Continuous},
+ prediction_type = :deterministic,
+ supports_class_weights = false,
+ supports_online = false,
+ supports_training_losses = false,
+ supports_weights = false,
+ transform_scitype = Unknown,
+ input_scitype =
+     Table{_s28} where _s28&lt;:(AbstractVector{_s29} where _s29&lt;:Continuous),
+ target_scitype = AbstractVector{Continuous},
+ output_scitype = Unknown)</pre><p>Extracting the model document string:</p><p><code>@example</code> doc(&quot;DecisionTreeClassifier&quot;, pkg=&quot;DecisionTree&quot;)</p><pre><code class="language-none">
+## Instantiating a model
+
+*Reference:*   [Getting Started](@ref), [Loading Model Code](@ref)
+</code></pre><p>@example workflows Tree = @load DecisionTreeClassifier pkg=DecisionTree tree = Tree(min<em>samples</em>split=5, max_depth=4)</p><pre><code class="language-none">
+or
+</code></pre><p>@julia tree = (@load DecisionTreeClassifier)() tree.min<em>samples</em>split = 5 tree.max_depth = 4</p><pre><code class="language-none">
+## Evaluating a model
+
+*Reference:*   [Evaluating Model Performance](evaluating_model_performance.md)
+
+</code></pre><p>@example workflows X, y = @load_boston KNN = @load KNNRegressor knn = KNN() evaluate(knn, X, y,          resampling=CV(nfolds=5),          measure=[RootMeanSquaredError(), MeanAbsoluteError()])</p><pre><code class="language-none">
+Note `RootMeanSquaredError()` has alias `rms` and `MeanAbsoluteError()` has alias `mae`.
+
+Do `measures()` to list all losses and scores and their aliases.
+
+
+##  Basic fit/evaluate/predict by hand:
+
+*Reference:*   [Getting Started](index.md), [Machines](machines.md),
+[Evaluating Model Performance](evaluating_model_performance.md), [Performance Measures](performance_measures.md)
+</code></pre><p>@example workflows crabs = load_crabs() |&gt; DataFrames.DataFrame schema(crabs)</p><pre><code class="language-none"></code></pre><p>@example workflows y, X = unpack(crabs, ==(:sp), !in([:index, :sex]); rng=123)</p><p>Tree = @load DecisionTreeClassifier pkg=DecisionTree tree = Tree(max_depth=2) # hide</p><pre><code class="language-none">
+Bind the model and data together in a *machine* , which will
+additionally store the learned parameters (*fitresults*) when fit:
+</code></pre><p>@example workflows mach = machine(tree, X, y)</p><pre><code class="language-none">
+Split row indices into training and evaluation rows:
+</code></pre><p>@example workflows train, test = partition(eachindex(y), 0.7); # 70:30 split</p><pre><code class="language-none">
+Fit on train and evaluate on test:
+</code></pre><p>@example workflows fit!(mach, rows=train) yhat = predict(mach, X[test,:]) mean(LogLoss(tol=1e-4)(yhat, y[test]))</p><pre><code class="language-none">
+Note `LogLoss()` has aliases `log_loss` and `cross_entropy`.
+
+Run `measures()` to list all losses and scores and their aliases (&quot;instances&quot;).
+
+Predict on new data:
+</code></pre><p>@example workflows Xnew = (FL = rand(3), RW = rand(3), CL = rand(3), CW = rand(3), BD =rand(3)) predict(mach, Xnew)      # a vector of distributions</p><pre><code class="language-none"></code></pre><p>@example workflows predict_mode(mach, Xnew) # a vector of point-predictions</p><pre><code class="language-none">
+## More performance evaluation examples
+
+Evaluating model + data directly:
+</code></pre><p>@example workflows evaluate(tree, X, y,          resampling=Holdout(fraction_train=0.7, shuffle=true, rng=1234),          measure=[LogLoss(), Accuracy()])</p><pre><code class="language-none">
+If a machine is already defined, as above:
+</code></pre><p>@example workflows evaluate!(mach,           resampling=Holdout(fraction_train=0.7, shuffle=true, rng=1234),           measure=[LogLoss(), Accuracy()])</p><pre><code class="language-none">
+Using cross-validation:
+</code></pre><p>@example workflows evaluate!(mach, resampling=CV(nfolds=5, shuffle=true, rng=1234),           measure=[LogLoss(), Accuracy()])</p><pre><code class="language-none">
+With user-specified train/test pairs of row indices:
+</code></pre><p>@example workflows f1, f2, f3 = 1:13, 14:26, 27:36 pairs = [(f1, vcat(f2, f3)), (f2, vcat(f3, f1)), (f3, vcat(f1, f2))]; evaluate!(mach,           resampling=pairs,           measure=[LogLoss(), Accuracy()])</p><pre><code class="language-none">
+Changing a hyperparameter and re-evaluating:
+</code></pre><p>@example workflows tree.max_depth = 3 evaluate!(mach,           resampling=CV(nfolds=5, shuffle=true, rng=1234),           measure=[LogLoss(), Accuracy()])</p><pre><code class="language-none">
+##  Inspecting training results
+
+Fit a ordinary least square model to some synthetic data:
+</code></pre><p>@example workflows x1 = rand(100) x2 = rand(100)</p><p>X = (x1=x1, x2=x2) y = x1 - 2x2 + 0.1*rand(100);</p><p>OLS = @load LinearRegressor pkg=GLM ols = OLS() mach =  machine(ols, X, y) |&gt; fit!</p><pre><code class="language-none">
+Get a named tuple representing the learned parameters,
+human-readable if appropriate:
+</code></pre><p>@example workflows fitted_params(mach)</p><pre><code class="language-none">
+Get other training-related information:
+</code></pre><p>@example workflows report(mach)</p><pre><code class="language-none">
+##  Basic fit/transform for unsupervised models
+
+Load data:
+</code></pre><p>@example workflows X, y = @load_iris train, test = partition(eachindex(y), 0.97, shuffle=true, rng=123)</p><pre><code class="language-none">
+Instantiate and fit the model/machine:
+</code></pre><p>@example workflows PCA = @load PCA pca = PCA(maxoutdim=2) mach = machine(pca, X) fit!(mach, rows=train)</p><pre><code class="language-none">
+Transform selected data bound to the machine:
+</code></pre><p>@example workflows transform(mach, rows=test);</p><pre><code class="language-none">
+Transform new data:
+</code></pre><p>@example workflows Xnew = (sepal<em>length=rand(3), sepal</em>width=rand(3),         petal<em>length=rand(3), petal</em>width=rand(3)); transform(mach, Xnew)</p><pre><code class="language-none">
+##  Inverting learned transformations
+</code></pre><p>@example workflows y = rand(100); stand = Standardizer() mach = machine(stand, y) fit!(mach) z = transform(mach, y); @assert inverse_transform(mach, z) ≈ y # true</p><pre><code class="language-none">
+## Nested hyperparameter tuning
+
+*Reference:*   [Tuning Models](tuning_models.md)
+</code></pre><p>@example workflows X, y = @load_iris; nothing # hide</p><pre><code class="language-none">
+Define a model with nested hyperparameters:
+</code></pre><p>@example workflows Tree = @load DecisionTreeClassifier pkg=DecisionTree tree = Tree() forest = EnsembleModel(model=tree, n=300)</p><pre><code class="language-none">
+Define ranges for hyperparameters to be tuned:
+</code></pre><p>@example workflows r1 = range(forest, :bagging_fraction, lower=0.5, upper=1.0, scale=:log10)</p><pre><code class="language-none"></code></pre><p>@example workflows r2 = range(forest, :(model.n_subfeatures), lower=1, upper=4) # nested</p><pre><code class="language-none">
+Wrap the model in a tuning strategy:
+</code></pre><p>@example workflows tuned_forest = TunedModel(model=forest,                           tuning=Grid(resolution=12),                           resampling=CV(nfolds=6),                           ranges=[r1, r2],                           measure=BrierLoss())</p><pre><code class="language-none">
+Bound the wrapped model to data:
+</code></pre><p>@example workflows mach = machine(tuned_forest, X, y)</p><pre><code class="language-none">
+Fitting the resultant machine optimizes the hyperparameters specified
+in `range`, using the specified `tuning` and `resampling` strategies
+and performance `measure` (possibly a vector of measures), and
+retrains on all data bound to the machine:
+</code></pre><p>@example workflows fit!(mach)</p><pre><code class="language-none">
+Inspecting the optimal model:
+</code></pre><p>@example workflows F = fitted_params(mach)</p><pre><code class="language-none"></code></pre><p>@example workflows F.best_model</p><pre><code class="language-none">
+Inspecting details of tuning procedure:
+</code></pre><p>@example workflows r = report(mach); keys(r)</p><pre><code class="language-none"></code></pre><p>@example workflows r.history[[1,end]]</p><pre><code class="language-none">
+Visualizing these results:
+</code></pre><p>julia using Plots plot(mach)</p><pre><code class="language-none">
+![](img/workflows_tuning_plot.png)
+
+Predicting on new data using the optimized model:
+</code></pre><p>@example workflows predict(mach, Xnew)</p><pre><code class="language-none">
+## Constructing linear pipelines
+
+*Reference:*   [Composing Models](composing_models.md)
+
+Constructing a linear (unbranching) pipeline with a *learned* target
+transformation/inverse transformation:
+</code></pre><p>@example workflows X, y = @load<em>reduced</em>ames KNN = @load KNNRegressor knn<em>with</em>target = TransformedTargetModel(model=KNN(K=3), target=Standardizer()) pipe = (X -&gt; coerce(X, :age=&gt;Continuous)) |&gt; OneHotEncoder() |&gt; knn<em>with</em>target</p><pre><code class="language-none">
+Evaluating the pipeline (just as you would any other model):
+</code></pre><p>@example workflows pipe.one<em>hot</em>encoder.drop_last = true evaluate(pipe, X, y, resampling=Holdout(), measure=RootMeanSquaredError(), verbosity=2)</p><pre><code class="language-none">
+Inspecting the learned parameters in a pipeline:
+</code></pre><p>@example workflows mach = machine(pipe, X, y) |&gt; fit! F = fitted<em>params(mach) F.transformed</em>target<em>model</em>deterministic.model</p><pre><code class="language-none">
+Constructing a linear (unbranching) pipeline with a *static* (unlearned)
+target transformation/inverse transformation:
+</code></pre><p>@example workflows Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0 tree<em>with</em>target = TransformedTargetModel(model=Tree(),                                           target=y -&gt; log.(y),                                           inverse = z -&gt; exp.(z)) pipe2 = (X -&gt; coerce(X, :age=&gt;Continuous)) |&gt; OneHotEncoder() |&gt; tree<em>with</em>target; nothing # hide</p><pre><code class="language-none">
+## Creating a homogeneous ensemble of models
+
+*Reference:* [Homogeneous Ensembles](homogeneous_ensembles.md)
+</code></pre><p>@example workflows X, y = @load<em>iris Tree = @load DecisionTreeClassifier pkg=DecisionTree tree = Tree() forest = EnsembleModel(model=tree, bagging</em>fraction=0.8, n=300) mach = machine(forest, X, y) evaluate!(mach, measure=LogLoss())</p><pre><code class="language-none">
+## Performance curves
+
+Generate a plot of performance, as a function of some hyperparameter
+(building on the preceding example)
+
+Single performance curve:
+</code></pre><p>@example workflows r = range(forest, :n, lower=1, upper=1000, scale=:log10) curve = learning_curve(mach,                        range=r,                        resampling=Holdout(),                        resolution=50,                        measure=LogLoss(),                        verbosity=0)</p><pre><code class="language-none"></code></pre><p>julia using Plots plot(curve.parameter<em>values, curve.measurements, xlab=curve.parameter</em>name, xscale=curve.parameter_scale)</p><pre><code class="language-none">
+![](img/workflows_learning_curve.png)
+
+Multiple curves:
+</code></pre><p>@example workflows curve = learning<em>curve(mach,                        range=r,                        resampling=Holdout(),                        measure=LogLoss(),                        resolution=50,                        rng</em>name=:rng,                        rngs=4,                        verbosity=0)</p><pre><code class="language-none"></code></pre><p>julia plot(curve.parameter<em>values, curve.measurements, xlab=curve.parameter</em>name, xscale=curve.parameter_scale) ```</p><p><img src="../img/workflows_learning_curves.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../getting_started/">« Getting Started</a><a class="docs-footer-nextpage" href="../working_with_categorical_data/">Working with Categorical Data »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 6 April 2022 22:47">Wednesday 6 April 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
