@@ -830,16 +830,19 @@ MMI.is_pure_julia(::Type{<:DecisionTreeClassifier}) = true
 Alternatively these traits can also be declared using `MMI.metadata_pkg` and `MMI.metadata_model` helper functions as:
 
 ```julia
-MMI.metadata_pkg(DecisionTreeClassifier,
-				 name="DecisionTree",
-				 packge_uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
-				 package_url="https://github.com/bensadeghi/DecisionTree.jl",
-				 is_pure_julia=true)
+MMI.metadata_pkg(
+  DecisionTreeClassifier,
+  name="DecisionTree",
+  packge_uuid="7806a523-6efd-50cb-b5f6-3fa6f1930dbb",
+  package_url="https://github.com/bensadeghi/DecisionTree.jl",
+  is_pure_julia=true
+)
 
-MMI.metadata_model(DecisionTreeClassifier,
-				   input_scitype=MMI.Table(MMI.Continuous),
-				   target_scitype=AbstractVector{<:MMI.Finite},
-				   load_path="MLJDecisionTreeInterface.DecisionTreeClassifier")
+MMI.metadata_model(
+  DecisionTreeClassifier,
+  input_scitype=MMI.Table(MMI.Continuous),
+  target_scitype=AbstractVector{<:MMI.Finite},
+  load_path="MLJDecisionTreeInterface.DecisionTreeClassifier")
 ```
 
 *Important.* Do not omit the `load_path` specification. If unsure what
