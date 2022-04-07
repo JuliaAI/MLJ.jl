@@ -141,6 +141,12 @@ info("PCA")
 info("RidgeRegressor", pkg="MultivariateStats") # a model type in multiple packages
 ```
 
+Extracting the model document string:
+
+```@example```
+doc("DecisionTreeClassifier", pkg="DecisionTree")
+```
+
 ## Instantiating a model
 
 *Reference:*   [Getting Started](@ref), [Loading Model Code](@ref)

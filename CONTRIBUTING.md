@@ -8,6 +8,8 @@ channel](https://julialang.org/slack/), #MLJ.
 
 - [Code organization](ORGANIZATION.md)
 
+- Issues: Currently issues are split between [MLJ issues](https://github.com/alan-turing-institute/MLJ.jl/issues) and issues in all other repositories, collected in [this GitHub Project](https://github.com/orgs/JuliaAI/projects/1).
+
 
 ### Conventions
 

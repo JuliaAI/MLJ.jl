@@ -7,54 +7,39 @@ See also [Getting help and reporting problems](@ref).
 The present document, although littered with examples, is primarily
 intended as a complete reference. 
 
-#### New to machine learning?
+### Where to start?
 
-Try the "Introduction to Statistical
-Learning" notebooks at [Data Science
-Tutorials](https://juliaai.github.io/DataScienceTutorials.jl/),
-starting with [this
-tutorial](https://juliaai.github.io/DataScienceTutorials.jl/isl/lab-2/).
-Or have a look at the [Julia Data
-Science](https://github.com/JuliaDataScience/JuliaDataScience) book.
+### Completely new to Julia? 
+[Julia's learning resources page](https://julialang.org/learning/) |
+[Learn X in Y minutes](https://learnxinyminutes.com/docs/julia/) |
+[HelloJulia](https://github.com/ablaom/HelloJulia.jl)
 
-#### Know a little machine learning and just want some MLJ basics?
+### New to data science?
+[Julia Data Science](https://github.com/JuliaDataScience/JuliaDataScience)
 
-Read [Getting Started](@ref).
+### New to machine learning?
+[Introduction to Statistical Learning](https://www.statlearning.com) with Julia versions of  the R labs [here](https://juliaai.github.io/DataScienceTutorials.jl/)
 
-#### A practicing data scientist transitioning from another platform?
+### Know some ML and just want MLJ basics?
+[Getting Started](@ref)
 
-If, for example, you're coming from scikit-learn or R, we recommend
-your start with [MLJ for Data Scientists in Two
-Hours](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/telco/notebook.ipynb).
+### An ML practioner transitioning from another platform?
+[MLJ for Data Scientists in Two Hours](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/telco/notebook.ipynb) |
+[MLJTutorial](https://github.com/ablaom/MLJTutorial.jl)
 
-#### Want a compressed survey of key MLJ functionality?
 
-Try this [Lightning
-Tour](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/lightning_tour/lightning_tour.ipynb).
+### Other resources
 
-#### Something more leisurely?
+- [Data Science
+Tutorials](https://juliaai.github.io/DataScienceTutorials.jl): MLJ tutorials including end-to-end examples, and "Introduction to Statistical Learning" labs
 
-See
-[MLJTutorial](https://github.com/ablaom/MLJTutorial.jl).
+- [Analyzing the Glass Dataset](https://towardsdatascience.com/part-i-analyzing-the-glass-dataset-c556788a496f): A gentle introduction to data science using Julia and MLJ (three-part blog post)
 
-#### Prefer a video resource?
+- [Lightning Tour](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/lightning_tour/lightning_tour.ipynb): A compressed demonstration of key MLJ functionality
 
-Try the slightly older [MLJ JuliaCon2020
-Workshop](https://github.com/ablaom/MachineLearningInJulia2020)
-version of preceding resource, and accompanying [video
-recording](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title).
+- [MLJ JuliaCon2020 Workshop](https://github.com/ablaom/MachineLearningInJulia2020): older version of  [MLJTutorial](https://github.com/ablaom/MLJTutorial.jl) with [video
+](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title)
 
-#### Looking for more end-to-end examples?
+- [Learning Networks](@ref): For advanced MLJ users wanting to wrap workflows more complicated than linear pipelines
 
-Browse [Data Science
-Tutorials](https://juliaai.github.io/DataScienceTutorials.jl).
-
-#### Power MLJ user seeking to wrap complicated workflows?
-
-Learn about [Learning Networks](@ref).
-
-#### Completely new to Julia?
-
-Browse [these resources](https://julialang.org/learning/) or visit
-[HelloJulia](https://github.com/ablaom/HelloJulia.jl).
 

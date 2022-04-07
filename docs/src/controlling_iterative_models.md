@@ -116,7 +116,7 @@ control                                                        | description    
 [`WithReportDo`](@ref MLJIteration.WithReportDo)`(f->e->@info("report: $e))`| Call `f(r)` where `r` is the training machine report                    | yes
 [`WithModelDo`](@ref MLJIteration.WithModelDo)`(f->m->@info("model: $m))`| Call `f(m)` where `m` is the model, which may be mutated by `f`             | yes
 [`WithMachineDo`](@ref MLJIteration.WithMachineDo)`(f->mach->@info("report: $mach))`| Call `f(mach)` wher `mach` is the training machine in its current state    | yes
-[`Save`](@ref MLJSerialization.Save)`(filename="machine.jlso")`| ⋆ Save current training machine to `machine1.jlso`, `machine2.jslo`, etc                         | yes
+[`Save`](@ref MLJIteration.Save)`(filename="machine.jlso")`|Save current training machine to `machine1.jlso`, `machine2.jslo`, etc                         | yes
 
 > Table 1. Atomic controls. Some advanced options omitted.
 
@@ -124,9 +124,6 @@ control                                                        | description    
  (1998)](https://link.springer.com/chapter/10.1007%2F3-540-49430-8_3):
  "Early Stopping - But When?", in *Neural Networks: Tricks of the
  Trade*, ed. G. Orr, Springer.
-
-⋆ If using `MLJIteration` without `MLJ`, then `Save` is not available
-  unless one is also using `MLJSerialization`.
 
 **Stopping option.** All the following controls trigger a stop if the
 provided function `f` returns `true` and `stop_if_true=true` is
@@ -438,7 +435,7 @@ MLJIteration.WithFittedParamsDo
 MLJIteration.WithReportDo
 MLJIteration.WithModelDo
 MLJIteration.WithMachineDo
-MLJSerialization.Save
+MLJIteration.Save
 ```
 
 ### Control wrappers
