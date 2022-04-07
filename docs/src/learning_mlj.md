@@ -21,7 +21,7 @@ intended as a complete reference.
 [Introduction to Statistical Learning](https://www.statlearning.com) with Julia versions of  the R labs [here](https://juliaai.github.io/DataScienceTutorials.jl/)
 
 ### Know some ML and just want MLJ basics?
-[Getting Started](@ref)
+[Getting Started](@ref) | [Common MLJ Workflows](@ref)
 
 ### An ML practioner transitioning from another platform?
 [MLJ for Data Scientists in Two Hours](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/telco/notebook.ipynb) |
