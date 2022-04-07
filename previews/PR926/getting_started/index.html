@@ -97,8 +97,8 @@ AbstractVector{Count} (alias for AbstractArray{Count, 1})</code></pre><p>and usi
 Machine{DecisionTreeClassifier,…} trained 0 times; caches data
   model: MLJDecisionTreeInterface.DecisionTreeClassifier
   args:
-    1:	Source @260 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @940 ⏎ `AbstractVector{Multiclass{3}}`</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7); # 70:30 split
+    1:	Source @849 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @696 ⏎ `AbstractVector{Multiclass{3}}`</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7); # 70:30 split
 
 julia&gt; fit!(mach, rows=train);
 [ Info: Training Machine{DecisionTreeClassifier,…}.
@@ -160,14 +160,14 @@ julia&gt; mach2 = machine(stand, v)
 Machine{Standardizer,…} trained 0 times; caches data
   model: Standardizer
   args:
-    1:	Source @582 ⏎ `AbstractVector{Continuous}`
+    1:	Source @358 ⏎ `AbstractVector{Continuous}`
 
 julia&gt; fit!(mach2)
 [ Info: Training Machine{Standardizer,…}.
 Machine{Standardizer,…} trained 1 time; caches data
   model: Standardizer
   args:
-    1:	Source @582 ⏎ `AbstractVector{Continuous}`
+    1:	Source @358 ⏎ `AbstractVector{Continuous}`
 
 julia&gt; w = transform(mach2, v)
 4-element Vector{Float64}:

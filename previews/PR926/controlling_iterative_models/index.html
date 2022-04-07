@@ -22,8 +22,8 @@ mach = machine(iterated_model, X, y)</code></pre><pre><code class="language-juli
 Machine{ProbabilisticIteratedModel{EvoTreeClassifier{Float64,…}},…} trained 1 time; does not cache data
   model: MLJIteration.ProbabilisticIteratedModel{EvoTrees.EvoTreeClassifier{Float64, EvoTrees.Softmax, Int64}}
   args:
-    1:	Source @330 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @448 ⏎ `AbstractVector{Multiclass{2}}`</code></pre><p>As detailed under <a href="#MLJIteration.IteratedModel"><code>IteratedModel</code></a> below, the specified <code>controls</code> are repeatedly applied in sequence to a <em>training machine</em>, constructed under the hood, until one of the controls triggers a stop. Here <code>Step(5)</code> means &quot;Compute 5 more iterations&quot; (in this case starting from none); <code>Patience(2)</code> means &quot;Stop at the end of the control cycle if there have been 2 consecutive drops in the log loss&quot;; and <code>NumberLimit(100)</code> is a safeguard ensuring a stop after 100 control cycles (500 iterations). See <a href="#Controls-provided">Controls provided</a> below for a complete list.</p><p>Because iteration is implemented as a wrapper, the &quot;self-iterating&quot; model can be evaluated using cross-validation, say, and the number of iterations on each fold will generally be different:</p><pre><code class="language-julia">e = evaluate!(mach, resampling=CV(nfolds=3), measure=log_loss, verbosity=0);
+    1:	Source @710 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @150 ⏎ `AbstractVector{Multiclass{2}}`</code></pre><p>As detailed under <a href="#MLJIteration.IteratedModel"><code>IteratedModel</code></a> below, the specified <code>controls</code> are repeatedly applied in sequence to a <em>training machine</em>, constructed under the hood, until one of the controls triggers a stop. Here <code>Step(5)</code> means &quot;Compute 5 more iterations&quot; (in this case starting from none); <code>Patience(2)</code> means &quot;Stop at the end of the control cycle if there have been 2 consecutive drops in the log loss&quot;; and <code>NumberLimit(100)</code> is a safeguard ensuring a stop after 100 control cycles (500 iterations). See <a href="#Controls-provided">Controls provided</a> below for a complete list.</p><p>Because iteration is implemented as a wrapper, the &quot;self-iterating&quot; model can be evaluated using cross-validation, say, and the number of iterations on each fold will generally be different:</p><pre><code class="language-julia">e = evaluate!(mach, resampling=CV(nfolds=3), measure=log_loss, verbosity=0);
 map(e.report_per_fold) do r
     r.n_iterations
 end</code></pre><pre class="documenter-example-output">3-element Vector{Int64}:
@@ -53,8 +53,8 @@ mach = machine(iterated_model, X, y)</code></pre><pre><code class="language-juli
 Machine{DeterministicIteratedModel{DeterministicTunedModel{RandomSearch,…}},…} trained 1 time; does not cache data
   model: MLJIteration.DeterministicIteratedModel{MLJTuning.DeterministicTunedModel{RandomSearch, MLJLinearModels.RidgeRegressor}}
   args:
-    1:	Source @820 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @551 ⏎ `AbstractVector{Continuous}`</code></pre><pre><code class="language-julia-repl">julia&gt; report(mach).model_report.best_model
+    1:	Source @745 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @333 ⏎ `AbstractVector{Continuous}`</code></pre><pre><code class="language-julia-repl">julia&gt; report(mach).model_report.best_model
 RidgeRegressor(
     lambda = 0.42431707080901004,
     fit_intercept = true,

@@ -27,8 +27,8 @@ julia&gt; regressor = machine(model, X, y)
 Machine{MyRegressor,…} trained 0 times; caches data
   model: Main.ex-regressor_example.MyRegressor
   args:
-    1:	Source @023 ⏎ `Table{AbstractVector{Continuous}}`
-    2:	Source @107 ⏎ `AbstractVector{Continuous}`
+    1:	Source @897 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @373 ⏎ `AbstractVector{Continuous}`
 
 julia&gt; evaluate!(regressor, resampling=CV(), measure=rms, verbosity=0)
 PerformanceEvaluation object with these fields:

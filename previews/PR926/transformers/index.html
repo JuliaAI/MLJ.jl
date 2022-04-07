@@ -305,12 +305,12 @@ yhat = transform(averagerM, y1, y2)</code></pre><pre class="documenter-example-o
             Machine{RidgeRegressor,…}, 
             transform(
                 Machine{OneHotEncoder,…}, 
-                Source @982)),
+                Source @993)),
         predict(
             Machine{KNNRegressor,…}, 
             transform(
                 Machine{OneHotEncoder,…}, 
-                Source @982)))</pre><p>Now we export to obtain a <code>Deterministic</code> composite model and then instantiate composite model</p><pre><code class="language-julia">learning_mach = machine(Deterministic(), X, y; predict=yhat)
+                Source @993)))</pre><p>Now we export to obtain a <code>Deterministic</code> composite model and then instantiate composite model</p><pre><code class="language-julia">learning_mach = machine(Deterministic(), X, y; predict=yhat)
 Machine{DeterministicSurrogate} @772 trained 0 times.
   args:
     1:	Source @415 ⏎ `Unknown`
