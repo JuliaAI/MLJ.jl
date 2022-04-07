@@ -116,7 +116,7 @@ control                                                        | description    
 [`WithReportDo`](@ref MLJIteration.WithReportDo)`(f->e->@info("report: $e))`| Call `f(r)` where `r` is the training machine report                    | yes
 [`WithModelDo`](@ref MLJIteration.WithModelDo)`(f->m->@info("model: $m))`| Call `f(m)` where `m` is the model, which may be mutated by `f`             | yes
 [`WithMachineDo`](@ref MLJIteration.WithMachineDo)`(f->mach->@info("report: $mach))`| Call `f(mach)` wher `mach` is the training machine in its current state    | yes
-[`Save`](@ref MLJIteration.Save)`(filename="machine.jlso")`|Save current training machine to `machine1.jlso`, `machine2.jslo`, etc                         | yes
+[`Save`](@ref MLJIteration.Save)`(filename="machine.jls")`|Save current training machine to `machine1.jls`, `machine2.jsl`, etc                         | yes
 
 > Table 1. Atomic controls. Some advanced options omitted.
 

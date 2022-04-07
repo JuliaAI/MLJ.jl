@@ -3,6 +3,10 @@
 For an outline of MLJ's **goals** and **features**, see
 [About MLJ](@ref).
 
+This page introduces some MLJ basics, assuming some familiarity with
+machine learning. For a complete list of other MLJ learning resources,
+see [Learning MLJ](@ref).
+
 This section introduces only the most basic MLJ operations and
 concepts. It assumes MJL has been successfully installed. See
 [Installation](@ref) if this is not the case. 

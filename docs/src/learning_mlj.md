@@ -36,8 +36,7 @@ intended as a complete reference.
 
 - [Lightning Tour](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/lightning_tour/lightning_tour.ipynb): A compressed demonstration of key MLJ functionality
 
-- [MLJ JuliaCon2020 Workshop](https://github.com/ablaom/MachineLearningInJulia2020): older version of  [MLJTutorial](https://github.com/ablaom/MLJTutorial.jl) with [video
-](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title)
+- [MLJ JuliaCon2020 Workshop](https://github.com/ablaom/MachineLearningInJulia2020): older version of  [MLJTutorial](https://github.com/ablaom/MLJTutorial.jl) with [video](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title)
 
 - [Learning Networks](@ref): For advanced MLJ users wanting to wrap workflows more complicated than linear pipelines
 
