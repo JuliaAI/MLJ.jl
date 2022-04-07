@@ -1089,7 +1089,7 @@ MMI.save(model::SomeModel, fitresult; kwargs...) -> serializable_fitresult
 
 Implement this method to return a persistent serializable
 representation of the `fitresult` component of the `MMI.fit` return
-value.below).
+value.
 
 The fallback of `save` performs no action and returns `fitresult`.
 
@@ -1110,7 +1110,7 @@ The fallback of `restore` performs no action and returns `serializable_fitresult
 #### Example
 
 For an example, refer to the model implementations at
-[MLJXGBoostInterface.jl](https://github.com/JuliaAI/MLJXGBoostInterface.jl/blob/master/src/MLJXGBoostInterface.jl)
+[MLJXGBoostInterface.jl](https://github.com/JuliaAI/MLJXGBoostInterface.jl/blob/42afbd2974bd3bd734994004e367c98964ed1262/src/MLJXGBoostInterface.jl#L679).
 
 
 ### Document strings

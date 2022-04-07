@@ -143,7 +143,7 @@ info("RidgeRegressor", pkg="MultivariateStats") # a model type in multiple packa
 
 Extracting the model document string:
 
-```@example```
+```@example workflows
 doc("DecisionTreeClassifier", pkg="DecisionTree")
 ```
 

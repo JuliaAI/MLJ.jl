@@ -164,7 +164,7 @@ pkg="MultivariateStats")` gets all properties (aka traits) of registered models
 
 ## Saving and retrieving machines using Julia serializer
 
-`MLJ.save("trained_for_five_days.jls", mach)` to save machine `mach`
+`MLJ.save("trained_for_five_days.jls", mach)` to save machine `mach` (without data)
 
 `predict_only_mach = machine("trained_for_five_days.jlso")` to deserialize.
 

@@ -125,7 +125,7 @@ export Grid, RandomSearch, Explicit, TunedModel, LatinHypercube,
     learning_curve!, learning_curve
 
 # re-export from MLJModels:
-export models, localmodels, @load, @iload, load, info,
+export models, localmodels, @load, @iload, load, info, doc,
     ConstantRegressor, ConstantClassifier,     # builtins/Constant.jl
     FeatureSelector, UnivariateStandardizer,   # builtins/Transformers.jl
     Standardizer, UnivariateBoxCoxTransformer,
