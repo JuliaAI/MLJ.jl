@@ -58,41 +58,42 @@ md"**Time.** Between two and three hours, first time through."
 # ╔═╡ 28197138-d6b7-433c-9e54-3f7b3ca87ecb
 md"## Summary of methods and types introduced"
 
-# ╔═╡ 39c599b2-3c1f-4292-ba1f-6363f43ec697
+# ╔═╡ aad8dc13-c0f9-4090-ba1f-6363f43ec697
 md"""
 |code   | purpose|
 |:-------|:-------------------------------------------------------|
-|`OpenML.load(id)` | grab a dataset from [OpenML.org](https://www.openml.org)|
-|`scitype(X)`      | inspect the scientific type (scitype) of object `X`|
-|`schema(X)`       | inspect the column scitypes (scientific types) of a table `X`|
-|`coerce(X, ...)`   | fix column encodings to get appropriate scitypes|
-|`partition(data, frac1, frac2, ...; rng=...)` | vertically split `data`, which can be a table, vector or matrix|
-|`unpack(table, f1, f2, ...)` | horizontally split `table` based on conditions `f1`, `f2`, ..., applied to column names|
-|`@load ModelType pkg=...`           | load code defining a model type|
-|`input_scitype(model)` | inspect the scitype that a model requires for features (inputs)|
-|`target_scitype(model)`| inspect the scitype that a model requires for the target (labels)|
-|`ContinuousEncoder`   | built-in model type for re-encoding all features as `Continuous`|# |`model1 |> model2` |> ...` | combine multiple models into a pipeline
-| `measures("under curve")` | list all measures (metrics) with string "under curve" in documentation
-| `accuracy(yhat, y)` | compute accuracy of predictions `yhat` against ground truth observations `y`
-| `auc(yhat, y)`, `brier_loss(yhat, y)` | evaluate two probabilistic measures (`yhat` a vector of probability distributions)
-| `machine(model, X, y)` | bind `model` to training data `X` (features) and `y` (target)
-| `fit!(mach, rows=...)` | train machine using specified rows (observation indices)
-| `predict(mach, rows=...)`, | make in-sample model predictions given specified rows
-| `predict(mach, Xnew)` | make predictions given new features `Xnew`
-| `fitted_params(mach)` | inspect learned parameters
-| `report(mach)`        | inspect other outcomes of training
-| `confmat(yhat, y)`    | confusion matrix for predictions `yhat` and ground truth `y`
-| `roc(yhat, y)` | compute points on the receiver-operator Characteristic
-| `StratifiedCV(nfolds=6)` | 6-fold stratified cross-validation resampling strategy
-| `Holdout(fraction_train=0.7)` | holdout resampling strategy
-| `evaluate(model, X, y; resampling=..., options...)` | estimate performance metrics `model` using the data `X`, `y`
-| `FeatureSelector()` | transformer for selecting features
-| `Step(3)` | iteration control for stepping 3 iterations
-| `NumberSinceBest(6)`, `TimeLimit(60/5), InvalidValue()` | iteration control stopping criteria
-| `IteratedModel(model=..., controls=..., options...)` | wrap an iterative `model` in control strategies
-| `range(model,  :some_hyperparam, lower=..., upper=...)` | define a numeric range
-| `RandomSearch()` | random search tuning strategy
-| `TunedModel(model=..., tuning=..., options...)` | wrap the supervised `model` in specified `tuning` strategy
+| `OpenML.load(id)` | grab a dataset from [OpenML.org](https://www.openml.org)|
+| `scitype(X)`      | inspect the scientific type (scitype) of object `X`|
+| `schema(X)`       | inspect the column scitypes (scientific types) of a table `X`|
+| `coerce(X, ...)`   | fix column encodings to get appropriate scitypes|
+| `partition(data, frac1, frac2, ...; rng=...)` | vertically split `data`, which can be a table, vector or matrix|
+| `unpack(table, f1, f2, ...)` | horizontally split `table` based on conditions `f1`, `f2`, ..., applied to column names|
+| `@load ModelType pkg=...`           | load code defining a model type|
+| `input_scitype(model)` | inspect the scitype that a model requires for features (inputs)|
+| `target_scitype(model)`| inspect the scitype that a model requires for the target (labels)|
+| `ContinuousEncoder`   | built-in model type for re-encoding all features as `Continuous`|
+| `model1 ∣> model2 ∣> ...` | combine multiple models into a pipeline|
+| `measures("under curve")` | list all measures (metrics) with string "under curve" in documentation|
+| `accuracy(yhat, y)` | compute accuracy of predictions `yhat` against ground truth observations `y`|
+| `auc(yhat, y)`, `brier_loss(yhat, y)` | evaluate two probabilistic measures (`yhat` a vector of probability distributions)|
+| `machine(model, X, y)` | bind `model` to training data `X` (features) and `y` (target)|
+| `fit!(mach, rows=...)` | train machine using specified rows (observation indices)|
+| `predict(mach, rows=...)`, | make in-sample model predictions given specified rows|
+| `predict(mach, Xnew)` | make predictions given new features `Xnew`|
+| `fitted_params(mach)` | inspect learned parameters|
+| `report(mach)`        | inspect other outcomes of training|
+| `confmat(yhat, y)`    | confusion matrix for predictions `yhat` and ground truth `y`|
+| `roc(yhat, y)` | compute points on the receiver-operator Characteristic|
+| `StratifiedCV(nfolds=6)` | 6-fold stratified cross-validation resampling strategy|
+| `Holdout(fraction_train=0.7)` | holdout resampling strategy|
+| `evaluate(model, X, y; resampling=..., options...)` | estimate performance metrics `model` using the data `X`, `y`|
+| `FeatureSelector()` | transformer for selecting features|
+| `Step(3)` | iteration control for stepping 3 iterations|
+| `NumberSinceBest(6)`, `TimeLimit(60/5), InvalidValue()` | iteration control stopping criteria|
+| `IteratedModel(model=..., controls=..., options...)` | wrap an iterative `model` in control strategies|
+| `range(model,  :some_hyperparam, lower=..., upper=...)` | define a numeric range|
+| `RandomSearch()` | random search tuning strategy|
+| `TunedModel(model=..., tuning=..., options...)` | wrap the supervised `model` in specified `tuning` strategy|
 """
 
 # ╔═╡ 7c0464a0-4114-46bf-95ea-2955abd45275
@@ -1129,7 +1130,7 @@ md"""
 # ╟─a583d175-d623-4888-a6bf-47194d7e8e12
 # ╟─4830fc64-3d70-4869-828a-4cc485149963
 # ╟─28197138-d6b7-433c-9e54-3f7b3ca87ecb
-# ╟─39c599b2-3c1f-4292-ba1f-6363f43ec697
+# ╟─aad8dc13-c0f9-4090-ba1f-6363f43ec697
 # ╟─7c0464a0-4114-46bf-95ea-2955abd45275
 # ╟─256869d0-5e0c-42af-b1b3-dd47e367ba54
 # ╠═60fe49c1-3434-4a77-8d7e-8e449afd1c48
