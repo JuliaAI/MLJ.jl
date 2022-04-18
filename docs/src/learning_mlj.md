@@ -40,4 +40,4 @@ intended as a complete reference.
 
 - [Learning Networks](@ref): For advanced MLJ users wanting to wrap workflows more complicated than linear pipelines
 
-
+- [MLCourse](https://github.com/jbrea/MLCourse): Teaching material for an introductory machine learning course at EPFL (for an interactive preview see [here](https://bio322.epfl.ch).

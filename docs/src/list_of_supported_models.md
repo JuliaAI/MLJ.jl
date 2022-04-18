@@ -24,7 +24,7 @@ models()`.
 [EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl) | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian | medium | gradient boosting models
 [GLM.jl](https://github.com/JuliaStats/GLM.jl) | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium | †
 [LIBSVM.jl](https://github.com/mpastell/LIBSVM.jl) | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
-[LightGBM.jl](https://github.com/IQVIA-ML/LightGBM.jl) | LightGBMClassifier, LightGBMRegressor | high | 
+[LightGBM.jl](https://github.com/IQVIA-ML/LightGBM.jl) | LGBMClassifier, LGBMRegressor | high | 
 [MLJFlux.jl](https://github.com/FluxML/MLJFlux.jl) | NeuralNetworkRegressor, NeuralNetworkClassifier, MultitargetNeuralNetworkRegressor, ImageClassifier | experimental |
 [MLJLinearModels.jl](https://github.com/JuliaAI/MLJLinearModels.jl) | LinearRegressor, RidgeRegressor, LassoRegressor, ElasticNetRegressor, QuantileRegressor, HuberRegressor, RobustRegressor, LADRegressor, LogisticClassifier, MultinomialClassifier | experimental |
 [MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl) (built-in) | StaticTransformer, FeatureSelector, FillImputer, UnivariateStandardizer, Standardizer, UnivariateBoxCoxTransformer, OneHotEncoder, ContinuousEncoder, ConstantRegressor, ConstantClassifier, BinaryThreshholdPredictor | medium |
