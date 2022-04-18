@@ -21,7 +21,7 @@ intended as a complete reference.
 [Introduction to Statistical Learning](https://www.statlearning.com) with Julia versions of  the R labs [here](https://juliaai.github.io/DataScienceTutorials.jl/)
 
 ### Know some ML and just want MLJ basics?
-[Getting Started](@ref)
+[Getting Started](@ref) | [Common MLJ Workflows](@ref)
 
 ### An ML practioner transitioning from another platform?
 [MLJ for Data Scientists in Two Hours](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/telco/notebook.ipynb) |
@@ -40,4 +40,4 @@ intended as a complete reference.
 
 - [Learning Networks](@ref): For advanced MLJ users wanting to wrap workflows more complicated than linear pipelines
 
-
+- [MLCourse](https://github.com/jbrea/MLCourse): Teaching material for an introductory machine learning course at EPFL (for an interactive preview see [here](https://bio322.epfl.ch).

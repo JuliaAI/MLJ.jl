@@ -37,37 +37,38 @@
 
 # |code   | purpose|
 # |:-------|:-------------------------------------------------------|
-# |`OpenML.load(id)` | grab a dataset from [OpenML.org](https://www.openml.org)|
-# |`scitype(X)`      | inspect the scientific type (scitype) of object `X`|
-# |`schema(X)`       | inspect the column scitypes (scientific types) of a table `X`|
-# |`coerce(X, ...)`   | fix column encodings to get appropriate scitypes|
-# |`partition(data, frac1, frac2, ...; rng=...)` | vertically split `data`, which can be a table, vector or matrix|
-# |`unpack(table, f1, f2, ...)` | horizontally split `table` based on conditions `f1`, `f2`, ..., applied to column names|
-# |`@load ModelType pkg=...`           | load code defining a model type|
-# |`input_scitype(model)` | inspect the scitype that a model requires for features (inputs)|
-# |`target_scitype(model)`| inspect the scitype that a model requires for the target (labels)|
-# |`ContinuousEncoder`   | built-in model type for re-encoding all features as `Continuous`|# |`model1 |> model2` |> ...` | combine multiple models into a pipeline
-# | `measures("under curve")` | list all measures (metrics) with string "under curve" in documentation
-# | `accuracy(yhat, y)` | compute accuracy of predictions `yhat` against ground truth observations `y`
-# | `auc(yhat, y)`, `brier_loss(yhat, y)` | evaluate two probabilistic measures (`yhat` a vector of probability distributions)
-# | `machine(model, X, y)` | bind `model` to training data `X` (features) and `y` (target)
-# | `fit!(mach, rows=...)` | train machine using specified rows (observation indices)
-# | `predict(mach, rows=...)`, | make in-sample model predictions given specified rows
-# | `predict(mach, Xnew)` | make predictions given new features `Xnew`
-# | `fitted_params(mach)` | inspect learned parameters
-# | `report(mach)`        | inspect other outcomes of training
-# | `confmat(yhat, y)`    | confusion matrix for predictions `yhat` and ground truth `y`
-# | `roc(yhat, y)` | compute points on the receiver-operator Characteristic
-# | `StratifiedCV(nfolds=6)` | 6-fold stratified cross-validation resampling strategy
-# | `Holdout(fraction_train=0.7)` | holdout resampling strategy
-# | `evaluate(model, X, y; resampling=..., options...)` | estimate performance metrics `model` using the data `X`, `y`
-# | `FeatureSelector()` | transformer for selecting features
-# | `Step(3)` | iteration control for stepping 3 iterations
-# | `NumberSinceBest(6)`, `TimeLimit(60/5), InvalidValue()` | iteration control stopping criteria
-# | `IteratedModel(model=..., controls=..., options...)` | wrap an iterative `model` in control strategies
-# | `range(model,  :some_hyperparam, lower=..., upper=...)` | define a numeric range
-# | `RandomSearch()` | random search tuning strategy
-# | `TunedModel(model=..., tuning=..., options...)` | wrap the supervised `model` in specified `tuning` strategy
+# | `OpenML.load(id)` | grab a dataset from [OpenML.org](https://www.openml.org)|
+# | `scitype(X)`      | inspect the scientific type (scitype) of object `X`|
+# | `schema(X)`       | inspect the column scitypes (scientific types) of a table `X`|
+# | `coerce(X, ...)`   | fix column encodings to get appropriate scitypes|
+# | `partition(data, frac1, frac2, ...; rng=...)` | vertically split `data`, which can be a table, vector or matrix|
+# | `unpack(table, f1, f2, ...)` | horizontally split `table` based on conditions `f1`, `f2`, ..., applied to column names|
+# | `@load ModelType pkg=...`           | load code defining a model type|
+# | `input_scitype(model)` | inspect the scitype that a model requires for features (inputs)|
+# | `target_scitype(model)`| inspect the scitype that a model requires for the target (labels)|
+# | `ContinuousEncoder`   | built-in model type for re-encoding all features as `Continuous`|
+# | `model1 ∣> model2 ∣> ...` | combine multiple models into a pipeline|
+# | `measures("under curve")` | list all measures (metrics) with string "under curve" in documentation|
+# | `accuracy(yhat, y)` | compute accuracy of predictions `yhat` against ground truth observations `y`|
+# | `auc(yhat, y)`, `brier_loss(yhat, y)` | evaluate two probabilistic measures (`yhat` a vector of probability distributions)|
+# | `machine(model, X, y)` | bind `model` to training data `X` (features) and `y` (target)|
+# | `fit!(mach, rows=...)` | train machine using specified rows (observation indices)|
+# | `predict(mach, rows=...)`, | make in-sample model predictions given specified rows|
+# | `predict(mach, Xnew)` | make predictions given new features `Xnew`|
+# | `fitted_params(mach)` | inspect learned parameters|
+# | `report(mach)`        | inspect other outcomes of training|
+# | `confmat(yhat, y)`    | confusion matrix for predictions `yhat` and ground truth `y`|
+# | `roc(yhat, y)` | compute points on the receiver-operator Characteristic|
+# | `StratifiedCV(nfolds=6)` | 6-fold stratified cross-validation resampling strategy|
+# | `Holdout(fraction_train=0.7)` | holdout resampling strategy|
+# | `evaluate(model, X, y; resampling=..., options...)` | estimate performance metrics `model` using the data `X`, `y`|
+# | `FeatureSelector()` | transformer for selecting features|
+# | `Step(3)` | iteration control for stepping 3 iterations|
+# | `NumberSinceBest(6)`, `TimeLimit(60/5), InvalidValue()` | iteration control stopping criteria|
+# | `IteratedModel(model=..., controls=..., options...)` | wrap an iterative `model` in control strategies|
+# | `range(model,  :some_hyperparam, lower=..., upper=...)` | define a numeric range|
+# | `RandomSearch()` | random search tuning strategy|
+# | `TunedModel(model=..., tuning=..., options...)` | wrap the supervised `model` in specified `tuning` strategy|
 
 
 # ## Instantiate a Julia environment

@@ -34,6 +34,8 @@ To support MLJ development, please cite these works or star the repo:
   Star</a>
 ```
 
+# Reference manual
+
 ### Basics
 [Getting Started](@ref) | 
 [Working with Categorical Data](@ref) | 

@@ -71,6 +71,13 @@ learning algorithm indicated by the struct name (and nothing
 else). For common problems matching data to models, see [Model
 Search](@ref model_search) and [Preparing Data](@ref).
 
+To see the document string for `DecisionTreeClassifier` (without
+loading its defining code) do
+
+```julia
+doc("DecisionTreeClassifier", pkg="DecisionTree")
+```
+
 Assuming the MLJDecisionTreeInterface.jl package is in your load path
 (see [Installation](@ref)) we can use `@load` to import the
 `DecisionTreeClassifier` model type, which we will bind to `Tree`:
