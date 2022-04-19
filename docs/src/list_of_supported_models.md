@@ -15,10 +15,10 @@ independent assessment.
 * *experimental*: indicates the package is fairly new and/or is under
   active development; you can help by testing these packages and
   making them more robust,
-* *low*: indicates packages that have reached a roughly stable form in
-  terms of interface and are unlikely to contain serious bugs. They be
-  missing some functionality found in similar packages elsewhere. They
-  have not benefited from a high level of use
+* *low*: indicate a package that has reached a roughly stable form in
+  terms of interface and which is unlikely to contain serious bugs. It
+  may be missing some functionality found in similar packages. It
+  has not benefited from a high level of use
 * *medium*: indicates the package is fairly mature but may benefit
   from optimizations and/or extra features; you can help by suggesting
   either,
