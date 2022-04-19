@@ -41,6 +41,7 @@ independent assessment.
 [MultivariateStats.jl](https://github.com/JuliaStats/MultivariateStats.jl) | LinearRegressor, MultitargetLinearRegressor, RidgeRegressor, MultitargetRidgeRegressor, PCA, KernelPCA, ICA, LDA, BayesianLDA, SubspaceLDA, BayesianSubspaceLDA, FactorAnalysis, PPCA | high | 
 [NaiveBayes.jl](https://github.com/dfdx/NaiveBayes.jl) | GaussianNBClassifier, MultinomialNBClassifier, HybridNBClassifier | low |
 [NearestNeighborModels.jl](https://github.com/JuliaAI/NearestNeighborModels.jl) | KNNClassifier, KNNRegressor, MultitargetKNNClassifier, MultitargetKNNRegressor | high |
+[OneRule.jl](https://github.com/roland-KA/OneRule.jl) | OneRuleClassifier | experimental |
 [OutlierDetectionNeighbors.jl](https://github.com/OutlierDetectionJL/OutlierDetectionNeighbors.jl) | ABODDetector, COFDetector, DNNDetector, KNNDetector, LOFDetector | medium | 
 [OutlierDetectionNetworks.jl](https://github.com/OutlierDetectionJL/OutlierDetectionNetworks.jl) | AEDetector, DSADDetector, ESADDetector | medium | 
 [OutlierDetectionPython.jl](https://github.com/OutlierDetectionJL/OutlierDetectionPython.jl) | ABODDetector, CBLOFDetector, COFDetector, COPODDetector, HBOSDetector, IForestDetector, KNNDetector, LMDDDetector, LOCIDetector, LODADetector, LOFDetector, MCDDetector, OCSVMDetector, PCADetector, RODDetector, SODDetector, SOSDetector | high | 
