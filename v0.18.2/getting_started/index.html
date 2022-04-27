@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Getting Started · MLJ</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.svg" alt="MLJ logo"/></a><div class="docs-package-name"><span class="docs-autofit">MLJ</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../about_mlj/">About MLJ</a></li><li><a class="tocitem" href="../learning_mlj/">Learning MLJ</a></li><li class="is-active"><a class="tocitem" href>Getting Started</a><ul class="internal"><li><a class="tocitem" href="#Choosing-and-evaluating-a-model"><span>Choosing and evaluating a model</span></a></li><li><a class="tocitem" href="#A-preview-of-data-type-specification-in-MLJ"><span>A preview of data type specification in MLJ</span></a></li><li><a class="tocitem" href="#Fit-and-predict"><span>Fit and predict</span></a></li><li><a class="tocitem" href="#Next-steps"><span>Next steps</span></a></li><li><a class="tocitem" href="#Data-containers-and-scientific-types"><span>Data containers and scientific types</span></a></li></ul></li><li><a class="tocitem" href="../common_mlj_workflows/">Common MLJ Workflows</a></li><li><a class="tocitem" href="../working_with_categorical_data/">Working with Categorical Data</a></li><li><a class="tocitem" href="../model_search/">Model Search</a></li><li><a class="tocitem" href="../loading_model_code/">Loading Model Code</a></li><li><a class="tocitem" href="../machines/">Machines</a></li><li><a class="tocitem" href="../evaluating_model_performance/">Evaluating Model Performance</a></li><li><a class="tocitem" href="../performance_measures/">Performance Measures</a></li><li><a class="tocitem" href="../weights/">Weights</a></li><li><a class="tocitem" href="../tuning_models/">Tuning Models</a></li><li><a class="tocitem" href="../learning_curves/">Learning Curves</a></li><li><a class="tocitem" href="../preparing_data/">Preparing Data</a></li><li><a class="tocitem" href="../transformers/">Transformers and Other Unsupervised models</a></li><li><a class="tocitem" href="../more_on_probabilistic_predictors/">More on Probablistic Predictors</a></li><li><a class="tocitem" href="../composing_models/">Composing Models</a></li><li><a class="tocitem" href="../linear_pipelines/">Linear Pipelines</a></li><li><a class="tocitem" href="../target_transformations/">Target Transformations</a></li><li><a class="tocitem" href="../homogeneous_ensembles/">Homogeneous Ensembles</a></li><li><a class="tocitem" href="../model_stacking/">Model Stacking</a></li><li><a class="tocitem" href="../controlling_iterative_models/">Controlling Iterative Models</a></li><li><a class="tocitem" href="../generating_synthetic_data/">Generating Synthetic Data</a></li><li><a class="tocitem" href="../openml_integration/">OpenML Integration</a></li><li><a class="tocitem" href="../acceleration_and_parallelism/">Acceleration and Parallelism</a></li><li><a class="tocitem" href="../simple_user_defined_models/">Simple User Defined Models</a></li><li><a class="tocitem" href="../quick_start_guide_to_adding_models/">Quick-Start Guide to Adding Models</a></li><li><a class="tocitem" href="../adding_models_for_general_use/">Adding Models for General Use</a></li><li><a class="tocitem" href="../modifying_behavior/">Modifying Behavior</a></li><li><a class="tocitem" href="../internals/">Internals</a></li><li><a class="tocitem" href="../list_of_supported_models/">List of Supported Models</a></li><li><a class="tocitem" href="../third_party_packages/">Third Party Packages</a></li><li><a class="tocitem" href="../glossary/">Glossary</a></li><li><a class="tocitem" href="../mlj_cheatsheet/">MLJ Cheatsheet</a></li><li><a class="tocitem" href="../known_issues/">Known Issues</a></li><li><a class="tocitem" href="../frequently_asked_questions/">FAQ</a></li><li><a class="tocitem" href="../julia_blogpost/">Julia BlogPost</a></li><li><a class="tocitem" href="../api/">Index of Methods</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Getting Started</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Getting Started</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/alan-turing-institute/MLJ.jl/blob/master/docs/src/getting_started.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Getting-Started"><a class="docs-heading-anchor" href="#Getting-Started">Getting Started</a><a id="Getting-Started-1"></a><a class="docs-heading-anchor-permalink" href="#Getting-Started" title="Permalink"></a></h1><p>For an outline of MLJ&#39;s <strong>goals</strong> and <strong>features</strong>, see <a href="../about_mlj/#About-MLJ">About MLJ</a>.</p><p>This page introduces some MLJ basics, assuming some familiarity with machine learning. For a complete list of other MLJ learning resources, see <a href="../learning_mlj/#Learning-MLJ">Learning MLJ</a>.</p><p>This section introduces only the most basic MLJ operations and concepts. It assumes MJL has been successfully installed. See <a href="../about_mlj/#Installation">Installation</a> if this is not the case. </p><h2 id="Choosing-and-evaluating-a-model"><a class="docs-heading-anchor" href="#Choosing-and-evaluating-a-model">Choosing and evaluating a model</a><a id="Choosing-and-evaluating-a-model-1"></a><a class="docs-heading-anchor-permalink" href="#Choosing-and-evaluating-a-model" title="Permalink"></a></h2><p>The following code loads Fisher&#39;s famous iris data set as a named tuple of column vectors:</p><pre><code class="language-julia-repl">julia&gt; using MLJ
+
+julia&gt; iris = load_iris();
+
+julia&gt; selectrows(iris, 1:3)  |&gt; pretty
+┌──────────────┬─────────────┬──────────────┬─────────────┬──────────────────────────────────┐
+│ sepal_length │ sepal_width │ petal_length │ petal_width │ target                           │
+│ Float64      │ Float64     │ Float64      │ Float64     │ CategoricalValue{String, UInt32} │
+│ Continuous   │ Continuous  │ Continuous   │ Continuous  │ Multiclass{3}                    │
+├──────────────┼─────────────┼──────────────┼─────────────┼──────────────────────────────────┤
+│ 5.1          │ 3.5         │ 1.4          │ 0.2         │ setosa                           │
+│ 4.9          │ 3.0         │ 1.4          │ 0.2         │ setosa                           │
+│ 4.7          │ 3.2         │ 1.3          │ 0.2         │ setosa                           │
+└──────────────┴─────────────┴──────────────┴─────────────┴──────────────────────────────────┘
+
+julia&gt; schema(iris)
+┌──────────────┬───────────────┬──────────────────────────────────┐
+│ names        │ scitypes      │ types                            │
+├──────────────┼───────────────┼──────────────────────────────────┤
+│ sepal_length │ Continuous    │ Float64                          │
+│ sepal_width  │ Continuous    │ Float64                          │
+│ petal_length │ Continuous    │ Float64                          │
+│ petal_width  │ Continuous    │ Float64                          │
+│ target       │ Multiclass{3} │ CategoricalValue{String, UInt32} │
+└──────────────┴───────────────┴──────────────────────────────────┘</code></pre><p>Because this data format is compatible with <a href="https://tables.juliadata.org/stable/">Tables.jl</a>, many MLJ methods (such as <code>selectrows</code>, <code>pretty</code> and <code>schema</code> used above) as well as many MLJ models, can work with it. However, as most new users are already familiar with the access methods particular to <a href="https://dataframes.juliadata.org/stable/">DataFrames</a> (also compatible with Tables.jl) we&#39;ll put our data into that format here:</p><pre><code class="language-julia">import DataFrames
+iris = DataFrames.DataFrame(iris);</code></pre><p>Next, let&#39;s split the data &quot;horizontally&quot; into input and target parts, and specify an RNG seed, to force observations to be shuffled:</p><pre><code class="language-julia-repl">julia&gt; y, X = unpack(iris, ==(:target); rng=123);
+
+julia&gt; first(X, 3) |&gt; pretty
+┌──────────────┬─────────────┬──────────────┬─────────────┐
+│ sepal_length │ sepal_width │ petal_length │ petal_width │
+│ Float64      │ Float64     │ Float64      │ Float64     │
+│ Continuous   │ Continuous  │ Continuous   │ Continuous  │
+├──────────────┼─────────────┼──────────────┼─────────────┤
+│ 6.7          │ 3.3         │ 5.7          │ 2.1         │
+│ 5.7          │ 2.8         │ 4.1          │ 1.3         │
+│ 7.2          │ 3.0         │ 5.8          │ 1.6         │
+└──────────────┴─────────────┴──────────────┴─────────────┘</code></pre><p>This call to <code>unpack</code> splits off any column with name <code>==</code> to <code>:target</code> into something called <code>y</code>, and all the remaining columns into <code>X</code>.</p><p>To list <em>all</em> models available in MLJ&#39;s <a href="../model_search/#model_search">model registry</a> do <code>models()</code>. Listing the models compatible with the present data:</p><pre><code class="language-julia-repl">julia&gt; models(matching(X,y))
+47-element Vector{NamedTuple{(:name, :package_name, :is_supervised, :abstract_type, :deep_properties, :docstring, :fit_data_scitype, :human_name, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :inverse_transform_scitype, :is_pure_julia, :is_wrapper, :iteration_parameter, :load_path, :package_license, :package_url, :package_uuid, :predict_scitype, :prediction_type, :supports_class_weights, :supports_online, :supports_training_losses, :supports_weights, :transform_scitype, :input_scitype, :target_scitype, :output_scitype)}}:
+ (name = AdaBoostClassifier, package_name = ScikitLearn, ... )
+ (name = AdaBoostStumpClassifier, package_name = DecisionTree, ... )
+ (name = BaggingClassifier, package_name = ScikitLearn, ... )
+ (name = BayesianLDA, package_name = MultivariateStats, ... )
+ (name = BayesianLDA, package_name = ScikitLearn, ... )
+ (name = BayesianQDA, package_name = ScikitLearn, ... )
+ (name = BayesianSubspaceLDA, package_name = MultivariateStats, ... )
+ (name = ConstantClassifier, package_name = MLJModels, ... )
+ (name = DecisionTreeClassifier, package_name = BetaML, ... )
+ (name = DecisionTreeClassifier, package_name = DecisionTree, ... )
+ ⋮
+ (name = RidgeCVClassifier, package_name = ScikitLearn, ... )
+ (name = RidgeClassifier, package_name = ScikitLearn, ... )
+ (name = SGDClassifier, package_name = ScikitLearn, ... )
+ (name = SVC, package_name = LIBSVM, ... )
+ (name = SVMClassifier, package_name = ScikitLearn, ... )
+ (name = SVMLinearClassifier, package_name = ScikitLearn, ... )
+ (name = SVMNuClassifier, package_name = ScikitLearn, ... )
+ (name = SubspaceLDA, package_name = MultivariateStats, ... )
+ (name = XGBoostClassifier, package_name = XGBoost, ... )</code></pre><p>In MLJ a <em>model</em> is a struct storing the hyperparameters of the learning algorithm indicated by the struct name (and nothing else). For common problems matching data to models, see <a href="../model_search/#model_search">Model Search</a> and <a href="../preparing_data/#Preparing-Data">Preparing Data</a>.</p><p>To see the document string for <code>DecisionTreeClassifier</code> (without loading its defining code) do</p><pre><code class="language-julia">doc(&quot;DecisionTreeClassifier&quot;, pkg=&quot;DecisionTree&quot;)</code></pre><p>Assuming the MLJDecisionTreeInterface.jl package is in your load path (see <a href="../about_mlj/#Installation">Installation</a>) we can use <code>@load</code> to import the <code>DecisionTreeClassifier</code> model type, which we will bind to <code>Tree</code>:</p><pre><code class="language-julia-repl">julia&gt; Tree = @load DecisionTreeClassifier pkg=DecisionTree
+[ Info: For silent loading, specify `verbosity=0`. 
+import MLJDecisionTreeInterface ✔
+MLJDecisionTreeInterface.DecisionTreeClassifier</code></pre><p>(In this case we need to specify <code>pkg=...</code> because multiple packages provide a model type with name <code>DecisionTreeClassifier</code>.) Now we can instantiate a model with default hyperparameters:</p><pre><code class="language-julia-repl">julia&gt; tree = Tree()
+DecisionTreeClassifier(
+    max_depth = -1,
+    min_samples_leaf = 1,
+    min_samples_split = 2,
+    min_purity_increase = 0.0,
+    n_subfeatures = 0,
+    post_prune = false,
+    merge_purity_threshold = 1.0,
+    display_depth = 5,
+    rng = Random._GLOBAL_RNG())</code></pre><p><em>Important:</em> DecisionTree.jl and most other packages implementing machine learning algorithms for use in MLJ are not MLJ dependencies. If such a package is not in your load path you will receive an error explaining how to add the package to your current environment. Alternatively, you can use the interactive macro <code>@iload</code>. For more on importing model types, see <a href="../loading_model_code/#Loading-Model-Code">Loading Model Code</a>.</p><p>Once instantiated, a model&#39;s performance can be evaluated with the <code>evaluate</code> method. Our classifier is a <em>probabilistic</em> predictor (check <code>prediction_type(tree) == :probabilistic</code>) which means we can specify a probabilistic measure (metric) like <code>log_loss</code>, as well deterministic measures like <code>accuracy</code> (which are applied after computing the mode of each prediction):</p><pre><code class="language-julia-repl">julia&gt; evaluate(tree, X, y,
+                resampling=CV(shuffle=true),
+                        measures=[log_loss, accuracy],
+                        verbosity=0)
+PerformanceEvaluation object with these fields:
+  measure, measurement, operation, per_fold,
+  per_observation, fitted_params_per_fold,
+  report_per_fold, train_test_rows
+Extract:
+┌────────────────────────────┬─────────────┬──────────────┬─────────────────────
+│ measure                    │ measurement │ operation    │ per_fold           ⋯
+├────────────────────────────┼─────────────┼──────────────┼─────────────────────
+│ LogLoss(tol = 2.22045e-16) │ 1.92        │ predict      │ [1.44, 2.88, 2.22e ⋯
+│ Accuracy()                 │ 0.947       │ predict_mode │ [0.96, 0.92, 1.0,  ⋯
+└────────────────────────────┴─────────────┴──────────────┴─────────────────────
+                                                                1 column omitted</code></pre><p>Under the hood, <code>evaluate</code> calls lower level functions <code>predict</code> or <code>predict_mode</code> according to the type of measure, as shown in the output. We shall call these operations directly below.</p><p>For more on performance evaluation, see <a href="../evaluating_model_performance/">Evaluating Model Performance</a> for details.</p><h2 id="A-preview-of-data-type-specification-in-MLJ"><a class="docs-heading-anchor" href="#A-preview-of-data-type-specification-in-MLJ">A preview of data type specification in MLJ</a><a id="A-preview-of-data-type-specification-in-MLJ-1"></a><a class="docs-heading-anchor-permalink" href="#A-preview-of-data-type-specification-in-MLJ" title="Permalink"></a></h2><p>The target <code>y</code> above is a categorical vector, which is appropriate because our model is a decision tree <em>classifier</em>:</p><pre><code class="language-julia-repl">julia&gt; typeof(y)
+CategoricalVector{String, UInt32, String, CategoricalValue{String, UInt32}, Union{}} (alias for CategoricalArray{String, 1, UInt32, String, CategoricalValue{String, UInt32}, Union{}})</code></pre><p>However, MLJ models do not actually prescribe the machine types for the data they operate on. Rather, they specify a <em>scientific type</em>, which refers to the way data is to be <em>interpreted</em>, as opposed to how it is <em>encoded</em>:</p><pre><code class="language-julia-repl">julia&gt; target_scitype(tree)
+AbstractVector{&lt;:Finite} (alias for AbstractArray{&lt;:Finite, 1})</code></pre><p>Here <code>Finite</code> is an example of a &quot;scalar&quot; scientific type with two subtypes:</p><pre><code class="language-julia-repl">julia&gt; subtypes(Finite)
+2-element Vector{Any}:
+ Multiclass
+ OrderedFactor</code></pre><p>We use the <code>scitype</code> function to check how MLJ is going to interpret given data. Our choice of encoding for <code>y</code> works for <code>DecisionTreeClassifier</code>, because we have:</p><pre><code class="language-julia-repl">julia&gt; scitype(y)
+AbstractVector{Multiclass{3}} (alias for AbstractArray{Multiclass{3}, 1})</code></pre><p>and <code>Multiclass{3} &lt;: Finite</code>. If we would encode with integers instead, we obtain:</p><pre><code class="language-julia-repl">julia&gt; yint = int.(y);
+
+julia&gt; scitype(yint)
+AbstractVector{Count} (alias for AbstractArray{Count, 1})</code></pre><p>and using <code>yint</code> in place of <code>y</code> in classification problems will fail. See also <a href="../working_with_categorical_data/#Working-with-Categorical-Data">Working with Categorical Data</a>.</p><p>For more on scientific types, see <a href="#Data-containers-and-scientific-types">Data containers and scientific types</a> below.</p><h2 id="Fit-and-predict"><a class="docs-heading-anchor" href="#Fit-and-predict">Fit and predict</a><a id="Fit-and-predict-1"></a><a class="docs-heading-anchor-permalink" href="#Fit-and-predict" title="Permalink"></a></h2><p>To illustrate MLJ&#39;s fit and predict interface, let&#39;s perform our performance evaluations by hand, but using a simple holdout set, instead of cross-validation.</p><p>Wrapping the model in data creates a <em>machine</em> which will store training outcomes:</p><pre><code class="language-julia-repl">julia&gt; mach = machine(tree, X, y)
+Machine{DecisionTreeClassifier,…} trained 0 times; caches data
+  model: MLJDecisionTreeInterface.DecisionTreeClassifier
+  args:
+    1:	Source @540 ⏎ `Table{AbstractVector{Continuous}}`
+    2:	Source @132 ⏎ `AbstractVector{Multiclass{3}}`</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7); # 70:30 split
+
+julia&gt; fit!(mach, rows=train);
+[ Info: Training Machine{DecisionTreeClassifier,…}.
+
+julia&gt; yhat = predict(mach, X[test,:]);
+
+julia&gt; yhat[3:5]
+3-element CategoricalDistributions.UnivariateFiniteVector{Multiclass{3}, String, UInt32, Float64}:
+ UnivariateFinite{Multiclass{3}}(setosa=&gt;1.0, versicolor=&gt;0.0, virginica=&gt;0.0)
+ UnivariateFinite{Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.0, virginica=&gt;1.0)
+ UnivariateFinite{Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.0, virginica=&gt;1.0)
+
+julia&gt; log_loss(yhat, y[test]) |&gt; mean
+2.4029102259411435</code></pre><p>Note that <code>log_loss</code> and <code>cross_entropy</code> are aliases for <code>LogLoss()</code> (which can be passed an optional keyword parameter, as in <code>LogLoss(tol=0.001)</code>). For a list of all losses and scores, and their aliases, run <code>measures()</code>.</p><p>Notice that <code>yhat</code> is a vector of <code>Distribution</code> objects, because DecisionTreeClassifier makes probabilistic predictions. The methods of the <a href="https://github.com/JuliaStats/Distributions.jl">Distributions.jl</a> package can be applied to such distributions:</p><pre><code class="language-julia-repl">julia&gt; broadcast(pdf, yhat[3:5], &quot;virginica&quot;) # predicted probabilities of virginica
+3-element Vector{Float64}:
+ 0.0
+ 1.0
+ 1.0
+
+julia&gt; broadcast(pdf, yhat, y[test])[3:5] # predicted probability of observed class
+3-element Vector{Float64}:
+ 1.0
+ 1.0
+ 1.0
+
+julia&gt; mode.(yhat[3:5])
+3-element CategoricalArray{String,1,UInt32}:
+ &quot;setosa&quot;
+ &quot;virginica&quot;
+ &quot;virginica&quot;</code></pre><p>Or, one can explicitly get modes by using <code>predict_mode</code> instead of <code>predict</code>:</p><pre><code class="language-julia-repl">julia&gt; predict_mode(mach, X[test[3:5],:])
+3-element CategoricalArray{String,1,UInt32}:
+ &quot;setosa&quot;
+ &quot;virginica&quot;
+ &quot;virginica&quot;</code></pre><p>Finally, we note that <code>pdf()</code> is overloaded to allow the retrieval of probabilities for all levels at once:</p><pre><code class="language-julia-repl">julia&gt; L = levels(y)
+3-element Vector{String}:
+ &quot;setosa&quot;
+ &quot;versicolor&quot;
+ &quot;virginica&quot;
+
+julia&gt; pdf(yhat[3:5], L)
+3×3 Matrix{Float64}:
+ 1.0  0.0  0.0
+ 0.0  0.0  1.0
+ 0.0  0.0  1.0</code></pre><p>Unsupervised models have a <code>transform</code> method instead of <code>predict</code>, and may optionally implement an <code>inverse_transform</code> method:</p><pre><code class="language-julia-repl">julia&gt; v = Float64[1, 2, 3, 4]
+4-element Vector{Float64}:
+ 1.0
+ 2.0
+ 3.0
+ 4.0
+
+julia&gt; stand = Standardizer() # this type is built-in
+Standardizer(
+    features = Symbol[],
+    ignore = false,
+    ordered_factor = false,
+    count = false)
+
+julia&gt; mach2 = machine(stand, v)
+Machine{Standardizer,…} trained 0 times; caches data
+  model: Standardizer
+  args:
+    1:	Source @802 ⏎ `AbstractVector{Continuous}`
+
+julia&gt; fit!(mach2)
+[ Info: Training Machine{Standardizer,…}.
+Machine{Standardizer,…} trained 1 time; caches data
+  model: Standardizer
+  args:
+    1:	Source @802 ⏎ `AbstractVector{Continuous}`
+
+julia&gt; w = transform(mach2, v)
+4-element Vector{Float64}:
+ -1.161895003862225
+ -0.3872983346207417
+  0.3872983346207417
+  1.161895003862225
+
+julia&gt; inverse_transform(mach2, w)
+4-element Vector{Float64}:
+ 1.0
+ 2.0
+ 3.0
+ 4.0</code></pre><p><a href="../machines/">Machines</a> have an internal state which allows them to avoid redundant calculations when retrained, in certain conditions - for example when increasing the number of trees in a random forest, or the number of epochs in a neural network. The machine building syntax also anticipates a more general syntax for composing multiple models, an advanced feature explained in <a href="../composing_models/#Learning-Networks">Learning Networks</a>.</p><p>There is a version of <code>evaluate</code> for machines as well as models. This time we&#39;ll use a simple holdout strategy as above. (An exclamation point is added to the method name because machines are generally mutated when trained.)</p><pre><code class="language-julia-repl">julia&gt; evaluate!(mach, resampling=Holdout(fraction_train=0.7),
+                       measures=[log_loss, accuracy],
+                       verbosity=0)
+PerformanceEvaluation object with these fields:
+  measure, measurement, operation, per_fold,
+  per_observation, fitted_params_per_fold,
+  report_per_fold, train_test_rows
+Extract:
+┌────────────────────────────┬─────────────┬──────────────┬──────────┐
+│ measure                    │ measurement │ operation    │ per_fold │
+├────────────────────────────┼─────────────┼──────────────┼──────────┤
+│ LogLoss(tol = 2.22045e-16) │ 2.4         │ predict      │ [2.4]    │
+│ Accuracy()                 │ 0.933       │ predict_mode │ [0.933]  │
+└────────────────────────────┴─────────────┴──────────────┴──────────┘</code></pre><p>Changing a hyperparameter and re-evaluating:</p><pre><code class="language-julia-repl">julia&gt; tree.max_depth = 3
+3
+
+julia&gt; evaluate!(mach, resampling=Holdout(fraction_train=0.7),
+                 measures=[log_loss, accuracy],
+                 verbosity=0)
+PerformanceEvaluation object with these fields:
+  measure, measurement, operation, per_fold,
+  per_observation, fitted_params_per_fold,
+  report_per_fold, train_test_rows
+Extract:
+┌────────────────────────────┬─────────────┬──────────────┬──────────┐
+│ measure                    │ measurement │ operation    │ per_fold │
+├────────────────────────────┼─────────────┼──────────────┼──────────┤
+│ LogLoss(tol = 2.22045e-16) │ 1.61        │ predict      │ [1.61]   │
+│ Accuracy()                 │ 0.956       │ predict_mode │ [0.956]  │
+└────────────────────────────┴─────────────┴──────────────┴──────────┘</code></pre><h2 id="Next-steps"><a class="docs-heading-anchor" href="#Next-steps">Next steps</a><a id="Next-steps-1"></a><a class="docs-heading-anchor-permalink" href="#Next-steps" title="Permalink"></a></h2><p>To learn a little more about what MLJ can do, browse <a href="../common_mlj_workflows/">Common MLJ Workflows</a> or <a href="https://alan-turing-institute.github.io/DataScienceTutorials.jl/">Data Science Tutorials in Julia</a> or try the <a href="https://github.com/ablaom/MachineLearningInJulia2020">JuliaCon2020 Workshop</a> on MLJ (recorded <a href="https://www.youtube.com/watch?time_continue=27&amp;v=qSWbCn170HU&amp;feature=emb_title">here</a>) returning to the manual as needed.</p><p><em>Read at least the remainder of this page before considering serious use of MLJ.</em></p><h2 id="Data-containers-and-scientific-types"><a class="docs-heading-anchor" href="#Data-containers-and-scientific-types">Data containers and scientific types</a><a id="Data-containers-and-scientific-types-1"></a><a class="docs-heading-anchor-permalink" href="#Data-containers-and-scientific-types" title="Permalink"></a></h2><p>The MLJ user should acquaint themselves with some basic assumptions about the form of data expected by MLJ, as outlined below. The basic <code>machine</code> constructors look like this (see also <a href="../machines/#Constructing-machines">Constructing machines</a>):</p><pre><code class="language-none">machine(model::Unsupervised, X)
+machine(model::Supervised, X, y)</code></pre><p>Each supervised model in MLJ declares the permitted <em>scientific type</em> of the inputs <code>X</code> and targets <code>y</code> that can be bound to it in the first constructor above, rather than specifying specific machine types (such as <code>Array{Float32, 2}</code>). Similar remarks apply to the input <code>X</code> of an unsupervised model.</p><p>Scientific types are julia types defined in the package <a href="https://github.com/JuliaAI/ScientificTypesBase.jl">ScientificTypesBase.jl</a>; the package <a href="https://JuliaAI.github.io/ScientificTypes.jl/dev/">ScientificTypes.jl</a> implements the particular convention used in the MLJ universe for assigning a specific scientific type (interpretation) to each julia object (see the <code>scitype</code> examples below).</p><p>The basic &quot;scalar&quot; scientific types are <code>Continuous</code>, <code>Multiclass{N}</code>, <code>OrderedFactor{N}</code>, <code>Count</code> and <code>Textual</code>. <code>Missing</code> and <code>Nothing</code> are also considered scientific types. Be sure you read <a href="#Scalar-scientific-types">Scalar scientific types</a> below to guarantee your scalar data is interpreted correctly. Tools exist to coerce the data to have the appropriate scientific type; see <a href="https://JuliaAI.github.io/ScientificTypes.jl/dev/">ScientificTypes.jl</a> or run <code>?coerce</code> for details.</p><p>Additionally, most data containers - such as tuples, vectors, matrices and tables - have a scientific type parameterized by scitype of the elements they contain.</p><p><img src="../img/scitypes_small.png" alt/></p><p><em>Figure 1. Part of the scientific type hierarchy in</em> <a href="https://JuliaAI.github.io/ScientificTypes.jl/dev/">ScientificTypesBase.jl</a>.</p><pre><code class="language-julia-repl">julia&gt; scitype(4.6)
+Continuous
+
+julia&gt; scitype(42)
+Count
+
+julia&gt; x1 = coerce([&quot;yes&quot;, &quot;no&quot;, &quot;yes&quot;, &quot;maybe&quot;], Multiclass);
+
+julia&gt; scitype(x1)
+AbstractVector{Multiclass{3}} (alias for AbstractArray{Multiclass{3}, 1})
+
+julia&gt; X = (x1=x1, x2=rand(4), x3=rand(4))  # a &quot;column table&quot;
+(x1 = CategoricalValue{String, UInt32}[&quot;yes&quot;, &quot;no&quot;, &quot;yes&quot;, &quot;maybe&quot;],
+ x2 = [0.17296982732153476, 0.4311265688549152, 0.9164218371622808, 0.0029817110637152533],
+ x3 = [0.7422777179776697, 0.5491931062469285, 0.05065936857102282, 0.14872233376483412],)
+
+julia&gt; scitype(X)
+Table{Union{AbstractVector{Continuous}, AbstractVector{Multiclass{3}}}}</code></pre><h3 id="Two-dimensional-data"><a class="docs-heading-anchor" href="#Two-dimensional-data">Two-dimensional data</a><a id="Two-dimensional-data-1"></a><a class="docs-heading-anchor-permalink" href="#Two-dimensional-data" title="Permalink"></a></h3><p>Generally, two-dimensional data in MLJ is expected to be <em>tabular</em>. All data containers compatible with the <a href="https://github.com/JuliaData/Tables.jl">Tables.jl</a> interface (which includes all source formats listed <a href="https://github.com/JuliaData/Tables.jl/blob/master/INTEGRATIONS.md">here</a>) have the scientific type <code>Table{K}</code>, where <code>K</code> depends on the scientific types of the columns, which can be individually inspected using <code>schema</code>:</p><pre><code class="language-julia-repl">julia&gt; schema(X)
+┌───────┬───────────────┬──────────────────────────────────┐
+│ names │ scitypes      │ types                            │
+├───────┼───────────────┼──────────────────────────────────┤
+│ x1    │ Multiclass{3} │ CategoricalValue{String, UInt32} │
+│ x2    │ Continuous    │ Float64                          │
+│ x3    │ Continuous    │ Float64                          │
+└───────┴───────────────┴──────────────────────────────────┘</code></pre><h4 id="Matrix-data"><a class="docs-heading-anchor" href="#Matrix-data">Matrix data</a><a id="Matrix-data-1"></a><a class="docs-heading-anchor-permalink" href="#Matrix-data" title="Permalink"></a></h4><p>MLJ models expecting a table do not generally accept a matrix instead. However, a matrix can be wrapped as a table, using <a href="../adding_models_for_general_use/#MLJModelInterface.table"><code>MLJ.table</code></a>:</p><pre><code class="language-julia">matrix_table = MLJ.table(rand(2,3))
+schema(matrix_table)</code></pre><pre><code class="language-none">┌─────────┬─────────┬────────────┐
+│ _.names │ _.types │ _.scitypes │
+├─────────┼─────────┼────────────┤
+│ x1      │ Float64 │ Continuous │
+│ x2      │ Float64 │ Continuous │
+│ x3      │ Float64 │ Continuous │
+└─────────┴─────────┴────────────┘
+_.nrows = 2
+</code></pre><p>The matrix is <em>not</em> copied, only wrapped.  To manifest a table as a matrix, use <a href="../adding_models_for_general_use/#MLJModelInterface.matrix"><code>MLJ.matrix</code></a>.</p><h3 id="Observations-correspond-to-rows,-not-columns"><a class="docs-heading-anchor" href="#Observations-correspond-to-rows,-not-columns">Observations correspond to rows, not columns</a><a id="Observations-correspond-to-rows,-not-columns-1"></a><a class="docs-heading-anchor-permalink" href="#Observations-correspond-to-rows,-not-columns" title="Permalink"></a></h3><p>When supplying models with matrices, or wrapping them in tables, each <em>row</em> should correspond to a different observation. That is, the matrix should be <code>n x p</code>, where <code>n</code> is the number of observations and <code>p</code> the number of features. However, <em>some models may perform better</em> if supplied the <em>adjoint</em> of a <code>p x n</code> matrix instead, and observation resampling is always more efficient in this case.</p><h3 id="Inputs"><a class="docs-heading-anchor" href="#Inputs">Inputs</a><a id="Inputs-1"></a><a class="docs-heading-anchor-permalink" href="#Inputs" title="Permalink"></a></h3><p>Since an MLJ model only specifies the scientific type of data, if that type is <code>Table</code> - which is the case for the majority of MLJ models - then any <a href="https://github.com/JuliaData/Tables.jl">Tables.jl</a> format is permitted.</p><p>Specifically, the requirement for an arbitrary model&#39;s input is <code>scitype(X) &lt;: input_scitype(model)</code>.</p><h3 id="Targets"><a class="docs-heading-anchor" href="#Targets">Targets</a><a id="Targets-1"></a><a class="docs-heading-anchor-permalink" href="#Targets" title="Permalink"></a></h3><p>The target <code>y</code> expected by MLJ models is generally an <code>AbstractVector</code>. A multivariate target <code>y</code> will generally be a table.</p><p>Specifically, the type requirement for a model target is <code>scitype(y) &lt;: target_scitype(model)</code>.</p><h3 id="Querying-a-model-for-acceptable-data-types"><a class="docs-heading-anchor" href="#Querying-a-model-for-acceptable-data-types">Querying a model for acceptable data types</a><a id="Querying-a-model-for-acceptable-data-types-1"></a><a class="docs-heading-anchor-permalink" href="#Querying-a-model-for-acceptable-data-types" title="Permalink"></a></h3><p>Given a model instance, one can inspect the admissible scientific types of its input and target, and without loading the code defining the model;</p><pre><code class="language-julia-repl">julia&gt; i = info(&quot;DecisionTreeClassifier&quot;, pkg=&quot;DecisionTree&quot;)
+(name = &quot;DecisionTreeClassifier&quot;,
+ package_name = &quot;DecisionTree&quot;,
+ is_supervised = true,
+ abstract_type = Probabilistic,
+ deep_properties = (),
+ docstring = &quot;```\nDecisionTreeClassifier\n```\n\nA model type for c...&quot;,
+ fit_data_scitype =
+     Tuple{Table{&lt;:Union{AbstractVector{&lt;:Continuous}, AbstractVector{&lt;:Count}, AbstractVector{&lt;:OrderedFactor}}}, AbstractVector{&lt;:Finite}},
+ human_name = &quot;CART decision tree classifier&quot;,
+ hyperparameter_ranges = (nothing,
+                          nothing,
+                          nothing,
+                          nothing,
+                          nothing,
+                          nothing,
+                          nothing,
+                          nothing,
+                          nothing),
+ hyperparameter_types = (&quot;Int64&quot;,
+                         &quot;Int64&quot;,
+                         &quot;Int64&quot;,
+                         &quot;Float64&quot;,
+                         &quot;Int64&quot;,
+                         &quot;Bool&quot;,
+                         &quot;Float64&quot;,
+                         &quot;Int64&quot;,
+                         &quot;Union{Integer, Random.AbstractRNG}&quot;),
+ hyperparameters = (:max_depth,
+                    :min_samples_leaf,
+                    :min_samples_split,
+                    :min_purity_increase,
+                    :n_subfeatures,
+                    :post_prune,
+                    :merge_purity_threshold,
+                    :display_depth,
+                    :rng),
+ implemented_methods = [:clean!, :fitted_params, :predict, :fit],
+ inverse_transform_scitype = Unknown,
+ is_pure_julia = true,
+ is_wrapper = false,
+ iteration_parameter = nothing,
+ load_path = &quot;MLJDecisionTreeInterface.DecisionTreeClassifier&quot;,
+ package_license = &quot;MIT&quot;,
+ package_url = &quot;https://github.com/bensadeghi/DecisionTree.jl&quot;,
+ package_uuid = &quot;7806a523-6efd-50cb-b5f6-3fa6f1930dbb&quot;,
+ predict_scitype =
+     AbstractVector{ScientificTypesBase.Density{_s25} where _s25&lt;:Finite},
+ prediction_type = :probabilistic,
+ supports_class_weights = false,
+ supports_online = false,
+ supports_training_losses = false,
+ supports_weights = false,
+ transform_scitype = Unknown,
+ input_scitype =
+     Table{&lt;:Union{AbstractVector{&lt;:Continuous}, AbstractVector{&lt;:Count}, AbstractVector{&lt;:OrderedFactor}}},
+ target_scitype = AbstractVector{&lt;:Finite},
+ output_scitype = Unknown)
+
+julia&gt; i.input_scitype
+Table{&lt;:Union{AbstractVector{&lt;:Continuous}, AbstractVector{&lt;:Count}, AbstractVector{&lt;:OrderedFactor}}}
+
+julia&gt; i.target_scitype
+AbstractVector{&lt;:Finite} (alias for AbstractArray{&lt;:Finite, 1})</code></pre><p>This output indicates that any table with <code>Continuous</code>, <code>Count</code> or <code>OrderedFactor</code> columns is acceptable as the input <code>X</code>, and that any vector with element scitype <code>&lt;: Finite</code> is acceptable as the target <code>y</code>.</p><p>For more on matching models to data, see <a href="../model_search/#model_search">Model Search</a>.</p><h3 id="Scalar-scientific-types"><a class="docs-heading-anchor" href="#Scalar-scientific-types">Scalar scientific types</a><a id="Scalar-scientific-types-1"></a><a class="docs-heading-anchor-permalink" href="#Scalar-scientific-types" title="Permalink"></a></h3><p>Models in MLJ will always apply the <code>MLJ</code> convention described in <a href="https://JuliaAI.github.io/ScientificTypes.jl/dev/">ScientificTypes.jl</a> to decide how to interpret the elements of your container types. Here are the key features of that convention:</p><ul><li><p>Any <code>AbstractFloat</code> is interpreted as <code>Continuous</code>.</p></li><li><p>Any <code>Integer</code> is interpreted as <code>Count</code>.</p></li><li><p>Any <code>CategoricalValue</code> <code>x</code>, is interpreted as <code>Multiclass</code> or <code>OrderedFactor</code>, depending on the value of <code>isordered(x)</code>.</p></li><li><p><code>String</code>s and <code>Char</code>s are <em>not</em> interpreted as <code>Multiclass</code> or <code>OrderedFactor</code> (they have scitypes <code>Textual</code> and <code>Unknown</code> respectively).</p></li><li><p>In particular, <em>integers</em> (including <code>Bool</code>s) <em>cannot be used to represent categorical data.</em> Use the preceding <code>coerce</code> operations to coerce to a <code>Finite</code> scitype.</p></li><li><p>The scientific types of <code>nothing</code> and <code>missing</code> are <code>Nothing</code> and <code>Missing</code>, native types we also regard as scientific.</p></li></ul><p>Use <code>coerce(v, OrderedFactor)</code> or <code>coerce(v, Multiclass)</code> to coerce a vector <code>v</code> of integers, strings or characters to a vector with an appropriate <code>Finite</code> (categorical) scitype.  See <a href="../working_with_categorical_data/#Working-with-Categorical-Data">Working with Categorical Data</a>.</p><p>For more on scitype coercion of arrays and tables, see <a href="#ScientificTypes.coerce"><code>coerce</code></a>, <a href="#ScientificTypes.autotype"><code>autotype</code></a> and <a href="../preparing_data/#MLJBase.unpack"><code>unpack</code></a> below and the examples at <a href="https://JuliaAI.github.io/ScientificTypes.jl/dev/">ScientificTypes.jl</a>.</p><article class="docstring"><header><a class="docstring-binding" id="ScientificTypes.scitype" href="#ScientificTypes.scitype"><code>ScientificTypes.scitype</code></a> — <span class="docstring-category">Function</span></header><section><div><p>The scientific type (interpretation) of <code>X</code>, as distinct from its machine type, as specified by the active convention.</p><p><strong>Examples</strong></p><pre><code class="language-none">julia&gt; scitype(3.14)
+Continuous
+
+julia&gt; scitype([1, 2, missing])
+AbstractVector{Union{Missing, Count}} 
+
+julia&gt; scitype((5, &quot;beige&quot;))
+Tuple{Count, Textual}
+
+using CategoricalArrays
+X = (gender = categorical([&#39;M&#39;, &#39;M&#39;, &#39;F&#39;, &#39;M&#39;, &#39;F&#39;]),
+     ndevices = [1, 3, 2, 3, 2])
+julia&gt; scitype(X)
+Table{Union{AbstractVector{Count}, AbstractVector{Multiclass{2}}}}</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="ScientificTypes.coerce" href="#ScientificTypes.coerce"><code>ScientificTypes.coerce</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">coerce(A, S)</code></pre><p>Return new version of the array <code>A</code> whose scientific element type is <code>S</code>.</p><pre><code class="language-none">julia&gt; v = coerce([3, 7, 5], Continuous)
+3-element Vector{Float64}:
+ 3.0
+ 7.0
+ 5.0
+
+julia&gt; scitype(v)
+AbstractVector{Continuous}
+</code></pre><pre><code class="language-none">coerce(X, specs...; tight=false, verbosity=1)</code></pre><p>Given a table <code>X</code>, return a copy of <code>X</code>, ensuring that the element scitypes of the columns match the new specification, <code>specs</code>. There are three valid specifications:</p><p>(i) one or more <code>column_name=&gt;Scitype</code> pairs:</p><pre><code class="language-none">coerce(X, col1=&gt;Scitype1, col2=&gt;Scitype2, ... ; verbosity=1)</code></pre><p>(ii) one or more <code>OldScitype=&gt;NewScitype</code> pairs (<code>OldScitype</code> covering both the <code>OldScitype</code> and <code>Union{Missing,OldScitype}</code> cases):</p><pre><code class="language-none">coerce(X, OldScitype1=&gt;NewScitype1, OldScitype2=&gt;NewScitype2, ... ; verbosity=1)</code></pre><p>(iii) a dictionary of scientific types keyed on column names:</p><pre><code class="language-none">coerce(X, d::AbstractDict{&lt;:ColKey, &lt;:Type}; verbosity=1)</code></pre><p>where <code>ColKey = Union{Symbol,AbstractString}</code>.</p><p><strong>Examples</strong></p><p>Specifying  <code>column_name=&gt;Scitype</code> pairs:</p><pre><code class="language-none">using CategoricalArrays, DataFrames, Tables
+X = DataFrame(name=[&quot;Siri&quot;, &quot;Robo&quot;, &quot;Alexa&quot;, &quot;Cortana&quot;],
+              height=[152, missing, 148, 163],
+              rating=[1, 5, 2, 1])
+Xc = coerce(X, :name=&gt;Multiclass, :height=&gt;Continuous, :rating=&gt;OrderedFactor)
+schema(Xc).scitypes # (Multiclass, Continuous, OrderedFactor)</code></pre><p>Specifying <code>OldScitype=&gt;NewScitype</code> pairs:</p><pre><code class="language-none">X  = (x = [1, 2, 3],
+      y = rand(3),
+      z = [10, 20, 30])
+Xc = coerce(X, Count=&gt;Continuous)
+schema(Xfixed).scitypes # (Continuous, Continuous, Continuous)</code></pre></div></section><section><div><pre><code class="language-none">coerce(image::AbstractArray{&lt;:Real, N}, I)</code></pre><p>Given a an array called <code>image</code> representing one or more images, return a transformed version of the data so as to enforce an appropriate scientific interpretation <code>I</code>:</p><table><tr><th style="text-align: right">single or collection ?</th><th style="text-align: right">N</th><th style="text-align: right">I</th><th style="text-align: right"><code>scitype</code> of result</th></tr><tr><td style="text-align: right">single</td><td style="text-align: right">2</td><td style="text-align: right"><code>GrayImage</code></td><td style="text-align: right"><code>GrayImage{W,H}</code></td></tr><tr><td style="text-align: right">single</td><td style="text-align: right">3</td><td style="text-align: right"><code>ColorImage</code></td><td style="text-align: right"><code>ColorImage{W,H}</code></td></tr><tr><td style="text-align: right">collection</td><td style="text-align: right">3</td><td style="text-align: right"><code>GrayImage</code></td><td style="text-align: right"><code>AbstractVector{&lt;:GrayImage}</code></td></tr><tr><td style="text-align: right">collection</td><td style="text-align: right">4 (W x H x {1} x C)</td><td style="text-align: right"><code>GrayImage</code></td><td style="text-align: right"><code>AbstractVector{&lt;:GrayImage}</code></td></tr><tr><td style="text-align: right">collection</td><td style="text-align: right">4</td><td style="text-align: right"><code>ColorImage</code></td><td style="text-align: right"><code>AbstractVector{&lt;:ColorImage}</code></td></tr></table><pre><code class="language-none">imgs = rand(10, 10, 3, 5)
+v = coerce(imgs, ColorImage)
+
+julia&gt; typeof(v)
+Vector{Matrix{ColorTypes.RGB{Float64}}}
+
+julia&gt; scitype(v)
+AbstractVector{ColorImage{10, 10}}
+</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="ScientificTypes.autotype" href="#ScientificTypes.autotype"><code>ScientificTypes.autotype</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">autotype(X; kw...)</code></pre><p>Return a dictionary of suggested scitypes for each column of <code>X</code>, a table or an array based on rules</p><p><strong>Kwargs</strong></p><ul><li><code>only_changes=true</code>:       if true, return only a dictionary of the names for                             which applying autotype differs from just using                             the ambient convention. When coercing with                             autotype, <code>only_changes</code> should be true.</li><li><code>rules=(:few_to_finite,)</code>: the set of rules to apply.</li></ul></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../learning_mlj/">« Learning MLJ</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 27 April 2022 22:35">Wednesday 27 April 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
