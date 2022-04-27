@@ -147,7 +147,7 @@ const MLJOpenML = OpenML
 export OpenML, MLJOpenML
 
 # re-export from ComputaionalResources:
-export CPU1, CPUProcesses, CPUThreads
+export CPU1, CPUProcesses, CPUThreads, CUDALibs
 
 
 end # module
