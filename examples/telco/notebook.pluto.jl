@@ -710,25 +710,26 @@ md"""
 functions and what the `PerformanceEvaluation` object `e_pipe` records.)
 """
 
-# ╔═╡ 2468db48-0ffd-459e-897c-f79712f9ec7c
+# ╔═╡ 45a4d300-a392-485c-897c-f79712f9ec7c
 md"""
 While [less than ideal](https://arxiv.org/abs/2104.00673), let's
 adopt the common practice of using the standard error of a
 cross-validation score as an estimate of the uncertainty of a
 performance measure's expected value. Here's a utility function to
-calculate confidence intervals for our performance estimates based
+calculate 95% confidence intervals for our performance estimates based
 on this practice, and it's application to the current evaluation:
 """
 
 # ╔═╡ 0f76a79f-8675-4ec1-a543-f9324a87efad
 using Measurements
 
-# ╔═╡ f8d9dea6-d5a8-4b27-8657-9fba0caf3cb7
+# ╔═╡ fc641df4-693c-4007-8657-9fba0caf3cb7
 begin
   function confidence_intervals(e)
+      factor = 2.0 # to get level of 95%
       measure = e.measure
       nfolds = length(e.per_fold[1])
-      measurement = [e.measurement[j] ± std(e.per_fold[j])/sqrt(nfolds - 1)
+      measurement = [e.measurement[j] ± factor*std(e.per_fold[j])/sqrt(nfolds - 1)
                      for j in eachindex(measure)]
       table = (measure=measure, measurement=measurement)
       return DataFrames.DataFrame(table)
@@ -1248,9 +1249,9 @@ md"""
 # ╟─562887bb-b7fb-430f-b61c-748aec38e674
 # ╠═f9be989e-2604-44c2-9727-ed822e4fd85d
 # ╟─ff7cfc36-b9fc-4570-b2f2-e08965e5be66
-# ╟─2468db48-0ffd-459e-897c-f79712f9ec7c
+# ╟─45a4d300-a392-485c-897c-f79712f9ec7c
 # ╠═0f76a79f-8675-4ec1-a543-f9324a87efad
-# ╠═f8d9dea6-d5a8-4b27-8657-9fba0caf3cb7
+# ╠═fc641df4-693c-4007-8657-9fba0caf3cb7
 # ╟─c3f71e42-8bbe-47fe-a217-e58f442fc85c
 # ╟─db354064-c2dd-4e6a-b8ad-0340f15a03ba
 # ╟─3bbb26ed-7d1e-46ac-946d-b124a8db5f7c
