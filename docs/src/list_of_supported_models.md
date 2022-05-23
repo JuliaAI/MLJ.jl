@@ -27,7 +27,7 @@ independent assessment.
 
 | Package | Models | Maturity | Note
 | ------- | ------ | -------- | ----
-[BetaML.jl](https://github.com/sylvaticus/BetaML.jl) | DecisionTreeClassifier, DecisionTreeRegressor, KernelPerceptronClassifier, PegasosClassifier, PerceptronClassifier, RandomForestClassifier | medium |
+[BetaML.jl](https://github.com/sylvaticus/BetaML.jl) | DecisionTreeClassifier, DecisionTreeRegressor, GMMClusterer, KMeans, KMedoids, KernelPerceptronClassifier, MissingImputator, PegasosClassifier, PerceptronClassifier, RandomForestClassifier, RandomForestRegressor | medium |
 [Clustering.jl](https://github.com/JuliaStats/Clustering.jl) | KMeans, KMedoids | high | †
 [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl) | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier, RandomForestClassifier, RandomForestRegressor | high | 
 [EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl) | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian | medium | gradient boosting models
