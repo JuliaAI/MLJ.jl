@@ -61,10 +61,8 @@ its conventional use, are marked with a ⟂ symbol:
   provides the `IteratedModel` wrapper for controlling iterative
   models (snapshots, early stopping criteria, etc)
   
-* [MLJSerialization.jl](https://github.com/JuliaAI/MLJSerialization.jl)
-  provides functionality for saving MLJ machines to file
-  
-* [MLJOpenML.jl](https://github.com/JuliaAI/MLJOpenML.jl) provides
+* (⟂)
+  [OpenML.jl](https://github.com/JuliaAI/OpenML.jl) provides
   integration with the [OpenML](https://www.openml.org) data science
   exchange platform
   
@@ -89,13 +87,14 @@ its conventional use, are marked with a ⟂ symbol:
   
 * (⟂)
   [ScientificTypes.jl](https://github.com/JuliaAI/ScientificTypes.jl)
-  articulates MLJ's own convention for the scientific interpretation of
-  data.
+  articulates the particular convention for the scientific interpretation of
+  data that MLJ adopts
   
 * (⟂)
   [StatisticalTraits.jl](https://github.com/JuliaAI/StatisticalTraits.jl)
   An ultra lightweight package defining fall-back implementations for
-  a collection of traits possessed by statistical objects.
+  a collection of traits possessed by statistical objects, principally
+  models and measures (metrics).
 
 * (⟂)
   [DataScienceTutorials](https://github.com/alan-turing-institute/DataScienceTutorials.jl)

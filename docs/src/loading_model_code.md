@@ -6,7 +6,9 @@ import the model type interactively with `@iload`, as shown under
 [Installation](@ref), or use `@load` as shown below. The `@load` macro
 works from within a module, a package or a function, provided the
 relevant package providing the MLJ interface has been added to your
-package environment.
+package environment. It will attempt to load the model type into the
+global namespace of the module in which `@load` is invoked (`Main` if
+invoked at the REPL).
 
 In general, the code providing core functionality for the model
 (living in a packge you should consult for documentation) may be
@@ -56,7 +58,7 @@ which is equivalent to
 
 ```julia
 julia> import MLJDecisionTreeInterface.DecisionTreeClassifier
-julia> Tree = MLJDecisionTreeInterface.DecisionTreeClassifier()
+julia> Tree = MLJDecisionTreeInterface.DecisionTreeClassifier
 julia> tree = Tree()
 ```
 
