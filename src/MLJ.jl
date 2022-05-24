@@ -95,7 +95,8 @@ export nrows, color_off, color_on,
     StratifiedCV, evaluate!, Resampler, iterator,
     default_resource, pretty,
     make_blobs, make_moons, make_circles, make_regression,
-    fit_only!, return!, int, decoder
+    fit_only!, return!, int, decoder,
+    default_scitype_check_level
 
 # MLJBase/composition/abstract_types.jl:
 for T in vcat(MLJBase.MLJModelInterface.ABSTRACT_MODEL_SUBTYPES,
