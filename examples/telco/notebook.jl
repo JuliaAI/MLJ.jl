@@ -263,7 +263,7 @@ df, df_test, df_dumped = partition(df0, 0.07, 0.03, # in ratios 7:3:90
                                    rng=123);
 
 # The reader interested in including all data can instead do
-# `df, df_test = partition(df0, 0.7, rng=123)`.
+# `df, df_test = partition(df0, 0.7, stratify=df0.Churn, rng=123)`.
 
 
 # ## Splitting data into target and features

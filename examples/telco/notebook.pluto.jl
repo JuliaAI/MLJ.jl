@@ -379,10 +379,10 @@ df, df_test, df_dumped = partition(df0, 0.07, 0.03, # in ratios 7:3:90
                                    stratify=df0.Churn,
                                    rng=123);
 
-# ╔═╡ 401c6f14-1128-4df1-910b-f8a9a217eff2
+# ╔═╡ ecb7c90a-4c93-483c-910b-f8a9a217eff2
 md"""
 The reader interested in including all data can instead do
-`df, df_test = partition(df0, 0.7, rng=123)`.
+`df, df_test = partition(df0, 0.7, stratify=df0.Churn, rng=123)`.
 """
 
 # ╔═╡ 81aa1aa9-27d9-423f-aa36-d2e8546da46a
@@ -1187,7 +1187,7 @@ md"""
 # ╟─7b12673f-cc63-4cd9-bb0e-3a45761c733a
 # ╟─3c98ab4e-47cd-4247-9979-7044b2f2df33
 # ╠═ea010966-bb7d-4c79-b2a1-fbbde543f620
-# ╟─401c6f14-1128-4df1-910b-f8a9a217eff2
+# ╟─ecb7c90a-4c93-483c-910b-f8a9a217eff2
 # ╟─81aa1aa9-27d9-423f-aa36-d2e8546da46a
 # ╟─fff47e76-d7ac-4377-88a1-a2bf91434413
 # ╟─f1dbbc22-9844-4e1c-a1cb-54e34396a855
