@@ -100,3 +100,7 @@ its conventional use, are marked with a ⟂ symbol:
   [DataScienceTutorials](https://github.com/alan-turing-institute/DataScienceTutorials.jl)
   collects tutorials on how to use MLJ, which are deployed
   [here](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
+
+* [MLJTestIntegration](https://github.com/JuliaAI/MLJTestIntegration.jl)
+  provides tests for implementations of the MLJ model interface, and
+  integration tests for the entire MLJ ecosystem
