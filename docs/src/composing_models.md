@@ -3,23 +3,31 @@
 Three common ways of combining multiple models together
 have out-of-the-box implementations in MLJ:
 
-- [Linear Pipelines](@ref) - for unbranching chains that take the
+- [Linear Pipelines](@ref) (`Pipeline`)- for unbranching chains that take the
   output of one model (e.g., dimension reduction, such as `PCA`) and
   make it the input of the next model in the chain (e.g., a
   classification model, such as `EvoTreeClassifier`). To include
   transformations of the target variable in a supervised pipeline
   model, see [Target Transformations](@ref).
   
-- [Homogeneous Ensembles](@ref) - for blending the predictions of
-  multiple supervised models all of the same type, but which receive different
-  views of the training data to reduce overall variance. The technique
-  is known as observation
-  [bagging](https://en.wikipedia.org/wiki/Bootstrap_aggregating). Bagging
-  decision trees, like a `DecisionTreeClassifier`, gives what is known
-  as a *random forest*, although MLJ also provides several canned
-  random forest models.
+- [Homogeneous Ensembles](@ref) (`EnsembleModel`) - for blending the
+  predictions of multiple supervised models all of the same type, but
+  which receive different views of the training data to reduce overall
+  variance. The technique implemented here is known as observation
+  [bagging](https://en.wikipedia.org/wiki/Bootstrap_aggregating). (In
+  the special case of decision trees, further randomness is normally
+  introduced by subsampling *features* when training each node ([Ho
+  (1995)](https://web.archive.org/web/20160417030218/http://ect.bell-labs.com/who/tkh/publications/papers/odt.pdf),
+  [Brieman and Cutler
+  (2001)](https://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm)). In
+  `DecisionTreeClassifier` from DecisionTree.jl, for example, you can
+  control feature subsampling with the `n_subfeatures`
+  hyper-parameter. See the [Random Forest wikipedia
+  page](https://en.wikipedia.org/wiki/Random_forest) for details on
+  this combination. Run `models("RandomForest")` to see canned random
+  forest implementations provided by MLJ.)
   
-- [Model Stacking](@ref) - for combining the predictions of a smaller
+- [Model Stacking](@ref) - (`Stack`) for combining the predictions of a smaller
   number of models of possibly *different* type, with the help of an
   adjudicating model.
   
