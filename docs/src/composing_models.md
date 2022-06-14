@@ -14,18 +14,7 @@ have out-of-the-box implementations in MLJ:
   predictions of multiple supervised models all of the same type, but
   which receive different views of the training data to reduce overall
   variance. The technique implemented here is known as observation
-  [bagging](https://en.wikipedia.org/wiki/Bootstrap_aggregating). (In
-  the special case of decision trees, further randomness is normally
-  introduced by subsampling *features* when training each node ([Ho
-  (1995)](https://web.archive.org/web/20160417030218/http://ect.bell-labs.com/who/tkh/publications/papers/odt.pdf),
-  [Brieman and Cutler
-  (2001)](https://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm)). In
-  `DecisionTreeClassifier` from DecisionTree.jl, for example, you can
-  control feature subsampling with the `n_subfeatures`
-  hyper-parameter. See the [Random Forest wikipedia
-  page](https://en.wikipedia.org/wiki/Random_forest) for details on
-  this combination. Run `models("RandomForest")` to see canned random
-  forest implementations provided by MLJ.)
+  [bagging](https://en.wikipedia.org/wiki/Bootstrap_aggregating). 
   
 - [Model Stacking](@ref) - (`Stack`) for combining the predictions of a smaller
   number of models of possibly *different* type, with the help of an
