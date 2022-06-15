@@ -11,7 +11,7 @@ When bagging decision trees, further randomness is normally introduced
 by subsampling *features*, when training each node of each tree ([Ho
 (1995)](https://web.archive.org/web/20160417030218/http://ect.bell-labs.com/who/tkh/publications/papers/odt.pdf),
 [Brieman and Cutler
-(2001)](https://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm)). An
+(2001)](https://www.stat.berkeley.edu/~breiman/RandomForests/cc_home.htm)). A
 bagged ensemble of such trees is known as a [Random
 Forest](https://en.wikipedia.org/wiki/Random_forest). You can see an
 example of using `EnsembleModel` to build a random forest in [this
