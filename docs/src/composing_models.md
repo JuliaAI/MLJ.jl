@@ -3,23 +3,20 @@
 Three common ways of combining multiple models together
 have out-of-the-box implementations in MLJ:
 
-- [Linear Pipelines](@ref) - for unbranching chains that take the
+- [Linear Pipelines](@ref) (`Pipeline`)- for unbranching chains that take the
   output of one model (e.g., dimension reduction, such as `PCA`) and
   make it the input of the next model in the chain (e.g., a
   classification model, such as `EvoTreeClassifier`). To include
   transformations of the target variable in a supervised pipeline
   model, see [Target Transformations](@ref).
   
-- [Homogeneous Ensembles](@ref) - for blending the predictions of
-  multiple supervised models all of the same type, but which receive different
-  views of the training data to reduce overall variance. The technique
-  is known as observation
-  [bagging](https://en.wikipedia.org/wiki/Bootstrap_aggregating). Bagging
-  decision trees, like a `DecisionTreeClassifier`, gives what is known
-  as a *random forest*, although MLJ also provides several canned
-  random forest models.
+- [Homogeneous Ensembles](@ref) (`EnsembleModel`) - for blending the
+  predictions of multiple supervised models all of the same type, but
+  which receive different views of the training data to reduce overall
+  variance. The technique implemented here is known as observation
+  [bagging](https://en.wikipedia.org/wiki/Bootstrap_aggregating). 
   
-- [Model Stacking](@ref) - for combining the predictions of a smaller
+- [Model Stacking](@ref) - (`Stack`) for combining the predictions of a smaller
   number of models of possibly *different* type, with the help of an
   adjudicating model.
   
@@ -83,7 +80,7 @@ use and test the learning network as it is defined, which is also a
 good way to understand how learning networks work under the hood. This
 data, if specified, is ignored in the export process, for the exported
 composite model, like any other model, is not associated with any data
-until wrapped in a machine.
+until bound to data in a machine.
 
 In MLJ learning networks treat the flow of information during training
 and prediction/transforming separately.
@@ -130,7 +127,8 @@ x3 = rand(300)
 y = exp.(x1 - x2 -2x3 + 0.1*rand(300))
 X = DataFrames.DataFrame(x1=x1, x2=x2, x3=x3)
 
-train, test  = partition(eachindex(y), 0.8); # hide
+train, test  = partition(eachindex(y), 0.8); 
+nothing # hide
 ```
 Step one is to wrap the data in *source nodes*:
 
@@ -140,11 +138,10 @@ ys = source(y)
 ```
 
 *Note.* One can omit the specification of data at the source nodes (by
-writing instead `Xs = source()` and `ys = source()`) and
-still export the resulting network as a stand-alone model using the
-@from_network macro described later; see the example under [Static
-operations on nodes](@ref). However, one will be unable to fit
-or call network nodes, as illustrated below.
+writing instead `Xs = source()` and `ys = source()`) and still export
+the resulting network as a stand-alone model, as discussed later; see
+the example under [Static operations on nodes](@ref). However, one
+will be unable to `fit!` or call network nodes, as illustrated below.
 
 The contents of a source node can be recovered by simply calling the
 node with no arguments:
@@ -227,6 +224,15 @@ rms(y[test], yhat(rows=test))
 > **Notable feature.** The machine, `ridge::Machine{RidgeRegressor}`, is retrained, because its underlying model has been mutated. However, since the outcome of this training has no effect on the training inputs of the machines `stand` and `box`, these transformers are left untouched. (During construction, each node and machine in a learning network determines and records all machines on which it depends.) This behavior, which extends to exported learning networks, means we can tune our wrapped regressor (using a holdout set) without re-computing transformations each time a `ridge_model` hyperparameter is changed.
 
 
+#### Multithreaded training
+
+A more complicated learning network (e.g., some inhomogenous ensemble
+of supervised models) may contain machines that can be trained in
+parallel. In that case, a call to a node `N`, such as `fit!(N,
+accleration=CPUThreads())`, will parallelize the training using
+multithreading.
+
+
 ### Learning network machines
 
 As we show shortly, a learning network needs to be "exported" to create a
@@ -290,6 +296,17 @@ in it's report (and so in the report of the corresponding exported
 model). See [Exposing internal state of a learning network](@ref) for
 this advanced feature.
 
+
+#### Learning network machines with multithreading
+
+To indicate that a learning network machine should be trained using
+multithreading (see above for the node case) add the
+`acceleration=CPUThreads()` keyword argument to the machine
+constructor, as in 
+
+```julia
+machine(Deterministic(), Xs, ys; predict=yhat, acceleration=CPUThreads()) 
+```
 
 ## Exporting a learning network as a stand-alone model
 
@@ -356,17 +373,20 @@ WrappedRegressor(regressor = KNNRegressor(K = 7,
 										  weights = :uniform,),) @ 2…63
 ```
 
+!!! warning "Limitations of `@from_network`"
 
-### Method II: Finer control (advanced)
+    All the objects defined in an `@from_network` call need to be in the 
+	global scope of the module from which it is called. A more robust method for
+	exporting learning networks is described under "Method II" below.
 
-This section describes an advanced feature that can be skipped on a
-first reading.
+
+### Method II: Finer control
 
 In Method I above, only models appearing in the network will appear as
 hyperparameters of the exported composite model. There is a second
 more flexible method for exporting the network, which allows finer
 control over the exported `Model` struct, and which also avoids
-macros. The two steps required are:
+limitations of using a macro. The two steps required are:
 
 - Define a new `mutable struct` model type.
 

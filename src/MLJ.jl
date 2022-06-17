@@ -92,10 +92,11 @@ export nrows, color_off, color_on,
     machines, sources, anonymize!, @from_network, fitresults,
     @pipeline, Stack, Pipeline, TransformedTargetModel,
     ResamplingStrategy, Holdout, CV, TimeSeriesCV,
-    StratifiedCV, evaluate!, Resampler, iterator,
+    StratifiedCV, evaluate!, Resampler, iterator, PerformanceEvaluation,
     default_resource, pretty,
     make_blobs, make_moons, make_circles, make_regression,
-    fit_only!, return!, int, decoder
+    fit_only!, return!, int, decoder,
+    default_scitype_check_level
 
 # MLJBase/composition/abstract_types.jl:
 for T in vcat(MLJBase.MLJModelInterface.ABSTRACT_MODEL_SUBTYPES,
