@@ -24,7 +24,7 @@ intended as a complete reference.
 [Getting Started](@ref) | [Common MLJ Workflows](@ref)
 
 ### An ML practioner transitioning from another platform?
-[MLJ for Data Scientists in Two Hours](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/telco/notebook.ipynb) |
+[MLJ for Data Scientists in Two Hours](https://juliaai.github.io/DataScienceTutorials.jl/end-to-end/telco/) |
 [MLJTutorial](https://github.com/ablaom/MLJTutorial.jl)
 
 
