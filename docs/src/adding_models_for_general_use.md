@@ -722,6 +722,23 @@ If a new model type subtypes `JointProbablistic <: Probabilistic` then
 implementation of `predict_joint` is compulsory.
 
 
+### Training losses
+
+```@docs
+MLJModelInterface.training_losses
+```
+
+Trait values can also be set using the `metadata_model` method, see below.
+
+### Feature importances
+
+```@docs
+MLJModelInterface.feature_importances
+```
+
+Trait values can also be set using the `metadata_model` method, see below.
+
+
 ### Trait declarations
 
 Two trait functions allow the implementer to restrict the types of
@@ -802,15 +819,19 @@ Additional trait functions tell MLJ's `@load` macro how to find your
 model if it is registered, and provide other self-explanatory metadata
 about the model:
 
-method                   | return type       | declarable return values           | fallback value
--------------------------|-------------------|------------------------------------|---------------
-`load_path`              | `String`          | unrestricted                       | "unknown"
-`package_name`           | `String`          | unrestricted                       | "unknown"
-`package_uuid`           | `String`          | unrestricted                       | "unknown"
-`package_url`            | `String`          | unrestricted                       | "unknown"
-`package_license`        | `String`          | unrestricted                       | "unknown"
-`is_pure_julia`          | `Bool`            | `true` or `false`                  | `false`
-`supports_weights`       | `Bool`            | `true` or `false`                  | `false`
+method                       | return type       | declarable return values           | fallback value
+-----------------------------|-------------------|------------------------------------|---------------
+`load_path`                  | `String`          | unrestricted                       | "unknown"
+`package_name`               | `String`          | unrestricted                       | "unknown"
+`package_uuid`               | `String`          | unrestricted                       | "unknown"
+`package_url`                | `String`          | unrestricted                       | "unknown"
+`package_license`            | `String`          | unrestricted                       | "unknown"
+`is_pure_julia`              | `Bool`            | `true` or `false`                  | `false`
+`supports_weights`           | `Bool`            | `true` or `false`                  | `false`
+`supports_sample_weights`    | `Bool`            | `true` or `false`                  | `false`
+`supports_training_losses`   | `Bool`            | `true` or `false`                  | `false`
+`reports_feature_importances`| `Bool`            | `true` or `false`                  | `false`
+
 
 Here is the complete list of trait function declarations for
 `DecisionTreeClassifier`, whose core algorithms are provided by
