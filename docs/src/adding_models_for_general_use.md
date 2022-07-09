@@ -828,7 +828,7 @@ method                       | return type       | declarable return values     
 `package_license`            | `String`          | unrestricted                       | "unknown"
 `is_pure_julia`              | `Bool`            | `true` or `false`                  | `false`
 `supports_weights`           | `Bool`            | `true` or `false`                  | `false`
-`supports_sample_weights`    | `Bool`            | `true` or `false`                  | `false`
+`supports_class_weights`     | `Bool`            | `true` or `false`                  | `false`
 `supports_training_losses`   | `Bool`            | `true` or `false`                  | `false`
 `reports_feature_importances`| `Bool`            | `true` or `false`                  | `false`
 
