@@ -9,7 +9,7 @@ the machine's internal state (as recorded in private fields
 `old_model` and `old_rows`). These lower-level `fit` and `update`
 methods, which are not ordinarily called directly by the user,
 dispatch on the model and a view of the data defined by the optional
-`rows` keyword argument of `fit!` (all rows by default). 
+`rows` keyword argument of `fit!` (all rows by default).
 
 # Warm restarts
 
@@ -75,10 +75,10 @@ critetion. See [Controlling Iterative Models](@ref) for details.
 
 ## Inspecting machines
 
-There are two methods for inspecting the outcomes of training in
-MLJ. To obtain a named-tuple describing the learned parameters (in a
-user-friendly way where possible) use `fitted_params(mach)`. All other
-training-related outcomes are inspected with `report(mach)`.
+There are two principal methods for inspecting the outcomes of training in MLJ. To obtain a
+named-tuple describing the learned parameters (in a user-friendly way where possible) use
+`fitted_params(mach)`. All other training-related outcomes are inspected with
+`report(mach)`.
 
 ```@example machines
 X, y = @load_iris
@@ -96,6 +96,32 @@ report(mach)
 fitted_params
 report
 ```
+
+### Training losses and feature importances
+
+Training losses and feature importances, if reported by a model, will be available in the
+machine's report (see above). However, there are also direct access methods where
+supported:
+
+```julia
+training_losses(mach::Machine) -> vector_of_losses
+```
+
+Here `vector_of_losses` will be in historical order (most recent loss last). This kind of
+access is supported for `model = mach.model` if `supports_training_losses(model) == true`.
+
+```julia
+feature_importances(mach::Machine) -> vector_of_pairs
+```
+
+Here a `vector_of_pairs` is a vector of elements of the form `feature => importance_value`,
+where `feature` is a symbol. For example, `vector_of_pairs = [:gender => 0.23, :height =>
+0.7, :weight => 0.1]`. If a model does not support feature importances for some model
+hyper-parameters, every `importance_value` will be zero. This kind of accesss is supported
+for `model = mach.model` if `reports_feature_importances(model) == true`.
+
+If a model can report multiple types of feature importances, then there will be a model
+hyper-parameter controlling the active type.
 
 
 ## Constructing machines
@@ -203,8 +229,8 @@ For a supervised machine the `predict` method calls a lower-level
 unsupervised cousins `transform` and `inverse_transform`, see
 [Getting Started](index.md).
 
-The fields of a `Machine` instance (which should not generally be
-accessed by the user) are:
+With the exception of `model`, a `Machine` instance has an number of fields which the user
+should not directly access; these include:
 
 - `model` - the struct containing the hyperparameters to be used in
   calls to `fit!`
@@ -215,7 +241,8 @@ accessed by the user) are:
   see [Learning Networks](@ref) (in the supervised learning example
   above, `args = (source(X), source(y))`)
 
-- `report` - outputs of training not encoded in `fitresult` (eg, feature rankings)
+- `report` - outputs of training not encoded in `fitresult` (eg, feature rankings),
+  initially undefined
 
 - `old_model` - a deep copy of the model used in the last call to `fit!`
 
