@@ -79,7 +79,7 @@ export coerce, coerce!, autotype, schema, info
 # re-export from MLJBase:
 export nrows, color_off, color_on,
     selectrows, selectcols, restrict, corestrict, complement,
-    training_losses,
+    training_losses, feature_importances, 
     predict, predict_mean, predict_median, predict_mode, predict_joint,
     transform, inverse_transform, evaluate, fitted_params, params,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
