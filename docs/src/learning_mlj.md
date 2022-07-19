@@ -42,3 +42,5 @@ intended as a complete reference.
 
 - [Learning Networks](@ref): For advanced MLJ users wanting to wrap workflows more complicated than linear pipelines
 
+- [Machine Learning Property Loans for Fun and Profit](https://dm13450.github.io/2022/07/08/Machine-Learning-Property-Loans.html) - Blog post demonstrating use of MLJ to predict prospects for investment in property development loans. 
+
