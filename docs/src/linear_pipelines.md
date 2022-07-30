@@ -25,7 +25,7 @@ We would like to train using a K-nearest neighbor model, but the
 model type `KNNRegressor` assumes the features are all
 `Continuous`. This can be fixed by first:
 
-- coercing the `:age` feature to have `Continuous` type by replacing
+- coercing the `:age` feature to have the `Continuous` type by replacing
   `X` with `coerce(X, :age=>Continuous)`
 - standardizing continuous features and one-hot encoding the
   `Multiclass` features using the `ContinuousEncoder` model
@@ -54,7 +54,7 @@ pipe = pipe_transformer |> KNNRegressor(K=2)
 ```
 
 A pipeline is just a model like any other. For example, we can
-evaluate it's performance on the data above:
+evaluate its performance on the data above:
 
 ```@example 7
 evaluate(pipe, X, y, resampling=CV(nfolds=3), measure=mae)
