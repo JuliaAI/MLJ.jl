@@ -16,7 +16,7 @@ To quickly implement a new supervised model in MLJ, it suffices to:
 
 In the examples below, the training input `X` of `fit`, and the new
 input `Xnew` passed to `predict`, are tables. Each training target `y`
-is a `AbstractVector`.
+is an `AbstractVector`.
 
 The predictions returned by `predict` have the same form as `y` for
 deterministic models, but are `Vector`s of distributions for
@@ -27,7 +27,7 @@ Advanced model functionality not addressed here includes: (i) optional
 machines a second time; (ii) reporting extra training-related
 statistics; (iii) exposing model-specific functionality; (iv) checking
 the scientific type of data passed to your model in `machine`
-construction; and (iv) checking validity of hyperparameter values. All
+construction; and (iv) checking the validity of hyperparameter values. All
 this is described in [Adding Models for General
 Use](adding_models_for_general_use.md).
 
@@ -56,7 +56,7 @@ function MLJBase.fit(model::MyRegressor, verbosity, X, y)
     return fitresult, cache, report
 end
 
-# predict uses coefficients to make new prediction:
+# predict uses coefficients to make a new prediction:
 MLJBase.predict(::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew) * fitresult
 ```
 
