@@ -6,10 +6,10 @@ functions from the
 [LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl)
 library, overloaded to behave the same way as the built-in measures.
 
-To see list all measures, run `measures()`.  Further measures for
+To see the list of all measures, run `measures()`.  Further measures for
 probabilistic predictors, such as proper scoring rules, and for
 constructing multi-target product measures, are planned.  If you'd like
-to see measure added to MLJ, post a comment
+to see a measure added to MLJ, post a comment
 [here](https://github.com/JuliaAI/MLJBase.jl/issues/299).g
 
 *Note for developers:* The measures interface and the built-in
@@ -42,7 +42,7 @@ using MLJ
 y = [1, 2, 3, 4];
 ŷ = [2, 3, 3, 3];
 w = [1, 2, 2, 1];
-rms(ŷ, y) # reports an aggregrate loss
+rms(ŷ, y) # reports an aggregate loss
 l2(ŷ, y, w) # reports per observation losses
 y = coerce(["male", "female", "female"], Multiclass)
 d = UnivariateFinite(["male", "female"], [0.55, 0.45], pool=y);
@@ -88,7 +88,7 @@ measures(conditions...)
 ```
 
 A user-defined measure in MLJ can be passed to the `evaluate!`
-method, and elsewhere in MLJ, provided it is a function or callable
+method, and elsewhere in MLJ, provided it is a function or a callable
 object conforming to the above syntactic conventions. By default, a
 custom measure is understood to:
 
@@ -170,7 +170,7 @@ DataFrame(table)
 ```
 
 
-## Other performance related tools
+## Other performance-related tools
 
 In MLJ one computes a confusion matrix by calling an instance of the
 `ConfusionMatrix` measure type on the data:
