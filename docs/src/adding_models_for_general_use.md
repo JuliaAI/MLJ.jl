@@ -718,7 +718,7 @@ instance of `Distributions.Sampleable{<:Multivariate,V}`, where
 `scitype(V) = target_scitype(SomeModel)` and samples have length `n`,
 where `n` is the number of observations in `Xnew`.
 
-If a new model type subtypes `JointProbablistic <: Probabilistic` then
+If a new model type subtypes `JointProbabilistic <: Probabilistic` then
 implementation of `predict_joint` is compulsory.
 
 
