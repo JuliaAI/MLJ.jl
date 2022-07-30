@@ -23,7 +23,7 @@ are classified either as *supervised* or *unsupervised* models (eg,
 `Unsupervised <: Model`.
 
 
-### fit-result (type generally defined outside of MLJ)
+### fitresult (type generally defined outside of MLJ)
 
 Also known as "learned" or "fitted" parameters, these are "weights",
 "coefficients", or similar parameters learned by an algorithm, after
@@ -35,7 +35,7 @@ or the rotation and projection matrices of the PCA reduction scheme.
 ### operation
 
 Data-manipulating operations (methods) parameterized by some
-fit-result. For supervised learners, the `predict`, `predict_mean`,
+fitresult. For supervised learners, the `predict`, `predict_mean`,
 `predict_median`, or `predict_mode` methods; for transformers, the
 `transform` or `inverse_transform` method. An operation may also
 refer to an ordinary data-manipulating method that does *not* depend
