@@ -1068,7 +1068,7 @@ encoding representations).
 	The following API is experimental. It is subject to breaking changes during minor or major releases without warning. Models implementing this interface will not work with MLJBase versions earlier than 0.17.5.
 
 Models that fit a probability distribution to some `data` should be
-regarded as `Probablisitic <: Supervised` models with target `y = data`
+regarded as `Probabilistic <: Supervised` models with target `y = data`
 and `X = nothing`.
 
 The `predict` method should return a single distribution.
