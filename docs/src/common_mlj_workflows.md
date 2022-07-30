@@ -58,7 +58,7 @@ scitype(y)
 schema(X)
 ```
 
-Fixing wrong scientfic types in `X`:
+Fixing wrong scientific types in `X`:
 
 ```@example workflows
 X = coerce(X, :Exit=>Continuous, :Entry=>Continuous, :Cens=>Multiclass)
@@ -98,7 +98,7 @@ Or, if already horizontally split:
 ```
 
 
-## Model search
+## Model Search
 
 *Reference:*   [Model Search](model_search.md)
 
@@ -201,8 +201,8 @@ Tree = @load DecisionTreeClassifier pkg=DecisionTree
 tree = Tree(max_depth=2) # hide
 ```
 
-Bind the model and data together in a *machine* , which will
-additionally store the learned parameters (*fitresults*) when fit:
+Bind the model and data together in a *machine*, which will
+additionally, store the learned parameters (*fitresults*) when fit:
 
 ```@example workflows
 mach = machine(tree, X, y)
@@ -214,7 +214,7 @@ Split row indices into training and evaluation rows:
 train, test = partition(eachindex(y), 0.7); # 70:30 split
 ```
 
-Fit on train and evaluate on test:
+Fit on the train data set and evaluate on the test data set:
 
 ```@example workflows
 fit!(mach, rows=train)
@@ -226,7 +226,7 @@ Note `LogLoss()` has aliases `log_loss` and `cross_entropy`.
 
 Run `measures()` to list all losses and scores and their aliases ("instances").
 
-Predict on new data:
+Predict on the new data set:
 
 ```@example workflows
 Xnew = (FL = rand(3), RW = rand(3), CL = rand(3), CW = rand(3), BD =rand(3))
@@ -283,7 +283,7 @@ evaluate!(mach,
 
 ##  Inspecting training results
 
-Fit a ordinary least square model to some synthetic data:
+Fit an ordinary least square model to some synthetic data:
 
 ```@example workflows
 x1 = rand(100)
