@@ -68,7 +68,7 @@ fit!(mach, rows=1:100);
 ```
 
 If an iterative model exposes its iteration parameter as a
-hyperparameter, and it implements the warm restart behaviour above,
+hyperparameter, and it implements the warm restart behavior above,
 then it can be wrapped in a "control strategy", like an early stopping
 criterion. See [Controlling Iterative Models](@ref) for details.
 
