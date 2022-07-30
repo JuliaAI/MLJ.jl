@@ -159,7 +159,7 @@ or contain previously unseen classes.
 
 !!! warning 
 
-    Unpredictable behaviour may result whenever `Finite` categorical data presents in a production set with different classes (levels) from those presented during training
+    Unpredictable behavior may result whenever `Finite` categorical data presents in a production set with different classes (levels) from those presented during training
 
 Consider, for example, the following naive workflow:
 
