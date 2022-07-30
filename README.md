@@ -47,7 +47,7 @@ Science Investment
 Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/strategic-science-investment-fund/ssif-funded-programmes/university-of-auckland/)
 awarded to the University of Auckland.
 
-MLJ been developed with the support of the following organizations:
+MLJ has been developed with the support of the following organizations:
 
 <div align="center">
     <img src="material/Turing_logo.png" width = 100/>
@@ -60,7 +60,7 @@ MLJ been developed with the support of the following organizations:
 
 ### The MLJ Universe
 
-The functionality of MLJ is distributed over a number of repositories
+The functionality of MLJ is distributed over several repositories
 illustrated in the dependency chart below. These repositories live at
 the [JuliaAI](https://github.com/JuliaAI) umbrella organization.
 
