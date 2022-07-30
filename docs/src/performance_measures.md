@@ -98,7 +98,7 @@ custom measure is understood to:
 
 - be feature-independent
 
-To override this behaviour one simply overloads the appropriate trait,
+To override this behavior one simply overloads the appropriate trait,
 as shown in the following examples:
 
 ```@repl losses_and_scores
