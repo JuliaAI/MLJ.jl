@@ -9,7 +9,7 @@ such as a learning rate, in response to the behavior of these
 estimates.
 
 Some iterative model implementations enable some form of automated
-control, with the method and options for doing so varying from model
+control, with the method and options for doing so vary from model
 to model. But sometimes it is up to the user to arrange control, which
 in the crudest case reduces to manually experimenting with the
 iteration parameter.
@@ -118,7 +118,7 @@ control                                                        | description    
 [`WithMachineDo`](@ref MLJIteration.WithMachineDo)`(f->mach->@info("report: $mach))`| Call `f(mach)` wher `mach` is the training machine in its current state    | yes
 [`Save`](@ref MLJIteration.Save)`(filename="machine.jls")`|Save current training machine to `machine1.jls`, `machine2.jsl`, etc                         | yes
 
-> Table 1. Atomic controls. Some advanced options omitted.
+> Table 1. Atomic controls. Some advanced options were omitted.
 
 † For more on these controls see [Prechelt, Lutz
  (1998)](https://link.springer.com/chapter/10.1007%2F3-540-49430-8_3):
@@ -136,7 +136,7 @@ wrapper                                                                    | des
 ---------------------------------------------------------------------------|-------------------------------------------------------------------------
 [`IterationControl.skip`](@ref)`(control, predicate=1)`                    | Apply `control` every `predicate` applications of the control wrapper (can also be a function; see doc-string)
 [`IterationControl.louder`](@ref IterationControl.louder)`(control, by=1)` | Increase the verbosity level of `control` by the specified value (negative values lower verbosity)
-[`IterationControl.with_state_do`](@ref)`(control; f=...)`                 | Apply control *and* call `f(x)` where `x` is the internal state of control; useful for debugging. Default `f` logs state to `Info`. **Warning**: internal control state is not yet part of public API.
+[`IterationControl.with_state_do`](@ref)`(control; f=...)`                 | Apply control *and* call `f(x)` where `x` is the internal state of control; useful for debugging. Default `f` logs state to `Info`. **Warning**: internal control state is not yet part of the public API.
 [`IterationControl.composite`](@ref)`(controls...)`                        | Apply each `control` in `controls` in sequence; used internally by IterationControl.jl
 
 > Table 2. Wrapped controls
@@ -145,11 +145,11 @@ wrapper                                                                    | des
 ## Using training losses, and controlling model tuning
 
 Some iterative models report a training loss, as a byproduct of a
-`fit!` call, and these can be used in two ways:
+`fit!` call and these can be used in two ways:
 
 1. To supplement an out-of-sample estimate of the loss in deciding when to stop, as in the `PQ` stopping criterion (see [Prechelt, Lutz (1998)](https://link.springer.com/chapter/10.1007%2F3-540-49430-8_3))); or
 
-2. As a (generally less reliable) substitute for an out-of-sample loss, when wishing to train excusivley on all supplied data.
+2. As a (generally less reliable) substitute for an out-of-sample loss, when wishing to train exclusively on all supplied data.
 
 To have `IteratedModel` bind all data to the training machine and use
 training losses in place of an out-of-sample loss, specify
@@ -161,19 +161,19 @@ training losses, load the model code and inspect
 
 ### Controlling model tuning
 
-An example of scenario 2 occurs when controlling hyper-parameter
+An example of scenario 2 occurs when controlling hyperparameter
 optimization (model tuning). Recall that MLJ's [`TunedModel`](@ref
 MLJTuning.TunedModel) wrapper is implemented as an iterative
 model. Moreover, this wrapper reports, as a training loss, the lowest
 value of the optimization objective function so far (typically the
 lowest value of an out-of-sample loss, or -1 times an out-of-sample
-score). One may want to simply end the hyper-parameter search when
+score). One may want to simply end the hyperparameter search when
 this value meets the [`NumberSinceBest`](@ref
 EarlyStopping.NumberSinceBest) stopping criterion discussed below,
-say, rather than introduce an extra layer of resampling to first
+say, rather than introducing an extra layer of resampling to first
 "learn" the optimal value of the iteration parameter.
 
-In the following example we conduct a [`RandomSearch`](@ref
+In the following example, we conduct a [`RandomSearch`](@ref
 MLJTuning.RandomSearch) for the optimal value of the regularization
 parameter `lambda` in a `RidgeRegressor` using 6-fold
 cross-validation. By wrapping our "self-tuning" version of the
@@ -223,14 +223,14 @@ Under the hood, control in MLJIteration is implemented using
 [IterationControl.jl](https://github.com/ablaom/IterationControl.jl). Rather
 than iterating a training machine directly, we iterate a wrapped
 version of this object, which includes other information that controls
-may want to access, such the MLJ evaluation object. This information
+may want to access, such as the MLJ evaluation object. This information
 is summarized under [The training machine wrapper](@ref) below.
 
 Controls must implement two `update!` methods, one for initializing
 the control's *state* on the first application of the control (this
 state being external to the control `struct`) and one for all
-subsequent control applications, which generally updates state
-also. There are two optional methods: `done`, for specifying
+subsequent control applications, which generally updates the state as well.
+There are two optional methods: `done`, for specifying
 conditions triggering a stop, and `takedown` for specifying actions to
 perform at the end of controlled training.
 
