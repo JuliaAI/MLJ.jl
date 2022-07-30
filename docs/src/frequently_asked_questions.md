@@ -11,7 +11,7 @@ API. Meta-algorithms (systematic tuning, pipelining, etc) remain
 python wrapped code, however.
 
 While ScikitLearn.jl provides the Julia user with access to a mature
-and large library of machine learning models, the scikit-learn API on
+and a large library of machine learning models, the scikit-learn API on
 which it is modeled, dating back to 2007, is not likely to
 evolve significantly in the future. MLJ enjoys (or will enjoy) several
 features that should make it an attractive alternative in the longer
@@ -30,8 +30,8 @@ term:
 
 - **Registry for model metadata.** In ScikitLearn.jl the list of
   available models, as well as model metadata (whether a model handles
-  categorical inputs, whether is can make probabilistic predictions,
-  etc) must be gleaned from documentation. In MLJ, this information is
+  categorical inputs, whether it can make probabilistic predictions,
+  etc) must be gleaned from the documentation. In MLJ, this information is
   more structured and is accessible to MLJ via a searchable model
   registry (without the models needing to be loaded).
 
@@ -56,7 +56,7 @@ term:
 - **Universal adoption of categorical data types.** Python's
   scientific array library NumPy has no dedicated data type for
   representing categorical data (i.e., no type that tracks the pool of
-  *all* possible classes). Generally scikit-learn models deal with
+  *all* possible classes). Generally, scikit-learn models deal with
   this by requiring data to be relabeled as integers. However, the
   naive user trains a model on relabeled categorical data only to
   discover that evaluation on a test set crashes their code because a
@@ -64,7 +64,7 @@ term:
   mitigates such issues by insisting on the use of categorical data
   types, and by insisting that MLJ model implementations preserve the
   class pools. If, for example, a training target contains classes in
-  the pool that do not actually appear in the training set, a
+  the pool that do not appear in the training set, a
   probabilistic prediction will nevertheless predict a distribution
   whose support includes the missing class, but which is appropriately
   weighted with probability zero.
