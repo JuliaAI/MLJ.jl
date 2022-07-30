@@ -45,7 +45,7 @@ end
 
 `Ridge = @load RidgeRegressor pkg=MultivariateStats` imports a type for a model provided by multiple packages
 
-For interactive loading instead use `@iload`
+For interactive loading instead, use `@iload`
 
 
 ## Scitypes and coercion
@@ -144,9 +144,9 @@ Unsupervised case: `transform(mach, rows=1:100)` or `inverse_transform(mach, row
 
 ## Inspecting objects
 
-`@more` gets detail on last object in REPL
+`@more` gets detail on the last object in REPL
 
-`params(model)` gets nested-tuple of all hyperparameters, even nested ones
+`params(model)` gets a nested-tuple of all hyperparameters, even nested ones
 
 `info(ConstantRegressor())`, `info("PCA")`, `info("RidgeRegressor",
 pkg="MultivariateStats")` gets all properties (aka traits) of registered models
@@ -155,9 +155,9 @@ pkg="MultivariateStats")` gets all properties (aka traits) of registered models
 
 `schema(X)` get column names, types and scitypes, and nrows, of a table `X`
 
-`scitype(X)` gets scientific type of `X`
+`scitype(X)` gets the scientific type of `X`
 
-`fitted_params(mach)` gets learned parameters of fitted machine
+`fitted_params(mach)` gets learned parameters of the fitted machine
 
 `report(mach)` gets other training results (e.g. feature rankings)
 
@@ -223,7 +223,7 @@ Also available: `LatinHyperCube`, `Explicit` (built-in), `MLJTreeParzenTuning`, 
 
 #### Learning curves
 
-For generating plot of performance against parameter specified by `range`:
+For generating a plot of performance against parameter specified by `range`:
 
 `curve = learning_curve(mach, resolution=30, resampling=Holdout(), measure=…, operation=predict, range=…, n=1)`
 
@@ -304,9 +304,9 @@ Concatenation:
 `yhat = predict(knn_machine, W, ys)` (final node)
 
 
-## Exporting a learning network as stand-alone model:
+## Exporting a learning network as a stand-alone model:
 
-Supervised, with final node `yhat` returning point-predictions:
+Supervised, with final node `yhat` returning point predictions:
 
 ```julia
 @from_network machine(Deterministic(), Xs, ys; predict=yhat) begin
