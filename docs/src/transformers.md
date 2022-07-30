@@ -6,7 +6,7 @@ are detailed in [Built-in transformers](@ref) below.
 
 A transformer is *static* if it has no learned parameters. While such
 a transformer is tantamount to an ordinary function, realizing it as
-an MLJ static transformer (subtype of `Static <: Unsupervised`) can be
+an MLJ static transformer (a subtype of `Static <: Unsupervised`) can be
 useful, especially if the function depends on parameters the user
 would like to manipulate (which become *hyper-parameters* of the
 model). The necessary syntax for defining your own static transformers
@@ -16,7 +16,7 @@ Some unsupervised models, such as clustering algorithms, have a
 `predict` method in addition to a `transform` method. We give an
 example of this in [Transformers that also predict](@ref)
 
-Finally we note that models that fit a distribution, or more generally
+Finally, we note that models that fit a distribution, or more generally
 a sampler object, to some data, which are sometimes viewed as
 unsupervised, are treated in MLJ as *supervised* models. See [Models
 that learn a probability distribution](@ref) for an example.
@@ -66,7 +66,7 @@ MLJ.transform(a::Averager, _, y1, y2) = (1 - a.mix)*y1 + a.mix*y2
 *Important.* Note the sub-typing `<: Static`.
 
 Such static transformers with (unlearned) parameters can have
-arbitrarily many inputs, but only one output. In the single input case
+arbitrarily many inputs, but only one output. In the single input case,
 an `inverse_transform` can also be defined. Since they have no real
 learned parameters, you bind a static transformer to a machine without
 specifying training arguments.
@@ -78,7 +78,7 @@ transform(mach, [1, 2, 3], [3, 2, 1])
 
 Let's see how we can include our `Averager` in a learning network (see
 [Composing Models](@ref)) to mix the predictions of two regressors,
-with one-hot encoding of the inputs:
+with the one-hot encoding of the inputs:
 
 ```@example boots
 X = source()
