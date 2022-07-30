@@ -6,8 +6,8 @@ For more on available performance measures, see
 [Performance Measures](performance_measures.md).
 
 In addition to hold-out and cross-validation, the user can specify
-their own list of train/test pairs of row indices for resampling, or
-define their own re-usable resampling strategies.
+their list of train/test pairs of row indices for resampling, or
+define their re-usable resampling strategies.
 
 For simultaneously evaluating *multiple* models and/or data
 sets, see [Benchmarking](benchmarking.md).
@@ -71,7 +71,7 @@ evaluate!(mach,
 
 ## User-specified train/test sets
 
-Users can either provide their own list of train/test pairs of row indices for resampling, as in this example:
+Users can either provide their list of train/test pairs of row indices for resampling, as in this example:
 
 ```@repl evaluation_of_supervised_models
 fold1 = 1:6; fold2 = 7:12;
@@ -105,7 +105,7 @@ MLJBase.TimeSeriesCV
 
 ## Custom resampling strategies
 
-To define your own resampling strategy, make relevant parameters of
+To define your resampling strategy, make relevant parameters of
 your strategy the fields of a new type `MyResamplingStrategy <:
 MLJ.ResamplingStrategy`, and implement one of the following methods:
 
@@ -115,7 +115,7 @@ MLJ.train_test_pairs(my_strategy::MyResamplingStrategy, rows, y)
 MLJ.train_test_pairs(my_strategy::MyResamplingStrategy, rows, X, y)
 ```
 
-Each method takes a vector of indices `rows` and return a
+Each method takes a vector of indices `rows` and returns a
 vector `[(t1, e1), (t2, e2), ... (tk, ek)]` of train/test pairs of row
 indices selected from `rows`. Here `X`, `y` are the input and target
 data (ignored in simple strategies, such as `Holdout` and `CV`).
