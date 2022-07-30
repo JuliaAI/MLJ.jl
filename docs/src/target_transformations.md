@@ -2,7 +2,7 @@
 
 Some supervised models work best if the target variable has been
 standardized, i.e., rescaled to have zero mean and unit variance.
-Such a target transformation is learned from values of the training
+Such a target transformation is learned from the values of the training
 target variable. In particular, one generally learns a different
 transformation when training on a proper subset of the training
 data. Good data hygiene prescribes that a new transformation should
@@ -10,8 +10,8 @@ be computed each time the supervised model is trained on new
 data - for example in cross-validation.
 
 Additionally, one generally wants to *inverse* transform the
-predictions of the supervised model, so that final target predictions
-are on the original scale.
+predictions of the supervised model for the final target predictions
+to be on the original scale.
 
 All these concerns are addressed by wrapping the supervised model
 using `TransformedTargetModel`:
@@ -26,7 +26,7 @@ Ridge = @load RidgeRegressor pkg=MLJLinearModels verbosity=0
 ridge = Ridge()
 ridge2 = TransformedTargetModel(ridge, target=Standardizer())
 ```
-Note that the all the original hyper-parameters, as well as those of
+Note that all the original hyperparameters, as well as those of
 the `Standardizer`, are accessible as nested hyper-parameters of the
 wrapped model, which can be trained or evaluated like any other:
 
