@@ -71,7 +71,7 @@ evaluate!(mach,
 
 ## User-specified train/test sets
 
-Users can either provide their list of train/test pairs of row indices for resampling, as in this example:
+Users can either provide an explicit list of train/test pairs of row indices for resampling, as in this example:
 
 ```@repl evaluation_of_supervised_models
 fold1 = 1:6; fold2 = 7:12;
