@@ -610,7 +610,7 @@ distribution per row of `Xnew`.
 A *distribution* is some object that, at the least, implements
 `Base.rng` (i.e., is something that can be sampled).  Currently, all
 performance measures (metrics) defined in MLJBase.jl additionally
-assume that distribution is either:
+assume that a distribution is either:
 
 - An instance of some subtype of `Distributions.Distribution`, an
   abstract type defined in the
