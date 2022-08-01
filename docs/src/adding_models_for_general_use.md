@@ -60,7 +60,7 @@ following packages is also helpful:
   algorithm needs input data in a novel format).
 
 In MLJ, the basic interface exposed to the user, built atop the model
-interface described here, is the *machine interface*. After the first
+interface described here, is the *machine interface*. After a first
 reading of this document, the reader may wish to refer to [MLJ
 Internals](internals.md) for context.
 
