@@ -25,7 +25,7 @@ We would like to train using a K-nearest neighbor model, but the
 model type `KNNRegressor` assumes the features are all
 `Continuous`. This can be fixed by first:
 
-- coercing the `:age` feature to have the `Continuous` type by replacing
+- coercing the `:age` feature to have `Continuous` type by replacing
   `X` with `coerce(X, :age=>Continuous)`
 - standardizing continuous features and one-hot encoding the
   `Multiclass` features using the `ContinuousEncoder` model
