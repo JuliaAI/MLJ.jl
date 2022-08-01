@@ -96,7 +96,7 @@ That macro specifies:
 * Constraints on the hyperparameters where `_` refers to a value passed.
 
 Further to the last point, `a::Float64 = 0.5::(_ > 0)` indicates that
-the field `a` is a `Float64`, takes `0.5` as a default value, and
+the field `a` is a `Float64`, takes `0.5` as its default value, and
 expects its value to be positive.
 
 Please see [this
