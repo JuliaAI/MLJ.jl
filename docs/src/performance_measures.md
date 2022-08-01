@@ -88,7 +88,7 @@ measures(conditions...)
 ```
 
 A user-defined measure in MLJ can be passed to the `evaluate!`
-method, and elsewhere in MLJ, provided it is a function or a callable
+method, and elsewhere in MLJ, provided it is a function or callable
 object conforming to the above syntactic conventions. By default, a
 custom measure is understood to:
 
