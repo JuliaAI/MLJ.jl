@@ -7,7 +7,7 @@ models](@ref model_list) written in Julia and other languages. In
 particular MLJ wraps a large number of
 [scikit-learn](https://scikit-learn.org/stable/) models.
 
-MLJ is released under the MIT licensed.
+MLJ is released under the MIT license.
 
 ## Lightning tour
 
@@ -47,7 +47,7 @@ booster = Booster(max_depth=2)   # specify hyper-parameter at construction
 booster.nrounds=50               # or mutate afterwards
 ```
 
-This model is an example of an iterative model. As is stands, the
+This model is an example of an iterative model. As it stands, the
 number of iterations `nrounds` is fixed.
 
 
@@ -146,7 +146,7 @@ Extract:
 * Data agnostic, train models on any data supported by the
   [Tables.jl](https://github.com/JuliaData/Tables.jl) interface.
 
-* Extensive, state-of-the art, support for model composition
+* Extensive, state-of-the-art, support for model composition
   (*pipelines*, *stacks* and, more generally, *learning networks*). See more
   [below](#model-composability).
 
@@ -156,7 +156,7 @@ Extract:
 
 * Extensible [tuning
   interface](https://github.com/JuliaAI/MLJTuning.jl),
-  to support growing number of optimization strategies, and designed
+  to support a growing number of optimization strategies, and designed
   to play well with model composition.
 
 * Options to accelerate model evaluation and tuning with
@@ -225,7 +225,7 @@ See also, [Known Issues](@ref)
 
 ## Installation
 
-Initially it is recommended that MLJ and associated packages be
+Initially, it is recommended that MLJ and associated packages be
 installed in a new
 [environment](https://julialang.github.io/Pkg.jl/v1/environments/) to
 avoid package conflicts. You can do this with
@@ -247,7 +247,7 @@ julia> Pkg.test("MLJ")
 ```
 
 It is important to note that MLJ is essentially a big wrapper
-providing unified access to _model providing packages_. For this
+providing unified access to _model-providing packages_. For this
 reason, one generally needs to add further packages to your
 environment to make model-specific code available. This
 happens automatically when you use MLJ's interactive load command
@@ -267,12 +267,12 @@ module or function) see [Loading Model Code](@ref).
 It is recommended that you start with models from more mature
 packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.
 
-MLJ is supported by a number of satellite packages (MLJTuning,
+MLJ is supported by several satellite packages (MLJTuning,
 MLJModelInterface, etc) which the general user is *not* required to
 install directly. Developers can learn more about these
 [here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/ORGANIZATION.md).
 
-See also the alternative instalation instructions for [Modifying Behavior](@ref).
+See also the alternative installation instructions for [Modifying Behavior](@ref).
 
 
 ## Funding

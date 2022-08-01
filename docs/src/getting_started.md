@@ -8,7 +8,7 @@ machine learning. For a complete list of other MLJ learning resources,
 see [Learning MLJ](@ref).
 
 This section introduces only the most basic MLJ operations and
-concepts. It assumes MJL has been successfully installed. See
+concepts. It assumes MLJ has been successfully installed. See
 [Installation](@ref) if this is not the case. 
 
 
@@ -35,7 +35,7 @@ schema(iris)
 Because this data format is compatible with
 [Tables.jl](https://tables.juliadata.org/stable/), many MLJ methods
 (such as `selectrows`, `pretty` and `schema` used above) as well as
-many MLJ models, can work with it. However, as most new users are
+many MLJ models can work with it. However, as most new users are
 already familiar with the access methods particular to
 [DataFrames](https://dataframes.juliadata.org/stable/) (also
 compatible with Tables.jl) we'll put our data into that format here:
@@ -71,7 +71,7 @@ learning algorithm indicated by the struct name (and nothing
 else). For common problems matching data to models, see [Model
 Search](@ref model_search) and [Preparing Data](@ref).
 
-To see the document string for `DecisionTreeClassifier` (without
+To see the documentation for `DecisionTreeClassifier` (without
 loading its defining code) do
 
 ```julia
@@ -86,8 +86,8 @@ Assuming the MLJDecisionTreeInterface.jl package is in your load path
 Tree = @load DecisionTreeClassifier pkg=DecisionTree
 ```
 
-(In this case we need to specify `pkg=...` because multiple packages
-provide a model type with name `DecisionTreeClassifier`.) Now we can
+(In this case, we need to specify `pkg=...` because multiple packages
+provide a model type with the name `DecisionTreeClassifier`.) Now we can
 instantiate a model with default hyperparameters:
 
 ```@repl doda
@@ -133,7 +133,7 @@ because our model is a decision tree *classifier*:
 typeof(y)
 ```
 
-However, MLJ models do not actually prescribe the machine types for
+However, MLJ models do not prescribe the machine types for
 the data they operate on. Rather, they specify a *scientific type*,
 which refers to the way data is to be *interpreted*, as opposed to how
 it is *encoded*:
@@ -241,7 +241,7 @@ inverse_transform(mach2, w)
 [Machines](machines.md) have an internal state which allows them to
 avoid redundant calculations when retrained, in certain conditions -
 for example when increasing the number of trees in a random forest, or
-the number of epochs in a neural network. The machine building syntax
+the number of epochs in a neural network. The machine-building syntax
 also anticipates a more general syntax for composing multiple models,
 an advanced feature explained in [Learning Networks](@ref).
 

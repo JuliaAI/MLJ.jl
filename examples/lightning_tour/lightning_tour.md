@@ -21,7 +21,7 @@ Pkg.instantiate()
 
 Assuming Julia 1.7
 
-In MLJ a *model* is just a container for hyper-parameters, and that's
+In MLJ a *model* is just a container for hyperparameters, and that's
 all. Here we will apply several kinds of model composition before
 binding the resulting "meta-model" to data in a *machine* for
 evaluation, using cross-validation.
@@ -33,7 +33,7 @@ using MLJ
 MLJ.color_off()
 
 Booster = @load EvoTreeRegressor # loads code defining a model type
-booster = Booster(max_depth=2)   # specify hyper-parameter at construction
+booster = Booster(max_depth=2)   # specify hyperparameter at construction
 ````
 
 ````@example lightning_tour
@@ -69,8 +69,8 @@ pipe = ContinuousEncoder |> iterated_booster
 
 ### Composition 3: Wrapping the model to make it "self-tuning"
 
-First, we define a hyper-parameter range for optimization of a
-(nested) hyper-parameter:
+First, we define a hyperparameter range for optimization of a
+(nested) hyperparameter:
 
 ````@example lightning_tour
 max_depth_range = range(pipe,

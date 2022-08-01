@@ -2,7 +2,7 @@
 
 ## The machine interface, simplified
 
-The following is simplified description of the `Machine` interface. It
+The following is a simplified description of the `Machine` interface. It
 predates the introduction of an optional data front-end for models
 (see [Implementing a data front-end](@ref)). See also the
 [Glossary](glossary.md)
@@ -18,7 +18,7 @@ mutable struct Machine{M<Model}
     cache
     args::Tuple    # e.g., (X, y) for supervised models
     report
-    previous_rows # remember last rows used
+    previous_rows # remember the last rows used
 
     function Machine{M}(model::M, args...) where M<:Model
         machine = new{M}(model)

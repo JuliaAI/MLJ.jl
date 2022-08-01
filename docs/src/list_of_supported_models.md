@@ -1,6 +1,6 @@
 # [List of Supported Models](@id model_list)
 
-MLJ provides access to to a wide variety of machine learning models.
+MLJ provides access to a wide variety of machine learning models.
 We are always looking for
 [help](https://github.com/alan-turing-institute/MLJ.jl/blob/master/CONTRIBUTING.md)
 adding new models or testing existing ones.  Currently available

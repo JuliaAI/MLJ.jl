@@ -120,7 +120,7 @@ levels(y_iris)
 DecisionTree = @load DecisionTreeClassifier pkg=DecisionTree # model type
 model = DecisionTree(min_samples_split=5)                    # model instance
 
-# In MLJ, a *model* is just a container for hyper-parameters of
+# In MLJ, a *model* is just a container for hyperparameters of
 # some learning algorithm. It does not store learned parameters.
 
 # Next, we bind the model together with the available data in what's
@@ -128,7 +128,7 @@ model = DecisionTree(min_samples_split=5)                    # model instance
 
 mach = machine(model, X_iris, y_iris)
 
-# A machine is essentially just a model (ie, hyper-parameters) plus data, but
+# A machine is essentially just a model (ie, hyperparameters) plus data, but
 # it additionally stores *learned parameters* (the tree) once it is
 # trained on some view of the data:
 
@@ -142,7 +142,7 @@ fitted_params(mach)
 # access and mutate the `model` parameter:
 
 mach.model.min_samples_split  = 10
-fit!(mach, rows=train_rows) # re-train with new hyper-parameter
+fit!(mach, rows=train_rows) # re-train with new hyperparameter
 
 # Now we can make predictions on some other view of the data, as in
 
@@ -302,8 +302,8 @@ const ytest, Xtest = unpack(df_test, ==(:Churn), !=(:customerID));
 Booster = @load EvoTreeClassifier pkg=EvoTrees
 
 # Recall that a *model* is just a container for some algorithm's
-# hyper-parameters. Let's create a `Booster` with default values for
-# the hyper-parameters:
+# hyperparameters. Let's create a `Booster` with default values for
+# the hyperparameters:
 
 booster = Booster()
 
@@ -338,13 +338,13 @@ scitype(X) <: input_scitype(booster)
 
 pipe = ContinuousEncoder() |> booster
 
-# Note that the component models appear as hyper-parameters of
+# Note that the component models appear as hyperparameters of
 # `pipe`. Pipelines are an implementation of a more general [model
 # composition](https://alan-turing-institute.github.io/MLJ.jl/dev/composing_models/#Composing-Models)
 # interface provided by MLJ that advanced users may want to learn about.
 
-# From the above display, we see that component model hyper-parameters
-# are now *nested*, but they are still accessible (important in hyper-parameter
+# From the above display, we see that component model hyperparameters
+# are now *nested*, but they are still accessible (important in hyperparameter
 # optimization):
 
 pipe.evo_tree_classifier.max_depth
@@ -356,7 +356,7 @@ pipe.evo_tree_classifier.max_depth
 # > `machine`, `fit!`, `predict`, `fitted_params`, `report`, `roc`, **resampling strategy** `StratifiedCV`, `evaluate`, `FeatureSelector`
 
 # Without touching our test set `Xtest`, `ytest`, we will estimate the
-# performance of our pipeline model, with default hyper-parameters, in
+# performance of our pipeline model, with default hyperparameters, in
 # two different ways:
 
 # **Evaluating by hand.** First, we'll do this "by hand" using the `fit!` and `predict`
@@ -517,7 +517,7 @@ pipe2 = ContinuousEncoder() |>
 
 # > Introduces: **control strategies:** `Step`, `NumberSinceBest`, `TimeLimit`, `InvalidValue`, **model wrapper** `IteratedModel`, **resampling strategy:** `Holdout`
 
-# We want to optimize the hyper-parameters of our model. Since our
+# We want to optimize the hyperparameters of our model. Since our
 # model is iterative, these parameters include the (nested) iteration
 # parameter `pipe.evo_tree_classifier.nrounds`. Sometimes this
 # parameter is optimized first, fixed, and then maybe optimized again
@@ -575,16 +575,16 @@ fit!(mach_iterated_pipe);
 
 # > Introduces: `range`, **model wrapper** `TunedModel`, `RandomSearch`
 
-# We now turn to hyper-parameter optimization. A tool not discussed
+# We now turn to hyperparameter optimization. A tool not discussed
 # here is the `learning_curve` function, which can be useful when
 # wanting to visualize the effect of changes to a *single*
-# hyper-parameter (which could be an iteration parameter). See, for
+# hyperparameter (which could be an iteration parameter). See, for
 # example, [this section of the
 # manual](https://alan-turing-institute.github.io/MLJ.jl/dev/learning_curves/)
 # or [this
 # tutorial](https://github.com/ablaom/MLJTutorial.jl/blob/dev/notebooks/04_tuning/notebook.ipynb).
 
-# Fine tuning the hyper-parameters of a gradient booster can be
+# Fine tuning the hyperparameters of a gradient booster can be
 # somewhat involved. Here we settle for simultaneously optimizing two
 # key parameters: `max_depth` and `η` (learning_rate).
 
@@ -597,7 +597,7 @@ fit!(mach_iterated_pipe);
 # one then calls `predict(mach, Xnew)`. In this way the wrapped model
 # may be viewed as a "self-tuning" version of the unwrapped
 # model. That is, wrapping the model simply transforms certain
-# hyper-parameters into learned parameters (just as `IteratedModel`
+# hyperparameters into learned parameters (just as `IteratedModel`
 # does for an iteration parameter).
 
 # To start with, we define ranges for the parameters of
@@ -629,7 +629,7 @@ tuning = RandomSearch(rng=123)
 # all measures can be accessed from the model's `report`.
 
 # The keyword `n` specifies the total number of models (sets of
-# hyper-parameters) to evaluate.
+# hyperparameters) to evaluate.
 
 tuned_iterated_pipe = TunedModel(model=iterated_pipe,
                                  range=[r1, r2],
@@ -660,7 +660,7 @@ best_booster = rpt2.best_model.model.evo_tree_classifier
 
 #-
 
-@info "Optimal hyper-parameters:" best_booster.max_depth best_booster.η;
+@info "Optimal hyperparameters:" best_booster.max_depth best_booster.η;
 
 # Using the `confidence_intervals` function we defined earlier:
 
@@ -716,7 +716,7 @@ confidence_intervals_basic_model
 
 # As each pair of intervals overlap, it's doubtful the small changes
 # here can be assigned statistical significance. Default `booster`
-# hyper-parameters do a pretty good job.
+# hyperparameters do a pretty good job.
 
 
 # ## Testing the final model

@@ -33,7 +33,7 @@ appropriate interpretation.
 ### OrderedFactor and Multiclass data
 
 Other integer data, such as the number of an animal's legs, or number
-of rooms of homes, are generally coerced to `OrderedFactor <:
+of rooms in homes, are, generally, coerced to `OrderedFactor <:
 Finite`. The other categorical scientific type is `Multiclass <:
 Finite`, which is for *unordered* categorical data. Coercing data to
 one of these two forms is discussed under [ Detecting and coercing
@@ -48,10 +48,10 @@ Data with type `OrderedFactor{2}` is considered to have an intrinsic
 "positive" class, e.g., the outcome of a medical test, and the
 "pass/fail" outcome of an exam. MLJ measures, such as `true_positive`
 assume the *second* class in the ordering is the "positive"
-class. Inspecting and changing order is discussed in the next section.
+class. Inspecting and changing order are discussed in the next section.
 
 If data has type `Bool` it is considered `Count` data (as `Bool <:
-Integer`) and generally users will want to coerce such data to
+Integer`) and, generally, users will want to coerce such data to
 `Multiclass` or `OrderedFactor`.
 
 
@@ -103,7 +103,7 @@ levels(X.outcome)
 !!! warning "Changing levels of categorical data"
 
     The order of levels should generally be changed
-    early in your data science work-flow and then not again. Similar
+    early in your data science workflow and then not again. Similar
     remarks apply to *adding* levels (which is possible; see the
     [CategorialArrays.jl documentation](https://juliadata.github.io/CategoricalArrays.jl/stable/)). MLJ supervised and unsupervised models assume levels
     and their order do not change.
@@ -159,7 +159,7 @@ or contain previously unseen classes.
 
 !!! warning 
 
-    Unpredictable behaviour may result whenever `Finite` categorical data presents in a production set with different classes (levels) from those presented in training
+    Unpredictable behavior may result whenever `Finite` categorical data presents in a production set with different classes (levels) from those presented during training
 
 Consider, for example, the following naive workflow:
 
@@ -214,7 +214,7 @@ transform(mach, Xproduction) == transform(mach, X[2:3,:])
 
 Another solution is to pack all production data with dummy rows based
 on the training data (subsequently dropped) to ensure there are no
-missing classes. Currently MLJ contains no general tooling to check
+missing classes. Currently, MLJ contains no general tooling to check
 and fix categorical levels in production data (although one can check
 that training data and production data have the same schema, to ensure
 the *number* of classes in categorical data is consistent).
@@ -223,7 +223,7 @@ the *number* of classes in categorical data is consistent).
 ## Extracting an integer representation of Finite data
 
 Occasionally, you may really want an integer representation of data
-that currently has scitype `Finite`. For example, you are developer
+that currently has scitype `Finite`. For example, you are a developer
 wrapping an algorithm from an external package for use in MLJ, and
 that algorithm uses integer representations. Use the `int` method for
 this purpose, and use `decoder` to construct decoders for reversing
@@ -281,7 +281,7 @@ scitype(v)
 
 When you index a `CategoricalVector` you don't get a raw label, but
 instead an instance of `CategoricalValue`. As explained above, this
-value knows the complete pool of levels from vector from which it
+value knows the complete pool of levels from the vector from which it
 came. Use `get(val)` to extract the raw label from a value `val`.
 
 Despite the distinction that exists between a value (element) and a
@@ -295,7 +295,7 @@ v[1] == 'A' # true
 
 ## Probabilistic predictions of categorical data
 
-Recall from [Getting Started](@ref) that probabilistic classfiers
+Recall from [Getting Started](@ref) that probabilistic classifiers
 ordinarily predict `UnivariateFinite` distributions, not raw
 probabilities (which are instead accessed using the `pdf` method.)
 Here's how to construct such a distribution yourself:

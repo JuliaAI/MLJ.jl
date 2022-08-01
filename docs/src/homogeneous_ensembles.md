@@ -1,7 +1,7 @@
 # Homogeneous Ensembles
 
 Although an ensemble of models sharing a common set of hyperparameters
-can defined using the learning network API, MLJ's `EnsembleModel`
+can be defined using the learning network API, MLJ's `EnsembleModel`
 model wrapper is preferred, for convenience and best
 performance. Examples of using `EnsembleModel` are given in [this Data
 Science

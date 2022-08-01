@@ -67,10 +67,10 @@ fit!(mach, rows=1:100);
 fit!(mach, rows=1:100);
 ```
 
-If an iterative model exposes it's iteration parameter as a
-hyper-parameter, and it implements the warm restart behaviour above,
+If an iterative model exposes its iteration parameter as a
+hyperparameter, and it implements the warm restart behavior above,
 then it can be wrapped in a "control strategy", like an early stopping
-critetion. See [Controlling Iterative Models](@ref) for details.
+criterion. See [Controlling Iterative Models](@ref) for details.
 
 
 ## Inspecting machines
@@ -117,7 +117,7 @@ feature_importances(mach::Machine) -> vector_of_pairs
 Here a `vector_of_pairs` is a vector of elements of the form `feature => importance_value`,
 where `feature` is a symbol. For example, `vector_of_pairs = [:gender => 0.23, :height =>
 0.7, :weight => 0.1]`. If a model does not support feature importances for some model
-hyper-parameters, every `importance_value` will be zero. This kind of accesss is supported
+hyperparameters, every `importance_value` will be zero. This kind of access is supported
 for `model = mach.model` if `reports_feature_importances(model) == true`.
 
 If a model can report multiple types of feature importances, then there will be a model
@@ -128,8 +128,8 @@ hyper-parameter controlling the active type.
 
 A machine is constructed with the syntax `machine(model, args...)`
 where the possibilities for `args` (called *training arguments*) are
-summarized in table below. Here `X` and `y` represent inputs and
-target, respectively, and `Xout` the output of a `transform` call.
+summarized in the table below. Here `X` and `y` represent inputs and
+target, respectively, and `Xout` is the output of a `transform` call.
 Machines for supervised models may have additional training arguments,
 such as a vector of per-observation weights (in which case
 `supports_weights(model) == true`).
@@ -155,7 +155,7 @@ if retraining using new data. See [Saving machines](@ref) below.
 
 ## Lowering memory demands
 
-For large data sets you may be able to save memory by suppressing data
+For large data sets, you may be able to save memory by suppressing data
 caching that some models perform to increase speed. To do this,
 specify `cache=false`, as in
 
@@ -186,7 +186,7 @@ Serialization module, there is a simplified workflow described first.
 
 The usual serialization provisos apply. For example, when
 deserializing you need to have all code on which the serialization
-object depended loaded at time of deserialization also. If a
+object depended loaded at the time of deserialization also. If a
 hyper-parameter happens to be a user-defined function, then that
 function must be defined at deserialization. And you should only
 deserialize objects from trusted sources.
@@ -223,13 +223,13 @@ MLJBase.restore!
 
 ## Internals
 
-For a supervised machine the `predict` method calls a lower-level
+For a supervised machine, the `predict` method calls a lower-level
 `MLJBase.predict` method, dispatched on the underlying model and the
 `fitresult` (see below). To see `predict` in action, as well as its
 unsupervised cousins `transform` and `inverse_transform`, see
 [Getting Started](index.md).
 
-With the exception of `model`, a `Machine` instance has an number of fields which the user
+Except for `model`, a `Machine` instance has several fields which the user
 should not directly access; these include:
 
 - `model` - the struct containing the hyperparameters to be used in
@@ -246,11 +246,11 @@ should not directly access; these include:
 
 - `old_model` - a deep copy of the model used in the last call to `fit!`
 
-- `old_rows` -  a copy of the row indices used in last call to `fit!`
+- `old_rows` -  a copy of the row indices used in the last call to `fit!`
 
 - `cache`
 
-The interested reader can learn more on machine internals by examining
+The interested reader can learn more about machine internals by examining
 the simplified code excerpt in [Internals](internals.md).
 
 

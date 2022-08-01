@@ -43,7 +43,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 ### Adding models
 
 - [ ] **Integrate deep learning** using [Flux.jl](https://github.com/FluxML/Flux.jl.git) deep learning.  [Done](https://github.com/FluxML/MLJFlux.jl) but can
-  improve experience by:
+  improve the experience by:
 
   - [x] finishing iterative model wrapper [#139](https://github.com/alan-turing-institute/MLJ.jl/issues/139)
 
@@ -86,7 +86,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	  [done](https://github.com/JuliaAI/MLJTuning.jl/pull/96)
 
 	- [ ] Bayesian methods, starting with Gaussian Process methods a
-	  la PyMC3. Some preliminary research done .
+	  la PyMC3. Some preliminary research done.
 
 	- [ ] POC for AD-powered gradient descent [#74](https://github.com/alan-turing-institute/MLJ.jl/issues/74)
 
@@ -99,7 +99,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	- [ ] Genetic algorithms
 [#38](https://github.com/alan-turing-institute/MLJ.jl/issues/38)
 
-	- [ ] Particle Swarm Optization (current WIP, GSoC project @lhnguyen-vn)
+	- [ ] Particle Swarm Optimization (current WIP, GSoC project @lhnguyen-vn)
 
 	- [ ] tuning strategies for non-Cartesian spaces of models [MLJTuning
 	#18](https://github.com/JuliaAI/MLJTuning.jl/issues/18), architecture search, and other AutoML workflows
@@ -107,28 +107,28 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 - [ ]  Systematic benchmarking, probably modeled on
 	[MLaut](https://arxiv.org/abs/1901.03678) [#69](https://github.com/alan-turing-institute/MLJ.jl/issues/74)
 
-- [ ]   Give `EnsembleModel` more extendible API and extend beyond bagging
-	(boosting, etc) and migrate to separate repository?
+- [ ]   Give `EnsembleModel` a more extendible API and extend beyond bagging
+	(boosting, etc) and migrate to a separate repository?
 	[#363](https://github.com/alan-turing-institute/MLJ.jl/issues/363)
 
-- [ ]  **†** Enhance complex model compostition:
+- [ ]  **†** Enhance complex model composition:
 
 	- [x] Introduce a canned
 	stacking model wrapper ([POC](https://alan-turing-institute.github.io/DataScienceTutorials.jl/getting-started/stacking/)). WIP @olivierlabayle
 
 	- [ ] Get rid of macros for creating pipelines and possibly
-	implement target transforms as wrapper ([MLJBase
+	implement target transforms as wrappers ([MLJBase
 	#594](https://github.com/alan-turing-institute/MLJ.jl/issues/594))
 	WIP @CameronBieganek and @ablaom
 
 
 ### Broadening scope
 
-- [ ] Integrate causal and counterfactual methods for, example,
+- [ ] Integrate causal and counterfactual methods for example,
   applications to FAIRness; see [this
   proposal](https://julialang.org/jsoc/gsoc/MLJ/#causal_and_counterfactual_methods_for_fairness_in_machine_learning)
 
-- [ ] Explore possibility of closer integration of Interpretable
+- [ ] Explore the possibility of closer integration of Interpretable
   Machine Learning approaches, such as Shapley values and lime; see
   [Shapley.jl](https://gitlab.com/ExpandingMan/Shapley.jl),
   [ShapML.jl](https://github.com/nredell/ShapML.jl),
@@ -146,7 +146,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 - [ ] Add sparse data support and better support for NLP models; we
 	could use [NaiveBayes.jl](https://github.com/dfdx/NaiveBayes.jl)
 	as a POC (currently wrapped only for dense input) but the API
-	needs finalizing first
+	needs to be finalized first
 	{#731](https://github.com/alan-turing-institute/MLJ.jl/issues/731). Probably
 	need a new SparseTables.jl package.
 
@@ -159,7 +159,7 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	first, and someone to finish [PR on time series
 	CV](https://github.com/JuliaAI/MLJBase.jl/pull/331). See also [this proposal](https://julialang.org/jsoc/gsoc/MLJ/#time_series_forecasting_at_scale_-_speed_up_via_julia)
 
-- [ ]   Add tools or separate repository for visualization in MLJ.
+- [ ]   Add tools or a separate repository for visualization in MLJ.
 
 	- [x] Extend visualization of tuning plots beyond two-parameters
 	[#85](https://github.com/alan-turing-institute/MLJ.jl/issues/85)
@@ -167,19 +167,19 @@ list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
 	[#416](https://github.com/alan-turing-institute/MLJ.jl/issues/416)
 	[Done](https://github.com/JuliaAI/MLJTuning.jl/pull/121) but might be worth adding alternatives suggested in issue.
 
-	- [ ] visualizing decision boundaries ? [#342](https://github.com/alan-turing-institute/MLJ.jl/issues/342)
+	- [ ] visualizing decision boundaries? [#342](https://github.com/alan-turing-institute/MLJ.jl/issues/342)
 
 	- [ ] provide visualizations that MLR3 provides via [mlr3viz](https://github.com/mlr-org/mlr3viz)
 
-- [ ] Extend API to accomodate outlier detection, as provided by [OutlierDetection.jl](https://github.com/davnn/OutlierDetection.jl) [#780](https://github.com/alan-turing-institute/MLJ.jl/issues/780) WIP @davn and @ablaom
+- [ ] Extend API to accommodate outlier detection, as provided by [OutlierDetection.jl](https://github.com/davnn/OutlierDetection.jl) [#780](https://github.com/alan-turing-institute/MLJ.jl/issues/780) WIP @davn and @ablaom
 
 - [ ] Add more pre-processing tools:
 
-  - [x] missing value imputation using Gaussina Mixture Model. Done,
+  - [x] missing value imputation using Gaussian Mixture Model. Done,
 	via addition of BetaML model, `MissingImputator`.
 
   - [ ] improve `autotype` method (from ScientificTypes), perhaps by
-	training on large collection of datasets with manually labelled
+	training on a large collection of datasets with manually labelled
 	scitype schema.
 	
 - [ ] Add integration with [MLFlow](https://julialang.org/jsoc/gsoc/MLJ/#mlj_and_mlflow_integration); see [this proposal](https://julialang.org/jsoc/gsoc/MLJ/#mlj_and_mlflow_integration)

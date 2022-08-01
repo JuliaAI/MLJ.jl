@@ -2,9 +2,9 @@
 
 MLJ provides several built-in and third-party options for optimizing a
 model's hyper-parameters.  The quick-reference table below omits some
-advanced key-word options.
+advanced keyword options.
 
-tuning strategy | notes |package to import | package providing core algorithm
+tuning strategy | notes |package to import | package providing the core algorithm
 ----------------|-------|------------------|----------------------------------
 [`Grid`](@ref)`(goal=nothing, resolution=10)` | shuffled by default; `goal` is upper bound for number of grid points | MLJ.jl or MLJTuning.jl | [MLJTuning.jl](https://github.com/FluxML/model-zoo)
 [`RandomSearch`](@ref)`(rng=GLOBAL_RNG)` | with customizable priors |MLJ.jl or MLJTuning.jl   | [MLJTuning.jl](https://github.com/FluxML/model-zoo)
@@ -25,13 +25,13 @@ a model in a tuning strategy and binding the wrapped model to data in
 a machine called `mach`, calling `fit!(mach)` instigates a search for
 optimal model hyperparameters, within a specified `range`, and then
 uses all supplied data to train the best model. To predict using that
-model, one then calls `predict(mach, Xnew)`. In this way the wrapped
+model, one then calls `predict(mach, Xnew)`. In this way, the wrapped
 model may be viewed as a "self-tuning" version of the unwrapped
 model. That is, wrapping the model simply transforms certain
 hyper-parameters into *learned* parameters.
 
-A corollary of the tuning-as-wrapper approach is that evaluating the
-performance of a `TunedModel` instance, using [`evaluate!`](@ref)
+A corollary of the tuning-as-wrapper approach is that the evaluation of the
+performance of a `TunedModel` instance using [`evaluate!`](@ref)
 implies nested resampling. This approach is inspired by
 [MLR](https://mlr.mlr-org.com/articles/tutorial/nested_resampling.html). See
 also [below](@ref explicit).
@@ -131,7 +131,7 @@ predict(mach, rows=test)
 ```
 
 For tuning using only a subset `train` of all observation indices,
-specify `rows=train` in the above `fit!` call. In that case the above
+specify `rows=train` in the above `fit!` call. In that case, the above
 `predict` calls would be based on training the optimal model on all
 `train` rows.
 
@@ -143,7 +143,7 @@ regressor. A common gotcha however is to overlook the distinction
 between supervised models that make point predictions (subtypes of
 `Deterministic`) and those that make probabilistic predictions
 (subtypes of `Probabilistic`). The `DecisionTreeRegressor` model in
-the preceding illustration was deterministic, so in this example will
+the preceding illustration was deterministic, so this example will
 consider a probabilistic classifier:
 
 ```@example goof
@@ -262,7 +262,7 @@ forest = EnsembleModel(model=tree)
 ```
 
 Ranges for nested hyperparameters are specified using dot syntax. In
-this case we will specify a `goal` for the total number of grid
+this case, we will specify a `goal` for the total number of grid
 points:
 
 ```@example goof
@@ -291,11 +291,11 @@ plot(mach)
 ![](img/tuning_plot.png)
 
 Instead of specifying a `goal`, we can declare a global `resolution`,
-which is overriden for a particular parameter by pairing it's range
+which is overridden for a particular parameter by pairing its range
 with the resolution desired. In the next example, the default
 `resolution=100` is applied to the `r2` field, but a resolution of `3`
 is applied to the `r1` field. Additionally, we ask that the grid
-points be randomly traversed, and the the total number of evaluations
+points be randomly traversed and the total number of evaluations
 be limited to 25.
 
 ```@example goof
@@ -348,13 +348,13 @@ customized, as can the global fallbacks. See the
 ## Tuning using Latin hypercube sampling
 
 One can also tune the hyperparameters using the `LatinHypercube`
-tuning stragegy.  This method uses a genetic based optimization
+tuning strategy.  This method uses a genetic-based optimization
 algorithm based on the inverse of the Audze-Eglais function, using the
 library
 [`LatinHypercubeSampling.jl`](https://github.com/MrUrq/LatinHypercubeSampling.jl).
 
 We'll work with the data `X`, `y` and ranges `r1` and `r2` defined
-above and instatiate a Latin hypercube resampling strategy:
+above and instantiate a Latin hypercube resampling strategy:
 
 ```@example goof
 latin = LatinHypercube(gens=2, popsize=120)
@@ -362,7 +362,7 @@ latin = LatinHypercube(gens=2, popsize=120)
 
 Here `gens` is the number of generations to run the optimisation for
 and `popsize` is the population size in the genetic algorithm. For
-more on these and other `LatinHypercube` parameters, refer to the
+more on these and other `LatinHypercube` parameters refer to the
 [LatinHypercubeSampling.jl](https://github.com/MrUrq/LatinHypercubeSampling.jl)
 documentation. Pay attention that `gens` and `popsize` are not to be
 confused with the iteration parameter `n` in the construction of a
@@ -405,7 +405,7 @@ models = [tree, knn]
 nothing # hide
 ```
 
-The following model is equivalent to best in `models` by using 3-fold
+The following model is equivalent to the best in `models` by using 3-fold
 cross-validation:
 
 ```@example goof

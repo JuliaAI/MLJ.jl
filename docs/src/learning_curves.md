@@ -4,7 +4,7 @@ A *learning curve* in MLJ is a plot of some performance estimate, as a
 function of some model hyperparameter. This can be useful when tuning
 a single model hyperparameter, or when deciding how many iterations
 are required for some iterative model. The `learning_curve` method
-does not actually generate a plot, but generates the data needed to do
+does not actually generate a plot but generates the data needed to do
 so.
 
 To generate learning curves you can bind data to a model by
@@ -37,7 +37,7 @@ plot(curve.parameter_values,
 
 ![](img/learning_curve42.png)
 
-In the case the `range` hyperparameter is the number of iterations in
+If the `range` hyperparameter is the number of iterations in
 some iterative model, `learning_curve` will not restart the training
 from scratch for each new value, unless a non-holdout `resampling`
 strategy is specified (and provided the model implements an

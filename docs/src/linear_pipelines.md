@@ -54,7 +54,7 @@ pipe = pipe_transformer |> KNNRegressor(K=2)
 ```
 
 A pipeline is just a model like any other. For example, we can
-evaluate it's performance on the data above:
+evaluate its performance on the data above:
 
 ```@example 7
 evaluate(pipe, X, y, resampling=CV(nfolds=3), measure=mae)
