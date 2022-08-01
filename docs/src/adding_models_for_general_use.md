@@ -800,7 +800,7 @@ target_scitype(SomeSupervisedModel) = Table(Continuous, Finite{2})
 restricts to tables with continuous or binary (ordered or unordered)
 columns.
 
-For predicting variable-length sequences of, say, binary values
+For predicting variable length sequences of, say, binary values
 (`CategoricalValue`s) with some common size-two pool) we declare
 
 ```julia
