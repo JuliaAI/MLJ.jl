@@ -118,7 +118,7 @@ control                                                        | description    
 [`WithMachineDo`](@ref MLJIteration.WithMachineDo)`(f->mach->@info("report: $mach))`| Call `f(mach)` wher `mach` is the training machine in its current state    | yes
 [`Save`](@ref MLJIteration.Save)`(filename="machine.jls")`|Save current training machine to `machine1.jls`, `machine2.jsl`, etc                         | yes
 
-> Table 1. Atomic controls. Some advanced options were omitted.
+> Table 1. Atomic controls. Some advanced options are omitted.
 
 † For more on these controls see [Prechelt, Lutz
  (1998)](https://link.springer.com/chapter/10.1007%2F3-540-49430-8_3):
