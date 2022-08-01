@@ -37,7 +37,7 @@ plot(curve.parameter_values,
 
 ![](img/learning_curve42.png)
 
-In case the `range` hyperparameter is the number of iterations in
+If the `range` hyperparameter is the number of iterations in
 some iterative model, `learning_curve` will not restart the training
 from scratch for each new value, unless a non-holdout `resampling`
 strategy is specified (and provided the model implements an
