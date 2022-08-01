@@ -685,7 +685,7 @@ instead of vectors. See
 
 See
 [LinearBinaryClassifier](https://github.com/JuliaAI/MLJModels.jl/blob/master/src/GLM.jl)
-for example of a Probabilistic classifier implementation.
+for an example of a Probabilistic classifier implementation.
 
 *Important note on binary classifiers.* There is no "Binary" scitype
 distinct from `Multiclass{2}` or `OrderedFactor{2}`; `Binary` is just
