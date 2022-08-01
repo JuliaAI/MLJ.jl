@@ -11,7 +11,7 @@ API. Meta-algorithms (systematic tuning, pipelining, etc) remain
 python wrapped code, however.
 
 While ScikitLearn.jl provides the Julia user with access to a mature
-and a large library of machine learning models, the scikit-learn API on
+and large library of machine learning models, the scikit-learn API on
 which it is modeled, dating back to 2007, is not likely to
 evolve significantly in the future. MLJ enjoys (or will enjoy) several
 features that should make it an attractive alternative in the longer
