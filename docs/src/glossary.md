@@ -34,7 +34,7 @@ or the projection matrices of a PCA dimension-reduction algorithm.
 
 ### operation
 
-Data-manipulating operations (methods) parameterized by some
+Data-manipulating operations (methods) using some
 `fitresult`. For supervised learners, the `predict`, `predict_mean`,
 `predict_median`, or `predict_mode` methods; for transformers, the
 `transform` or `inverse_transform` method. An operation may also
