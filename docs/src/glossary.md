@@ -29,7 +29,7 @@ Also known as "learned" or "fitted" parameters, these are "weights",
 "coefficients", or similar parameters learned by an algorithm, after
 adopting the prescribed hyper-parameters. For example, decision trees
 of a random forest, the coefficients and intercept of a linear model,
-or the rotation and projection matrices of the PCA reduction scheme.
+or the projection matrices of a PCA dimension-reduction algorithm.
 
 
 ### operation
