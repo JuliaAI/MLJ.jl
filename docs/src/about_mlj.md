@@ -156,8 +156,8 @@ Extract:
 
 * Extensible [tuning
   interface](https://github.com/JuliaAI/MLJTuning.jl),
-  to support the growing number of optimization strategies, designed
-  to play well with the model composition.
+  to support a growing number of optimization strategies, and designed
+  to play well with model composition.
 
 * Options to accelerate model evaluation and tuning with
   multithreading and/or distributed processing.
