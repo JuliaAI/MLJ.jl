@@ -12,7 +12,7 @@ of how things work with MLJ.  In particular, you are familiar with:
 
 - what `Probabilistic`, `Deterministic` and `Unsupervised` models are
 
-- the fact that MLJ generally works with tables rather than barebone
+- the fact that MLJ generally works with tables rather than
   matrices. Here a *table* is a container satisfying the
   [Tables.jl](https://github.com/JuliaData/Tables.jl) API (e.g.,
   DataFrame, JuliaDB table, CSV file, named tuple of equal-length
