@@ -600,7 +600,7 @@ zhat = node((y1, y2)->sqrt.(y1.*y2), predict(mach1, W), predict(mach2, W))
 
 ### More `node` examples
 
-Here are some examples taken from the MLJ source
+Here are some examples taken from the MLJ source code
 (at work in the example above) for overloading common operations for nodes:
 
 ```julia
