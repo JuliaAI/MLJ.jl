@@ -9,7 +9,7 @@ such as a learning rate, in response to the behavior of these
 estimates.
 
 Some iterative model implementations enable some form of automated
-control, with the method and options for doing so vary from model
+control, with the method and options for doing so varying from model
 to model. But sometimes it is up to the user to arrange control, which
 in the crudest case reduces to manually experimenting with the
 iteration parameter.
