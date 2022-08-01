@@ -117,7 +117,7 @@ feature_importances(mach::Machine) -> vector_of_pairs
 Here a `vector_of_pairs` is a vector of elements of the form `feature => importance_value`,
 where `feature` is a symbol. For example, `vector_of_pairs = [:gender => 0.23, :height =>
 0.7, :weight => 0.1]`. If a model does not support feature importances for some model
-hyper-parameters, every `importance_value` will be zero. This kind of access is supported
+hyperparameters, every `importance_value` will be zero. This kind of access is supported
 for `model = mach.model` if `reports_feature_importances(model) == true`.
 
 If a model can report multiple types of feature importances, then there will be a model
