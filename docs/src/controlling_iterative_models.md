@@ -222,7 +222,7 @@ predict(mach, selectrows(X, 1:4))
 Under the hood, control in MLJIteration is implemented using
 [IterationControl.jl](https://github.com/ablaom/IterationControl.jl). Rather
 than iterating a training machine directly, we iterate a wrapped
-version of this object, which includes other information that controls
+version of this object, which includes other information that a control
 may want to access, such as the MLJ evaluation object. This information
 is summarized under [The training machine wrapper](@ref) below.
 
