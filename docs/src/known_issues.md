@@ -2,7 +2,7 @@
 
 Routine issues are posted
 [here](https://github.com/alan-turing-institute/MLJ.jl/issues). Below
-are some longer-term issues and limitations.
+are some longer term issues and limitations.
 
 #### ScikitLearn/MKL issue
 
