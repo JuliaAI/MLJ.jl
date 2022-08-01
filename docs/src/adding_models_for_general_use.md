@@ -546,7 +546,7 @@ probability distribution `p(X |y)` above).
 
 In the case of `Deterministic` models, `yhat` should have the same
 scitype as the `y` passed to `fit` (see above). If `y` is a
-`CategoricalVector` (classification) than elements of the prediction
+`CategoricalVector` (classification) then elements of the prediction
 `yhat` **must have a pool == to the pool of the target `y` presented
 in training**, even if not all levels appear in the training data or
 prediction itself.
