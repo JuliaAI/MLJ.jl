@@ -443,7 +443,7 @@ This completes the export process.
 Notes:
 
 - The line marked `###`, where the new exported model's hyperparameter
-  `regressor` is spliced into the network, and is the only modification to
+  `regressor` is spliced into the network, is the only modification to
   the previous code.
 
 - After defining the network there is the additional step of
