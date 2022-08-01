@@ -78,7 +78,7 @@ transform(mach, [1, 2, 3], [3, 2, 1])
 
 Let's see how we can include our `Averager` in a learning network (see
 [Composing Models](@ref)) to mix the predictions of two regressors,
-with the one-hot encoding of the inputs:
+with one-hot encoding of the inputs:
 
 ```@example boots
 X = source()
