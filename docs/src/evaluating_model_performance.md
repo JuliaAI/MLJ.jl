@@ -6,8 +6,8 @@ For more on available performance measures, see
 [Performance Measures](performance_measures.md).
 
 In addition to hold-out and cross-validation, the user can specify
-their list of train/test pairs of row indices for resampling, or
-define their re-usable resampling strategies.
+an explicit list of train/test pairs of row indices for resampling, or
+define new resampling strategies.
 
 For simultaneously evaluating *multiple* models and/or data
 sets, see [Benchmarking](benchmarking.md).
