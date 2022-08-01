@@ -105,7 +105,7 @@ MLJBase.TimeSeriesCV
 
 ## Custom resampling strategies
 
-To define your resampling strategy, make relevant parameters of
+To define a new resampling strategy, make relevant parameters of
 your strategy the fields of a new type `MyResamplingStrategy <:
 MLJ.ResamplingStrategy`, and implement one of the following methods:
 
