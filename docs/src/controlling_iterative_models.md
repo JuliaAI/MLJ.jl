@@ -40,7 +40,7 @@ using MLJ
 X, y = make_moons(100, rng=123, noise=0.5)
 EvoTreeClassifier = @load EvoTreeClassifier verbosity=0
 
-iterated_model = IteratedModel(model=EvoTreeClassifier(rng=123, η=0.005),
+iterated_model = IteratedModel(model=EvoTreeClassifier(rng=123, eta=0.005),
                                resampling=Holdout(),
                                measures=log_loss,
                                controls=[Step(5),
