@@ -6,16 +6,16 @@ condensed instructions below, we assume: (i) you have a Julia
 **registered** package `YourPackage.jl` implementing some machine
 learning models; (ii) that you would like to interface and register
 these models with MLJ; and (iii) that you have a rough understanding
-of how things work with MLJ.  In particular you are familiar with:
+of how things work with MLJ.  In particular, you are familiar with:
 
 - what [scientific types](https://github.com/JuliaAI/ScientificTypes.jl) are
 
 - what `Probabilistic`, `Deterministic` and `Unsupervised` models are
 
-- the fact that MLJ generally works with tables rather than bare bone
+- the fact that MLJ generally works with tables rather than
   matrices. Here a *table* is a container satisfying the
   [Tables.jl](https://github.com/JuliaData/Tables.jl) API (e.g.,
-  DataFrame, JuliaDB table, CSV file, named tuple of equi-length
+  DataFrame, JuliaDB table, CSV file, named tuple of equal-length
   vectors)
 
 - [CategoricalArrays.jl](https://github.com/JuliaData/CategoricalArrays.jl)
@@ -34,7 +34,7 @@ input data is tabular.
 
 For simplicity, this document assumes no data front-end is to be
 defined for your model. Adding a data front-end, which offers the MLJ
-user some performances benefits, is easy to add post-facto, and is
+user some performance benefits, is easy to add post-facto, and is
 described in [Implementing a data front-end](@ref).
 
 ### Overview
@@ -96,7 +96,7 @@ That macro specifies:
 * Constraints on the hyperparameters where `_` refers to a value passed.
 
 Further to the last point, `a::Float64 = 0.5::(_ > 0)` indicates that
-the field `a` is a `Float64`, takes `0.5` as default value, and
+the field `a` is a `Float64`, takes `0.5` as its default value, and
 expects its value to be positive.
 
 Please see [this
@@ -237,10 +237,10 @@ Nothing special for a transformer.
 ### Fitted parameters
 
 There is a function you can optionally implement which will return the
-learned parameters of your model for purposes of user-inspection. For
+learned parameters of your model for user inspection. For
 instance, in the case of a linear regression, the user may want to get
 direct access to the coefficients and intercept. This should be as human and
-machine readable as practical (not a graphical representation) and the
+machine-readable as practical (not a graphical representation) and the
 information should be combined in the form of a named tuple.
 
 The function will always look like:
@@ -266,16 +266,16 @@ user. Here is a summary of the interface points for users that your
 implementation creates:
 
 - Use `fitted_params` to expose *learned parameters*, such as linear
-  coefficients, to the user in a machine and human readable form (for
+  coefficients, to the user in a machine and human-readable form (for
   re-use in another model, for example).
 - Use the fields of your model struct for *hyperparameters*, i.e.,
   those parameters declared by the user ahead of time that generally
   affect the outcome of training. It is okay to add "control"
-  parameters (such a specifying an `acceleration` parameter specifying
+  parameters (such as specifying an `acceleration` parameter specifying
   computational resources, as
   [here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/src/ensembles.jl#L193)).
 - Use `report` to return *everything else*, including model-specific
-  *methods* (or other callable objects). This includes: feature rankings,
+  *methods* (or other callable objects). This includes feature rankings,
   decision boundaries, SVM support vectors, clustering centres,
   methods for visualizing training outcomes, methods for saving
   learned parameters in a custom format, degrees of freedom, deviance,
@@ -324,7 +324,7 @@ whose performance may suffice.
 Adding metadata for your model(s) is crucial for the discoverability
 of your package and its models and to make sure your model is used
 with data it can handle.  You can individually overload a number of
-trait functions that encode this metadata by following the instuctions
+trait functions that encode this metadata by following the instructions
 in [Adding Models for General Use](@ref)), which also explains these
 traits in more detail. However, your most convenient option is to use
 `metadata_model` and `metadata_pkg` functionalities from

@@ -4,38 +4,38 @@ Note: This glossary includes some detail intended mainly for MLJ developers.
 
 ## Basics
 
-### hyper-parameters
+### hyperparameters
 
 Parameters on which some learning algorithm depends, specified before
 the algorithm is applied, and where learning is interpreted in the
 broadest sense. For example, PCA feature reduction is a
 "preprocessing" transformation "learning" a projection from training
-data, governed by a dimension hyperparameter. Hyper-Parameters in our
+data, governed by a dimension hyperparameter. Hyperparameters in our
 sense may specify configuration (eg, number of parallel processes)
-even when this does not effect the end-product of learning. (But we
+even when this does not affect the end-product of learning. (But we
 exclude verbosity level.)
 
 ### model (object of abstract type `Model`)
 
-Object collecting together hyperameters of a single algorithm.  Models
+Object collecting together hyperpameters of a single algorithm.  Models
 are classified either as *supervised* or *unsupervised* models (eg,
 "transformers"), with corresponding subtypes `Supervised <: Model` and
 `Unsupervised <: Model`.
 
 
-### fit-result (type generally defined outside of MLJ)
+### fitresult (type generally defined outside of MLJ)
 
 Also known as "learned" or "fitted" parameters, these are "weights",
-"coefficients", or similar paramaters learned by an algorithm, after
+"coefficients", or similar parameters learned by an algorithm, after
 adopting the prescribed hyper-parameters. For example, decision trees
 of a random forest, the coefficients and intercept of a linear model,
-or the rotation and projection matrices of PCA reduction scheme.
+or the projection matrices of a PCA dimension-reduction algorithm.
 
 
 ### operation
 
-Data-manipulating operations (methods) parameterized by some
-fit-result. For supervised learners, the `predict`, `predict_mean`,
+Data-manipulating operations (methods) using some
+`fitresult`. For supervised learners, the `predict`, `predict_mean`,
 `predict_median`, or `predict_mode` methods; for transformers, the
 `transform` or `inverse_transform` method. An operation may also
 refer to an ordinary data-manipulating method that does *not* depend
@@ -56,14 +56,14 @@ associated `fit` method). A training argument is data used for
 training (subsampled by specifying `rows=...` in `fit!`) but also in
 evaluation (subsampled by specifying `rows=...` in `predict`,
 `predict_mean`, etc). Generally, there are two training arguments for
-supervised models, and just one for unsuperivsed models. Each argument
+supervised models, and just one for unsupervised models. Each argument
 is either a `Source` node, wrapping concrete data supplied to the
 `machine` constructor, or a `Node`, in the case of a learning network
 (see below). Both kinds of nodes can be *called* with an optional
 `rows=...` keyword argument to (lazily) return concrete data.
 
 In addition, machines store "report" metadata, for recording
-algorithm-specific statistics of training (eg, internal estimate of
+algorithm-specific statistics of training (eg, an internal estimate of
 generalization error, feature importances); and they cache information
 allowing the fit-result to be updated without repeating unnecessary
 information.
@@ -103,7 +103,7 @@ wrapped in an associated operation (e.g., `predict` or
 
 ### learning network
 
-An acyclic directed graph implicit in the connections of a collection
+A directed acyclic graph implicit in the connections of a collection
 of source(s) and nodes. 
 
 

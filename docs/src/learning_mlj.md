@@ -23,7 +23,7 @@ intended as a complete reference.
 ### Know some ML and just want MLJ basics?
 [Getting Started](@ref) | [Common MLJ Workflows](@ref)
 
-### An ML practioner transitioning from another platform?
+### An ML practitioner transitioning from another platform?
 [MLJ for Data Scientists in Two Hours](https://juliaai.github.io/DataScienceTutorials.jl/end-to-end/telco/) |
 [MLJTutorial](https://github.com/ablaom/MLJTutorial.jl)
 
@@ -41,4 +41,6 @@ intended as a complete reference.
 - [MLJ JuliaCon2020 Workshop](https://github.com/ablaom/MachineLearningInJulia2020): older version of  [MLJTutorial](https://github.com/ablaom/MLJTutorial.jl) with [video](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title)
 
 - [Learning Networks](@ref): For advanced MLJ users wanting to wrap workflows more complicated than linear pipelines
+
+- [Machine Learning Property Loans for Fun and Profit](https://dm13450.github.io/2022/07/08/Machine-Learning-Property-Loans.html) - Blog post demonstrating the use of MLJ to predict prospects for investment in property development loans. 
 

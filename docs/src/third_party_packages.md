@@ -1,6 +1,6 @@
 # Third Party Packages
 
-A list of third party packages with integration with MLJ.
+A list of third-party packages with integration with MLJ.
 
 Last updated December 2020.
 

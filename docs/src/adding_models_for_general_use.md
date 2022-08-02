@@ -168,7 +168,7 @@ of `nothing`.
 
 The section [Acceleration and Parallelism](@ref) indicates how MLJ
 models specify an option to run an algorithm using distributed
-processing or multi-threading. A hyper-parameter specifying such an
+processing or multithreading. A hyper-parameter specifying such an
 option should be called `acceleration`. Its value `a` should satisfy
 `a isa AbstractResource` where `AbstractResource` is defined in the
 ComputationalResources.jl package. An option to run on a GPU is
@@ -259,7 +259,7 @@ At present, MLJ's performance estimate functionality (resampling using
 `evaluate`/`evaluate!`) tacitly assumes that feature-label pairs of
 observations `(X1, y1), (X2, y2), (X2, y2), ...` are being modelled as
 identically independent random variables (i.i.d.), and constructs some
-kind of representation of an estimate of the conditional probablility
+kind of representation of an estimate of the conditional probability
 `p(y | X)` (`y` and `X` *single* observations). It may be that a model
 implementing the MLJ interface has the potential to make predictions
 under weaker assumptions (e.g., time series forecasting
@@ -370,9 +370,9 @@ Additionally, if `SomeSupervisedModel` supports sample weights, one must declare
 MMI.supports_weights(model::Type{<:SomeSupervisedModel}) = true
 ```
 
-Optionally, an implemenation may add a data front-end, for
+Optionally, an implementation may add a data front-end, for
 transforming user data (such as a table) into some model-specific
-format (such as a matrix), and for adding methods to specify how said
+format (such as a matrix), and for adding methods to specify how the said
 format is resampled. (This alters the meaning of `X`, `y` and `w` in
 the signatures of `fit`, `update`, `predict`, etc; see [Implementing a
 data front-end](@ref) for details). This can provide the MLJ user
@@ -439,7 +439,7 @@ methods](@ref) below for details.
 
 #### Important convention
 
-It is to be understood that the columns of the table `X` correspond to
+It is to be understood that the columns of table `X` correspond to
 features and the rows to observations. So, for example, the predict
 method for a linear regression model might look like `predict(model,
 w, Xnew) = MMI.matrix(Xnew)*w`, where `w` is the vector of learned
@@ -492,7 +492,7 @@ exception being fields of type `<:AbstractRNG`. If the package is able
 to suggest better hyperparameters, as a byproduct of training, return
 these in the report field.
 
-The `verbosity` level (0 for silent) is for passing to learning
+The `verbosity` level (0 for silent) is for passing to the learning
 algorithm itself. A `fit` method wrapping such an algorithm should
 generally avoid doing any of its own logging.
 
@@ -508,7 +508,7 @@ MMI.fit(model::SomeSupervisedModel, verbosity, X, y, w=nothing) -> fitresult, ca
 
 ### The fitted_params method
 
-A `fitted_params` method may be optionally overloaded. It's purpose is
+A `fitted_params` method may be optionally overloaded. Its purpose is
 to provide MLJ access to a user-friendly representation of the
 learned parameters of the model (as opposed to the
 hyperparameters). They must be extractable from `fitresult`.
@@ -539,14 +539,14 @@ Note that while `Xnew` generally consists of multiple observations
 the i.i.d assumption recalled above, that calling `predict(..., Xnew)`
 is equivalent to broadcasting some method `predict_one(..., x)` over
 the individual observations `x` in `Xnew` (a method implementing the
-probablility distribution `p(X |y)` above).
+probability distribution `p(X |y)` above).
 
 
 #### Prediction types for deterministic responses.
 
 In the case of `Deterministic` models, `yhat` should have the same
 scitype as the `y` passed to `fit` (see above). If `y` is a
-`CategoricalVector` (classification) then elements of the predition
+`CategoricalVector` (classification) then elements of the prediction
 `yhat` **must have a pool == to the pool of the target `y` presented
 in training**, even if not all levels appear in the training data or
 prediction itself.
@@ -666,9 +666,9 @@ vector). If you would like to assign `:rare` non-zero probabilities,
 simply add it to the first vector (the *support*) and supply a larger
 `probs` matrix.
 
-In a binary classification problem it suffices to specify a single
+In a binary classification problem, it suffices to specify a single
 vector of probabilities, provided you specify `augment=true`, as in
-the following example, *and note carefully that these probablities are
+the following example, *and note carefully that these probabilities are
 associated with the* **last** *(second) class you specify in the
 constructor:*
 
@@ -718,7 +718,7 @@ instance of `Distributions.Sampleable{<:Multivariate,V}`, where
 `scitype(V) = target_scitype(SomeModel)` and samples have length `n`,
 where `n` is the number of observations in `Xnew`.
 
-If a new model type subtypes `JointProbablistic <: Probabilistic` then
+If a new model type subtypes `JointProbabilistic <: Probabilistic` then
 implementation of `predict_joint` is compulsory.
 
 
@@ -848,7 +848,7 @@ MMI.package_url(::Type{<:DecisionTreeClassifier}) = "https://github.com/bensadeg
 MMI.is_pure_julia(::Type{<:DecisionTreeClassifier}) = true
 ```
 
-Alternatively these traits can also be declared using `MMI.metadata_pkg` and `MMI.metadata_model` helper functions as:
+Alternatively, these traits can also be declared using `MMI.metadata_pkg` and `MMI.metadata_model` helper functions as:
 
 ```julia
 MMI.metadata_pkg(
@@ -902,23 +902,23 @@ been called with a new `rows` keyword argument. However, `MLJModelInterface`
 defines a fallback for `update` which just calls `fit`. For context,
 see [MLJ Internals](internals.md).
 
-Learning networks wrapped as models constitute one use-case (see
+Learning networks wrapped as models constitute one use case (see
 [Composing Models](index.md)): one would like each component model to
 be retrained only when hyperparameter changes "upstream" make this
-necessary. In this case MLJ provides a fallback (specifically, the
+necessary. In this case, MLJ provides a fallback (specifically, the
 fallback is for any subtype of `SupervisedNetwork =
 Union{DeterministicNetwork,ProbabilisticNetwork}`). A second more
-generally relevant use-case is iterative models, where calls to
+generally relevant use case is iterative models, where calls to
 increase the number of iterations only restarts the iterative
 procedure if other hyperparameters have also changed. (A useful method
 for inspecting model changes in such cases is
 `MLJModelInterface.is_same_except`. ) For an example, see
 [MLJEnsembles.jl](https://github.com/JuliaAI/MLJEnsembles.jl).
 
-A third use-case is to avoid repeating time-consuming preprocessing of
+A third use case is to avoid repeating the time-consuming preprocessing of
 `X` and `y` required by some models.
 
-In the event that the argument `fitresult` (returned by a preceding
+If the argument `fitresult` (returned by a preceding
 call to `fit`) is not sufficient for performing an update, the author
 can arrange for `fit` to output in its `cache` return value any
 additional information required (for example, pre-processed versions
@@ -929,7 +929,7 @@ method.
 
 !!! note
 
-	It is suggested that packages implementing MLJ's model API, that later implement a data front-end, should tag their changes in a breaking release. (The changes will not break use of models for the ordinary MLJ user, who interacts with models exlusively through the machine interface. However, it will break usage for some external packages that have chosen to depend directly on the model API.)
+	It is suggested that packages implementing MLJ's model API, that later implement a data front-end, should tag their changes in a breaking release. (The changes will not break the use of models for the ordinary MLJ user, who interacts with models exclusively through the machine interface. However, it will break usage for some external packages that have chosen to depend directly on the model API.)
 
 ```julia
 MLJModelInterface.reformat(model, args...) -> data
@@ -939,7 +939,7 @@ MLJModelInterface.selectrows(::Model, I, data...) -> sampled_data
 Models optionally overload `reformat` to define transformations of
 user-supplied data into some model-specific representation (e.g., from
 a table to a matrix). Computational overheads associated with multiple
-`fit!`/`predict`/`transform` calls (on MLJ machines) are then avoided,
+`fit!`/`predict`/`transform` calls (on MLJ machines) are then avoided
 when memory resources allow. The fallback returns `args` (no
 transformation).
 
@@ -947,10 +947,10 @@ The `selectrows(::Model, I, data...)` method is overloaded to specify
 how the model-specific data is to be subsampled, for some observation
 indices `I` (a colon, `:`, or instance of
 `AbstractVector{<:Integer}`). In this way, implementing a data
-front-end also allow more efficient resampling of data (in user calls
+front-end also allows more efficient resampling of data (in user calls
 to `evaluate!`).
 
-After detailing formal requirments for implementing a data front-end,
+After detailing formal requirements for implementing a data front-end,
 we give a [Sample implementation](@ref). A simple implementation
 [implementation](https://github.com/Evovest/EvoTrees.jl/blob/94b58faf3042009bd609c9a5155a2e95486c2f0e/src/MLJ.jl#L23)
 also appears in the EvoTrees.jl package.
@@ -1042,7 +1042,7 @@ and `Xnew` represent matrices with features as rows.
 ### Supervised models with a `transform` method
 
 A supervised model may optionally implement a `transform` method,
-whose signature is the same as `predict`. In that case the
+whose signature is the same as `predict`. In that case, the
 implementation should define a value for the `output_scitype` trait. A
 declaration
 
@@ -1068,7 +1068,7 @@ encoding representations).
 	The following API is experimental. It is subject to breaking changes during minor or major releases without warning. Models implementing this interface will not work with MLJBase versions earlier than 0.17.5.
 
 Models that fit a probability distribution to some `data` should be
-regarded as `Probablisitic <: Supervised` models with target `y = data`
+regarded as `Probabilistic <: Supervised` models with target `y = data`
 and `X = nothing`.
 
 The `predict` method should return a single distribution.
@@ -1130,7 +1130,7 @@ The fallback of `restore` performs no action and returns `serializable_fitresult
 
 #### Example
 
-For an example, refer to the model implementations at
+Refer to the model implementations at
 [MLJXGBoostInterface.jl](https://github.com/JuliaAI/MLJXGBoostInterface.jl/blob/42afbd2974bd3bd734994004e367c98964ed1262/src/MLJXGBoostInterface.jl#L679).
 
 
@@ -1162,14 +1162,14 @@ Your document string must include the following components, in order:
 
 - A *reference describing the algorithm* or an actual description of
   the algorithm, if necessary. Detail any non-standard aspects of the
-  implementation. Generally defer details on the role of
+  implementation. Generally, defer details on the role of
   hyper-parameters to the "Hyper-parameters" section (see below).
 
 - Instructions on *how to import the model type* from MLJ (because a user can already inspect the doc-string in the Model Registry, without having loaded the code-providing package).
 
 - Instructions on *how to instantiate* with default hyper-parameters or with keywords.
 
-- A *Training data* section: explains how to bind model to data in a machine with all possible signatures (eg, `machine(model, X, y)` but also `machine(model, X, y, w)` if, say, weights are supported);  the role and scitype requirements for each data argument should be itemized.
+- A *Training data* section: explains how to bind a model to data in a machine with all possible signatures (eg, `machine(model, X, y)` but also `machine(model, X, y, w)` if, say, weights are supported);  the role and scitype requirements for each data argument should be itemized.
 
 - Instructions on *how to fit* the machine (in the same section).
 
@@ -1217,7 +1217,7 @@ similar fashion. The main differences are:
   signature as for supervised models, as in
   `MLJModelInterface.predict(model, fitresult, Xnew)`. A use-case is
   clustering algorithms that `predict` labels and `transform` new
-  input features into a space of lower-dimension. See [Transformers
+  input features into a space of lower dimension. See [Transformers
   that also predict](@ref) for an example.
 
 ## Outlier detection models
@@ -1331,7 +1331,7 @@ to all MLJ users:
    them.
 
 2. *Separate interface package*. Implementation code lives in a
-   separate *interface package*, which has the algorithm providing
+   separate *interface package*, which has the algorithm-providing
    package as a dependency. See the template repository
    [MLJExampleInterface.jl](https://github.com/JuliaAI/MLJExampleInterface.jl).
 

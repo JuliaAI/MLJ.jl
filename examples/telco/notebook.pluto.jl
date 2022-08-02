@@ -36,7 +36,7 @@ md"""
 fit/predict workflow, constructing a pipeline to include data
 pre-processing, estimating performance metrics, ROC curves, confusion
 matrices, feature importance, basic feature selection, controlling iterative
-models, hyper-parameter optimization (tuning).
+models, hyperparameter optimization (tuning).
 """
 
 # ╔═╡ a583d175-d623-4888-a6bf-47194d7e8e12
@@ -167,7 +167,7 @@ end
 
 # ╔═╡ e69cd764-e4b8-4ff8-bf32-94657e65284e
 md"""
-In MLJ, a *model* is just a container for hyper-parameters of
+In MLJ, a *model* is just a container for hyperparameters of
 some learning algorithm. It does not store learned parameters.
 """
 
@@ -182,7 +182,7 @@ mach = machine(model, X_iris, y_iris)
 
 # ╔═╡ 6ad971c7-9fe5-45a9-9292-fe822525fc77
 md"""
-A machine is essentially just a model (ie, hyper-parameters) plus data, but
+A machine is essentially just a model (ie, hyperparameters) plus data, but
 it additionally stores *learned parameters* (the tree) once it is
 trained on some view of the data:
 """
@@ -205,7 +205,7 @@ access and mutate the `model` parameter:
 # ╔═╡ 5edc98cd-df7d-428a-a5f1-151fcbe229a2
 begin
   mach.model.min_samples_split  = 10
-  fit!(mach, rows=train_rows) # re-train with new hyper-parameter
+  fit!(mach, rows=train_rows) # re-train with new hyperparameter
 end
 
 # ╔═╡ 1848109f-c94c-4cdd-81bc-2d5603785a09
@@ -438,8 +438,8 @@ Booster = @load EvoTreeClassifier pkg=EvoTrees
 # ╔═╡ ee41a121-df0d-40ad-9e90-09023d201062
 md"""
 Recall that a *model* is just a container for some algorithm's
-hyper-parameters. Let's create a `Booster` with default values for
-the hyper-parameters:
+hyperparameters. Let's create a `Booster` with default values for
+the hyperparameters:
 """
 
 # ╔═╡ be6cef47-d585-45fe-b7bb-2f33ef765cc0
@@ -495,7 +495,7 @@ pipe = ContinuousEncoder() |> booster
 
 # ╔═╡ 4b6e3239-fd47-495a-ac0a-23ded81445da
 md"""
-Note that the component models appear as hyper-parameters of
+Note that the component models appear as hyperparameters of
 `pipe`. Pipelines are an implementation of a more general [model
 composition](https://alan-turing-institute.github.io/MLJ.jl/dev/composing_models/#Composing-Models)
 interface provided by MLJ that advanced users may want to learn about.
@@ -503,8 +503,8 @@ interface provided by MLJ that advanced users may want to learn about.
 
 # ╔═╡ ce9a3479-601a-472a-8535-1a088a6a3228
 md"""
-From the above display, we see that component model hyper-parameters
-are now *nested*, but they are still accessible (important in hyper-parameter
+From the above display, we see that component model hyperparameters
+are now *nested*, but they are still accessible (important in hyperparameter
 optimization):
 """
 
@@ -523,7 +523,7 @@ md"""
 # ╔═╡ 442078e4-a695-471c-b45d-88d068bb0fa2
 md"""
 Without touching our test set `Xtest`, `ytest`, we will estimate the
-performance of our pipeline model, with default hyper-parameters, in
+performance of our pipeline model, with default hyperparameters, in
 two different ways:
 """
 
@@ -766,7 +766,7 @@ md"> Introduces: **control strategies:** `Step`, `NumberSinceBest`, `TimeLimit`,
 
 # ╔═╡ 19e7e4c9-95c0-49d6-8396-93fa872d2512
 md"""
-We want to optimize the hyper-parameters of our model. Since our
+We want to optimize the hyperparameters of our model. Since our
 model is iterative, these parameters include the (nested) iteration
 parameter `pipe.evo_tree_classifier.nrounds`. Sometimes this
 parameter is optimized first, fixed, and then maybe optimized again
@@ -845,17 +845,17 @@ md"""
 """
 
 # ╔═╡ ed9f284e-1e45-46e7-b54b-e44bea97c579
-md"## Hyper-parameter optimization (model tuning)"
+md"## Hyperparameter optimization (model tuning)"
 
 # ╔═╡ b8b0e5ee-8468-4e02-9121-4e392242994e
 md"> Introduces: `range`, **model wrapper** `TunedModel`, `RandomSearch`"
 
 # ╔═╡ 50372dc8-bb10-4f9e-b221-79886442efe7
 md"""
-We now turn to hyper-parameter optimization. A tool not discussed
+We now turn to hyperparameter optimization. A tool not discussed
 here is the `learning_curve` function, which can be useful when
 wanting to visualize the effect of changes to a *single*
-hyper-parameter (which could be an iteration parameter). See, for
+hyperparameter (which could be an iteration parameter). See, for
 example, [this section of the
 manual](https://alan-turing-institute.github.io/MLJ.jl/dev/learning_curves/)
 or [this
@@ -864,7 +864,7 @@ tutorial](https://github.com/ablaom/MLJTutorial.jl/blob/dev/notebooks/04_tuning/
 
 # ╔═╡ 3e385eb4-0a44-40f6-8df5-b7371beb6b3f
 md"""
-Fine tuning the hyper-parameters of a gradient booster can be
+Fine tuning the hyperparameters of a gradient booster can be
 somewhat involved. Here we settle for simultaneously optimizing two
 key parameters: `max_depth` and `η` (learning_rate).
 """
@@ -880,7 +880,7 @@ supplied data to train the best model. To predict using that model,
 one then calls `predict(mach, Xnew)`. In this way the wrapped model
 may be viewed as a "self-tuning" version of the unwrapped
 model. That is, wrapping the model simply transforms certain
-hyper-parameters into learned parameters (just as `IteratedModel`
+hyperparameters into learned parameters (just as `IteratedModel`
 does for an iteration parameter).
 """
 
@@ -930,7 +930,7 @@ all measures can be accessed from the model's `report`.
 # ╔═╡ 147cc2c5-f3c2-4aec-82ca-0687059409ae
 md"""
 The keyword `n` specifies the total number of models (sets of
-hyper-parameters) to evaluate.
+hyperparameters) to evaluate.
 """
 
 # ╔═╡ 2996c4f0-567a-4c5a-9e9e-2379bd3c438e
@@ -979,7 +979,7 @@ begin
 end
 
 # ╔═╡ 242b8047-0508-4ce2-bcf7-0be279ee1434
-@info "Optimal hyper-parameters:" best_booster.max_depth best_booster.η;
+@info "Optimal hyperparameters:" best_booster.max_depth best_booster.η;
 
 # ╔═╡ af6d8f76-f96e-4136-9df6-c78b3bed8b80
 md"Using the `confidence_intervals` function we defined earlier:"
@@ -1060,7 +1060,7 @@ confidence_intervals_basic_model
 md"""
 As each pair of intervals overlap, it's doubtful the small changes
 here can be assigned statistical significance. Default `booster`
-hyper-parameters do a pretty good job.
+hyperparameters do a pretty good job.
 """
 
 # ╔═╡ 19bb6a91-8c9d-4ed0-8f9a-f7439f35ea8f
@@ -1073,7 +1073,7 @@ lock-and-throw-away-the-key holdout set. To demonstrate
 deserialization, we'll pretend we're in a new Julia session (but
 have called `import`/`using` on the same packages). Then the
 following should suffice to recover our model trained under
-"Hyper-parameter optimization" above:
+"Hyperparameter optimization" above:
 """
 
 # ╔═╡ 695926dd-3faf-48a0-8c71-7d4e18e2f699

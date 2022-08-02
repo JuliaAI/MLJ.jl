@@ -17,7 +17,7 @@ have out-of-the-box implementations in MLJ:
   [bagging](https://en.wikipedia.org/wiki/Bootstrap_aggregating). 
   
 - [Model Stacking](@ref) - (`Stack`) for combining the predictions of a smaller
-  number of models of possibly *different* type, with the help of an
+  number of models of possibly *different* types, with the help of an
   adjudicating model.
   
 We note that composite models share all of the functionality of
@@ -35,7 +35,7 @@ explaining this advanced feature.
 
 ## Learning Networks
 
-Below is a practical guide to the MLJ implementantion of learning
+Below is a practical guide to the MLJ implementation of learning
 networks, which have been described more abstractly in the article:
 
 [Anthony D. Blaom and Sebastian J. Voller (2020): Flexible model
@@ -51,11 +51,11 @@ It is important to distinguish between *learning networks* and the
 composite MLJ model types they are used to define.
 
 A *learning network* is a directed acyclic graph whose nodes are
-objects that can be called to obtained data, either for training a
+objects that can be called on obtained data, either for training a
 machine, or for using as input to an *operation*. An operation is
 either:
 
-- *static*, that is, an ordinary function, such as such as `+`, `log` or `vcat`; or
+- *static*, that is, an ordinary function, such as `+`, `log` or `vcat`; or
 
 - *dynamic*, that is, an operation such as `predict` or `transform`
   which is dispatched on both data *and* a training outcome attached
@@ -171,7 +171,7 @@ W = transform(stand, Xs)
 
 To get actual transformed data we *call* the node appropriately, which
 will require we first train the node. Training a node, rather than a
-machine, triggers training of *all* necessary machines in the network.
+machine, triggers the training of *all* necessary machines in the network.
 
 
 ```@example 42
@@ -182,7 +182,7 @@ W(X[3:4,:])   # transform any data, new or old
 ```
 
 If you like, you can think of `W` (and the other nodes we will define)
-as "dynamic data": `W` is *data*, in the sense that it an be called
+as "dynamic data": `W` is *data*, in the sense that it can be called
 ("indexed") on rows, but *dynamic*, in the sense the result depends on
 the outcome of training events.
 
@@ -209,7 +209,7 @@ it was trained earlier:
 fit!(yhat, rows=train);
 rms(y[test], yhat(rows=test)) # evaluate
 ```
-We can change a hyperparameters and retrain:
+We can change a hyperparameter and retrain:
 
 ```@example 42
 ridge_model.lambda = 0.01
@@ -226,7 +226,7 @@ rms(y[test], yhat(rows=test))
 
 #### Multithreaded training
 
-A more complicated learning network (e.g., some inhomogenous ensemble
+A more complicated learning network (e.g., some inhomogeneous ensemble
 of supervised models) may contain machines that can be trained in
 parallel. In that case, a call to a node `N`, such as `fit!(N,
 accleration=CPUThreads())`, will parallelize the training using
@@ -240,7 +240,7 @@ new stand-alone model type. Instances of that type can be bound with
 data in a machine, which can then be evaluated, for example. Somewhat
 paradoxically, one can wrap a learning network in a certain kind of
 machine, called a *learning network machine*, **before** exporting it,
-and in fact, the export process actually requires us to do so. Since a
+and in fact, the export process requires us to do so. Since a
 composite model type does not yet exist, one constructs the machine
 using a "surrogate" model, whose name indicates the ultimate model
 supertype (`Deterministic`, `Probabilistic`, `Unsupervised` or
@@ -253,7 +253,7 @@ surrogate = Deterministic()
 mach = machine(surrogate, Xs, ys; predict=yhat);
 ```
 
-Notice that a key-word argument declares which node is for making
+Notice that a keyword argument declares which node is for making
 predictions, and the arguments `Xs` and `ys` declare which source
 nodes receive the input and target data. With `mach` constructed in
 this way, the code
@@ -280,8 +280,8 @@ fit!(yhat)
 yhat(X[test,:]);
 ```
 
-Like ordinary machine, once can call `report(mach)` and
-`fitted_params(mach)`. While it's main purpose is for export (see
+Like an ordinary machine, once can call `report(mach)` and
+`fitted_params(mach)`. While its main purpose is for export (see
 below), this machine can even be evaluated:
 
 ```@example 42
@@ -291,8 +291,8 @@ evaluate!(mach, resampling=CV(nfolds=3), measure=LPLoss(p=2))
 For more on constructing learning network machines, see
 [`machine`](@ref).
 
-A learning network machine can also include additional internal state
-in it's report (and so in the report of the corresponding exported
+A learning network machine can also include the additional internal state
+in its report (as well as in the report of the corresponding exported
 model). See [Exposing internal state of a learning network](@ref) for
 this advanced feature.
 
@@ -385,14 +385,14 @@ WrappedRegressor(regressor = KNNRegressor(K = 7,
 In Method I above, only models appearing in the network will appear as
 hyperparameters of the exported composite model. There is a second
 more flexible method for exporting the network, which allows finer
-control over the exported `Model` struct, and which also avoids
+control over the exported `Model` struct, and also avoids the
 limitations of using a macro. The two steps required are:
 
 - Define a new `mutable struct` model type.
 
 - Wrap the learning network code in a model `fit` method.
 
-Let's start with an elementary illustration in the learning network we
+Let's start with an elementary illustration of the learning network we
 just exported using Method I.
 
 The `mutable struct` definition looks like this:
@@ -465,7 +465,7 @@ We now give a more complicated example of a composite model which
 exposes some parameters used in the network that are not simply
 component models. The model combines a clustering model (e.g.,
 `KMeans()`) for dimension reduction with ridge regression, but has the
-following "coupling" of the hyper parameters: The ridge regularization
+following "coupling" of the hyperparameters: The ridge regularization
 depends on the number of clusters used (with less regularization for a
 greater number of clusters) and a user-specified "coupling"
 coefficient `K`.
@@ -490,7 +490,7 @@ function MLJ.fit(composite::Composite, verbosity, X, y)
 	clustererM = machine(clusterer, Xs)
 	Xsmall = transform(clustererM, Xs)
 
-	# the coupling: ridge regularization depends on number of
+	# the coupling: ridge regularization depends on the number of
 	# clusters (and the specified coefficient `K`):
 	lambda = exp(-composite.K/clusterer.k)
 
@@ -580,9 +580,9 @@ Exporting this learning network as a stand-alone model:
 end
 ```
 
-To deal with operations on nodes not supported out-of-the box, one
+To deal with operations on nodes not supported out-of-the-box, one
 can use the `@node` macro. Supposing, in the preceding example, we
-wanted the geometric mean rather than arithmetic mean. Then, the
+wanted the geometric mean rather than the arithmetic mean. Then, the
 definition of `zhat` above can be replaced with
 
 ```julia
@@ -600,7 +600,7 @@ zhat = node((y1, y2)->sqrt.(y1.*y2), predict(mach1, W), predict(mach2, W))
 
 ### More `node` examples
 
-Here are some examples taken from MLJ source
+Here are some examples taken from the MLJ source code
 (at work in the example above) for overloading common operations for nodes:
 
 ```julia
@@ -633,7 +633,7 @@ julia> W()
 
 ```
 
-## Exposing internal state of a learning network 
+## Exposing the internal state of a learning network 
 
 This section describes an advanced feature. 
 
@@ -711,9 +711,9 @@ graphs (DAG's) whose nodes are `Node` or `Source` objects, and whose
 labels are `Machine` objects. We obtain the first DAG from directed
 edges of the form $N1 -> N2$ whenever $N1$ is an *argument* of $N2$
 (see below). Only this DAG is relevant when calling a node, as
-discussed in examples above and below. To form the second DAG
+discussed in the examples above and below. To form the second DAG
 (relevant when calling or calling `fit!` on a node) one adds edges for
-which $N1$ is *training argument* of the the machine which labels
+which $N1$ is *training argument* of the machine which labels
 $N1$. We call the second, larger DAG, the *completed learning network*
 (but note only edges of the smaller network are explicitly drawn in
 diagrams, for simplicity).

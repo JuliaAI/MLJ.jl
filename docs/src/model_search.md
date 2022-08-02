@@ -97,7 +97,7 @@ models(task)
 ```
 
 Also defined are `Bool`-valued callable objects `matching(model)`,
-`matching(X, y)` and `matching(X)`, with obvious behaviour. For example,
+`matching(X, y)` and `matching(X)`, with obvious behavior. For example,
 `matching(X, y)(model) = matching(model, X, y)`.
 
 So, to search for all models compatible with input `X` and target `y`,

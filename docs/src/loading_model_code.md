@@ -11,13 +11,13 @@ global namespace of the module in which `@load` is invoked (`Main` if
 invoked at the REPL).
 
 In general, the code providing core functionality for the model
-(living in a packge you should consult for documentation) may be
+(living in a package you should consult for documentation) may be
 different from the package providing the MLJ interface. Since the core
 package is a dependency of the interface package, only the interface
 package needs to be added to your environment.
 
 For instance, suppose you have activated a Julia package environment
-`my_env` that you wish to use for your MLJ project; for example you
+`my_env` that you wish to use for your MLJ project; for example, you
 have run:
 
 
@@ -26,7 +26,7 @@ using Pkg
 Pkg.activate("my_env", shared=true)
 ```
 
-And, furthermore, suppose you want to use `DecisionTreeClassifier`,
+Furthermore, suppose you want to use `DecisionTreeClassifier`,
 provided by the
 [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl)
 package. Then, to determine which package provides the MLJ interface
@@ -37,7 +37,7 @@ julia> load_path("DecisionTreeClassifier", pkg="DecisionTree")
 "MLJDecisionTreeInterface.DecisionTreeClassifier"
 ```
 
-In this case we see that the package required is
+In this case, we see that the package required is
 MLJDecisionTreeInterface.jl. If this package is not in `my_env` (do
 `Pkg.status()` to check) you add it by running
 
