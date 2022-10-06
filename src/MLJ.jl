@@ -98,16 +98,10 @@ export nrows, color_off, color_on,
     fit_only!, return!, int, decoder,
     default_scitype_check_level
 
-# MLJBase/composition/abstract_types.jl:
-for T in vcat(
-    MLJBase.MLJModelInterface.ABSTRACT_MODEL_SUBTYPES,
-    MLJBase.COMPOSITE_TYPES,
-    MLJBase.SURROGATE_TYPES,
-)
+# abstract model types from MLJBase:
+for T in MLJBase.EXTENDED_ABSTRACT_MODEL_TYPES
     @eval(export $T)
 end
-export Surrogate, Composite
-
 
 # MLJBase/measures:
 # measure names:
