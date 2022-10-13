@@ -49,6 +49,7 @@ pages = [
     "Target Transformations" => "target_transformations.md",
     "Homogeneous Ensembles" => "homogeneous_ensembles.md",
     "Model Stacking" => "model_stacking.md",
+    "Learning Networks" => "learning_networks.md",
     "Controlling Iterative Models" => "controlling_iterative_models.md",
     "Generating Synthetic Data" => "generating_synthetic_data.md",
     "OpenML Integration" => "openml_integration.md",
