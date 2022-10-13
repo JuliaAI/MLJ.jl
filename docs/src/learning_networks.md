@@ -229,7 +229,9 @@ data). We demonstrate the process by way of examples of increasing complexity.
 
 ### Example A - Mini-pipeline
 
-First we export the simple learning network defined above.
+First we export the simple learning network defined above. (This is for illustration
+purposes; in practice using [`Pipeline`](@ref) or the corresponding `model1 |> model2`
+syntax is more convenient.)
 
 #### Step 1 - Define a new model struct
 
@@ -275,8 +277,9 @@ mach2 = machine(:classifier, x, ys)  # <---- `tree` swapped out for `:classifier
 yhat = predict(mach2, x)
 ```
 
-This network can be used as before except we must provide an instance of `CompositeA` in
-our `fit!` calls, to indicate what models the symbols are being substituted with:
+Incidentally, this network can be used as before except we must provide an instance of
+`CompositeA` in our `fit!` calls, to indicate what actual models the symbols are being
+substituted with:
 
 ```@example 42
 composite_a = CompositeA(pca, ConstantClassifier())
@@ -290,7 +293,7 @@ In this case `:preprocessor` is being substituted by `pca`, and `:classifier` by
 #### Step 2 - Wrap the learning network in `prefit`
 
 Literally copy and paste the learning network above into the definition of a method called
-`prefit`, as shown below:
+`prefit`, as shown below (it has the same signature as `MLJModelInterface.fit`):
 
 ```@example 42
 import MLJBase
@@ -314,9 +317,9 @@ end
 That's it.
 
 Generally, `prefit` always returns a *learning network interface*; see
-[`MLJBase.prefit`](@ref) for what this means. In this example, the interface dictates that
-calling `predict(mach, Xnew)` on a machine `mach` bound to some instance of `CompositeA`
-should internally call `yhat(Xnew)`.
+[`MLJBase.prefit`](@ref) for what this means in general. In this example, the interface
+dictates that calling `predict(mach, Xnew)` on a machine `mach` bound to some instance of
+`CompositeA` should internally call `yhat(Xnew)`.
 
 Here's our new composite model type `CompositeA` in action, combining standardization with
 KNN classification:
