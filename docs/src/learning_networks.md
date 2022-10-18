@@ -5,7 +5,7 @@ networks, which have been described more abstractly in the article:
 
 [Anthony D. Blaom and Sebastian J. Voller (2020): Flexible model
 composition in machine learning and its implementation in MLJ.
-Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505)
+Preprint, arXiv:2012.15505](https://arxiv.org/abs/2012.15505).
 
 *Learning networks*, an advanced but powerful MLJ feature, are "blueprints" for combining
 models in flexible ways, beyond ordinary linear pipelines and simple model ensembles. They
@@ -19,11 +19,11 @@ implemented internally as exported learning networks.
 !!! note
 
     While learning networks can be used for complex machine learning workflows, their main
-    purpose is for defining new stand-alone model types, which behave just like
-    any other model type: they can be evaluated, tuned, inserted into pipelines, etc.  In
-    serious applications, users are encouraged to export their learning networks, as
-    explained under [Exporting a learning network as a new model type](@ref)
-    below, **after testing the network**, using a small training dataset.
+    purpose is for defining new stand-alone model types, which behave just like any other
+    model type: Instances can be evaluated, tuned, inserted into pipelines, etc.  In serious
+    applications, users are encouraged to export their learning networks, as explained under
+    [Exporting a learning network as a new model type](@ref) below, **after testing the
+    network**, using a small training dataset.
 
 
 ## Learning networks by example
@@ -39,11 +39,12 @@ using MLJ
 MLJ.color_off()
 ```
 
-```julia
+```@example 42
 X = 4
 Y = 3
 Z = 2*X
 W = Y + Z
+W
 ```
 
 we can do
@@ -59,9 +60,9 @@ W()
 ```
 
 In the first computation `X`, `Y`, `Z` and `W` are all bound to ordinary data. In the
-second, they are bound to objects called *nodes*. The nodes constituting entry points for
-data, namely `X` and `Y`, are called *source nodes*. As the terminology suggests, we can
-imagine these objects as part of a "network" (a directed acyclic graph) which can aid
+second, they are bound to objects called *nodes*. The special nodes `X` and `Y` constitute
+"entry points" for data, and are called *source nodes*. As the terminology suggests, we
+can imagine these objects as part of a "network" (a directed acyclic graph) which can aid
 conceptualization (but is less useful in more complicated examples):
 
 ![](img/simple.png)
@@ -102,19 +103,17 @@ origins(Z)
 Z(6)
 ```
 
-This has the advantage that you don't need to locate the origin and
-rebind data directly, and the unique-origin restriction turns out to
-be sufficient for the applications to learning we have in mind.
+This has the advantage that you don't need to locate the origin and rebind data directly,
+and the unique-origin restriction turns out to be sufficient for the applications to
+learning we have in mind.
 
 ### [Overloading functions for use on nodes](@id node_overloading)
 
-Several built-in function like `*` and `+` above are overloaded in
-MLJBase to work on nodes, as illustrated above. Others that work
-out-of-the-box include: `MLJBase.matrix`, `MLJBase.table`, `vcat`,
-`hcat`, `mean`, `median`, `mode`, `first`, `last`, as well as
-broadcasted versions of `log`, `exp`, `mean`, `mode` and `median`. A
-function like `sqrt` is not overloaded, so that `Q = sqrt(Z)` will
-throw an error. Instead, we do
+Several built-in function like `*` and `+` above are overloaded in MLJBase to work on
+nodes, as illustrated above. Others that work out-of-the-box include: `MLJBase.matrix`,
+`MLJBase.table`, `vcat`, `hcat`, `mean`, `median`, `mode`, `first`, `last`, as well as
+broadcasted versions of `log`, `exp`, `mean`, `mode` and `median`. A function like `sqrt`
+is not overloaded, so that `Q = sqrt(Z)` will throw an error. Instead, we do
 
 ```@example 42
 Q = node(z->sqrt(z), Z)
@@ -137,7 +136,7 @@ To incorporate learning in a network of nodes we need to:
   depend on learned parameters to generate output).
 
 For an example of a learning network that actually learns, we first synthesize some
-training and production data:
+training data `X`, `y`, and production data `Xnew`:
 
 ```@example 42
 using MLJ
@@ -179,7 +178,7 @@ fact, an interesting implementation detail is that an "ordinary" machine is not 
 bound directly to data, but bound to data wrapped in source nodes.
 
 ```@example 42
-machine(pca, Xnew).args # `Xnew` is ordinary data
+machine(pca, Xnew).args[1] # `Xnew` is ordinary data
 ```
 
 Before calling a node, we need to `fit!` the node, to trigger training of all the machines
@@ -230,8 +229,8 @@ data). We demonstrate the process by way of examples of increasing complexity.
 ### Example A - Mini-pipeline
 
 First we export the simple learning network defined above. (This is for illustration
-purposes; in practice using [`Pipeline`](@ref) or the corresponding `model1 |> model2`
-syntax is more convenient.)
+purposes; in practice using the [`Pipeline`](@ref) syntax `model1 |> model2` syntax is
+more convenient.)
 
 #### Step 1 - Define a new model struct
 
@@ -288,12 +287,13 @@ yhat(Xnew)
 ```
 
 In this case `:preprocessor` is being substituted by `pca`, and `:classifier` by
-`ConstantClassifier()` for training. 
+`ConstantClassifier()` for training.
 
 #### Step 2 - Wrap the learning network in `prefit`
 
 Literally copy and paste the learning network above into the definition of a method called
-`prefit`, as shown below (it has the same signature as `MLJModelInterface.fit`):
+`prefit`, as shown below (if you have implemented your own MLJ model, you will notice this
+has the same signature as `MLJModelInterface.fit`):
 
 ```@example 42
 import MLJBase
@@ -325,14 +325,15 @@ Here's our new composite model type `CompositeA` in action, combining standardiz
 KNN classification:
 
 ```@example 42
+using MLJ
 X, y = @load_iris
 
 knn = (@load KNNClassifier pkg=NearestNeighborModels verbosity=0)()
-composite = CompositeA(Standardizer(), knn)
+composite_a = CompositeA(Standardizer(), knn)
 ```
 
 ```@example 42
-mach = machine(composite, X, y) |> fit!
+mach = machine(composite_a, X, y) |> fit!
 predict(mach, X)[1:2]
 ```
 
@@ -344,6 +345,20 @@ report(mach).preprocessor
 fitted_params(mach).classifier
 ```
 
+### More on replacing models with symbols
+
+Only the first argument `model` in some expression `machine(model, ...)` can be replaced
+with a symbol. These replacements function as hooks for exposing reports and fitted
+parameters of component models in the report and fitted parameters of the composite model,
+but these replacements are not absolutely necessary. For example, instead of the line
+`mach1 = machine(:preprocessor, Xs)` in the `prefit` definition, we can do `mach1 =
+machine(composite.preprocessor, Xs)`. However, `report` and `fittted_params` will not
+include items for the `:preprocessor` component model in that case. 
+
+If a component model is not explicitly bound to data in a machine (for example, because it
+is first wrapped in `TunedModel`) then there are ways to explicitly expose associated
+fitted parameters or report items. See Example F below.
+
 ### Example B - Multiple operations: transform and inverse transform
 
 Here's a second mini-pipeline example composing two transformers which both implement
@@ -353,7 +368,8 @@ too.
 #### Step 1 - Define a new model struct
 
 ```@example 42
-using MLJBase
+using MLJ
+import MLJBase
 
 mutable struct CompositeB <: DeterministicNetworkComposite
     transformer1
@@ -406,7 +422,8 @@ regressors, the new model has two other fields:
 #### Step 1 - Define a new model struct
 
 ```@example 42
-using MLJBase
+using MLJ
+import MLJBase
 
 mutable struct CompositeC <: DeterministicNetworkComposite
     regressor1
@@ -481,7 +498,8 @@ scale. (This represents a model we could alternatively build using the
 #### Step 1 - Define a new model struct
 
 ```@example 42
-using MLJBase
+using MLJ
+import MLJBase
 
 mutable struct CompositeD <: DeterministicNetworkComposite
     preprocessor
@@ -552,7 +570,8 @@ nor ridge regressor are themselves hyperparameters of the composite.)
 #### Step 1 - Define a new model struct
 
 ```@example 42
-using MLJBase
+using MLJ
+import MLJBase
 
 mutable struct CompositeE <: DeterministicNetworkComposite
         clusterer     # `:kmeans` or `:kmedoids`
@@ -614,6 +633,108 @@ mach = machine(tuned_composite_e, X, y) |> fit!
 report(mach).best_model
 ```
 
+### Example F - Wrapping a model in a data-dependent tuning strategy
+
+When the regularization parameter of a [Lasso
+model](https://en.wikipedia.org/wiki/Lasso_(statistics)) is optimized, one commonly
+searches over a parameter range depending on properties of the training data. Indeed,
+Lasso (and, more generally, elastic net) implementations commonly provide a method to
+carry out this data-dependent optimization automatically, using cross-validation. The
+following example shows how to transform the `LassoRegressor` model type from
+MLJLinearModels.jl into a self-tuning model type `LassoCVRegressor` using the commonly
+implemented data-dependent tuning strategy. A new dimensionless hyperparameter `epsilon`
+controls the lower bound on the parameter range.
+
+#### Step 1 - Define a new model struct
+
+```@example 42
+using MLJ
+import MLJBase
+
+mutable struct LassoCVRegressor <: DeterministicNetworkComposite
+    lasso              # the atomic lasso model (`lasso.lambda` is ignored)
+    epsilon::Float64   # controls lower bound of `lasso.lambda` in tuning
+    resampling         # resampling strategy for optimization of `lambda`
+end
+
+# keyword constructor for convenience:
+LassoRegressor = @load LassoRegressor pkg=MLJLinearModels
+LassoCVRegressor(;
+    lasso=LassoRegressor(),
+    epsilon=0.001,
+    resampling=CV(nfolds=6),
+) = LassoCVRegressor(
+    lasso,
+    epsilon,
+    resampling,
+)
+nothing # hide
+```
+
+#### Step 2 - Wrap the learning network in `prefit`
+
+In this case, there is no `model -> :symbol` replacement that makes sense here, because
+the model is getting wrapped by `TunedModel`. However, we can expose the the learned lasso
+`coefs` and `intercept` using fitted parameter nodes; and expose the optimal `lambda`, and
+range searched, using report nodes (as previously demonstrated in Example C).
+
+```@example 42
+function MLJBase.prefit(composite::LassoCVRegressor, verbosity, X, y)
+
+    λ_max = maximum(abs.(MLJ.matrix(X)'y))
+
+    Xs = source(X)
+    ys = source(y)
+
+    lambda_range = range(
+        composite.lasso,
+        :lambda,
+        lower=composite.epsilon*λ_max,
+        upper=λ_max,
+        scale=:log10,
+    )
+
+    tuned_lasso = TunedModel(
+        composite.lasso,
+        tuning=Grid(shuffle=false),
+        range = lambda_range,
+        measure = l2,
+        resampling=composite.resampling,
+    )
+    mach = machine(tuned_lasso, Xs, ys)
+
+    R = node(m->report(m), mach) # `R()` returns `report(mach)`
+    lambda = node(r -> r.best_model.lambda, R)             # a "report node"
+
+    F = node(m->fitted_params(m), mach) # `F()` returns `fitted_params(mach)`
+    coefs = node(f->f.best_fitted_params.coefs, F)         # a "fitted params node" 
+    intercept = node(f->f.best_fitted_params.intercept, F) # a "fitted params node"
+
+    yhat = predict(mach, Xs)
+
+    return (
+        predict=yhat,
+        fitted_params=(; coefs, intercept),
+        report=(; lambda, lambda_range),
+   )
+
+end
+```
+
+Here's a demonstration:
+
+```@example 42
+X, _ = make_regression(1000, 3, rng=123)
+y = X.x2 - X.x2 + 0.005*X.x3 + 0.05*rand(1000)
+lasso_cv = LassoCVRegressor(epsilon=1e-5)
+mach = machine(lasso_cv, X, y) |> fit!
+report(mach)
+```
+
+```@example 42
+fitted_params(mach)
+```
+
 ## More on overloading ordinary functions for nodes
 
 Overloading ordinary functions for nodes has already been discussed [above](@ref
@@ -656,7 +777,7 @@ table:
 ```julia
 using Random
 X = (x1 = [1, 2, 3, 4, 5],
-	 x2 = [:one, :two, :three, :four, :five])
+         x2 = [:one, :two, :three, :four, :five])
 rows(X) = 1:nrows(X)
 
 Xs = source(X)
