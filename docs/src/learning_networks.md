@@ -124,6 +124,8 @@ Z()
 Q()
 ```
 
+You can learn more about the `node` function under [;;;
+
 ### A network that learns
 
 To incorporate learning in a network of nodes we need to:
@@ -224,7 +226,17 @@ Currently, only `CPU1()` (default) and `CPUThreads()` are supported here.
 
 Once a learning network has been tested, typically on some small dummy data set, it is
 ready to be exported as a new, stand-alone, re-usable model type (unattached to any
-data). We demonstrate the process by way of examples of increasing complexity.
+data). We demonstrate the process by way of examples of increasing complexity:
+
+- [Example A - Mini-pipeline](@ref)
+- [More on replacing models with symbols](@ref)
+- [Example B - Multiple operations: transform and inverse transform](@ref)
+- [Example C - Exposing internal network state in reports](@ref)
+- [Example D - Multiple nodes pointing to the same machine](@ref)
+- [Example E - Coupling component model hyper-parameters](@ref)
+- [More on defining new nodes](@ref)
+- [Example F - Wrapping a model in a data-dependent tuning strategy](@ref)
+
 
 ### Example A - Mini-pipeline
 
@@ -353,7 +365,7 @@ parameters of component models in the report and fitted parameters of the compos
 but these replacements are not absolutely necessary. For example, instead of the line
 `mach1 = machine(:preprocessor, Xs)` in the `prefit` definition, we can do `mach1 =
 machine(composite.preprocessor, Xs)`. However, `report` and `fittted_params` will not
-include items for the `:preprocessor` component model in that case. 
+include items for the `:preprocessor` component model in that case.
 
 If a component model is not explicitly bound to data in a machine (for example, because it
 is first wrapped in `TunedModel`) then there are ways to explicitly expose associated
@@ -441,7 +453,7 @@ function MLJBase.prefit(composite::CompositeC, verbosity, X, y)
     Xs = source(X)
     ys = source(y)
 
-    mach1 = machine(:regressor1, Xs, ys)   #  <--- symbol instead of model
+    mach1 = machine(:regressor1, Xs, ys)
     mach2 = machine(:regressor2, Xs, ys)
 
     yhat1 = predict(mach1, Xs)
@@ -556,7 +568,6 @@ composite_d = CompositeD(stand, box, ridge, CPU1())
 evaluate(composite_d, X, y, resampling=CV(nfolds=5), measure=l2, verbosity=0)
 ```
 
-
 ### Example E - Coupling component model hyper-parameters
 
 The composite model in this example combines a clustering model used to reduce the
@@ -633,130 +644,84 @@ mach = machine(tuned_composite_e, X, y) |> fit!
 report(mach).best_model
 ```
 
-### Example F - Wrapping a model in a data-dependent tuning strategy
+## More on defining new nodes
 
-When the regularization parameter of a [Lasso
-model](https://en.wikipedia.org/wiki/Lasso_(statistics)) is optimized, one commonly
-searches over a parameter range depending on properties of the training data. Indeed,
-Lasso (and, more generally, elastic net) implementations commonly provide a method to
-carry out this data-dependent optimization automatically, using cross-validation. The
-following example shows how to transform the `LassoRegressor` model type from
-MLJLinearModels.jl into a self-tuning model type `LassoCVRegressor` using the commonly
-implemented data-dependent tuning strategy. A new dimensionless hyperparameter `epsilon`
-controls the lower bound on the parameter range.
-
-#### Step 1 - Define a new model struct
+Overloading ordinary functions for nodes has already been discussed [above](@ref
+node_overloading). Here's another example:
 
 ```@example 42
-using MLJ
-import MLJBase
+divide(x, y) = x/y
 
-mutable struct LassoCVRegressor <: DeterministicNetworkComposite
-    lasso              # the atomic lasso model (`lasso.lambda` is ignored)
-    epsilon::Float64   # controls lower bound of `lasso.lambda` in tuning
-    resampling         # resampling strategy for optimization of `lambda`
-end
+X = source(2)
+Y = source(3)
 
-# keyword constructor for convenience:
-LassoRegressor = @load LassoRegressor pkg=MLJLinearModels
-LassoCVRegressor(;
-    lasso=LassoRegressor(),
-    epsilon=0.001,
-    resampling=CV(nfolds=6),
-) = LassoCVRegressor(
-    lasso,
-    epsilon,
-    resampling,
-)
+Z = node(divide, X, Y)
 nothing # hide
 ```
 
-#### Step 2 - Wrap the learning network in `prefit`
-
-In this case, there is no `model -> :symbol` replacement that makes sense here, because
-the model is getting wrapped by `TunedModel`. However, we can expose the the learned lasso
-`coefs` and `intercept` using fitted parameter nodes; and expose the optimal `lambda`, and
-range searched, using report nodes (as previously demonstrated in Example C).
+This means `Z()` returns `divide(X(), Y())`, which is `divide(2, 3)` in this case:
 
 ```@example 42
-function MLJBase.prefit(composite::LassoCVRegressor, verbosity, X, y)
-
-    λ_max = maximum(abs.(MLJ.matrix(X)'y))
-
-    Xs = source(X)
-    ys = source(y)
-
-    lambda_range = range(
-        composite.lasso,
-        :lambda,
-        lower=composite.epsilon*λ_max,
-        upper=λ_max,
-        scale=:log10,
-    )
-
-    tuned_lasso = TunedModel(
-        composite.lasso,
-        tuning=Grid(shuffle=false),
-        range = lambda_range,
-        measure = l2,
-        resampling=composite.resampling,
-    )
-    mach = machine(tuned_lasso, Xs, ys)
-
-    R = node(m->report(m), mach) # `R()` returns `report(mach)`
-    lambda = node(r -> r.best_model.lambda, R)             # a "report node"
-
-    F = node(m->fitted_params(m), mach) # `F()` returns `fitted_params(mach)`
-    coefs = node(f->f.best_fitted_params.coefs, F)         # a "fitted params node" 
-    intercept = node(f->f.best_fitted_params.intercept, F) # a "fitted params node"
-
-    yhat = predict(mach, Xs)
-
-    return (
-        predict=yhat,
-        fitted_params=(; coefs, intercept),
-        report=(; lambda, lambda_range),
-   )
-
-end
+Z()
 ```
 
-Here's a demonstration:
+We cannot call `Z` with arguments (e.g., `Z(2)`) because it does not have a unique origin.
+
+In all the `node` examples so far, the first argument of `node` is a function, and all
+other arguments are nodes - one node for each argument of the function. A node constructed
+in this way is called a *static* node. A *dynamic* node, which directly depends on the
+outcome of a training event, is constructed by giving a *machine* as the second argument,
+to be passed as the first argument of the function in a node call. For example, we can do
 
 ```@example 42
-X, _ = make_regression(1000, 3, rng=123)
-y = X.x2 - X.x2 + 0.005*X.x3 + 0.05*rand(1000)
-lasso_cv = LassoCVRegressor(epsilon=1e-5)
-mach = machine(lasso_cv, X, y) |> fit!
-report(mach)
+Xs = source(rand(4))
+mach = machine(Standardizer(), Xs)
+N = node(transform, mach, Xs) |> fit!
+nothing # hide
 ```
+
+Then `N` has the following calling properties:
+
+- `N()` returns `transform(mach, Xs())`
+- `N(Xnew)` returns `transform(mach, Xs(Xnew))`; here `Xs(Xnew)` is just `Xnew` because
+  `Xs` is just a source node.)
 
 ```@example 42
-fitted_params(mach)
+N()
+```
+```@example 42
+N(rand(2))
 ```
 
-## More on overloading ordinary functions for nodes
-
-Overloading ordinary functions for nodes has already been discussed [above](@ref
-node_overloading). Here are some further examples taken from the MLJBase.jl source code:
+In fact, this is precisely how the `tranform` method is internally overloaded to work,
+when called with a node argument (to return a node instead of data). That is, internally
+there exists code that amounts to the defintion
 
 ```julia
-import Base.+
-+(y1::AbstractNode, y2::AbstractNode) = node(+, y1, y2)
-+(x, y::AbstractNode) = node(y->x + y, y)
-+(y::AbstractNode, x) = node(y->y + x, y)
-
-Base.vcat(args::AbstractNode...) = node(vcat, args...)
+transform(mach, X::AbstractNode) = node(transform, mach, X)
 ```
 
 Here `AbstractNode` is the common super-type of `Node` and `Source`.
-For example, the first definition is responsible for this behaviour:
+
+It sometimes useful to create dynamic nodes with *no* node arguments, as in
 
 ```@example 42
-y1 = source(2)
-y2 = source(3)
-(y1*y2)()
+Xs = source(rand(10))
+mach = machine(Standardizer(), Xs)
+N = node(fitted_params, mach) |> fit!
+N()
 ```
+
+Static nodes can have also have zero node arguments. These may be viewed as "constant"
+nodes:
+
+```@example 42
+N = Node(()-> 42)
+N()
+```
+
+Example F below demonstrates the use of static and dynamic nodes. For more details, see
+the [`node`](@ref) docstring.
 
 There is also an experimental macro [`@node`](@ref). If `Z` is an `AbstractNode` (`Z =
 source(16)`, say) then instead of
@@ -792,6 +757,112 @@ julia> W()
 
 **Important.** An argument not in global scope is assumed by `@node` to be a node or
 source.
+
+
+### Example F - Wrapping a model in a data-dependent tuning strategy
+
+When the regularization parameter of a [Lasso
+model](https://en.wikipedia.org/wiki/Lasso_(statistics)) is optimized, one commonly
+searches over a parameter range depending on properties of the training data. Indeed,
+Lasso (and, more generally, elastic net) implementations commonly provide a method to
+carry out this data-dependent optimization automatically, using cross-validation. The
+following example shows how to transform the `LassoRegressor` model type from
+MLJLinearModels.jl into a self-tuning model type `LassoCVRegressor` using the commonly
+implemented data-dependent tuning strategy. A new dimensionless hyperparameter `epsilon`
+controls the lower bound on the parameter range.
+
+#### Step 1 - Define a new model struct
+
+```@example 42
+using MLJ
+import MLJBase
+
+mutable struct LassoCVRegressor <: DeterministicNetworkComposite
+    lasso              # the atomic lasso model (`lasso.lambda` is ignored)
+    epsilon::Float64   # controls lower bound of `lasso.lambda` in tuning
+    resampling         # resampling strategy for optimization of `lambda`
+end
+
+# keyword constructor for convenience:
+LassoRegressor = @load LassoRegressor pkg=MLJLinearModels verbosity=0
+LassoCVRegressor(;
+    lasso=LassoRegressor(),
+    epsilon=0.001,
+    resampling=CV(nfolds=6),
+) = LassoCVRegressor(
+    lasso,
+    epsilon,
+    resampling,
+)
+nothing # hide
+```
+
+#### Step 2 - Wrap the learning network in `prefit`
+
+In this case, there is no `model -> :symbol` replacement that makes sense here, because
+the model is getting wrapped by `TunedModel` before being bound to nodes in a
+machine. However, we can expose the the learned lasso `coefs` and `intercept` using fitted
+parameter nodes; and expose the optimal `lambda`, and range searched, using report nodes
+(as previously demonstrated in Example C).
+
+```@example 42
+function MLJBase.prefit(composite::LassoCVRegressor, verbosity, X, y)
+
+    λ_max = maximum(abs.(MLJ.matrix(X)'y))
+
+    Xs = source(X)
+    ys = source(y)
+
+    r = range(
+        composite.lasso,
+        :lambda,
+        lower=composite.epsilon*λ_max,
+        upper=λ_max,
+        scale=:log10,
+    )
+
+    lambda_range = node(()->r)  # a "constant" report node
+
+    tuned_lasso = TunedModel(
+        composite.lasso,
+        tuning=Grid(shuffle=false),
+        range = r,
+        measure = l2,
+        resampling=composite.resampling,
+    )
+    mach = machine(tuned_lasso, Xs, ys)
+
+    R = node(report, mach)                                 # `R()` returns `report(mach)`
+    lambda = node(r -> r.best_model.lambda, R)             # a report node
+
+    F = node(fitted_params, mach)             # `F()` returns `fitted_params(mach)`
+    coefs = node(f->f.best_fitted_params.coefs, F)         # a fitted params node
+    intercept = node(f->f.best_fitted_params.intercept, F) # a fitted params node
+
+    yhat = predict(mach, Xs)
+
+    return (
+        predict=yhat,
+        fitted_params=(; coefs, intercept),
+        report=(; lambda, lambda_range),
+   )
+
+end
+```
+
+Here's a demonstration:
+
+```@example 42
+X, _ = make_regression(1000, 3, rng=123)
+y = X.x2 - X.x2 + 0.005*X.x3 + 0.05*rand(1000)
+lasso_cv = LassoCVRegressor(epsilon=1e-5)
+mach = machine(lasso_cv, X, y) |> fit!
+report(mach)
+```
+
+```@example 42
+fitted_params(mach)
+```
 
 
 ## The learning network API
