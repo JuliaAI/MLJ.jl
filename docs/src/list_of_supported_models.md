@@ -27,7 +27,7 @@ independent assessment.
 
 | Package | Models | Maturity | Note
 | ------- | ------ | -------- | ----
-[BetaML.jl](https://github.com/sylvaticus/BetaML.jl) | BetaMLGMMImputer, BetaMLGMMRegressor, BetaMLGenericImputer, BetaMLMeanImputer, BetaMLRFImputer, DecisionTreeClassifier, DecisionTreeRegressor, GMMClusterer, KMeans, KMedoids, KernelPerceptronClassifier, MissingImputator, PegasosClassifier, PerceptronClassifier, RandomForestClassifier, RandomForestRegressor | medium |
+[BetaML.jl](https://github.com/sylvaticus/BetaML.jl) | LinearPerceptron, KernelPerceptron, Pegasos, DecisionTreeClassifier, DecisionTreeRegressor,RandomForestClassifier, RandomForestRegressor, NeuralNetworkRegressor, MultitargetNeuralNetworkRegressor, NeuralNetworkClassifier, GaussianMixtureRegressor, MultitargetGaussianMixtureRegressor, KMeans, KMedoids, GaussianMixtureClusterer, SimpleImputer, GaussianMixtureImputer, MultitargetGaussianMixtureImputer, RandomForestImputer, GeneralImputer | medium |
 [Clustering.jl](https://github.com/JuliaStats/Clustering.jl) | KMeans, KMedoids | high | †
 [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl) | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier, RandomForestClassifier, RandomForestRegressor | high | 
 [EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl) | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian | medium | gradient boosting models
