@@ -77,9 +77,10 @@ export scitype, scitype_union, elscitype, nonmissing, trait
 export coerce, coerce!, autotype, schema, info
 
 # re-export from MLJBase:
+import MLJBase: serializable, restore!
 export nrows, color_off, color_on,
     selectrows, selectcols, restrict, corestrict, complement,
-    training_losses, feature_importances, 
+    training_losses, feature_importances,
     predict, predict_mean, predict_median, predict_mode, predict_joint,
     transform, inverse_transform, evaluate, fitted_params, params,
     @constant, @more, HANDLE_GIVEN_ID, UnivariateFinite,
@@ -96,7 +97,8 @@ export nrows, color_off, color_on,
     default_resource, pretty,
     make_blobs, make_moons, make_circles, make_regression,
     fit_only!, return!, int, decoder,
-    default_scitype_check_level
+    default_scitype_check_level,
+    serializable, restore!
 
 # MLJBase/composition/abstract_types.jl:
 for T in vcat(MLJBase.MLJModelInterface.ABSTRACT_MODEL_SUBTYPES,
@@ -132,7 +134,7 @@ export models, localmodels, @load, @iload, load, info, doc,
     Standardizer, UnivariateBoxCoxTransformer,
     OneHotEncoder, ContinuousEncoder, UnivariateDiscretizer,
     FillImputer, matching, BinaryThresholdPredictor,
-    UnivariateTimeTypeToContinuous
+    UnivariateTimeTypeToContinuous, InteractionTransformer
 
 # re-export from MLJIteration:
 export MLJIteration

@@ -39,12 +39,16 @@ MLJModels.UnivariateTimeTypeToContinuous
 
 ## Static transformers
 
-The main use-case for static transformers is for insertion into
-[Linear Pipelines](@ref) or other exported learning networks (see [Composing
-Models](@ref)). If a static transformer has no hyper-parameters, it is
-tantamount to an ordinary function. An ordinary function can be
-inserted directly into a pipeline; the situation for learning
-networks is only slightly more complicated; see [Static operations on nodes](@ref).
+A *static transformer* is a model for transforming data that does not generalize to new
+data (does not "learn") but which nevertheless has hyperparameters. For example, the
+`DBSAN` clustering model from Clustering.jl can assign labels to some collection of
+observations, cannot directly assign a label to some new observation. 
+
+The general user may define their own static models. The main use-case is insertion into a
+[Linear Pipelines](@ref) some parameter-dependent transformation. (If a static transformer
+has no hyper-parameters, it is tantamount to an ordinary function. An ordinary function
+can be inserted directly into a pipeline; the situation for learning networks is only
+slightly more complicated; see [Static operations on nodes](@ref).)
 
 The following example defines a new model type `Averager` to perform
 the weighted average of two vectors (target predictions, for
@@ -151,6 +155,9 @@ _.fitted_params_per_fold = [ … ]
 _.report_per_fold = [ … ]
 ```
 
+A static transformer can also expose byproducts of the transform computation in the report
+of any associated machine. See [Static models (models that do not generalize)](@ref) for
+details.
 
 ## Transformers that also predict
 
