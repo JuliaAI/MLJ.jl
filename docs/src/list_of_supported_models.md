@@ -30,7 +30,8 @@ independent assessment.
 [BetaML.jl](https://github.com/sylvaticus/BetaML.jl) | - | BetaMLGMMImputer, BetaMLGMMRegressor, BetaMLGenericImputer, BetaMLMeanImputer, BetaMLRFImputer, DecisionTreeClassifier, DecisionTreeRegressor, GMMClusterer, KMeans, KMedoids, KernelPerceptronClassifier, MissingImputator, PegasosClassifier, PerceptronClassifier, RandomForestClassifier, RandomForestRegressor | medium |
 [Clustering.jl](https://github.com/JuliaStats/Clustering.jl) | [MLJClusteringInterface.jl](https://github.com/JuliaAI/MLJClusteringInterface.jl) | KMeans, KMedoids | high | †
 [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl) | [MLJDecisionTreeInterface.jl](https://github.com/JuliaAI/MLJDecisionTreeInterface.jl) | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier, RandomForestClassifier, RandomForestRegressor | high | 
-[EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl) | - | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian | medium | gradient boosting models
+[EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl) | - | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian | medium | tree-based gradient boosting models
+[EvoLinear.jl](https://github.com/jeremiedb/EvoLinear.jl) | - | EvoLinearRegressor | medium | linear boosting models
 [GLM.jl](https://github.com/JuliaStats/GLM.jl) | [MLJGLMInterface.jl](https://github.com/JuliaAI/MLJGLMInterface.jl) | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium | †
 [LIBSVM.jl](https://github.com/mpastell/LIBSVM.jl) | [MLJLIBSVMInterface.jl](https://github.com/JuliaAI/MLJLIBSVMInterface.jl) | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
 [LightGBM.jl](https://github.com/IQVIA-ML/LightGBM.jl) | - | LGBMClassifier, LGBMRegressor | high | 
