@@ -134,7 +134,7 @@ export models, localmodels, @load, @iload, load, info, doc,
     Standardizer, UnivariateBoxCoxTransformer,
     OneHotEncoder, ContinuousEncoder, UnivariateDiscretizer,
     FillImputer, matching, BinaryThresholdPredictor,
-    UnivariateTimeTypeToContinuous
+    UnivariateTimeTypeToContinuous, InteractionTransformer
 
 # re-export from MLJIteration:
 export MLJIteration
