@@ -143,8 +143,9 @@ Extract:
 
 ## Key features
 
-* Data agnostic, train models on any data supported by the
-  [Tables.jl](https://github.com/JuliaData/Tables.jl) interface.
+* Data agnostic, train most models on any data `X` supported by the
+  [Tables.jl](https://github.com/JuliaData/Tables.jl) interface (needs `Tables.istable(X)
+  == true`).
 
 * Extensive, state-of-the-art, support for model composition
   (*pipelines*, *stacks* and, more generally, *learning networks*). See more
