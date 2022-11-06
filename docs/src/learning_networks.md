@@ -124,7 +124,7 @@ Z()
 Q()
 ```
 
-You can learn more about the `node` function under [;;;
+You can learn more about the `node` function under [More on defining new nodes](@ref) 
 
 ### A network that learns
 
@@ -133,9 +133,9 @@ To incorporate learning in a network of nodes we need to:
 - Allow binding of machines to nodes instead of data
 
 - Generate "operation" nodes when calling an operation like `predict` or `transform` on a
-  machine. Such nodes point to both a machine (storing learned parameters) and nodes from
-  which to fetch data for applying the operation (which, unlike the nodes seen so far,
-  depend on learned parameters to generate output).
+  machine and node input data. Such nodes point to both a machine (storing learned
+  parameters) and the node from which to fetch data for applying the operation (which,
+  unlike the nodes seen so far, depend on learned parameters to generate output).
 
 For an example of a learning network that actually learns, we first synthesize some
 training data `X`, `y`, and production data `Xnew`:
@@ -695,7 +695,7 @@ N(rand(2))
 
 In fact, this is precisely how the `tranform` method is internally overloaded to work,
 when called with a node argument (to return a node instead of data). That is, internally
-there exists code that amounts to the defintion
+there exists code that amounts to the definition
 
 ```julia
 transform(mach, X::AbstractNode) = node(transform, mach, X)
@@ -867,7 +867,7 @@ fitted_params(mach)
 
 ## The learning network API
 
-Two new julia types are part of learning networks: `Source` and `Node`.
+Two new julia types are part of learning networks: `Source` and `Node`, which share a common abstract supertype `AbstractNode`. 
 
 Formally, a learning network defines *two* labeled directed acyclic
 graphs (DAG's) whose nodes are `Node` or `Source` objects, and whose
