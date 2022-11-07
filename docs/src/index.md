@@ -71,6 +71,7 @@ To support MLJ development, please cite these works or star the repo:
 [Target Transformations](@ref) |
 [Homogeneous Ensembles](@ref) |
 [Model Stacking](@ref) |
+[Learning Networks](@ref)
 
 ### Customization and Extension
 [Simple User Defined Models](@ref) |
