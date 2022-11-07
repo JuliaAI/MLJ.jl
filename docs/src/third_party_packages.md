@@ -26,5 +26,6 @@ See [List of Supported Models](@ref model_list)
 - [ShapML.jl](https://github.com/nredell/ShapML.jl) (feature ranking / interpretation)
 - [Fairness.jl](https://github.com/ashryaagr/Fairness.jl) (FAIRness metrics)
 - [OutlierDetection.jl](https://github.com/OutlierDetectionJL/OutlierDetection.jl/blob/master/src/mlj_wrappers.jl) (provides the `ProbabilisticDetector` wrapper and other outlier detection meta-functionality)
+- [ConformalPrediction.jl](https://github.com/pat-alt/ConformalPrediction.jl) (predictive uncertainty quantification through conformal prediction)
 
 

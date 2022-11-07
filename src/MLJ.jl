@@ -100,15 +100,10 @@ export nrows, color_off, color_on,
     default_scitype_check_level,
     serializable, restore!
 
-# MLJBase/composition/abstract_types.jl:
-for T in vcat(MLJBase.MLJModelInterface.ABSTRACT_MODEL_SUBTYPES,
-    MLJBase.COMPOSITE_TYPES,
-    MLJBase.SURROGATE_TYPES)
+# abstract model types from MLJBase:
+for T in MLJBase.EXTENDED_ABSTRACT_MODEL_TYPES
     @eval(export $T)
 end
-export Surrogate, Composite
-export DeterministicNetwork, ProbabilisticNetwork, UnsupervisedNetwork
-
 
 # MLJBase/measures:
 # measure names:
@@ -116,7 +111,7 @@ for m in MLJBase.MEASURE_TYPES_ALIASES_AND_INSTANCES
     :(export $m) |> eval
 end
 export measures,
-    aggregate, default_measure, value, skipinvalid,
+    aggregate, default_measure, skipinvalid,
     roc_curve, roc,
     no_avg, macro_avg, micro_avg
 

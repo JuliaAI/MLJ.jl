@@ -126,15 +126,6 @@ The possible signatures for custom measures are: `measure(ŷ, y)`,
 measure implementing one non-weighted version, and possibly a second
 weighted version.
 
-*Implementation detail:* Internally, every measure is evaluated using
-the syntax
-
-```julia
-MLJ.value(measure, ŷ, X, y, w)
-```
-and the traits determine what can be ignored and how `measure` is actually called. If `w=nothing` then the non-weighted form of `measure` is
-dispatched.
-
 ## Using measures from LossFunctions.jl
 
 The [LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl)

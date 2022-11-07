@@ -48,7 +48,7 @@ The general user may define their own static models. The main use-case is insert
 [Linear Pipelines](@ref) some parameter-dependent transformation. (If a static transformer
 has no hyper-parameters, it is tantamount to an ordinary function. An ordinary function
 can be inserted directly into a pipeline; the situation for learning networks is only
-slightly more complicated; see [Static operations on nodes](@ref).)
+[slightly more complicated](@ref node_overloading).
 
 The following example defines a new model type `Averager` to perform
 the weighted average of two vectors (target predictions, for
