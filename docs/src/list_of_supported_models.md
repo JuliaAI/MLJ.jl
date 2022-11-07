@@ -30,7 +30,7 @@ independent assessment.
 [BetaML.jl](https://github.com/sylvaticus/BetaML.jl) | BetaMLGMMImputer, BetaMLGMMRegressor, BetaMLGenericImputer, BetaMLMeanImputer, BetaMLRFImputer, DecisionTreeClassifier, DecisionTreeRegressor, GMMClusterer, KMeans, KMedoids, KernelPerceptronClassifier, MissingImputator, PegasosClassifier, PerceptronClassifier, RandomForestClassifier, RandomForestRegressor | medium |
 [Clustering.jl](https://github.com/JuliaStats/Clustering.jl) | KMeans, KMedoids | high | †
 [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl) | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier, RandomForestClassifier, RandomForestRegressor | high | 
-[EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl) | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian | medium | gradient boosting models
+[EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl) | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian, EvoTreeMLE | medium | gradient boosting models
 [GLM.jl](https://github.com/JuliaStats/GLM.jl) | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium | †
 [LIBSVM.jl](https://github.com/mpastell/LIBSVM.jl) | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
 [LightGBM.jl](https://github.com/IQVIA-ML/LightGBM.jl) | LGBMClassifier, LGBMRegressor | high | 
