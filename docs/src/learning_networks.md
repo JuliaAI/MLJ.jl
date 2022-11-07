@@ -624,7 +624,7 @@ function MLJBase.prefit(composite::CompositeE, verbosity, X, y)
 end
 ```
 
-Here's an application to the Boston dataset in which we optimize the coupling coefficien
+Here's an application to the Boston dataset in which we optimize the coupling coefficient
 (see [Tuning Models](@ref) for more on hyper-parameter optimization):
 
 ```@example 42
@@ -693,7 +693,7 @@ N()
 N(rand(2))
 ```
 
-In fact, this is precisely how the `tranform` method is internally overloaded to work,
+In fact, this is precisely how the `transform` method is internally overloaded to work,
 when called with a node argument (to return a node instead of data). That is, internally
 there exists code that amounts to the definition
 
