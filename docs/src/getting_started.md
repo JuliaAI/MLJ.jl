@@ -33,12 +33,11 @@ schema(iris)
 ```
 
 Because this data format is compatible with
-[Tables.jl](https://tables.juliadata.org/stable/), many MLJ methods
-(such as `selectrows`, `pretty` and `schema` used above) as well as
-many MLJ models can work with it. However, as most new users are
-already familiar with the access methods particular to
-[DataFrames](https://dataframes.juliadata.org/stable/) (also
-compatible with Tables.jl) we'll put our data into that format here:
+[Tables.jl](https://tables.juliadata.org/stable/) (and satisfies `Tables.istable(iris) ==
+true`) many MLJ methods (such as `selectrows`, `pretty` and `schema` used above) as well
+as many MLJ models can work with it. However, as most new users are already familiar with
+the access methods particular to [DataFrames](https://dataframes.juliadata.org/stable/)
+(also compatible with Tables.jl) we'll put our data into that format here:
 
 ```@example doda
 import DataFrames
@@ -334,14 +333,12 @@ scitype(X)
 
 ### Two-dimensional data
 
-Generally, two-dimensional data in MLJ is expected to be *tabular*.
-All data containers compatible with the
-[Tables.jl](https://github.com/JuliaData/Tables.jl) interface (which
-includes all source formats listed
-[here](https://github.com/JuliaData/Tables.jl/blob/master/INTEGRATIONS.md))
-have the scientific type `Table{K}`, where `K` depends on the
-scientific types of the columns, which can be individually inspected
-using `schema`:
+Generally, two-dimensional data in MLJ is expected to be *tabular*.  All data containers
+`X` compatible with the [Tables.jl](https://github.com/JuliaData/Tables.jl) interface and
+sastisfying `Tables.istable(X) == true` (most of the formats in [this
+list](https://github.com/JuliaData/Tables.jl/blob/master/INTEGRATIONS.md)) have the
+scientific type `Table{K}`, where `K` depends on the scientific types of the columns,
+which can be individually inspected using `schema`:
 
 ```@repl doda
 schema(X)
@@ -385,10 +382,10 @@ resampling is always more efficient in this case.
 
 ### Inputs
 
-Since an MLJ model only specifies the scientific type of data, if that
-type is `Table` - which is the case for the majority of MLJ models -
-then any [Tables.jl](https://github.com/JuliaData/Tables.jl) format is
-permitted.
+Since an MLJ model only specifies the scientific type of data, if that type is `Table` -
+which is the case for the majority of MLJ models - then any
+[Tables.jl](https://github.com/JuliaData/Tables.jl) container `X` is permitted, so long as
+`Tables.istable(X) == true`.
 
 Specifically, the requirement for an arbitrary model's input is `scitype(X)
 <: input_scitype(model)`.

@@ -1,7 +1,7 @@
 name = "MLJ"
 uuid = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 authors = ["Anthony D. Blaom <anthony.blaom@gmail.com>"]
-version = "0.18.4"
+version = "0.18.6"
 
 [deps]
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
@@ -32,7 +32,7 @@ MLJEnsembles = "0.3"
 MLJIteration = "0.5"
 MLJModels = "0.16"
 MLJTuning = "0.7"
-OpenML = "0.2"
+OpenML = "0.2,0.3"
 ProgressMeter = "1.1"
 ScientificTypes = "3"
 StatsBase = "0.32,0.33"

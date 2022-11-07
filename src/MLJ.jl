@@ -77,6 +77,7 @@ export scitype, scitype_union, elscitype, nonmissing, trait
 export coerce, coerce!, autotype, schema, info
 
 # re-export from MLJBase:
+import MLJBase: serializable, restore!
 export nrows, color_off, color_on,
     selectrows, selectcols, restrict, corestrict, complement,
     training_losses, feature_importances,
@@ -96,7 +97,8 @@ export nrows, color_off, color_on,
     default_resource, pretty,
     make_blobs, make_moons, make_circles, make_regression,
     fit_only!, return!, int, decoder,
-    default_scitype_check_level
+    default_scitype_check_level,
+    serializable, restore!
 
 # abstract model types from MLJBase:
 for T in MLJBase.EXTENDED_ABSTRACT_MODEL_TYPES
@@ -127,7 +129,7 @@ export models, localmodels, @load, @iload, load, info, doc,
     Standardizer, UnivariateBoxCoxTransformer,
     OneHotEncoder, ContinuousEncoder, UnivariateDiscretizer,
     FillImputer, matching, BinaryThresholdPredictor,
-    UnivariateTimeTypeToContinuous
+    UnivariateTimeTypeToContinuous, InteractionTransformer
 
 # re-export from MLJIteration:
 export MLJIteration

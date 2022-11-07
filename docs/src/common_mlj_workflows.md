@@ -77,7 +77,7 @@ Loading a built-in data set already split into `X` and `y`:
 
 ```@example workflows
 X, y = @load_iris;
-selectrows(X, 1:4) # selectrows works for any Tables.jl table
+selectrows(X, 1:4) # selectrows works whenever `Tables.istable(X)==true`.
 ```
 
 ```@example workflows

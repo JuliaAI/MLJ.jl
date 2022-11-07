@@ -697,6 +697,12 @@ convention, elements of `y` have type `CategoricalValue`, and *not*
 [BinaryClassifier](https://github.com/JuliaAI/MLJModels.jl/blob/master/src/GLM.jl)
 for an example.
 
+#### Report items returned by predict
+
+A `predict` method, or other operation such as `transform`, can contribute to the report
+accessible in any machine associated with a model. See [Reporting byproducts of a
+static transformation](@ref) below for details.
+
 
 ### The predict_joint method
 
@@ -1191,11 +1197,12 @@ Your document string must include the following components, in order:
 Unsupervised models implement the MLJ model interface in a very
 similar fashion. The main differences are:
 
-- The `fit` method has only one training argument `X`, as in
-  `MLJModelInterface.fit(model, verbosity, X)`. However, it has
-  the same return value `(fitresult, cache, report)`. An `update`
-  method (e.g., for iterative models) can be optionally implemented in
-  the same way.
+- The `fit` method has only one training argument `X`, as in `MLJModelInterface.fit(model,
+  verbosity, X)`. However, it has the same return value `(fitresult, cache, report)`. An
+  `update` method (e.g., for iterative models) can be optionally implemented in the same
+  way. For models that subtype `Static <: Unsupervised` (see also [Static
+  transformers](@ref) `fit` has no training arguments but does not need to be implemented
+  as a fallback returns `(nothing, nothing, nothing)`.
 
 - A `transform` method is compulsory and has the same signature as
   `predict`, as in `MLJModelInterface.transform(model, fitresult, Xnew)`.
@@ -1219,6 +1226,30 @@ similar fashion. The main differences are:
   clustering algorithms that `predict` labels and `transform` new
   input features into a space of lower dimension. See [Transformers
   that also predict](@ref) for an example.
+
+## Static models (models that do not generalize)
+
+See [Static transformers](@ref) for basic implementation of models that do not generalize
+to new data but do have hyperparameters. 
+
+### Reporting byproducts of a static transformation
+
+As a static transformer does not implement `fit`, the usual mechanism for creating a
+`report` is not available. Instead, byproducts of the computation performed by `transform`
+can be returned by `transform` itself by returning a pair (`output`, `report`) instead of
+just `output`.  Here `report` should be a named tuple. In fact, any operation, (e.g.,
+`predict`) can do this, and in the case of any model type. However, this exceptional
+behavior must be flagged with an appropriate trait declaration, as in
+
+```julia
+MLJModelInterface.reporting_operations(::Type{<:SomeModelType}) = (:transform,)
+```
+
+If `mach` is a machine wrapping a model of this kind, then the `report(mach)` will include
+the `report` item form `transform`'s output. For sample implementations, see [this
+issue](https://github.com/JuliaAI/MLJBase.jl/pull/806) or the code for [DBSCAN
+clustering](https://github.com/jbrea/MLJClusteringInterface.jl/blob/41d3c2195ad33f1840596c9762a3a67b9a124c6a/src/MLJClusteringInterface.jl#L125).
+
 
 ## Outlier detection models
 
