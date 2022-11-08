@@ -128,11 +128,11 @@ You can learn more about the `node` function under [More on defining new nodes](
 
 ### A network that learns
 
-To incorporate learning in a network of nodes we need to:
+To incorporate learning in a network of nodes MLJ:
 
-- Allow binding of machines to nodes instead of data
+- Allows binding of machines to nodes instead of data
 
-- Generate "operation" nodes when calling an operation like `predict` or `transform` on a
+- Generates "operation" nodes when calling an operation like `predict` or `transform` on a
   machine and node input data. Such nodes point to both a machine (storing learned
   parameters) and the node from which to fetch data for applying the operation (which,
   unlike the nodes seen so far, depend on learned parameters to generate output).
