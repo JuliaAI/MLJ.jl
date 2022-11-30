@@ -1,2 +1,4 @@
 *ipynb linguist-vendored
 *.bib linguist-vendored
+*.md linguist-vendored
+*.drawio linguist-vendored
