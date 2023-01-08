@@ -84,7 +84,7 @@ Extract:
 ├────────────────────────────────┼──────────────┼─────────────┼─────────┼───────
 │ LogLoss(                       │ predict      │ 1.92        │ 1.53    │ [1.4 ⋯
 │   tol = 2.220446049250313e-16) │              │             │         │      ⋯
-│ Accuracy()                     │ predict_mode │ 0.947       │ 0.0425  │ [0.9 ⋯
+│ Accuracy()                     │ predict_mode │ 0.947       │ N/A     │ [0.9 ⋯
 └────────────────────────────────┴──────────────┴─────────────┴─────────┴───────
                                                                 1 column omitted</code></pre><p>Under the hood, <code>evaluate</code> calls lower level functions <code>predict</code> or <code>predict_mode</code> according to the type of measure, as shown in the output. We shall call these operations directly below.</p><p>For more on performance evaluation, see <a href="../evaluating_model_performance/">Evaluating Model Performance</a> for details.</p><h2 id="A-preview-of-data-type-specification-in-MLJ"><a class="docs-heading-anchor" href="#A-preview-of-data-type-specification-in-MLJ">A preview of data type specification in MLJ</a><a id="A-preview-of-data-type-specification-in-MLJ-1"></a><a class="docs-heading-anchor-permalink" href="#A-preview-of-data-type-specification-in-MLJ" title="Permalink"></a></h2><p>The target <code>y</code> above is a categorical vector, which is appropriate because our model is a decision tree <em>classifier</em>:</p><pre><code class="language-julia-repl">julia&gt; typeof(y)
 CategoricalVector{String, UInt32, String, CategoricalValue{String, UInt32}, Union{}} (alias for CategoricalArray{String, 1, UInt32, String, CategoricalValue{String, UInt32}, Union{}})</code></pre><p>However, MLJ models do not prescribe the machine types for the data they operate on. Rather, they specify a <em>scientific type</em>, which refers to the way data is to be <em>interpreted</em>, as opposed to how it is <em>encoded</em>:</p><pre><code class="language-julia-repl">julia&gt; target_scitype(tree)
@@ -99,8 +99,8 @@ AbstractVector{Count} (alias for AbstractArray{Count, 1})</code></pre><p>and usi
 untrained Machine; caches model-specific representations of data
   model: DecisionTreeClassifier(max_depth = -1, …)
   args:
-    1:	Source @065 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @085 ⏎ AbstractVector{Multiclass{3}}</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7); # 70:30 split
+    1:	Source @934 ⏎ Table{AbstractVector{Continuous}}
+    2:	Source @821 ⏎ AbstractVector{Multiclass{3}}</code></pre><p>Training and testing on a hold-out set:</p><pre><code class="language-julia-repl">julia&gt; train, test = partition(eachindex(y), 0.7); # 70:30 split
 
 julia&gt; fit!(mach, rows=train);
 [ Info: Training machine(DecisionTreeClassifier(max_depth = -1, …), …).
@@ -162,14 +162,14 @@ julia&gt; mach2 = machine(stand, v)
 untrained Machine; caches model-specific representations of data
   model: Standardizer(features = Symbol[], …)
   args:
-    1:	Source @913 ⏎ AbstractVector{Continuous}
+    1:	Source @114 ⏎ AbstractVector{Continuous}
 
 julia&gt; fit!(mach2)
 [ Info: Training machine(Standardizer(features = Symbol[], …), …).
 trained Machine; caches model-specific representations of data
   model: Standardizer(features = Symbol[], …)
   args:
-    1:	Source @913 ⏎ AbstractVector{Continuous}
+    1:	Source @114 ⏎ AbstractVector{Continuous}
 
 julia&gt; w = transform(mach2, v)
 4-element Vector{Float64}:
@@ -358,4 +358,4 @@ Vector{Matrix{ColorTypes.RGB{Float64}}}
 
 julia&gt; scitype(v)
 AbstractVector{ColorImage{10, 10}}
-</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="ScientificTypes.autotype" href="#ScientificTypes.autotype"><code>ScientificTypes.autotype</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">autotype(X; kw...)</code></pre><p>Return a dictionary of suggested scitypes for each column of <code>X</code>, a table or an array based on rules</p><p><strong>Kwargs</strong></p><ul><li><code>only_changes=true</code>:       if true, return only a dictionary of the names for                             which applying autotype differs from just using                             the ambient convention. When coercing with                             autotype, <code>only_changes</code> should be true.</li><li><code>rules=(:few_to_finite,)</code>: the set of rules to apply.</li></ul></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../learning_mlj/">« Learning MLJ</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 1 December 2022 04:17">Thursday 1 December 2022</span>. Using Julia version 1.8.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="ScientificTypes.autotype" href="#ScientificTypes.autotype"><code>ScientificTypes.autotype</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia">autotype(X; kw...)</code></pre><p>Return a dictionary of suggested scitypes for each column of <code>X</code>, a table or an array based on rules</p><p><strong>Kwargs</strong></p><ul><li><code>only_changes=true</code>:       if true, return only a dictionary of the names for                             which applying autotype differs from just using                             the ambient convention. When coercing with                             autotype, <code>only_changes</code> should be true.</li><li><code>rules=(:few_to_finite,)</code>: the set of rules to apply.</li></ul></div></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../learning_mlj/">« Learning MLJ</a><a class="docs-footer-nextpage" href="../common_mlj_workflows/">Common MLJ Workflows »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 8 January 2023 23:36">Sunday 8 January 2023</span>. Using Julia version 1.8.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
