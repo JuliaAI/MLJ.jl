@@ -23,16 +23,16 @@ MLJ.color_off()
 
 ```@example 123
 Ridge = @load RidgeRegressor pkg=MLJLinearModels verbosity=0
-ridge = Ridge()
-ridge2 = TransformedTargetModel(ridge, target=Standardizer())
+ridge = Ridge(fit_intercept=false)
+ridge2 = TransformedTargetModel(ridge, transformer=Standardizer())
 ```
 Note that all the original hyperparameters, as well as those of
 the `Standardizer`, are accessible as nested hyper-parameters of the
 wrapped model, which can be trained or evaluated like any other:
 
 ```@example 123
-X, y = make_regression(rng=1234)
-y = 10^6*y
+X, y = make_regression(rng=1234, intercept=false)
+y = y*10^5
 mach = machine(ridge2, X, y)
 fit!(mach, rows=1:60, verbosity=0)
 predict(mach, rows=61:62)
@@ -48,9 +48,9 @@ Training and predicting using `ridge2` as above means:
 
 4. Applying the inverse scaling learned in Step 1 to those predictions (to get the final output shown above)
 
-Since both `ridge` and `ridge2` return predictions on the original
-scale, we can meaningfully compare the corresponding mean absolute
-errors and see that the wrapped model appears to be better:
+Since both `ridge` and `ridge2` return predictions on the original scale, we can
+meaningfully compare the corresponding mean absolute errors, which are indeed different in
+this case.
 
 ```@example 123
 evaluate(ridge, X, y, measure=mae)
