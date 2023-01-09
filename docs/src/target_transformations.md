@@ -64,7 +64,7 @@ Ordinary functions can also be used in target transformations but an
 inverse must be explicitly specified:
 
 ```@example 123
-ridge3 = TransformedTargetModel(ridge, target=y->log.(y), inverse=z->exp.(z))
+ridge3 = TransformedTargetModel(ridge, transformer=y->log.(y), inverse=z->exp.(z))
 X, y = @load_boston
 evaluate(ridge3, X, y, measure=mae)
 ```
