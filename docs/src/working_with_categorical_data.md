@@ -302,7 +302,7 @@ Here's how to construct such a distribution yourself:
 
 ```@example hut
 v = coerce(["yes", "no", "yes", "yes", "maybe"], Multiclass)
-d = UnivariateFinite([v[1], v[2]], [0.9, 0.1])
+d = UnivariateFinite([v[2], v[1]], [0.9, 0.1])
 ```
 
 Or, equivalently,
