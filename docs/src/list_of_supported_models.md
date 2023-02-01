@@ -28,7 +28,7 @@ independent assessment.
 | Package | Interface Pkg | Models | Maturity | Note
 | ------- | ------------- | ------ | -------- | ----
 [BetaML.jl](https://github.com/sylvaticus/BetaML.jl) | - | DecisionTreeClassifier, RandomForestClassifier, NeuralNetworkClassifier, LinearPerceptron, KernelPerceptron, Pegasos, DecisionTreeRegressor, RandomForestRegressor, NeuralNetworkRegressor, MultitargetNeuralNetworkRegressor, GaussianMixtureRegressor, MultitargetGaussianMixtureRegressor, KMeans, KMedoids, GaussianMixtureClusterer,  SimpleImputer,  GaussianMixtureImputer, RandomForestImputer, GeneralImputer | medium |
-[Clustering.jl](https://github.com/JuliaStats/Clustering.jl) | [MLJClusteringInterface.jl](https://github.com/JuliaAI/MLJClusteringInterface.jl) | KMeans, KMedoids | high | †
+[Clustering.jl](https://github.com/JuliaStats/Clustering.jl) | [MLJClusteringInterface.jl](https://github.com/JuliaAI/MLJClusteringInterface.jl) | KMeans, KMedoids, DBSCAN, HierarchicalClustering | high | †
 [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl) | [MLJDecisionTreeInterface.jl](https://github.com/JuliaAI/MLJDecisionTreeInterface.jl) | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier, RandomForestClassifier, RandomForestRegressor | high | 
 [EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl) | - | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian, EvoTreeMLE | medium | tree-based gradient boosting models
 [EvoLinear.jl](https://github.com/jeremiedb/EvoLinear.jl) | - | EvoLinearRegressor | medium | linear boosting models
