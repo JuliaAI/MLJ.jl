@@ -1030,16 +1030,16 @@ this:
 	constant MMI = MLJModelInterface
 
 	# for fit:
-	MMI.reformat(::SomeSupervised, X, y) = (MMI.matrix(X, transpose=true), y)
-	MMI.reformat(::SomeSupervised, X, y, w) = (MMI.matrix(X, transpose=true), y, w)
+	MMI.reformat(::SomeSupervised, X, y) = (MMI.matrix(X)'), y)
+	MMI.reformat(::SomeSupervised, X, y, w) = (MMI.matrix(X)', y, w)
 	MMI.selectrows(::SomeSupervised, I, Xmatrix, y) =
 		(view(Xmatrix, :, I), view(y, I))
 	MMI.selectrows(::SomeSupervised, I, Xmatrix, y, w) =
 		(view(Xmatrix, :, I), view(y, I), view(w, I))
 
 	# for predict:
-	MMI.reformat(::SomeSupervised, X) = (MMI.matrix(X, transpose=true),)
-	MMI.selectrows(::SomeSupervised, I, Xmatrix) = view(Xmatrix, I)
+	MMI.reformat(::SomeSupervised, X) = (MMI.matrix(X)',)
+	MMI.selectrows(::SomeSupervised, I, Xmatrix) = view(Xmatrix, :, I)
 
 With these additions, `fit` and `predict` are refactored, so that `X`
 and `Xnew` represent matrices with features as rows.
