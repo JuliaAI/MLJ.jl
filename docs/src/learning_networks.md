@@ -88,7 +88,7 @@ calculation with new data. One way to do this (discouraged in practice) is to us
 `rebind!`:
 
 ```@example 42
-rebind!(Z, 6) # demonstration only!
+rebind!(X, 6) # demonstration only!
 Z()
 ```
 
