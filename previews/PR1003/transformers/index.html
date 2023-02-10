@@ -295,10 +295,10 @@ knnM = machine(knn, W, y)
 y2 = predict(knnM, W)
 
 averagerM= machine(averager)
-yhat = transform(averagerM, y1, y2)</code></pre><pre class="documenter-example-output">Node @701 → Averager(…)
+yhat = transform(averagerM, y1, y2)</code></pre><pre class="documenter-example-output">Node @499 → Averager(…)
   args:
-    1:	Node @539 → RidgeRegressor(…)
-    2:	Node @493 → KNNRegressor(…)
+    1:	Node @920 → RidgeRegressor(…)
+    2:	Node @598 → KNNRegressor(…)
   formula:
     transform(
       machine(Averager(mix = 0.5), …), 
@@ -306,12 +306,12 @@ yhat = transform(averagerM, y1, y2)</code></pre><pre class="documenter-example-o
         machine(RidgeRegressor(lambda = 1.0, …), …), 
         transform(
           machine(OneHotEncoder(features = Symbol[], …), …), 
-          Source @443)),
+          Source @189)),
       predict(
         machine(KNNRegressor(K = 5, …), …), 
         transform(
           machine(OneHotEncoder(features = Symbol[], …), …), 
-          Source @443)))</pre><p>Now we export to obtain a <code>Deterministic</code> composite model and then instantiate composite model</p><pre><code class="language-julia">learning_mach = machine(Deterministic(), X, y; predict=yhat)
+          Source @189)))</pre><p>Now we export to obtain a <code>Deterministic</code> composite model and then instantiate composite model</p><pre><code class="language-julia">learning_mach = machine(Deterministic(), X, y; predict=yhat)
 Machine{DeterministicSurrogate} @772 trained 0 times.
   args:
     1:	Source @415 ⏎ `Unknown`
@@ -405,4 +405,4 @@ compare[101:108]
  (2, &quot;virginica&quot;)
  (2, &quot;virginica&quot;)
  (3, &quot;virginica&quot;)
- (2, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../preparing_data/">« Preparing Data</a><a class="docs-footer-nextpage" href="../more_on_probabilistic_predictors/">More on Probabilistic Predictors »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 10 February 2023 03:22">Friday 10 February 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ (2, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../preparing_data/">« Preparing Data</a><a class="docs-footer-nextpage" href="../more_on_probabilistic_predictors/">More on Probabilistic Predictors »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 10 February 2023 03:44">Friday 10 February 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
