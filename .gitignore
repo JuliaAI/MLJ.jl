@@ -1,5 +1,6 @@
 /Manifest.toml
 /docs/Manifest.toml
+/docs/src/models/
 .ipynb_checkpoints
 *~
 #*
