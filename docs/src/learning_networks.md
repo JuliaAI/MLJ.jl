@@ -88,8 +88,8 @@ calculation with new data. One way to do this (discouraged in practice) is to us
 `rebind!`:
 
 ```@example 42
-rebind!(X, 1) # demonstration only!
-W()
+rebind!(X, 6) # demonstration only!
+Z()
 ```
 
 However, if a node has a unique origin, then one instead *calls* the node on the new data one

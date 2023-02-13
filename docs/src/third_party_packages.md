@@ -15,6 +15,7 @@ See [List of Supported Models](@ref model_list)
 
 ## Providing unregistered models:
 
+- [CatBoost.jl](https://github.com/JuliaAI/CatBoost.jl)
 - [SossMLJ.jl](https://github.com/cscherrer/SossMLJ.jl)
 - [TimeSeriesClassification](https://github.com/alan-turing-institute/TimeSeriesClassification.jl)
 

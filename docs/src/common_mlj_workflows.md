@@ -141,10 +141,11 @@ info("PCA")
 info("RidgeRegressor", pkg="MultivariateStats") # a model type in multiple packages
 ```
 
-Extracting the model document string:
+Extracting the model document string (output omitted):
 
 ```@example workflows
 doc("DecisionTreeClassifier", pkg="DecisionTree")
+nothing # hide
 ```
 
 ## Instantiating a model
