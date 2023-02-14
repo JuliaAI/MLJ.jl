@@ -1,5 +1,7 @@
 /Manifest.toml
 /docs/Manifest.toml
+/docs/src/models/
+/docs/src/models/model_browser.md
 .ipynb_checkpoints
 *~
 #*
