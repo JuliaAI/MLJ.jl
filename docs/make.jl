@@ -16,11 +16,32 @@ import ScientificTypes
 import MLJModelInterface
 import ScientificTypesBase
 import Distributions
-using CategoricalArrays # avoid types like CategoricalArrays.Categorica
+using CategoricalArrays
 using LossFunctions
 import CategoricalDistributions
 
 const MMI = MLJModelInterface
+
+include("model_docstring_tools.jl")
+
+# checking every model has a descriptor, for determining categories under which it appears
+# in the Model Browser section of manual:
+@info "Checking ModelDescriptors.toml to see all models have descriptors assigned. "
+problems = models_missing_descriptors()
+isempty(problems) || error(
+    "The following keys are missing from /docs/ModelDescriptors.toml: "*
+        "$problems. ")
+
+# compose the individual model docstring pages:
+@info "Getting individual model docstrings from the registry and generating "*
+    "pages for them, written at /docs/src/models/ ."
+for model in models()
+    write_page(model)
+end
+
+# compose the model browser page:
+@info "Composing the Model Browser page, /docs/src/model_browser.md"
+write_page()
 
 # using Literate
 # Literate.markdown("common_mlj_workflows.jl", ".",
@@ -28,6 +49,7 @@ const MMI = MLJModelInterface
 
 pages = [
     "Home" => "index.md",
+    "Model Browser" => "model_browser.md",
     "About MLJ" => "about_mlj.md",
     "Learning MLJ" => "learning_mlj.md",
     "Getting Started" => "getting_started.md",
