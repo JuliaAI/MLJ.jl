@@ -34,7 +34,9 @@ To support MLJ development, please cite these works or star the repo:
   Star</a>
 ```
 
-# Reference manual
+# [Model Browser](@ref)
+
+# Reference Manual
 
 ### Basics
 [Getting Started](@ref) | 
