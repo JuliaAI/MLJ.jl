@@ -41,6 +41,21 @@ const DESCRIPTORS_GIVEN_HANDLE =
 const descriptors = vcat(values(DESCRIPTORS_GIVEN_HANDLE)...)
 const ranking = MLJBase.countmap(descriptors)
 const DESCRIPTORS = sort(unique(descriptors), by=d -> ranking[d], rev=true)
+const HANDLES = keys(DESCRIPTORS_GIVEN_HANDLE)
+
+"""
+    models_missing_descriptors()
+
+Return a list of handles for those models in the registry not have the corresponding
+handle as key in /docs/src/ModelDescriptors.toml.
+
+"""
+function models_missing_descriptors()
+    handles = handle.(models())
+    filter(handles) do h
+        !(h in HANDLES)
+    end 
+end
 
 """
     modelswith(descriptor)

@@ -24,6 +24,14 @@ const MMI = MLJModelInterface
 
 include("model_docstring_tools.jl")
 
+# checking every model has a descriptor, for determining categories under which it appears
+# in the Model Browser section of manual:
+@info "Checking ModelDescriptors.toml to see all models have descriptors assigned. "
+problems = models_missing_descriptors()
+isempty(problems) || error(
+    "The following keys are missing from /docs/ModelDescriptors.toml: "*
+        "$problems. ")
+
 # compose the individual model docstring pages:
 @info "Getting individual model docstrings from the registry and generating "*
     "pages for them, written at /docs/src/models/ ."
