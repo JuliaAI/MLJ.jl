@@ -34,6 +34,8 @@ intended as a complete reference.
 
 - [MLCourse](https://github.com/jbrea/MLCourse): Teaching material for an introductory machine learning course at EPFL (for an interactive preview see [here](https://bio322.epfl.ch)).
 
+- [Julia Boards the Titanic](https://forem.julialang.org/ablaom/julia-boards-the-titanic-1ne8) Blog post on using MLJ for users new to Julia. 
+
 - [Analyzing the Glass Dataset](https://towardsdatascience.com/part-i-analyzing-the-glass-dataset-c556788a496f): A gentle introduction to data science using Julia and MLJ (three-part blog post)
 
 - [Lightning Tour](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/lightning_tour/lightning_tour.ipynb): A compressed demonstration of key MLJ functionality
