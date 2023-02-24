@@ -53,7 +53,7 @@ we can do
 using MLJ
 
 X = source(4)
-Y = source(9)
+Y = source(3)
 Z = 2*X
 W = Y + Z
 W()
@@ -88,6 +88,10 @@ calculation with new data. One way to do this (discouraged in practice) is to us
 `rebind!`:
 
 ```@example 42
+Z()
+```
+
+```@example 42
 rebind!(X, 6) # demonstration only!
 Z()
 ```
@@ -102,6 +106,11 @@ origins(Z)
 ```@example 42
 Z(6)
 ```
+
+```@example 42
+Z(4)
+```
+
 
 This has the advantage that you don't need to locate the origin and rebind data directly,
 and the unique-origin restriction turns out to be sufficient for the applications to
@@ -124,7 +133,7 @@ Z()
 Q()
 ```
 
-You can learn more about the `node` function under [More on defining new nodes](@ref) 
+You can learn more about the `node` function under [More on defining new nodes](@ref)
 
 ### A network that learns
 
@@ -867,7 +876,7 @@ fitted_params(mach)
 
 ## The learning network API
 
-Two new julia types are part of learning networks: `Source` and `Node`, which share a common abstract supertype `AbstractNode`. 
+Two new julia types are part of learning networks: `Source` and `Node`, which share a common abstract supertype `AbstractNode`.
 
 Formally, a learning network defines *two* labeled directed acyclic
 graphs (DAG's) whose nodes are `Node` or `Source` objects, and whose
