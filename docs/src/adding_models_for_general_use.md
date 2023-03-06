@@ -1,4 +1,4 @@
-# Adding Models for General Use
+# Adding Models for General Use 
 
 !!! note
 
@@ -370,13 +370,18 @@ Additionally, if `SomeSupervisedModel` supports sample weights, one must declare
 MMI.supports_weights(model::Type{<:SomeSupervisedModel}) = true
 ```
 
-Optionally, an implementation may add a data front-end, for
-transforming user data (such as a table) into some model-specific
-format (such as a matrix), and for adding methods to specify how the said
-format is resampled. (This alters the meaning of `X`, `y` and `w` in
-the signatures of `fit`, `update`, `predict`, etc; see [Implementing a
-data front-end](@ref) for details). This can provide the MLJ user
-certain performance advantages when fitting a machine.
+Optionally, an implementation may add a data front-end, for transforming user data (such
+as a table) into some model-specific format (such as a matrix), and/or add methods to
+specify how reformatted data is resampled. **This alters the interpretation of the data
+arguments of `fit`, `update` and `predict`, whose number may also change.** See
+[Implementing a data front-end](@ref) for details). A data front-end provides the MLJ user
+certain performance advantages when retraining a machine.
+
+**Third-party packages that interact directly with models using the MLJModelInterface.jl
+API, rather than through the machine interface, will also need to understand how the data
+front-end works**, so they incorporate `reformat` into their `fit`/`update`/`predict`
+calls. See also this
+[issue](https://github.com/JuliaAI/MLJDecisionTreeInterface.jl/issues/51).
 
 ```julia
 MLJModelInterface.reformat(model::SomeSupervisedModel, args...) = args
@@ -964,9 +969,9 @@ also appears in the EvoTrees.jl package.
 Here "user-supplied data" is what the MLJ user supplies when
 constructing a machine, as in `machine(models, args...)`, which
 coincides with the arguments expected by `fit(model, verbosity,
-args...)` when `reformat` is not overloaded.
+args...)` when `reformat` is not overloaded. 
 
-Implementing a `reformat` data front-end is permitted for any `Model`
+Overloading `reformat` is permitted for any `Model`
 subtype, except for subtypes of `Static`. Here is a complete list of
 responsibilities for such an implementation, for some
 `model::SomeModelType` (a sample implementation follows after):
@@ -981,10 +986,11 @@ responsibilities for such an implementation, for some
   serving as a data front-end for operations like `predict`. It must
   always hold that `reformat(model, args...)[1] = reformat(model,
   args[1])`.
+  
+The fallback is `reformat(model, args...) = args` (i.e., slurps provided data).
 
-*Important.* `reformat(model::SomeModelType, args...)` must always
-  return a tuple of the same length as `args`, even if this is one.
-
+*Important.* `reformat(model::SomeModelType, args...)` must always return a tuple, even if
+  this has length one. The length of the tuple need not match `length(args)`.
 - `fit(model::SomeModelType, verbosity, data...)` should be
   implemented as if `data` is the output of `reformat(model,
   args...)`, where `args` is the data an MLJ user has bound to `model`
