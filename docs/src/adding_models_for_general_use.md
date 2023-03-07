@@ -1,4 +1,4 @@
-# Adding Models for General Use
+# Adding Models for General Use 
 
 !!! note
 
@@ -119,7 +119,7 @@ in most cases. `Unsupervised` models may implement an
 ## New model type declarations and optional clean! method
 
 Here is an example of a concrete supervised model type declaration,
-for a model with a single hyper-parameter:
+for a model with a single hyperparameter:
 
 ```julia
 import MLJModelInterface
@@ -164,38 +164,38 @@ with a default of `Symbol[]` (detected with `isempty` method) is
 preferred to `features::Union{Vector{Symbol}, Nothing}` with a default
 of `nothing`.
 
-### Hyper-parameters for parellizatioin options
+### Hyperparameters for parallelization options
 
 The section [Acceleration and Parallelism](@ref) indicates how MLJ
 models specify an option to run an algorithm using distributed
-processing or multithreading. A hyper-parameter specifying such an
+processing or multithreading. A hyperparameter specifying such an
 option should be called `acceleration`. Its value `a` should satisfy
 `a isa AbstractResource` where `AbstractResource` is defined in the
 ComputationalResources.jl package. An option to run on a GPU is
 ordinarily indicated with the `CUDALibs()` resource.
 
-### Hyper-parameter access and mutation
+### hyperparameter access and mutation
 
-To support hyper-parameter optimization (see [Tuning Models](@ref))
-any hyper-parameter to be individually controlled must be:
+To support hyperparameter optimization (see [Tuning Models](@ref))
+any hyperparameter to be individually controlled must be:
 
 - property-accessible; nested property access allowed, as in
   `model.detector.K`
 
 - mutable
 
-For an un-nested hyper-parameter, the requirement is that
+For an un-nested hyperparameter, the requirement is that
 `getproperty(model, :param_name)` and `setproperty!(model,
-:param_name, value)` have the expected behavior. (In hyper-parameter
+:param_name, value)` have the expected behavior. (In hyperparameter
 tuning, recursive access is implemented using
 [`MLJBase.recursive_getproperty`](@ref)` and
 [`MLJBase.recursively_setproperty!`](@ref).)
 
-Combining hyper-parameters in a named tuple does not generally
+Combining hyperparameters in a named tuple does not generally
 work, because, although property-accessible (with nesting), an
 individual value cannot be mutated.
 
-For a suggested way to deal with hyper-parameters varying in number,
+For a suggested way to deal with hyperparameters varying in number,
 see the
 [implementation](https://github.com/JuliaAI/MLJBase.jl/blob/dev/src/composition/models/stacking.jl)
 of `Stack`, where the model struct stores a varying number of base
@@ -370,13 +370,18 @@ Additionally, if `SomeSupervisedModel` supports sample weights, one must declare
 MMI.supports_weights(model::Type{<:SomeSupervisedModel}) = true
 ```
 
-Optionally, an implementation may add a data front-end, for
-transforming user data (such as a table) into some model-specific
-format (such as a matrix), and for adding methods to specify how the said
-format is resampled. (This alters the meaning of `X`, `y` and `w` in
-the signatures of `fit`, `update`, `predict`, etc; see [Implementing a
-data front-end](@ref) for details). This can provide the MLJ user
-certain performance advantages when fitting a machine.
+Optionally, an implementation may add a data front-end, for transforming user data (such
+as a table) into some model-specific format (such as a matrix), and/or add methods to
+specify how reformatted data is resampled. **This alters the interpretation of the data
+arguments of `fit`, `update` and `predict`, whose number may also change.** See
+[Implementing a data front-end](@ref) for details). A data front-end provides the MLJ user
+certain performance advantages when retraining a machine.
+
+**Third-party packages that interact directly with models using the MLJModelInterface.jl
+API, rather than through the machine interface, will also need to understand how the data
+front-end works**, so they incorporate `reformat` into their `fit`/`update`/`predict`
+calls. See also this
+[issue](https://github.com/JuliaAI/MLJDecisionTreeInterface.jl/issues/51).
 
 ```julia
 MLJModelInterface.reformat(model::SomeSupervisedModel, args...) = args
@@ -964,9 +969,9 @@ also appears in the EvoTrees.jl package.
 Here "user-supplied data" is what the MLJ user supplies when
 constructing a machine, as in `machine(models, args...)`, which
 coincides with the arguments expected by `fit(model, verbosity,
-args...)` when `reformat` is not overloaded.
+args...)` when `reformat` is not overloaded. 
 
-Implementing a `reformat` data front-end is permitted for any `Model`
+Overloading `reformat` is permitted for any `Model`
 subtype, except for subtypes of `Static`. Here is a complete list of
 responsibilities for such an implementation, for some
 `model::SomeModelType` (a sample implementation follows after):
@@ -981,10 +986,11 @@ responsibilities for such an implementation, for some
   serving as a data front-end for operations like `predict`. It must
   always hold that `reformat(model, args...)[1] = reformat(model,
   args[1])`.
+  
+The fallback is `reformat(model, args...) = args` (i.e., slurps provided data).
 
-*Important.* `reformat(model::SomeModelType, args...)` must always
-  return a tuple of the same length as `args`, even if this is one.
-
+*Important.* `reformat(model::SomeModelType, args...)` must always return a tuple, even if
+  this has length one. The length of the tuple need not match `length(args)`.
 - `fit(model::SomeModelType, verbosity, data...)` should be
   implemented as if `data` is the output of `reformat(model,
   args...)`, where `args` is the data an MLJ user has bound to `model`
@@ -1082,7 +1088,7 @@ The `predict` method should return a single distribution.
 A working implementation of a model that fits a `UnivariateFinite`
 distribution to some categorical data using [Laplace
 smoothing](https://en.wikipedia.org/wiki/Additive_smoothing)
-controlled by a hyper-parameter `alpha` is given
+controlled by a hyperparameter `alpha` is given
 [here](https://github.com/JuliaAI/MLJBase.jl/blob/d377bee1198ec179a4ade191c11fef583854af4a/test/interface/model_api.jl#L36).
 
 
@@ -1169,17 +1175,17 @@ Your document string must include the following components, in order:
 - A *reference describing the algorithm* or an actual description of
   the algorithm, if necessary. Detail any non-standard aspects of the
   implementation. Generally, defer details on the role of
-  hyper-parameters to the "Hyper-parameters" section (see below).
+  hyperparameters to the "Hyperparameters" section (see below).
 
 - Instructions on *how to import the model type* from MLJ (because a user can already inspect the doc-string in the Model Registry, without having loaded the code-providing package).
 
-- Instructions on *how to instantiate* with default hyper-parameters or with keywords.
+- Instructions on *how to instantiate* with default hyperparameters or with keywords.
 
 - A *Training data* section: explains how to bind a model to data in a machine with all possible signatures (eg, `machine(model, X, y)` but also `machine(model, X, y, w)` if, say, weights are supported);  the role and scitype requirements for each data argument should be itemized.
 
 - Instructions on *how to fit* the machine (in the same section).
 
-- A *Hyper-parameters* section (unless there aren't any): an itemized list of the parameters, with defaults given.
+- A *Hyperparameters* section (unless there aren't any): an itemized list of the parameters, with defaults given.
 
 - An *Operations* section: each implemented operation (`predict`, `predict_mode`, `transform`, `inverse_transform`, etc ) is itemized and explained. This should include operations with no data arguments, such as `training_losses` and `feature_importances`.
 
