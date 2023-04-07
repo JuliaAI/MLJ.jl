@@ -27,8 +27,8 @@
 
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
-tuning, evaluating, composing and comparing over [160 machine learning
-models](https://alan-turing-institute.github.io/MLJ.jl/dev/list_of_supported_models/)
+tuning, evaluating, composing and comparing about [200 machine learning
+models](https://alan-turing-institute.github.io/MLJ.jl/dev/model_browser/#Model-Browser)
 written in Julia and other languages.
 
 **New to MLJ?** Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/).
