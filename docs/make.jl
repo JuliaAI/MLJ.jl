@@ -97,6 +97,7 @@ for (k, v) in pages
 end
 
 makedocs(
+    doctest  = true,
     sitename = "MLJ",
     format   = Documenter.HTML(),
     modules  = [MLJ,
