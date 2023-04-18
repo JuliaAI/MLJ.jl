@@ -144,8 +144,12 @@ const MLJOpenML = OpenML
 
 export OpenML, MLJOpenML
 
-# re-export from ComputaionalResources:
+# re-export from ComputationalResources:
 export CPU1, CPUProcesses, CPUThreads, CUDALibs
 
+using SnoopPrecompile: @precompile_all_calls
+@precompile_all_calls begin
+    include("precompile.jl")
+end
 
 end # module
