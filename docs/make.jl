@@ -111,7 +111,9 @@ makedocs(
                 EarlyStopping,
                 IterationControl,
                 CategoricalDistributions],
-    pages    = pages)
+    pages    = pages,
+    strict   = true
+)
 
 # By default Documenter does not deploy docs just for PR
 # this causes issues with how we're doing things and ends
