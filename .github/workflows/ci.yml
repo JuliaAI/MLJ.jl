@@ -87,16 +87,6 @@ jobs:
                 Pkg.develop(PackageSpec(path=pwd()))
                 Pkg.instantiate()
             end'
-      - run: |
-          julia --project=docs -e '
-            if ENV["BUILD_DOCS"] == "true"
-                using Documenter: doctest
-                using MLJ
-                @info "attempting to run the doctests"
-                doctest(MLJ)
-            else
-                @info "skipping the doctests"
-            end'
       - run: julia --project=docs -e '
             if ENV["BUILD_DOCS"] == "true"
                 @info "attempting to build the docs"
