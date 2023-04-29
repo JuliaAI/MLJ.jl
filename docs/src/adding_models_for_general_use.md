@@ -962,8 +962,7 @@ front-end also allows more efficient resampling of data (in user calls
 to `evaluate!`).
 
 After detailing formal requirements for implementing a data front-end,
-we give a [Sample implementation](@ref). A simple implementation
-[implementation](https://github.com/Evovest/EvoTrees.jl/blob/94b58faf3042009bd609c9a5155a2e95486c2f0e/src/MLJ.jl#L23)
+we give a [Sample implementation](@ref). A simple [implementation](https://github.com/Evovest/EvoTrees.jl/blob/94b58faf3042009bd609c9a5155a2e95486c2f0e/src/MLJ.jl#L23)
 also appears in the EvoTrees.jl package.
 
 Here "user-supplied data" is what the MLJ user supplies when
@@ -1029,8 +1028,8 @@ single operation `predict`:
 
 Without a data front-end implemented, suppose `X` is expected to be a
 table and `y` a vector, but suppose the core algorithm always converts
-`X` to a matrix with features as rows (features corresponding to
-columns in the table).  Then a new data-front end might look like
+`X` to a matrix with features as rows (each record corresponds to
+a column in the table).  Then a new data-front end might look like
 this:
 
 	constant MMI = MLJModelInterface
