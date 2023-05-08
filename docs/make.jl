@@ -97,6 +97,7 @@ for (k, v) in pages
 end
 
 makedocs(
+    doctest  = true,
     sitename = "MLJ",
     format   = Documenter.HTML(),
     modules  = [MLJ,
@@ -111,7 +112,9 @@ makedocs(
                 EarlyStopping,
                 IterationControl,
                 CategoricalDistributions],
-    pages    = pages)
+    pages    = pages,
+    strict   = true
+)
 
 # By default Documenter does not deploy docs just for PR
 # this causes issues with how we're doing things and ends
