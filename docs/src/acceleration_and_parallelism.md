@@ -1,13 +1,5 @@
 # Acceleration and Parallelism
 
-!!! warning "Experimental API"
-
-    The acceleration API is experimental and may not work correctly in all
-    cases, especially if trying to use an acceleration method that your
-    version of Julia or installed packages cannot support. The API is also
-    subject to breaking changes during minor or major releases without
-    warning.
-
 ## User-facing interface
 
 To enable composable, extensible acceleration of core MLJ methods,
@@ -29,11 +21,6 @@ processing via CPU. The default resource can be changed as in this
 example: `MLJ.default_resource(CPUProcesses())`. The argument must
 always have type `<:ComputationalResource.AbstractResource`. To
 inspect the current default, use `MLJ.default_resource()`.
-
-!!! note
-
-    The `CPUThreads()` resource is only available when running a version of
-    Julia with `Threads.@spawn` available.
 
 !!! note
 
