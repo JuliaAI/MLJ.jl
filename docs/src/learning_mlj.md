@@ -46,3 +46,6 @@ intended as a complete reference.
 
 - [Machine Learning Property Loans for Fun and Profit](https://dm13450.github.io/2022/07/08/Machine-Learning-Property-Loans.html) - Blog post demonstrating the use of MLJ to predict prospects for investment in property development loans. 
 
+- [Predicting a Successful Mt Everest
+  Climb](https://dm13450.github.io/2023/04/27/Predicting-a-Successful-Mt-Everest-Climb.html) -
+  Blog post using MLJ to discover factors correlating with success in expeditions to climb the world's highest peak.

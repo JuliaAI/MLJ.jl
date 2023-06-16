@@ -30,16 +30,7 @@ jobs:
         with:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
-      - uses: actions/cache@v1
-        env:
-          cache-name: cache-artifacts
-        with:
-          path: ~/.julia/artifacts
-          key: ${{ runner.os }}-test-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-test-${{ env.cache-name }}-
-            ${{ runner.os }}-test-
-            ${{ runner.os }}-
+      - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
@@ -85,7 +76,7 @@ jobs:
            if build_docs
                @info("We will build the docs")
                set_environment_variable("BUILD_DOCS", "true")
-           else 
+           else
                @info("We will NOT build the docs")
                set_environment_variable("BUILD_DOCS", "false")
            end'
@@ -95,16 +86,6 @@ jobs:
                 using Pkg
                 Pkg.develop(PackageSpec(path=pwd()))
                 Pkg.instantiate()
-            end'
-      - run: |
-          julia --project=docs -e '
-            if ENV["BUILD_DOCS"] == "true"
-                using Documenter: doctest
-                using MLJ
-                @info "attempting to run the doctests"
-                doctest(MLJ)
-            else
-                @info "skipping the doctests"
             end'
       - run: julia --project=docs -e '
             if ENV["BUILD_DOCS"] == "true"
