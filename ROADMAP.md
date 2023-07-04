@@ -1,11 +1,11 @@
 # Road map
 
-February 2020; updated, May 2021
+February 2020; updated, July 2023
 
 Please visit [contributing guidelines](CONTRIBUTING.md) if interested
 in contributing to MLJ.
 
-### Guiding goals
+### Goals
 
 -   **Usability, interoperability, extensibility, reproducibility,**
 	and **code transparency**.
@@ -13,15 +13,15 @@ in contributing to MLJ.
 -   Offer state-of-art tools for model **composition** and model
 	**optimization** (hyper-parameter tuning)
 
--   Avoid common **pain-points** of other frameworks:
+-   Avoid common **pain-points** of other frameworks with MLJ:
 
-	-   identifying all models that solve a given task
+	-   identify and list all models that solve a given task
 
-	-   routine operations requiring a lot of code
+	-   easily perform routine operations requiring a lot of code
 
-	-   passage from data source to algorithm-specific data format
+	-   easily transform data, from source to algorithm-specific data format
 
-	-   probabilistic predictions: inconsistent representations, lack
+	-   make use of probabilistic predictions: no more inconsistent representations / lack
 		of options for performance evaluation
 
 -   Add some focus to julia machine learning software development more
