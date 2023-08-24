@@ -22,4 +22,9 @@ Save()
 
 @test OpenML.load isa Function
 
+
+# MLJFlow
+
+MLFlowLogger
+
 true

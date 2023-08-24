@@ -9,8 +9,11 @@ In addition to hold-out and cross-validation, the user can specify
 an explicit list of train/test pairs of row indices for resampling, or
 define new resampling strategies.
 
-For simultaneously evaluating *multiple* models and/or data
-sets, see [Benchmarking](benchmarking.md).
+For simultaneously evaluating *multiple* models, see [Comparing models of different type
+and nested cross-validation](@ref).
+
+For externally logging the outcomes of performance evaluation experiments, see [Logging
+Workflows](@ref)
 
 ## Evaluating against a single measure
 
