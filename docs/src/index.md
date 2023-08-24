@@ -75,6 +75,10 @@ To support MLJ development, please cite these works or star the repo:
 [Model Stacking](@ref) |
 [Learning Networks](@ref)
 
+### Integration 
+[Logging Workflows](@ref) |
+[OpenML Integration](@ref)
+
 ### Customization and Extension
 [Simple User Defined Models](@ref) |
 [Quick-Start Guide to Adding Models](@ref) |
