@@ -74,6 +74,7 @@ pages = [
     "Learning Networks" => "learning_networks.md",
     "Controlling Iterative Models" => "controlling_iterative_models.md",
     "Generating Synthetic Data" => "generating_synthetic_data.md",
+    "Logging Workflows" => "logging_workflows.md",
     "OpenML Integration" => "openml_integration.md",
     "Acceleration and Parallelism" => "acceleration_and_parallelism.md",
     "Simple User Defined Models" => "simple_user_defined_models.md",
