@@ -1,9 +1,9 @@
-# Generating Synthetic Data
+# Generating Example Data
 
 MLJ has a set of functions - `make_blobs`, `make_circles`,
 `make_moons` and `make_regression` (closely resembling functions in
 [scikit-learn](https://scikit-learn.org/stable/datasets/index.html#generated-datasets)
-of the same name) - for generating synthetic data sets. These are
+of the same name) - for generating example data sets. These are
 useful for testing machine learning models (e.g., testing user-defined
 composite models; see [Composing Models](@ref))
 
