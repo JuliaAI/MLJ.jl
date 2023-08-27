@@ -92,7 +92,7 @@ export nrows, color_off, color_on,
     @load_boston, @load_ames, @load_iris, @load_reduced_ames, @load_crabs,
     load_boston, load_ames, load_iris, load_reduced_ames, load_crabs,
     Machine, machine, AbstractNode, @node,
-
+    source, node, fit!, freeze!, thaw!, Node, sources, origins,
     machines, sources, anonymize!, @from_network, fitresults,
     @pipeline, Stack, Pipeline, TransformedTargetModel,
     ResamplingStrategy, Holdout, CV, TimeSeriesCV,
