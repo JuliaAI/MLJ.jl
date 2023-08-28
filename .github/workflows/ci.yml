@@ -81,14 +81,14 @@ jobs:
                set_environment_variable("BUILD_DOCS", "false")
            end'
       - run: |
-          if ENV["BUILD_DOCS"] != "true"
+          if ENV["BUILD_DOCS"] == "true"
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()
           end
         shell: julia --color=yes --project=docs {0}
       - run: |
-          if ENV["BUILD_DOCS"] != "true"
+          if ENV["BUILD_DOCS"] == "true"
             @info "attempting to build the docs"
             run(`julia --project=docs docs/make.jl`)
             @info "successfully built the docs"
