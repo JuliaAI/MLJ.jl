@@ -81,20 +81,21 @@ jobs:
                set_environment_variable("BUILD_DOCS", "false")
            end'
       - run: |
-          julia --project=docs -e '
-            if ENV["BUILD_DOCS"] == "true"
-                using Pkg
-                Pkg.develop(PackageSpec(path=pwd()))
-                Pkg.instantiate()
-            end'
-      - run: julia --project=docs -e '
-            if ENV["BUILD_DOCS"] == "true"
-                @info "attempting to build the docs"
-                run(`julia --project=docs docs/make.jl`)
-                @info "successfully built the docs"
-            else
-                @info "skipping the docs build"
-            end'
+          if ENV["BUILD_DOCS"] == "true"
+            using Pkg
+            Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.instantiate()
+          end
+        shell: julia --color=yes --project=docs {0}
+      - run: |
+          if ENV["BUILD_DOCS"] == "true"
+            @info "attempting to build the docs"
+            run(`julia --project=docs docs/make.jl`)
+            @info "successfully built the docs"
+          else
+            @info "skipping the docs build"
+          end
+        shell: julia --color=yes --project=docs {0}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
