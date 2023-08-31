@@ -73,7 +73,6 @@ jobs:
            else
                build_docs = false
            end
-           build_docs = true # TODO: delete this debugging line
            if build_docs
                @info("We will build the docs")
                set_environment_variable("BUILD_DOCS", "true")
