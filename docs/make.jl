@@ -114,7 +114,7 @@ makedocs(
                 IterationControl,
                 CategoricalDistributions],
     pages    = pages,
-    strict   = true
+    strict   = Documenter.except(:cross_references, :missing_docs),
 )
 
 # By default Documenter does not deploy docs just for PR
