@@ -126,5 +126,5 @@ ENV["TRAVIS_PULL_REQUEST"] = "false"
 
 deploydocs(
     repo = "github.com/alan-turing-institute/MLJ.jl.git",
-    push_preview=true
+    push_preview=false
 )
