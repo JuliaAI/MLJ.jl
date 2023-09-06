@@ -121,7 +121,7 @@ makedocs(
 
 deploydocs(
     repo = "github.com/alan-turing-institute/MLJ.jl",
-    devbranch="dev",
+    devbranch="master",
     push_preview=false,
 )
 
