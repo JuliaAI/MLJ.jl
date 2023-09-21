@@ -1,174 +1,56 @@
 # Performance Measures
 
-In MLJ loss functions, scoring rules, sensitivities, and so on, are
-collectively referred to as *measures*. These include re-exported loss
-functions from the
-[LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl)
-library, overloaded to behave the same way as the built-in measures.
+**Quick link:** [List of aliases of all
+measures](https://juliaai.github.io/StatisticalMeasures.jl/dev/auto_generated_list_of_measures/#aliases)
 
-To see the list of all measures, run `measures()`.  Further measures for
-probabilistic predictors, such as proper scoring rules, and for
-constructing multi-target product measures, are planned.  If you'd like
-to see a measure added to MLJ, post a comment
-[here](https://github.com/JuliaAI/MLJBase.jl/issues/299).g
+In MLJ loss functions, scoring rules, confusion matrices, sensitivities, etc, are
+collectively referred to as *measures*. These measures are provided by the package
+[StatisticalMeasures.jl](https://juliaai.github.io/StatisticalMeasures.jl/dev/). As this
+package is a dependency of MLJ, and all its methods are re-exported, the measures are
+immediately available to the MLJ user. Commonly measures are passed to MLJ meta-algorithms
+(see [Uses of measures](@ref) below) but to learn how to call measures directly, see
+[this](https://juliaai.github.io/StatisticalMeasures.jl/dev/examples_of_usage/)
+StatisticalMeasures.jl tutorial.
 
-*Note for developers:* The measures interface and the built-in
-measures described here are defined in MLJBase, but will ultimately live
-in a separate package.
-
-
-## Using built-in measures
-
-These measures all have the common calling syntax
-
-```julia
-measure(ŷ, y)
-```
-
-or
-
-```julia
-measure(ŷ, y, w)
-```
-
-where `y` iterates over observations of some target variable, and `ŷ`
-iterates over predictions (`Distribution` or `Sampler` objects in the
-probabilistic case). Here `w` is an optional vector of sample weights,
-or a dictionary of class weights, when these are supported by the
-measure.
-
-```@repl losses_and_scores
-using MLJ
-y = [1, 2, 3, 4];
-ŷ = [2, 3, 3, 3];
-w = [1, 2, 2, 1];
-rms(ŷ, y) # reports an aggregate loss
-l2(ŷ, y, w) # reports per observation losses
-y = coerce(["male", "female", "female"], Multiclass)
-d = UnivariateFinite(["male", "female"], [0.55, 0.45], pool=y);
-ŷ = [d, d, d];
-log_loss(ŷ, y)
-```
-
-The measures `rms`, `l2` and `log_loss` illustrated here are actually
-        instances of measure *types*. For, example, `l2 = LPLoss(p=2)` and
-`log_loss = LogLoss() = LogLoss(tol=eps())`. Common aliases are
-provided:
-
-```@repl losses_and_scores
-cross_entropy
-```
-
-## Traits and custom measures
-
-Notice that `l1` reports per-sample evaluations, while `rms`
-only reports an aggregated result. This and other behavior can be
-gleaned from measure *traits* which are summarized by the `info`
-method:
-
-```@repl losses_and_scores
-info(l1)
-```
-
-Query the doc-string for a measure using the name of its type:
-
-```@repl losses_and_scores
-rms
-@doc RootMeanSquaredError # same as `?RootMeanSqauredError
-```
-
-Use `measures()` to list all measures, and `measures(conditions...)` to
-search for measures with given traits (as you would [query
-models](model_search.md)). The trait `instances` list the actual
-callable instances of a given measure type (typically aliases for the
-default instance).
-
-```@docs
-measures(conditions...)
-```
-
-A user-defined measure in MLJ can be passed to the `evaluate!`
-method, and elsewhere in MLJ, provided it is a function or callable
-object conforming to the above syntactic conventions. By default, a
-custom measure is understood to:
-
-- be a loss function (rather than a score)
-
-- report an aggregated value (rather than per-sample evaluations)
-
-- be feature-independent
-
-To override this behavior one simply overloads the appropriate trait,
-as shown in the following examples:
-
-```@repl losses_and_scores
-y = [1, 2, 3, 4];
-ŷ = [2, 3, 3, 3];
-w = [1, 2, 2, 1];
-my_loss(ŷ, y) = maximum((ŷ - y).^2);
-my_loss(ŷ, y)
-my_per_sample_loss(ŷ, y) = abs.(ŷ - y);
-MLJ.reports_each_observation(::typeof(my_per_sample_loss)) = true;
-my_per_sample_loss(ŷ, y)
-my_weighted_score(ŷ, y) = 1/mean(abs.(ŷ - y));
-my_weighted_score(ŷ, y, w) = 1/mean(abs.((ŷ - y).^w));
-MLJ.supports_weights(::typeof(my_weighted_score)) = true;
-MLJ.orientation(::typeof(my_weighted_score)) = :score;
-my_weighted_score(ŷ, y)
-X = (x=rand(4), penalty=[1, 2, 3, 4]);
-my_feature_dependent_loss(ŷ, X, y) = sum(abs.(ŷ - y) .* X.penalty)/sum(X.penalty);
-MLJ.is_feature_dependent(::typeof(my_feature_dependent_loss)) = true
-my_feature_dependent_loss(ŷ, X, y)
-```
-
-The possible signatures for custom measures are: `measure(ŷ, y)`,
-`measure(ŷ, y, w)`, `measure(ŷ, X, y)` and `measure(ŷ, X, y, w)`, each
-measure implementing one non-weighted version, and possibly a second
-weighted version.
-
-## Using measures from LossFunctions.jl
-
-The [LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl)
-package includes "distance loss" functions for `Continuous` targets,
-and "marginal loss" functions for `Finite{2}` (binary) targets. While the
-LossFunctions.jl interface differs from the present one (for, example
-binary observations must be +1 or -1), MLJ has overloaded instances
-of the LossFunctions.jl types to behave the same as the built-in
-types.
-
-Note that the "distance losses" in the package apply to deterministic
-predictions, while the "marginal losses" apply to probabilistic
-predictions.
+A list of all measures ready to use after running `using MLJ` or `using
+StatisticalMeasures`, is
+[here](https://juliaai.github.io/StatisticalMeasures.jl/dev/auto_generated_list_of_measures/). Alternatively,
+call [`measures()`](@ref) (experimental) to generate a dictionary keyed on available
+measure constructors, with measure metadata as values.
 
 
-## List of measures
+## Custom measures
 
-All measures listed below have a doc-string associated with the measure's
-*type*. So, for example, do `?LPLoss` not `?l2`.
+Any measure-like object with appropriate [calling
+behavior](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/implementing_new_measures/#definitions)
+can be used with MLJ. To quickly build custom measures, we recommend using the package
+[StatisticalMeasuresBase.jl](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/),
+which provides [this](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/tutorial/)
+tutorial. Note, in particular, that an "atomic" measure can be transformed into a
+multi-target measure using this package.
 
-```@setup losses_and_scores
-using DataFrames
-```
+## Uses of measures
 
-```@example losses_and_scores
-ms = measures()
-types = map(ms) do m
-    m.name
-end
-instance = map(ms) do m m.instances end
-table = (type=types, instances=instance)
-DataFrame(table)
-```
+In MLJ, measures are specified: 
 
+- when evaluating model performance using
+[`evaluate!`](@ref)/[`evaluate`](@ref) - see [Evaluating Model Performance](@ref)
 
-## Other performance-related tools
+- when wrapping models using [`TunedModel`](@ref) - see [Tuning Models](@ref)
+- when wrapping iterative models using [`IteratedModel`](@ref) - see [Controlling Iterative Models](@ref)
+- when generating learning curves using [`learning_curve`](@ref) - see [Learning Curves](@ref)
 
-In MLJ one computes a confusion matrix by calling an instance of the
-`ConfusionMatrix` measure type on the data:
+and elsewhere.
 
-```@docs
-ConfusionMatrix
-```
+## Using LossFunctions.jl 
+
+In previous versions of MLJ, measures from LossFunctions.jl were also available. Now
+measures from that package must be explicitly imported and wrapped, as described
+[here](https://juliaai.github.io/StatisticalMeasures.jl/dev/examples_of_usage/#Using-losses-from-LossFunctions.jl).
+
+## Receiver operator characteristics
+
+A related performance evaluation tool provided by StatisticalMeasures.jl, and hence by MLJ, is the `roc_curve` method:
 
 ```@docs
 roc_curve

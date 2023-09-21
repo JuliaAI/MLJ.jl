@@ -37,7 +37,7 @@ data:
 
 ```@repl evaluation_of_supervised_models
 mach = machine(model, X, y)
-evaluate!(mach, resampling=cv, measure=l2, verbosity=0)
+evaluate!(mach, resampling=cv, measure=l2), verbosity=0)
 ```
 
 (The latter call is a mutating call as the learned parameters stored in the
@@ -45,31 +45,41 @@ machine potentially change. )
 
 ## Multiple measures
 
+Multiple measures are specified as a vector:
+
 ```@repl evaluation_of_supervised_models
-evaluate!(mach,
-          resampling=cv,
-          measure=[l1, rms, rmslp1], verbosity=0)
+evaluate!(
+    mach,
+    resampling=cv,
+    measures=[l1, rms, rmslp1], 
+	verbosity=0,
+a)
 ```
 
-## Custom measures and weighted measures
+[Custom measures](@ref) can also be provided.
+
+## Specifying weights
+
+Per-observation weights can be passed to measures. If a measure does not support weights,
+the weights are ignored:
 
 ```@repl evaluation_of_supervised_models
-my_loss(yhat, y) = maximum((yhat - y).^2);
-
-my_per_observation_loss(yhat, y) = abs.(yhat - y);
-MLJ.reports_each_observation(::typeof(my_per_observation_loss)) = true;
-
-my_weighted_score(yhat, y) = 1/mean(abs.(yhat - y));
-my_weighted_score(yhat, y, w) = 1/mean(abs.((yhat - y).^w));
-MLJ.supports_weights(::typeof(my_weighted_score)) = true;
-MLJ.orientation(::typeof(my_weighted_score)) = :score;
-
 holdout = Holdout(fraction_train=0.8)
 weights = [1, 1, 2, 1, 1, 2, 3, 1, 1, 2, 3, 1];
-evaluate!(mach,
-          resampling=CV(nfolds=3),
-          measure=[my_loss, my_per_observation_loss, my_weighted_score, l1],
-          weights=weights, verbosity=0)
+evaluate!(
+    mach,
+    resampling=CV(nfolds=3),
+    measure=[l2, rsquared],
+    weights=weights, 
+)
+```
+
+In classification problems, a class weight dictionary can be supplied instead. 
+
+```@docs
+MLJBase.evaluate!
+MLJBase.evaluate
+MLJBase.PerformanceEvaluation
 ```
 
 ## User-specified train/test sets
@@ -78,17 +88,19 @@ Users can either provide an explicit list of train/test pairs of row indices for
 
 ```@repl evaluation_of_supervised_models
 fold1 = 1:6; fold2 = 7:12;
-evaluate!(mach,
-          resampling = [(fold1, fold2), (fold2, fold1)],
-          measure=[l1, l2], verbosity=0)
+evaluate!(
+    mach,
+    resampling = [(fold1, fold2), (fold2, fold1)],
+    measures=[l1, l2], 
+	verbosity=0,
+)
 ```
 
-Or define their own re-usable `ResamplingStrategy` objects, - see
-[Custom resampling strategies](@ref) below.
+Or the user can define their own re-usable `ResamplingStrategy` objects, - see [Custom
+resampling strategies](@ref) below.
 
 
 ## Built-in resampling strategies
-
 
 ```@docs
 MLJBase.Holdout
@@ -159,10 +171,3 @@ function train_test_pairs(holdout::Holdout, rows)
 end
 ```
 
-## API
-
-```@docs
-MLJBase.evaluate!
-MLJBase.evaluate
-MLJBase.PerformanceEvaluation
-```
