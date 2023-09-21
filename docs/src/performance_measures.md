@@ -5,7 +5,7 @@
 - [List of aliases of all
   measures](https://juliaai.github.io/StatisticalMeasures.jl/dev/auto_generated_list_of_measures/#aliases)
 
-- [Changes to measures in MLJBase 1.0](@ref)
+- [Migration guide for changes to measures in MLJBase 1.0](@ref)
 
 ## Introduction 
 
@@ -61,12 +61,12 @@ A related performance evaluation tool provided by StatisticalMeasures.jl, and he
 roc_curve
 ```
 
-## Changes to measures in MLJBase 1.0
+## Migration guide for changes to measures in MLJBase 1.0
 
 Prior to MLJBase.jl 1.0 (respectivey, MLJ.jl version 0.19.6) measures were defined in
 MLJBase.jl (a dependency of MLJ.jl) but now they are provided by MLJ.jl dependency
-[StatisticalMeasures](https://juliaai.github.io/StatisticalMeasures.jl/dev/). The effects
-on users is detailed below:
+[StatisticalMeasures](https://juliaai.github.io/StatisticalMeasures.jl/dev/). Effects
+on users are detailed below:
 
 
 ### Breaking behavior relevant to many users
@@ -121,8 +121,28 @@ on users is detailed below:
   supported. See [What is a
   measure?](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/implementing_new_measures/#definitions)
   for allowed signatures in measures.
+  
+### Packages implementing the MLJ model interface 
 
-## Breaking behavior likely relevant only to developers of some client packages
+The migration of measures is not expected to require any changes to the source code in
+packges providing implementations of the MLJ model interface (MLJModelInterface.jl) such
+as MLJDecisionTreeInterface.jl and MLJFlux.jl, and this is confirmed by extensive
+integration tests. However, some current tests will fail, if they use MLJBase
+measures. The following should generally suffice to adapt such tests:
+
+- Add StatisticalMeasures as test dependency, and add `using StatisticalMeasures` to your
+  `runtests.jl` (and/or included submodules).
+  
+- If measures are qualified, as in `MLJBase.rms`, then the qualification must be removed
+  or changed to `StatisticalMeasures.rms`, etc.
+
+- Be aware that the default measure used in methods such as `evaluate!`, when `measure` is
+  not specified, is changed from `rms` to `l2` for regression models.
+  
+- Be aware of that all measures now report a measurement for every observation, and never
+  an aggregate. See second point above.
+
+### Rarely relevant breaking behavior
 
 - The abstract measure types `Aggregated`, `Unaggregated`, `Measure` have been
   decommissioned. (A measure is now defined purely by its [calling
