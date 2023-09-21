@@ -18,6 +18,7 @@ using MLJTuning
 using MLJModels
 using OpenML
 @reexport using MLJFlow
+@reexport using StatisticalMeasures
 using MLJIteration
 import MLJIteration.IterationControl
 
@@ -107,16 +108,6 @@ export nrows, color_off, color_on,
 for T in MLJBase.EXTENDED_ABSTRACT_MODEL_TYPES
     @eval(export $T)
 end
-
-# MLJBase/measures:
-# measure names:
-for m in MLJBase.MEASURE_TYPES_ALIASES_AND_INSTANCES
-    :(export $m) |> eval
-end
-export measures,
-    aggregate, default_measure, skipinvalid,
-    roc_curve, roc,
-    no_avg, macro_avg, micro_avg
 
 # re-export from MLJEnsembles:
 export EnsembleModel
