@@ -40,6 +40,9 @@ its conventional use, are marked with a ⟂ symbol:
   readme](https://github.com/JuliaAI/MLJBase.jl) for a
   detailed description of MLJBase's contents.
 
+* [StatisticalMeasures.jl](https://github.com/JuliaAI/StatisticalMeasures.jl) provifes
+  performance measures (metrics) such as losses and scores.
+
 * [MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl)
   hosts the *MLJ model registry*, which contains metadata on all the
   models the MLJ user can search and load from MLJ. Moreover, it
