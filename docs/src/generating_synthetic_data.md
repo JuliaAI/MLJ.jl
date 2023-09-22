@@ -1,5 +1,9 @@
 # Generating Synthetic Data
 
+Here *synthetic data* means artificially generated data, with no reference to a "real
+world" data set. Not to be confused "fake data" obtained by resampling from a distribution
+fit to some actual real data.
+
 MLJ has a set of functions - `make_blobs`, `make_circles`,
 `make_moons` and `make_regression` (closely resembling functions in
 [scikit-learn](https://scikit-learn.org/stable/datasets/index.html#generated-datasets)
