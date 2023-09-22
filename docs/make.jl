@@ -87,9 +87,7 @@ pages = [
     "Third Party Packages" => "third_party_packages.md",
     "Glossary" => "glossary.md",
     "MLJ Cheatsheet" => "mlj_cheatsheet.md",
-    "Known Issues" => "known_issues.md",
     "FAQ" => "frequently_asked_questions.md",
-    "Julia BlogPost" => "julia_blogpost.md",
     "Index of Methods" => "api.md",
     ]
 

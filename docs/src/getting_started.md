@@ -191,7 +191,7 @@ train, test = partition(eachindex(y), 0.7); # 70:30 split
 fit!(mach, rows=train);
 yhat = predict(mach, X[test,:]);
 yhat[3:5]
-log_loss(yhat, y[test]) |> mean
+log_loss(yhat, y[test])
 ```
 
 Note that `log_loss` and `cross_entropy` are aliases for `LogLoss()`
@@ -350,21 +350,9 @@ MLJ models expecting a table do not generally accept a matrix
 instead. However, a matrix can be wrapped as a table, using
 [`MLJ.table`](@ref):
 
-```julia
-matrix_table = MLJ.table(rand(2,3))
+```@repl doda
+matrix_table = MLJ.table(rand(2,3));
 schema(matrix_table)
-```
-
-```
-┌─────────┬─────────┬────────────┐
-│ _.names │ _.types │ _.scitypes │
-├─────────┼─────────┼────────────┤
-│ x1      │ Float64 │ Continuous │
-│ x2      │ Float64 │ Continuous │
-│ x3      │ Float64 │ Continuous │
-└─────────┴─────────┴────────────┘
-_.nrows = 2
-
 ```
 
 The matrix is *not* copied, only wrapped.  To manifest a table as a

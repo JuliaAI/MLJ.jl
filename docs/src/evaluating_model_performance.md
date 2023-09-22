@@ -74,7 +74,7 @@ evaluate!(
 )
 ```
 
-In classification problems, a class weight dictionary can be supplied instead. 
+In classification problems, use `class_weights=...` to specify a class weight dictionary.
 
 ```@docs
 MLJBase.evaluate!

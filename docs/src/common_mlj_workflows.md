@@ -220,7 +220,7 @@ Fit on the train data set and evaluate on the test data set:
 ```@example workflows
 fit!(mach, rows=train)
 yhat = predict(mach, X[test,:])
-mean(LogLoss(tol=1e-4)(yhat, y[test]))
+LogLoss(tol=1e-4)(yhat, y[test])
 ```
 
 Note `LogLoss()` has aliases `log_loss` and `cross_entropy`.
@@ -451,7 +451,7 @@ transformation/inverse transformation:
 ```@example workflows
 X, y = @load_reduced_ames
 KNN = @load KNNRegressor
-knn_with_target = TransformedTargetModel(model=KNN(K=3), target=Standardizer())
+knn_with_target = TransformedTargetModel(model=KNN(K=3), transformer=Standardizer())
 pipe = (X -> coerce(X, :age=>Continuous)) |> OneHotEncoder() |> knn_with_target
 ```
 
@@ -476,7 +476,7 @@ target transformation/inverse transformation:
 ```@example workflows
 Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0
 tree_with_target = TransformedTargetModel(model=Tree(),
-                                          target=y -> log.(y),
+                                          transformer=y -> log.(y),
                                           inverse = z -> exp.(z))
 pipe2 = (X -> coerce(X, :age=>Continuous)) |> OneHotEncoder() |> tree_with_target;
 nothing # hide
