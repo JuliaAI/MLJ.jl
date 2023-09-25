@@ -73,7 +73,8 @@ on users are detailed below:
 
 - If `using MLJBase` without MLJ, then, in Julia 1.9 or higher, `StatisticalMeasures` must
   be explicitly imported to use measures that were previously part of MLJBase. If `using
-  MLJ`, then all previous measures are still available.
+  MLJ`, then all previous measures are still available, with the exception of those
+  corresponding to LossFunctions.jl (see below). 
 
 - All measures return a *single* aggregated measurement. In other words, measures
   previously reporting a measurement *per-observation* (previously subtyping
