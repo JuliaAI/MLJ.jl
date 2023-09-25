@@ -79,7 +79,7 @@ on users are detailed below:
 - All measures return a *single* aggregated measurement. In other words, measures
   previously reporting a measurement *per-observation* (previously subtyping
   `Unaggregated`) no longer do so. To get per-observation measurements, use the new method
-  `measurements(measure, ŷ, y[, weights, class_weights])`.
+  `StatisticalMeasures.measurements(measure, ŷ, y[, weights, class_weights])`.
   
 - The default measure for regression models (used in `evaluate/evaluate!` when `measures`
   is unspecified) is changed from `rms` to `l2=LPLoss(2)` (mean sum of squares).
