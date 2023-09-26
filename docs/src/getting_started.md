@@ -5,7 +5,10 @@ For an outline of MLJ's **goals** and **features**, see
 
 This page introduces some MLJ basics, assuming some familiarity with
 machine learning. For a complete list of other MLJ learning resources,
-see [Learning MLJ](@ref).
+see [Learning MLJ](@ref). 
+
+MLJ collects together the functionality provided by mutliple packages. To learn how to
+install components separately, run `using MLJ; @doc MLJ`.
 
 This section introduces only the most basic MLJ operations and
 concepts. It assumes MLJ has been successfully installed. See
