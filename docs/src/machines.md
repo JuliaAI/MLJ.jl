@@ -93,8 +93,8 @@ report(mach)
 ```
 
 ```@docs
-fitted_params
-report
+fitted_params(::Machine)
+report(::Machine)
 ```
 
 ### Training losses and feature importances
@@ -166,12 +166,9 @@ machine(model, X, y, cache=false)
 
 ### Constructing machines in learning networks
 
-Instead of data `X`, `y`, etc,  the `machine` constructor is provided
-`Node` or `Source` objects ("dynamic data") when building a learning
-network. See [Composing Models](composing_models.md) for more on this
-advanced feature. One also uses `machine` to wrap a machine
-around a whole learning network; see [Learning network
-machines](@ref).
+Instead of data `X`, `y`, etc, the `machine` constructor is provided `Node` or `Source`
+objects ("dynamic data") when building a learning network. See [Learning Networks](@ref)
+for more on this advanced feature.
 
 
 ## Saving machines

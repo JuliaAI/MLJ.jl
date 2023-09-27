@@ -14,11 +14,12 @@ import MLJModels
 import MLJEnsembles
 import ScientificTypes
 import MLJModelInterface
+import ScientificTypes
 import ScientificTypesBase
 import Distributions
 using CategoricalArrays
-using LossFunctions
 import CategoricalDistributions
+import StatisticalMeasures
 
 const MMI = MLJModelInterface
 
@@ -107,12 +108,14 @@ makedocs(
                 ScientificTypes,
                 MLJModelInterface,
                 ScientificTypesBase,
+                StatisticalMeasures,
                 MLJIteration,
                 EarlyStopping,
                 IterationControl,
-                CategoricalDistributions],
+                CategoricalDistributions,
+                StatisticalMeasures],
     pages    = pages,
-    strict   = Documenter.except(:cross_references, :missing_docs),
+    warnonly = Documenter.except(:cross_references, :missing_docs),
 )
 
 @info "`makedocs` has finished running. "

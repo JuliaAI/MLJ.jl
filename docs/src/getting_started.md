@@ -344,7 +344,7 @@ scientific type `Table{K}`, where `K` depends on the scientific types of the col
 which can be individually inspected using `schema`:
 
 ```@repl doda
-schema(X)
+ScientificTypes.schema
 ```
 
 #### Matrix data

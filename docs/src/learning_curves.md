@@ -24,7 +24,7 @@ r_lambda = range(ensemble, :(model.lambda), lower=1e-1, upper=100, scale=:log10)
 curve = MLJ.learning_curve(mach;
                            range=r_lambda,
                            resampling=CV(nfolds=3),
-                           measure=MeanAbsoluteError())
+                           measure=l1)
 ```
 ```julia
 using Plots
@@ -52,7 +52,7 @@ atom.lambda= 7.3
 r_n = range(ensemble, :n, lower=1, upper=50)
 curves = MLJ.learning_curve(mach;
                             range=r_n,
-                            measure=MeanAbsoluteError(),
+                            measure=l1,
                             verbosity=0,
                             rng_name=:rng,
                             rngs=4)

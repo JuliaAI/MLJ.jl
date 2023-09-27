@@ -2,6 +2,22 @@
 
 const PATH_TO_MODEL_DOCS = joinpath(@__DIR__, "src", "models")
 
+"""
+    remove_doc_refs(str::AbstractString)
+
+Removes `@ref` references from `str. For example, a substring of the form
+"[`some.thing_like_this123!`](@ref)" is replaced with "`some.thing_like_this123!`".
+
+"""
+function remove_doc_refs(page)
+    regex = r"\[(['\.\d`\!\_a-zA-Z]*)\]\(\@ref\)"
+    while contains(page, regex)
+        # replace the first matched regex with the captured string
+        page = replace(page, regex => s"\1")
+    end
+    page
+end
+
 demote_headings(str) = replace(str, "# "=>"## ")
 handle(model) = model.name*"_"*model.package_name
 
@@ -25,7 +41,7 @@ function write_page(model; path=PATH_TO_MODEL_DOCS)
     open(pagepath, "w") do stream
         header = "# [$(model.name)](@id $id)\n\n"
         md_page = doc(model.name, pkg=model.package_name)
-        page = header*demote_headings(string(md_page))
+        page = header*demote_headings(string(md_page)) |> remove_doc_refs
         write(stream, page)
         nothing
     end
@@ -54,7 +70,7 @@ function models_missing_descriptors()
     handles = handle.(models())
     filter(handles) do h
         !(h in HANDLES)
-    end 
+    end
 end
 
 """

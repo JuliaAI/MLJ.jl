@@ -221,8 +221,6 @@ Bugs, suggestions, and feature requests can be posted
 Users are also welcome to join the `#mlj` Julia slack channel to ask
 questions and make suggestions.
 
-See also, [Known Issues](@ref)
-
 
 ## Installation
 

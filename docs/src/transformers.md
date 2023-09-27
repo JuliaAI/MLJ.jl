@@ -42,7 +42,7 @@ MLJModels.UnivariateTimeTypeToContinuous
 A *static transformer* is a model for transforming data that does not generalize to new
 data (does not "learn") but which nevertheless has hyperparameters. For example, the
 `DBSAN` clustering model from Clustering.jl can assign labels to some collection of
-observations, cannot directly assign a label to some new observation. 
+observations, cannot directly assign a label to some new observation.
 
 The general user may define their own static models. The main use-case is insertion into a
 [Linear Pipelines](@ref) some parameter-dependent transformation. (If a static transformer
@@ -73,86 +73,103 @@ Such static transformers with (unlearned) parameters can have
 arbitrarily many inputs, but only one output. In the single input case,
 an `inverse_transform` can also be defined. Since they have no real
 learned parameters, you bind a static transformer to a machine without
-specifying training arguments.
+specifying training arguments; there is no need to `fit!` the machine:
 
 ```@example boots
-mach = machine(Averager(0.5)) |> fit!
+mach = machine(Averager(0.5))
 transform(mach, [1, 2, 3], [3, 2, 1])
 ```
 
-Let's see how we can include our `Averager` in a learning network (see
-[Composing Models](@ref)) to mix the predictions of two regressors,
-with one-hot encoding of the inputs:
+Let's see how we can include our `Averager` in a [learning network](@ref "Learning
+Networks")) to mix the predictions of two regressors, with one-hot encoding of the
+inputs. Here's some dummy data and component models to test our learning network:
 
 ```@example boots
-X = source()
-y = source() 
-
 ridge = (@load RidgeRegressor pkg=MultivariateStats)()
 knn = (@load KNNRegressor)()
+
+import Random.seed!
+seed!(112)
+X = (
+    x1=coerce(rand("ab", 100), Multiclass),
+    x2=rand(100),
+)
+y = X.x2 + 0.05*rand(100)
+schema(X)
+```
+
+And the learning network:
+
+```@example boots
+Xs = source(X)
+ys = source(y)
+
 averager = Averager(0.5)
 
-hotM = machine(OneHotEncoder(), X)
-W = transform(hotM, X) # one-hot encode the input
+mach0 = machine(OneHotEncoder(), Xs)
+W = transform(mach0, Xs) # one-hot encode the input
 
-ridgeM = machine(ridge, W, y)
-y1 = predict(ridgeM, W)
+mach1 = machine(ridge, W, ys)
+y1 = predict(mach1, W)
 
-knnM = machine(knn, W, y)
-y2 = predict(knnM, W)
+mach2 = machine(knn, W, ys)
+y2 = predict(mach2, W)
 
-averagerM= machine(averager)
-yhat = transform(averagerM, y1, y2)
+mach4= machine(averager)
+yhat = transform(mach4, y1, y2)
+
+# test:
+fit!(yhat)
+Xnew = selectrows(X, 1:3)
+yhat(Xnew)
 ```
 
-Now we export to obtain a `Deterministic` composite model and then
-instantiate composite model
+We next "export" the learning network as a standalone composite model type. First we need
+a struct for the composite model. Since we are restricting to `Deterministic` component
+regressors, the composite will also make deterministic predictions, and so gets the
+supertype `DeterministicNetworkComposite`:
 
-```julia
-learning_mach = machine(Deterministic(), X, y; predict=yhat)
-Machine{DeterministicSurrogate} @772 trained 0 times.
-  args:
-    1:	Source @415 ⏎ `Unknown`
-    2:	Source @389 ⏎ `Unknown`
-
-
-@from_network learning_mach struct DoubleRegressor
-       regressor1=ridge
-       regressor2=knn
-       averager=averager
-       end
-
-composite = DoubleRegressor()
-julia> composite = DoubleRegressor()
-DoubleRegressor(
-    regressor1 = RidgeRegressor(
-            lambda = 1.0),
-    regressor2 = KNNRegressor(
-            K = 5,
-            algorithm = :kdtree,
-            metric = Distances.Euclidean(0.0),
-            leafsize = 10,
-            reorder = true,
-            weights = :uniform),
-    averager = Averager(
-            mix = 0.5)) @301
-
+```@example boots
+mutable struct DoubleRegressor <: DeterministicNetworkComposite
+    regressor1
+    regressor2
+    averager
+end
 ```
 
-which can be can be evaluated like any other model:
+As described in [Learning Networks](@ref), we next paste the learning network into a
+`prefit` declaration, removing the test data and replacing the component models with
+symbolic placeholders:
 
-```julia
+```@example boots
+function MLJBase.prefit(composite::DoubleRegressor, verbosity, X, y)
+    Xs = source()
+    ys = source()
+
+    mach0 = machine(OneHotEncoder(), Xs)
+    W = transform(mach0, Xs) # one-hot encode the input
+
+    mach1 = machine(:regressor1, W, ys)
+    y1 = predict(mach1, W)
+
+    mach2 = machine(:regressor2, W, ys)
+    y2 = predict(mach2, W)
+
+    mach4= machine(:averager)
+    yhat = transform(mach4, y1, y2)
+end
+```
+
+The new model type can be evaluated like any other supervised model:
+
+```@example boots
+X, y = @load_reduced_ames
+composite = DoubleRegressor(ridge, knn, Averager(0.5))
+```
+
+```@example boots
 composite.averager.mix = 0.25 # adjust mix from default of 0.5
-julia> evaluate(composite, (@load_reduced_ames)..., measure=rms)
-Evaluating over 6 folds: 100%[=========================] Time: 0:00:00
-┌───────────┬───────────────┬────────────────────────────────────────────────────────┐
-│ _.measure │ _.measurement │ _.per_fold                                             │
-├───────────┼───────────────┼────────────────────────────────────────────────────────┤
-│ rms       │ 26800.0       │ [21400.0, 23700.0, 26800.0, 25900.0, 30800.0, 30700.0] │
-└───────────┴───────────────┴────────────────────────────────────────────────────────┘
-_.per_observation = [missing]
-_.fitted_params_per_fold = [ … ]
-_.report_per_fold = [ … ]
+evaluate(composite, X, y, measures=[l1, rmslp1])
 ```
 
 A static transformer can also expose byproducts of the transform computation in the report

@@ -176,10 +176,10 @@ KNN = @load KNNRegressor
 knn = KNN()
 evaluate(knn, X, y,
          resampling=CV(nfolds=5),
-         measure=[RootMeanSquaredError(), MeanAbsoluteError()])
+         measure=[RootMeanSquaredError(), LPLoss(1)])
 ```
 
-Note `RootMeanSquaredError()` has alias `rms` and `MeanAbsoluteError()` has alias `mae`.
+Note `RootMeanSquaredError()` has alias `rms` and `LPLoss(1)` has aliases `l1`, `mae`.
 
 Do `measures()` to list all losses and scores and their aliases.
 

@@ -215,23 +215,25 @@ predict(mach, rows=148:150)
 
 ### Specifying a custom measure
 
-Users may specify a custom loss or scoring function.  Suppose, for
-example, we define a new scoring function `custom_accuracy` by
+Users may specify a custom loss or scoring function, so long as it complies with the
+StatisticalMeasuresBase.jl
+[API](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/implementing_new_measures/#definitions)
+and implements the appropriate `orientation` trait (`Score()` or `Loss()`) from that
+package.  For example, we suppose define a "new" scoring function `custom_accuracy` by
 
 ```@example goof
-custom_accuracy(y,yhat) = mean(y .== yhat);
+custom_accuracy(yhat, y) = mean(y .== yhat); # yhat - prediction, y - ground truth
 ```
 
-In tuning, scores are maximised, while losses are minimised. By
-default, a custom measure is assumed to be a loss rather than a score,
-so we must also declare
+In tuning, scores are maximised, while losses are minimised. So here we declare
 
 ```@example goof
-MLJ.orientation(::typeof(custom_accuracy)) = :score
+import StatisticalMeasuresBase as SMB
+SMB.orientation(::typeof(custom_accuracy)) = SMB.Score()
 ```
 
-For full details on constructing custom measures, see [Traits and custom
-measures](@ref).
+For full details on constructing custom measures, see
+[StatisticalMeasuresBase.jl](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/).
 
 
 ```@example goof

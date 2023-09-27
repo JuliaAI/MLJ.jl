@@ -37,7 +37,7 @@ data:
 
 ```@repl evaluation_of_supervised_models
 mach = machine(model, X, y)
-evaluate!(mach, resampling=cv, measure=l2), verbosity=0)
+evaluate!(mach, resampling=cv, measure=l2, verbosity=0)
 ```
 
 (The latter call is a mutating call as the learned parameters stored in the
@@ -53,7 +53,7 @@ evaluate!(
     resampling=cv,
     measures=[l1, rms, rmslp1], 
 	verbosity=0,
-a)
+)
 ```
 
 [Custom measures](@ref) can also be provided.
