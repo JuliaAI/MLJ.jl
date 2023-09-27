@@ -10,7 +10,7 @@ Removes `@ref` references from `str. For example, a substring of the form
 
 """
 function remove_doc_refs(page)
-    regex = r"\[(['\.\d`\!\_a-zA-Z]*)\]\(\@ref\)"
+    regex = r"\[([\?'\.\d`\!\_a-zA-Z]*)\]\(\@ref\)"
     while contains(page, regex)
         # replace the first matched regex with the captured string
         page = replace(page, regex => s"\1")

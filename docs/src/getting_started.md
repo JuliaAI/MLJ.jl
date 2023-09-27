@@ -268,17 +268,8 @@ evaluate!(mach, resampling=Holdout(fraction_train=0.7),
 
 ## Next steps
 
-To learn a little more about what MLJ can do, browse [Common MLJ
-Workflows](common_mlj_workflows.md) or [Data Science Tutorials in
-Julia](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
-or try the [JuliaCon2020
-Workshop](https://github.com/ablaom/MachineLearningInJulia2020) on MLJ
-(recorded
-[here](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title))
-returning to the manual as needed.
-
-*Read at least the remainder of this page before considering serious
-use of MLJ.*
+For next steps, consult the [Learn MLJ](@ref) section. *At the least, we recommned you
+read the remainder of this page before considering serious use of MLJ.*
 
 
 ## Data containers and scientific types
@@ -438,19 +429,9 @@ are the key features of that convention:
 - The scientific types of `nothing` and `missing` are `Nothing` and
   `Missing`, native types we also regard as scientific.
 
-Use `coerce(v, OrderedFactor)` or `coerce(v, Multiclass)` to coerce a
-vector `v` of integers, strings or characters to a vector with an
-appropriate `Finite` (categorical) scitype.  See [Working with
-Categorical Data](@ref).
-
-For more on scitype coercion of arrays and tables, see [`coerce`](@ref),
-[`autotype`](@ref) and [`unpack`](@ref) below and the examples at
-[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/).
+Use `coerce(v, OrderedFactor)` or `coerce(v, Multiclass)` to coerce a vector `v` of
+integers, strings or characters to a vector with an appropriate `Finite` (categorical)
+scitype.  See also [Working with Categorical Data](@ref), and the
+[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/) documentation.
 
 
-
-```@docs
-scitype
-coerce
-autotype
-```

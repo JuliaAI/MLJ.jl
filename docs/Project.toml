@@ -26,6 +26,7 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 ScientificTypes = "321657f4-b219-11e9-178b-2701a2544e81"
 ScientificTypesBase = "30f210dd-8aff-4c5f-94ba-8e64358c1161"
 StatisticalMeasures = "a19d573c-0a75-4610-95b3-7071388c7541"
+StatisticalMeasuresBase = "c062fc1d-0d66-479b-b6ac-8b44719de4cc"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 TypedTables = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9"
 

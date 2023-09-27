@@ -20,6 +20,7 @@ import Distributions
 using CategoricalArrays
 import CategoricalDistributions
 import StatisticalMeasures
+import StatisticalMeasuresBase
 
 const MMI = MLJModelInterface
 
@@ -115,7 +116,7 @@ makedocs(
                 CategoricalDistributions,
                 StatisticalMeasures],
     pages    = pages,
-    warnonly = Documenter.except(:cross_references, :missing_docs),
+    warnonly = [:cross_references, :missing_docs],
 )
 
 @info "`makedocs` has finished running. "

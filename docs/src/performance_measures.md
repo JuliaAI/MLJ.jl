@@ -7,17 +7,28 @@
 
 - [Migration guide for changes to measures in MLJBase 1.0](@ref)
 
-## Introduction 
+## Introduction
 
 In MLJ loss functions, scoring rules, confusion matrices, sensitivities, etc, are
 collectively referred to as *measures*. These measures are provided by the package
 [StatisticalMeasures.jl](https://juliaai.github.io/StatisticalMeasures.jl/dev/) but are
-immediately available to the MLJ user. Commonly, measures are passed to MLJ
-meta-algorithms (see [Uses of measures](@ref) below) but to learn how to call measures
-directly, see the StatisticalMeasures.jl
+immediately available to the MLJ user. Here's a simple example of direct application of
+the `log_loss` measures to compute a training loss:
+
+```@example measures
+using MLJ
+X, y = @load_iris
+DecisionTreeClassifier = @load DecisionTreeClassifier pkg=DecisionTree
+tree = DecisionTreeClassifier(max_depth=2)
+mach = machine(tree, X, y) |> fit!
+yhat = predict(mach, X)
+log_loss(yhat, y)
+```
+
+For more examples of direct measure usage, see the StatisticalMeasures.jl
 [tutorial](https://juliaai.github.io/StatisticalMeasures.jl/dev/examples_of_usage/).
 
-A list of all measures ready to use after running `using MLJ` or `using
+A list of all measures, ready to use after running `using MLJ` or `using
 StatisticalMeasures`, is
 [here](https://juliaai.github.io/StatisticalMeasures.jl/dev/auto_generated_list_of_measures/). Alternatively,
 call [`measures()`](@ref StatisticalMeasures.measures) (experimental) to generate a
@@ -36,7 +47,7 @@ multi-target measure using this package.
 
 ## Uses of measures
 
-In MLJ, measures are specified: 
+In MLJ, measures are specified:
 
 - when evaluating model performance using
 [`evaluate!`](@ref)/[`evaluate`](@ref) - see [Evaluating Model Performance](@ref)
@@ -47,7 +58,7 @@ In MLJ, measures are specified:
 
 and elsewhere.
 
-## Using LossFunctions.jl 
+## Using LossFunctions.jl
 
 In previous versions of MLJ, measures from LossFunctions.jl were also available. Now
 measures from that package must be explicitly imported and wrapped, as described
@@ -58,7 +69,7 @@ measures from that package must be explicitly imported and wrapped, as described
 A related performance evaluation tool provided by StatisticalMeasures.jl, and hence by MLJ, is the `roc_curve` method:
 
 ```@docs
-StatisticalMeausures.roc_curve
+StatisticalMeasures.roc_curve
 ```
 
 ## Migration guide for changes to measures in MLJBase 1.0
@@ -69,27 +80,27 @@ MLJBase.jl (a dependency of MLJ.jl) but now they are provided by MLJ.jl dependen
 on users are detailed below:
 
 
-### Breaking behavior relevant to many users
+### Breaking behavior likely relevant to many users
 
 - If `using MLJBase` without MLJ, then, in Julia 1.9 or higher, `StatisticalMeasures` must
   be explicitly imported to use measures that were previously part of MLJBase. If `using
   MLJ`, then all previous measures are still available, with the exception of those
-  corresponding to LossFunctions.jl (see below). 
+  corresponding to LossFunctions.jl (see below).
 
 - All measures return a *single* aggregated measurement. In other words, measures
   previously reporting a measurement *per-observation* (previously subtyping
   `Unaggregated`) no longer do so. To get per-observation measurements, use the new method
   `StatisticalMeasures.measurements(measure, ŷ, y[, weights, class_weights])`.
-  
+
 - The default measure for regression models (used in `evaluate/evaluate!` when `measures`
   is unspecified) is changed from `rms` to `l2=LPLoss(2)` (mean sum of squares).
-  
-- `MeanAbsoluteError` has been removed and instead `mae` is an alias for `LPLoss(p=1)`. 
+
+- `MeanAbsoluteError` has been removed and instead `mae` is an alias for `LPLoss(p=1)`.
 
 - Measures that previously skipped `NaN` values will now (at least by default) propagate
    those values. Missing value behavior is unchanged, except some measures that
    previously did not support `missing` now do.
-  
+
 - Aliases for measure *types* have been removed. For example `RMSE` (alias for
   `RootMeanSquaredError`) is gone. Aliases for instances, such as `rms` and
   `cross_entropy` persist. The exception is `precision`, for which `ppv` can
@@ -107,7 +118,7 @@ on users are detailed below:
   `measures(predicate)` is decommissioned, but `measures(needle)` is preserved. (This
   method, owned by StatisticalMeasures.jl, has some other search options, but is
   experimental.)
-  
+
 - Measures that were wraps of losses from LossFunctions.jl are no longer exposed by
   MLJBase or MLJ. To use such a loss, you must explicitly `import LossFunctions` and wrap
   the loss appropriately.  See [Using losses from
@@ -124,8 +135,8 @@ on users are detailed below:
   supported. See [What is a
   measure?](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/implementing_new_measures/#definitions)
   for allowed signatures in measures.
-  
-### Packages implementing the MLJ model interface 
+
+### Packages implementing the MLJ model interface
 
 The migration of measures is not expected to require any changes to the source code in
 packges providing implementations of the MLJ model interface (MLJModelInterface.jl) such
@@ -135,17 +146,17 @@ measures. The following should generally suffice to adapt such tests:
 
 - Add StatisticalMeasures as test dependency, and add `using StatisticalMeasures` to your
   `runtests.jl` (and/or included submodules).
-  
+
 - If measures are qualified, as in `MLJBase.rms`, then the qualification must be removed
   or changed to `StatisticalMeasures.rms`, etc.
 
 - Be aware that the default measure used in methods such as `evaluate!`, when `measure` is
   not specified, is changed from `rms` to `l2` for regression models.
-  
+
 - Be aware of that all measures now report a measurement for every observation, and never
   an aggregate. See second point above.
 
-### Rarely relevant breaking behavior
+### Breaking behavior possibly relevant to some developers
 
 - The abstract measure types `Aggregated`, `Unaggregated`, `Measure` have been
   decommissioned. (A measure is now defined purely by its [calling
@@ -156,7 +167,7 @@ measures. The following should generally suffice to adapt such tests:
 - `target_scitype(measure)` is decommissioned. Related is
   `StatisticalMeasures.observation_scitype(measure)` which declares an upper bound on the
   allowed scitype *of a single observation*.
-  
+
 - `prediction_type(measure)` is decommissioned. Instead use
   `StatisticalMeasures.kind_of_proxy(measure)`.
 

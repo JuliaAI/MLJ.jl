@@ -81,8 +81,9 @@ transform(mach, [1, 2, 3], [3, 2, 1])
 ```
 
 Let's see how we can include our `Averager` in a [learning network](@ref "Learning
-Networks")) to mix the predictions of two regressors, with one-hot encoding of the
-inputs. Here's some dummy data and component models to test our learning network:
+Networks") to mix the predictions of two regressors, with one-hot encoding of the
+inputs. Here's two regressors for mixing, and some dummy data for testing our learning
+network:
 
 ```@example boots
 ridge = (@load RidgeRegressor pkg=MultivariateStats)()
@@ -138,13 +139,14 @@ end
 ```
 
 As described in [Learning Networks](@ref), we next paste the learning network into a
-`prefit` declaration, removing the test data and replacing the component models with
-symbolic placeholders:
+`prefit` declaration, replace the component models with symbolic placeholders, and add a
+learning network "interface":
 
 ```@example boots
+import MLJBase
 function MLJBase.prefit(composite::DoubleRegressor, verbosity, X, y)
-    Xs = source()
-    ys = source()
+    Xs = source(X)
+    ys = source(y)
 
     mach0 = machine(OneHotEncoder(), Xs)
     W = transform(mach0, Xs) # one-hot encode the input
@@ -157,19 +159,22 @@ function MLJBase.prefit(composite::DoubleRegressor, verbosity, X, y)
 
     mach4= machine(:averager)
     yhat = transform(mach4, y1, y2)
+
+    # learning network interface:
+    (; predict=yhat)
 end
 ```
 
 The new model type can be evaluated like any other supervised model:
 
 ```@example boots
-X, y = @load_reduced_ames
+X, y = @load_reduced_ames;
 composite = DoubleRegressor(ridge, knn, Averager(0.5))
 ```
 
 ```@example boots
 composite.averager.mix = 0.25 # adjust mix from default of 0.5
-evaluate(composite, X, y, measures=[l1, rmslp1])
+evaluate(composite, X, y, measure=l1)
 ```
 
 A static transformer can also expose byproducts of the transform computation in the report

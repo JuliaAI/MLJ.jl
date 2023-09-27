@@ -458,7 +458,7 @@ pipe = (X -> coerce(X, :age=>Continuous)) |> OneHotEncoder() |> knn_with_target
 Evaluating the pipeline (just as you would any other model):
 
 ```@example workflows
-pipe.one_hot_encoder.drop_last = true
+pipe.one_hot_encoder.drop_last = true # mutate a nested hyper-parameter
 evaluate(pipe, X, y, resampling=Holdout(), measure=RootMeanSquaredError(), verbosity=2)
 ```
 
