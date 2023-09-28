@@ -53,11 +53,11 @@ meaningfully compare the corresponding mean absolute errors, which are indeed di
 this case.
 
 ```@example 123
-evaluate(ridge, X, y, measure=mae)
+evaluate(ridge, X, y, measure=l1)
 ```
 
 ```@example 123
-evaluate(ridge2, X, y, measure=mae)
+evaluate(ridge2, X, y, measure=l1)
 ```
 
 Ordinary functions can also be used in target transformations but an
@@ -66,11 +66,11 @@ inverse must be explicitly specified:
 ```@example 123
 ridge3 = TransformedTargetModel(ridge, transformer=y->log.(y), inverse=z->exp.(z))
 X, y = @load_boston
-evaluate(ridge3, X, y, measure=mae)
+evaluate(ridge3, X, y, measure=l1)
 ```
 
-Without the log transform (ie, using `ridge`) we get the poorer
-`mae` of 3.9.
+Without the log transform (ie, using `ridge`) we get the poorer mean absolute error,
+`l1`, of 3.9.
 
 ```@docs
 TransformedTargetModel

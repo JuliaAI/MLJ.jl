@@ -27,4 +27,10 @@ Save()
 
 MLFlowLogger
 
+# StatisticalMeasures
+
+rms
+l2
+log_score
+
 true

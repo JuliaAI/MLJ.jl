@@ -67,11 +67,13 @@ one-dimensional range object constructed using the `range` method:
 
 ```@example goof
 r = range(tree, :min_purity_increase, lower=0.001, upper=1.0, scale=:log);
-self_tuning_tree = TunedModel(model=tree,
-							  resampling=CV(nfolds=3),
-							  tuning=Grid(resolution=10),
-							  range=r,
-							  measure=rms);
+self_tuning_tree = TunedModel(
+    model=tree,
+    resampling=CV(nfolds=3),
+    tuning=Grid(resolution=10),
+    range=r,
+    measure=rms
+);
 ```
 
 Incidentally, a grid is generated internally "over the range" by calling the
@@ -171,11 +173,13 @@ deterministic measure, such as `misclassification_rate` (which means
 **Case (i) - probabilistic measure**:
 
 ```@example goof
-self_tuning_knn = TunedModel(model=knn,
-							 resampling = CV(nfolds=4, rng=1234),
-							 tuning = Grid(resolution=5),
-							 range = K_range,
-							 measure=BrierLoss());
+self_tuning_knn = TunedModel(
+    model=knn,
+    resampling = CV(nfolds=4, rng=1234),
+    tuning = Grid(resolution=5),
+    range = K_range,
+    measure=BrierLoss()
+);
 
 mach = machine(self_tuning_knn, X, y);
 fit!(mach, verbosity=0);
@@ -184,11 +188,13 @@ fit!(mach, verbosity=0);
 **Case (ii) - deterministic measure**:
 
 ```@example goof
-self_tuning_knn = TunedModel(model=knn,
-							 resampling = CV(nfolds=4, rng=1234),
-							 tuning = Grid(resolution=5),
-							 range = K_range,
-							 measure=MisclassificationRate())
+self_tuning_knn = TunedModel(
+    model=knn,
+    resampling = CV(nfolds=4, rng=1234),
+    tuning = Grid(resolution=5),
+    range = K_range,
+    measure=MisclassificationRate()
+)
 
 mach = machine(self_tuning_knn, X, y);
 fit!(mach, verbosity=0);
@@ -215,32 +221,36 @@ predict(mach, rows=148:150)
 
 ### Specifying a custom measure
 
-Users may specify a custom loss or scoring function.  Suppose, for
-example, we define a new scoring function `custom_accuracy` by
+Users may specify a custom loss or scoring function, so long as it complies with the
+StatisticalMeasuresBase.jl
+[API](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/implementing_new_measures/#definitions)
+and implements the appropriate `orientation` trait (`Score()` or `Loss()`) from that
+package.  For example, we suppose define a "new" scoring function `custom_accuracy` by
 
 ```@example goof
-custom_accuracy(y,yhat) = mean(y .== yhat);
+custom_accuracy(yhat, y) = mean(y .== yhat); # yhat - prediction, y - ground truth
 ```
 
-In tuning, scores are maximised, while losses are minimised. By
-default, a custom measure is assumed to be a loss rather than a score,
-so we must also declare
+In tuning, scores are maximised, while losses are minimised. So here we declare
 
 ```@example goof
-MLJ.orientation(::typeof(custom_accuracy)) = :score
+import StatisticalMeasuresBase as SMB
+SMB.orientation(::typeof(custom_accuracy)) = SMB.Score()
 ```
 
-For full details on constructing custom measures, see [Traits and custom
-measures](@ref).
+For full details on constructing custom measures, see
+[StatisticalMeasuresBase.jl](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/).
 
 
 ```@example goof
-self_tuning_knn = TunedModel(model=knn,
-							 resampling = CV(nfolds=4),
-							 tuning = Grid(resolution=5),
-							 range = K_range,
-							 measure = [custom_accuracy, MulticlassFScore()],
-							 operation = predict_mode);
+self_tuning_knn = TunedModel(
+    model=knn,
+    resampling = CV(nfolds=4),
+    tuning = Grid(resolution=5),
+    range = K_range,
+    measure = [custom_accuracy, MulticlassFScore()],
+    operation = predict_mode
+);
 
 mach = machine(self_tuning_knn, X, y)
 fit!(mach, verbosity=0)
@@ -268,11 +278,12 @@ points:
 ```@example goof
 r1 = range(forest, :(model.n_subfeatures), lower=1, upper=9);
 r2 = range(forest, :bagging_fraction, lower=0.4, upper=1.0);
-self_tuning_forest = TunedModel(model=forest,
-									  tuning=Grid(goal=30),
-									  resampling=CV(nfolds=6),
-									  range=[r1, r2],
-									  measure=rms);
+self_tuning_forest = TunedModel(
+    model=forest,
+    tuning=Grid(goal=30),
+    resampling=CV(nfolds=6),
+    range=[r1, r2],
+    measure=rms);
 
 X = MLJ.table(rand(100, 10));
 y = 2X.x1 - X.x2 + 0.05*rand(100);
@@ -300,12 +311,14 @@ be limited to 25.
 
 ```@example goof
 tuning = Grid(resolution=100, shuffle=true, rng=1234)
-self_tuning_forest = TunedModel(model=forest,
-									  tuning=tuning,
-									  resampling=CV(nfolds=6),
-									  range=[(r1, 3), r2],
-									  measure=rms,
-									  n=25);
+self_tuning_forest = TunedModel(
+    model=forest,
+    tuning=tuning,
+    resampling=CV(nfolds=6),
+    range=[(r1, 3), r2],
+    measure=rms,
+    n=25
+);
 fit!(machine(self_tuning_forest, X, y), verbosity=0);
 ```
 
@@ -321,12 +334,14 @@ distribution by default, and all others using a (truncated) normal
 distribution.
 
 ```@example goof
-self_tuning_forest = TunedModel(model=forest,
-									  tuning=RandomSearch(),
-									  resampling=CV(nfolds=6),
-									  range=[r1, r2],
-									  measure=rms,
-									  n=25);
+self_tuning_forest = TunedModel(
+    model=forest,
+    tuning=RandomSearch(),
+    resampling=CV(nfolds=6),
+    range=[r1, r2],
+    measure=rms,
+    n=25
+);
 X = MLJ.table(rand(100, 10));
 y = 2X.x1 - X.x2 + 0.05*rand(100);
 mach = machine(self_tuning_forest, X, y);
@@ -373,12 +388,14 @@ For this illustration we'll add a third, nominal,  hyper-parameter:
 
 ```@example goof
 r3 = range(forest, :(model.post_prune), values=[true, false]);
-self_tuning_forest = TunedModel(model=forest,
-									  tuning=latin,
-									  resampling=CV(nfolds=6),
-									  range=[r1, r2, r3],
-									  measure=rms,
-									  n=25);
+self_tuning_forest = TunedModel(
+    model=forest,
+    tuning=latin,
+    resampling=CV(nfolds=6),
+    range=[r1, r2, r3],
+    measure=rms,
+    n=25
+);
 mach = machine(self_tuning_forest, X, y);
 fit!(mach, verbosity=0)
 ```
@@ -409,10 +426,12 @@ The following model is equivalent to the best in `models` by using 3-fold
 cross-validation:
 
 ```@example goof
-multi_model = TunedModel(models=models,
-						 resampling=CV(nfolds=3),
-						 measure=log_loss,
-						 check_measure=false)
+multi_model = TunedModel(
+    models=models,
+    resampling=CV(nfolds=3),
+    measure=log_loss,
+    check_measure=false
+)
 nothing # hide
 ```
 
@@ -424,10 +443,7 @@ evaluated 2 x 3 times):
 ```@example goof
 X, y = make_blobs()
 
-e = evaluate(multi_model, X, y,
-			 resampling=CV(nfolds=2),
-			 measure=log_loss,
-			 verbosity=6)
+e = evaluate(multi_model, X, y, resampling=CV(nfolds=2), measure=log_loss, verbosity=6)
 ```
 
 Now, for example, we can get the best model for the first fold out of
@@ -451,7 +467,7 @@ For example, for the first fold of the outer loop and the second model:
 e.report_per_fold[2].history[1]
 ```
 
-## API
+## Reference
 
 ```@docs
 MLJBase.range

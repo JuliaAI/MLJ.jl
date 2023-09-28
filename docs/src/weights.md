@@ -43,7 +43,7 @@ The model `model` supports class weights if
 
 ## Specifying weights in performance evaluation
 
-When calling an MLJ measure (metric) that supports weights, provide the
+When calling a measure (metric) that supports weights, provide the
 weights as the last argument, as in
 
 ```julia
@@ -53,18 +53,12 @@ w = Dict("versicolor" => 1, "setosa" => 2, "virginica"=> 3)
 macro_f1score(ŷ, y, w)
 ```
 
-You can use `supports_weights` and `supports_class_weights` on
-measures to check weight support. For example, to list all measures
-supporting per observation weights, do
+Some measures also support specification of a class weight dictionary. For details see the
+StatisticalMeasures.jl
+[tutorial](https://juliaai.github.io/StatisticalMeasures.jl/dev/examples_of_usage/).
 
-```julia 
-measures() do m 
-   m.supports_weights 
-end 
-```
+To pass weights to all the measures listed in an [`evaluate!`](@ref)/[`evaluate`](@ref)
+call, use the keyword specifiers `weights=...` or `class_weights=...`. For details, see
+[Evaluating Model Performance](@ref).
 
-See also [Evaluating Model Performance](@ref).
 
-To pass weights to all the measures listed in an `evaluate!/evaluate`
-call, use the keyword specifiers `weights=...` or
-`class_weights=...`. For details, see [`evaluate!`](@ref).
