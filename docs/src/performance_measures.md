@@ -49,9 +49,8 @@ multi-target measure using this package.
 
 In MLJ, measures are specified:
 
-- when evaluating model performance using
-[`evaluate!`](@ref)/[`evaluate`](@ref) - see [Evaluating Model Performance](@ref)
-
+- when evaluating model performance using [`evaluate!`](@ref)/[`evaluate`](@ref); see
+  [Evaluating Model Performance](@ref)
 - when wrapping models using [`TunedModel`](@ref) - see [Tuning Models](@ref)
 - when wrapping iterative models using [`IteratedModel`](@ref) - see [Controlling Iterative Models](@ref)
 - when generating learning curves using [`learning_curve`](@ref) - see [Learning Curves](@ref)
