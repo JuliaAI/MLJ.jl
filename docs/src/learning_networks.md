@@ -240,7 +240,7 @@ data). We demonstrate the process by way of examples of increasing complexity:
 - [Example A - Mini-pipeline](@ref)
 - [More on replacing models with symbols](@ref)
 - [Example B - Multiple operations: transform and inverse transform](@ref)
-- [Example C - Exposing internal network state in reports](@ref)
+- [Example C - Blending predictions and exposing internal network state in reports](@ref)
 - [Example D - Multiple nodes pointing to the same machine](@ref)
 - [Example E - Coupling component model hyper-parameters](@ref)
 - [More on defining new nodes](@ref)
@@ -428,7 +428,7 @@ W =  transform(mach, X)
 @assert inverse_transform(mach, W) ≈ X
 ```
 
-### Example C - Exposing internal network state in reports
+### Example C - Blending predictions and exposing internal network state in reports
 
 The code below defines a new composite model type `CompositeC` that predicts by taking the
 weighted average of two regressors, and additionally exposes, in the model's report, a

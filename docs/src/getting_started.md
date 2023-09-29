@@ -5,7 +5,10 @@ For an outline of MLJ's **goals** and **features**, see
 
 This page introduces some MLJ basics, assuming some familiarity with
 machine learning. For a complete list of other MLJ learning resources,
-see [Learning MLJ](@ref).
+see [Learning MLJ](@ref). 
+
+MLJ collects together the functionality provided by mutliple packages. To learn how to
+install components separately, run `using MLJ; @doc MLJ`.
 
 This section introduces only the most basic MLJ operations and
 concepts. It assumes MLJ has been successfully installed. See
@@ -191,7 +194,7 @@ train, test = partition(eachindex(y), 0.7); # 70:30 split
 fit!(mach, rows=train);
 yhat = predict(mach, X[test,:]);
 yhat[3:5]
-log_loss(yhat, y[test]) |> mean
+log_loss(yhat, y[test])
 ```
 
 Note that `log_loss` and `cross_entropy` are aliases for `LogLoss()`
@@ -265,17 +268,8 @@ evaluate!(mach, resampling=Holdout(fraction_train=0.7),
 
 ## Next steps
 
-To learn a little more about what MLJ can do, browse [Common MLJ
-Workflows](common_mlj_workflows.md) or [Data Science Tutorials in
-Julia](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
-or try the [JuliaCon2020
-Workshop](https://github.com/ablaom/MachineLearningInJulia2020) on MLJ
-(recorded
-[here](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title))
-returning to the manual as needed.
-
-*Read at least the remainder of this page before considering serious
-use of MLJ.*
+For next steps, consult the [Learn MLJ](@ref) section. *At the least, we recommned you
+read the remainder of this page before considering serious use of MLJ.*
 
 
 ## Data containers and scientific types
@@ -341,7 +335,7 @@ scientific type `Table{K}`, where `K` depends on the scientific types of the col
 which can be individually inspected using `schema`:
 
 ```@repl doda
-schema(X)
+ScientificTypes.schema
 ```
 
 #### Matrix data
@@ -350,21 +344,9 @@ MLJ models expecting a table do not generally accept a matrix
 instead. However, a matrix can be wrapped as a table, using
 [`MLJ.table`](@ref):
 
-```julia
-matrix_table = MLJ.table(rand(2,3))
+```@repl doda
+matrix_table = MLJ.table(rand(2,3));
 schema(matrix_table)
-```
-
-```
-┌─────────┬─────────┬────────────┐
-│ _.names │ _.types │ _.scitypes │
-├─────────┼─────────┼────────────┤
-│ x1      │ Float64 │ Continuous │
-│ x2      │ Float64 │ Continuous │
-│ x3      │ Float64 │ Continuous │
-└─────────┴─────────┴────────────┘
-_.nrows = 2
-
 ```
 
 The matrix is *not* copied, only wrapped.  To manifest a table as a
@@ -447,19 +429,9 @@ are the key features of that convention:
 - The scientific types of `nothing` and `missing` are `Nothing` and
   `Missing`, native types we also regard as scientific.
 
-Use `coerce(v, OrderedFactor)` or `coerce(v, Multiclass)` to coerce a
-vector `v` of integers, strings or characters to a vector with an
-appropriate `Finite` (categorical) scitype.  See [Working with
-Categorical Data](@ref).
-
-For more on scitype coercion of arrays and tables, see [`coerce`](@ref),
-[`autotype`](@ref) and [`unpack`](@ref) below and the examples at
-[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/).
+Use `coerce(v, OrderedFactor)` or `coerce(v, Multiclass)` to coerce a vector `v` of
+integers, strings or characters to a vector with an appropriate `Finite` (categorical)
+scitype.  See also [Working with Categorical Data](@ref), and the
+[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/) documentation.
 
 
-
-```@docs
-scitype
-coerce
-autotype
-```

@@ -176,10 +176,10 @@ KNN = @load KNNRegressor
 knn = KNN()
 evaluate(knn, X, y,
          resampling=CV(nfolds=5),
-         measure=[RootMeanSquaredError(), MeanAbsoluteError()])
+         measure=[RootMeanSquaredError(), LPLoss(1)])
 ```
 
-Note `RootMeanSquaredError()` has alias `rms` and `MeanAbsoluteError()` has alias `mae`.
+Note `RootMeanSquaredError()` has alias `rms` and `LPLoss(1)` has aliases `l1`, `mae`.
 
 Do `measures()` to list all losses and scores and their aliases.
 
@@ -220,7 +220,7 @@ Fit on the train data set and evaluate on the test data set:
 ```@example workflows
 fit!(mach, rows=train)
 yhat = predict(mach, X[test,:])
-mean(LogLoss(tol=1e-4)(yhat, y[test]))
+LogLoss(tol=1e-4)(yhat, y[test])
 ```
 
 Note `LogLoss()` has aliases `log_loss` and `cross_entropy`.
@@ -451,14 +451,14 @@ transformation/inverse transformation:
 ```@example workflows
 X, y = @load_reduced_ames
 KNN = @load KNNRegressor
-knn_with_target = TransformedTargetModel(model=KNN(K=3), target=Standardizer())
+knn_with_target = TransformedTargetModel(model=KNN(K=3), transformer=Standardizer())
 pipe = (X -> coerce(X, :age=>Continuous)) |> OneHotEncoder() |> knn_with_target
 ```
 
 Evaluating the pipeline (just as you would any other model):
 
 ```@example workflows
-pipe.one_hot_encoder.drop_last = true
+pipe.one_hot_encoder.drop_last = true # mutate a nested hyper-parameter
 evaluate(pipe, X, y, resampling=Holdout(), measure=RootMeanSquaredError(), verbosity=2)
 ```
 
@@ -476,7 +476,7 @@ target transformation/inverse transformation:
 ```@example workflows
 Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0
 tree_with_target = TransformedTargetModel(model=Tree(),
-                                          target=y -> log.(y),
+                                          transformer=y -> log.(y),
                                           inverse = z -> exp.(z))
 pipe2 = (X -> coerce(X, :age=>Continuous)) |> OneHotEncoder() |> tree_with_target;
 nothing # hide

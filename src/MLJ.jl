@@ -1,3 +1,34 @@
+"""
+   MLJ
+
+[`MLJ`](https://alan-turing-institute.github.io/MLJ.jl/dev/) is a Machine Learning toolbox
+for Julia. It collects together functionality from the following packages, which can be
+loaded separately:
+
+- MLJBase.jl: The `machine` interface, tools to `partition` and `unpack` datasets,
+  `evaluate`/`evaluate!` for model performance, `|>` pipeline syntax,
+  `TransformedTargetModel` wrapper, general model composition syntax (learning networks),
+  synthetic data generators, `scitype` and `schema` methods (from ScientificTypes.jl) for
+  checking how MLJ interprets your data
+
+- StatisticalMeasures.jl: MLJ-compatible measures (metrics) for machine learning,
+  confusion matrices, ROC curves. 
+
+- MLJModels.jl: Common transformers for data preprocessing, searching the model registry,
+  loading models with `@load`
+
+- MLJTuning.jl: Hyperparameter optimization via `TunedModel` wrapper
+
+- MLJIteration.jl: `IteratedModel` Wrapper for controlling iterative models
+
+- MLJEnsembles.jl: Homogeneous model ensembling, via the `EnsembleModel` wrapper
+
+- MLJBalancing.jl: Incorporation of oversampling/undersampling methods in pipelines, via
+  the `BalancedModel` wrapper
+
+- OpenML.jl: Tool for grabbing datasets from OpenML.org
+
+"""
 module MLJ
 
 
@@ -18,6 +49,7 @@ using MLJTuning
 using MLJModels
 using OpenML
 @reexport using MLJFlow
+@reexport using StatisticalMeasures
 using MLJIteration
 import MLJIteration.IterationControl
 
@@ -107,16 +139,6 @@ export nrows, color_off, color_on,
 for T in MLJBase.EXTENDED_ABSTRACT_MODEL_TYPES
     @eval(export $T)
 end
-
-# MLJBase/measures:
-# measure names:
-for m in MLJBase.MEASURE_TYPES_ALIASES_AND_INSTANCES
-    :(export $m) |> eval
-end
-export measures,
-    aggregate, default_measure, skipinvalid,
-    roc_curve, roc,
-    no_avg, macro_avg, micro_avg
 
 # re-export from MLJEnsembles:
 export EnsembleModel

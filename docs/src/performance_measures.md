@@ -1,175 +1,198 @@
 # Performance Measures
 
-In MLJ loss functions, scoring rules, sensitivities, and so on, are
-collectively referred to as *measures*. These include re-exported loss
-functions from the
-[LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl)
-library, overloaded to behave the same way as the built-in measures.
+## Quick links
 
-To see the list of all measures, run `measures()`.  Further measures for
-probabilistic predictors, such as proper scoring rules, and for
-constructing multi-target product measures, are planned.  If you'd like
-to see a measure added to MLJ, post a comment
-[here](https://github.com/JuliaAI/MLJBase.jl/issues/299).g
+- [List of aliases of all
+  measures](https://juliaai.github.io/StatisticalMeasures.jl/dev/auto_generated_list_of_measures/#aliases)
 
-*Note for developers:* The measures interface and the built-in
-measures described here are defined in MLJBase, but will ultimately live
-in a separate package.
+- [Migration guide for changes to measures in MLJBase 1.0](@ref)
 
+## Introduction
 
-## Using built-in measures
+In MLJ loss functions, scoring rules, confusion matrices, sensitivities, etc, are
+collectively referred to as *measures*. These measures are provided by the package
+[StatisticalMeasures.jl](https://juliaai.github.io/StatisticalMeasures.jl/dev/) but are
+immediately available to the MLJ user. Here's a simple example of direct application of
+the `log_loss` measures to compute a training loss:
 
-These measures all have the common calling syntax
-
-```julia
-measure(ŷ, y)
-```
-
-or
-
-```julia
-measure(ŷ, y, w)
-```
-
-where `y` iterates over observations of some target variable, and `ŷ`
-iterates over predictions (`Distribution` or `Sampler` objects in the
-probabilistic case). Here `w` is an optional vector of sample weights,
-or a dictionary of class weights, when these are supported by the
-measure.
-
-```@repl losses_and_scores
+```@example measures
 using MLJ
-y = [1, 2, 3, 4];
-ŷ = [2, 3, 3, 3];
-w = [1, 2, 2, 1];
-rms(ŷ, y) # reports an aggregate loss
-l2(ŷ, y, w) # reports per observation losses
-y = coerce(["male", "female", "female"], Multiclass)
-d = UnivariateFinite(["male", "female"], [0.55, 0.45], pool=y);
-ŷ = [d, d, d];
-log_loss(ŷ, y)
+X, y = @load_iris
+DecisionTreeClassifier = @load DecisionTreeClassifier pkg=DecisionTree
+tree = DecisionTreeClassifier(max_depth=2)
+mach = machine(tree, X, y) |> fit!
+yhat = predict(mach, X)
+log_loss(yhat, y)
 ```
 
-The measures `rms`, `l2` and `log_loss` illustrated here are actually
-        instances of measure *types*. For, example, `l2 = LPLoss(p=2)` and
-`log_loss = LogLoss() = LogLoss(tol=eps())`. Common aliases are
-provided:
+For more examples of direct measure usage, see the StatisticalMeasures.jl
+[tutorial](https://juliaai.github.io/StatisticalMeasures.jl/dev/examples_of_usage/).
 
-```@repl losses_and_scores
-cross_entropy
-```
+A list of all measures, ready to use after running `using MLJ` or `using
+StatisticalMeasures`, is
+[here](https://juliaai.github.io/StatisticalMeasures.jl/dev/auto_generated_list_of_measures/). Alternatively,
+call [`measures()`](@ref StatisticalMeasures.measures) (experimental) to generate a
+dictionary keyed on available measure constructors, with measure metadata as values.
 
-## Traits and custom measures
 
-Notice that `l1` reports per-sample evaluations, while `rms`
-only reports an aggregated result. This and other behavior can be
-gleaned from measure *traits* which are summarized by the `info`
-method:
+## Custom measures
 
-```@repl losses_and_scores
-info(l1)
-```
+Any measure-like object with appropriate [calling
+behavior](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/implementing_new_measures/#definitions)
+can be used with MLJ. To quickly build custom measures, we recommend using the package
+[StatisticalMeasuresBase.jl](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/),
+which provides [this](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/tutorial/)
+tutorial. Note, in particular, that an "atomic" measure can be transformed into a
+multi-target measure using this package.
 
-Query the doc-string for a measure using the name of its type:
+## Uses of measures
 
-```@repl losses_and_scores
-rms
-@doc RootMeanSquaredError # same as `?RootMeanSqauredError
-```
+In MLJ, measures are specified:
 
-Use `measures()` to list all measures, and `measures(conditions...)` to
-search for measures with given traits (as you would [query
-models](model_search.md)). The trait `instances` list the actual
-callable instances of a given measure type (typically aliases for the
-default instance).
+- when evaluating model performance using
+[`evaluate!`](@ref)/[`evaluate`](@ref) - see [Evaluating Model Performance](@ref)
+
+- when wrapping models using [`TunedModel`](@ref) - see [Tuning Models](@ref)
+- when wrapping iterative models using [`IteratedModel`](@ref) - see [Controlling Iterative Models](@ref)
+- when generating learning curves using [`learning_curve`](@ref) - see [Learning Curves](@ref)
+
+and elsewhere.
+
+## Using LossFunctions.jl
+
+In previous versions of MLJ, measures from LossFunctions.jl were also available. Now
+measures from that package must be explicitly imported and wrapped, as described
+[here](https://juliaai.github.io/StatisticalMeasures.jl/dev/examples_of_usage/#Using-losses-from-LossFunctions.jl).
+
+## Receiver operator characteristics
+
+A related performance evaluation tool provided by StatisticalMeasures.jl, and hence by MLJ, is the `roc_curve` method:
 
 ```@docs
-measures(conditions...)
+StatisticalMeasures.roc_curve
 ```
 
-A user-defined measure in MLJ can be passed to the `evaluate!`
-method, and elsewhere in MLJ, provided it is a function or callable
-object conforming to the above syntactic conventions. By default, a
-custom measure is understood to:
+## Migration guide for changes to measures in MLJBase 1.0
 
-- be a loss function (rather than a score)
-
-- report an aggregated value (rather than per-sample evaluations)
-
-- be feature-independent
-
-To override this behavior one simply overloads the appropriate trait,
-as shown in the following examples:
-
-```@repl losses_and_scores
-y = [1, 2, 3, 4];
-ŷ = [2, 3, 3, 3];
-w = [1, 2, 2, 1];
-my_loss(ŷ, y) = maximum((ŷ - y).^2);
-my_loss(ŷ, y)
-my_per_sample_loss(ŷ, y) = abs.(ŷ - y);
-MLJ.reports_each_observation(::typeof(my_per_sample_loss)) = true;
-my_per_sample_loss(ŷ, y)
-my_weighted_score(ŷ, y) = 1/mean(abs.(ŷ - y));
-my_weighted_score(ŷ, y, w) = 1/mean(abs.((ŷ - y).^w));
-MLJ.supports_weights(::typeof(my_weighted_score)) = true;
-MLJ.orientation(::typeof(my_weighted_score)) = :score;
-my_weighted_score(ŷ, y)
-X = (x=rand(4), penalty=[1, 2, 3, 4]);
-my_feature_dependent_loss(ŷ, X, y) = sum(abs.(ŷ - y) .* X.penalty)/sum(X.penalty);
-MLJ.is_feature_dependent(::typeof(my_feature_dependent_loss)) = true
-my_feature_dependent_loss(ŷ, X, y)
-```
-
-The possible signatures for custom measures are: `measure(ŷ, y)`,
-`measure(ŷ, y, w)`, `measure(ŷ, X, y)` and `measure(ŷ, X, y, w)`, each
-measure implementing one non-weighted version, and possibly a second
-weighted version.
-
-## Using measures from LossFunctions.jl
-
-The [LossFunctions.jl](https://github.com/JuliaML/LossFunctions.jl)
-package includes "distance loss" functions for `Continuous` targets,
-and "marginal loss" functions for `Finite{2}` (binary) targets. While the
-LossFunctions.jl interface differs from the present one (for, example
-binary observations must be +1 or -1), MLJ has overloaded instances
-of the LossFunctions.jl types to behave the same as the built-in
-types.
-
-Note that the "distance losses" in the package apply to deterministic
-predictions, while the "marginal losses" apply to probabilistic
-predictions.
+Prior to MLJBase.jl 1.0 (respectivey, MLJ.jl version 0.19.6) measures were defined in
+MLJBase.jl (a dependency of MLJ.jl) but now they are provided by MLJ.jl dependency
+[StatisticalMeasures](https://juliaai.github.io/StatisticalMeasures.jl/dev/). Effects
+on users are detailed below:
 
 
-## List of measures
+### Breaking behavior likely relevant to many users
 
-All measures listed below have a doc-string associated with the measure's
-*type*. So, for example, do `?LPLoss` not `?l2`.
+- If `using MLJBase` without MLJ, then, in Julia 1.9 or higher, `StatisticalMeasures` must
+  be explicitly imported to use measures that were previously part of MLJBase. If `using
+  MLJ`, then all previous measures are still available, with the exception of those
+  corresponding to LossFunctions.jl (see below).
 
-```@setup losses_and_scores
-using DataFrames
-```
+- All measures return a *single* aggregated measurement. In other words, measures
+  previously reporting a measurement *per-observation* (previously subtyping
+  `Unaggregated`) no longer do so. To get per-observation measurements, use the new method
+  `StatisticalMeasures.measurements(measure, ŷ, y[, weights, class_weights])`.
 
-```@example losses_and_scores
-ms = measures()
-types = map(ms) do m
-    m.name
-end
-instance = map(ms) do m m.instances end
-table = (type=types, instances=instance)
-DataFrame(table)
-```
+- The default measure for regression models (used in `evaluate/evaluate!` when `measures`
+  is unspecified) is changed from `rms` to `l2=LPLoss(2)` (mean sum of squares).
 
+- `MeanAbsoluteError` has been removed and instead `mae` is an alias for `LPLoss(p=1)`.
 
-## Other performance-related tools
+- Measures that previously skipped `NaN` values will now (at least by default) propagate
+   those values. Missing value behavior is unchanged, except some measures that
+   previously did not support `missing` now do.
 
-In MLJ one computes a confusion matrix by calling an instance of the
-`ConfusionMatrix` measure type on the data:
+- Aliases for measure *types* have been removed. For example `RMSE` (alias for
+  `RootMeanSquaredError`) is gone. Aliases for instances, such as `rms` and
+  `cross_entropy` persist. The exception is `precision`, for which `ppv` can
+  be used in its place. (This is to avoid conflict with `Base.precision`, which was
+  previously pirated.)
 
-```@docs
-ConfusionMatrix
-```
+- `info(measure)` has been decommissioned; query docstrings or access the new [measure
+  traits](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/methods/#Traits)
+  individually instead. These traits are now provided by StatisticalMeasures.jl and not
+  are not exported. For example, to access the orientation of the measure `rms`, do
+  `import StatisticalMeasures as SM; SM.orientation(rms)`.
 
-```@docs
-roc_curve
-```
+- Behavior of the `measures()` method, to list all measures and associated traits, has
+  changed. It now returns a dictionary instead of a vector of named tuples;
+  `measures(predicate)` is decommissioned, but `measures(needle)` is preserved. (This
+  method, owned by StatisticalMeasures.jl, has some other search options, but is
+  experimental.)
+
+- Measures that were wraps of losses from LossFunctions.jl are no longer exposed by
+  MLJBase or MLJ. To use such a loss, you must explicitly `import LossFunctions` and wrap
+  the loss appropriately.  See [Using losses from
+  LossFunctions.jl](https://juliaai.github.io/StatisticalMeasures.jl/dev/examples_of_usage/#Using-losses-from-LossFunctions.jl)
+  for examples.
+
+- Some user-defined measures working in previous versions of MLJBase.jl may not work
+  without modification, as they must conform to the new [StatisticalMeasuresBase.jl
+  API](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/implementing_new_measures/#definitions). See
+  [this tutorial](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/tutorial/) on
+  how define new measures.
+
+- Measures with a "feature argument" `X`, as in `some_measure(ŷ, y, X)`, are no longer
+  supported. See [What is a
+  measure?](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/implementing_new_measures/#definitions)
+  for allowed signatures in measures.
+
+### Packages implementing the MLJ model interface
+
+The migration of measures is not expected to require any changes to the source code in
+packges providing implementations of the MLJ model interface (MLJModelInterface.jl) such
+as MLJDecisionTreeInterface.jl and MLJFlux.jl, and this is confirmed by extensive
+integration tests. However, some current tests will fail, if they use MLJBase
+measures. The following should generally suffice to adapt such tests:
+
+- Add StatisticalMeasures as test dependency, and add `using StatisticalMeasures` to your
+  `runtests.jl` (and/or included submodules).
+
+- If measures are qualified, as in `MLJBase.rms`, then the qualification must be removed
+  or changed to `StatisticalMeasures.rms`, etc.
+
+- Be aware that the default measure used in methods such as `evaluate!`, when `measure` is
+  not specified, is changed from `rms` to `l2` for regression models.
+
+- Be aware of that all measures now report a measurement for every observation, and never
+  an aggregate. See second point above.
+
+### Breaking behavior possibly relevant to some developers
+
+- The abstract measure types `Aggregated`, `Unaggregated`, `Measure` have been
+  decommissioned. (A measure is now defined purely by its [calling
+  behavior](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/implementing_new_measures/#definitions).)
+
+- What were previously exported as measure types are now only constructors.
+
+- `target_scitype(measure)` is decommissioned. Related is
+  `StatisticalMeasures.observation_scitype(measure)` which declares an upper bound on the
+  allowed scitype *of a single observation*.
+
+- `prediction_type(measure)` is decommissioned. Instead use
+  `StatisticalMeasures.kind_of_proxy(measure)`.
+
+- The trait `reports_each_observation` is decommissioned. Related is
+  `StatisticalMeasures.can_report_unaggregated`; if `false` the new `measurements` method
+  simply returns `n` copies of the aggregated measurement, where `n` is the number of
+  observations provided, instead of individual observation-dependent measurements.
+
+- `aggregation(measure)` has been decommissioned. Instead use
+  `StatisticalMeasures.external_mode_of_aggregation(measure)`.
+
+- `instances(measure)` has been decommissioned; query docstrings for measure aliases, or
+  follow this example: `aliases = measures()[RootMeanSquaredError].aliases`.
+
+- `is_feature_dependent(measure)` has been decommissioned. Measures consuming feature data
+  are not longer supported; see above.
+
+- `distribution_type(measure)` has been decommissioned.
+
+- `docstring(measure)` has been decommissioned.
+
+- Behavior of `aggregate` [has changed](https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/methods/#StatisticalMeasuresBase.aggregate).
+
+- The following traits, previously exported by MLJBase and MLJ, cannot be applied to
+  measures: `supports_weights`, `supports_class_weights`, `orientation`,
+  `human_name`. Instead use the traits with these names provided by
+  StatisticalMeausures.jl (they will need to be qualified, as in `import
+  StatisticalMeasures; StatisticalMeasures.orientation(measure)`).
