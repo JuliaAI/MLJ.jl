@@ -13,8 +13,8 @@ One or more oversampling/undersampling algorithms can be fused with an MLJ class
 using the [`BalancedModel`](@ref) wrapper. This creates a new classifier which can be
 treated like any other; resampling to correct for class imbalance, relevant only for
 *training* of the atomic classifier, is then carried out internally. If, for example, one
-applies cross-validation to the wrapped classifier (using [`evaluate!`](@ref), say), then
-this means over/undersampling is then repeated for each fold automatically.
+applies cross-validation to the wrapped classifier (using [`evaluate!`](@ref), say) then
+this means over/undersampling is then repeated for each training fold automatically.
 
 Refer to the [MLJBalancing.jl]() documentation for further details.
 
