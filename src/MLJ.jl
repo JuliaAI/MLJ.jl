@@ -50,6 +50,7 @@ using MLJModels
 using OpenML
 @reexport using MLJFlow
 @reexport using StatisticalMeasures
+@reexport using MLJBalancing: BalancedModel
 using MLJIteration
 import MLJIteration.IterationControl
 

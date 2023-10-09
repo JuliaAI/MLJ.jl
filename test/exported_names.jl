@@ -12,6 +12,16 @@ IterationControl.with_state_do(Step(2))
 IteratedModel
 MLJIteration
 
+# MLJBalancing
+
+bmodel = @test_logs(
+    (:warn, r"^No balancer"),
+    BalancedModel(model=ConstantClassifier()),
+)
+
+@test bmodel isa Probabilistic
+
+
 # MLJSerialization
 
 Save()
