@@ -62,7 +62,7 @@ const HANDLES = keys(DESCRIPTORS_GIVEN_HANDLE)
 """
     models_missing_descriptors()
 
-Return a list of handles for those models in the registry not have the corresponding
+Return a list of handles for those models in the registry not having the corresponding
 handle as key in /docs/src/ModelDescriptors.toml.
 
 """
