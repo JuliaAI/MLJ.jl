@@ -41,7 +41,7 @@ independent assessment.
 [LIBSVM.jl](https://github.com/mpastell/LIBSVM.jl) | [MLJLIBSVMInterface.jl](https://github.com/JuliaAI/MLJLIBSVMInterface.jl) | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
 [LightGBM.jl](https://github.com/IQVIA-ML/LightGBM.jl) | - | LGBMClassifier, LGBMRegressor | high | 
 [Flux.jl](https://github.com/FluxML/Flux.jl) | [MLJFlux.jl](https://github.com/FluxML/MLJFlux.jl) | NeuralNetworkRegressor, NeuralNetworkClassifier, MultitargetNeuralNetworkRegressor, ImageClassifier | low |
-[MLJBalancing.jl](https://github.com/JuliaAI/MLJBalancing.jl) | - | BaggedEnsembleClassifier | low | 
+[MLJBalancing.jl](https://github.com/JuliaAI/MLJBalancing.jl) | - | BalancedBaggingClassifier | low | 
 [MLJLinearModels.jl](https://github.com/JuliaAI/MLJLinearModels.jl) | - | LinearRegressor, RidgeRegressor, LassoRegressor, ElasticNetRegressor, QuantileRegressor, HuberRegressor, RobustRegressor, LADRegressor, LogisticClassifier, MultinomialClassifier | medium |
 [MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl) (built-in) | - | ConstantClassifier, ConstantRegressor, ContinuousEncoder, DeterministicConstantClassifier, DeterministicConstantRegressor, FeatureSelector, FillImputer, InteractionTransformer, OneHotEncoder, Standardizer, UnivariateBoxCoxTransformer, UnivariateDiscretizer, UnivariateFillImputer,  UnivariateTimeTypeToContinuous, Standardizer, BinaryThreshholdPredictor | medium |
 [MLJText.jl](https://github.com/JuliaAI/MLJText.jl) | - | TfidfTransformer, BM25Transformer, CountTransformer | low |
