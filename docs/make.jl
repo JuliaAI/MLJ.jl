@@ -5,16 +5,16 @@ end
 using Pkg
 using Documenter
 using MLJ
-import MLJIteration
-import IterationControl
-import EarlyStopping
-import MLJBase
-import MLJTuning
-import MLJModels
-import MLJEnsembles
-import ScientificTypes
-import MLJModelInterface
-import ScientificTypes
+using MLJBase
+import MLJ.MLJBase.MLJModelInterface
+import MLJ.MLJIteration
+import MLJ.MLJIteration.IterationControl
+import MLJ.MLJIteration.IterationControl.EarlyStopping
+import MLJ.MLJTuning
+import MLJ.MLJModels
+import MLJ.MLJEnsembles
+import MLJ.ScientificTypes
+import MLJ.MLJBalancing
 import ScientificTypesBase
 import Distributions
 using CategoricalArrays
@@ -72,6 +72,7 @@ pages = [
     "Linear Pipelines" => "linear_pipelines.md",
     "Target Transformations" => "target_transformations.md",
     "Homogeneous Ensembles" => "homogeneous_ensembles.md",
+    "Correcting Class Imbalance" => "correcting_class_imbalance.md",
     "Model Stacking" => "model_stacking.md",
     "Learning Networks" => "learning_networks.md",
     "Controlling Iterative Models" => "controlling_iterative_models.md",
@@ -101,20 +102,23 @@ makedocs(
     doctest  = true,
     sitename = "MLJ",
     format   = Documenter.HTML(),
-    modules  = [MLJ,
-                MLJBase,
-                MLJTuning,
-                MLJModels,
-                MLJEnsembles,
-                ScientificTypes,
-                MLJModelInterface,
-                ScientificTypesBase,
-                StatisticalMeasures,
-                MLJIteration,
-                EarlyStopping,
-                IterationControl,
-                CategoricalDistributions,
-                StatisticalMeasures],
+    modules  = [
+        MLJ,
+        MLJBase,
+        MLJTuning,
+        MLJModels,
+        MLJEnsembles,
+        MLJBalancing,
+        MLJIteration,
+        ScientificTypes,
+        MLJModelInterface,
+        ScientificTypesBase,
+        StatisticalMeasures,
+        EarlyStopping,
+        IterationControl,
+        CategoricalDistributions,
+        StatisticalMeasures,
+    ],
     pages    = pages,
     warnonly = [:cross_references, :missing_docs],
 )

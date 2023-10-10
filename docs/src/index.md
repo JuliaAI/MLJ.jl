@@ -49,7 +49,8 @@ To support MLJ development, please cite these works or star the repo:
 [Working with Categorical Data](@ref) | 
 [Preparing Data](@ref) |
 [Generating Synthetic Data](@ref) |
-[OpenML Integration](@ref)
+[OpenML Integration](@ref) |
+[Correcting Class Imbalance](@ref)
 
 ### Models
 [Model Search](@ref model_search) |
@@ -65,7 +66,8 @@ To support MLJ development, please cite these works or star the repo:
 [Evaluating Model Performance](@ref) |
 [Tuning Models](@ref) |
 [Controlling Iterative Models](@ref) |
-[Learning Curves](@ref)
+[Learning Curves](@ref)|
+[Correcting Class Imbalance](@ref)
 
 ### Composition
 [Composing Models](@ref) |
@@ -73,7 +75,9 @@ To support MLJ development, please cite these works or star the repo:
 [Target Transformations](@ref) |
 [Homogeneous Ensembles](@ref) |
 [Model Stacking](@ref) |
-[Learning Networks](@ref)
+[Learning Networks](@ref)|
+[Correcting Class Imbalance](@ref)
+
 
 ### Integration 
 [Logging Workflows](@ref) |
