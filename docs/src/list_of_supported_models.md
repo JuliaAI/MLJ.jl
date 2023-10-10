@@ -37,7 +37,7 @@ independent assessment.
 [EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl) | - | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian, EvoTreeMLE | medium | tree-based gradient boosting models
 [EvoLinear.jl](https://github.com/jeremiedb/EvoLinear.jl) | - | EvoLinearRegressor | medium | linear boosting models
 [GLM.jl](https://github.com/JuliaStats/GLM.jl) | [MLJGLMInterface.jl](https://github.com/JuliaAI/MLJGLMInterface.jl) | LinearRegressor, LinearBinaryClassifier, LinearCountRegressor | medium² |
-[Imbalance.jl](https://github.com/JuliaAI/Imbalance.jl) | - | RandomOversampler, SMOTENC, TomekUndersampler, ClusterUndersampler, SMOTE, SMOTEN, ROSE, RandomUndersampler, ENNUndersampler, BorderlineSMOTE1, RandomWalkOversampler | low | 
+[Imbalance.jl](https://github.com/JuliaAI/Imbalance.jl) | - | RandomOversampler, RandomWalkOversampler, ROSE, SMOTE, BorderlineSMOTE1, SMOTEN, SMOTENC, RandomUndersampler, ClusterUndersampler,  ENNUndersampler, TomekUndersampler, | low | 
 [LIBSVM.jl](https://github.com/mpastell/LIBSVM.jl) | [MLJLIBSVMInterface.jl](https://github.com/JuliaAI/MLJLIBSVMInterface.jl) | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
 [LightGBM.jl](https://github.com/IQVIA-ML/LightGBM.jl) | - | LGBMClassifier, LGBMRegressor | high | 
 [Flux.jl](https://github.com/FluxML/Flux.jl) | [MLJFlux.jl](https://github.com/FluxML/MLJFlux.jl) | NeuralNetworkRegressor, NeuralNetworkClassifier, MultitargetNeuralNetworkRegressor, ImageClassifier | low |
