@@ -16,7 +16,9 @@ treated like any other; resampling to correct for class imbalance, relevant only
 applies cross-validation to the wrapped classifier (using [`evaluate!`](@ref), say) then
 this means over/undersampling is then repeated for each training fold automatically.
 
-Refer to the [MLJBalancing.jl]() documentation for further details.
+Refer to the
+[MLJBalancing.jl](https://juliaai.github.io/Imbalance.jl/dev/algorithms/mlj_balancing/)
+documentation for further details.
 
 ```@docs
 MLJBalancing.BalancedModel
