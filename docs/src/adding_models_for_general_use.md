@@ -155,8 +155,15 @@ function RidgeRegressor(; lambda=0.0)
 end
 ```
 
-*Important.* The clean method must have the property that
-`clean!(clean!(model)) == clean!(model)` for any instance `model`.
+*Important.* Performing `clean!(model)` a second time should not mutate `model`. That is,
+this test should hold:
+
+```julia
+clean!(model)
+clone = deepcopy(model)
+clean!(model)
+@test model == clone
+```
 
 Although not essential, try to avoid `Union` types for model
 fields. For example, a field declaration `features::Vector{Symbol}`
