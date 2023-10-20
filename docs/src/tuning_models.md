@@ -6,13 +6,13 @@ advanced keyword options.
 
 tuning strategy | notes |package to import | package providing the core algorithm
 ----------------|-------|------------------|----------------------------------
-[`Grid`](@ref)`(goal=nothing, resolution=10)` | shuffled by default; `goal` is upper bound for number of grid points | MLJ.jl or MLJTuning.jl | [MLJTuning.jl](https://github.com/FluxML/model-zoo)
-[`RandomSearch`](@ref)`(rng=GLOBAL_RNG)` | with customizable priors |MLJ.jl or MLJTuning.jl   | [MLJTuning.jl](https://github.com/FluxML/model-zoo)
+[`Grid`](@ref)`(goal=nothing, resolution=10)` | shuffled by default; `goal` is upper bound for number of grid points | MLJ.jl or MLJTuning.jl | [MLJTuning.jl](https://github.com/JuliaAI/MLJTuning.jl)
+[`RandomSearch`](@ref)`(rng=GLOBAL_RNG)` | with customizable priors |MLJ.jl or MLJTuning.jl   | [MLJTuning.jl](https://github.com/JuliaAI/MLJTuning.jl)
 [`LatinHypercube`](@ref)`(rng=GLOBAL_RNG)` | with discrete parameter support | MLJ.jl or MLJTuning.jl | [LatinHypercubeSampling](https://github.com/MrUrq/LatinHypercubeSampling.jl)
 `MLJTreeParzenTuning()` | See this [example](https://github.com/IQVIA-ML/TreeParzen.jl/blob/master/docs/examples/simple_mlj_demo/simple_mlj_demo.md) for usage | TreeParzen.jl | [TreeParzen.jl](https://github.com/IQVIA-ML/TreeParzen.jl) (port to Julia of [hyperopt](http://hyperopt.github.io/hyperopt/))
 `ParticleSwarm(n_particles=3, rng=GLOBAL_RNG)` | Standard Kennedy-Eberhart algorithm, plus discrete parameter support | MLJParticleSwarmOptimization.jl | [MLJParticleSwarmOptimization.jl](https://github.com/JuliaAI/MLJParticleSwarmOptimization.jl/)
 `AdaptiveParticleSwarm(n_particles=3, rng=GLOBAL_RNG)` | Zhan et al. variant with automated swarm coefficient updates, plus discrete parameter support | MLJParticleSwarmOptimization.jl | [MLJParticleSwarmOptimization.jl](https://github.com/JuliaAI/MLJParticleSwarmOptimization.jl/)
-`Explicit()` | For an [explicit list](@ref explicit) of models of varying type | MLJ.jl or MLJTuning.jl | [MLJTuning.jl](https://github.com/FluxML/model-zoo)
+`Explicit()` | For an [explicit list](@ref explicit) of models of varying type | MLJ.jl or MLJTuning.jl | [MLJTuning.jl](https://github.com/JuliaAI/MLJTuning.jl)
 
 Below we illustrate hyperparameter optimization using the
 [`Grid`](@ref), [`RandomSearch`](@ref), [`LatinHypercube`](@ref) and
