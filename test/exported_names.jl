@@ -35,7 +35,7 @@ Save()
 
 # MLJFlow
 
-MLFlowLogger
+MLJFlow.Logger
 
 # StatisticalMeasures
 
