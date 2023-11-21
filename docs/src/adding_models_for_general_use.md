@@ -1209,35 +1209,39 @@ Your document string must include the following components, in order:
 Unsupervised models implement the MLJ model interface in a very
 similar fashion. The main differences are:
 
-- The `fit` method has only one training argument `X`, as in `MLJModelInterface.fit(model,
-  verbosity, X)`. However, it has the same return value `(fitresult, cache, report)`. An
-  `update` method (e.g., for iterative models) can be optionally implemented in the same
-  way. For models that subtype `Static <: Unsupervised` (see also [Static
-  transformers](@ref) `fit` has no training arguments but does not need to be implemented
-  as a fallback returns `(nothing, nothing, nothing)`.
+- The `fit` method, which still returns `(fitresult, cache, report)` will typically have
+  only one training argument `X`, as in `MLJModelInterface.fit(model, verbosity, X)`,
+  although this is not a hard requirement. For example, a feature selection tool (wrapping
+  some supervised model) might also include a target `y` as input. Furthermore, in the
+  case of models that subtype `Static <: Unsupervised` (see also [Static
+  transformers](@ref) `fit` has no training arguments at all, but does not need to be
+  implemented as a fallback returns `(nothing, nothing, nothing)`.
 
-- A `transform` method is compulsory and has the same signature as
-  `predict`, as in `MLJModelInterface.transform(model, fitresult, Xnew)`.
+- A `transform` and/or `predict` method is implemented, and has the same signature as
+  `predict` does in the supervised case, as in `MLJModelInterface.transform(model,
+  fitresult, Xnew)`. However, it may only have one data argument `Xnew`, unless `model <:
+  Static`, in which case there is no restriction.  A use-case for `predict` is K-means 
+  `MLJModelInterface.predict(model, fitresult, Xnew)`. A use-case is
+  clustering that `predict`s labels and `transform`s 
+  input features into a space of lower dimension. See [Transformers
+  that also predict](@ref) for an example.
 
-- Instead of defining the `target_scitype` trait, one declares an
-  `output_scitype` trait (see above for the meaning).
+- The `target_scitype` trait continues to refer to the output of `predict`, if
+  implemented, while a trait, `output_scitype`, is for the output of `transform`.
 
 - An `inverse_transform` can be optionally implemented. The signature
   is the same as `transform`, as in
   `MLJModelInterface.inverse_transform(model, fitresult, Xout)`, which:
-
    - must make sense for any `Xout` for which `scitype(Xout) <:
-	 output_scitype(SomeSupervisedModel)` (see below); and
-
+     output_scitype(SomeSupervisedModel)` (see below); and
    - must return an object `Xin` satisfying `scitype(Xin) <:
-	 input_scitype(SomeSupervisedModel)`.
+     input_scitype(SomeSupervisedModel)`.
 
-- A `predict` method may be optionally implemented, and has the same
-  signature as for supervised models, as in
-  `MLJModelInterface.predict(model, fitresult, Xnew)`. A use-case is
-  clustering algorithms that `predict` labels and `transform` new
-  input features into a space of lower dimension. See [Transformers
-  that also predict](@ref) for an example.
+For sample implementatations, see MLJ's [built-in
+transformers](https://github.com/JuliaAI/MLJModels.jl/blob/dev/src/builtins/Transformers.jl)
+and the clustering models at
+[MLJClusteringInterface.jl](https://github.com/jbrea/MLJClusteringInterface.jl).
+
 
 ## Static models (models that do not generalize)
 
