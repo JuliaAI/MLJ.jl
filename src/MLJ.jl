@@ -26,6 +26,8 @@ loaded separately:
 - MLJBalancing.jl: Incorporation of oversampling/undersampling methods in pipelines, via
   the `BalancedModel` wrapper
 
+- MLJFlow.jl: Integration with MLflow workflow tracking
+
 - OpenML.jl: Tool for grabbing datasets from OpenML.org
 
 """
