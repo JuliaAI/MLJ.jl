@@ -32,9 +32,8 @@
  transform_scitype = Table{&lt;:AbstractVector{&lt;:Continuous}},
  input_scitype = Table{&lt;:AbstractVector{&lt;:Continuous}},
  target_scitype = Unknown,
- output_scitype = Table{&lt;:AbstractVector{&lt;:Continuous}})</code></pre><p>So a &quot;model&quot; in the present context is just a named tuple containing metadata, and not an actual model type or instance. If two models with the same name occur in different packages, the package name must be specified, as in <code>info(&quot;LinearRegressor&quot;, pkg=&quot;GLM&quot;)</code>. </p><p>Model document strings can be retreived, without importing the defining code, using the <code>doc</code> function:</p><pre><code class="nohighlight hljs">doc(&quot;DecisionTreeClassifier&quot;, pkg=&quot;DecisionTree&quot;)</code></pre><h2 id="General-model-queries"><a class="docs-heading-anchor" href="#General-model-queries">General model queries</a><a id="General-model-queries-1"></a><a class="docs-heading-anchor-permalink" href="#General-model-queries" title="Permalink"></a></h2><p>We list all models (named tuples) using <code>models()</code>, and list the models for which code is  already loaded with <code>localmodels()</code>:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; localmodels()</code><code class="nohighlight hljs ansi" style="display:block;">60-element Vector{NamedTuple{(:name, :package_name, :is_supervised, :abstract_type, :deep_properties, :docstring, :fit_data_scitype, :human_name, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :inverse_transform_scitype, :is_pure_julia, :is_wrapper, :iteration_parameter, :load_path, :package_license, :package_url, :package_uuid, :predict_scitype, :prediction_type, :reporting_operations, :reports_feature_importances, :supports_class_weights, :supports_online, :supports_training_losses, :supports_weights, :transform_scitype, :input_scitype, :target_scitype, :output_scitype)}}:
+ output_scitype = Table{&lt;:AbstractVector{&lt;:Continuous}})</code></pre><p>So a &quot;model&quot; in the present context is just a named tuple containing metadata, and not an actual model type or instance. If two models with the same name occur in different packages, the package name must be specified, as in <code>info(&quot;LinearRegressor&quot;, pkg=&quot;GLM&quot;)</code>. </p><p>Model document strings can be retreived, without importing the defining code, using the <code>doc</code> function:</p><pre><code class="nohighlight hljs">doc(&quot;DecisionTreeClassifier&quot;, pkg=&quot;DecisionTree&quot;)</code></pre><h2 id="General-model-queries"><a class="docs-heading-anchor" href="#General-model-queries">General model queries</a><a id="General-model-queries-1"></a><a class="docs-heading-anchor-permalink" href="#General-model-queries" title="Permalink"></a></h2><p>We list all models (named tuples) using <code>models()</code>, and list the models for which code is  already loaded with <code>localmodels()</code>:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; localmodels()</code><code class="nohighlight hljs ansi" style="display:block;">59-element Vector{NamedTuple{(:name, :package_name, :is_supervised, :abstract_type, :deep_properties, :docstring, :fit_data_scitype, :human_name, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :inverse_transform_scitype, :is_pure_julia, :is_wrapper, :iteration_parameter, :load_path, :package_license, :package_url, :package_uuid, :predict_scitype, :prediction_type, :reporting_operations, :reports_feature_importances, :supports_class_weights, :supports_online, :supports_training_losses, :supports_weights, :transform_scitype, :input_scitype, :target_scitype, :output_scitype)}}:
  (name = AdaBoostStumpClassifier, package_name = DecisionTree, ... )
- (name = BalancedBaggingClassifier, package_name = MLJBalancing, ... )
  (name = BayesianLDA, package_name = MultivariateStats, ... )
  (name = BayesianSubspaceLDA, package_name = MultivariateStats, ... )
  (name = ConstantClassifier, package_name = MLJModels, ... )
@@ -43,6 +42,7 @@
  (name = DBSCAN, package_name = Clustering, ... )
  (name = DecisionTreeClassifier, package_name = DecisionTree, ... )
  (name = DecisionTreeRegressor, package_name = DecisionTree, ... )
+ (name = DeterministicConstantClassifier, package_name = MLJModels, ... )
  ⋮
  (name = RidgeRegressor, package_name = MultivariateStats, ... )
  (name = RobustRegressor, package_name = MLJLinearModels, ... )
@@ -52,46 +52,47 @@
  (name = UnivariateDiscretizer, package_name = MLJModels, ... )
  (name = UnivariateFillImputer, package_name = MLJModels, ... )
  (name = UnivariateStandardizer, package_name = MLJModels, ... )
- (name = UnivariateTimeTypeToContinuous, package_name = MLJModels, ... )</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; localmodels()[2]</code><code class="nohighlight hljs ansi" style="display:block;">(name = &quot;BalancedBaggingClassifier&quot;,
- package_name = &quot;MLJBalancing&quot;,
+ (name = UnivariateTimeTypeToContinuous, package_name = MLJModels, ... )</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; localmodels()[2]</code><code class="nohighlight hljs ansi" style="display:block;">(name = &quot;BayesianLDA&quot;,
+ package_name = &quot;MultivariateStats&quot;,
  is_supervised = true,
  abstract_type = Probabilistic,
  deep_properties = (),
- docstring = &quot;```\nBalancedBaggingClassifier\n```\n\nA model type fo...&quot;,
- fit_data_scitype = Tuple{Union{Infinite, Finite}, AbstractVector},
- human_name = &quot;balanced bagging classifier&quot;,
- hyperparameter_ranges = (nothing, nothing, nothing),
- hyperparameter_types = (&quot;MLJModelInterface.Probabilistic&quot;,
-                         &quot;Integer&quot;,
-                         &quot;Union{Integer, Random.AbstractRNG}&quot;),
- hyperparameters = (:model, :T, :rng),
- implemented_methods = [],
+ docstring = &quot;```\nBayesianLDA\n```\n\nA model type for constructing...&quot;,
+ fit_data_scitype =
+     Tuple{Table{&lt;:AbstractVector{&lt;:Continuous}}, AbstractVector{&lt;:Finite}},
+ human_name = &quot;Bayesian LDA model&quot;,
+ hyperparameter_ranges =
+     (nothing, nothing, nothing, nothing, nothing, nothing),
+ hyperparameter_types =
+     (&quot;Symbol&quot;,
+      &quot;StatsBase.CovarianceEstimator&quot;,
+      &quot;StatsBase.CovarianceEstimator&quot;,
+      &quot;Int64&quot;,
+      &quot;Float64&quot;,
+      &quot;Union{Nothing, Dict{&lt;:Any, &lt;:Real}, CategoricalDistributions.UnivariateFinite{&lt;:Any, &lt;:Any, &lt;:Any, &lt;:Real}}&quot;),
+ hyperparameters = (:method, :cov_w, :cov_b, :outdim, :regcoef, :priors),
+ implemented_methods = [:clean!, :fit, :fitted_params, :predict, :transform],
  inverse_transform_scitype = Unknown,
  is_pure_julia = true,
  is_wrapper = false,
  iteration_parameter = nothing,
- load_path = &quot;MLJBalancing.MLJBalancing.BalancedBaggingClassifier&quot;,
- package_license = &quot;unknown&quot;,
- package_url = &quot;https://github.com/JuliaAI/MLJBalancing.jl&quot;,
- package_uuid = &quot;45f359ea-796d-4f51-95a5-deb1a414c586&quot;,
- predict_scitype = Unknown,
+ load_path = &quot;MLJMultivariateStatsInterface.BayesianLDA&quot;,
+ package_license = &quot;MIT&quot;,
+ package_url = &quot;https://github.com/JuliaStats/MultivariateStats.jl&quot;,
+ package_uuid = &quot;6f286f6a-111f-5878-ab1e-185364afe411&quot;,
+ predict_scitype =
+     AbstractVector{ScientificTypesBase.Density{_s25} where _s25&lt;:Finite},
  prediction_type = :probabilistic,
- reporting_operations = (:predict,
-                         :predict_mean,
-                         :predict_mode,
-                         :predict_median,
-                         :predict_joint,
-                         :transform,
-                         :inverse_transform),
+ reporting_operations = (),
  reports_feature_importances = false,
  supports_class_weights = false,
  supports_online = false,
  supports_training_losses = false,
  supports_weights = false,
  transform_scitype = Unknown,
- input_scitype = Union{Infinite, Finite},
- target_scitype = AbstractVector,
- output_scitype = Union{Infinite, Finite})</code></pre><p>One can search for models containing specified strings or regular expressions in their <code>docstring</code> attributes, as in</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; models(&quot;forest&quot;)</code><code class="nohighlight hljs ansi" style="display:block;">12-element Vector{NamedTuple{(:name, :package_name, :is_supervised, :abstract_type, :deep_properties, :docstring, :fit_data_scitype, :human_name, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :inverse_transform_scitype, :is_pure_julia, :is_wrapper, :iteration_parameter, :load_path, :package_license, :package_url, :package_uuid, :predict_scitype, :prediction_type, :reporting_operations, :reports_feature_importances, :supports_class_weights, :supports_online, :supports_training_losses, :supports_weights, :transform_scitype, :input_scitype, :target_scitype, :output_scitype)}}:
+ input_scitype = Table{&lt;:AbstractVector{&lt;:Continuous}},
+ target_scitype = AbstractVector{&lt;:Finite},
+ output_scitype = Table{&lt;:AbstractVector{&lt;:Continuous}})</code></pre><p>One can search for models containing specified strings or regular expressions in their <code>docstring</code> attributes, as in</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; models(&quot;forest&quot;)</code><code class="nohighlight hljs ansi" style="display:block;">12-element Vector{NamedTuple{(:name, :package_name, :is_supervised, :abstract_type, :deep_properties, :docstring, :fit_data_scitype, :human_name, :hyperparameter_ranges, :hyperparameter_types, :hyperparameters, :implemented_methods, :inverse_transform_scitype, :is_pure_julia, :is_wrapper, :iteration_parameter, :load_path, :package_license, :package_url, :package_uuid, :predict_scitype, :prediction_type, :reporting_operations, :reports_feature_importances, :supports_class_weights, :supports_online, :supports_training_losses, :supports_weights, :transform_scitype, :input_scitype, :target_scitype, :output_scitype)}}:
  (name = GeneralImputer, package_name = BetaML, ... )
  (name = IForestDetector, package_name = OutlierDetectionPython, ... )
  (name = RandomForestClassifier, package_name = DecisionTree, ... )
@@ -125,4 +126,4 @@ end</code></pre><h2 id="API"><a class="docs-heading-anchor" href="#API">API</a><
 localmodels(filters...; modl=Main)
 localmodels(needle::Union{AbstractString,Regex}; modl=Main)</code></pre><p>List all models currently available to the user from the module <code>modl</code> without importing a package, and which additional pass through the specified filters. Here a <em>filter</em> is a <code>Bool</code>-valued function on models.</p><p>Use <code>load_path</code> to get the path to some model returned, as in these examples:</p><pre><code class="nohighlight hljs">ms = localmodels()
 model = ms[1]
-load_path(model)</code></pre><p>See also <a href="#MLJModels.models"><code>models</code></a>, <a href="../loading_model_code/#StatisticalTraits.load_path"><code>load_path</code></a>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/MLJModels.jl/blob/v0.16.12/src/model_search.jl#L395-L414">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../working_with_categorical_data/">« Working with Categorical Data</a><a class="docs-footer-nextpage" href="../loading_model_code/">Loading Model Code »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.1.2 on <span class="colophon-date" title="Tuesday 21 November 2023 03:25">Tuesday 21 November 2023</span>. Using Julia version 1.9.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+load_path(model)</code></pre><p>See also <a href="#MLJModels.models"><code>models</code></a>, <a href="../loading_model_code/#StatisticalTraits.load_path"><code>load_path</code></a>.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/MLJModels.jl/blob/v0.16.12/src/model_search.jl#L395-L414">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../working_with_categorical_data/">« Working with Categorical Data</a><a class="docs-footer-nextpage" href="../loading_model_code/">Loading Model Code »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Tuesday 9 January 2024 01:05">Tuesday 9 January 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
