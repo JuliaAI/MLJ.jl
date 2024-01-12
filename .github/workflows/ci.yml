@@ -30,7 +30,7 @@ jobs:
         if: (${{ github.head_ref }} == "dev") && (${{ github.repository }} == ${{ github.event.pull_request.head.repo.full_name }})
       - name: Verify the value of the integration test flag
         run: |
-          MLJ_TEST_INTEGRATION is "${MLJ_TEST_INTEGRATION}"
+          echo "MLJ_TEST_INTEGRATION is ${MLJ_TEST_INTEGRATION}"
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
