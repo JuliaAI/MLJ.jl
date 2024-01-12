@@ -32,6 +32,7 @@ jobs:
                 value = "true"
                 line = "$(name)=$(value)"
                 println(io, line)
+          end'
         if: (${{ github.head_ref }} == "dev") && (${{ github.repository }} == ${{ github.event.pull_request.head.repo.full_name }})
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
