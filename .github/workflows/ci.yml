@@ -18,13 +18,18 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.6'
           - '1' # automatically expands to the latest stable 1.x release of Julia.
         os:
           - ubuntu-latest
         arch:
           - x64
     steps:
+      - name: Set integration test flag
+        run: |
+          julia -e '
+            ENV["MLJ_TEST_INTEGRATION"]="true"'
+
+        if: (${{ github.head_ref }} == "dev") && (${{ github.repository }} == ${{ github.event.pull_request.head.repo.full_name }})
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
