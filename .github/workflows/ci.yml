@@ -25,8 +25,12 @@ jobs:
           - x64
     steps:
       - name: Set integration test flag
-        run: echo "MLJ_TEST_INTEGRATION=true" >> "${GITHUB_ENV:?}"
+        run: |
+          echo "MLJ_TEST_INTEGRATION=true" >> "${GITHUB_ENV:?}"
         if: (${{ github.head_ref }} == "dev") && (${{ github.repository }} == ${{ github.event.pull_request.head.repo.full_name }})
+      - name: Verify the value of the integration test flag
+        run: |
+          MLJ_TEST_INTEGRATION is "${MLJ_TEST_INTEGRATION:?}"
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
