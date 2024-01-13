@@ -25,9 +25,9 @@ jobs:
           - x64
     steps:
       - run: |
-          echo ${{ github.head_ref }}
-          echo ${{ github.repository }}
-          echo ${{ github.event.pull_request.head.repo.full_name }})
+          echo "head_ref is: ${{ github.head_ref }}"
+          echo "target repository is: ${{ github.repository }}"
+          echo "head repositort is: ${{ github.event.pull_request.head.repo.full_name }}"
       - name: Set integration test flag
         if: (github.head_ref == 'dev') && (github.repository == github.event.pull_request.head.repo.full_name)
         run: |
