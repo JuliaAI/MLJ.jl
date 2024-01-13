@@ -24,10 +24,14 @@ jobs:
         arch:
           - x64
     steps:
+      - run: |
+          echo ${{ github.head_ref }}
+          echo ${{ github.repository }}
+          echo ${{ github.event.pull_request.head.repo.full_name }})
       - name: Set integration test flag
+        if: (github.head_ref == "dev") && (github.repository == github.event.pull_request.head.repo.full_name)
         run: |
           echo "MLJ_TEST_INTEGRATION=true" >> "${GITHUB_ENV:?}"
-        if: (${{ github.head_ref }} == "dev") && (${{ github.repository }} == ${{ github.event.pull_request.head.repo.full_name }})
       - name: Verify the value of the integration test flag
         run: |
           echo "MLJ_TEST_INTEGRATION is ${MLJ_TEST_INTEGRATION}"
