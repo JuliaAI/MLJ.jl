@@ -24,10 +24,11 @@ jobs:
         arch:
           - x64
     steps:
-      - run: |
+      - name: Determine if PR is from a fork
+        run: |
           echo "head_ref is: ${{ github.head_ref }}"
           echo "target repository is: ${{ github.repository }}"
-          echo "head repositort is: ${{ github.event.pull_request.head.repo.full_name }}"
+          echo "head repository is: ${{ github.event.pull_request.head.repo.full_name }}"
       - name: Set integration test flag
         if: (github.head_ref == 'dev') && (github.repository == github.event.pull_request.head.repo.full_name)
         run: |
