@@ -24,16 +24,18 @@ jobs:
         arch:
           - x64
     steps:
-      - name: Set integration test flag
+      - name: Determine if PR is from a fork
         run: |
-          julia - e '
-            open("ENV[\"GITHUB_ENV\"]", "a") do io
-                name = "MLJ_TEST_INTEGRATION"
-                value = "true"
-                line = "$(name)=$(value)"
-                println(io, line)
-          end'
-        if: (${{ github.head_ref }} == "dev") && (${{ github.repository }} == ${{ github.event.pull_request.head.repo.full_name }})
+          echo "head_ref is: ${{ github.head_ref }}"
+          echo "target repository is: ${{ github.repository }}"
+          echo "head repository is: ${{ github.event.pull_request.head.repo.full_name }}"
+      - name: Set integration test flag
+        if: (github.head_ref == 'dev') && (github.repository == github.event.pull_request.head.repo.full_name)
+        run: |
+          echo "MLJ_TEST_INTEGRATION=true" >> "${GITHUB_ENV:?}"
+      - name: Verify the value of the integration test flag
+        run: |
+          echo "MLJ_TEST_INTEGRATION is ${MLJ_TEST_INTEGRATION}"
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:

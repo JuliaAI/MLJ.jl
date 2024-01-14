@@ -20,7 +20,7 @@ end
     @test include("scitypes.jl")
 end
 
-if get(ENV, "MLJ_TEST_INTEGRATION", "false")  == "true"
+if parse(Bool, get(ENV, "MLJ_TEST_INTEGRATION", "false"))
     @testset "integration" begin
         @test include("integration.jl")
     end
