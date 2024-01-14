@@ -2,8 +2,8 @@ using MLJTestIntegration, MLJModels, MLJ, Test, Markdown
 import MLJTestIntegration as MTI
 import Pkg.TOML as TOML
 
-const JULIA_TEST_LEVEL = 1
-const OTHER_TEST_LEVEL = 1
+const JULIA_TEST_LEVEL = 4
+const OTHER_TEST_LEVEL = 3
 
 
 # # RECORD OF OUTSTANDING ISSUES
