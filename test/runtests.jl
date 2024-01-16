@@ -19,3 +19,13 @@ end
 @testset "scitypes" begin
     @test include("scitypes.jl")
 end
+
+if parse(Bool, get(ENV, "MLJ_TEST_INTEGRATION", "false"))
+    @testset "integration" begin
+        @test include("integration.jl")
+    end
+else
+    @info "Integration tests skipped. Set environment variable "*
+        "MLJ_TEST_INTEGRATION = \"true\" to include them.\n"*
+        "Integration tests take at least one hour. "
+end

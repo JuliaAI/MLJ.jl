@@ -18,13 +18,24 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - '1.6'
           - '1' # automatically expands to the latest stable 1.x release of Julia.
         os:
           - ubuntu-latest
         arch:
           - x64
     steps:
+      - name: Determine if PR is from a fork
+        run: |
+          echo "head_ref is: ${{ github.head_ref }}"
+          echo "target repository is: ${{ github.repository }}"
+          echo "head repository is: ${{ github.event.pull_request.head.repo.full_name }}"
+      - name: Set integration test flag
+        if: (github.head_ref == 'dev') && (github.repository == github.event.pull_request.head.repo.full_name)
+        run: |
+          echo "MLJ_TEST_INTEGRATION=true" >> "${GITHUB_ENV:?}"
+      - name: Verify the value of the integration test flag
+        run: |
+          echo "MLJ_TEST_INTEGRATION is ${MLJ_TEST_INTEGRATION}"
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
