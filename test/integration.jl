@@ -9,6 +9,12 @@ const OTHER_TEST_LEVEL = 3
 # # RECORD OF OUTSTANDING ISSUES
 
 FILTER_GIVEN_ISSUE = Dict(
+    "https://github.com/alan-turing-institute/MLJ.jl/issues/1085" =>
+        model ->
+        (model.name == "AdaBoostStumpClassifier" &&
+        model.package_name == "DecisionTree") ||
+        (model.name == "COFDetector" &&
+        model.package_name == "OutlierDetectionNeighbors"),
     "https://github.com/JuliaAI/CatBoost.jl/pull/28 (waiting for 0.3.3 release)" =>
         model -> model.name == "CatBoostRegressor",
     "LOCIDetector too slow to train!" =>
@@ -47,7 +53,7 @@ const OTHER_MODELS = setdiff(MODELS, JULIA_MODELS);
 
 const EXCLUDED_BY_ISSUE = filter(MODELS) do model
     any([p(model) for p in values(FILTER_GIVEN_ISSUE)])
-end;
+end
 
 affected_packages = unique([m.package_name for m in EXCLUDED_BY_ISSUE])
 n_excluded = length(EXCLUDED_BY_ISSUE)
