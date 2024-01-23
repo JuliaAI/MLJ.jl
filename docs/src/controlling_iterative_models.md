@@ -103,6 +103,7 @@ control                                                        | description    
 [`GL`](@ref EarlyStopping.GL)`(alpha=2.0)`                     | † Stop after the "generalization loss (GL)" exceeds `alpha`                             | yes
 [`PQ`](@ref EarlyStopping.PQ)`(alpha=0.75, k=5)`               | † Stop after "progress-modified GL" exceeds `alpha`                                     | yes
 [`Patience`](@ref EarlyStopping.Patience)`(n=5)`               | † Stop after `n` consecutive loss increases                                             | yes
+[`Warmup`](@ref EarlyStopping.Warmup)`(c; n=1)`                | Wait for `n` loss updates before checking criteria `c`                                  | no
 [`Info`](@ref IterationControl.Info)`(f=identity)`             | Log to `Info` the value of `f(mach)`, where `mach` is current machine                   | no
 [`Warn`](@ref IterationControl.Warn)`(predicate; f="")`        | Log to `Warn` the value of `f` or `f(mach)`, if `predicate(mach)` holds                 | no
 [`Error`](@ref IterationControl.Error)`(predicate; f="")`      | Log to `Error` the value of `f` or `f(mach)`, if `predicate(mach)` holds and then stop  | yes
