@@ -30,7 +30,7 @@ independent assessment.
 
 | Package | Interface Pkg | Models | Maturity | Note
 | ------- | ------------- | ------ | -------- | ----
-[BetaML.jl](https://github.com/sylvaticus/BetaML.jl) | - | DecisionTreeClassifier, RandomForestClassifier, NeuralNetworkClassifier, LinearPerceptron, KernelPerceptron, Pegasos, DecisionTreeRegressor, RandomForestRegressor, NeuralNetworkRegressor, MultitargetNeuralNetworkRegressor, GaussianMixtureRegressor, MultitargetGaussianMixtureRegressor, KMeans, KMedoids, GaussianMixtureClusterer,  SimpleImputer,  GaussianMixtureImputer, RandomForestImputer, GeneralImputer | medium |
+[BetaML.jl](https://github.com/sylvaticus/BetaML.jl) | - | DecisionTreeClassifier, RandomForestClassifier, NeuralNetworkClassifier, PerceptronClassifier, KernelPerceptronClassifier, PegasosClassifier, DecisionTreeRegressor, RandomForestRegressor, NeuralNetworkRegressor, MultitargetNeuralNetworkRegressor, GaussianMixtureRegressor, MultitargetGaussianMixtureRegressor, KMeansClusterer, KMedoidsClusterer, GaussianMixtureClusterer,  SimpleImputer,  GaussianMixtureImputer, RandomForestImputer, GeneralImputer, AutoEncoder | medium |
 [CatBoost.jl](https://github.com/JuliaAI/CatBoost.jl) | - | CatBoostRegressor, CatBoostClassifier | high |
 [Clustering.jl](https://github.com/JuliaStats/Clustering.jl) | [MLJClusteringInterface.jl](https://github.com/JuliaAI/MLJClusteringInterface.jl) | KMeans, KMedoids, DBSCAN, HierarchicalClustering | high² |
 [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl) | [MLJDecisionTreeInterface.jl](https://github.com/JuliaAI/MLJDecisionTreeInterface.jl) | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier, RandomForestClassifier, RandomForestRegressor | high | 
