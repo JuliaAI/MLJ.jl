@@ -37,7 +37,7 @@ review external contributions in any area.
 ## Future enhancements
 
 The following road map is more big-picture; see also [this
-list](https://github.com/alan-turing-institute/MLJ.jl/issues/673).
+GH Project](https://github.com/orgs/JuliaAI/projects/1).
 
 
 ### Adding models
