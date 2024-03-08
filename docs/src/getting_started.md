@@ -268,7 +268,7 @@ evaluate!(mach, resampling=Holdout(fraction_train=0.7),
 
 ## Next steps
 
-For next steps, consult the [Learn MLJ](@ref) section. *At the least, we recommned you
+For next steps, consult the [Learning MLJ](@ref) section. *At the least, we recommned you
 read the remainder of this page before considering serious use of MLJ.*
 
 
@@ -335,7 +335,7 @@ scientific type `Table{K}`, where `K` depends on the scientific types of the col
 which can be individually inspected using `schema`:
 
 ```@repl doda
-ScientificTypes.schema
+schema(X)
 ```
 
 #### Matrix data

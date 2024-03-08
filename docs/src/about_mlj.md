@@ -1,6 +1,6 @@
 # About MLJ
 
-MLJ (Machine Learning in Julia) is a toolbox written in Julia
+MLJ (Machine Learning in Julia) is a toolbox written in Julia 
 providing a common interface and meta-algorithms for selecting,
 tuning, evaluating, composing and comparing [over 180 machine learning
 models](@ref model_list) written in Julia and other languages. In
