@@ -268,7 +268,7 @@ evaluate!(mach, resampling=Holdout(fraction_train=0.7),
 
 ## Next steps
 
-For next steps, consult the [Learn MLJ](@ref) section. *At the least, we recommned you
+For next steps, consult the [Learning MLJ](@ref) section. *At the least, we recommned you
 read the remainder of this page before considering serious use of MLJ.*
 
 
