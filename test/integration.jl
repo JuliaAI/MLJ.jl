@@ -181,7 +181,7 @@ MLJTestIntegration.test(MODELS, (nothing, ), level=1, throw=true, verbosity=0);
 options = (
     level = JULIA_TEST_LEVEL,
     verbosity = 0, # bump to 2 to debug
-    throw = true,
+    throw = false,
 )
 @testset "level 4 tests" begin
     println()
@@ -202,7 +202,7 @@ end
 options = (
     level = OTHER_TEST_LEVEL,
     verbosity = 0, # bump to 2 to debug
-    throw = true,
+    throw = false,
 )
 @testset "level 3 tests" begin
     println()
