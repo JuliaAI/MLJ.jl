@@ -65,7 +65,7 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 	 "distributions" that can only be sampled.
 
 -   [ ] Feature engineering (python featuretools?, recursive feature
-	elimination?)
+	elimination ✓ done in FeatureSelection.jl :)
 	[#426](https://github.com/alan-turing-institute/MLJ.jl/issues/426) [MLJModels #314](https://github.com/JuliaAI/MLJModels.jl/issues/314)
 
 
@@ -137,7 +137,7 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
   [this
   proposal](https://julialang.org/jsoc/gsoc/MLJ/#interpretable_machine_learning_in_julia)
 
-- [ ]  Spin-off a stand-alone measures (loss functions) package
+- [x]  Spin-off a stand-alone measures (loss functions) package
 	(currently
 	[here](https://github.com/JuliaAI/MLJBase.jl/tree/master/src/measures)). Introduce
 	measures for multi-targets [MLJBase
