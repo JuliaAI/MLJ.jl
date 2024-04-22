@@ -65,14 +65,13 @@ see
 [here](https://github.com/JuliaAI/ScientificTypesBase.jl#more-on-the-table-type).)
 
 ```@example hut
-import DataFrames.DataFrame
-X = DataFrame(
-                 name       = ["Siri", "Robo", "Alexa", "Cortana"],
-                 gender     = ["male", "male", "Female", "female"],
-                 likes_soup = [true, false, false, true],
-                 height     = [152, missing, 148, 163],
-                 rating     = [2, 5, 2, 1],
-                 outcome    = ["rejected", "accepted", "accepted", "rejected"])
+import DataFrames: DataFrame
+X = DataFrame( name       = ["Siri", "Robo", "Alexa", "Cortana"],
+               gender     = ["male", "male", "Female", "female"],
+               likes_soup = [true, false, false, true],
+               height     = [152, missing, 148, 163],
+               rating     = [2, 5, 2, 1],
+               outcome    = ["rejected", "accepted", "accepted", "rejected"])
 schema(X)
 ```
 
@@ -102,11 +101,12 @@ levels(X.outcome)
 
 !!! warning "Changing levels of categorical data"
 
-    The order of levels should generally be changed
-    early in your data science workflow and then not again. Similar
-    remarks apply to *adding* levels (which is possible; see the
-    [CategorialArrays.jl documentation](https://juliadata.github.io/CategoricalArrays.jl/stable/)). MLJ supervised and unsupervised models assume levels
-    and their order do not change.
+    The order of levels should generally be changed early in your
+    data science workflow and then not again. Similar remarks apply
+    to *adding* levels (which is possible; see the
+    [CategorialArrays.jl documentation](https://juliadata.github.io/CategoricalArrays.jl/stable/)).
+    MLJ supervised and unsupervised models assume levels and their
+    order do not change.
 
 Coercing all remaining types simultaneously:
 
@@ -157,7 +157,7 @@ or contain previously unseen classes.
 
 ## New or missing levels in production data
 
-!!! warning 
+!!! warning
 
     Unpredictable behavior may result whenever `Finite` categorical data presents in a production set with different classes (levels) from those presented during training
 
@@ -179,7 +179,7 @@ Xproduction == X[2:3,:]
 
 So far, so good. But the following operation throws an error:
 
-```julia
+```julia-repl
 julia> transform(mach, Xproduction) == transform(mach, X[2:3,:])
 ERROR: Found category level mismatch in feature `x`. Consider using `levels!` to ensure fitted and transforming features have the same category levels.
 ```
@@ -287,7 +287,7 @@ came. Use `get(val)` to extract the raw label from a value `val`.
 Despite the distinction that exists between a value (element) and a
 label, the two are the same, from the point of `==` and `in`:
 
-```@julia
+```julia
 v[1] == 'A' # true
 'A' in v    # true
 ```
@@ -338,7 +338,7 @@ d_vec = UnivariateFinite(["no", "yes"], probs, pool=v)
 
 Or, equivalently:
 
-```@julia
+```julia
 d_vec = UnivariateFinite(["no", "yes"], yes_probs, augment=true, pool=v)
 ```
 

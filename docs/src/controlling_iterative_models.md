@@ -253,7 +253,6 @@ In the code, `wrapper` is an object that wraps the training machine
 in this example).
 
 ```julia
-
 import IterationControl # or MLJ.IterationControl
 
 struct IterateFromList

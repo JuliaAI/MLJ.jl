@@ -34,14 +34,15 @@ With additional conditions:
 models() do model
     matching(model, X, y) &&
     model.prediction_type == :probabilistic &&
-        model.is_pure_julia
+    model.is_pure_julia
 end
 ```
 
-`Tree = @load DecisionTreeClassifier pkg=DecisionTree` imports "DecisionTreeClassifier" type and binds it to `Tree`
-`tree = Tree()` to instantiate a `Tree`. 
+`Tree = @load DecisionTreeClassifier pkg=DecisionTree` imports "DecisionTreeClassifier" type and binds it to `Tree`.
 
-`tree2  = Tree(max_depth=2)` instantiates a tree with different hyperparameter
+`tree = Tree()` to instantiate a `Tree`.
+
+`tree2 = Tree(max_depth=2)` instantiates a tree with different hyperparameter
 
 `Ridge = @load RidgeRegressor pkg=MultivariateStats` imports a type for a model provided by multiple packages
 
@@ -96,20 +97,26 @@ y, X =  unpack(channing,
 
 Splitting row indices into train/validation/test, with seeded shuffling:
 
-`train, valid, test = partition(eachindex(y), 0.7, 0.2, rng=1234)` for 70:20:10 ratio
+```julia-repl
+julia> train, valid, test = partition(eachindex(y), 0.7, 0.2, rng=1234) # for 70:20:10 ratio
+```
 
 For a stratified split:
 
-`train, test = partition(eachindex(y), 0.8, stratify=y)`
+```julia-repl
+julia> train, test = partition(eachindex(y), 0.8, stratify=y)
+```
 
 Split a table or matrix `X`, instead of indices:
 
-`Xtrain, Xvalid, Xtest = partition(X, 0.5, 0.3, rng=123)` 
+```julia-repl
+julia> Xtrain, Xvalid, Xtest = partition(X, 0.5, 0.3, rng=123)
+```
 
 Getting data from [OpenML](https://www.openml.org):
-
-`table = OpenML.load(91)`
-
+```julia-repl
+julia> table = OpenML.load(91)
+```
 Creating synthetic classification data:
 
 `X, y = make_blobs(100, 2)` (also: `make_moons`, `make_circles`)
@@ -121,12 +128,17 @@ Creating synthetic regression data:
 ## Machine construction
 
 Supervised case:
-
-`model = KNNRegressor(K=1)` and `mach = machine(model, X, y)`
+```julia-repl
+julia> model = KNNRegressor(K=1)
+julia> mach = machine(model, X, y)
+```
 
 Unsupervised case:
 
-`model = OneHotEncoder()` and `mach = machine(model, X)`
+```julia-repl
+julia> model = OneHotEncoder()
+julia> mach = machine(model, X)
+```
 
 ## Fitting
 
@@ -283,7 +295,7 @@ Externals include: `PCA` (in MultivariateStats), `KMeans`, `KMedoids` (in Cluste
 
 ## Pipelines
 
-`pipe = (X -> coerce(X, :height=>Continuous)) |> OneHotEncoder |> KNNRegressor(K=3)` 
+`pipe = (X -> coerce(X, :height=>Continuous)) |> OneHotEncoder |> KNNRegressor(K=3)`
 
 Unsupervised:
 
@@ -311,9 +323,10 @@ Supervised, with final node `yhat` returning point predictions:
 ```julia
 @from_network machine(Deterministic(), Xs, ys; predict=yhat) begin
     mutable struct Composite
-	    reducer=network_pca
-		regressor=network_knn
+        reducer=network_pca
+        regressor=network_knn
     end
+end
 ```
 
 Here `network_pca` and `network_knn` are models appearing in the
@@ -327,6 +340,7 @@ Supervised, with `yhat` final node returning probabilistic predictions:
         reducer=network_pca
         classifier=network_tree
     end
+end
 ```
 
 Unsupervised, with final node `Xout`:
@@ -334,8 +348,8 @@ Unsupervised, with final node `Xout`:
 ```julia
 @from_network machine(Unsupervised(), Xs; transform=Xout) begin
     mutable struct Composite
-	    reducer1=network_pca
-		reducer2=clusterer
+        reducer1=network_pca
+        reducer2=clusterer
     end
 end
-```UnivariateTimeTypeToContinuous
+```

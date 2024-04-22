@@ -14,9 +14,9 @@ channing = (Sex = rand(["Male","Female"], 462),
 coerce!(channing, :Sex => Multiclass)
 ```
 
-```julia
-import RDatasets
-channing = RDatasets.dataset("boot", "channing")
+```julia-repl
+julia> import RDatasets
+julia> channing = RDatasets.dataset("boot", "channing")
 
 julia> first(channing, 4)
 4×5 DataFrame
@@ -40,7 +40,7 @@ Horizontally splitting data and shuffling rows.
 Here `y` is the `:Exit` column and `X` everything else:
 
 ```@example workflows
-y, X =  unpack(channing, ==(:Exit), rng=123);
+y, X = unpack(channing, ==(:Exit), rng=123);
 nothing # hide
 ```
 
@@ -514,7 +514,8 @@ curve = learning_curve(mach,
 
 ```julia
 using Plots
-plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)
+plot(curve.parameter_values, curve.measurements,
+     xlab=curve.parameter_name, xscale=curve.parameter_scale)
 ```
 
 ![](img/workflows_learning_curve.png)
@@ -534,7 +535,7 @@ curve = learning_curve(mach,
 
 ```julia
 plot(curve.parameter_values, curve.measurements,
-xlab=curve.parameter_name, xscale=curve.parameter_scale)
+     xlab=curve.parameter_name, xscale=curve.parameter_scale)
 ```
 
 ![](img/workflows_learning_curves.png)

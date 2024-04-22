@@ -27,7 +27,7 @@ using MLJ
 X = (a=rand(12), b=rand(12), c=rand(12));
 y = X.a + 2X.b + 0.05*rand(12);
 model = (@load RidgeRegressor pkg=MultivariateStats verbosity=0)()
-cv=CV(nfolds=3)
+cv = CV(nfolds=3)
 evaluate(model, X, y, resampling=cv, measure=l2, verbosity=0)
 ```
 
@@ -51,8 +51,8 @@ Multiple measures are specified as a vector:
 evaluate!(
     mach,
     resampling=cv,
-    measures=[l1, rms, rmslp1], 
-	verbosity=0,
+    measures=[l1, rms, rmslp1],
+    verbosity=0,
 )
 ```
 
@@ -70,7 +70,7 @@ evaluate!(
     mach,
     resampling=CV(nfolds=3),
     measure=[l2, rsquared],
-    weights=weights, 
+    weights=weights,
 )
 ```
 
@@ -91,8 +91,8 @@ fold1 = 1:6; fold2 = 7:12;
 evaluate!(
     mach,
     resampling = [(fold1, fold2), (fold2, fold1)],
-    measures=[l1, l2], 
-	verbosity=0,
+    measures=[l1, l2],
+    verbosity=0,
 )
 ```
 

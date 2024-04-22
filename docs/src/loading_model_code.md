@@ -32,7 +32,7 @@ provided by the
 package. Then, to determine which package provides the MLJ interface
 you call `load_path`:
 
-```julia
+```julia-repl
 julia> load_path("DecisionTreeClassifier", pkg="DecisionTree")
 "MLJDecisionTreeInterface.DecisionTreeClassifier"
 ```
@@ -41,7 +41,7 @@ In this case, we see that the package required is
 MLJDecisionTreeInterface.jl. If this package is not in `my_env` (do
 `Pkg.status()` to check) you add it by running
 
-```julia
+```julia-repl
 julia> Pkg.add("MLJDecisionTreeInterface");
 ```
 
@@ -49,14 +49,14 @@ So long as `my_env` is the active environment, this action need never
 be repeated (unless you run `Pkg.rm("MLJDecisionTreeInterface")`). You
 are now ready to instantiate a decision tree classifier:
 
-```julia
+```julia-repl
 julia> Tree = @load DecisionTree pkg=DecisionTree
 julia> tree = Tree()
 ```
 
 which is equivalent to
 
-```julia
+```julia-repl
 julia> import MLJDecisionTreeInterface.DecisionTreeClassifier
 julia> Tree = MLJDecisionTreeInterface.DecisionTreeClassifier
 julia> tree = Tree()

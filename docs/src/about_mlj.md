@@ -110,7 +110,7 @@ X, y = @load_reduced_ames;
 Evaluating the "self-tuning" pipeline model's performance using 5-fold
 cross-validation (implies multiple layers of nested resampling):
 
-```julia
+```julia-repl
 julia> evaluate(self_tuning_pipe, X, y,
                 measures=[l1, l2],
                 resampling=CV(nfolds=5, rng=123),
@@ -229,19 +229,19 @@ installed in a new
 [environment](https://julialang.github.io/Pkg.jl/v1/environments/) to
 avoid package conflicts. You can do this with
 
-```julia
+```julia-repl
 julia> using Pkg; Pkg.activate("my_MLJ_env", shared=true)
 ```
 
 Installing MLJ is also done with the package manager:
 
-```julia
+```julia-repl
 julia> Pkg.add("MLJ")
 ```
 
 **Optional:** To test your installation, run
 
-```julia
+```julia-repl
 julia> Pkg.test("MLJ")
 ```
 
@@ -252,7 +252,7 @@ environment to make model-specific code available. This
 happens automatically when you use MLJ's interactive load command
 `@iload`, as in
 
-```julia
+```julia-repl
 julia> Tree = @iload DecisionTreeClassifier # load type
 julia> tree = Tree() # instance
 ```

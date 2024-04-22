@@ -33,7 +33,7 @@ Generally, changing a hyperparameter triggers retraining on calls to
 subsequent `fit!`:
 
 ```@repl machines
-forest.bagging_fraction=0.5
+forest.bagging_fraction = 0.5
 fit!(mach, verbosity=2);
 ```
 
@@ -41,7 +41,7 @@ However, for this iterative model, increasing the iteration parameter
 only adds models to the existing ensemble:
 
 ```@repl machines
-forest.n=15
+forest.n = 15
 fit!(mach, verbosity=2);
 ```
 
