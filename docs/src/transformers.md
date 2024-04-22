@@ -193,18 +193,17 @@ K-means clustering algorithm assigns one of three labels 1, 2, 3 to
 the input features of the iris data set and compares them with the
 actual species recorded in the target (not seen by the algorithm).
 
-```julia
-import Random.seed!
-seed!(123)
+```julia-repl
+julia> import Random.seed!
+julia> seed!(123)
 
-X, y = @load_iris;
-KMeans = @load KMeans pkg=ParallelKMeans
-kmeans = KMeans()
-mach = machine(kmeans, X) |> fit!
+julia> X, y = @load_iris;
+julia> KMeans = @load KMeans pkg=ParallelKMeans
+julia> kmeans = KMeans()
+julia> mach = machine(kmeans, X) |> fit!
 
-# transforming:
-Xsmall = transform(mach);
-selectrows(Xsmall, 1:4) |> pretty
+julia> # transforming:
+julia> Xsmall = transform(mach);
 julia> selectrows(Xsmall, 1:4) |> pretty
 ┌─────────────────────┬────────────────────┬────────────────────┐
 │ x1                  │ x2                 │ x3                 │
@@ -217,10 +216,10 @@ julia> selectrows(Xsmall, 1:4) |> pretty
 │ 0.26919199999998966 │ 26.28656804733727  │ 11.64392098898145  │
 └─────────────────────┴────────────────────┴────────────────────┘
 
-# predicting:
-yhat = predict(mach);
-compare = zip(yhat, y) |> collect;
-compare[1:8]
+julia> # predicting:
+julia> yhat = predict(mach);
+julia> compare = zip(yhat, y) |> collect;
+julia> compare[1:8]
 8-element Array{Tuple{CategoricalValue{Int64,UInt32},CategoricalString{UInt32}},1}:
  (1, "setosa")
  (1, "setosa")
@@ -231,7 +230,7 @@ compare[1:8]
  (1, "setosa")
  (1, "setosa")
 
-compare[51:58]
+julia> compare[51:58]
 8-element Array{Tuple{CategoricalValue{Int64,UInt32},CategoricalString{UInt32}},1}:
  (2, "versicolor")
  (3, "versicolor")
@@ -242,7 +241,7 @@ compare[51:58]
  (3, "versicolor")
  (3, "versicolor")
 
-compare[101:108]
+julia> compare[101:108]
 8-element Array{Tuple{CategoricalValue{Int64,UInt32},CategoricalString{UInt32}},1}:
  (2, "virginica")
  (3, "virginica")
