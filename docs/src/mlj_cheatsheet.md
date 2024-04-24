@@ -293,49 +293,6 @@ Concatenation:
 
 `pipe1 |> pipe2` or `model |> pipe` or `pipe |> model`, etc
 
+## Advanced model composition techniques
 
-## Define a supervised learning network:
-
-`Xs = source(X)`
-`ys = source(y)`
-
-... define further nodal machines and nodes ...
-
-`yhat = predict(knn_machine, W, ys)` (final node)
-
-
-## Exporting a learning network as a stand-alone model:
-
-Supervised, with final node `yhat` returning point predictions:
-
-```julia
-@from_network machine(Deterministic(), Xs, ys; predict=yhat) begin
-    mutable struct Composite
-	    reducer=network_pca
-		regressor=network_knn
-    end
-```
-
-Here `network_pca` and `network_knn` are models appearing in the
-learning network.
-
-Supervised, with `yhat` final node returning probabilistic predictions:
-
-```julia
-@from_network machine(Probabilistic(), Xs, ys; predict=yhat) begin
-    mutable struct Composite
-        reducer=network_pca
-        classifier=network_tree
-    end
-```
-
-Unsupervised, with final node `Xout`:
-
-```julia
-@from_network machine(Unsupervised(), Xs; transform=Xout) begin
-    mutable struct Composite
-	    reducer1=network_pca
-		reducer2=clusterer
-    end
-end
-```UnivariateTimeTypeToContinuous
+See the [Composing Models](@ref) section of the MLJ manual. 
