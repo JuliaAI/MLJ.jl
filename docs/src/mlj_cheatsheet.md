@@ -97,47 +97,52 @@ y, X =  unpack(channing,
 
 Splitting row indices into train/validation/test, with seeded shuffling:
 
-```julia-repl
-julia> train, valid, test = partition(eachindex(y), 0.7, 0.2, rng=1234) # for 70:20:10 ratio
+```julia
+train, valid, test = partition(eachindex(y), 0.7, 0.2, rng=1234) # for 70:20:10 ratio
 ```
 
 For a stratified split:
 
-```julia-repl
-julia> train, test = partition(eachindex(y), 0.8, stratify=y)
+```julia
+train, test = partition(eachindex(y), 0.8, stratify=y)
 ```
 
 Split a table or matrix `X`, instead of indices:
 
-```julia-repl
-julia> Xtrain, Xvalid, Xtest = partition(X, 0.5, 0.3, rng=123)
+```julia
+Xtrain, Xvalid, Xtest = partition(X, 0.5, 0.3, rng=123)
 ```
 
 Getting data from [OpenML](https://www.openml.org):
-```julia-repl
-julia> table = OpenML.load(91)
+```julia
+table = OpenML.load(91)
 ```
 Creating synthetic classification data:
 
-`X, y = make_blobs(100, 2)` (also: `make_moons`, `make_circles`)
+```julia
+X, y = make_blobs(100, 2)
+```
+(also: `make_moons`, `make_circles`)
 
 Creating synthetic regression data:
 
-`X, y = make_regression(100, 2)`
+```julia
+X, y = make_regression(100, 2)
+```
 
 ## Machine construction
 
 Supervised case:
-```julia-repl
-julia> model = KNNRegressor(K=1)
-julia> mach = machine(model, X, y)
+```julia
+model = KNNRegressor(K=1)
+mach = machine(model, X, y)
 ```
 
 Unsupervised case:
 
-```julia-repl
-julia> model = OneHotEncoder()
-julia> mach = machine(model, X)
+```julia
+model = OneHotEncoder()
+mach = machine(model, X)
 ```
 
 ## Fitting
@@ -308,8 +313,10 @@ Concatenation:
 
 ## Define a supervised learning network:
 
-`Xs = source(X)`
-`ys = source(y)`
+```julia
+Xs = source(X)
+ys = source(y)
+```
 
 ... define further nodal machines and nodes ...
 
