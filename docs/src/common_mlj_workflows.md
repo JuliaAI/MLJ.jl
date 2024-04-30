@@ -14,19 +14,13 @@ channing = (Sex = rand(["Male","Female"], 462),
 coerce!(channing, :Sex => Multiclass)
 ```
 
-```julia-repl
-julia> import RDatasets
-julia> channing = RDatasets.dataset("boot", "channing")
+```julia
+import RDatasets
+channing = RDatasets.dataset("boot", "channing")
+```
 
-julia> first(channing, 4)
-4×5 DataFrame
- Row │ Sex   Entry  Exit   Time   Cens
-     │ Cat…  Int32  Int32  Int32  Int32
-─────┼──────────────────────────────────
-   1 │ Male    782    909    127      1
-   2 │ Male   1020   1128    108      1
-   3 │ Male    856    969    113      1
-   4 │ Male    915    957     42      1
+```@example
+first(channing, 4)
 ```
 
 Inspecting metadata, including column scientific types:
@@ -47,10 +41,10 @@ nothing # hide
 Here `y` is the `:Exit` column and `X` everything else except `:Time`:
 
 ```@example workflows
-y, X =  unpack(channing,
-               ==(:Exit),
-               !=(:Time);
-               rng=123);
+y, X = unpack(channing,
+              ==(:Exit),
+              !=(:Time);
+              rng=123);
 scitype(y)
 ```
 
@@ -159,7 +153,7 @@ tree = Tree(min_samples_split=5, max_depth=4)
 
 or
 
-```@julia
+```julia
 tree = (@load DecisionTreeClassifier)()
 tree.min_samples_split = 5
 tree.max_depth = 4
