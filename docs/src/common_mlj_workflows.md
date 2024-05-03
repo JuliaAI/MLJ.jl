@@ -19,7 +19,7 @@ import RDatasets
 channing = RDatasets.dataset("boot", "channing")
 ```
 
-```@example
+```@example workflows
 first(channing, 4)
 ```
 
@@ -88,7 +88,7 @@ nothing # hide
 Or, if already horizontally split:
 
 ```@example workflows
-(Xtrain, Xtest), (ytrain, ytest)  = partition((X, y), 0.6, multi=true,  rng=123)
+(Xtrain, Xtest), (ytrain, ytest) = partition((X, y), 0.6, multi=true, rng=123)
 ```
 
 
@@ -108,7 +108,7 @@ ms[6]
 ```
 
 ```@example workflows
-models("Tree");
+models("Tree")
 ```
 
 A more refined search:
@@ -224,7 +224,7 @@ Run `measures()` to list all losses and scores and their aliases ("instances").
 Predict on the new data set:
 
 ```@example workflows
-Xnew = (FL = rand(3), RW = rand(3), CL = rand(3), CW = rand(3), BD =rand(3))
+Xnew = (FL = rand(3), RW = rand(3), CL = rand(3), CW = rand(3), BD = rand(3))
 predict(mach, Xnew)      # a vector of distributions
 ```
 
