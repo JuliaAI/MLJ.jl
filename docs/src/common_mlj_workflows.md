@@ -1,10 +1,30 @@
 # Common MLJ Workflows
 
+This demo assumes you have certain packages in your active [package
+environment](https://docs.julialang.org/en/v1/stdlib/Pkg/). To activate a new environment,
+"MyNewEnv", with just these packages, do this in a new REPL session:
+
+```julia
+using Pkg
+Pkg.activate("MyNewEnv")
+Pkg.add(["MLJ", "RDatasets", "DataFrames", "MLJDecisionTreeInterface",
+    "MLJMultivariateStatsInterface", "NearestNeighborModels", "MLJGLMInterface",
+    "Plots"])
+```
+
+The following starts MLJ and shows the current version of MLJ (you can also use
+`Pkg.status()`):
+
+```@example workflows
+using MLJ
+MLJ_VERSION
+```
+
 ## Data ingestion
 
 ```@setup workflows
 # to avoid RDatasets as a doc dependency:
-using MLJ; color_off()
+color_off()
 import DataFrames
 channing = (Sex = rand(["Male","Female"], 462),
             Entry = rand(Int, 462),
@@ -13,6 +33,7 @@ channing = (Sex = rand(["Male","Female"], 462),
             Cens = rand(Int, 462)) |> DataFrames.DataFrame
 coerce!(channing, :Sex => Multiclass)
 ```
+
 
 ```julia
 import RDatasets
@@ -31,7 +52,7 @@ schema(channing)
 
 Horizontally splitting data and shuffling rows.
 
-Here `y` is the `:Exit` column and `X` everything else:
+Here `y` is the `:Exit` column and `X` a table with everything else:
 
 ```@example workflows
 y, X = unpack(channing, ==(:Exit), rng=123);
@@ -55,7 +76,7 @@ schema(X)
 Fixing wrong scientific types in `X`:
 
 ```@example workflows
-X = coerce(X, :Exit=>Continuous, :Entry=>Continuous, :Cens=>Multiclass)
+X = coerce(X, :Exit=>Continuous, :Entry=>Continuous, :Cens=>Multiclass);
 schema(X)
 ```
 
@@ -144,7 +165,10 @@ nothing # hide
 
 ## Instantiating a model
 
-*Reference:*   [Getting Started](@ref), [Loading Model Code](@ref)
+    *Reference:*   [Getting Started](@ref), [Loading Model Code](@ref)
+
+Assumes `MLJDecisionTreeClassifier` is in your environment. Otherwise, try interactive
+loading with `@iload`:
 
 ```@example workflows
 Tree = @load DecisionTreeClassifier pkg=DecisionTree
@@ -163,9 +187,8 @@ tree.max_depth = 4
 
 *Reference:*   [Evaluating Model Performance](evaluating_model_performance.md)
 
-
 ```@example workflows
-X, y = @load_boston
+X, y = @load_boston  # a table and a vector
 KNN = @load KNNRegressor
 knn = KNN()
 evaluate(knn, X, y,
@@ -175,7 +198,8 @@ evaluate(knn, X, y,
 
 Note `RootMeanSquaredError()` has alias `rms` and `LPLoss(1)` has aliases `l1`, `mae`.
 
-Do `measures()` to list all losses and scores and their aliases.
+Do `measures()` to list all losses and scores and their aliases, or refer to the
+StatisticalMeasures.jl [docs](https://juliaai.github.io/StatisticalMeasures.jl/dev/).
 
 
 ##  Basic fit/evaluate/predict by hand:
@@ -190,7 +214,6 @@ schema(crabs)
 
 ```@example workflows
 y, X = unpack(crabs, ==(:sp), !in([:index, :sex]); rng=123)
-
 
 Tree = @load DecisionTreeClassifier pkg=DecisionTree
 tree = Tree(max_depth=2) # hide
@@ -218,8 +241,6 @@ LogLoss(tol=1e-4)(yhat, y[test])
 ```
 
 Note `LogLoss()` has aliases `log_loss` and `cross_entropy`.
-
-Run `measures()` to list all losses and scores and their aliases ("instances").
 
 Predict on the new data set:
 
@@ -310,7 +331,7 @@ report(mach)
 Load data:
 
 ```@example workflows
-X, y = @load_iris
+X, y = @load_iris  # a table and a vector
 train, test = partition(eachindex(y), 0.97, shuffle=true, rng=123)
 ```
 
@@ -429,7 +450,7 @@ plot(mach)
 
 ![](img/workflows_tuning_plot.png)
 
-Predicting on new data using the optimized model:
+Predicting on new data using the optimized model trained on all data:
 
 ```@example workflows
 predict(mach, Xnew)
@@ -437,7 +458,7 @@ predict(mach, Xnew)
 
 ## Constructing linear pipelines
 
-*Reference:*   [Composing Models](composing_models.md)
+*Reference:*   [Linear Pipelines](@ref)
 
 Constructing a linear (unbranching) pipeline with a *learned* target
 transformation/inverse transformation:
@@ -446,6 +467,9 @@ transformation/inverse transformation:
 X, y = @load_reduced_ames
 KNN = @load KNNRegressor
 knn_with_target = TransformedTargetModel(model=KNN(K=3), transformer=Standardizer())
+```
+
+```@example workflows
 pipe = (X -> coerce(X, :age=>Continuous)) |> OneHotEncoder() |> knn_with_target
 ```
 
