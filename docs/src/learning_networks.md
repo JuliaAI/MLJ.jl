@@ -748,19 +748,17 @@ Q = @node sqrt(Z)
 (so that `Q() == 4`). Here's a more complicated application of `@node` to row-shuffle a
 table:
 
-```julia-repl
-julia> using Random
-julia> X = (x1 = [1, 2, 3, 4, 5],
-            x2 = [:one, :two, :three, :four, :five])
-julia> rows(X) = 1:nrows(X)
+```@example
+using MLJ, Random
+X = (x1 = [1, 2, 3, 4, 5],
+     x2 = [:one, :two, :three, :four, :five])
+rows(X) = 1:nrows(X)
 
-julia> Xs = source(X)
-julia> rs = @node rows(Xs)
-julia> W = @node selectrows(Xs, @node shuffle(rs))
+Xs = source(X)
+rs = @node rows(Xs)
+W = @node selectrows(Xs, @node shuffle(rs))
 
-julia> W()
-(x1 = [5, 1, 3, 2, 4],
- x2 = Symbol[:five, :one, :three, :two, :four],)
+W()
 ```
 
 **Important.** An argument not in global scope is assumed by `@node` to be a node or
