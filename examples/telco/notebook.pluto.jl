@@ -10,7 +10,7 @@ md"# MLJ for Data Scientists in Two Hours"
 # ╔═╡ 8a6670b8-96a8-4a5d-b795-033f6f2a0674
 md"""
 An application of the [MLJ
-toolbox](https://alan-turing-institute.github.io/MLJ.jl/dev/) to the
+toolbox](https://juliaai.github.io/MLJ.jl/dev/) to the
 Telco Customer Churn dataset, aimed at practicing data scientists
 new to MLJ (Machine Learning in Julia). This tutorial does not
 cover exploratory data analysis.
@@ -25,9 +25,9 @@ deep-learning).
 # ╔═╡ b04c4790-59e0-42a3-af2a-25235e544a31
 md"""
 For other MLJ learning resources see the [Learning
-MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/learning_mlj/)
+MLJ](https://juliaai.github.io/MLJ.jl/dev/learning_mlj/)
 section of the
-[manual](https://alan-turing-institute.github.io/MLJ.jl/dev/).
+[manual](https://juliaai.github.io/MLJ.jl/dev/).
 """
 
 # ╔═╡ 4eb8dff4-c23a-4b41-8af5-148d95ea2900
@@ -106,7 +106,7 @@ used to develop this tutorial. If this is your first time running
 the notebook, package instantiation and pre-compilation may take a
 minute or so to complete. **This step will fail** if the [correct
 Manifest.toml and Project.toml
-files](https://github.com/alan-turing-institute/MLJ.jl/tree/dev/examples/telco)
+files](https://github.com/JuliaAI/MLJ.jl/tree/dev/examples/telco)
 are not in the same directory as this notebook.
 """
 
@@ -131,7 +131,7 @@ don't fully grasp should become clearer in the Telco study.
 # ╔═╡ 33ca287e-8cba-47d1-a0de-1721c1bc2df2
 md"""
 This section is a condensed adaption of the [Getting Started
-example](https://alan-turing-institute.github.io/MLJ.jl/dev/getting_started/#Fit-and-predict)
+example](https://juliaai.github.io/MLJ.jl/dev/getting_started/#Fit-and-predict)
 in the MLJ documentation.
 """
 
@@ -197,7 +197,7 @@ end
 # ╔═╡ 0f978839-cc95-4c3a-8a29-32f11452654a
 md"""
 A machine stores some other information enabling [warm
-restart](https://alan-turing-institute.github.io/MLJ.jl/dev/machines/#Warm-restarts)
+restart](https://juliaai.github.io/MLJ.jl/dev/machines/#Warm-restarts)
 for some models, but we won't go into that here. You are allowed to
 access and mutate the `model` parameter:
 """
@@ -324,7 +324,7 @@ begin
           return x
       end
   end
-  
+
   df0.TotalCharges = fix_blanks(df0.TotalCharges);
 end
 
@@ -424,7 +424,7 @@ md"> Introduces: `@load`, `input_scitype`, `target_scitype`"
 # ╔═╡ f97969e2-c15c-42cf-a6fa-eaf14df5d44b
 md"""
 For tools helping us to identify suitable models, see the [Model
-Search](https://alan-turing-institute.github.io/MLJ.jl/dev/model_search/#model_search)
+Search](https://juliaai.github.io/MLJ.jl/dev/model_search/#model_search)
 section of the manual. We will build a gradient tree-boosting model,
 a popular first choice for structured data like we have here. Model
 code is contained in a third-party package called
@@ -497,7 +497,7 @@ pipe = ContinuousEncoder() |> booster
 md"""
 Note that the component models appear as hyperparameters of
 `pipe`. Pipelines are an implementation of a more general [model
-composition](https://alan-turing-institute.github.io/MLJ.jl/dev/composing_models/#Composing-Models)
+composition](https://juliaai.github.io/MLJ.jl/dev/composing_models/#Composing-Models)
 interface provided by MLJ that advanced users may want to learn about.
 """
 
@@ -693,7 +693,7 @@ observation space, for a total of 18 folds) and set
 # ╔═╡ 562887bb-b7fb-430f-b61c-748aec38e674
 md"""
 We choose a `StratifiedCV` resampling strategy; the complete list of options is
-[here](https://alan-turing-institute.github.io/MLJ.jl/dev/evaluating_model_performance/#Built-in-resampling-strategies).
+[here](https://juliaai.github.io/MLJ.jl/dev/evaluating_model_performance/#Built-in-resampling-strategies).
 """
 
 # ╔═╡ f9be989e-2604-44c2-9727-ed822e4fd85d
@@ -734,7 +734,7 @@ begin
       table = (measure=measure, measurement=measurement)
       return DataFrames.DataFrame(table)
   end
-  
+
   const confidence_intervals_basic_model = confidence_intervals(e_pipe)
 end
 
@@ -753,7 +753,7 @@ with low feature importance, to speed up later optimization:
 # ╔═╡ cdfe840d-4e87-467f-b582-dfcbeb05bcc5
 begin
   unimportant_features = filter(:importance => <(0.005), feature_importance_table).feature
-  
+
   pipe2 = ContinuousEncoder() |>
       FeatureSelector(features=unimportant_features, ignore=true) |> booster
 end
@@ -790,7 +790,7 @@ eg, the neural network models provided by
 # ╔═╡ 8fc99d35-d8cc-455f-806e-1bc580dc349d
 md"""
 First, we select appropriate controls from [this
-list](https://alan-turing-institute.github.io/MLJ.jl/dev/controlling_iterative_models/#Controls-provided):
+list](https://juliaai.github.io/MLJ.jl/dev/controlling_iterative_models/#Controls-provided):
 """
 
 # ╔═╡ 29f33708-4a82-4acc-9703-288eae064e2a
@@ -857,7 +857,7 @@ here is the `learning_curve` function, which can be useful when
 wanting to visualize the effect of changes to a *single*
 hyperparameter (which could be an iteration parameter). See, for
 example, [this section of the
-manual](https://alan-turing-institute.github.io/MLJ.jl/dev/learning_curves/)
+manual](https://juliaai.github.io/MLJ.jl/dev/learning_curves/)
 or [this
 tutorial](https://github.com/ablaom/MLJTutorial.jl/blob/dev/notebooks/04_tuning/notebook.ipynb).
 """
@@ -898,7 +898,7 @@ show(iterated_pipe, 2)
 begin
   p1 = :(model.evo_tree_classifier.η)
   p2 = :(model.evo_tree_classifier.max_depth)
-  
+
   r1 = range(iterated_pipe, p1, lower=-2, upper=-0.5, scale=x->10^x)
   r2 = range(iterated_pipe, p2, lower=2, upper=6)
 end
@@ -912,7 +912,7 @@ and `upper`.
 # ╔═╡ af3023e6-920f-478d-af76-60dddeecbe6c
 md"""
 Next, we choose an optimization strategy from [this
-list](https://alan-turing-institute.github.io/MLJ.jl/dev/tuning_models/#Tuning-Models):
+list](https://juliaai.github.io/MLJ.jl/dev/tuning_models/#Tuning-Models):
 """
 
 # ╔═╡ 93c17a9b-b49c-4780-9074-c069a0e97d7e
@@ -1105,9 +1105,9 @@ md"For comparison, here's the performance for the basic pipeline model"
 begin
   mach_basic = machine(pipe, X, y)
   fit!(mach_basic, verbosity=0)
-  
+
   ŷ_basic = predict(mach_basic, Xtest);
-  
+
   @info("Basic model measurements on test set:",
         brier_loss(ŷ_basic, ytest) |> mean,
         auc(ŷ_basic, ytest),

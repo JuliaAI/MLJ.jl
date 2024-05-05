@@ -1,7 +1,7 @@
 # # Lightning tour of MLJ
 
 # *For a more elementary introduction to MLJ, see [Getting
-# Started](https://alan-turing-institute.github.io/MLJ.jl/dev/getting_started/).*
+# Started](https://juliaai.github.io/MLJ.jl/dev/getting_started/).*
 
 # **Note.** Be sure this file has not been separated from the
 # accompanying Project.toml and Manifest.toml files, which should not
