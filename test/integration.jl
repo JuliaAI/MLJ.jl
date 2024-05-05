@@ -9,7 +9,7 @@ const OTHER_TEST_LEVEL = 3
 # # RECORD OF OUTSTANDING ISSUES
 
 FILTER_GIVEN_ISSUE = Dict(
-    "https://github.com/alan-turing-institute/MLJ.jl/issues/1085" =>
+    "https://github.com/JuliaAI/MLJ.jl/issues/1085" =>
         model ->
         (model.name == "AdaBoostStumpClassifier" &&
         model.package_name == "DecisionTree") ||
@@ -32,7 +32,7 @@ FILTER_GIVEN_ISSUE = Dict(
         model.package_name == "BetaML",
     "https://github.com/JuliaAI/MLJTSVDInterface.jl/pull/17" =>
         model -> model.name == "TSVDTransformer",
-    "https://github.com/alan-turing-institute/MLJ.jl/issues/1074" =>
+    "https://github.com/JuliaAI/MLJ.jl/issues/1074" =>
         model -> model.name == "AutoEncoderMLJ",
     "https://github.com/sylvaticus/BetaML.jl/issues/64" =>
         model -> model.name =="GaussianMixtureClusterer" && model.package_name=="BetaML",

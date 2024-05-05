@@ -1,7 +1,7 @@
 """
    MLJ
 
-[`MLJ`](https://alan-turing-institute.github.io/MLJ.jl/dev/) is a Machine Learning toolbox
+[`MLJ`](https://juliaai.github.io/MLJ.jl//dev/) is a Machine Learning toolbox
 for Julia. It collects together functionality from the following packages, which can be
 loaded separately:
 
