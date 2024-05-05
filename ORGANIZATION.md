@@ -8,7 +8,7 @@ connections do not currently exist but are planned/proposed.*
 Repositories of some possible interest outside of MLJ, or beyond
 its conventional use, are marked with a ⟂ symbol:
 
-* [MLJ.jl](https://github.com/alan-turing-institute/MLJ.jl) is the
+* [MLJ.jl](https://github.com/JuliaAI/MLJ.jl) is the
   general user's point-of-entry for choosing, loading, composing,
   evaluating and tuning machine learning models. It pulls in most code
   from other repositories described below.  MLJ also hosts the [MLJ
@@ -100,9 +100,9 @@ its conventional use, are marked with a ⟂ symbol:
   models and measures (metrics).
 
 * (⟂)
-  [DataScienceTutorials](https://github.com/alan-turing-institute/DataScienceTutorials.jl)
+  [DataScienceTutorials](https://github.com/JuliaAI/DataScienceTutorials.jl)
   collects tutorials on how to use MLJ, which are deployed
-  [here](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
+  [here](https://JuliaAI.github.io/DataScienceTutorials.jl/)
 
 * [MLJTestIntegration](https://github.com/JuliaAI/MLJTestIntegration.jl)
   provides tests for implementations of the MLJ model interface, and

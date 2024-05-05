@@ -2,4 +2,4 @@
 
 This feature not yet available.
 
-[CONTRIBUTE.md](https://github.com/alan-turing-institute/MLJ.jl/blob/master/CONTRIBUTE.md)
+[CONTRIBUTE.md](https://github.com/JuliaAI/MLJ.jl/blob/master/CONTRIBUTE.md)

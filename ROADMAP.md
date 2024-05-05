@@ -45,7 +45,7 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 - [ ] **Integrate deep learning** using [Flux.jl](https://github.com/FluxML/Flux.jl.git) deep learning.  [Done](https://github.com/FluxML/MLJFlux.jl) but can
   improve the experience by:
 
-  - [x] finishing iterative model wrapper [#139](https://github.com/alan-turing-institute/MLJ.jl/issues/139)
+  - [x] finishing iterative model wrapper [#139](https://github.com/JuliaAI/MLJ.jl/issues/139)
 
   - [ ] improving performance by implementing data front-end after (see [MLJBase
   #501](https://github.com/JuliaAI/MLJBase.jl/pull/501)) but see also [this relevant discussion](https://github.com/FluxML/MLJFlux.jl/issues/97).
@@ -55,7 +55,7 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
    [Turing.jl](https://github.com/TuringLang/Turing.jl),
    [Gen](https://github.com/probcomp/Gen),
    [Soss.jl](https://github.com/cscherrer/Soss.jl.git)
-   [#157](https://github.com/alan-turing-institute/MLJ.jl/issues/157)
+   [#157](https://github.com/JuliaAI/MLJ.jl/issues/157)
    [discourse
    thread](https://discourse.julialang.org/t/ppl-connection-to-mlj-jl/28736)
    [done](https://github.com/tlienart/SossMLJ.jl) but experimental and
@@ -66,12 +66,12 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 
 -   [ ] Feature engineering (python featuretools?, recursive feature
 	elimination ✓ done in FeatureSelection.jl :)
-	[#426](https://github.com/alan-turing-institute/MLJ.jl/issues/426) [MLJModels #314](https://github.com/JuliaAI/MLJModels.jl/issues/314)
+	[#426](https://github.com/JuliaAI/MLJ.jl/issues/426) [MLJModels #314](https://github.com/JuliaAI/MLJModels.jl/issues/314)
 
 
 ### Enhancing core functionality
 
--   [x] Iterative model control [#139](https://github.com/alan-turing-institute/MLJ.jl/issues/139). [Done](https://github.com/JuliaAI/MLJIteration.jl)
+-   [x] Iterative model control [#139](https://github.com/JuliaAI/MLJ.jl/issues/139). [Done](https://github.com/JuliaAI/MLJIteration.jl)
 
 -   [ ] **†** Add more tuning
 	strategies. See [here](https://github.com/JuliaAI/MLJTuning.jl#what-is-provided-here)
@@ -79,7 +79,7 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 	wish-list. Particular focus on:
 
 	- [x] random search
-	([#37](https://github.com/alan-turing-institute/MLJ.jl/issues/37))
+	([#37](https://github.com/JuliaAI/MLJ.jl/issues/37))
 	(done)
 
 	- [x] Latin hypercube
@@ -88,16 +88,16 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 	- [ ] Bayesian methods, starting with Gaussian Process methods a
 	  la PyMC3. Some preliminary research done.
 
-	- [ ] POC for AD-powered gradient descent [#74](https://github.com/alan-turing-institute/MLJ.jl/issues/74)
+	- [ ] POC for AD-powered gradient descent [#74](https://github.com/JuliaAI/MLJ.jl/issues/74)
 
 	- [ ] Tuning with adaptive resource allocation, as in
 	  Hyperband. This might be implemented elegantly with the help of
 	  the recent `IterativeModel` wrapper, which applies, in
 	  particular to `TunedModel` instances [see
-	  here](https://alan-turing-institute.github.io/MLJ.jl/dev/controlling_iterative_models/#Using-training-losses,-and-controlling-model-tuning).
+	  here](https://JuliaAI.github.io/MLJ.jl/dev/controlling_iterative_models/#Using-training-losses,-and-controlling-model-tuning).
 
 	- [ ] Genetic algorithms
-[#38](https://github.com/alan-turing-institute/MLJ.jl/issues/38)
+[#38](https://github.com/JuliaAI/MLJ.jl/issues/38)
 
 	- [ ] Particle Swarm Optimization (current WIP, GSoC project @lhnguyen-vn)
 
@@ -105,20 +105,20 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 	#18](https://github.com/JuliaAI/MLJTuning.jl/issues/18), architecture search, and other AutoML workflows
 
 - [ ]  Systematic benchmarking, probably modeled on
-	[MLaut](https://arxiv.org/abs/1901.03678) [#69](https://github.com/alan-turing-institute/MLJ.jl/issues/74)
+	[MLaut](https://arxiv.org/abs/1901.03678) [#69](https://github.com/JuliaAI/MLJ.jl/issues/74)
 
 - [ ]   Give `EnsembleModel` a more extendible API and extend beyond bagging
 	(boosting, etc) and migrate to a separate repository?
-	[#363](https://github.com/alan-turing-institute/MLJ.jl/issues/363)
+	[#363](https://github.com/JuliaAI/MLJ.jl/issues/363)
 
 - [ ]  **†** Enhance complex model composition:
 
 	- [x] Introduce a canned
-	stacking model wrapper ([POC](https://alan-turing-institute.github.io/DataScienceTutorials.jl/getting-started/stacking/)). WIP @olivierlabayle
+	stacking model wrapper ([POC](https://JuliaAI.github.io/DataScienceTutorials.jl/getting-started/stacking/)). WIP @olivierlabayle
 
 	- [ ] Get rid of macros for creating pipelines and possibly
 	implement target transforms as wrappers ([MLJBase
-	#594](https://github.com/alan-turing-institute/MLJ.jl/issues/594))
+	#594](https://github.com/JuliaAI/MLJ.jl/issues/594))
 	WIP @CameronBieganek and @ablaom
 
 
@@ -147,11 +147,11 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 	could use [NaiveBayes.jl](https://github.com/dfdx/NaiveBayes.jl)
 	as a POC (currently wrapped only for dense input) but the API
 	needs to be finalized first
-	{#731](https://github.com/alan-turing-institute/MLJ.jl/issues/731). Probably
+	{#731](https://github.com/JuliaAI/MLJ.jl/issues/731). Probably
 	need a new SparseTables.jl package.
 
 - [x] POC for implementation of time series models classification
-	[#303](https://github.com/alan-turing-institute/MLJ.jl/issues/303),
+	[#303](https://github.com/JuliaAI/MLJ.jl/issues/303),
 	[ScientificTypesBase #14](https://github.com/JuliaAI/ScientificTypesBase.jl/issues/14) POC is [here](https://github.com/JuliaAI/TimeSeriesClassification.jl)
 
 - [ ] POC for time series forecasting, along lines of sktime; probably needs [MLJBase
@@ -162,16 +162,16 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 - [ ]   Add tools or a separate repository for visualization in MLJ.
 
 	- [x] Extend visualization of tuning plots beyond two-parameters
-	[#85](https://github.com/alan-turing-institute/MLJ.jl/issues/85)
+	[#85](https://github.com/JuliaAI/MLJ.jl/issues/85)
 	(closed).
-	[#416](https://github.com/alan-turing-institute/MLJ.jl/issues/416)
+	[#416](https://github.com/JuliaAI/MLJ.jl/issues/416)
 	[Done](https://github.com/JuliaAI/MLJTuning.jl/pull/121) but might be worth adding alternatives suggested in issue.
 
-	- [ ] visualizing decision boundaries? [#342](https://github.com/alan-turing-institute/MLJ.jl/issues/342)
+	- [ ] visualizing decision boundaries? [#342](https://github.com/JuliaAI/MLJ.jl/issues/342)
 
 	- [ ] provide visualizations that MLR3 provides via [mlr3viz](https://github.com/mlr-org/mlr3viz)
 
-- [ ] Extend API to accommodate outlier detection, as provided by [OutlierDetection.jl](https://github.com/davnn/OutlierDetection.jl) [#780](https://github.com/alan-turing-institute/MLJ.jl/issues/780) WIP @davn and @ablaom
+- [ ] Extend API to accommodate outlier detection, as provided by [OutlierDetection.jl](https://github.com/davnn/OutlierDetection.jl) [#780](https://github.com/JuliaAI/MLJ.jl/issues/780) WIP @davn and @ablaom
 
 - [ ] Add more pre-processing tools:
 
@@ -194,14 +194,14 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
   is merged.
 
 - [ ]  Online learning support and distributed data
-	[#60](https://github.com/alan-turing-institute/MLJ.jl/issues/60)
+	[#60](https://github.com/JuliaAI/MLJ.jl/issues/60)
 
 - [ ]  DAG scheduling for learning network training
-	[#72](https://github.com/alan-turing-institute/MLJ.jl/issues/72)
+	[#72](https://github.com/JuliaAI/MLJ.jl/issues/72)
 	(multithreading first?)
 
 - [ ]  Automated estimates of cpu/memory requirements
-	[#71](https://github.com/alan-turing-institute/MLJ.jl/issues/71)
+	[#71](https://github.com/JuliaAI/MLJ.jl/issues/71)
 
 - [x] Add multithreading to tuning [MLJTuning
   #15](https://github.com/JuliaAI/MLJTuning.jl/issues/15)

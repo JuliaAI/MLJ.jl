@@ -4,11 +4,11 @@
 
 <h2 align="center">A Machine Learning Framework for Julia
 <p align="center">
-  <a href="https://github.com/alan-turing-institute/MLJ.jl/actions">
-    <img src="https://github.com/alan-turing-institute/MLJ.jl/workflows/CI/badge.svg"
+  <a href="https://github.com/JuliaAI/MLJ.jl/actions">
+    <img src="https://github.com/JuliaAI/MLJ.jl/workflows/CI/badge.svg"
          alt="Build Status">
   </a>
-  <a href="https://alan-turing-institute.github.io/MLJ.jl/dev/">
+  <a href="https://JuliaAI.github.io/MLJ.jl/dev/">
     <img src="https://img.shields.io/badge/docs-stable-blue.svg"
          alt="Documentation">
   </a>
@@ -28,13 +28,13 @@
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
 tuning, evaluating, composing and comparing about [200 machine learning
-models](https://alan-turing-institute.github.io/MLJ.jl/dev/model_browser/#Model-Browser)
+models](https://JuliaAI.github.io/MLJ.jl/dev/model_browser/#Model-Browser)
 written in Julia and other languages.
 
-**New to MLJ?** Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/).
+**New to MLJ?** Start [here](https://JuliaAI.github.io/MLJ.jl/dev/).
 
 **Integrating an existing machine learning model into the MLJ
-framework?** Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/quick_start_guide_to_adding_models/).
+framework?** Start [here](https://JuliaAI.github.io/MLJ.jl/dev/quick_start_guide_to_adding_models/).
 
 **Wanting to contribute?** Start [here](CONTRIBUTING.md). 
 
