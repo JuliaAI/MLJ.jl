@@ -42,7 +42,7 @@ framework?** Start [here](https://JuliaAI.github.io/MLJ.jl/dev/quick_start_guide
 
 MLJ was initially created as a Tools, Practices and Systems project at
 the [Alan Turing Institute](https://www.turing.ac.uk/)
-in 2019. Current funding is provided by a [New Zealand Strategic
+in 2019. Funding has also been provided by a [New Zealand Strategic
 Science Investment
 Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/strategic-science-investment-fund/ssif-funded-programmes/university-of-auckland/)
 awarded to the University of Auckland.
@@ -50,6 +50,7 @@ awarded to the University of Auckland.
 MLJ has been developed with the support of the following organizations:
 
 <div align="center">
+    <img src="material/DFKI.png" width = 100/>
     <img src="material/Turing_logo.png" width = 100/>
     <img src="material/UoA_logo.png" width = 100/>
     <img src="material/IQVIA_logo.png" width = 100/>
