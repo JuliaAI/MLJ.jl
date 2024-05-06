@@ -1,7 +1,7 @@
 # # MLJ for Data Scientists in Two Hours
 
 # An application of the [MLJ
-# toolbox](https://alan-turing-institute.github.io/MLJ.jl/dev/) to the
+# toolbox](https://juliaai.github.io/MLJ.jl/dev/) to the
 # Telco Customer Churn dataset, aimed at practicing data scientists
 # new to MLJ (Machine Learning in Julia). This tutorial does not
 # cover exploratory data analysis.
@@ -10,9 +10,9 @@
 # deep-learning).
 
 # For other MLJ learning resources see the [Learning
-# MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/learning_mlj/)
+# MLJ](https://juliaai.github.io/MLJ.jl/dev/learning_mlj/)
 # section of the
-# [manual](https://alan-turing-institute.github.io/MLJ.jl/dev/).
+# [manual](https://juliaai.github.io/MLJ.jl/dev/).
 
 # **Topics covered**: Grabbing and preparing a dataset, basic
 # fit/predict workflow, constructing a pipeline to include data
@@ -78,7 +78,7 @@
 # the notebook, package instantiation and pre-compilation may take a
 # minute or so to complete. **This step will fail** if the [correct
 # Manifest.toml and Project.toml
-# files](https://github.com/alan-turing-institute/MLJ.jl/tree/dev/examples/telco)
+# files](https://github.com/JuliaAI/MLJ.jl/tree/dev/examples/telco)
 # are not in the same directory as this notebook.
 
 using Pkg
@@ -94,7 +94,7 @@ Pkg.instantiate()
 # don't fully grasp should become clearer in the Telco study.
 
 # This section is a condensed adaption of the [Getting Started
-# example](https://alan-turing-institute.github.io/MLJ.jl/dev/getting_started/#Fit-and-predict)
+# example](https://juliaai.github.io/MLJ.jl/dev/getting_started/#Fit-and-predict)
 # in the MLJ documentation.
 
 # First, using the built-in iris dataset, we load and inspect the features
@@ -137,7 +137,7 @@ fit!(mach, rows=train_rows)
 fitted_params(mach)
 
 # A machine stores some other information enabling [warm
-# restart](https://alan-turing-institute.github.io/MLJ.jl/dev/machines/#Warm-restarts)
+# restart](https://juliaai.github.io/MLJ.jl/dev/machines/#Warm-restarts)
 # for some models, but we won't go into that here. You are allowed to
 # access and mutate the `model` parameter:
 
@@ -292,7 +292,7 @@ const ytest, Xtest = unpack(df_test, ==(:Churn), !=(:customerID));
 # > Introduces: `@load`, `input_scitype`, `target_scitype`
 
 # For tools helping us to identify suitable models, see the [Model
-# Search](https://alan-turing-institute.github.io/MLJ.jl/dev/model_search/#model_search)
+# Search](https://juliaai.github.io/MLJ.jl/dev/model_search/#model_search)
 # section of the manual. We will build a gradient tree-boosting model,
 # a popular first choice for structured data like we have here. Model
 # code is contained in a third-party package called
@@ -340,7 +340,7 @@ pipe = ContinuousEncoder() |> booster
 
 # Note that the component models appear as hyperparameters of
 # `pipe`. Pipelines are an implementation of a more general [model
-# composition](https://alan-turing-institute.github.io/MLJ.jl/dev/composing_models/#Composing-Models)
+# composition](https://juliaai.github.io/MLJ.jl/dev/composing_models/#Composing-Models)
 # interface provided by MLJ that advanced users may want to learn about.
 
 # From the above display, we see that component model hyperparameters
@@ -464,7 +464,7 @@ plot!([0, 1], [0, 1], linewidth=2, linestyle=:dash, color=:black)
 # `acceleration=CPUThreads()` to parallelize the computation.
 
 # We choose a `StratifiedCV` resampling strategy; the complete list of options is
-# [here](https://alan-turing-institute.github.io/MLJ.jl/dev/evaluating_model_performance/#Built-in-resampling-strategies).
+# [here](https://juliaai.github.io/MLJ.jl/dev/evaluating_model_performance/#Built-in-resampling-strategies).
 
 e_pipe = evaluate(pipe, X, y,
                   resampling=StratifiedCV(nfolds=6, rng=123),
@@ -535,7 +535,7 @@ pipe2 = ContinuousEncoder() |>
 # [MLJFlux.jl](https://github.com/FluxML/MLJFlux.jl).
 
 # First, we select appropriate controls from [this
-# list](https://alan-turing-institute.github.io/MLJ.jl/dev/controlling_iterative_models/#Controls-provided):
+# list](https://juliaai.github.io/MLJ.jl/dev/controlling_iterative_models/#Controls-provided):
 
 controls = [
     Step(1),              # to increment iteration parameter (`pipe.nrounds`)
@@ -580,7 +580,7 @@ fit!(mach_iterated_pipe);
 # wanting to visualize the effect of changes to a *single*
 # hyperparameter (which could be an iteration parameter). See, for
 # example, [this section of the
-# manual](https://alan-turing-institute.github.io/MLJ.jl/dev/learning_curves/)
+# manual](https://juliaai.github.io/MLJ.jl/dev/learning_curves/)
 # or [this
 # tutorial](https://github.com/ablaom/MLJTutorial.jl/blob/dev/notebooks/04_tuning/notebook.ipynb).
 
@@ -618,7 +618,7 @@ r2 = range(iterated_pipe, p2, lower=2, upper=6)
 # and `upper`.
 
 # Next, we choose an optimization strategy from [this
-# list](https://alan-turing-institute.github.io/MLJ.jl/dev/tuning_models/#Tuning-Models):
+# list](https://juliaai.github.io/MLJ.jl/dev/tuning_models/#Tuning-Models):
 
 tuning = RandomSearch(rng=123)
 
@@ -755,4 +755,3 @@ ŷ_basic = predict(mach_basic, Xtest);
       auc(ŷ_basic, ytest),
       accuracy(mode.(ŷ_basic), ytest)
       )
-

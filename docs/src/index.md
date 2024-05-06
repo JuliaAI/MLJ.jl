@@ -4,12 +4,12 @@
 <div style="font-size:1.25em;font-weight:bold;">
   <a href="about_mlj"
     style="color: #389826;">About</a>           &nbsp;|&nbsp;
-  <a href="https://alan-turing-institute.github.io/MLJ.jl/dev/about_mlj/#Installation" 
+  <a href="https://JuliaAI.github.io/MLJ.jl/dev/about_mlj/#Installation" 
     style="color: #389826;">Install</a>         &nbsp;|&nbsp;
   <a href="learning_mlj"   style="color: #389826;">Learn</a>            &nbsp;|&nbsp;
   <a href="mlj_cheatsheet" style="color: #9558B2;">Cheatsheet</a>       &nbsp;|&nbsp;
   <a href="common_mlj_workflows" style="color: #9558B2;">Workflows</a>  &nbsp;|&nbsp;
-  <a href="https://github.com/alan-turing-institute/MLJ.jl/" style="color: #9558B2;">For Developers</a> &nbsp;|&nbsp;
+  <a href="https://github.com/JuliaAI/MLJ.jl/" style="color: #9558B2;">For Developers</a> &nbsp;|&nbsp;
   <a href="third_party_packages" style="color: #9558B2;">3rd Party Packages</a>
 </div>
 
@@ -26,11 +26,11 @@ To support MLJ development, please cite these works or star the repo:
 
 ```@raw html
 <a class="github-button" 
-  href="https://github.com/alan-turing-institute/MLJ.jl" 
+  href="https://github.com/JuliaAI/MLJ.jl" 
   data-icon="octicon-star" 
   data-size="large" 
   data-show-count="true" 
-  aria-label="Star alan-turing-institute/MLJ.jl on GitHub">
+  aria-label="Star JuliaAI/MLJ.jl on GitHub">
   Star</a>
 ```
 

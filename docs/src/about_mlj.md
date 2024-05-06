@@ -15,7 +15,7 @@ MLJ is released under the MIT license.
 
 A self-contained notebook and julia script of this demonstration is
 also available
-[here](https://github.com/alan-turing-institute/MLJ.jl/tree/dev/examples/lightning_tour).
+[here](https://github.com/JuliaAI/MLJ.jl/tree/dev/examples/lightning_tour).
 
 The first code snippet below creates a new Julia environment
 `MLJ_tour` and installs just those packages needed for the tour. See
@@ -210,13 +210,13 @@ and to report issues.
 
 For a query to have maximum exposure to maintainers and users, start a
 discussion thread at [Julia Discourse Machine
-Learning](https://github.com/alan-turing-institute/MLJ.jl) and tag
+Learning](https://github.com/JuliaAI/MLJ.jl) and tag
 your issue "mlj". Queries can also be posted as
-[issues](https://github.com/alan-turing-institute/MLJ.jl/issues), or
+[issues](https://github.com/JuliaAI/MLJ.jl/issues), or
 on the `#mlj` slack workspace in the Julia Slack channel.
 
 Bugs, suggestions, and feature requests can be posted
-[here](https://github.com/alan-turing-institute/MLJ.jl/issues).
+[here](https://github.com/JuliaAI/MLJ.jl/issues).
 
 Users are also welcome to join the `#mlj` Julia slack channel to ask
 questions and make suggestions.
@@ -269,7 +269,7 @@ packages such as DecisionTree.jl, ScikitLearn.jl or XGBoost.jl.
 MLJ is supported by several satellite packages (MLJTuning,
 MLJModelInterface, etc) which the general user is *not* required to
 install directly. Developers can learn more about these
-[here](https://github.com/alan-turing-institute/MLJ.jl/blob/master/ORGANIZATION.md).
+[here](https://github.com/JuliaAI/MLJ.jl/blob/master/ORGANIZATION.md).
 
 See also the alternative installation instructions for [Modifying Behavior](@ref).
 

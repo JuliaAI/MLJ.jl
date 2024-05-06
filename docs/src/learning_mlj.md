@@ -38,7 +38,7 @@ intended as a complete reference.
 
 - [Analyzing the Glass Dataset](https://towardsdatascience.com/part-i-analyzing-the-glass-dataset-c556788a496f): A gentle introduction to data science using Julia and MLJ (three-part blog post)
 
-- [Lightning Tour](https://github.com/alan-turing-institute/MLJ.jl/blob/dev/examples/lightning_tour/lightning_tour.ipynb): A compressed demonstration of key MLJ functionality
+- [Lightning Tour](https://github.com/JuliaAI/MLJ.jl/blob/dev/examples/lightning_tour/lightning_tour.ipynb): A compressed demonstration of key MLJ functionality
 
 - [MLJ JuliaCon2020 Workshop](https://github.com/ablaom/MachineLearningInJulia2020): older version of  [MLJTutorial](https://github.com/ablaom/MLJTutorial.jl) with [video](https://www.youtube.com/watch?time_continue=27&v=qSWbCn170HU&feature=emb_title)
 

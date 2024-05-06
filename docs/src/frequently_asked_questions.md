@@ -49,7 +49,7 @@ term:
 - **Clean probabilistic API.** The scikit-learn API does not specify a
   universal standard for the form of probabilistic predictions. By
   fixing a probabilistic API along the lines of the
-  [skpro](https://github.com/alan-turing-institute/skpro) project, MLJ
+  [skpro](https://github.com/JuliaAI/skpro) project, MLJ
   aims to improve support for Bayesian statistics and probabilistic
   graphical models.
 

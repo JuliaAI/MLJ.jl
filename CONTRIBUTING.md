@@ -9,7 +9,7 @@ channel](https://julialang.org/slack/), #mlj.
 - [Code organization](ORGANIZATION.md)
 
 - Issues: Currently issues are split between [MLJ
-  issues](https://github.com/alan-turing-institute/MLJ.jl/issues) and
+  issues](https://github.com/JuliaAI/MLJ.jl/issues) and
   issues in all other repositories, collected in [this GitHub
   Project](https://github.com/orgs/JuliaAI/projects/1).
 
@@ -43,7 +43,7 @@ an internal state reflecting the outcomes of applying `fit!` and
 A generalization of machine, called a *nodal* machine, is a key
 element of *learning networks* which combine several models together,
 and form the basis for specifying new composite model types. See
-[here](https://alan-turing-institute.github.io/MLJ.jl/dev/composing_models/)
+[here](https://JuliaAI.github.io/MLJ.jl/dev/composing_models/)
 for more on these.
 
 MLJ code is now spread over [multiple repositories](ORGANIZATION.md).

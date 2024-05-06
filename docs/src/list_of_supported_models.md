@@ -5,7 +5,7 @@ the [Model Browser](@ref).
 
 MLJ provides access to a wide variety of machine learning models.
 We are always looking for
-[help](https://github.com/alan-turing-institute/MLJ.jl/blob/master/CONTRIBUTING.md)
+[help](https://github.com/JuliaAI/MLJ.jl/blob/master/CONTRIBUTING.md)
 adding new models or testing existing ones.  Currently available
 models are listed below; for the most up-to-date list, run `using MLJ;
 models()`. 
