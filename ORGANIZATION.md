@@ -59,9 +59,9 @@ its conventional use, are marked with a ⟂ symbol:
 * (⟂) [OpenML.jl](https://github.com/JuliaAI/OpenML.jl) provides integration with the
   [OpenML](https://www.openml.org) data science exchange platform
   
-* (⟂) [MLJLinearModels.jl](https://github.com/JuliaAI/MLJLinearModels.jl) is an
-  experimental package for a wide range of julia-native penalized linear models such as
-  Lasso, Elastic-Net, Robust regression, LAD regression, etc.
+* (⟂) [MLJLinearModels.jl](https://github.com/JuliaAI/MLJLinearModels.jl) provides a wide
+  range of julia-native penalized linear models such as Lasso, Elastic-Net, Robust
+  regression, LAD regression, etc.
 
 * [MLJFlux.jl](https://github.com/FluxML/MLJFlux.jl) an experimental package for
   gradient-descent models, such as traditional neural-networks, built with
