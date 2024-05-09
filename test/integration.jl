@@ -1,6 +1,7 @@
 using MLJTestIntegration, MLJModels, MLJ, Test, Markdown
 import MLJTestIntegration as MTI
 import Pkg.TOML as TOML
+using Suppressor
 
 const JULIA_TEST_LEVEL = 4
 const OTHER_TEST_LEVEL = 3
@@ -47,7 +48,7 @@ FILTER_GIVEN_ISSUE = Dict(
 
 # # LOG OUTSTANDING ISSUES TO STDOUT
 
-const MODELS= models();
+const MODELS = models();
 const JULIA_MODELS = filter(m->m.is_pure_julia, MODELS);
 const OTHER_MODELS = setdiff(MODELS, JULIA_MODELS);
 
@@ -178,6 +179,8 @@ MLJTestIntegration.test(MODELS, (nothing, ), level=1, throw=true, verbosity=0);
 
 # # JULIA TESTS
 
+problems = []
+
 options = (
     level = JULIA_TEST_LEVEL,
     verbosity = 0, # bump to 2 to debug
@@ -192,7 +195,9 @@ options = (
         model in EXCLUDED_BY_ISSUE && continue
 
         print("\rTesting $(model.name) ($(model.package_name))                       ")
-        @test isempty(MLJTestIntegration.test(model; mod=@__MODULE__, options...))
+        okay =
+            @suppress isempty(MLJTestIntegration.test(model; mod=@__MODULE__, options...))
+        okay || push!(problems, model)
     end
 end
 
@@ -213,8 +218,15 @@ options = (
         model in EXCLUDED_BY_ISSUE && continue
 
         print("\rTesting $(model.name) ($(model.package_name))                       ")
-        @test isempty(MLJTestIntegration.test(model; mod=@__MODULE__, options...))
+        okay =
+            @suppress isempty(MLJTestIntegration.test(model; mod=@__MODULE__, options...))
+        okay || push!(problems, model)
     end
 end
+
+okay = isempty(problems)
+okay || println("Integration tests failed for these models: \n $problems")
+
+@test okay
 
 true
