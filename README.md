@@ -4,11 +4,11 @@
 
 <h2 align="center">A Machine Learning Framework for Julia
 <p align="center">
-  <a href="https://github.com/alan-turing-institute/MLJ.jl/actions">
-    <img src="https://github.com/alan-turing-institute/MLJ.jl/workflows/CI/badge.svg"
+  <a href="https://github.com/JuliaAI/MLJ.jl/actions">
+    <img src="https://github.com/JuliaAI/MLJ.jl/workflows/CI/badge.svg"
          alt="Build Status">
   </a>
-  <a href="https://alan-turing-institute.github.io/MLJ.jl/dev/">
+  <a href="https://JuliaAI.github.io/MLJ.jl/dev/">
     <img src="https://img.shields.io/badge/docs-stable-blue.svg"
          alt="Documentation">
   </a>
@@ -28,13 +28,13 @@
 MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
 tuning, evaluating, composing and comparing about [200 machine learning
-models](https://alan-turing-institute.github.io/MLJ.jl/dev/model_browser/#Model-Browser)
+models](https://JuliaAI.github.io/MLJ.jl/dev/model_browser/#Model-Browser)
 written in Julia and other languages.
 
-**New to MLJ?** Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/).
+**New to MLJ?** Start [here](https://JuliaAI.github.io/MLJ.jl/dev/).
 
 **Integrating an existing machine learning model into the MLJ
-framework?** Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/quick_start_guide_to_adding_models/).
+framework?** Start [here](https://JuliaAI.github.io/MLJ.jl/dev/quick_start_guide_to_adding_models/).
 
 **Wanting to contribute?** Start [here](CONTRIBUTING.md). 
 
@@ -42,7 +42,7 @@ framework?** Start [here](https://alan-turing-institute.github.io/MLJ.jl/dev/qui
 
 MLJ was initially created as a Tools, Practices and Systems project at
 the [Alan Turing Institute](https://www.turing.ac.uk/)
-in 2019. Current funding is provided by a [New Zealand Strategic
+in 2019. Funding has also been provided by a [New Zealand Strategic
 Science Investment
 Fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/strategic-science-investment-fund/ssif-funded-programmes/university-of-auckland/)
 awarded to the University of Auckland.
@@ -50,6 +50,7 @@ awarded to the University of Auckland.
 MLJ has been developed with the support of the following organizations:
 
 <div align="center">
+    <img src="material/DFKI.png" width = 100/>
     <img src="material/Turing_logo.png" width = 100/>
     <img src="material/UoA_logo.png" width = 100/>
     <img src="material/IQVIA_logo.png" width = 100/>

@@ -113,7 +113,7 @@ Workshop](https://github.com/ablaom/MachineLearningInJulia2020)
 (specifically,
 [here](https://github.com/ablaom/MachineLearningInJulia2020/blob/master/tutorials.md#fixing-scientific-types-in-tabular-data))
 and [this Data Science in Julia
-tutorial](https://alan-turing-institute.github.io/DataScienceTutorials.jl/data/scitype/).
+tutorial](https://JuliaAI.github.io/DataScienceTutorials.jl/data/scitype/).
 
 Also relevant is the section, [Working with Categorical Data](@ref).
 
@@ -132,5 +132,5 @@ MissingImputator = @load MissingImputator pkg=BetaML
 [This MLJ
 Workshop](https://github.com/ablaom/MachineLearningInJulia2020), and
 the "End-to-end examples" in [Data Science in Julia
-tutorials](https://alan-turing-institute.github.io/DataScienceTutorials.jl/)
+tutorials](https://JuliaAI.github.io/DataScienceTutorials.jl/)
 give further illustrations of data preprocessing in MLJ.

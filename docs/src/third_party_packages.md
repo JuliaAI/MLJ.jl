@@ -6,7 +6,7 @@ Last updated December 2020.
 
 Pull requests to update this list are very welcome. Otherwise, you may
 post an issue requesting this
-[here](https://github.com/alan-turing-institute/MLJ.jl/issues).
+[here](https://github.com/JuliaAI/MLJ.jl/issues).
 
 ## Packages providing models in the MLJ model registry
 
@@ -16,7 +16,7 @@ See [List of Supported Models](@ref model_list)
 ## Providing unregistered models:
 
 - [SossMLJ.jl](https://github.com/cscherrer/SossMLJ.jl)
-- [TimeSeriesClassification](https://github.com/alan-turing-institute/TimeSeriesClassification.jl)
+- [TimeSeriesClassification](https://github.com/JuliaAI/TimeSeriesClassification.jl)
 
 ## Packages providing other kinds of functionality:
 

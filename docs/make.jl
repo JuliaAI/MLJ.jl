@@ -126,7 +126,7 @@ makedocs(
 @info "`makedocs` has finished running. "
 
 deploydocs(
-    repo = "github.com/alan-turing-institute/MLJ.jl",
+    repo = "github.com/JuliaAI/MLJ.jl",
     devbranch="master",
     push_preview=false,
 )

@@ -1,7 +1,7 @@
 """
    MLJ
 
-[`MLJ`](https://alan-turing-institute.github.io/MLJ.jl/dev/) is a Machine Learning toolbox
+[`MLJ`](https://juliaai.github.io/MLJ.jl//dev/) is a Machine Learning toolbox
 for Julia. It collects together functionality from the following packages, which can be
 loaded separately:
 
@@ -12,7 +12,7 @@ loaded separately:
   checking how MLJ interprets your data
 
 - StatisticalMeasures.jl: MLJ-compatible measures (metrics) for machine learning,
-  confusion matrices, ROC curves. 
+  confusion matrices, ROC curves.
 
 - MLJModels.jl: Common transformers for data preprocessing, searching the model registry,
   loading models with `@load`

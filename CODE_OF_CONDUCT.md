@@ -18,7 +18,7 @@ below. The Committee will respond to reports on a case-by-case basis.
 following forums:
 
 - the GitHub repository
-  [MLJ.jl](https://github.com/alan-turing-institute/MLJ.jl) (including
+  [MLJ.jl](https://github.com/JuliaAI/MLJ.jl) (including
   all issues, discussions, and pull requests)
 
 - all GitHub repositories in the [JuliaAI](https://github.com/JuliaAI)
