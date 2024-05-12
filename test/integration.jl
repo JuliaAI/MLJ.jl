@@ -18,8 +18,6 @@ FILTER_GIVEN_ISSUE = Dict(
         model.package_name == "OutlierDetectionNeighbors"),
     "https://github.com/JuliaAI/CatBoost.jl/pull/28 (waiting for 0.3.3 release)" =>
         model -> model.name == "CatBoostRegressor",
-    "LOCIDetector too slow to train!" =>
-        model -> model.name == "LOCIDetector",
     "https://github.com/JuliaML/LIBSVM.jl/issues/98" =>
         model -> model.name == "LinearSVC" &&
         model.package_name == "LIBSVM",
@@ -42,9 +40,16 @@ FILTER_GIVEN_ISSUE = Dict(
     "https://github.com/lalvim/PartialLeastSquaresRegressor.jl/issues/29 "*
         "(still need release > 2.2.0)" =>
         model -> model.package_name == "PartialLeastSquaresRegressor",
-    "MLJScikitLearnInterface - multiple issues, hangs tests, WIP" =>
-        model -> model.package_name == "MLJScikitLearnInterface",
+    "MLJScikitLearnInterface - multiple issues, WIP" =>
+        model -> model.package_name == "MLJScikitLearnInterface" &&
+        model.name in [
+            "MultiTaskElasticNetCVRegressor",
+            "MultiTaskElasticNetRegressor",
+            "MultiTaskLassoCVRegressor",
+            "MultiTaskLassoRegressor",
+        ]
 )
+
 
 # # LOG OUTSTANDING ISSUES TO STDOUT
 
@@ -128,7 +133,7 @@ for model in WITHOUT_DATASETS
 end
 
 # Additionally exclude some models for which the inferred datasets have a model-specific
-# pathololgy that prevents a valid test:
+# pathology that prevents valid generic test.
 
 PATHOLOGIES = filter(MODELS) do model
     # in the subsampling occuring in stacking, we get a Cholesky
@@ -139,7 +144,11 @@ PATHOLOGIES = filter(MODELS) do model
         # in tuned_pipe_evaluation C library gives "Incorrect parameter: specified nu is
         # infeasible":
         (model.name in ["NuSVC", "ProbabilisticNuSVC"] &&
-        model.package_name == "LIBSVM")
+        model.package_name == "LIBSVM") ||
+        # too slow to train!
+        (model.name == "LOCIDetector" && model.package_name == "OutlierDetectionPython") ||
+        # TO REDUCE TESTING TIME
+        model.package_name == "MLJScikitLearnInterface"
 end
 
 WITHOUT_DATASETS = vcat(WITHOUT_DATASETS, PATHOLOGIES)
@@ -179,48 +188,44 @@ MLJTestIntegration.test(MODELS, (nothing, ), level=1, throw=true, verbosity=0);
 
 # # JULIA TESTS
 
+const INFO_TEST_NOW_PASSING =
+    "The model above now passes tests.\nConsider removing from "*
+    "`FILTER_GIVEN_ISSUE` in test/integration.jl."
+
 problems = []
 
-options = (
-    level = JULIA_TEST_LEVEL,
-    verbosity = 0, # bump to 2 to debug
-    throw = false,
-)
-@testset "level 4 tests" begin
-    println()
-    for model in JULIA_MODELS
+for (model_set, level) in [
+    (:JULIA_MODELS, JULIA_TEST_LEVEL),
+    (:OTHER_MODELS, OTHER_TEST_LEVEL),
+    ]
+    set = eval(model_set)
+    options = (
+        ; level,
+        verbosity = 0, # bump to 2 to debug
+        throw = false,
+    )
 
-        # exclusions:
-        model in WITHOUT_DATASETS && continue
-        model in EXCLUDED_BY_ISSUE && continue
+    @testset "$model_set tests" begin
+        println()
+        for model in set
 
-        print("\rTesting $(model.name) ($(model.package_name))                       ")
-        okay =
-            @suppress isempty(MLJTestIntegration.test(model; mod=@__MODULE__, options...))
-        okay || push!(problems, model)
-    end
-end
+            # exclusions:
+            model in WITHOUT_DATASETS && continue
 
+            notice = "Testing $(model.name) ($(model.package_name))"
+            print("\r", notice, "                       ")
 
-# # NON-JULIA TESTS
-
-options = (
-    level = OTHER_TEST_LEVEL,
-    verbosity = 0, # bump to 2 to debug
-    throw = false,
-)
-@testset "level 3 tests" begin
-    println()
-    for model in OTHER_MODELS
-
-        # exclusions:
-        model in WITHOUT_DATASETS && continue
-        model in EXCLUDED_BY_ISSUE && continue
-
-        print("\rTesting $(model.name) ($(model.package_name))                       ")
-        okay =
-            @suppress isempty(MLJTestIntegration.test(model; mod=@__MODULE__, options...))
-        okay || push!(problems, model)
+            okay = @suppress isempty(MLJTestIntegration.test(
+                model;
+                mod=@__MODULE__,
+                options...,
+            ))
+            if model in EXCLUDED_BY_ISSUE
+                okay && (println(); @info INFO_TEST_NOW_PASSING)
+            else
+                okay || push!(problems, notice)
+            end
+        end
     end
 end
 
