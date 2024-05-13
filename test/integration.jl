@@ -211,9 +211,8 @@ for (model_set, level) in [
         verbosity = 0, # bump to 2 to debug
         throw = false,
     )
-
+    println()
     @testset "$model_set tests" begin
-        println()
         for model in set
             global i += 1
             progress = string("(", round(i/nmodels*100, digits=1), "%) ")
