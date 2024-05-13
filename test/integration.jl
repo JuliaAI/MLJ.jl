@@ -6,6 +6,17 @@ using Suppressor
 const JULIA_TEST_LEVEL = 4
 const OTHER_TEST_LEVEL = 3
 
+# # IMPORTANT
+
+# There are two main ways to flag a problem model for integration test purposes.
+
+# - Adding to `FILTER_GIVEN_ISSUE` means the model is allowed to fail silently, unless
+#  tests pass, a fact that will be reported in the log.
+
+# - Adding to `PATHOLOGIES` completely excludes the model from testing.
+
+# Obviously the first method is strongly preferred.
+
 
 # # RECORD OF OUTSTANDING ISSUES
 
@@ -194,10 +205,14 @@ const INFO_TEST_NOW_PASSING =
 
 problems = []
 
+const nmodels = length(JULIA_MODELS) + length(OTHER_MODELS)
+i = 0
 for (model_set, level) in [
     (:JULIA_MODELS, JULIA_TEST_LEVEL),
     (:OTHER_MODELS, OTHER_TEST_LEVEL),
     ]
+    i += 1
+    progress = string("(", round(i/nmodels*100, sigdigits=2), "%) ")
     set = eval(model_set)
     options = (
         ; level,
@@ -213,7 +228,7 @@ for (model_set, level) in [
             model in WITHOUT_DATASETS && continue
 
             notice = "Testing $(model.name) ($(model.package_name))"
-            print("\r", notice, "                       ")
+            print("\r", progress, notice, "                       ")
 
             okay = @suppress isempty(MLJTestIntegration.test(
                 model;
