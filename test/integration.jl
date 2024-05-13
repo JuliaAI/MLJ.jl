@@ -205,8 +205,8 @@ for (model_set, level) in [
     (:JULIA_MODELS, JULIA_TEST_LEVEL),
     (:OTHER_MODELS, OTHER_TEST_LEVEL),
     ]
-    i += 1
-    progress = string("(", round(i/nmodels*100, sigdigits=2), "%) ")
+    global i += 1
+    progress = string("(", round(i/nmodels*100, digits=1), "%) ")
     set = eval(model_set)
     options = (
         ; level,
