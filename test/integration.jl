@@ -27,8 +27,6 @@ FILTER_GIVEN_ISSUE = Dict(
         model.package_name == "DecisionTree") ||
         (model.name == "COFDetector" &&
         model.package_name == "OutlierDetectionNeighbors"),
-    "https://github.com/JuliaAI/CatBoost.jl/pull/28 (waiting for 0.3.3 release)" =>
-        model -> model.name == "CatBoostRegressor",
     "https://github.com/JuliaML/LIBSVM.jl/issues/98" =>
         model -> model.name == "LinearSVC" &&
         model.package_name == "LIBSVM",
@@ -40,12 +38,8 @@ FILTER_GIVEN_ISSUE = Dict(
     "https://github.com/sylvaticus/BetaML.jl/issues/65" =>
         model -> model.name in ["KMeans", "KMedoids"] &&
         model.package_name == "BetaML",
-    "https://github.com/JuliaAI/MLJTSVDInterface.jl/pull/17" =>
-        model -> model.name == "TSVDTransformer",
     "https://github.com/JuliaAI/MLJ.jl/issues/1074" =>
         model -> model.name == "AutoEncoderMLJ",
-    "https://github.com/sylvaticus/BetaML.jl/issues/64" =>
-        model -> model.name =="GaussianMixtureClusterer" && model.package_name=="BetaML",
      "https://github.com/rikhuijzer/SIRUS.jl/issues/78" =>
         model -> model.package_name == "SIRUS",
     "https://github.com/lalvim/PartialLeastSquaresRegressor.jl/issues/29 "*
