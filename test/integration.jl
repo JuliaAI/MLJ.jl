@@ -201,6 +201,7 @@ problems = []
 
 const nmodels = length(JULIA_MODELS) + length(OTHER_MODELS)
 i = 0
+println()
 for (model_set, level) in [
     (:JULIA_MODELS, JULIA_TEST_LEVEL),
     (:OTHER_MODELS, OTHER_TEST_LEVEL),
@@ -211,16 +212,15 @@ for (model_set, level) in [
         verbosity = 0, # bump to 2 to debug
         throw = false,
     )
-    println()
     @testset "$model_set tests" begin
         for model in set
             global i += 1
-            progress = string("(", round(i/nmodels*100, digits=1), "%) ")
+            progress = string("(", round(i/nmodels*100, digits=1), "%) Testing: ")
 
             # exclusions:
             model in WITHOUT_DATASETS && continue
 
-            notice = "Testing $(model.name) ($(model.package_name))"
+            notice = "$(model.name) ($(model.package_name))"
             print("\r", progress, notice, "                       ")
 
             okay = @suppress isempty(MLJTestIntegration.test(
