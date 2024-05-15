@@ -165,7 +165,7 @@ nothing # hide
 
 ## Instantiating a model
 
-    *Reference:*   [Getting Started](@ref), [Loading Model Code](@ref)
+*Reference:*   [Getting Started](@ref), [Loading Model Code](@ref)
 
 Assumes `MLJDecisionTreeClassifier` is in your environment. Otherwise, try interactive
 loading with `@iload`:
