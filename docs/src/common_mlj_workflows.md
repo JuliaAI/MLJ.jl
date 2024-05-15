@@ -23,14 +23,16 @@ MLJ_VERSION
 ## Data ingestion
 
 ```@setup workflows
-# to avoid RDatasets as a doc dependency:
+# to avoid RDatasets as a doc dependency, generate synthetic data with
+# similar parameters, with the first four rows mimicking the original dataset
+# for display purposes
 color_off()
 import DataFrames
-channing = (Sex = rand(["Male","Female"], 462),
-            Entry = rand(Int, 462),
-            Exit = rand(Int, 462),
-            Time = rand(Int, 462),
-            Cens = rand(Int, 462)) |> DataFrames.DataFrame
+channing = (Sex = [repeat(["Male"], 4)..., rand(["Male","Female"], 458)...],
+            Entry = Int32[782, 1020, 856, 915, rand(733:1140, 458)...],
+            Exit = Int32[909, 1128, 969, 957, rand(777:1207, 458)...],
+            Time = Int32[127, 108, 113, 42, rand(0:137, 458)...],
+            Cens = Int32[1, 1, 1, 1, rand(0:1, 458)...]) |> DataFrames.DataFrame
 coerce!(channing, :Sex => Multiclass)
 ```
 
@@ -41,7 +43,7 @@ channing = RDatasets.dataset("boot", "channing")
 ```
 
 ```@example workflows
-first(channing, 4)
+first(channing, 4) |> pretty
 ```
 
 Inspecting metadata, including column scientific types:
