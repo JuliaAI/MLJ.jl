@@ -228,7 +228,7 @@ or a list of pairs of row indices:
 tuned_model = TunedModel(model=…, tuning=RandomSearch(), resampling=Holdout(), measure=…, operation=predict, range=…)
 ```
 
-## Ranges for tuning (`range=...`)
+## Ranges for tuning `(range=...)`
 
 If `r = range(KNNRegressor(), :K, lower=1, upper = 20, scale=:log)`
 
