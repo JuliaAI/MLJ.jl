@@ -125,7 +125,7 @@ broadcasted versions of `log`, `exp`, `mean`, `mode` and `median`. A function li
 is not overloaded, so that `Q = sqrt(Z)` will throw an error. Instead, we do
 
 ```@example 42
-Q = node(z->sqrt(z), Z)
+Q = node(sqrt, Z)
 Z()
 ```
 
@@ -736,7 +736,7 @@ There is also an experimental macro [`@node`](@ref). If `Z` is an `AbstractNode`
 source(16)`, say) then instead of
 
 ```julia
-Q = node(z->sqrt(z), Z)
+Q = node(sqrt, Z)
 ```
 
 one can do
