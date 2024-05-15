@@ -47,20 +47,20 @@ on a fit-result (e.g., a broadcasted logarithm) which is then called
 
 An object consisting of:
 
-(1) A model
+1. A model
 
-(2) A fit-result (undefined until training)
+2. A fit-result (undefined until training)
 
-(3) *Training arguments* (one for each data argument of the model's
-associated `fit` method). A training argument is data used for
-training (subsampled by specifying `rows=...` in `fit!`) but also in
-evaluation (subsampled by specifying `rows=...` in `predict`,
-`predict_mean`, etc). Generally, there are two training arguments for
-supervised models, and just one for unsupervised models. Each argument
-is either a `Source` node, wrapping concrete data supplied to the
-`machine` constructor, or a `Node`, in the case of a learning network
-(see below). Both kinds of nodes can be *called* with an optional
-`rows=...` keyword argument to (lazily) return concrete data.
+3. *Training arguments* (one for each data argument of the model's
+   associated `fit` method). A training argument is data used for
+   training (subsampled by specifying `rows=...` in `fit!`) but also in
+   evaluation (subsampled by specifying `rows=...` in `predict`,
+   `predict_mean`, etc). Generally, there are two training arguments for
+   supervised models, and just one for unsupervised models. Each argument
+   is either a `Source` node, wrapping concrete data supplied to the
+   `machine` constructor, or a `Node`, in the case of a learning network
+   (see below). Both kinds of nodes can be *called* with an optional
+   `rows=...` keyword argument to (lazily) return concrete data.
 
 In addition, machines store "report" metadata, for recording
 algorithm-specific statistics of training (eg, an internal estimate of

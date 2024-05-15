@@ -66,11 +66,11 @@ type                                       | scitype
 
 Use `schema(X)` to get the column scitypes of a table `X`
 
-`coerce(y, Multiclass)` attempts coercion of all elements of `y` into scitype `Multiclass`
+- `coerce(y, Multiclass)` attempts coercion of all elements of `y` into scitype `Multiclass`
 
-`coerce(X, :x1 => Continuous, :x2 => OrderedFactor)` to coerce columns `:x1` and `:x2` of table `X`.
+- `coerce(X, :x1 => Continuous, :x2 => OrderedFactor)` to coerce columns `:x1` and `:x2` of table `X`.
 
-`coerce(X, Count => Continuous)` to coerce all columns with `Count` scitype to `Continuous`.
+- `coerce(X, Count => Continuous)` to coerce all columns with `Count` scitype to `Continuous`.
 
 
 ## Ingesting data
@@ -152,11 +152,11 @@ mach = machine(model, X)
 
 ## Prediction
 
-Supervised case: `predict(mach, Xnew)` or `predict(mach, rows=1:100)`
+- Supervised case: `predict(mach, Xnew)` or `predict(mach, rows=1:100)`
 
-Similarly, for probabilistic models: `predict_mode`, `predict_mean` and `predict_median`.
+  Similarly, for probabilistic models: `predict_mode`, `predict_mean` and `predict_median`.
 
-Unsupervised case: `transform(mach, rows=1:100)` or `inverse_transform(mach, rows)`, etc.
+- Unsupervised case: `transform(mach, rows=1:100)` or `inverse_transform(mach, rows)`, etc.
 
 
 ## Inspecting objects
@@ -302,13 +302,13 @@ Externals include: `PCA` (in MultivariateStats), `KMeans`, `KMedoids` (in Cluste
 
 `pipe = (X -> coerce(X, :height=>Continuous)) |> OneHotEncoder |> KNNRegressor(K=3)`
 
-Unsupervised:
+- Unsupervised:
 
-`pipe = Standardizer |> OneHotEncoder`
+  `pipe = Standardizer |> OneHotEncoder`
 
-Concatenation:
+- Concatenation:
 
-`pipe1 |> pipe2` or `model |> pipe` or `pipe |> model`, etc
+  `pipe1 |> pipe2` or `model |> pipe` or `pipe |> model`, etc.
 
 ## Advanced model composition techniques
 
