@@ -260,7 +260,7 @@ evaluate!(mach, resampling=Holdout(fraction_train=0.7),
 Changing a hyperparameter and re-evaluating:
 
 ```@repl doda
-tree.max_depth = 3
+tree.max_depth = 3;
 evaluate!(mach, resampling=Holdout(fraction_train=0.7),
           measures=[log_loss, accuracy],
           verbosity=0)

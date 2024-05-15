@@ -55,7 +55,7 @@ Horizontally splitting data and shuffling rows.
 Here `y` is the `:Exit` column and `X` a table with everything else:
 
 ```@example workflows
-y, X = unpack(channing, ==(:Exit), rng=123);
+y, X = unpack(channing, ==(:Exit), rng=123)
 nothing # hide
 ```
 
@@ -202,7 +202,7 @@ Do `measures()` to list all losses and scores and their aliases, or refer to the
 StatisticalMeasures.jl [docs](https://juliaai.github.io/StatisticalMeasures.jl/dev/).
 
 
-##  Basic fit/evaluate/predict by hand:
+##  Basic fit/evaluate/predict by hand
 
 *Reference:*   [Getting Started](index.md), [Machines](machines.md),
 [Evaluating Model Performance](evaluating_model_performance.md), [Performance Measures](performance_measures.md)
@@ -496,7 +496,7 @@ Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0
 tree_with_target = TransformedTargetModel(model=Tree(),
                                           transformer=y -> log.(y),
                                           inverse = z -> exp.(z))
-pipe2 = (X -> coerce(X, :age=>Continuous)) |> OneHotEncoder() |> tree_with_target;
+pipe2 = (X -> coerce(X, :age=>Continuous)) |> OneHotEncoder() |> tree_with_target
 nothing # hide
 ```
 

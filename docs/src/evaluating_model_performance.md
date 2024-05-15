@@ -96,7 +96,7 @@ evaluate!(
 )
 ```
 
-Or the user can define their own re-usable `ResamplingStrategy` objects, - see [Custom
+Or the user can define their own re-usable `ResamplingStrategy` objects; see [Custom
 resampling strategies](@ref) below.
 
 
@@ -170,4 +170,3 @@ function train_test_pairs(holdout::Holdout, rows)
     return [(train, test),]
 end
 ```
-

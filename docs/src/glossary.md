@@ -93,8 +93,8 @@ wrapped in an associated operation (e.g., `predict` or
 `inverse_transform`). It consists primarily of:
 
 1. An operation, static or dynamic.
-1. A machine, or `nothing` if the operation is static.
-1. Upstream connections to other nodes, specified by a list of
+2. A machine, or `nothing` if the operation is static.
+3. Upstream connections to other nodes, specified by a list of
    *arguments* (one for each argument of the operation). These are the
    arguments on which the operation "acts" when the node `N` is
    called, as in `N()`.

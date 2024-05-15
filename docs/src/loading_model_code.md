@@ -42,7 +42,7 @@ MLJDecisionTreeInterface.jl. If this package is not in `my_env` (do
 `Pkg.status()` to check) you add it by running
 
 ```julia-repl
-julia> Pkg.add("MLJDecisionTreeInterface");
+julia> Pkg.add("MLJDecisionTreeInterface")
 ```
 
 So long as `my_env` is the active environment, this action need never

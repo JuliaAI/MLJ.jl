@@ -40,7 +40,7 @@ models(matching(X, y))
 Or are unsure about the source of the following warning:
 
 ```julia-repl
-julia> Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0
+julia> Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0;
 julia> tree = Tree();
 
 julia> machine(tree, X, y)
@@ -57,7 +57,7 @@ Machine{DecisionTreeRegressor,…} @198 trained 0 times; caches data
 The meaning of the warning is:
 
 - The input `X` is a table with column scitypes `Continuous`, `Count`, and `Textual` and `Union{Missing, Textual}`, which can also see by inspecting the schema:
-	
+
 ```@example poot
 schema(X)
 ```
@@ -72,8 +72,7 @@ above, with links to further documentation given below:
 **Scientific type coercion:** We coerce machine types to obtain the
 intended scientific interpretation. If `height` in the above example
 is intended to be `Continuous`, `mark` is supposed to be
-`OrderedFactor`, and `admitted` a (binary) `Multiclass`, then we can
-do
+`OrderedFactor`, and `admitted` a (binary) `Multiclass`, then we can do
 
 ```@example poot
 X_coerced = coerce(X, :height=>Continuous, :mark=>OrderedFactor, :admitted=>Multiclass);
@@ -82,7 +81,7 @@ schema(X_coerced)
 
 **Data transformations:** We carry out conventional data
 transformations, such as missing value imputation and feature encoding:
-  
+
 ```@example poot
 imputer = FillImputer()
 mach = machine(imputer, X_coerced) |> fit!

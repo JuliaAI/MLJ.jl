@@ -201,7 +201,7 @@ using MLJ
 import Random.seed!
 seed!(123)
 
-X, y = @load_iris;
+X, y = @load_iris
 KMeans = @load KMeans pkg=ParallelKMeans
 kmeans = KMeans()
 mach = machine(kmeans, X) |> fit!
@@ -210,14 +210,14 @@ nothing # hide
 
 Transforming:
 ```@example predtrans
-Xsmall = transform(mach);
+Xsmall = transform(mach)
 selectrows(Xsmall, 1:4) |> pretty
 ```
 
 Predicting:
 ```@example predtrans
-yhat = predict(mach);
-compare = zip(yhat, y) |> collect;
+yhat = predict(mach)
+compare = zip(yhat, y) |> collect
 ```
 
 ```@example predtrans

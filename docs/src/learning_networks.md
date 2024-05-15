@@ -224,7 +224,7 @@ A more complicated learning network may contain machines that can be trained in
 parallel. In that case, a call like the following may speed up training:
 
 ```@example 42
-tree.max_depth=2
+tree.max_depth = 2
 fit!(yhat, acceleration=CPUThreads())
 nothing # hide
 ```

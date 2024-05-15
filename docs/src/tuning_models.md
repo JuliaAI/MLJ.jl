@@ -121,7 +121,7 @@ Predicting on new input observations using the optimal model, *trained
 on all the data* bound to `mach`:
 
 ```@example goof
-Xnew  = MLJ.table(rand(3, 10));
+Xnew = MLJ.table(rand(3, 10));
 predict(mach, Xnew)
 ```
 
@@ -178,7 +178,7 @@ self_tuning_knn = TunedModel(
     resampling = CV(nfolds=4, rng=1234),
     tuning = Grid(resolution=5),
     range = K_range,
-    measure=BrierLoss()
+    measure = BrierLoss()
 );
 
 mach = machine(self_tuning_knn, X, y);
@@ -193,7 +193,7 @@ self_tuning_knn = TunedModel(
     resampling = CV(nfolds=4, rng=1234),
     tuning = Grid(resolution=5),
     range = K_range,
-    measure=MisclassificationRate()
+    measure = MisclassificationRate()
 )
 
 mach = machine(self_tuning_knn, X, y);

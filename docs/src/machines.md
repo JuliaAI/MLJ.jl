@@ -33,7 +33,7 @@ Generally, changing a hyperparameter triggers retraining on calls to
 subsequent `fit!`:
 
 ```@repl machines
-forest.bagging_fraction = 0.5
+forest.bagging_fraction = 0.5;
 fit!(mach, verbosity=2);
 ```
 
@@ -41,7 +41,7 @@ However, for this iterative model, increasing the iteration parameter
 only adds models to the existing ensemble:
 
 ```@repl machines
-forest.n = 15
+forest.n = 15;
 fit!(mach, verbosity=2);
 ```
 
@@ -138,8 +138,8 @@ such as a vector of per-observation weights (in which case
 --------------------|-----------------------------|--------------------------------------
 `Deterministic <: Supervised`    | `machine(model, X, y, extras...)` | `predict(mach, Xnew)`, `transform(mach, Xnew)`, `inverse_transform(mach, Xout)`
 `Probabilistic <: Supervised`    | `machine(model, X, y, extras...)` | `predict(mach, Xnew)`, `predict_mean(mach, Xnew)`, `predict_median(mach, Xnew)`, `predict_mode(mach, Xnew)`, `transform(mach, Xnew)`, `inverse_transform(mach, Xout)`
-`Unsupervised` (except `Static`) | `machine(model, X)` | `transform(mach, Xnew)`, `inverse_transform(mach, Xout)`, `predict(mach, Xnew)`
-`Static`                        | `machine(model)`    | `transform(mach, Xnews...)`, `inverse_transform(mach, Xout)`
+`Unsupervised` (except `Static`) | `machine(model, X)`               | `transform(mach, Xnew)`, `inverse_transform(mach, Xout)`, `predict(mach, Xnew)`
+`Static`                         | `machine(model)`                  | `transform(mach, Xnews...)`, `inverse_transform(mach, Xout)`
 
 All operations on machines (`predict`, `transform`, etc) have exactly
 one argument (`Xnew` or `Xout` above) after `mach`, the machine

@@ -1,6 +1,6 @@
 # About MLJ
 
-MLJ (Machine Learning in Julia) is a toolbox written in Julia 
+MLJ (Machine Learning in Julia) is a toolbox written in Julia
 providing a common interface and meta-algorithms for selecting,
 tuning, evaluating, composing and comparing [over 180 machine learning
 models](@ref model_list) written in Julia and other languages. In
@@ -22,8 +22,7 @@ The first code snippet below creates a new Julia environment
 [Installation](@ref) for more on creating a Julia environment for use
 with MLJ.
 
-Julia installation instructions are
-[here](https://julialang.org/downloads/).
+Julia installation instructions are [here](https://julialang.org/downloads/).
 
 ```julia
 using Pkg
@@ -44,7 +43,7 @@ Loading and instantiating a gradient tree-boosting model:
 using MLJ
 Booster = @load EvoTreeRegressor # loads code defining a model type
 booster = Booster(max_depth=2)   # specify hyper-parameter at construction
-booster.nrounds=50               # or mutate afterwards
+booster.nrounds = 50             # or mutate afterwards
 ```
 
 This model is an example of an iterative model. As it stands, the
@@ -92,7 +91,7 @@ it "self-tuning":
 ```julia
 self_tuning_pipe = TunedModel(model=pipe,
                               tuning=RandomSearch(),
-                              ranges = max_depth_range,
+                              ranges=max_depth_range,
                               resampling=CV(nfolds=3, rng=456),
                               measure=l1,
                               acceleration=CPUThreads(),
@@ -105,7 +104,7 @@ Loading a selection of features and labels from the Ames
 House Price dataset:
 
 ```julia
-X, y = @load_reduced_ames;
+X, y = @load_reduced_ames
 ```
 Evaluating the "self-tuning" pipeline model's performance using 5-fold
 cross-validation (implies multiple layers of nested resampling):
@@ -155,8 +154,7 @@ Extract:
 
 * Consistent interface to handle probabilistic predictions.
 
-* Extensible [tuning
-  interface](https://github.com/JuliaAI/MLJTuning.jl),
+* Extensible [tuning interface](https://github.com/JuliaAI/MLJTuning.jl),
   to support a growing number of optimization strategies, and designed
   to play well with model composition.
 
