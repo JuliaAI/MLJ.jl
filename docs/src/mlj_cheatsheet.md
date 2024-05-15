@@ -92,11 +92,12 @@ Same as above but exclude `:Time` column from `X`:
 ```julia
 using RDatasets
 channing = dataset("boot", "channing")
-y, X =  unpack(channing,
-               ==(:Exit),     # y is the :Exit column
-               !=(:Time);     # X is the rest, except :Time
-               rng=123)
+y, X = unpack(channing,
+              ==(:Exit),
+              !=(:Time);
+              rng=123)
 ```
+Here, `y` is assigned the `:Exit` column, and `X` is assigned the rest, except `:Time`.
 
 Splitting row indices into train/validation/test, with seeded shuffling:
 
