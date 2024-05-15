@@ -219,15 +219,15 @@ or a list of pairs of row indices:
 
 `[(train1, eval1), (train2, eval2), ... (traink, evalk)]`
 
-## Tuning
 
-### Tuning model wrapper
+
+## Tuning model wrapper
 
 ```julia
 tuned_model = TunedModel(model=…, tuning=RandomSearch(), resampling=Holdout(), measure=…, operation=predict, range=…)
 ```
 
-### Ranges for tuning (`range=...`)
+## Ranges for tuning (`range=...`)
 
 If `r = range(KNNRegressor(), :K, lower=1, upper = 20, scale=:log)`
 
@@ -242,7 +242,7 @@ Nested ranges: Use dot syntax, as in `r = range(EnsembleModel(atom=tree), :(atom
 Can specify multiple ranges, as in `range=[r1, r2, r3]`. For more range options do `?Grid` or `?RandomSearch`
 
 
-### Tuning strategies
+## Tuning strategies
 
 `RandomSearch(rng=1234)` for basic random search
 
@@ -251,7 +251,7 @@ Can specify multiple ranges, as in `range=[r1, r2, r3]`. For more range options 
 Also available: `LatinHyperCube`, `Explicit` (built-in), `MLJTreeParzenTuning`, `ParticleSwarm`, `AdaptiveParticleSwarm` (3rd-party packages)
 
 
-#### Learning curves
+### Learning curves
 
 For generating a plot of performance against parameter specified by `range`:
 
