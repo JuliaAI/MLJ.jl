@@ -238,7 +238,8 @@ for (model_set, level) in [
 end
 
 okay = isempty(problems)
-okay || println("Integration tests failed for these models: \n $problems")
+okay || print("Integration tests failed for these models: \n $problems")
+println()
 
 @test okay
 
