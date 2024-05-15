@@ -58,9 +58,9 @@ The meaning of the warning is:
 
 - The input `X` is a table with column scitypes `Continuous`, `Count`, and `Textual` and `Union{Missing, Textual}`, which can also see by inspecting the schema:
 
-```@example poot
-schema(X)
-```
+  ```@example poot
+  schema(X)
+  ```
 
 - The model requires a table whose column element scitypes subtype `Continuous`, an incompatibility.
 
