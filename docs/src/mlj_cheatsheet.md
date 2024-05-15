@@ -38,7 +38,10 @@ models() do model
 end
 ```
 
-`Tree = @load DecisionTreeClassifier pkg=DecisionTree` imports "DecisionTreeClassifier" type and binds it to `Tree`.
+```julia
+Tree = @load DecisionTreeClassifier pkg=DecisionTree
+```
+imports "DecisionTreeClassifier" type and binds it to `Tree`.
 
 `tree = Tree()` to instantiate a `Tree`.
 
@@ -90,8 +93,8 @@ Same as above but exclude `:Time` column from `X`:
 using RDatasets
 channing = dataset("boot", "channing")
 y, X =  unpack(channing,
-               ==(:Exit),            # y is the :Exit column
-               !=(:Time);            # X is the rest, except :Time
+               ==(:Exit),     # y is the :Exit column
+               !=(:Time);     # X is the rest, except :Time
                rng=123)
 ```
 
@@ -117,8 +120,8 @@ Getting data from [OpenML](https://www.openml.org):
 ```julia
 table = OpenML.load(91)
 ```
-Creating synthetic classification data:
 
+Creating synthetic classification data:
 ```julia
 X, y = make_blobs(100, 2)
 ```
@@ -147,8 +150,10 @@ mach = machine(model, X)
 
 ## Fitting
 
-`fit!(mach, rows=1:100, verbosity=1, force=false)` (defaults shown)
-
+The `fit!` function can be used to fit a machine (defaults shown):
+```julia
+fit!(mach, rows=1:100, verbosity=1, force=false)
+```
 
 ## Prediction
 
@@ -188,11 +193,17 @@ pkg="MultivariateStats")` gets all properties (aka traits) of registered models
 
 ## Performance estimation
 
-`evaluate(model, X, y, resampling=CV(), measure=rms, operation=predict, weights=..., verbosity=1)`
+```julia
+evaluate(model, X, y, resampling=CV(), measure=rms, operation=predict, weights=..., verbosity=1)
+```
 
-`evaluate!(mach, resampling=Holdout(), measure=[rms, mav], operation=predict, weights=..., verbosity=1)`
+```julia
+evaluate!(mach, resampling=Holdout(), measure=[rms, mav], operation=predict, weights=..., verbosity=1)
+```
 
-`evaluate!(mach, resampling=[(fold1, fold2), (fold2, fold1)], measure=rms)`
+```julia
+evaluate!(mach, resampling=[(fold1, fold2), (fold2, fold1)], measure=rms)
+```
 
 ## Resampling strategies (`resampling=...`)
 
@@ -212,7 +223,9 @@ or a list of pairs of row indices:
 
 ### Tuning model wrapper
 
-`tuned_model = TunedModel(model=…, tuning=RandomSearch(), resampling=Holdout(), measure=…, operation=predict, range=…)`
+```julia
+tuned_model = TunedModel(model=…, tuning=RandomSearch(), resampling=Holdout(), measure=…, operation=predict, range=…)
+```
 
 ### Ranges for tuning (`range=...`)
 
@@ -242,20 +255,28 @@ Also available: `LatinHyperCube`, `Explicit` (built-in), `MLJTreeParzenTuning`, 
 
 For generating a plot of performance against parameter specified by `range`:
 
-`curve = learning_curve(mach, resolution=30, resampling=Holdout(), measure=…, operation=predict, range=…, n=1)`
+```julia
+curve = learning_curve(mach, resolution=30, resampling=Holdout(), measure=…, operation=predict, range=…, n=1)
+```
 
-`curve = learning_curve(model, X, y, resolution=30, resampling=Holdout(), measure=…, operation=predict, range=…, n=1)`
+```julia
+curve = learning_curve(model, X, y, resolution=30, resampling=Holdout(), measure=…, operation=predict, range=…, n=1)
+```
 
 If using Plots.jl:
 
-`plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)`
+```julia
+plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)
+```
 
 
 ## Controlling iterative models
 
 Requires: `using MLJIteration`
 
-`iterated_model = IteratedModel(model=…, resampling=Holdout(), measure=…, controls=…, retrain=false)`
+```julia
+iterated_model = IteratedModel(model=…, resampling=Holdout(), measure=…, controls=…, retrain=false)
+```
 
 
 ### Controls
@@ -291,16 +312,22 @@ Externals include: `PCA` (in MultivariateStats), `KMeans`, `KMedoids` (in Cluste
 
 ## Ensemble model wrapper
 
-`EnsembleModel(atom=…, weights=Float64[], bagging_fraction=0.8, rng=GLOBAL_RNG, n=100, parallel=true, out_of_bag_measure=[])`
+```julia
+EnsembleModel(atom=…, weights=Float64[], bagging_fraction=0.8, rng=GLOBAL_RNG, n=100, parallel=true, out_of_bag_measure=[])
+```
 
 
 ## Target transformation wrapper
 
-`TransformedTargetModel(model=ConstantClassifier(), target=Standardizer())`
+```julia
+TransformedTargetModel(model=ConstantClassifier(), target=Standardizer())
+```
 
 ## Pipelines
 
-`pipe = (X -> coerce(X, :height=>Continuous)) |> OneHotEncoder |> KNNRegressor(K=3)`
+```julia
+pipe = (X -> coerce(X, :height=>Continuous)) |> OneHotEncoder |> KNNRegressor(K=3)
+```
 
 - Unsupervised:
 
@@ -312,4 +339,4 @@ Externals include: `PCA` (in MultivariateStats), `KMeans`, `KMedoids` (in Cluste
 
 ## Advanced model composition techniques
 
-See the [Composing Models](@ref) section of the MLJ manual. 
+See the [Composing Models](@ref) section of the MLJ manual.
