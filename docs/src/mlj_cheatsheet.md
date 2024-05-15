@@ -173,8 +173,6 @@ fit!(mach, rows=1:100, verbosity=1, force=false)
 `info(ConstantRegressor())`, `info("PCA")`, `info("RidgeRegressor",
 pkg="MultivariateStats")` gets all properties (aka traits) of registered models
 
-`info(rms)` gets all properties of a performance measure
-
 `schema(X)` get column names, types and scitypes, and nrows, of a table `X`
 
 `scitype(X)` gets the scientific type of `X`
