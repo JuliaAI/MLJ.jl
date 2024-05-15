@@ -373,8 +373,8 @@ z = transform(mach, y);
 
 *Reference:*   [Tuning Models](tuning_models.md)
 
-```@example workflows
-X, y = @load_iris; nothing # hide
+```@setup workflows
+X, y = @load_iris
 ```
 
 Define a model with nested hyperparameters:
