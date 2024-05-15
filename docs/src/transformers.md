@@ -202,7 +202,7 @@ import Random.seed!
 seed!(123)
 
 X, y = @load_iris
-KMeans = @load KMeans pkg=ParallelKMeans
+KMeans = @load KMeans pkg=Clustering
 kmeans = KMeans()
 mach = machine(kmeans, X) |> fit!
 nothing # hide
