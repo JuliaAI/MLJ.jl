@@ -69,6 +69,8 @@ type                                       | scitype
 
 Use `schema(X)` to get the column scitypes of a table `X`
 
+To coerce the data into different scitypes, use the `coerce` function:
+
 - `coerce(y, Multiclass)` attempts coercion of all elements of `y` into scitype `Multiclass`
 
 - `coerce(X, :x1 => Continuous, :x2 => OrderedFactor)` to coerce columns `:x1` and `:x2` of table `X`.
