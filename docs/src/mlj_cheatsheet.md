@@ -299,7 +299,7 @@ Wraps: `MLJIteration.skip(control, predicate=1)`, `IterationControl.with_state_d
 
 Do `measures()` to get full list.
 
-`info(rms)` to list properties (aka traits) of the `rms` measure
+`?rms` in the REPL can provide information about the `rms` measure, and can be used with any measure or their aliases.
 
 
 ## Transformers
