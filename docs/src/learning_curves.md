@@ -48,7 +48,7 @@ used using `rngs=...` (an integer automatically generates the number
 specified):
 
 ```@example hooking
-atom.lambda= 7.3
+atom.lambda = 7.3
 r_n = range(ensemble, :n, lower=1, upper=50)
 curves = MLJ.learning_curve(mach;
                             range=r_n,

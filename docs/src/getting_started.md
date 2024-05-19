@@ -5,14 +5,14 @@ For an outline of MLJ's **goals** and **features**, see
 
 This page introduces some MLJ basics, assuming some familiarity with
 machine learning. For a complete list of other MLJ learning resources,
-see [Learning MLJ](@ref). 
+see [Learning MLJ](@ref).
 
 MLJ collects together the functionality provided by mutliple packages. To learn how to
 install components separately, run `using MLJ; @doc MLJ`.
 
 This section introduces only the most basic MLJ operations and
 concepts. It assumes MLJ has been successfully installed. See
-[Installation](@ref) if this is not the case. 
+[Installation](@ref) if this is not the case.
 
 
 ```@setup doda
@@ -31,7 +31,7 @@ column vectors:
 ```@repl doda
 using MLJ
 iris = load_iris();
-selectrows(iris, 1:3)  |> pretty
+selectrows(iris, 1:3) |> pretty
 schema(iris)
 ```
 
@@ -114,8 +114,8 @@ computing the mode of each prediction):
 ```@repl doda
 evaluate(tree, X, y,
          resampling=CV(shuffle=true),
-                 measures=[log_loss, accuracy],
-                 verbosity=0)
+         measures=[log_loss, accuracy],
+         verbosity=0)
 ```
 
 Under the hood, `evaluate` calls lower level functions `predict` or
@@ -260,7 +260,7 @@ evaluate!(mach, resampling=Holdout(fraction_train=0.7),
 Changing a hyperparameter and re-evaluating:
 
 ```@repl doda
-tree.max_depth = 3
+tree.max_depth = 3;
 evaluate!(mach, resampling=Holdout(fraction_train=0.7),
           measures=[log_loss, accuracy],
           verbosity=0)

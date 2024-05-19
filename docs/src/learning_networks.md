@@ -125,7 +125,7 @@ broadcasted versions of `log`, `exp`, `mean`, `mode` and `median`. A function li
 is not overloaded, so that `Q = sqrt(Z)` will throw an error. Instead, we do
 
 ```@example 42
-Q = node(z->sqrt(z), Z)
+Q = node(sqrt, Z)
 Z()
 ```
 
@@ -224,7 +224,7 @@ A more complicated learning network may contain machines that can be trained in
 parallel. In that case, a call like the following may speed up training:
 
 ```@example 42
-tree.max_depth=2
+tree.max_depth = 2
 fit!(yhat, acceleration=CPUThreads())
 nothing # hide
 ```
@@ -320,18 +320,18 @@ has the same signature as `MLJModelInterface.fit`):
 import MLJBase
 function MLJBase.prefit(composite::CompositeA, verbosity, X, y)
 
-        # the learning network from above:
-        Xs = source(X)
-        ys = source(y)
-        mach1 = machine(:preprocessor, Xs)
-        x = transform(mach1, Xs)
-        mach2 = machine(:classifier, x, ys)
-        yhat = predict(mach2, x)
+    # the learning network from above:
+    Xs = source(X)
+    ys = source(y)
+    mach1 = machine(:preprocessor, Xs)
+    x = transform(mach1, Xs)
+    mach2 = machine(:classifier, x, ys)
+    yhat = predict(mach2, x)
 
-        verbosity > 0 && @info "I'm a noisy fellow!"
+    verbosity > 0 && @info "I'm a noisy fellow!"
 
-        # return "learning network interface":
-        return (; predict=yhat)
+    # return "learning network interface":
+    return (; predict=yhat)
 end
 ```
 
@@ -594,10 +594,10 @@ using MLJ
 import MLJBase
 
 mutable struct CompositeE <: DeterministicNetworkComposite
-        clusterer     # `:kmeans` or `:kmedoids`
-        k::Int        # number of clusters
-        solver        # a ridge regression parameter we want to expose
-        c::Float64    # a "coupling" coefficient
+    clusterer     # `:kmeans` or `:kmedoids`
+    k::Int        # number of clusters
+    solver        # a ridge regression parameter we want to expose
+    c::Float64    # a "coupling" coefficient
 end
 ```
 
@@ -610,26 +610,26 @@ KMedoids = @load KMedoids pkg=Clustering verbosity=0
 
 function MLJBase.prefit(composite::CompositeE, verbosity, X, y)
 
-        Xs = source(X)
-        ys = source(y)
+    Xs = source(X)
+    ys = source(y)
 
-        k = composite.k
-        solver = composite.solver
-        c = composite.c
+    k = composite.k
+    solver = composite.solver
+    c = composite.c
 
-        clusterer = composite.clusterer == :kmeans ? KMeans(; k) : KMedoids(; k)
-        mach1 = machine(clusterer, Xs)
-        Xsmall = transform(mach1, Xs)
+    clusterer = composite.clusterer == :kmeans ? KMeans(; k) : KMedoids(; k)
+    mach1 = machine(clusterer, Xs)
+    Xsmall = transform(mach1, Xs)
 
-        # the coupling - ridge regularization depends on the number of
-        # clusters `k` and the coupling coefficient `c`:
-        lambda = exp(-c/k)
+    # the coupling - ridge regularization depends on the number of
+    # clusters `k` and the coupling coefficient `c`:
+    lambda = exp(-c/k)
 
-        ridge = RidgeRegressor(; lambda, solver)
-        mach2 = machine(ridge, Xsmall, ys)
-        yhat = predict(mach2, Xsmall)
+    ridge = RidgeRegressor(; lambda, solver)
+    mach2 = machine(ridge, Xsmall, ys)
+    yhat = predict(mach2, Xsmall)
 
-        return (predict=yhat,)
+    return (predict=yhat,)
 end
 ```
 
@@ -736,7 +736,7 @@ There is also an experimental macro [`@node`](@ref). If `Z` is an `AbstractNode`
 source(16)`, say) then instead of
 
 ```julia
-Q = node(z->sqrt(z), Z)
+Q = node(sqrt, Z)
 ```
 
 one can do
@@ -748,20 +748,17 @@ Q = @node sqrt(Z)
 (so that `Q() == 4`). Here's a more complicated application of `@node` to row-shuffle a
 table:
 
-```julia
-using Random
+```@example
+using MLJ, Random
 X = (x1 = [1, 2, 3, 4, 5],
-         x2 = [:one, :two, :three, :four, :five])
+     x2 = [:one, :two, :three, :four, :five])
 rows(X) = 1:nrows(X)
 
 Xs = source(X)
-rs  = @node rows(Xs)
+rs = @node rows(Xs)
 W = @node selectrows(Xs, @node shuffle(rs))
 
-julia> W()
-(x1 = [5, 1, 3, 2, 4],
- x2 = Symbol[:five, :one, :three, :two, :four],)
-
+W()
 ```
 
 **Important.** An argument not in global scope is assumed by `@node` to be a node or

@@ -5,7 +5,7 @@ properties, without loading all the packages containing model code. In
 turn, this allows one to efficiently find all models solving a given
 machine learning task. The task itself is specified with the help of
 the `matching` method, and the search executed with the `models`
-methods, as detailed below. 
+methods, as detailed below.
 
 For commonly encountered problems with model search, see also
 [Preparing Data](@ref).
@@ -33,27 +33,29 @@ info("PCA")
 So a "model" in the present context is just a named tuple containing
 metadata, and not an actual model type or instance. If two models with
 the same name occur in different packages, the package name must be
-specified, as in `info("LinearRegressor", pkg="GLM")`. 
+specified, as in `info("LinearRegressor", pkg="GLM")`.
 
 Model document strings can be retreived, without importing the
 defining code, using the `doc` function:
 
-```
+```julia
 doc("DecisionTreeClassifier", pkg="DecisionTree")
 ```
 
 ## General model queries
 
-We list all models (named tuples) using `models()`, and list the models for which code is  already loaded with `localmodels()`:
+We list all models (named tuples) using `models()`, and list the models for
+which code is  already loaded with `localmodels()`:
 
 ```@repl tokai
 localmodels()
 localmodels()[2]
 ```
 
-One can search for models containing specified strings or regular expressions in their `docstring` attributes, as in
+One can search for models containing specified strings or regular expressions in
+their `docstring` attributes, as in
 
-```@repl tokai 
+```@repl tokai
 models("forest")
 ```
 

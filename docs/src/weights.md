@@ -2,7 +2,7 @@
 
 In machine learning it is possible to assign each observation an
 independent significance, or *weight*, either in **training** or in
-**performance evaluation**, or both. 
+**performance evaluation**, or both.
 
 There are two kinds of weights in use in MLJ:
 
@@ -11,7 +11,7 @@ There are two kinds of weights in use in MLJ:
 
 - *class weights* refer to dictionaries keyed on the target classes
   (levels) for use in classification problems
-  
+
 
 ## Specifying weights in training
 

@@ -38,7 +38,8 @@ For an unsupervised model, implement `transform` and, optionally,
 
 Here's a quick-and-dirty implementation of a ridge regressor with no intercept:
 
-```julia
+```@example regressor_example
+using MLJ; color_off() # hide
 import MLJBase
 using LinearAlgebra
 
@@ -51,42 +52,24 @@ MyRegressor(; lambda=0.1) = MyRegressor(lambda)
 function MLJBase.fit(model::MyRegressor, verbosity, X, y)
     x = MLJBase.matrix(X)                     # convert table to matrix
     fitresult = (x'x + model.lambda*I)\(x'y)  # the coefficients
-    cache=nothing
-    report=nothing
+    cache = nothing
+    report = nothing
     return fitresult, cache, report
 end
 
 # predict uses coefficients to make a new prediction:
 MLJBase.predict(::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew) * fitresult
-```
-
-``` @setup regressor_example
-using MLJ
-import MLJBase
-using LinearAlgebra
-MLJBase.color_off()
-mutable struct MyRegressor <: MLJBase.Deterministic
-    lambda::Float64
-end
-MyRegressor(; lambda=0.1) = MyRegressor(lambda)
-function MLJBase.fit(model::MyRegressor, verbosity, X, y)
-    x = MLJBase.matrix(X)
-    fitresult = (x'x + model.lambda*I)\(x'y)
-    cache=nothing
-    report=nothing
-    return fitresult, cache, report
-end
-MLJBase.predict(::MyRegressor, fitresult, Xnew) = MLJBase.matrix(Xnew) * fitresult
+nothing # hide
 ```
 
 After loading this code, all MLJ's basic meta-algorithms can be applied to `MyRegressor`:
 
 ```@repl regressor_example
+using MLJ # hide
 X, y = @load_boston;
 model = MyRegressor(lambda=1.0)
 regressor = machine(model, X, y)
 evaluate!(regressor, resampling=CV(), measure=rms, verbosity=0)
-
 ```
 
 ## A simple probabilistic classifier
@@ -95,7 +78,8 @@ The following probabilistic model simply fits a probability
 distribution to the `MultiClass` training target (i.e., ignores `X`)
 and returns this pdf for any new pattern:
 
-```julia
+```@example classifier_example
+using MLJ # hide
 import MLJBase
 import Distributions
 
@@ -116,11 +100,8 @@ MLJBase.predict(model::MyClassifier, fitresult, Xnew) =
     [fitresult for r in 1:nrows(Xnew)]
 ```
 
-```julia
-julia> X, y = @load_iris
-julia> mach = fit!(machine(MyClassifier(), X, y))
-julia> predict(mach, selectrows(X, 1:2))
-2-element Array{UnivariateFinite{String,UInt32,Float64},1}:
- UnivariateFinite(setosa=>0.333, versicolor=>0.333, virginica=>0.333)
- UnivariateFinite(setosa=>0.333, versicolor=>0.333, virginica=>0.333)
+```@repl classifier_example
+X, y = @load_iris;
+mach = machine(MyClassifier(), X, y) |> fit!;
+predict(mach, selectrows(X, 1:2))
 ```
