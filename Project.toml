@@ -84,8 +84,9 @@ PartitionedLS = "19f41c5e-8610-11e9-2f2a-0d67e7c5027f"
 SIRUS = "cdeec39e-fb35-4959-aadb-a1dd5dede958"
 SelfOrganizingMaps = "ba4b7379-301a-4be0-bee6-171e4e152787"
 StableRNGs = "860ef19b-820b-49d6-a774-d7a799459cd3"
+Suppressor = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
 SymbolicRegression = "8254be44-1295-4e6a-a16d-46603ac705cb"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["BetaML", "CatBoost", "EvoLinear", "EvoTrees", "Imbalance", "InteractiveUtils", "LightGBM", "MLJClusteringInterface", "MLJDecisionTreeInterface", "MLJFlux", "MLJGLMInterface", "MLJLIBSVMInterface", "MLJLinearModels", "MLJMultivariateStatsInterface", "MLJNaiveBayesInterface", "MLJScikitLearnInterface", "MLJTSVDInterface", "MLJTestInterface", "MLJTestIntegration", "MLJText", "MLJXGBoostInterface", "Markdown", "NearestNeighborModels", "OneRule", "OutlierDetectionNeighbors", "OutlierDetectionPython", "ParallelKMeans", "PartialLeastSquaresRegressor", "PartitionedLS", "SelfOrganizingMaps", "SIRUS", "SymbolicRegression", "StableRNGs", "Test"]
+test = ["BetaML", "CatBoost", "EvoLinear", "EvoTrees", "Imbalance", "InteractiveUtils", "LightGBM", "MLJClusteringInterface", "MLJDecisionTreeInterface", "MLJFlux", "MLJGLMInterface", "MLJLIBSVMInterface", "MLJLinearModels", "MLJMultivariateStatsInterface", "MLJNaiveBayesInterface", "MLJScikitLearnInterface", "MLJTSVDInterface", "MLJTestInterface", "MLJTestIntegration", "MLJText", "MLJXGBoostInterface", "Markdown", "NearestNeighborModels", "OneRule", "OutlierDetectionNeighbors", "OutlierDetectionPython", "ParallelKMeans", "PartialLeastSquaresRegressor", "PartitionedLS", "SelfOrganizingMaps", "SIRUS", "SymbolicRegression", "StableRNGs", "Suppressor","Test"]
