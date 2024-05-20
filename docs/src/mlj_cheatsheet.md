@@ -299,8 +299,7 @@ Wraps: `MLJIteration.skip(control, predicate=1)`, `IterationControl.with_state_d
 
 Do `measures()` to get full list.
 
-`?rms` in the REPL can provide information about the `rms` measure, and can be used with any measure or their aliases.
-
+Do `measures("log")` to list measures with "log" in doc-string.
 
 ## Transformers
 
