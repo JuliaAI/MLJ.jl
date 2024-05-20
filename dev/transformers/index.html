@@ -355,72 +355,83 @@ composite = DoubleRegressor(ridge, knn, Averager(0.5))</code></pre><pre class="d
   averager = Averager(
         mix = 0.5))</code></pre><pre><code class="language-julia hljs">composite.averager.mix = 0.25 # adjust mix from default of 0.5
 evaluate(composite, X, y, measure=l1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">PerformanceEvaluation object with these fields:
-  model, measure, operation, measurement, per_fold,
-  per_observation, fitted_params_per_fold,
-  report_per_fold, train_test_rows, resampling, repeats
+  model, measure, operation,
+  measurement, per_fold, per_observation,
+  fitted_params_per_fold, report_per_fold,
+  train_test_rows, resampling, repeats
 Extract:
-┌──────────┬───────────┬─────────────┬─────────┬────────────────────────────────
-│ measure  │ operation │ measurement │ 1.96*SE │ per_fold                      ⋯
-├──────────┼───────────┼─────────────┼─────────┼────────────────────────────────
-│ LPLoss(  │ predict   │ 17200.0     │ 1350.0  │ [15200.0, 15800.0, 18500.0, 1 ⋯
-│   p = 1) │           │             │         │                               ⋯
-└──────────┴───────────┴─────────────┴─────────┴────────────────────────────────
-<span class="sgr36">                                                                1 column omitted</span>
+┌──────────┬───────────┬─────────────┐
+│ measure  │ operation │ measurement │
+├──────────┼───────────┼─────────────┤
+│ LPLoss(  │ predict   │ 17200.0     │
+│   p = 1) │           │             │
+└──────────┴───────────┴─────────────┘
+┌────────────────────────────────────────────────────────┬─────────┐
+│ per_fold                                               │ 1.96*SE │
+├────────────────────────────────────────────────────────┼─────────┤
+│ [15200.0, 15800.0, 18500.0, 16400.0, 18600.0, 18500.0] │ 1350.0  │
+└────────────────────────────────────────────────────────┴─────────┘
 </code></pre><p>A static transformer can also expose byproducts of the transform computation in the report of any associated machine. See <a href="@ref">Static models (models that do not generalize)</a> for details.</p><h2 id="Transformers-that-also-predict"><a class="docs-heading-anchor" href="#Transformers-that-also-predict">Transformers that also predict</a><a id="Transformers-that-also-predict-1"></a><a class="docs-heading-anchor-permalink" href="#Transformers-that-also-predict" title="Permalink"></a></h2><p>Some clustering algorithms learn to label data by identifying a collection of &quot;centroids&quot; in the training data. Any new input observation is labeled with the cluster to which it is closest (this is the output of <code>predict</code>) while the vector of all distances from the centroids defines a lower-dimensional representation of the observation (the output of <code>transform</code>). In the following example a K-means clustering algorithm assigns one of three labels 1, 2, 3 to the input features of the iris data set and compares them with the actual species recorded in the target (not seen by the algorithm).</p><pre><code class="language-julia hljs">import Random.seed!
 seed!(123)
 
-X, y = @load_iris;
-KMeans = @load KMeans pkg=ParallelKMeans
+X, y = @load_iris
+KMeans = @load KMeans pkg=Clustering
 kmeans = KMeans()
-mach = machine(kmeans, X) |&gt; fit!
-
-# transforming:
-Xsmall = transform(mach);
-selectrows(Xsmall, 1:4) |&gt; pretty
-julia&gt; selectrows(Xsmall, 1:4) |&gt; pretty
-┌─────────────────────┬────────────────────┬────────────────────┐
-│ x1                  │ x2                 │ x3                 │
-│ Float64             │ Float64            │ Float64            │
-│ Continuous          │ Continuous         │ Continuous         │
-├─────────────────────┼────────────────────┼────────────────────┤
-│ 0.0215920000000267  │ 25.314260355029603 │ 11.645232464391299 │
-│ 0.19199200000001326 │ 25.882721893491123 │ 11.489658693899486 │
-│ 0.1699920000000077  │ 27.58656804733728  │ 12.674412792260142 │
-│ 0.26919199999998966 │ 26.28656804733727  │ 11.64392098898145  │
-└─────────────────────┴────────────────────┴────────────────────┘
-
-# predicting:
-yhat = predict(mach);
-compare = zip(yhat, y) |&gt; collect;
-compare[1:8]
-8-element Array{Tuple{CategoricalValue{Int64,UInt32},CategoricalString{UInt32}},1}:
- (1, &quot;setosa&quot;)
- (1, &quot;setosa&quot;)
- (1, &quot;setosa&quot;)
- (1, &quot;setosa&quot;)
- (1, &quot;setosa&quot;)
- (1, &quot;setosa&quot;)
- (1, &quot;setosa&quot;)
- (1, &quot;setosa&quot;)
-
-compare[51:58]
-8-element Array{Tuple{CategoricalValue{Int64,UInt32},CategoricalString{UInt32}},1}:
- (2, &quot;versicolor&quot;)
- (3, &quot;versicolor&quot;)
- (2, &quot;versicolor&quot;)
- (3, &quot;versicolor&quot;)
- (3, &quot;versicolor&quot;)
- (3, &quot;versicolor&quot;)
- (3, &quot;versicolor&quot;)
- (3, &quot;versicolor&quot;)
-
-compare[101:108]
-8-element Array{Tuple{CategoricalValue{Int64,UInt32},CategoricalString{UInt32}},1}:
- (2, &quot;virginica&quot;)
+mach = machine(kmeans, X) |&gt; fit!</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">[ Info: For silent loading, specify `verbosity=0`.
+import MLJClusteringInterface ✔
+[ Info: Training machine(KMeans(k = 3, …), …).</code></pre><p>Transforming:</p><pre><code class="language-julia hljs">Xsmall = transform(mach)
+selectrows(Xsmall, 1:4) |&gt; pretty</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌────────────┬────────────┬────────────┐
+│ x1         │ x2         │ x3         │
+│ Float64    │ Float64    │ Float64    │
+│ Continuous │ Continuous │ Continuous │
+├────────────┼────────────┼────────────┤
+│ 11.6913    │ 0.021592   │ 25.599     │
+│ 11.5503    │ 0.191992   │ 26.1626    │
+│ 12.7403    │ 0.169992   │ 27.8716    │
+│ 11.7129    │ 0.269192   │ 26.5595    │
+└────────────┴────────────┴────────────┘</code></pre><p>Predicting:</p><pre><code class="language-julia hljs">yhat = predict(mach)
+compare = zip(yhat, y) |&gt; collect</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">150-element Vector{Tuple{CategoricalValue{Int64, UInt32}, CategoricalValue{String, UInt32}}}:
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ ⋮
  (3, &quot;virginica&quot;)
- (2, &quot;virginica&quot;)
- (2, &quot;virginica&quot;)
- (2, &quot;virginica&quot;)
- (2, &quot;virginica&quot;)
+ (1, &quot;virginica&quot;)
  (3, &quot;virginica&quot;)
- (2, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../preparing_data/">« Preparing Data</a><a class="docs-footer-nextpage" href="../more_on_probabilistic_predictors/">More on Probabilistic Predictors »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.4.1 on <span class="colophon-date" title="Monday 6 May 2024 00:28">Monday 6 May 2024</span>. Using Julia version 1.10.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+ (3, &quot;virginica&quot;)
+ (3, &quot;virginica&quot;)
+ (1, &quot;virginica&quot;)
+ (3, &quot;virginica&quot;)
+ (3, &quot;virginica&quot;)
+ (1, &quot;virginica&quot;)</code></pre><pre><code class="language-julia hljs">compare[1:8]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">8-element Vector{Tuple{CategoricalValue{Int64, UInt32}, CategoricalValue{String, UInt32}}}:
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)
+ (2, &quot;setosa&quot;)</code></pre><pre><code class="language-julia hljs">compare[51:58]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">8-element Vector{Tuple{CategoricalValue{Int64, UInt32}, CategoricalValue{String, UInt32}}}:
+ (1, &quot;versicolor&quot;)
+ (1, &quot;versicolor&quot;)
+ (3, &quot;versicolor&quot;)
+ (1, &quot;versicolor&quot;)
+ (1, &quot;versicolor&quot;)
+ (1, &quot;versicolor&quot;)
+ (1, &quot;versicolor&quot;)
+ (1, &quot;versicolor&quot;)</code></pre><pre><code class="language-julia hljs">compare[101:108]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">8-element Vector{Tuple{CategoricalValue{Int64, UInt32}, CategoricalValue{String, UInt32}}}:
+ (3, &quot;virginica&quot;)
+ (1, &quot;virginica&quot;)
+ (3, &quot;virginica&quot;)
+ (3, &quot;virginica&quot;)
+ (3, &quot;virginica&quot;)
+ (3, &quot;virginica&quot;)
+ (1, &quot;virginica&quot;)
+ (3, &quot;virginica&quot;)</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../preparing_data/">« Preparing Data</a><a class="docs-footer-nextpage" href="../more_on_probabilistic_predictors/">More on Probabilistic Predictors »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.4.1 on <span class="colophon-date" title="Monday 20 May 2024 09:15">Monday 20 May 2024</span>. Using Julia version 1.10.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
