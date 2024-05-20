@@ -49,7 +49,7 @@ function fit!(mach::Machine; rows=nothing, force=false, verbosity=1)
     end
 
     rows_have_changed  = (!isdefined(mach, :previous_rows) ||
-	    rows != mach.previous_rows)
+            rows != mach.previous_rows)
 
     args = [MLJ.selectrows(arg, rows) for arg in mach.args]
 

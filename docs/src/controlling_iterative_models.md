@@ -98,7 +98,7 @@ control                                                        | description    
 [`TimeLimit`](@ref EarlyStopping.TimeLimit)`(t=0.5)`           | Stop after `t` hours                                                                    | yes
 [`NumberLimit`](@ref EarlyStopping.NumberLimit)`(n=100)`       | Stop after `n` applications of the control                                              | yes
 [`NumberSinceBest`](@ref EarlyStopping.NumberSinceBest)`(n=6)` | Stop when best loss occurred `n` control applications ago                               | yes
-[`InvalidValue`](@ref IterationControl.InvalidValue)()         | Stop when `NaN`, `Inf` or `-Inf` loss/training loss encountered                         | yes 
+[`InvalidValue`](@ref IterationControl.InvalidValue)()         | Stop when `NaN`, `Inf` or `-Inf` loss/training loss encountered                         | yes
 [`Threshold`](@ref EarlyStopping.Threshold)`(value=0.0)`       | Stop when `loss < value`                                                                | yes
 [`GL`](@ref EarlyStopping.GL)`(alpha=2.0)`                     | † Stop after the "generalization loss (GL)" exceeds `alpha`                             | yes
 [`PQ`](@ref EarlyStopping.PQ)`(alpha=0.75, k=5)`               | † Stop after "progress-modified GL" exceeds `alpha`                                     | yes
@@ -109,15 +109,15 @@ control                                                        | description    
 [`Error`](@ref IterationControl.Error)`(predicate; f="")`      | Log to `Error` the value of `f` or `f(mach)`, if `predicate(mach)` holds and then stop  | yes
 [`Callback`](@ref IterationControl.Callback)`(f=mach->nothing)`| Call `f(mach)`                                                                          | yes
 [`WithNumberDo`](@ref IterationControl.WithNumberDo)`(f=n->@info(n))`                       | Call `f(n + 1)` where `n` is the number of complete control cycles so far | yes
-[`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=i->@info("iterations: $i"))`| Call `f(i)`, where `i` is total number of iterations           | yes
+[`WithIterationsDo`](@ref MLJIteration.WithIterationsDo)`(f=i->@info("iterations: $i"))`    | Call `f(i)`, where `i` is total number of iterations       | yes
 [`WithLossDo`](@ref IterationControl.WithLossDo)`(f=x->@info("loss: $x"))`                  | Call `f(loss)` where `loss` is the current loss            | yes
-[`WithTrainingLossesDo`](@ref IterationControl.WithTrainingLossesDo)`(f=v->@info(v))`       | Call `f(v)` where `v` is the current batch of training losses | yes
-[`WithEvaluationDo`](@ref MLJIteration.WithEvaluationDo)`(f->e->@info("evaluation: $e))`| Call `f(e)` where `e` is the current performance evaluation object | yes
+[`WithTrainingLossesDo`](@ref IterationControl.WithTrainingLossesDo)`(f=v->@info(v))`       | Call `f(v)` where `v` is the current batch of training losses         | yes
+[`WithEvaluationDo`](@ref MLJIteration.WithEvaluationDo)`(f->e->@info("evaluation: $e))`    | Call `f(e)` where `e` is the current performance evaluation object    | yes
 [`WithFittedParamsDo`](@ref MLJIteration.WithFittedParamsDo)`(f->fp->@info("fitted_params: $fp))`| Call `f(fp)` where `fp` is fitted parameters of training machine | yes
-[`WithReportDo`](@ref MLJIteration.WithReportDo)`(f->e->@info("report: $e))`| Call `f(r)` where `r` is the training machine report                    | yes
-[`WithModelDo`](@ref MLJIteration.WithModelDo)`(f->m->@info("model: $m))`| Call `f(m)` where `m` is the model, which may be mutated by `f`             | yes
-[`WithMachineDo`](@ref MLJIteration.WithMachineDo)`(f->mach->@info("report: $mach))`| Call `f(mach)` wher `mach` is the training machine in its current state    | yes
-[`Save`](@ref MLJIteration.Save)`(filename="machine.jls")`|Save current training machine to `machine1.jls`, `machine2.jsl`, etc                         | yes
+[`WithReportDo`](@ref MLJIteration.WithReportDo)`(f->e->@info("report: $e))`| Call `f(r)` where `r` is the training machine report                       | yes
+[`WithModelDo`](@ref MLJIteration.WithModelDo)`(f->m->@info("model: $m))`| Call `f(m)` where `m` is the model, which may be mutated by `f`               | yes
+[`WithMachineDo`](@ref MLJIteration.WithMachineDo)`(f->mach->@info("report: $mach))`| Call `f(mach)` wher `mach` is the training machine in its current state       | yes
+[`Save`](@ref MLJIteration.Save)`(filename="machine.jls")`     | Save current training machine to `machine1.jls`, `machine2.jsl`, etc                    | yes
 
 > Table 1. Atomic controls. Some advanced options are omitted.
 
@@ -253,7 +253,6 @@ In the code, `wrapper` is an object that wraps the training machine
 in this example).
 
 ```julia
-
 import IterationControl # or MLJ.IterationControl
 
 struct IterateFromList
