@@ -119,6 +119,12 @@ Split a table or matrix `X`, instead of indices:
 Xtrain, Xvalid, Xtest = partition(X, 0.5, 0.3, rng=123)
 ```
 
+Simultaneous splitting (needs `multi=true`):
+
+```julia
+(Xtrain, Xtest), (ytrain, ytest) = partition((X, y), 0.8, rng=123, multi=true)
+```
+
 Getting data from [OpenML](https://www.openml.org):
 ```julia
 table = OpenML.load(91)
@@ -128,7 +134,7 @@ Creating synthetic classification data:
 ```julia
 X, y = make_blobs(100, 2)
 ```
-(also: `make_moons`, `make_circles`)
+(also: `make_moons`, `make_circles`, `make_regression`)
 
 Creating synthetic regression data:
 
@@ -162,16 +168,12 @@ fit!(mach, rows=1:100, verbosity=1, force=false)
 
 - Supervised case: `predict(mach, Xnew)` or `predict(mach, rows=1:100)`
 
-  Similarly, for probabilistic models: `predict_mode`, `predict_mean` and `predict_median`.
+  For probabilistic models: `predict_mode`, `predict_mean` and `predict_median`.
 
-- Unsupervised case: `transform(mach, rows=1:100)` or `inverse_transform(mach, rows)`, etc.
+- Unsupervised case: `W = transform(mach, Xnew)` or `inverse_transform(mach, W)`, etc.
 
 
 ## Inspecting objects
-
-`@more` gets detail on the last object in REPL
-
-`params(model)` gets a nested-tuple of all hyperparameters, even nested ones
 
 `info(ConstantRegressor())`, `info("PCA")`, `info("RidgeRegressor",
 pkg="MultivariateStats")` gets all properties (aka traits) of registered models
@@ -187,19 +189,19 @@ pkg="MultivariateStats")` gets all properties (aka traits) of registered models
 
 ## Saving and retrieving machines using Julia serializer
 
-`MLJ.save("trained_for_five_days.jls", mach)` to save machine `mach` (without data)
+`MLJ.save("my_machine.jls", mach)` to save machine `mach` (without data)
 
-`predict_only_mach = machine("trained_for_five_days.jlso")` to deserialize.
+`predict_only_mach = machine("my_machine.jls")` to deserialize.
 
 
 ## Performance estimation
 
 ```julia
-evaluate(model, X, y, resampling=CV(), measure=rms, operation=predict, weights=..., verbosity=1)
+evaluate(model, X, y, resampling=CV(), measure=rms)
 ```
 
 ```julia
-evaluate!(mach, resampling=Holdout(), measure=[rms, mav], operation=predict, weights=..., verbosity=1)
+evaluate!(mach, resampling=Holdout(), measure=[rms, mav])
 ```
 
 ```julia
@@ -216,6 +218,8 @@ evaluate!(mach, resampling=[(fold1, fold2), (fold2, fold1)], measure=rms)
 
 `TimeSeriesSV(nfolds=4)` for time-series cross-validation
 
+`InSample()`: test set = train set
+
 or a list of pairs of row indices:
 
 `[(train1, eval1), (train2, eval2), ... (traink, evalk)]`
@@ -225,7 +229,7 @@ or a list of pairs of row indices:
 ## Tuning model wrapper
 
 ```julia
-tuned_model = TunedModel(model=…, tuning=RandomSearch(), resampling=Holdout(), measure=…, operation=predict, range=…)
+tuned_model = TunedModel(model; tuning=RandomSearch(), resampling=Holdout(), measure=…, range=…)
 ```
 
 ## Ranges for tuning `(range=...)`
@@ -238,9 +242,11 @@ then `Grid()` search uses `iterator(r, 6) == [1, 2, 3, 6, 11, 20]`.
 
 Non-numeric ranges: `r = range(model, :parameter, values=…)`
 
+Instead of `model`, declare type: `r = range(Char, :c; values=['a', 'b'])`
+
 Nested ranges: Use dot syntax, as in `r = range(EnsembleModel(atom=tree), :(atom.max_depth), ...)`
 
-Can specify multiple ranges, as in `range=[r1, r2, r3]`. For more range options do `?Grid` or `?RandomSearch`
+Specify multiple ranges, as in `range=[r1, r2, r3]`. For more range options do `?Grid` or `?RandomSearch`
 
 
 ## Tuning strategies
@@ -257,11 +263,11 @@ Also available: `LatinHyperCube`, `Explicit` (built-in), `MLJTreeParzenTuning`, 
 For generating a plot of performance against parameter specified by `range`:
 
 ```julia
-curve = learning_curve(mach, resolution=30, resampling=Holdout(), measure=…, operation=predict, range=…, n=1)
+curve = learning_curve(mach, resolution=30, resampling=Holdout(), measure=…, range=…, n=1)
 ```
 
 ```julia
-curve = learning_curve(model, X, y, resolution=30, resampling=Holdout(), measure=…, operation=predict, range=…, n=1)
+curve = learning_curve(model, X, y, resolution=30, resampling=Holdout(), measure=…, range=…, n=1)
 ```
 
 If using Plots.jl:
@@ -313,14 +319,14 @@ Externals include: `PCA` (in MultivariateStats), `KMeans`, `KMedoids` (in Cluste
 ## Ensemble model wrapper
 
 ```julia
-EnsembleModel(atom=…, weights=Float64[], bagging_fraction=0.8, rng=GLOBAL_RNG, n=100, parallel=true, out_of_bag_measure=[])
+EnsembleModel(model; weights=Float64[], bagging_fraction=0.8, rng=GLOBAL_RNG, n=100, parallel=true, out_of_bag_measure=[])
 ```
 
 
 ## Target transformation wrapper
 
 ```julia
-TransformedTargetModel(model=ConstantClassifier(), target=Standardizer())
+TransformedTargetModel(model; target=Standardizer())
 ```
 
 ## Pipelines
