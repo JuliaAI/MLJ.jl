@@ -17,7 +17,7 @@ following model wrappers: `Pipeline`, `TunedModel`, `EnsembleModel`, `IteratedMo
   `evaluate`/`evaluate!` for model performance, `|>` pipeline syntax,
   `TransformedTargetModel` wrapper, general model composition syntax (learning networks),
   synthetic data generators, `scitype` and `schema` methods (from ScientificTypes.jl) for
-  checking how MLJ interprets your data
+  checking how MLJ interprets your data. Generally required for any MLJ workflow.
 
 - StatisticalMeasures.jl: MLJ-compatible measures (metrics) for machine learning,
   confusion matrices, ROC curves.
