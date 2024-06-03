@@ -8,6 +8,7 @@ CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
 ComputationalResources = "ed09eef8-17a6-5b46-8889-db040fac31e3"
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+FeatureSelection = "33837fe5-dbff-4c9e-8c2f-c5612fe2b8b6"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MLJBalancing = "45f359ea-796d-4f51-95a5-deb1a414c586"
 MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
@@ -89,4 +90,40 @@ SymbolicRegression = "8254be44-1295-4e6a-a16d-46603ac705cb"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["BetaML", "CatBoost", "EvoLinear", "EvoTrees", "Imbalance", "InteractiveUtils", "LightGBM", "MLJClusteringInterface", "MLJDecisionTreeInterface", "MLJFlux", "MLJGLMInterface", "MLJLIBSVMInterface", "MLJLinearModels", "MLJMultivariateStatsInterface", "MLJNaiveBayesInterface", "MLJScikitLearnInterface", "MLJTSVDInterface", "MLJTestInterface", "MLJTestIntegration", "MLJText", "MLJXGBoostInterface", "Markdown", "NearestNeighborModels", "OneRule", "OutlierDetectionNeighbors", "OutlierDetectionPython", "ParallelKMeans", "PartialLeastSquaresRegressor", "PartitionedLS", "SelfOrganizingMaps", "SIRUS", "SymbolicRegression", "StableRNGs", "Suppressor","Test"]
+test = [
+    "BetaML",
+    "CatBoost",
+    "EvoLinear",
+    "EvoTrees",
+    "Imbalance",
+    "InteractiveUtils",
+    "LightGBM",
+    "MLJClusteringInterface",
+    "MLJDecisionTreeInterface",
+    "MLJFlux",
+    "MLJGLMInterface",
+    "MLJLIBSVMInterface",
+    "MLJLinearModels",
+    "MLJMultivariateStatsInterface",
+    "MLJNaiveBayesInterface",
+    "MLJScikitLearnInterface",
+    "MLJTSVDInterface",
+    "MLJTestInterface",
+    "MLJTestIntegration",
+    "MLJText",
+    "MLJXGBoostInterface",
+    "Markdown",
+    "NearestNeighborModels",
+    "OneRule",
+    "OutlierDetectionNeighbors",
+    "OutlierDetectionPython",
+    "ParallelKMeans",
+    "PartialLeastSquaresRegressor",
+    "PartitionedLS",
+    "SelfOrganizingMaps",
+    "SIRUS",
+    "SymbolicRegression",
+    "StableRNGs",
+    "Suppressor",
+    "Test",
+]

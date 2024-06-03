@@ -10,7 +10,7 @@ explicitly loaded from the model-providing package, using `@load`, for example. 
 some common transformers, listed using `localmodels()` at startup, are immediately
 available, as are the following model wrappers: `Pipeline`, `TunedModel`, `EnsembleModel`,
 `IteratedModel`, `BalancedModel`, `TransformedTargetModel`, `BinaryThresholdPredictor`,
-and `Stack`.
+and `Stack`, `RecursiveFeatureSelection`.
 
 # Components
 
@@ -34,6 +34,9 @@ and `Stack`.
 
 - MLJBalancing.jl: Incorporation of oversampling/undersampling methods in pipelines, via
   the `BalancedModel` wrapper
+
+- FeatureSelection.jl: Transformers for feature selection, and the supervised model wrapper
+  `RecursiveFeatureSelection`.
 
 - MLJFlow.jl: Integration with MLflow workflow tracking
 
@@ -60,6 +63,7 @@ import MLJBase.save
 using MLJEnsembles
 using MLJTuning
 using MLJModels
+@reexport using FeatureSelection
 using OpenML
 @reexport using MLJFlow
 @reexport using StatisticalMeasures
@@ -165,11 +169,11 @@ export Grid, RandomSearch, Explicit, TunedModel, LatinHypercube,
 # re-export from MLJModels:
 export models, localmodels, @load, @iload, load, info, doc,
     ConstantRegressor, ConstantClassifier,     # builtins/Constant.jl
-    FeatureSelector, UnivariateStandardizer,   # builtins/Transformers.jl
+    UnivariateStandardizer,
     Standardizer, UnivariateBoxCoxTransformer,
     OneHotEncoder, ContinuousEncoder, UnivariateDiscretizer,
     FillImputer, matching, BinaryThresholdPredictor,
-    UnivariateTimeTypeToContinuous, InteractionTransformer
+    UnivariateTimeTypeToContinuous, InteractionTransformer  # builtins/Transformers.jl
 
 # re-export from MLJIteration:
 export MLJIteration
