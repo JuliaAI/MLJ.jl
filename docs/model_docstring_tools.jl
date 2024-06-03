@@ -5,7 +5,7 @@ const PATH_TO_MODEL_DOCS = joinpath(@__DIR__, "src", "models")
 """
     remove_doc_refs(str::AbstractString)
 
-Removes `@ref` references from `str. For example, a substring of the form
+Removes `@ref` references from `str`. For example, a substring of the form
 "[`some.thing_like_this123!`](@ref)" is replaced with "`some.thing_like_this123!`".
 
 """
