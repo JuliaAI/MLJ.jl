@@ -30,7 +30,7 @@ MLJModels.OneHotEncoder
 MLJModels.ContinuousEncoder
 MLJModels.FillImputer
 MLJModels.UnivariateFillImputer
-MLJModels.FeatureSelector
+FeatureSelection.FeatureSelector
 MLJModels.UnivariateBoxCoxTransformer
 MLJModels.UnivariateDiscretizer
 MLJModels.UnivariateTimeTypeToContinuous

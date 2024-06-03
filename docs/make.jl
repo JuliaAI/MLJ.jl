@@ -15,6 +15,7 @@ import MLJ.MLJModels
 import MLJ.MLJEnsembles
 import MLJ.ScientificTypes
 import MLJ.MLJBalancing
+import MLJ.FeatureSelection
 import ScientificTypesBase
 import Distributions
 using CategoricalArrays
@@ -37,7 +38,7 @@ isempty(problems) || error(
 # compose the individual model docstring pages:
 @info "Getting individual model docstrings from the registry and generating "*
     "pages for them, written at /docs/src/models/ ."
-for model in models()
+for model in models(wrappers=true)
     write_page(model)
 end
 
@@ -118,6 +119,7 @@ makedocs(
         IterationControl,
         CategoricalDistributions,
         StatisticalMeasures,
+        FeatureSelection,
     ],
     pages    = pages,
     warnonly = [:cross_references, :missing_docs],
