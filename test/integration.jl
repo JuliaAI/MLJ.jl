@@ -52,7 +52,7 @@ FILTER_GIVEN_ISSUE = Dict(
             "MultiTaskElasticNetRegressor",
             "MultiTaskLassoCVRegressor",
             "MultiTaskLassoRegressor",
-        ]
+        ],
     "https://github.com/JuliaAI/FeatureSelection.jl/issues/15" =>
         model -> model.package_name == "FeatureSelection" &&
         model.name = "RecursiveFeatureElimination"
