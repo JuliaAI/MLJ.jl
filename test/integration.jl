@@ -55,7 +55,7 @@ FILTER_GIVEN_ISSUE = Dict(
         ],
     "https://github.com/JuliaAI/FeatureSelection.jl/issues/15" =>
         model -> model.package_name == "FeatureSelection" &&
-        model.name = "RecursiveFeatureElimination"
+        model.name == "RecursiveFeatureElimination"
 )
 
 
