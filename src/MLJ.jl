@@ -7,10 +7,8 @@ be loaded individually.
 
 Actual model code (e.g., code for instantiating a `DecisionTreeClassifier`) must be
 explicitly loaded from the model-providing package, using `@load`, for example. However
-some common transformers, listed using `localmodels()` at startup, are immediately
-available, as are the following model wrappers: `Pipeline`, `TunedModel`, `EnsembleModel`,
-`IteratedModel`, `BalancedModel`, `TransformedTargetModel`, `BinaryThresholdPredictor`,
-and `Stack`, `RecursiveFeatureSelection`.
+core model wrappers and some common transformers are immediately
+available; do `localmodels(wrappers=true)` at startup to list.
 
 # Components
 
