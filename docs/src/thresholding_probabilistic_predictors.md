@@ -1,4 +1,4 @@
-# More on Probabilistic Predictors
+# Thresholding Probabilistic Predictors
 
 Although one can call `predict_mode` on a probabilistic binary
 classifier to get deterministic predictions, a more flexible strategy

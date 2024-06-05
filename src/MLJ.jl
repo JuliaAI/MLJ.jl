@@ -1,15 +1,24 @@
 """
    MLJ
 
-[`MLJ`](https://juliaai.github.io/MLJ.jl//dev/) is a Machine Learning toolbox
-for Julia. It collects together functionality from the following packages, which can be
-loaded separately:
+[`MLJ`](https://juliaai.github.io/MLJ.jl//dev/) is a Machine Learning toolbox for
+Julia. It collects together functionality from separate components listed below, which can
+be loaded individually.
+
+Actual model code (e.g., code for instantiating a `DecisionTreeClassifier`) must be
+explicitly loaded from the model-providing package, using `@load`, for example. However
+some common transformers, listed using `localmodels()` at startup, are immediately
+available, as are the following model wrappers: `Pipeline`, `TunedModel`, `EnsembleModel`,
+`IteratedModel`, `BalancedModel`, `TransformedTargetModel`, `BinaryThresholdPredictor`,
+and `Stack`.
+
+# Components
 
 - MLJBase.jl: The `machine` interface, tools to `partition` and `unpack` datasets,
   `evaluate`/`evaluate!` for model performance, `|>` pipeline syntax,
   `TransformedTargetModel` wrapper, general model composition syntax (learning networks),
   synthetic data generators, `scitype` and `schema` methods (from ScientificTypes.jl) for
-  checking how MLJ interprets your data
+  checking how MLJ interprets your data. Generally required for any MLJ workflow.
 
 - StatisticalMeasures.jl: MLJ-compatible measures (metrics) for machine learning,
   confusion matrices, ROC curves.
@@ -29,6 +38,8 @@ loaded separately:
 - MLJFlow.jl: Integration with MLflow workflow tracking
 
 - OpenML.jl: Tool for grabbing datasets from OpenML.org
+
+
 
 """
 module MLJ
