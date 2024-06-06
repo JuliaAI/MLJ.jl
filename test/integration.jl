@@ -26,7 +26,7 @@ FILTER_GIVEN_ISSUE = Dict(
         (model.name == "AdaBoostStumpClassifier" &&
         model.package_name == "DecisionTree") ||
         (model.name == "COFDetector" &&
-        model.package_name == "OutlierDetectionNeighbors"),
+        model.package_name == "OutlierDetectionNeighbors") ||
         (model.name == "TSVDTransformer" &&
         model.package_name == "TSVD"),
     "https://github.com/JuliaML/LIBSVM.jl/issues/98" =>
