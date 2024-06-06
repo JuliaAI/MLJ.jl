@@ -26,7 +26,9 @@ FILTER_GIVEN_ISSUE = Dict(
         (model.name == "AdaBoostStumpClassifier" &&
         model.package_name == "DecisionTree") ||
         (model.name == "COFDetector" &&
-        model.package_name == "OutlierDetectionNeighbors"),
+        model.package_name == "OutlierDetectionNeighbors") ||
+        (model.name == "TSVDTransformer" &&
+        model.package_name == "TSVD"),
     "https://github.com/JuliaML/LIBSVM.jl/issues/98" =>
         model -> model.name == "LinearSVC" &&
         model.package_name == "LIBSVM",
@@ -52,7 +54,10 @@ FILTER_GIVEN_ISSUE = Dict(
             "MultiTaskElasticNetRegressor",
             "MultiTaskLassoCVRegressor",
             "MultiTaskLassoRegressor",
-        ]
+        ],
+    "https://github.com/JuliaAI/FeatureSelection.jl/issues/15" =>
+        model -> model.package_name == "FeatureSelection" &&
+        model.name == "RecursiveFeatureElimination"
 )
 
 
