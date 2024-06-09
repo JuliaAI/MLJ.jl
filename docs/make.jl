@@ -112,14 +112,26 @@ pages = [
     "Index of Methods" => "api.md",
 ]
 
-for (k, v) in pages
-    println("$k\t=>$v")
-end
+const ASSET_URL1 =
+    "https://fonts.googleapis.com/css2?"*
+    "family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900"*
+    "&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+
+const ASSET_URL2 =
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
 
 makedocs(
     doctest  = true,
     sitename = "MLJ",
-    format   = Documenter.HTML(),
+    format   = Documenter.HTML(
+        collapselevel = 1,
+        assets = [
+            "assets/favicon.ico",
+            asset(ASSET_URL1, class = :css),
+            asset(ASSET_URL2, class = :css),
+        ],
+        repolink="https://github.com/JuliaAI/MLJ.jl"
+    ),
     modules  = [
         MLJ,
         MLJBase,
