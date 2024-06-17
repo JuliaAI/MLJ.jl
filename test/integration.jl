@@ -21,6 +21,8 @@ const OTHER_TEST_LEVEL = 3
 # # RECORD OF OUTSTANDING ISSUES
 
 FILTER_GIVEN_ISSUE = Dict(
+    " https://github.com/JuliaAI/CatBoost.jl/issues/37" =>
+        model -> model.package_name = "CatBoost",
     "https://github.com/JuliaAI/MLJ.jl/issues/1085" =>
         model ->
         (model.name == "AdaBoostStumpClassifier" &&
