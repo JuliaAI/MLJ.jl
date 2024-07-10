@@ -1,11 +1,10 @@
 # [Model Search](@id model_search)
 
-MLJ has a model registry, allowing the user to search models and their
-properties, without loading all the packages containing model code. In
-turn, this allows one to efficiently find all models solving a given
-machine learning task. The task itself is specified with the help of
-the `matching` method, and the search executed with the `models`
-methods, as detailed below.
+In addition to perusing the [Model Browser](@ref), one can programatically search MLJ's
+Model Registry, without actually loading all the packages providing model code. This
+allows you to efficiently find all models solving a given machine learning task. The task
+itself is specified with the help of the `matching` method, and the search executed with
+the `models` methods, as detailed below.
 
 For commonly encountered problems with model search, see also
 [Preparing Data](@ref).

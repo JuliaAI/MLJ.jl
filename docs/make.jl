@@ -71,6 +71,7 @@ pages = [
         "Model Search" => "model_search.md",
         "Loading Model Code" => "loading_model_code.md",
         "Transformers and Other Unsupervised models" => "transformers.md",
+        "Feature Selection" => "feature_selection.md",
         "List of Supported Models" => "list_of_supported_models.md",
     ],
     "Meta-algorithms" => [
