@@ -24,19 +24,16 @@ that learn a probability distribution](@ref) for an example.
 
 ## Built-in transformers
 
-```@docs
-MLJModels.Standardizer
-MLJModels.OneHotEncoder
-MLJModels.ContinuousEncoder
-MLJModels.FillImputer
-MLJModels.UnivariateFillImputer
-FeatureSelection.FeatureSelector
-MLJModels.UnivariateBoxCoxTransformer
-MLJModels.InteractionTransformer
-MLJModels.UnivariateDiscretizer
-MLJModels.UnivariateTimeTypeToContinuous
-```
-
+- [`Standardizer`](@ref)
+- [`OneHotEncoder`](@ref)
+- [`ContinuousEncoder`](@ref)
+- [`FillImputer`](@ref)
+- [`UnivariateFillImputer`](@ref)
+- [`UnivariateBoxCoxTransformer`](@ref)
+- [`InteractionTransformer`](@ref)
+- [`UnivariateDiscretizer`](@ref)
+- [`UnivariateTimeTypeToContinuous`](@ref)
+- [`FeatureSelector`](@ref).
 
 ## Static transformers
 
@@ -231,4 +228,18 @@ compare[51:58]
 
 ```@example predtrans
 compare[101:108]
+```
+
+## Reference
+
+```@docs
+MLJModels.Standardizer
+MLJModels.OneHotEncoder
+MLJModels.ContinuousEncoder
+MLJModels.FillImputer
+MLJModels.UnivariateFillImputer
+MLJModels.UnivariateBoxCoxTransformer
+MLJModels.InteractionTransformer
+MLJModels.UnivariateDiscretizer
+MLJModels.UnivariateTimeTypeToContinuous
 ```
