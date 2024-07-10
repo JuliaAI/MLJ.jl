@@ -32,6 +32,7 @@ MLJModels.FillImputer
 MLJModels.UnivariateFillImputer
 FeatureSelection.FeatureSelector
 MLJModels.UnivariateBoxCoxTransformer
+MLJModels.InteractionTransformer
 MLJModels.UnivariateDiscretizer
 MLJModels.UnivariateTimeTypeToContinuous
 ```
