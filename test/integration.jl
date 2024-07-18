@@ -155,7 +155,11 @@ PATHOLOGIES = filter(MODELS) do model
         # too slow to train!
         (model.name == "LOCIDetector" && model.package_name == "OutlierDetectionPython") ||
         # TO REDUCE TESTING TIME
-        model.package_name == "MLJScikitLearnInterface"
+        model.package_name == "MLJScikitLearnInterface" ||
+        # can be removed after resolution of
+        # https://github.com/JuliaAI/FeatureSelection.jl/issues/15
+        # and a Model Registry update
+        model.name == "RecursiveFeatureElimination"
 end
 
 WITHOUT_DATASETS = vcat(WITHOUT_DATASETS, PATHOLOGIES)
