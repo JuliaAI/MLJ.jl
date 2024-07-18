@@ -345,3 +345,9 @@ d_vec = UnivariateFinite(["no", "yes"], yes_probs, augment=true, pool=v)
 ```
 
 For more options, see [`UnivariateFinite`](@ref).
+
+## Reference
+
+```@docs
+UnivariateFinite
+```

@@ -67,10 +67,11 @@ pages = [
         "Generating Synthetic Data" => "generating_synthetic_data.md",
         "OpenML Integration" => "openml_integration.md",
     ],
-    "Model Basics" => [
+    "Models" => [
         "Model Search" => "model_search.md",
         "Loading Model Code" => "loading_model_code.md",
         "Transformers and Other Unsupervised models" => "transformers.md",
+        "Feature Selection" => "feature_selection.md",
         "List of Supported Models" => "list_of_supported_models.md",
     ],
     "Meta-algorithms" => [
