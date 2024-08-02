@@ -92,7 +92,7 @@ pages = [
         "Learning Networks" => "learning_networks.md",
     ],
     "Third Party Tools" => [
-        "Logging Workflows using MLflow" => "logging_workflows.md",
+        "Logging Workflows" => "logging_workflows.md",
         "Third Party Packages" => "third_party_packages.md",
     ],
     "Customization and Extension" => [

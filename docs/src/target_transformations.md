@@ -69,9 +69,6 @@ X, y = @load_boston
 evaluate(ridge3, X, y, measure=l1)
 ```
 
-Without the log transform (ie, using `ridge`) we get the poorer mean absolute error,
-`l1`, of 3.9.
-
 ```@docs
 TransformedTargetModel
 ```
