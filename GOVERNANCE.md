@@ -28,7 +28,8 @@ Steering Council, where the offenses will be handled on a case-by-case basis.
 
 ## Advisory Committee
 
-To be appointed
+- [Johanni Brea](https://people.epfl.ch/johanni.brea), EPFL, Switzerland 
+
 
 ## Governing Rules and Duties
 
