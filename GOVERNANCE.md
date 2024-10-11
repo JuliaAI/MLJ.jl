@@ -28,8 +28,9 @@ Steering Council, where the offenses will be handled on a case-by-case basis.
 
 ## Advisory Committee
 
-- [Johanni Brea](https://people.epfl.ch/johanni.brea), EPFL, Switzerland 
+- [Johanni Brea, PhD](https://people.epfl.ch/johanni.brea), EPFL, Switzerland 
 
+- [Dilum Aluthge, PhD](https://aluthge.com), Brown University & Pumas-AI, Inc.
 
 ## Governing Rules and Duties
 
