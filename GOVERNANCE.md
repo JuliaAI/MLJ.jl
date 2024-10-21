@@ -28,12 +28,15 @@ Steering Council, where the offenses will be handled on a case-by-case basis.
 
 ## Advisory Committee
 
-- [Bogumił Kamiński, PhD](http://bogumilkaminski.pl/about/), 
-  SGH Warsaw School of Economics and Toronto Metropolitan University
+- [Dilum Aluthge, PhD](https://aluthge.com), Brown University & Pumas-AI, Inc.
 
 - [Johanni Brea, PhD](https://people.epfl.ch/johanni.brea), EPFL, Switzerland
 
-- [Dilum Aluthge, PhD](https://aluthge.com), Brown University & Pumas-AI, Inc.
+- [Bogumił Kamiński, PhD](http://bogumilkaminski.pl/about/), 
+  SGH Warsaw School of Economics and Toronto Metropolitan University
+
+- [Thibaut Lienart](https://ravio.com/), Ravio
+
 
 ## Governing Rules and Duties
 
