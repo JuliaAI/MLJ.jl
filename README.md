@@ -68,6 +68,9 @@ MLJ has been developed with the support of the following organizations:
     <a href="https://juliahub.com/">
         <img src="material/julia.png" width = 100/>
     </a>
+    <a href="https://ethz.ch/en.html">
+        <img src="material/ETH-Zurich.jpg" width = 100/>
+    </a>
 </div>
 
 
