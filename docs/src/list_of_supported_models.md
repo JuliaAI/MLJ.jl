@@ -32,7 +32,7 @@ independent assessment.
 | ------- | ------------- | ------ | -------- | ----
 [BetaML.jl](https://github.com/sylvaticus/BetaML.jl) | - | DecisionTreeClassifier, RandomForestClassifier, NeuralNetworkClassifier, PerceptronClassifier, KernelPerceptronClassifier, PegasosClassifier, DecisionTreeRegressor, RandomForestRegressor, NeuralNetworkRegressor, MultitargetNeuralNetworkRegressor, GaussianMixtureRegressor, MultitargetGaussianMixtureRegressor, KMeansClusterer, KMedoidsClusterer, GaussianMixtureClusterer,  SimpleImputer,  GaussianMixtureImputer, RandomForestImputer, GeneralImputer, AutoEncoder | medium |
 [CatBoost.jl](https://github.com/JuliaAI/CatBoost.jl) | - | CatBoostRegressor, CatBoostClassifier | high |
-[Clustering.jl](https://github.com/JuliaStats/Clustering.jl) | [MLJClusteringInterface.jl](https://github.com/JuliaAI/MLJClusteringInterface.jl) | KMeans, KMedoids, DBSCAN, HierarchicalClustering | high² |
+[Clustering.jl](https://github.com/JuliaStats/Clustering.jl) | [MLJClusteringInterface.jl](https://github.com/JuliaAI/MLJClusteringInterface.jl) | KMeans, KMedoids, AffinityPropagation, DBSCAN, HierarchicalClustering | high² |
 [DecisionTree.jl](https://github.com/bensadeghi/DecisionTree.jl) | [MLJDecisionTreeInterface.jl](https://github.com/JuliaAI/MLJDecisionTreeInterface.jl) | DecisionTreeClassifier, DecisionTreeRegressor, AdaBoostStumpClassifier, RandomForestClassifier, RandomForestRegressor | high | 
 [EvoTrees.jl](https://github.com/Evovest/EvoTrees.jl) | - | EvoTreeRegressor, EvoTreeClassifier, EvoTreeCount, EvoTreeGaussian, EvoTreeMLE | medium | tree-based gradient boosting models
 [EvoLinear.jl](https://github.com/jeremiedb/EvoLinear.jl) | - | EvoLinearRegressor | medium | linear boosting models
