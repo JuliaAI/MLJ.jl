@@ -38,7 +38,7 @@ available; do `localmodels(wrappers=true)` at startup to list.
 
 - MLJFlow.jl: Integration with MLflow workflow tracking
 
-- OpenML.jl: Tool for grabbing datasets from OpenML.org 
+- OpenML.jl: Tool for grabbing datasets from OpenML.org
 
 
 
