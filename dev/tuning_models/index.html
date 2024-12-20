@@ -12,7 +12,7 @@ tree = Tree()</code></pre><pre class="documenter-example-output"><code class="no
   post_prune = false, 
   merge_purity_threshold = 1.0, 
   feature_importance = :impurity, 
-  rng = Random._GLOBAL_RNG())</code></pre><p>Let&#39;s tune <code>min_purity_increase</code> in the model above, using a grid-search. To do so we will use the simplest <code>range</code> object, a one-dimensional range object constructed using the <code>range</code> method:</p><pre><code class="language-julia hljs">r = range(tree, :min_purity_increase, lower=0.001, upper=1.0, scale=:log);
+  rng = Random.TaskLocalRNG())</code></pre><p>Let&#39;s tune <code>min_purity_increase</code> in the model above, using a grid-search. To do so we will use the simplest <code>range</code> object, a one-dimensional range object constructed using the <code>range</code> method:</p><pre><code class="language-julia hljs">r = range(tree, :min_purity_increase, lower=0.001, upper=1.0, scale=:log);
 self_tuning_tree = TunedModel(
     model=tree,
     resampling=CV(nfolds=3),
@@ -29,16 +29,16 @@ self_tuning_tree = TunedModel(
         post_prune = false, 
         merge_purity_threshold = 1.0, 
         feature_importance = :impurity, 
-        rng = Random._GLOBAL_RNG()), 
+        rng = Random.TaskLocalRNG()), 
   tuning = Grid(
         goal = nothing, 
         resolution = 10, 
         shuffle = true, 
-        rng = Random._GLOBAL_RNG()), 
+        rng = Random.TaskLocalRNG()), 
   resampling = CV(
         nfolds = 3, 
         shuffle = false, 
-        rng = Random._GLOBAL_RNG()), 
+        rng = Random.TaskLocalRNG()), 
   measure = RootMeanSquaredError(), 
   weights = nothing, 
   class_weights = nothing, 
@@ -66,26 +66,26 @@ iterator(r2)</code></pre><pre class="documenter-example-output"><code class="noh
 fit!(mach, verbosity=0)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">trained Machine; does not cache data
   model: DeterministicTunedModel(model = DecisionTreeRegressor(max_depth = -1, …), …)
   args: 
-    1:	Source @347 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @885 ⏎ AbstractVector{Continuous}
+    1:	Source @826 ⏎ Table{AbstractVector{Continuous}}
+    2:	Source @198 ⏎ AbstractVector{Continuous}
 </code></pre><p>We can inspect the detailed results of the grid search with <code>report(mach)</code> or just retrieve the optimal model, as here:</p><pre><code class="language-julia hljs">fitted_params(mach).best_model</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">DecisionTreeRegressor(
   max_depth = -1, 
   min_samples_leaf = 5, 
   min_samples_split = 2, 
-  min_purity_increase = 0.0021544346900318843, 
+  min_purity_increase = 0.0010000000000000002, 
   n_subfeatures = 0, 
   post_prune = false, 
   merge_purity_threshold = 1.0, 
   feature_importance = :impurity, 
-  rng = Random._GLOBAL_RNG())</code></pre><p>For more detailed information, we can look at <code>report(mach)</code>, for example:</p><pre><code class="language-julia hljs">entry = report(mach).best_history_entry</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(model = DecisionTreeRegressor(max_depth = -1, …),
+  rng = Random.TaskLocalRNG())</code></pre><p>For more detailed information, we can look at <code>report(mach)</code>, for example:</p><pre><code class="language-julia hljs">entry = report(mach).best_history_entry</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(model = DecisionTreeRegressor(max_depth = -1, …),
  measure = StatisticalMeasuresBase.RobustMeasure{StatisticalMeasuresBase.FussyMeasure{StatisticalMeasuresBase.RobustMeasure{StatisticalMeasuresBase.Multimeasure{StatisticalMeasuresBase.SupportsMissingsMeasure{StatisticalMeasures.RootMeanSquaredErrorOnScalars}, Nothing, StatisticalMeasuresBase.RootMean{Int64}, typeof(identity)}}, Nothing}}[RootMeanSquaredError()],
  measurement = [0.23191493145086536],
- per_fold = [[0.23963778283093778, 0.23324501217933086, 0.2222920334199983]],
+ per_fold = [[0.23963778283093778, 0.23324501217933083, 0.2222920334199983]],
  evaluation = CompactPerformanceEvaluation(0.232,),)</code></pre><p>Predicting on new input observations using the optimal model, <em>trained on all the data</em> bound to <code>mach</code>:</p><pre><code class="language-julia hljs">Xnew = MLJ.table(rand(3, 10));
 predict(mach, Xnew)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-element Vector{Float64}:
-  0.009919422085138586
-  0.8683815731405311
- -0.3322658877061991</code></pre><p>Or predicting on some subset of the observations bound to <code>mach</code>:</p><pre><code class="language-julia hljs">test = 1:3
+ 0.5537905152557214
+ 0.35584888633998285
+ 0.1970025529406713</code></pre><p>Or predicting on some subset of the observations bound to <code>mach</code>:</p><pre><code class="language-julia hljs">test = 1:3
 predict(mach, rows=test)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-element Vector{Float64}:
   0.5537905152557214
   0.453244054960287
@@ -109,8 +109,8 @@ mach = machine(self_tuning_knn, X, y);
 fit!(mach, verbosity=0);</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">trained Machine; does not cache data
   model: ProbabilisticTunedModel(model = KNNClassifier(K = 5, …), …)
   args: 
-    1:	Source @010 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @008 ⏎ AbstractVector{Multiclass{3}}
+    1:	Source @913 ⏎ Table{AbstractVector{Continuous}}
+    2:	Source @334 ⏎ AbstractVector{Multiclass{3}}
 </code></pre><p><strong>Case (ii) - deterministic measure</strong>:</p><pre><code class="language-julia hljs">self_tuning_knn = TunedModel(
     model=knn,
     resampling = CV(nfolds=4, rng=1234),
@@ -123,16 +123,16 @@ mach = machine(self_tuning_knn, X, y);
 fit!(mach, verbosity=0);</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">trained Machine; does not cache data
   model: ProbabilisticTunedModel(model = KNNClassifier(K = 5, …), …)
   args: 
-    1:	Source @166 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @272 ⏎ AbstractVector{Multiclass{3}}
-</code></pre><p>Let&#39;s inspect the best model and corresponding evaluation of the metric in case (ii):</p><pre><code class="language-julia hljs">entry = report(mach).best_history_entry</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(model = KNNClassifier(K = 9, …),
+    1:	Source @663 ⏎ Table{AbstractVector{Continuous}}
+    2:	Source @125 ⏎ AbstractVector{Multiclass{3}}
+</code></pre><p>Let&#39;s inspect the best model and corresponding evaluation of the metric in case (ii):</p><pre><code class="language-julia hljs">entry = report(mach).best_history_entry</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(model = KNNClassifier(K = 16, …),
  measure = StatisticalMeasuresBase.RobustMeasure{StatisticalMeasuresBase.FussyMeasure{StatisticalMeasuresBase.RobustMeasure{StatisticalMeasuresBase.Multimeasure{StatisticalMeasuresBase.SupportsMissingsMeasure{StatisticalMeasures.MisclassificationRateOnScalars}, Nothing, StatisticalMeasuresBase.Mean, typeof(identity)}}, Nothing}}[MisclassificationRate()],
  measurement = [0.02666666666666667],
- per_fold = [[0.0, 0.02631578947368421, 0.0, 0.08108108108108109]],
- evaluation = CompactPerformanceEvaluation(0.0267,),)</code></pre><pre><code class="language-julia hljs">entry.model.K</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">9</code></pre><p>Recall that fitting <code>mach</code> also retrains the optimal model on all available data. The following is therefore an optimal model prediction based on all available data:</p><pre><code class="language-julia hljs">predict(mach, rows=148:150)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-element UnivariateFiniteVector{Multiclass{3}, String, UInt32, Float64}:
- UnivariateFinite{Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.111, virginica=&gt;0.889)
+ per_fold = [[0.07894736842105263, 0.0, 0.02702702702702703, 0.0]],
+ evaluation = CompactPerformanceEvaluation(0.0267,),)</code></pre><pre><code class="language-julia hljs">entry.model.K</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">16</code></pre><p>Recall that fitting <code>mach</code> also retrains the optimal model on all available data. The following is therefore an optimal model prediction based on all available data:</p><pre><code class="language-julia hljs">predict(mach, rows=148:150)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-element UnivariateFiniteVector{Multiclass{3}, String, UInt32, Float64}:
+ UnivariateFinite{Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.0625, virginica=&gt;0.938)
  UnivariateFinite{Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.0, virginica=&gt;1.0)
- UnivariateFinite{Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.222, virginica=&gt;0.778)</code></pre><h3 id="Specifying-a-custom-measure"><a class="docs-heading-anchor" href="#Specifying-a-custom-measure">Specifying a custom measure</a><a id="Specifying-a-custom-measure-1"></a><a class="docs-heading-anchor-permalink" href="#Specifying-a-custom-measure" title="Permalink"></a></h3><p>Users may specify a custom loss or scoring function, so long as it complies with the StatisticalMeasuresBase.jl <a href="https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/implementing_new_measures/#definitions">API</a> and implements the appropriate <code>orientation</code> trait (<code>Score()</code> or <code>Loss()</code>) from that package.  For example, we suppose define a &quot;new&quot; scoring function <code>custom_accuracy</code> by</p><pre><code class="language-julia hljs">custom_accuracy(yhat, y) = mean(y .== yhat); # yhat - prediction, y - ground truth</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">custom_accuracy (generic function with 1 method)</code></pre><p>In tuning, scores are maximised, while losses are minimised. So here we declare</p><pre><code class="language-julia hljs">import StatisticalMeasuresBase as SMB
+ UnivariateFinite{Multiclass{3}}(setosa=&gt;0.0, versicolor=&gt;0.188, virginica=&gt;0.812)</code></pre><h3 id="Specifying-a-custom-measure"><a class="docs-heading-anchor" href="#Specifying-a-custom-measure">Specifying a custom measure</a><a id="Specifying-a-custom-measure-1"></a><a class="docs-heading-anchor-permalink" href="#Specifying-a-custom-measure" title="Permalink"></a></h3><p>Users may specify a custom loss or scoring function, so long as it complies with the StatisticalMeasuresBase.jl <a href="https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/implementing_new_measures/#definitions">API</a> and implements the appropriate <code>orientation</code> trait (<code>Score()</code> or <code>Loss()</code>) from that package.  For example, we suppose define a &quot;new&quot; scoring function <code>custom_accuracy</code> by</p><pre><code class="language-julia hljs">custom_accuracy(yhat, y) = mean(y .== yhat); # yhat - prediction, y - ground truth</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">custom_accuracy (generic function with 1 method)</code></pre><p>In tuning, scores are maximised, while losses are minimised. So here we declare</p><pre><code class="language-julia hljs">import StatisticalMeasuresBase as SMB
 SMB.orientation(::typeof(custom_accuracy)) = SMB.Score()</code></pre><p>For full details on constructing custom measures, see <a href="https://juliaai.github.io/StatisticalMeasuresBase.jl/dev/">StatisticalMeasuresBase.jl</a>.</p><pre><code class="language-julia hljs">self_tuning_knn = TunedModel(
     model=knn,
     resampling = CV(nfolds=4),
@@ -159,10 +159,10 @@ forest = EnsembleModel(model=tree)</code></pre><pre class="documenter-example-ou
         post_prune = false, 
         merge_purity_threshold = 1.0, 
         feature_importance = :impurity, 
-        rng = Random._GLOBAL_RNG()), 
+        rng = Random.TaskLocalRNG()), 
   atomic_weights = Float64[], 
   bagging_fraction = 0.8, 
-  rng = Random._GLOBAL_RNG(), 
+  rng = Random.TaskLocalRNG(), 
   n = 100, 
   acceleration = CPU1{Nothing}(nothing), 
   out_of_bag_measure = Any[])</code></pre><p>Ranges for nested hyperparameters are specified using dot syntax. In this case, we will specify a <code>goal</code> for the total number of grid points:</p><pre><code class="language-julia hljs">r1 = range(forest, :(model.n_subfeatures), lower=1, upper=9);
@@ -181,8 +181,8 @@ mach = machine(self_tuning_forest, X, y);
 fit!(mach, verbosity=0);</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">trained Machine; does not cache data
   model: DeterministicTunedModel(model = DeterministicEnsembleModel(model = DecisionTreeRegressor(max_depth = -1, …), …), …)
   args: 
-    1:	Source @117 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @354 ⏎ AbstractVector{Continuous}
+    1:	Source @619 ⏎ Table{AbstractVector{Continuous}}
+    2:	Source @351 ⏎ AbstractVector{Continuous}
 </code></pre><p>We can plot the grid search results:</p><pre><code class="language-julia hljs">using Plots
 plot(mach)</code></pre><p><img src="../img/tuning_plot.png" alt/></p><p>Instead of specifying a <code>goal</code>, we can declare a global <code>resolution</code>, which is overridden for a particular parameter by pairing its range with the resolution desired. In the next example, the default <code>resolution=100</code> is applied to the <code>r2</code> field, but a resolution of <code>3</code> is applied to the <code>r1</code> field. Additionally, we ask that the grid points be randomly traversed and the total number of evaluations be limited to 25.</p><pre><code class="language-julia hljs">tuning = Grid(resolution=100, shuffle=true, rng=1234)
 self_tuning_forest = TunedModel(
@@ -196,8 +196,8 @@ self_tuning_forest = TunedModel(
 fit!(machine(self_tuning_forest, X, y), verbosity=0);</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">trained Machine; does not cache data
   model: DeterministicTunedModel(model = DeterministicEnsembleModel(model = DecisionTreeRegressor(max_depth = -1, …), …), …)
   args: 
-    1:	Source @086 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @922 ⏎ AbstractVector{Continuous}
+    1:	Source @493 ⏎ Table{AbstractVector{Continuous}}
+    2:	Source @832 ⏎ AbstractVector{Continuous}
 </code></pre><p>For more options for a grid search, see <a href="#MLJTuning.Grid"><code>Grid</code></a> below.</p><h2 id="Tuning-using-a-random-search"><a class="docs-heading-anchor" href="#Tuning-using-a-random-search">Tuning using a random search</a><a id="Tuning-using-a-random-search-1"></a><a class="docs-heading-anchor-permalink" href="#Tuning-using-a-random-search" title="Permalink"></a></h2><p>Let&#39;s attempt to tune the same hyperparameters using a <code>RandomSearch</code> tuning strategy. By default, bounded numeric ranges like <code>r1</code> and <code>r2</code> are sampled uniformly (before rounding, in the case of the integer range <code>r1</code>). Positive unbounded ranges are sampled using a Gamma distribution by default, and all others using a (truncated) normal distribution.</p><pre><code class="language-julia hljs">self_tuning_forest = TunedModel(
     model=forest,
     tuning=RandomSearch(),
@@ -212,8 +212,8 @@ mach = machine(self_tuning_forest, X, y);
 fit!(mach, verbosity=0)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">trained Machine; does not cache data
   model: DeterministicTunedModel(model = DeterministicEnsembleModel(model = DecisionTreeRegressor(max_depth = -1, …), …), …)
   args: 
-    1:	Source @986 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @570 ⏎ AbstractVector{Continuous}
+    1:	Source @341 ⏎ Table{AbstractVector{Continuous}}
+    2:	Source @121 ⏎ AbstractVector{Continuous}
 </code></pre><pre><code class="language-julia hljs">using Plots
 plot(mach)</code></pre><p><img src="../img/random_search_tuning_plot.png" alt/></p><p>The prior distributions used for sampling each hyperparameter can be customized, as can the global fallbacks. See the <a href="#MLJTuning.RandomSearch"><code>RandomSearch</code></a> doc-string below for details.</p><h2 id="Tuning-using-Latin-hypercube-sampling"><a class="docs-heading-anchor" href="#Tuning-using-Latin-hypercube-sampling">Tuning using Latin hypercube sampling</a><a id="Tuning-using-Latin-hypercube-sampling-1"></a><a class="docs-heading-anchor-permalink" href="#Tuning-using-Latin-hypercube-sampling" title="Permalink"></a></h2><p>One can also tune the hyperparameters using the <code>LatinHypercube</code> tuning strategy.  This method uses a genetic-based optimization algorithm based on the inverse of the Audze-Eglais function, using the library <a href="https://github.com/MrUrq/LatinHypercubeSampling.jl"><code>LatinHypercubeSampling.jl</code></a>.</p><p>We&#39;ll work with the data <code>X</code>, <code>y</code> and ranges <code>r1</code> and <code>r2</code> defined above and instantiate a Latin hypercube resampling strategy:</p><pre><code class="language-julia hljs">latin = LatinHypercube(gens=2, popsize=120)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">LatinHypercube(
   gens = 2, 
@@ -223,7 +223,7 @@ plot(mach)</code></pre><p><img src="../img/random_search_tuning_plot.png" alt/><
   interSampleWeight = 1.0, 
   ae_power = 2, 
   periodic_ae = false, 
-  rng = Random._GLOBAL_RNG())</code></pre><p>Here <code>gens</code> is the number of generations to run the optimisation for and <code>popsize</code> is the population size in the genetic algorithm. For more on these and other <code>LatinHypercube</code> parameters refer to the <a href="https://github.com/MrUrq/LatinHypercubeSampling.jl">LatinHypercubeSampling.jl</a> documentation. Pay attention that <code>gens</code> and <code>popsize</code> are not to be confused with the iteration parameter <code>n</code> in the construction of a corresponding <code>TunedModel</code> instance, which specifies the total number of models to be evaluated, independent of the tuning strategy.</p><p>For this illustration we&#39;ll add a third, nominal,  hyper-parameter:</p><pre><code class="language-julia hljs">r3 = range(forest, :(model.post_prune), values=[true, false]);
+  rng = Random.TaskLocalRNG())</code></pre><p>Here <code>gens</code> is the number of generations to run the optimisation for and <code>popsize</code> is the population size in the genetic algorithm. For more on these and other <code>LatinHypercube</code> parameters refer to the <a href="https://github.com/MrUrq/LatinHypercubeSampling.jl">LatinHypercubeSampling.jl</a> documentation. Pay attention that <code>gens</code> and <code>popsize</code> are not to be confused with the iteration parameter <code>n</code> in the construction of a corresponding <code>TunedModel</code> instance, which specifies the total number of models to be evaluated, independent of the tuning strategy.</p><p>For this illustration we&#39;ll add a third, nominal,  hyper-parameter:</p><pre><code class="language-julia hljs">r3 = range(forest, :(model.post_prune), values=[true, false]);
 self_tuning_forest = TunedModel(
     model=forest,
     tuning=latin,
@@ -237,7 +237,7 @@ fit!(mach, verbosity=0)</code></pre><pre class="documenter-example-output"><code
   model: DeterministicTunedModel(model = DeterministicEnsembleModel(model = DecisionTreeRegressor(max_depth = -1, …), …), …)
   args: 
     1:	Source @974 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @608 ⏎ AbstractVector{Continuous}
+    2:	Source @035 ⏎ AbstractVector{Continuous}
 </code></pre><pre><code class="language-julia hljs">using Plots
 plot(mach)</code></pre><p><img src="../img/latin_hypercube_tuning_plot.png" alt/></p><h2 id="explicit"><a class="docs-heading-anchor" href="#explicit">Comparing models of different type and nested cross-validation</a><a id="explicit-1"></a><a class="docs-heading-anchor-permalink" href="#explicit" title="Permalink"></a></h2><p>Instead of mutating hyperparameters of a fixed model, one can instead optimise over an explicit list of models, whose types are allowed to vary. As with other tuning strategies, evaluating the resulting <code>TunedModel</code> itself implies nested resampling (e.g., nested cross-validation) which we now examine in a bit more detail.</p><pre><code class="language-julia hljs">tree = (@load DecisionTreeClassifier pkg=DecisionTree verbosity=0)()
 knn = (@load KNNClassifier pkg=NearestNeighborModels verbosity=0)()
@@ -257,30 +257,26 @@ Extract:
 ┌──────────────────────┬───────────┬─────────────┐
 │ measure              │ operation │ measurement │
 ├──────────────────────┼───────────┼─────────────┤
-│ LogLoss(             │ predict   │ 1.08        │
+│ LogLoss(             │ predict   │ 1.48        │
 │   tol = 2.22045e-16) │           │             │
 └──────────────────────┴───────────┴─────────────┘
 ┌───────────────┬─────────┐
 │ per_fold      │ 1.96*SE │
 ├───────────────┼─────────┤
-│ [1.44, 0.721] │ 0.999   │
+│ [0.478, 2.48] │ 2.78    │
 └───────────────┴─────────┘
-</code></pre><p>Now, for example, we can get the best model for the first fold out of the two folds:</p><pre><code class="language-julia hljs">e.report_per_fold[1].best_model</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">DecisionTreeClassifier(
-  max_depth = -1, 
-  min_samples_leaf = 1, 
-  min_samples_split = 2, 
-  min_purity_increase = 0.0, 
-  n_subfeatures = 0, 
-  post_prune = false, 
-  merge_purity_threshold = 1.0, 
-  display_depth = 5, 
-  feature_importance = :impurity, 
-  rng = Random._GLOBAL_RNG())</code></pre><p>And the losses in the outer loop (these still have to be matched to the best performing model):</p><pre><code class="language-julia hljs">e.per_fold</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1-element Vector{Vector{Float64}}:
- [1.4417461355646861, 0.7208730677823432]</code></pre><p>It is also possible to get the results for the nested evaluations. For example, for the first fold of the outer loop and the second model:</p><pre><code class="language-julia hljs">e.report_per_fold[2].history[1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(model = DecisionTreeClassifier(max_depth = -1, …),
+</code></pre><p>Now, for example, we can get the best model for the first fold out of the two folds:</p><pre><code class="language-julia hljs">e.report_per_fold[1].best_model</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">KNNClassifier(
+  K = 5, 
+  algorithm = :kdtree, 
+  metric = Distances.Euclidean(0.0), 
+  leafsize = 10, 
+  reorder = true, 
+  weights = NearestNeighborModels.Uniform())</code></pre><p>And the losses in the outer loop (these still have to be matched to the best performing model):</p><pre><code class="language-julia hljs">e.per_fold</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1-element Vector{Vector{Float64}}:
+ [0.47817514904586256, 2.4842197732176783]</code></pre><p>It is also possible to get the results for the nested evaluations. For example, for the first fold of the outer loop and the second model:</p><pre><code class="language-julia hljs">e.report_per_fold[2].history[1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(model = DecisionTreeClassifier(max_depth = -1, …),
  measure = StatisticalMeasuresBase.RobustMeasure{StatisticalMeasuresBase.FussyMeasure{StatisticalMeasuresBase.RobustMeasure{StatisticalMeasures._LogLossType{Float64}}, typeof(StatisticalMeasures.l2_check)}}[LogLoss(tol = 2.22045e-16)],
- measurement = [0.7208730677823433],
- per_fold = [[2.220446049250313e-16, 2.1202149052421855, 2.220446049250313e-16]],
- evaluation = CompactPerformanceEvaluation(0.721,),)</code></pre><h2 id="Reference"><a class="docs-heading-anchor" href="#Reference">Reference</a><a id="Reference-1"></a><a class="docs-heading-anchor-permalink" href="#Reference" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Base.range" href="#Base.range"><code>Base.range</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">r = range(model, :hyper; values=nothing)</code></pre><p>Define a one-dimensional <code>NominalRange</code> object for a field <code>hyper</code> of <code>model</code>. Note that <code>r</code> is not directly iterable but <code>iterator(r)</code> is.</p><p>A nested hyperparameter is specified using dot notation. For example, <code>:(atom.max_depth)</code> specifies the <code>max_depth</code> hyperparameter of the submodel <code>model.atom</code>.</p><pre><code class="nohighlight hljs">r = range(model, :hyper; upper=nothing, lower=nothing,
+ measurement = [7.929603745605774],
+ per_fold = [[4.240429810484371, 6.360644715726557, 13.51637002091893]],
+ evaluation = CompactPerformanceEvaluation(7.93,),)</code></pre><h2 id="Reference"><a class="docs-heading-anchor" href="#Reference">Reference</a><a id="Reference-1"></a><a class="docs-heading-anchor-permalink" href="#Reference" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Base.range" href="#Base.range"><code>Base.range</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">r = range(model, :hyper; values=nothing)</code></pre><p>Define a one-dimensional <code>NominalRange</code> object for a field <code>hyper</code> of <code>model</code>. Note that <code>r</code> is not directly iterable but <code>iterator(r)</code> is.</p><p>A nested hyperparameter is specified using dot notation. For example, <code>:(atom.max_depth)</code> specifies the <code>max_depth</code> hyperparameter of the submodel <code>model.atom</code>.</p><pre><code class="nohighlight hljs">r = range(model, :hyper; upper=nothing, lower=nothing,
           scale=nothing, values=nothing)</code></pre><p>Assuming <code>values</code> is not specified, define a one-dimensional <code>NumericRange</code> object for a <code>Real</code> field <code>hyper</code> of <code>model</code>.  Note that <code>r</code> is not directly iteratable but <code>iterator(r, n)</code>is an iterator of length <code>n</code>. To generate random elements from <code>r</code>, instead apply <code>rand</code> methods to <code>sampler(r)</code>. The supported scales are <code>:linear</code>,<code>:log</code>, <code>:logminus</code>, <code>:log10</code>, <code>:log10minus</code>, <code>:log2</code>, or a callable object.</p><p>Note that <code>r</code> is not directly iterable, but <code>iterator(r, n)</code> is, for given resolution (length) <code>n</code>.</p><p>By default, the behaviour of the constructed object depends on the type of the value of the hyperparameter <code>:hyper</code> at <code>model</code> <em>at the time of construction.</em> To override this behaviour (for instance if <code>model</code> is not available) specify a type in place of <code>model</code> so the behaviour is determined by the value of the specified type.</p><p>A nested hyperparameter is specified using dot notation (see above).</p><p>If <code>scale</code> is unspecified, it is set to <code>:linear</code>, <code>:log</code>, <code>:log10minus</code>, or <code>:linear</code>, according to whether the interval <code>(lower, upper)</code> is bounded, right-unbounded, left-unbounded, or doubly unbounded, respectively.  Note <code>upper=Inf</code> and <code>lower=-Inf</code> are allowed.</p><p>If <code>values</code> is specified, the other keyword arguments are ignored and a <code>NominalRange</code> object is returned (see above).</p><p>See also: <a href="#MLJBase.iterator"><code>iterator</code></a>, <a href="#Distributions.sampler"><code>sampler</code></a></p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/MLJBase.jl/blob/v1.7.0/src/hyperparam/one_dimensional_ranges.jl#L90-L133">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="MLJBase.iterator" href="#MLJBase.iterator"><code>MLJBase.iterator</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">iterator([rng, ], r::NominalRange, [,n])
 iterator([rng, ], r::NumericRange, n)</code></pre><p>Return an iterator (currently a vector) for a <code>ParamRange</code> object <code>r</code>. In the first case iteration is over all <code>values</code> stored in the range (or just the first <code>n</code>, if <code>n</code> is specified). In the second case, the iteration is over approximately <code>n</code> ordered values, generated as follows:</p><ol><li><p>First, exactly <code>n</code> values are generated between <code>U</code> and <code>L</code>, with a spacing determined by <code>r.scale</code> (uniform if <code>scale=:linear</code>) where <code>U</code> and <code>L</code> are given by the following table:</p><table><tr><th style="text-align: right"><code>r.lower</code></th><th style="text-align: right"><code>r.upper</code></th><th style="text-align: right"><code>L</code></th><th style="text-align: right"><code>U</code></th></tr><tr><td style="text-align: right">finite</td><td style="text-align: right">finite</td><td style="text-align: right"><code>r.lower</code></td><td style="text-align: right"><code>r.upper</code></td></tr><tr><td style="text-align: right"><code>-Inf</code></td><td style="text-align: right">finite</td><td style="text-align: right"><code>r.upper - 2r.unit</code></td><td style="text-align: right"><code>r.upper</code></td></tr><tr><td style="text-align: right">finite</td><td style="text-align: right"><code>Inf</code></td><td style="text-align: right"><code>r.lower</code></td><td style="text-align: right"><code>r.lower + 2r.unit</code></td></tr><tr><td style="text-align: right"><code>-Inf</code></td><td style="text-align: right"><code>Inf</code></td><td style="text-align: right"><code>r.origin - r.unit</code></td><td style="text-align: right"><code>r.origin + r.unit</code></td></tr></table></li><li><p>If a callable <code>f</code> is provided as <code>scale</code>, then a uniform spacing is always applied in (1) but <code>f</code> is broadcast over the results. (Unlike ordinary scales, this alters the effective range of values generated, instead of just altering the spacing.)</p></li><li><p>If <code>r</code> is a discrete numeric range (<code>r isa NumericRange{&lt;:Integer}</code>) then the values are additionally rounded, with any duplicate values removed. Otherwise all the values are used (and there are exacltly <code>n</code> of them).</p></li><li><p>Finally, if a random number generator <code>rng</code> is specified, then the values are returned in random order (sampling without replacement), and otherwise they are returned in numeric order, or in the order provided to the range constructor, in the case of a <code>NominalRange</code>.</p></li></ol></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/MLJBase.jl/blob/v1.7.0/src/hyperparam/one_dimensional_range_methods.jl#L59-L95">source</a></section></article><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="Distributions.sampler" href="#Distributions.sampler"><code>Distributions.sampler</code></a> — <span class="docstring-category">Function</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">sampler(r::NominalRange, probs::AbstractVector{&lt;:Real})
 sampler(r::NominalRange)
@@ -351,4 +347,4 @@ range3 = (:(atom.λ), MySampler())</code></pre><p><strong>Algorithm</strong></p>
                          tuning=LatinHypercube(...),
                          range=...,
                          measures=...,
-                         n=...)</code></pre><p>(See <a href="#MLJTuning.TunedModel"><code>TunedModel</code></a> for complete options.)</p><p>To use a periodic version of the Audze-Eglais function (to reduce clustering along the boundaries) specify <code>periodic_ae = true</code>.</p><p><strong>Supported ranges:</strong></p><p>A single one-dimensional range or vector of one-dimensioinal ranges can be specified. Specifically, in <code>LatinHypercubeSampling</code> search, the <code>range</code> field of a <code>TunedModel</code> instance can be:</p><ul><li>A single one-dimensional range - ie, <code>ParamRange</code> object - <code>r</code>, constructed</li></ul><p>using the <code>range</code> method.</p><ul><li>Any vector of objects of the above form</li></ul><p>Both <code>NumericRange</code>s and <code>NominalRange</code>s are supported, and hyper-parameter values are sampled on a scale specified by the range (eg, <code>r.scale = :log</code>).</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/MLJTuning.jl/blob/v0.8.8/src/strategies/latin_hypercube.jl#L1-L46">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../evaluating_model_performance/">« Evaluating Model Performance</a><a class="docs-footer-nextpage" href="../learning_curves/">Learning Curves »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.6.0 on <span class="colophon-date" title="Monday 2 September 2024 02:28">Monday 2 September 2024</span>. Using Julia version 1.10.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+                         n=...)</code></pre><p>(See <a href="#MLJTuning.TunedModel"><code>TunedModel</code></a> for complete options.)</p><p>To use a periodic version of the Audze-Eglais function (to reduce clustering along the boundaries) specify <code>periodic_ae = true</code>.</p><p><strong>Supported ranges:</strong></p><p>A single one-dimensional range or vector of one-dimensioinal ranges can be specified. Specifically, in <code>LatinHypercubeSampling</code> search, the <code>range</code> field of a <code>TunedModel</code> instance can be:</p><ul><li>A single one-dimensional range - ie, <code>ParamRange</code> object - <code>r</code>, constructed</li></ul><p>using the <code>range</code> method.</p><ul><li>Any vector of objects of the above form</li></ul><p>Both <code>NumericRange</code>s and <code>NominalRange</code>s are supported, and hyper-parameter values are sampled on a scale specified by the range (eg, <code>r.scale = :log</code>).</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/MLJTuning.jl/blob/v0.8.8/src/strategies/latin_hypercube.jl#L1-L46">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../evaluating_model_performance/">« Evaluating Model Performance</a><a class="docs-footer-nextpage" href="../learning_curves/">Learning Curves »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Friday 20 December 2024 08:13">Friday 20 December 2024</span>. Using Julia version 1.11.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
