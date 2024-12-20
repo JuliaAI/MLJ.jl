@@ -50,12 +50,27 @@ awarded to the University of Auckland.
 MLJ has been developed with the support of the following organizations:
 
 <div align="center">
-    <img src="material/DFKI.png" width = 100/>
-    <img src="material/Turing_logo.png" width = 100/>
-    <img src="material/UoA_logo.png" width = 100/>
-    <img src="material/IQVIA_logo.png" width = 100/>
-    <img src="material/warwick.png" width = 100/>
-    <img src="material/julia.png" width = 100/>
+    <a href="https://www.dfki.de/en/web">
+        <img src="material/DFKI.png" width = 100/>
+    </a>
+    <a href="https://www.turing.ac.uk/">
+        <img src="material/Turing_logo.png" width = 100/>
+    </a>
+    <a href="https://www.auckland.ac.nz/en.html">
+        <img src="material/UoA_logo.png" width = 100/>
+    </a>
+    <a href="https://www.iqvia.com/">
+        <img src="material/IQVIA_logo.png" width = 100/>
+    </a>
+    <a href="https://warwick.ac.uk/">
+        <img src="material/warwick.png" width = 100/>
+    </a>
+    <a href="https://juliahub.com/">
+        <img src="material/julia.png" width = 100/>
+    </a>
+    <a href="https://ethz.ch/en.html">
+        <img src="material/ETH-Zurich.jpg" width = 100/>
+    </a>
 </div>
 
 

@@ -54,7 +54,13 @@ FILTER_GIVEN_ISSUE = Dict(
         ],
     "https://github.com/JuliaAI/FeatureSelection.jl/issues/15" =>
         model -> model.package_name == "FeatureSelection" &&
-        model.name == "RecursiveFeatureElimination"
+        model.name == "RecursiveFeatureElimination",
+    "https://github.com/sylvaticus/BetaML.jl/issues/75" =>
+        model -> model.package_name == "BetaML" &&
+        model.name == "NeuralNetworkClassifier",
+    "https://github.com/MilesCranmer/SymbolicRegression.jl/issues/390" =>
+        model -> model.package_name == "SymbolicRegression" &&
+        model.name == "SRRegressor"
 )
 
 

@@ -60,6 +60,7 @@ EvoLinear = "ab853011-1780-437f-b4b5-5de6f4777246"
 EvoTrees = "f6006082-12f8-11e9-0c9c-0d5d367ab1e5"
 Imbalance = "c709b415-507b-45b7-9a3d-1767c89fde68"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+LaplaceRedux = "c52c1a26-f7c5-402b-80be-ba1e638ad478"
 LightGBM = "7acf609c-83a4-11e9-1ffb-b912bcd3b04a"
 MLJClusteringInterface = "d354fa79-ed1c-40d4-88ef-b8c7bd1568af"
 MLJDecisionTreeInterface = "c6f25543-311c-4c74-83dc-3ea6d1015661"
@@ -99,6 +100,7 @@ test = [
     "Imbalance",
     "InteractiveUtils",
     "LightGBM",
+    "LaplaceRedux",
     "MLJClusteringInterface",
     "MLJDecisionTreeInterface",
     "MLJFlux",
