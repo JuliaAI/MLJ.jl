@@ -26,7 +26,19 @@ Steering Council, where the offenses will be handled on a case-by-case basis.
 
 ## Advisory Committee
 
-To be appointed
+- [Jeremie
+  Desgagne-Bouchard](https://www.linkedin.com/in/jeremie-desgagne-bouchard-81a68b111/)
+  (or, at [GitHub](https://github.com/jeremiedb)), [Evovest](https://evovest.com), Montreal
+
+- [Dilum Aluthge, PhD](https://aluthge.com), Brown University & Pumas-AI, Inc., USA
+
+- [Johanni Brea, PhD](https://people.epfl.ch/johanni.brea), EPFL, Switzerland
+
+- [Bogumił Kamiński, PhD](http://bogumilkaminski.pl/about/), 
+  SGH Warsaw School of Economics and Toronto Metropolitan University
+
+- [Thibaut Lienart, PhD](https://ravio.com/), Ravio
+
 
 ## Governing Rules and Duties
 
