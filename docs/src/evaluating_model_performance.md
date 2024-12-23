@@ -104,19 +104,13 @@ resampling strategies](@ref) below.
 
 ```@docs
 MLJBase.Holdout
-```
-
-```@docs
 MLJBase.CV
-```
-
-```@docs
 MLJBase.StratifiedCV
+MLJBase.TimeSeriesCV
+MLJBase.InSample
 ```
 
-```@docs
-MLJBase.TimeSeriesCV
-```
+
 
 ## Custom resampling strategies
 
