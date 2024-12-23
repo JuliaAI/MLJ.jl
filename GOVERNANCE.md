@@ -1,5 +1,3 @@
-# DRAFT DOCUMENT ONLY
-
 # Governance in MLJ
 
 The following contains the formal governance structure of the Machine Learning in Julia
