@@ -2,9 +2,9 @@
 
 ## Splitting data
 
-MLJ has two tools for splitting data. To split data *vertically* (that
-is, to split by observations) use [`partition`](@ref). This is commonly applied to a
-vector of observation *indices*, but can also be applied to datasets
+MLJ has two tools for splitting data. To split data *vertically* (that is,
+to split by observations) use [`partition`](@ref). This is commonly applied to
+a vector of observation *indices*, but can also be applied to datasets
 themselves, provided they are vectors, matrices or tables.
 
 To split tabular data *horizontally* (i.e., break up a table based on
@@ -39,18 +39,17 @@ models(matching(X, y))
 
 Or are unsure about the source of the following warning:
 
-```julia
-Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0
-tree = Tree();
-julia> machine(tree, X, y)
+```julia-repl
+julia> Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0;
+julia> tree = Tree();
 
 julia> machine(tree, X, y)
-┌ Warning: The scitype of `X`, in `machine(model, X, ...)` is incompatible with `model=DecisionTreeRegressor @378`:                                                                
+┌ Warning: The scitype of `X`, in `machine(model, X, ...)` is incompatible with `model=DecisionTreeRegressor @378`:
 │ scitype(X) = Table{Union{AbstractVector{Continuous}, AbstractVector{Count}, AbstractVector{Textual}, AbstractVector{Union{Missing, Textual}}}}
 │ input_scitype(model) = Table{var"#s46"} where var"#s46"<:Union{AbstractVector{var"#s9"} where var"#s9"<:Continuous, AbstractVector{var"#s9"} where var"#s9"<:Count, AbstractVector{var"#s9"} where var"#s9"<:OrderedFactor}.
 └ @ MLJBase ~/Dropbox/Julia7/MLJ/MLJBase/src/machines.jl:103
 Machine{DecisionTreeRegressor,…} @198 trained 0 times; caches data
-  args: 
+  args:
     1:  Source @628 ⏎ `Table{Union{AbstractVector{Continuous}, AbstractVector{Count}, AbstractVector{Textual}, AbstractVector{Union{Missing, Textual}}}}`
     2:  Source @544 ⏎ `AbstractVector{Continuous}`
 ```
@@ -58,10 +57,10 @@ Machine{DecisionTreeRegressor,…} @198 trained 0 times; caches data
 The meaning of the warning is:
 
 - The input `X` is a table with column scitypes `Continuous`, `Count`, and `Textual` and `Union{Missing, Textual}`, which can also see by inspecting the schema:
-	
-```@example poot
-schema(X)
-```
+
+  ```@example poot
+  schema(X)
+  ```
 
 - The model requires a table whose column element scitypes subtype `Continuous`, an incompatibility.
 
@@ -73,19 +72,16 @@ above, with links to further documentation given below:
 **Scientific type coercion:** We coerce machine types to obtain the
 intended scientific interpretation. If `height` in the above example
 is intended to be `Continuous`, `mark` is supposed to be
-`OrderedFactor`, and `admitted` a (binary) `Multiclass`, then we can
-do
-        
-  
+`OrderedFactor`, and `admitted` a (binary) `Multiclass`, then we can do
+
 ```@example poot
 X_coerced = coerce(X, :height=>Continuous, :mark=>OrderedFactor, :admitted=>Multiclass);
 schema(X_coerced)
 ```
 
 **Data transformations:** We carry out conventional data
-transformations, such as missing value imputation and feature
-encoding:
-  
+transformations, such as missing value imputation and feature encoding:
+
 ```@example poot
 imputer = FillImputer()
 mach = machine(imputer, X_coerced) |> fit!
@@ -123,18 +119,17 @@ Also relevant is the section, [Working with Categorical Data](@ref).
 
 ## Data transformation
 
-MLJ's Built-in transformers are documented at [Transformers and Other Unsupervised Models](@ref). The most relevant in the present context
-  are: [`ContinuousEncoder`](@ref), [`OneHotEncoder`](@ref),
-  [`FeatureSelector`](@ref) and [`FillImputer`](@ref). A Gaussian
-  mixture models imputer is provided by BetaML, which can be loaded
-       with
+MLJ's Built-in transformers are documented at [Transformers and Other Unsupervised Models](@ref).
+The most relevant in the present context are: [`ContinuousEncoder`](@ref),
+[`OneHotEncoder`](@ref), [`FeatureSelector`](@ref) and [`FillImputer`](@ref).
+A Gaussian mixture models imputer is provided by BetaML, which can be loaded with
 
 ```julia
 MissingImputator = @load MissingImputator pkg=BetaML
 ```
 
 [This MLJ
-Workshop](https://github.com/ablaom/MachineLearningInJulia2020), and the "End-to-end
-examples" in [Data Science in Julia
+Workshop](https://github.com/ablaom/MachineLearningInJulia2020), and
+the "End-to-end examples" in [Data Science in Julia
 tutorials](https://JuliaAI.github.io/DataScienceTutorials.jl/)
 give further illustrations of data preprocessing in MLJ.

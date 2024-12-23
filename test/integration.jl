@@ -1,9 +1,21 @@
 using MLJTestIntegration, MLJModels, MLJ, Test, Markdown
 import MLJTestIntegration as MTI
 import Pkg.TOML as TOML
+using Suppressor
 
 const JULIA_TEST_LEVEL = 4
 const OTHER_TEST_LEVEL = 3
+
+# # IMPORTANT
+
+# There are two main ways to flag a problem model for integration test purposes.
+
+# - Adding to `FILTER_GIVEN_ISSUE` means the model is allowed to fail silently, unless
+#  tests pass, a fact that will be reported in the log.
+
+# - Adding to `PATHOLOGIES` completely excludes the model from testing.
+
+# Obviously the first method is strongly preferred.
 
 
 # # RECORD OF OUTSTANDING ISSUES
@@ -14,14 +26,9 @@ FILTER_GIVEN_ISSUE = Dict(
         (model.name == "AdaBoostStumpClassifier" &&
         model.package_name == "DecisionTree") ||
         (model.name == "COFDetector" &&
-        model.package_name == "OutlierDetectionNeighbors"),
-    "https://github.com/JuliaAI/CatBoost.jl/pull/28 (waiting for 0.3.3 release)" =>
-        model -> model.name == "CatBoostRegressor",
-    "LOCIDetector too slow to train!" =>
-        model -> model.name == "LOCIDetector",
-    "https://github.com/JuliaML/LIBSVM.jl/issues/98" =>
-        model -> model.name == "LinearSVC" &&
-        model.package_name == "LIBSVM",
+        model.package_name == "OutlierDetectionNeighbors") ||
+        (model.name == "TSVDTransformer" &&
+        model.package_name == "TSVD"),
     "https://github.com/OutlierDetectionJL/OutlierDetectionPython.jl/issues/4" =>
         model -> model.name == "CDDetector" &&
         model.package_name == "OutlierDetectionPython",
@@ -30,24 +37,36 @@ FILTER_GIVEN_ISSUE = Dict(
     "https://github.com/sylvaticus/BetaML.jl/issues/65" =>
         model -> model.name in ["KMeans", "KMedoids"] &&
         model.package_name == "BetaML",
-    "https://github.com/JuliaAI/MLJTSVDInterface.jl/pull/17" =>
-        model -> model.name == "TSVDTransformer",
     "https://github.com/JuliaAI/MLJ.jl/issues/1074" =>
         model -> model.name == "AutoEncoderMLJ",
-    "https://github.com/sylvaticus/BetaML.jl/issues/64" =>
-        model -> model.name =="GaussianMixtureClusterer" && model.package_name=="BetaML",
      "https://github.com/rikhuijzer/SIRUS.jl/issues/78" =>
         model -> model.package_name == "SIRUS",
     "https://github.com/lalvim/PartialLeastSquaresRegressor.jl/issues/29 "*
         "(still need release > 2.2.0)" =>
         model -> model.package_name == "PartialLeastSquaresRegressor",
-    "MLJScikitLearnInterface - multiple issues, hangs tests, WIP" =>
-        model -> model.package_name == "MLJScikitLearnInterface",
+    "MLJScikitLearnInterface - multiple issues, WIP" =>
+        model -> model.package_name == "MLJScikitLearnInterface" &&
+        model.name in [
+            "MultiTaskElasticNetCVRegressor",
+            "MultiTaskElasticNetRegressor",
+            "MultiTaskLassoCVRegressor",
+            "MultiTaskLassoRegressor",
+        ],
+    "https://github.com/JuliaAI/FeatureSelection.jl/issues/15" =>
+        model -> model.package_name == "FeatureSelection" &&
+        model.name == "RecursiveFeatureElimination",
+    "https://github.com/sylvaticus/BetaML.jl/issues/75" =>
+        model -> model.package_name == "BetaML" &&
+        model.name == "NeuralNetworkClassifier",
+    "https://github.com/MilesCranmer/SymbolicRegression.jl/issues/390" =>
+        model -> model.package_name == "SymbolicRegression" &&
+        model.name == "SRRegressor"
 )
+
 
 # # LOG OUTSTANDING ISSUES TO STDOUT
 
-const MODELS= models();
+const MODELS = models();
 const JULIA_MODELS = filter(m->m.is_pure_julia, MODELS);
 const OTHER_MODELS = setdiff(MODELS, JULIA_MODELS);
 
@@ -127,7 +146,7 @@ for model in WITHOUT_DATASETS
 end
 
 # Additionally exclude some models for which the inferred datasets have a model-specific
-# pathololgy that prevents a valid test:
+# pathology that prevents valid generic test.
 
 PATHOLOGIES = filter(MODELS) do model
     # in the subsampling occuring in stacking, we get a Cholesky
@@ -138,7 +157,15 @@ PATHOLOGIES = filter(MODELS) do model
         # in tuned_pipe_evaluation C library gives "Incorrect parameter: specified nu is
         # infeasible":
         (model.name in ["NuSVC", "ProbabilisticNuSVC"] &&
-        model.package_name == "LIBSVM")
+        model.package_name == "LIBSVM") ||
+        # too slow to train!
+        (model.name == "LOCIDetector" && model.package_name == "OutlierDetectionPython") ||
+        # TO REDUCE TESTING TIME
+        model.package_name == "MLJScikitLearnInterface" ||
+        # can be removed after resolution of
+        # https://github.com/JuliaAI/FeatureSelection.jl/issues/15
+        # and a Model Registry update
+        model.name == "RecursiveFeatureElimination"
 end
 
 WITHOUT_DATASETS = vcat(WITHOUT_DATASETS, PATHOLOGIES)
@@ -178,43 +205,54 @@ MLJTestIntegration.test(MODELS, (nothing, ), level=1, throw=true, verbosity=0);
 
 # # JULIA TESTS
 
-options = (
-    level = JULIA_TEST_LEVEL,
-    verbosity = 0, # bump to 2 to debug
-    throw = false,
-)
-@testset "level 4 tests" begin
-    println()
-    for model in JULIA_MODELS
+const INFO_TEST_NOW_PASSING =
+    "The model above now passes tests.\nConsider removing from "*
+    "`FILTER_GIVEN_ISSUE` in test/integration.jl."
 
-        # exclusions:
-        model in WITHOUT_DATASETS && continue
-        model in EXCLUDED_BY_ISSUE && continue
+problems = []
 
-        print("\rTesting $(model.name) ($(model.package_name))                       ")
-        @test isempty(MLJTestIntegration.test(model; mod=@__MODULE__, options...))
+const nmodels = length(JULIA_MODELS) + length(OTHER_MODELS)
+i = 0
+println()
+for (model_set, level) in [
+    (:JULIA_MODELS, JULIA_TEST_LEVEL),
+    (:OTHER_MODELS, OTHER_TEST_LEVEL),
+    ]
+    set = eval(model_set)
+    options = (
+        ; level,
+        verbosity = 0, # bump to 2 to debug
+        throw = false,
+    )
+    @testset "$model_set tests" begin
+        for model in set
+            global i += 1
+            progress = string("(", round(i/nmodels*100, digits=1), "%) Testing: ")
+
+            # exclusions:
+            model in WITHOUT_DATASETS && continue
+
+            notice = "$(model.name) ($(model.package_name))"
+            print("\r", progress, notice, "                       ")
+
+            okay = @suppress isempty(MLJTestIntegration.test(
+                model;
+                mod=@__MODULE__,
+                options...,
+            ))
+            if model in EXCLUDED_BY_ISSUE
+                okay && (println(); @info INFO_TEST_NOW_PASSING)
+            else
+                okay || push!(problems, notice)
+            end
+        end
     end
 end
 
+okay = isempty(problems)
+okay || print("Integration tests failed for these models: \n $problems")
+println()
 
-# # NON-JULIA TESTS
-
-options = (
-    level = OTHER_TEST_LEVEL,
-    verbosity = 0, # bump to 2 to debug
-    throw = false,
-)
-@testset "level 3 tests" begin
-    println()
-    for model in OTHER_MODELS
-
-        # exclusions:
-        model in WITHOUT_DATASETS && continue
-        model in EXCLUDED_BY_ISSUE && continue
-
-        print("\rTesting $(model.name) ($(model.package_name))                       ")
-        @test isempty(MLJTestIntegration.test(model; mod=@__MODULE__, options...))
-    end
-end
+@test okay
 
 true

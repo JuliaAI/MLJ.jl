@@ -15,6 +15,7 @@ import MLJ.MLJModels
 import MLJ.MLJEnsembles
 import MLJ.ScientificTypes
 import MLJ.MLJBalancing
+import MLJ.FeatureSelection
 import ScientificTypesBase
 import Distributions
 using CategoricalArrays
@@ -37,7 +38,7 @@ isempty(problems) || error(
 # compose the individual model docstring pages:
 @info "Getting individual model docstrings from the registry and generating "*
     "pages for them, written at /docs/src/models/ ."
-for model in models()
+for model in models(wrappers=true)
     write_page(model)
 end
 
@@ -54,54 +55,84 @@ pages = [
     "Model Browser" => "model_browser.md",
     "About MLJ" => "about_mlj.md",
     "Learning MLJ" => "learning_mlj.md",
-    "Getting Started" => "getting_started.md",
-    "Common MLJ Workflows" => "common_mlj_workflows.md",
-    "Working with Categorical Data" => "working_with_categorical_data.md",
-    "Model Search" => "model_search.md",
-    "Loading Model Code" => "loading_model_code.md",
-    "Machines" => "machines.md",
-    "Evaluating Model Performance" => "evaluating_model_performance.md",
-    "Performance Measures" => "performance_measures.md",
-    "Weights" => "weights.md",
-    "Tuning Models" => "tuning_models.md",
-    "Learning Curves" => "learning_curves.md",
-    "Preparing Data" => "preparing_data.md",
-    "Transformers and Other Unsupervised models" => "transformers.md",
-    "More on Probabilistic Predictors" => "more_on_probabilistic_predictors.md",
-    "Composing Models" => "composing_models.md",
-    "Linear Pipelines" => "linear_pipelines.md",
-    "Target Transformations" => "target_transformations.md",
-    "Homogeneous Ensembles" => "homogeneous_ensembles.md",
-    "Correcting Class Imbalance" => "correcting_class_imbalance.md",
-    "Model Stacking" => "model_stacking.md",
-    "Learning Networks" => "learning_networks.md",
-    "Controlling Iterative Models" => "controlling_iterative_models.md",
-    "Generating Synthetic Data" => "generating_synthetic_data.md",
-    "Logging Workflows" => "logging_workflows.md",
-    "OpenML Integration" => "openml_integration.md",
-    "Acceleration and Parallelism" => "acceleration_and_parallelism.md",
-    "Simple User Defined Models" => "simple_user_defined_models.md",
-    "Quick-Start Guide to Adding Models" =>
-               "quick_start_guide_to_adding_models.md",
-    "Adding Models for General Use" => "adding_models_for_general_use.md",
-    "Modifying Behavior" => "modifying_behavior.md",
-    "Internals" => "internals.md",
-    "List of Supported Models" => "list_of_supported_models.md",
-    "Third Party Packages" => "third_party_packages.md",
-    "Glossary" => "glossary.md",
-    "MLJ Cheatsheet" => "mlj_cheatsheet.md",
-    "FAQ" => "frequently_asked_questions.md",
+    "Basics" => [
+        "Getting Started" => "getting_started.md",
+        "Common MLJ Workflows" => "common_mlj_workflows.md",
+        "Machines" => "machines.md",
+        "MLJ Cheatsheet" => "mlj_cheatsheet.md",
+    ],
+    "Data" => [
+        "Working with Categorical Data" => "working_with_categorical_data.md",
+        "Preparing Data" => "preparing_data.md",
+        "Generating Synthetic Data" => "generating_synthetic_data.md",
+        "OpenML Integration" => "openml_integration.md",
+    ],
+    "Models" => [
+        "Model Search" => "model_search.md",
+        "Loading Model Code" => "loading_model_code.md",
+        "Transformers and Other Unsupervised models" => "transformers.md",
+        "Feature Selection" => "feature_selection.md",
+        "List of Supported Models" => "list_of_supported_models.md",
+    ],
+    "Meta-algorithms" => [
+        "Evaluating Model Performance" => "evaluating_model_performance.md",
+        "Tuning Models" => "tuning_models.md",
+        "Learning Curves" => "learning_curves.md",
+        "Controlling Iterative Models" => "controlling_iterative_models.md",
+        "Correcting Class Imbalance" => "correcting_class_imbalance.md",
+        "Thresholding Probabilistic Predictors" =>
+            "thresholding_probabilistic_predictors.md",
+        "Target Transformations" => "target_transformations.md",
+        "Homogeneous Ensembles" => "homogeneous_ensembles.md",
+    ],
+    "Model Composition" => [
+        "Composing Models" => "composing_models.md",
+        "Linear Pipelines" => "linear_pipelines.md",
+        "Model Stacking" => "model_stacking.md",
+        "Learning Networks" => "learning_networks.md",
+    ],
+    "Third Party Tools" => [
+        "Logging Workflows" => "logging_workflows.md",
+        "Third Party Packages" => "third_party_packages.md",
+    ],
+    "Customization and Extension" => [
+        "Simple User Defined Models" => "simple_user_defined_models.md",
+        "Quick-Start Guide to Adding Models" =>
+            "quick_start_guide_to_adding_models.md",
+        "Adding Models for General Use" => "adding_models_for_general_use.md",
+        "Modifying Behavior" => "modifying_behavior.md",
+        "Internals" => "internals.md",
+    ],
+    "Miscellaneous" => [
+        "Performance Measures" => "performance_measures.md",
+        "Weights" => "weights.md",
+        "Acceleration and Parallelism" => "acceleration_and_parallelism.md",
+        "Glossary" => "glossary.md",
+        "FAQ" => "frequently_asked_questions.md",
+    ],
     "Index of Methods" => "api.md",
-    ]
+]
 
-for (k, v) in pages
-    println("$k\t=>$v")
-end
+const ASSET_URL1 =
+    "https://fonts.googleapis.com/css2?"*
+    "family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900"*
+    "&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+
+const ASSET_URL2 =
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
 
 makedocs(
     doctest  = true,
     sitename = "MLJ",
-    format   = Documenter.HTML(),
+    format   = Documenter.HTML(
+        collapselevel = 1,
+        assets = [
+            "assets/favicon.ico",
+            asset(ASSET_URL1, class = :css),
+            asset(ASSET_URL2, class = :css),
+        ],
+        repolink="https://github.com/JuliaAI/MLJ.jl"
+    ),
     modules  = [
         MLJ,
         MLJBase,
@@ -118,6 +149,7 @@ makedocs(
         IterationControl,
         CategoricalDistributions,
         StatisticalMeasures,
+        FeatureSelection,
     ],
     pages    = pages,
     warnonly = [:cross_references, :missing_docs],

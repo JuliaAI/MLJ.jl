@@ -29,7 +29,7 @@ model type `KNNRegressor` assumes the features are all
   `X` with `coerce(X, :age=>Continuous)`
 - standardizing continuous features and one-hot encoding the
   `Multiclass` features using the `ContinuousEncoder` model
-  
+
 However, we can avoid separately applying these preprocessing steps
 (two of which require `fit!` steps) by combining them with the
 supervised `KKNRegressor` model in a new *pipeline* model, using

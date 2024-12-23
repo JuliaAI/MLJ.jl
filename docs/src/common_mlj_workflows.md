@@ -23,14 +23,16 @@ MLJ_VERSION
 ## Data ingestion
 
 ```@setup workflows
-# to avoid RDatasets as a doc dependency:
+# to avoid RDatasets as a doc dependency, generate synthetic data with
+# similar parameters, with the first four rows mimicking the original dataset
+# for display purposes
 color_off()
 import DataFrames
-channing = (Sex = rand(["Male","Female"], 462),
-            Entry = rand(Int, 462),
-            Exit = rand(Int, 462),
-            Time = rand(Int, 462),
-            Cens = rand(Int, 462)) |> DataFrames.DataFrame
+channing = (Sex = [repeat(["Male"], 4)..., rand(["Male","Female"], 458)...],
+            Entry = Int32[782, 1020, 856, 915, rand(733:1140, 458)...],
+            Exit = Int32[909, 1128, 969, 957, rand(777:1207, 458)...],
+            Time = Int32[127, 108, 113, 42, rand(0:137, 458)...],
+            Cens = Int32[1, 1, 1, 1, rand(0:1, 458)...]) |> DataFrames.DataFrame
 coerce!(channing, :Sex => Multiclass)
 ```
 
@@ -38,16 +40,10 @@ coerce!(channing, :Sex => Multiclass)
 ```julia
 import RDatasets
 channing = RDatasets.dataset("boot", "channing")
+```
 
-julia> first(channing, 4)
-4×5 DataFrame
- Row │ Sex   Entry  Exit   Time   Cens
-     │ Cat…  Int32  Int32  Int32  Int32
-─────┼──────────────────────────────────
-   1 │ Male    782    909    127      1
-   2 │ Male   1020   1128    108      1
-   3 │ Male    856    969    113      1
-   4 │ Male    915    957     42      1
+```@example workflows
+first(channing, 4) |> pretty
 ```
 
 Inspecting metadata, including column scientific types:
@@ -61,17 +57,17 @@ Horizontally splitting data and shuffling rows.
 Here `y` is the `:Exit` column and `X` a table with everything else:
 
 ```@example workflows
-y, X =  unpack(channing, ==(:Exit), rng=123);
+y, X = unpack(channing, ==(:Exit), rng=123)
 nothing # hide
 ```
 
 Here `y` is the `:Exit` column and `X` everything else except `:Time`:
 
 ```@example workflows
-y, X =  unpack(channing,
-               ==(:Exit),
-               !=(:Time);
-               rng=123);
+y, X = unpack(channing,
+              ==(:Exit),
+              !=(:Time);
+              rng=123);
 scitype(y)
 ```
 
@@ -115,7 +111,7 @@ nothing # hide
 Or, if already horizontally split:
 
 ```@example workflows
-(Xtrain, Xtest), (ytrain, ytest)  = partition((X, y), 0.6, multi=true,  rng=123)
+(Xtrain, Xtest), (ytrain, ytest) = partition((X, y), 0.6, multi=true, rng=123)
 ```
 
 
@@ -171,7 +167,7 @@ nothing # hide
 
 ## Instantiating a model
 
-    *Reference:*   [Getting Started](@ref), [Loading Model Code](@ref)
+*Reference:*   [Getting Started](@ref), [Loading Model Code](@ref)
 
 Assumes `MLJDecisionTreeClassifier` is in your environment. Otherwise, try interactive
 loading with `@iload`:
@@ -183,7 +179,7 @@ tree = Tree(min_samples_split=5, max_depth=4)
 
 or
 
-```@julia
+```julia
 tree = (@load DecisionTreeClassifier)()
 tree.min_samples_split = 5
 tree.max_depth = 4
@@ -208,7 +204,7 @@ Do `measures()` to list all losses and scores and their aliases, or refer to the
 StatisticalMeasures.jl [docs](https://juliaai.github.io/StatisticalMeasures.jl/dev/).
 
 
-##  Basic fit/evaluate/predict by hand:
+##  Basic fit/evaluate/predict by hand
 
 *Reference:*   [Getting Started](index.md), [Machines](machines.md),
 [Evaluating Model Performance](evaluating_model_performance.md), [Performance Measures](performance_measures.md)
@@ -251,7 +247,7 @@ Note `LogLoss()` has aliases `log_loss` and `cross_entropy`.
 Predict on the new data set:
 
 ```@example workflows
-Xnew = (FL = rand(3), RW = rand(3), CL = rand(3), CW = rand(3), BD =rand(3))
+Xnew = (FL = rand(3), RW = rand(3), CL = rand(3), CW = rand(3), BD = rand(3))
 predict(mach, Xnew)      # a vector of distributions
 ```
 
@@ -379,8 +375,8 @@ z = transform(mach, y);
 
 *Reference:*   [Tuning Models](tuning_models.md)
 
-```@example workflows
-X, y = @load_iris; nothing # hide
+```@setup workflows
+X, y = @load_iris
 ```
 
 Define a model with nested hyperparameters:
@@ -502,7 +498,7 @@ Tree = @load DecisionTreeRegressor pkg=DecisionTree verbosity=0
 tree_with_target = TransformedTargetModel(model=Tree(),
                                           transformer=y -> log.(y),
                                           inverse = z -> exp.(z))
-pipe2 = (X -> coerce(X, :age=>Continuous)) |> OneHotEncoder() |> tree_with_target;
+pipe2 = (X -> coerce(X, :age=>Continuous)) |> OneHotEncoder() |> tree_with_target
 nothing # hide
 ```
 
@@ -538,7 +534,8 @@ curve = learning_curve(mach,
 
 ```julia
 using Plots
-plot(curve.parameter_values, curve.measurements, xlab=curve.parameter_name, xscale=curve.parameter_scale)
+plot(curve.parameter_values, curve.measurements,
+     xlab=curve.parameter_name, xscale=curve.parameter_scale)
 ```
 
 ![](img/workflows_learning_curve.png)
@@ -558,7 +555,7 @@ curve = learning_curve(mach,
 
 ```julia
 plot(curve.parameter_values, curve.measurements,
-xlab=curve.parameter_name, xscale=curve.parameter_scale)
+     xlab=curve.parameter_name, xscale=curve.parameter_scale)
 ```
 
 ![](img/workflows_learning_curves.png)

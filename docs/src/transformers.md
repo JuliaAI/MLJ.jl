@@ -24,18 +24,16 @@ that learn a probability distribution](@ref) for an example.
 
 ## Built-in transformers
 
-```@docs
-MLJModels.Standardizer
-MLJModels.OneHotEncoder
-MLJModels.ContinuousEncoder
-MLJModels.FillImputer
-MLJModels.UnivariateFillImputer
-MLJModels.FeatureSelector
-MLJModels.UnivariateBoxCoxTransformer
-MLJModels.UnivariateDiscretizer
-MLJModels.UnivariateTimeTypeToContinuous
-```
-
+- [`Standardizer`](@ref)
+- [`OneHotEncoder`](@ref)
+- [`ContinuousEncoder`](@ref)
+- [`FillImputer`](@ref)
+- [`UnivariateFillImputer`](@ref)
+- [`UnivariateBoxCoxTransformer`](@ref)
+- [`InteractionTransformer`](@ref)
+- [`UnivariateDiscretizer`](@ref)
+- [`UnivariateTimeTypeToContinuous`](@ref)
+- [`FeatureSelector`](@ref).
 
 ## Static transformers
 
@@ -193,63 +191,55 @@ K-means clustering algorithm assigns one of three labels 1, 2, 3 to
 the input features of the iris data set and compares them with the
 actual species recorded in the target (not seen by the algorithm).
 
-```julia
+```@setup predtrans
+using MLJ
+```
+
+```@example predtrans
 import Random.seed!
 seed!(123)
 
-X, y = @load_iris;
-KMeans = @load KMeans pkg=ParallelKMeans
+X, y = @load_iris
+KMeans = @load KMeans pkg=Clustering
 kmeans = KMeans()
 mach = machine(kmeans, X) |> fit!
+nothing # hide
+```
 
-# transforming:
-Xsmall = transform(mach);
+Transforming:
+```@example predtrans
+Xsmall = transform(mach)
 selectrows(Xsmall, 1:4) |> pretty
-julia> selectrows(Xsmall, 1:4) |> pretty
-┌─────────────────────┬────────────────────┬────────────────────┐
-│ x1                  │ x2                 │ x3                 │
-│ Float64             │ Float64            │ Float64            │
-│ Continuous          │ Continuous         │ Continuous         │
-├─────────────────────┼────────────────────┼────────────────────┤
-│ 0.0215920000000267  │ 25.314260355029603 │ 11.645232464391299 │
-│ 0.19199200000001326 │ 25.882721893491123 │ 11.489658693899486 │
-│ 0.1699920000000077  │ 27.58656804733728  │ 12.674412792260142 │
-│ 0.26919199999998966 │ 26.28656804733727  │ 11.64392098898145  │
-└─────────────────────┴────────────────────┴────────────────────┘
+```
 
-# predicting:
-yhat = predict(mach);
-compare = zip(yhat, y) |> collect;
+Predicting:
+```@example predtrans
+yhat = predict(mach)
+compare = zip(yhat, y) |> collect
+```
+
+```@example predtrans
 compare[1:8]
-8-element Array{Tuple{CategoricalValue{Int64,UInt32},CategoricalString{UInt32}},1}:
- (1, "setosa")
- (1, "setosa")
- (1, "setosa")
- (1, "setosa")
- (1, "setosa")
- (1, "setosa")
- (1, "setosa")
- (1, "setosa")
+```
 
+```@example predtrans
 compare[51:58]
-8-element Array{Tuple{CategoricalValue{Int64,UInt32},CategoricalString{UInt32}},1}:
- (2, "versicolor")
- (3, "versicolor")
- (2, "versicolor")
- (3, "versicolor")
- (3, "versicolor")
- (3, "versicolor")
- (3, "versicolor")
- (3, "versicolor")
+```
 
+```@example predtrans
 compare[101:108]
-8-element Array{Tuple{CategoricalValue{Int64,UInt32},CategoricalString{UInt32}},1}:
- (2, "virginica")
- (3, "virginica")
- (2, "virginica")
- (2, "virginica")
- (2, "virginica")
- (2, "virginica")
- (3, "virginica")
- (2, "virginica")
+```
+
+## Reference
+
+```@docs
+MLJModels.Standardizer
+MLJModels.OneHotEncoder
+MLJModels.ContinuousEncoder
+MLJModels.FillImputer
+MLJModels.UnivariateFillImputer
+MLJModels.UnivariateBoxCoxTransformer
+MLJModels.InteractionTransformer
+MLJModels.UnivariateDiscretizer
+MLJModels.UnivariateTimeTypeToContinuous
 ```

@@ -1,15 +1,22 @@
 """
    MLJ
 
-[`MLJ`](https://juliaai.github.io/MLJ.jl//dev/) is a Machine Learning toolbox
-for Julia. It collects together functionality from the following packages, which can be
-loaded separately:
+[`MLJ`](https://juliaai.github.io/MLJ.jl//dev/) is a Machine Learning toolbox for
+Julia. It collects together functionality from separate components listed below, which can
+be loaded individually.
+
+Actual model code (e.g., code for instantiating a `DecisionTreeClassifier`) must be
+explicitly loaded from the model-providing package, using `@load`, for example. However
+core model wrappers and some common transformers are immediately
+available; do `localmodels(wrappers=true)` at startup to list.
+
+# Components
 
 - MLJBase.jl: The `machine` interface, tools to `partition` and `unpack` datasets,
   `evaluate`/`evaluate!` for model performance, `|>` pipeline syntax,
   `TransformedTargetModel` wrapper, general model composition syntax (learning networks),
   synthetic data generators, `scitype` and `schema` methods (from ScientificTypes.jl) for
-  checking how MLJ interprets your data
+  checking how MLJ interprets your data. Generally required for any MLJ workflow.
 
 - StatisticalMeasures.jl: MLJ-compatible measures (metrics) for machine learning,
   confusion matrices, ROC curves.
@@ -26,9 +33,14 @@ loaded separately:
 - MLJBalancing.jl: Incorporation of oversampling/undersampling methods in pipelines, via
   the `BalancedModel` wrapper
 
+- FeatureSelection.jl: Transformers for feature selection, and the supervised model wrapper
+  `RecursiveFeatureSelection`.
+
 - MLJFlow.jl: Integration with MLflow workflow tracking
 
 - OpenML.jl: Tool for grabbing datasets from OpenML.org
+
+
 
 """
 module MLJ
@@ -49,6 +61,7 @@ import MLJBase.save
 using MLJEnsembles
 using MLJTuning
 using MLJModels
+@reexport using FeatureSelection
 using OpenML
 @reexport using MLJFlow
 @reexport using StatisticalMeasures
@@ -133,7 +146,7 @@ export nrows, color_off, color_on,
     @pipeline, Stack, Pipeline, TransformedTargetModel,
     ResamplingStrategy, Holdout, CV, TimeSeriesCV,
     StratifiedCV, evaluate!, Resampler, iterator, PerformanceEvaluation,
-    default_resource, pretty,
+    default_resource, default_logger, pretty,
     make_blobs, make_moons, make_circles, make_regression,
     fit_only!, return!, int, decoder,
     default_scitype_check_level,
@@ -154,11 +167,11 @@ export Grid, RandomSearch, Explicit, TunedModel, LatinHypercube,
 # re-export from MLJModels:
 export models, localmodels, @load, @iload, load, info, doc,
     ConstantRegressor, ConstantClassifier,     # builtins/Constant.jl
-    FeatureSelector, UnivariateStandardizer,   # builtins/Transformers.jl
+    UnivariateStandardizer,
     Standardizer, UnivariateBoxCoxTransformer,
     OneHotEncoder, ContinuousEncoder, UnivariateDiscretizer,
     FillImputer, matching, BinaryThresholdPredictor,
-    UnivariateTimeTypeToContinuous, InteractionTransformer
+    UnivariateTimeTypeToContinuous, InteractionTransformer  # builtins/Transformers.jl
 
 # re-export from MLJIteration:
 export MLJIteration

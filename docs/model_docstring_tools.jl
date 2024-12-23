@@ -5,7 +5,7 @@ const PATH_TO_MODEL_DOCS = joinpath(@__DIR__, "src", "models")
 """
     remove_doc_refs(str::AbstractString)
 
-Removes `@ref` references from `str. For example, a substring of the form
+Removes `@ref` references from `str`. For example, a substring of the form
 "[`some.thing_like_this123!`](@ref)" is replaced with "`some.thing_like_this123!`".
 
 """
@@ -27,8 +27,8 @@ handle(model) = model.name*"_"*model.package_name
 **Private method.**
 
 Compose and write to file the documentation page for `model`. Here `model` is an entry in
-the MLJ Model Registry, i.e., an element of `MLJModels.models()`. The file name has the
-form `"ModelName_PackageName.md"`, for example,
+the MLJ Model Registry, i.e., an element of `MLJModels.models(; wrappers=true)`. The file
+name has the form `"ModelName_PackageName.md"`, for example,
 `"DecisionTreeClassifier_DecisionTree.md"`. Such a page can be referenced from any other
 markdown page in /docs/src/ like this: `[DecisionTreeClassifier](@ref
 DecisionTreeClassifier_DecisionTree)`.
@@ -56,6 +56,7 @@ const DESCRIPTORS_GIVEN_HANDLE =
 # determined the list of all descriptors, ranked by frequency:
 const descriptors = vcat(values(DESCRIPTORS_GIVEN_HANDLE)...)
 const ranking = MLJBase.countmap(descriptors)
+ranking["meta algorithms"] = 1e10
 const DESCRIPTORS = sort(unique(descriptors), by=d -> ranking[d], rev=true)
 const HANDLES = keys(DESCRIPTORS_GIVEN_HANDLE)
 
@@ -67,7 +68,7 @@ handle as key in /docs/src/ModelDescriptors.toml.
 
 """
 function models_missing_descriptors()
-    handles = handle.(models())
+    handles = handle.(models(wrappers=true))
     filter(handles) do h
         !(h in HANDLES)
     end
@@ -82,7 +83,7 @@ Return the list of  models with a given `descriptor`, such as "regressor", as
 these appear in /src/docs/ModelDescriptors.toml.
 
 """
-modelswith(descriptor) = filter(models()) do model
+modelswith(descriptor) = filter(models(wrappers=true)) do model
     descriptor in DESCRIPTORS_GIVEN_HANDLE[handle(model)]
 end
 
