@@ -5,7 +5,7 @@
 
 ```@repl cheat
 using MLJ
-MLJ_VERSION # version of MLJ for this cheatsheet
+MLJ_VERSION
 ```
 
 ## Model search and code loading
