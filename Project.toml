@@ -47,7 +47,7 @@ ProgressMeter = "1.1"
 Random = "<0.0.1, 1"
 Reexport = "1.2"
 ScientificTypes = "3"
-StatisticalMeasures = "0.1"
+StatisticalMeasures = "0.1, 0.2"
 Statistics = "<0.0.1, 1"
 StatsBase = "0.32,0.33, 0.34"
 Tables = "0.2,1.0"
@@ -92,42 +92,4 @@ SymbolicRegression = "8254be44-1295-4e6a-a16d-46603ac705cb"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = [
-    "BetaML",
-    "CatBoost",
-    "EvoLinear",
-    "EvoTrees",
-    "Imbalance",
-    "InteractiveUtils",
-    "LightGBM",
-    "LaplaceRedux",
-    "MLJClusteringInterface",
-    "MLJDecisionTreeInterface",
-    "MLJFlux",
-    "MLJGLMInterface",
-    "MLJLIBSVMInterface",
-    "MLJLinearModels",
-    "MLJMultivariateStatsInterface",
-    "MLJNaiveBayesInterface",
-    "MLJScikitLearnInterface",
-    "MLJTSVDInterface",
-    "MLJTestInterface",
-    "MLJTestIntegration",
-    "MLJText",
-    "MLJXGBoostInterface",
-    "Markdown",
-    "NearestNeighborModels",
-    "OneRule",
-    "OutlierDetectionNeighbors",
-    "OutlierDetectionPython",
-    "ParallelKMeans",
-    "PartialLeastSquaresRegressor",
-    "PartitionedLS",
-    "SelfOrganizingMaps",
-    "SIRUS",
-    "SymbolicRegression",
-    "StableRNGs",
-    "Suppressor",
-    "Test",
-]
-
+test = ["BetaML", "CatBoost", "EvoLinear", "EvoTrees", "Imbalance", "InteractiveUtils", "LightGBM", "LaplaceRedux", "MLJClusteringInterface", "MLJDecisionTreeInterface", "MLJFlux", "MLJGLMInterface", "MLJLIBSVMInterface", "MLJLinearModels", "MLJMultivariateStatsInterface", "MLJNaiveBayesInterface", "MLJScikitLearnInterface", "MLJTSVDInterface", "MLJTestInterface", "MLJTestIntegration", "MLJText", "MLJXGBoostInterface", "Markdown", "NearestNeighborModels", "OneRule", "OutlierDetectionNeighbors", "OutlierDetectionPython", "ParallelKMeans", "PartialLeastSquaresRegressor", "PartitionedLS", "SelfOrganizingMaps", "SIRUS", "SymbolicRegression", "StableRNGs", "Suppressor", "Test"]
