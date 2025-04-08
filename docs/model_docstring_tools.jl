@@ -116,7 +116,7 @@ Write the "Model Browser" page at /docs/model_browser.md"
 """
 function write_page()
     header = """
-           # Model Browser
+           # [Model Browser](@id model_browser)
 
            Models may appear under multiple categories.
 
