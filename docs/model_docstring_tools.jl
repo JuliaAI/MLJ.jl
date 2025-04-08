@@ -19,6 +19,7 @@ function remove_doc_refs(page)
 end
 
 demote_headings(str) = replace(str, "# "=>"## ")
+remove_example_fencing(str) = replace(str, "```@example"=>"```julia")
 handle(model) = model.name*"_"*model.package_name
 
 """
@@ -41,7 +42,8 @@ function write_page(model; path=PATH_TO_MODEL_DOCS)
     open(pagepath, "w") do stream
         header = "# [$(model.name)](@id $id)\n\n"
         md_page = doc(model.name, pkg=model.package_name)
-        page = header*demote_headings(string(md_page)) |> remove_doc_refs
+        page = header*demote_headings(string(md_page)) |> remove_doc_refs |>
+            remove_example_fencing
         write(stream, page)
         nothing
     end

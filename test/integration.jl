@@ -41,9 +41,6 @@ FILTER_GIVEN_ISSUE = Dict(
         model -> model.name == "AutoEncoderMLJ",
      "https://github.com/rikhuijzer/SIRUS.jl/issues/78" =>
         model -> model.package_name == "SIRUS",
-    "https://github.com/lalvim/PartialLeastSquaresRegressor.jl/issues/29 "*
-        "(still need release > 2.2.0)" =>
-        model -> model.package_name == "PartialLeastSquaresRegressor",
     "MLJScikitLearnInterface - multiple issues, WIP" =>
         model -> model.package_name == "MLJScikitLearnInterface" &&
         model.name in [
