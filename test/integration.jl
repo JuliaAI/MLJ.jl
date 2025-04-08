@@ -29,9 +29,6 @@ FILTER_GIVEN_ISSUE = Dict(
         model.package_name == "OutlierDetectionNeighbors") ||
         (model.name == "TSVDTransformer" &&
         model.package_name == "TSVD"),
-    "https://github.com/OutlierDetectionJL/OutlierDetectionPython.jl/issues/4" =>
-        model -> model.name == "CDDetector" &&
-        model.package_name == "OutlierDetectionPython",
     "https://github.com/JuliaAI/CatBoost.jl/issues/22" =>
         model -> model.name == "CatBoostClassifier",
     "https://github.com/sylvaticus/BetaML.jl/issues/65" =>
