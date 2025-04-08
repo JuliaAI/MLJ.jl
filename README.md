@@ -39,10 +39,10 @@ The MLJ.jl package is an umbrella package for components distributed in a number
 
 **New to MLJ?** Start [here](https://juliaml.ai).
 
-**Documentation** is [here](https://JuliaAI.github.io/MLJ.jl/stable/)
+**Documentation** is [here](https://JuliaAI.github.io/MLJ.jl/stable/).
 
 **Integrating an existing machine learning model into the MLJ
-framework?** Start [here](https://juliaai.github.io/MLJModelInterface.jl/stable/)
+framework?** Start [here](https://juliaai.github.io/MLJModelInterface.jl/stable/).
 
 
 
