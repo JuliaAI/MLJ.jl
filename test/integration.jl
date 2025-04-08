@@ -59,7 +59,7 @@ FILTER_GIVEN_ISSUE = Dict(
         model -> model.package_name == "SymbolicRegression" &&
         model.name == "SRRegressor",
     "https://github.com/JuliaAI/Imbalance.jl/issues/103" =>
-        model.package_name == "Imbalance",
+        model -> model.package_name == "Imbalance",
 )
 
 
