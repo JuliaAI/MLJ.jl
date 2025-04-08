@@ -47,7 +47,7 @@ ProgressMeter = "1.1"
 Random = "<0.0.1, 1"
 Reexport = "1.2"
 ScientificTypes = "3"
-StatisticalMeasures = "0.1"
+StatisticalMeasures = "0.2"
 Statistics = "<0.0.1, 1"
 StatsBase = "0.32,0.33, 0.34"
 Tables = "0.2,1.0"
@@ -82,7 +82,6 @@ OneRule = "90484964-6d6a-4979-af09-8657dbed84ff"
 OutlierDetectionNeighbors = "51249a0a-cb36-4849-8e04-30c7f8d311bb"
 OutlierDetectionPython = "2449c660-d36c-460e-a68b-92ab3c865b3e"
 ParallelKMeans = "42b8e9d4-006b-409a-8472-7f34b3fb58af"
-PartialLeastSquaresRegressor = "f4b1acfe-f311-436c-bb79-8483f53c17d5"
 PartitionedLS = "19f41c5e-8610-11e9-2f2a-0d67e7c5027f"
 SIRUS = "cdeec39e-fb35-4959-aadb-a1dd5dede958"
 SelfOrganizingMaps = "ba4b7379-301a-4be0-bee6-171e4e152787"
@@ -121,7 +120,6 @@ test = [
     "OutlierDetectionNeighbors",
     "OutlierDetectionPython",
     "ParallelKMeans",
-    "PartialLeastSquaresRegressor",
     "PartitionedLS",
     "SelfOrganizingMaps",
     "SIRUS",
