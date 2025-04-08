@@ -29,8 +29,6 @@ FILTER_GIVEN_ISSUE = Dict(
         model.package_name == "OutlierDetectionNeighbors") ||
         (model.name == "TSVDTransformer" &&
         model.package_name == "TSVD"),
-    "https://github.com/JuliaAI/CatBoost.jl/issues/22" =>
-        model -> model.name == "CatBoostClassifier",
     "https://github.com/sylvaticus/BetaML.jl/issues/65" =>
         model -> model.name in ["KMeans", "KMedoids"] &&
         model.package_name == "BetaML",
