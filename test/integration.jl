@@ -53,8 +53,8 @@ FILTER_GIVEN_ISSUE = Dict(
     "https://github.com/MilesCranmer/SymbolicRegression.jl/issues/390" =>
         model -> model.package_name == "SymbolicRegression" &&
         model.name == "SRRegressor",
-    "https://github.com/JuliaAI/Imbalance.jl/issues/103" =>
-        model -> model.package_name == "Imbalance",
+    # "https://github.com/JuliaAI/Imbalance.jl/issues/103" =>
+    #     model -> model.package_name == "Imbalance",
 )
 
 
