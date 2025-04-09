@@ -1,6 +1,9 @@
 # Road map
 
-February 2020; updated, July 2023
+February 2020; updated, December 2024
+
+The road map below is more big-picture; to get into the weeds, see also [this GH
+Project](https://github.com/orgs/JuliaAI/projects/1).
 
 Please visit [contributing guidelines](CONTRIBUTING.md) if interested
 in contributing to MLJ.
@@ -29,20 +32,14 @@ in contributing to MLJ.
 
 ### Priorities
 
-Priorities are somewhat fluid, depending on funding offers and
-available talent. Rough priorities for the core development team at
-present are marked with **†** below. However, we are always keen to
-review external contributions in any area.
+Priorities are somewhat fluid, depending on funding offers and available talent. However,
+we are always keen to review external contributions in any area.
 
 ## Future enhancements
 
-The following road map is more big-picture; see also [this
-GH Project](https://github.com/orgs/JuliaAI/projects/1).
-
-
 ### Adding models
 
-- [ ] **Integrate deep learning** using [Flux.jl](https://github.com/FluxML/Flux.jl.git) deep learning.  [Done](https://github.com/FluxML/MLJFlux.jl) but can
+- [x] **Integrate deep learning** using [Flux.jl](https://github.com/FluxML/Flux.jl.git) deep learning.  [Done](https://github.com/FluxML/MLJFlux.jl) but can
   improve the experience by:
 
   - [x] finishing iterative model wrapper [#139](https://github.com/JuliaAI/MLJ.jl/issues/139)
@@ -71,19 +68,10 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 
 ### Enhancing core functionality
 
--   [x] Iterative model control [#139](https://github.com/JuliaAI/MLJ.jl/issues/139). [Done](https://github.com/JuliaAI/MLJIteration.jl)
-
 -   [ ] **†** Add more tuning
 	strategies. See [here](https://github.com/JuliaAI/MLJTuning.jl#what-is-provided-here)
 	for complete
 	wish-list. Particular focus on:
-
-	- [x] random search
-	([#37](https://github.com/JuliaAI/MLJ.jl/issues/37))
-	(done)
-
-	- [x] Latin hypercube
-	  [done](https://github.com/JuliaAI/MLJTuning.jl/pull/96)
 
 	- [ ] Bayesian methods, starting with Gaussian Process methods a
 	  la PyMC3. Some preliminary research done.
@@ -99,8 +87,6 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 	- [ ] Genetic algorithms
 [#38](https://github.com/JuliaAI/MLJ.jl/issues/38)
 
-	- [ ] Particle Swarm Optimization (current WIP, GSoC project @lhnguyen-vn)
-
 	- [ ] tuning strategies for non-Cartesian spaces of models [MLJTuning
 	#18](https://github.com/JuliaAI/MLJTuning.jl/issues/18), architecture search, and other AutoML workflows
 
@@ -110,16 +96,6 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 - [ ]   Give `EnsembleModel` a more extendible API and extend beyond bagging
 	(boosting, etc) and migrate to a separate repository?
 	[#363](https://github.com/JuliaAI/MLJ.jl/issues/363)
-
-- [ ]  **†** Enhance complex model composition:
-
-	- [x] Introduce a canned
-	stacking model wrapper ([POC](https://JuliaAI.github.io/DataScienceTutorials.jl/getting-started/stacking/)). WIP @olivierlabayle
-
-	- [ ] Get rid of macros for creating pipelines and possibly
-	implement target transforms as wrappers ([MLJBase
-	#594](https://github.com/JuliaAI/MLJ.jl/issues/594))
-	WIP @CameronBieganek and @ablaom
 
 
 ### Broadening scope
@@ -136,12 +112,6 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
   [Shapley.jl (older)](https://github.com/frycast/Shapley.jl) and
   [this
   proposal](https://julialang.org/jsoc/gsoc/MLJ/#interpretable_machine_learning_in_julia)
-
-- [x]  Spin-off a stand-alone measures (loss functions) package
-	(currently
-	[here](https://github.com/JuliaAI/MLJBase.jl/tree/master/src/measures)). Introduce
-	measures for multi-targets [MLJBase
-	#502](https://github.com/JuliaAI/MLJBase.jl/issues/502).
 
 - [ ] Add sparse data support and better support for NLP models; we
 	could use [NaiveBayes.jl](https://github.com/dfdx/NaiveBayes.jl)
@@ -171,8 +141,6 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 
 	- [ ] provide visualizations that MLR3 provides via [mlr3viz](https://github.com/mlr-org/mlr3viz)
 
-- [ ] Extend API to accommodate outlier detection, as provided by [OutlierDetection.jl](https://github.com/davnn/OutlierDetection.jl) [#780](https://github.com/JuliaAI/MLJ.jl/issues/780) WIP @davn and @ablaom
-
 - [ ] Add more pre-processing tools:
 
   - [x] missing value imputation using Gaussian Mixture Model. Done,
@@ -182,8 +150,6 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 	training on a large collection of datasets with manually labelled
 	scitype schema.
 	
-- [ ] Add integration with [MLFlow](https://julialang.org/jsoc/gsoc/MLJ/#mlj_and_mlflow_integration); see [this proposal](https://julialang.org/jsoc/gsoc/MLJ/#mlj_and_mlflow_integration)
-
 - [ ] Extend integration with [OpenML](https://www.openml.org) WIP @darenasc
 
 
@@ -203,6 +169,3 @@ GH Project](https://github.com/orgs/JuliaAI/projects/1).
 - [ ]  Automated estimates of cpu/memory requirements
 	[#71](https://github.com/JuliaAI/MLJ.jl/issues/71)
 
-- [x] Add multithreading to tuning [MLJTuning
-  #15](https://github.com/JuliaAI/MLJTuning.jl/issues/15)
-  [Done](https://github.com/JuliaAI/MLJTuning.jl/pull/42).

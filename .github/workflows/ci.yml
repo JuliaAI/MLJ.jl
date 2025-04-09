@@ -39,9 +39,6 @@ jobs:
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v1
-        with:
-          file: lcov.info
   integration:
     # This job (the `integration` job) has a conditional (`if:`) with the following
     # three conditions:
@@ -77,9 +74,6 @@ jobs:
           # This environment variable enables the integration tests:
           MLJ_TEST_INTEGRATION: '1'
       - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v1
-        with:
-          file: lcov.info
   docs:
     name: Documentation
     runs-on: ubuntu-latest

@@ -29,11 +29,6 @@ FILTER_GIVEN_ISSUE = Dict(
         model.package_name == "OutlierDetectionNeighbors") ||
         (model.name == "TSVDTransformer" &&
         model.package_name == "TSVD"),
-    "https://github.com/OutlierDetectionJL/OutlierDetectionPython.jl/issues/4" =>
-        model -> model.name == "CDDetector" &&
-        model.package_name == "OutlierDetectionPython",
-    "https://github.com/JuliaAI/CatBoost.jl/issues/22" =>
-        model -> model.name == "CatBoostClassifier",
     "https://github.com/sylvaticus/BetaML.jl/issues/65" =>
         model -> model.name in ["KMeans", "KMedoids"] &&
         model.package_name == "BetaML",
@@ -41,9 +36,6 @@ FILTER_GIVEN_ISSUE = Dict(
         model -> model.name == "AutoEncoderMLJ",
      "https://github.com/rikhuijzer/SIRUS.jl/issues/78" =>
         model -> model.package_name == "SIRUS",
-    "https://github.com/lalvim/PartialLeastSquaresRegressor.jl/issues/29 "*
-        "(still need release > 2.2.0)" =>
-        model -> model.package_name == "PartialLeastSquaresRegressor",
     "MLJScikitLearnInterface - multiple issues, WIP" =>
         model -> model.package_name == "MLJScikitLearnInterface" &&
         model.name in [
@@ -60,7 +52,9 @@ FILTER_GIVEN_ISSUE = Dict(
         model.name == "NeuralNetworkClassifier",
     "https://github.com/MilesCranmer/SymbolicRegression.jl/issues/390" =>
         model -> model.package_name == "SymbolicRegression" &&
-        model.name == "SRRegressor"
+        model.name == "SRRegressor",
+    # "https://github.com/JuliaAI/Imbalance.jl/issues/103" =>
+    #     model -> model.package_name == "Imbalance",
 )
 
 

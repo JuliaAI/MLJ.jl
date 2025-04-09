@@ -5,7 +5,7 @@
 
 ```@repl cheat
 using MLJ
-MLJ_VERSION # version of MLJ for this cheatsheet
+MLJ_VERSION
 ```
 
 ## Model search and code loading
@@ -216,7 +216,7 @@ evaluate!(mach, resampling=[(fold1, fold2), (fold2, fold1)], measure=rms)
 
 `StratifiedCV(nfolds=6, rng=1234)` for stratified cross-validation
 
-`TimeSeriesSV(nfolds=4)` for time-series cross-validation
+`TimeSeriesCV(nfolds=4)` for time-series cross-validation
 
 `InSample()`: test set = train set
 

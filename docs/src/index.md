@@ -8,9 +8,7 @@
     style="color: #389826;">Install</a>         &nbsp;|&nbsp;
   <a href="learning_mlj"   style="color: #389826;">Learn</a>            &nbsp;|&nbsp;
   <a href="mlj_cheatsheet" style="color: #9558B2;">Cheatsheet</a>       &nbsp;|&nbsp;
-  <a href="common_mlj_workflows" style="color: #9558B2;">Workflows</a>  &nbsp;|&nbsp;
-  <a href="https://github.com/JuliaAI/MLJ.jl/" style="color: #9558B2;">For Developers</a> &nbsp;|&nbsp;
-  <a href="third_party_packages" style="color: #9558B2;">3rd Party Packages</a>
+  <a href="common_mlj_workflows" style="color: #9558B2;">Workflows</a>
 </div>
 
 <span style="color: #9558B2;font-size:4.5em;">
@@ -34,7 +32,9 @@ To support MLJ development, please cite these works or star the repo:
   Star</a>
 ```
 
-# [Model Browser](@ref)
+# Model Browser
+
+[Text Based](@ref model_browser) | [Graphical](https://juliaml.ai/machines) 
 
 # Reference Manual
 
