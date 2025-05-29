@@ -44,9 +44,6 @@ FILTER_GIVEN_ISSUE = Dict(
             "MultiTaskLassoCVRegressor",
             "MultiTaskLassoRegressor",
         ],
-    "https://github.com/JuliaAI/FeatureSelection.jl/issues/15" =>
-        model -> model.package_name == "FeatureSelection" &&
-        model.name == "RecursiveFeatureElimination",
     "https://github.com/sylvaticus/BetaML.jl/issues/75" =>
         model -> model.package_name == "BetaML" &&
         model.name == "NeuralNetworkClassifier",
@@ -155,11 +152,7 @@ PATHOLOGIES = filter(MODELS) do model
         # TO REDUCE TESTING TIME
         model.package_name == "MLJScikitLearnInterface" ||
         # "https://github.com/MilesCranmer/SymbolicRegression.jl/issues/390" =>
-        model.package_name == "SymbolicRegression" ||
-        # can be removed after resolution of
-        # https://github.com/JuliaAI/FeatureSelection.jl/issues/15
-        # and a Model Registry update
-        model.name == "RecursiveFeatureElimination"
+        model.package_name == "SymbolicRegression"
 end
 
 WITHOUT_DATASETS = vcat(WITHOUT_DATASETS, PATHOLOGIES)
