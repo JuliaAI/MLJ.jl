@@ -50,9 +50,6 @@ FILTER_GIVEN_ISSUE = Dict(
     "https://github.com/sylvaticus/BetaML.jl/issues/75" =>
         model -> model.package_name == "BetaML" &&
         model.name == "NeuralNetworkClassifier",
-    "https://github.com/MilesCranmer/SymbolicRegression.jl/issues/390" =>
-        model -> model.package_name == "SymbolicRegression" &&
-        model.name == "SRRegressor",
     # "https://github.com/JuliaAI/Imbalance.jl/issues/103" =>
     #     model -> model.package_name == "Imbalance",
 )
@@ -140,7 +137,8 @@ for model in WITHOUT_DATASETS
 end
 
 # Additionally exclude some models for which the inferred datasets have a model-specific
-# pathology that prevents valid generic test.
+# pathology that prevents valid generic test, or for some other reason requiring complete
+# exclusion from testing.
 
 PATHOLOGIES = filter(MODELS) do model
     # in the subsampling occuring in stacking, we get a Cholesky
@@ -156,6 +154,8 @@ PATHOLOGIES = filter(MODELS) do model
         (model.name == "LOCIDetector" && model.package_name == "OutlierDetectionPython") ||
         # TO REDUCE TESTING TIME
         model.package_name == "MLJScikitLearnInterface" ||
+        # "https://github.com/MilesCranmer/SymbolicRegression.jl/issues/390" =>
+        model.package_name == "SymbolicRegression" ||
         # can be removed after resolution of
         # https://github.com/JuliaAI/FeatureSelection.jl/issues/15
         # and a Model Registry update
