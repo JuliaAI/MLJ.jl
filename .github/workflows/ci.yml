@@ -31,11 +31,11 @@ jobs:
           echo "head_ref is: ${{ github.head_ref }}"
           echo "target repository is: ${{ github.repository }}"
           echo "head repository is: ${{ github.event.pull_request.head.repo.full_name }}"
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
-      - uses: julia-actions/cache@v1
+      - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
       - uses: julia-actions/julia-processcoverage@v1
@@ -61,13 +61,13 @@ jobs:
         os:
           - 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: julia-actions/setup-julia@v1
+      - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
-      - uses: julia-actions/cache@v1
+      - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
         env:
@@ -80,45 +80,45 @@ jobs:
     env:
       JULIA_PKG_SERVER: ""
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: julia-actions/setup-julia@v1
+      - uses: julia-actions/setup-julia@v2
         with:
           version: '1'
       - run: |
-         julia -e '
-           function set_environment_variable(name::AbstractString, value::AbstractString)
-               github_env = ENV["GITHUB_ENV"]
-               touch(github_env)
-               open(github_env, "a") do io
-                   println(io, "$(name)=$(value)")
-               end
-           end
-           event_name = "${{ github.event_name }}"
-           if event_name == "pull_request"
-               base_ref = "${{ github.base_ref }}"
-               head_ref = "${{ github.head_ref }}"
-               base_repository = "${{ github.repository }}"
-               head_repository = "${{ github.event.pull_request.head.repo.full_name }}"
-               build_docs = (base_ref == "master") && (head_ref == "dev") && (base_repository == head_repository)
-           elseif event_name == "push"
-               ref = "${{ github.ref }}"
-               build_docs = (ref == "refs/heads/master") || (startswith(ref, "refs/tags/"))
-           elseif event_name == "schedule"
-               build_docs = ref == "refs/heads/master"
-           elseif event_name == "workflow_dispatch"
-               build_docs = ref == "refs/heads/master"
-           else
-               build_docs = false
-           end
-           if build_docs
-               @info("We will build the docs")
-               set_environment_variable("BUILD_DOCS", "true")
-           else
-               @info("We will NOT build the docs")
-               set_environment_variable("BUILD_DOCS", "false")
-           end'
+          function set_environment_variable(name::AbstractString, value::AbstractString)
+              github_env = ENV["GITHUB_ENV"]
+              touch(github_env)
+              open(github_env, "a") do io
+                  println(io, "$(name)=$(value)")
+              end
+          end
+          event_name = "${{ github.event_name }}"
+          if event_name == "pull_request"
+              base_ref = "${{ github.base_ref }}"
+              head_ref = "${{ github.head_ref }}"
+              base_repository = "${{ github.repository }}"
+              head_repository = "${{ github.event.pull_request.head.repo.full_name }}"
+              build_docs = (base_ref == "master") && (head_ref == "dev") && (base_repository == head_repository)
+          elseif event_name == "push"
+              ref = "${{ github.ref }}"
+              build_docs = (ref == "refs/heads/master") || (startswith(ref, "refs/tags/"))
+          elseif event_name == "schedule"
+              build_docs = ref == "refs/heads/master"
+          elseif event_name == "workflow_dispatch"
+              build_docs = ref == "refs/heads/master"
+          else
+              build_docs = false
+          end
+          if build_docs
+              @info("We will build the docs")
+              set_environment_variable("BUILD_DOCS", "true")
+          else
+              @info("We will NOT build the docs")
+              set_environment_variable("BUILD_DOCS", "false")
+          end
+        shell: julia --color=yes {0}
       - run: |
           if ENV["BUILD_DOCS"] == "true"
             using Pkg
