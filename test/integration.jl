@@ -8,12 +8,17 @@ const OTHER_TEST_LEVEL = 3
 
 # # IMPORTANT
 
-# There are two main ways to flag a problem model for integration test purposes.
+# There are three main ways to flag a problem model for integration test purposes.
 
 # - Adding to `FILTER_GIVEN_ISSUE` means the model is allowed to fail silently, unless
 #  tests pass, a fact that will be reported in the log.
 
-# - Adding to `PATHOLOGIES` completely excludes the model from testing.
+# - Adding to `PATHOLOGIES` excludes the model from testing (although there will still be
+#   an attempt to load the model type, unless the package providing it is excluded from
+#   the MLJ/Project.toml)
+
+# - Completetely exclude all models provided by a particular package from testing, by
+#   excluding the package from the [extras] section of MLJ/Project.toml.
 
 # Obviously the first method is strongly preferred.
 
@@ -52,9 +57,34 @@ FILTER_GIVEN_ISSUE = Dict(
 )
 
 
+# # SEE IF PROJECT FILE INCLUDES ALL MODEL-PROVIDING PACKAGES
+
+# helper; `project_lines` are lines from a Project.toml file:
+function pkgs(project_lines)
+    project = TOML.parse(join(project_lines, "\n"))
+    headings = Set(keys(project)) ∩ ["deps", "extras"]
+    return vcat(collect.(keys.([project[h] for h in headings]))...)
+end
+
+# identify missing pkgs:
+project_path = joinpath(@__DIR__, "..", "Project.toml")
+project_lines = open(project_path) do io
+    readlines(io)
+end
+pkgs_in_project = pkgs(project_lines)
+registry_project_lines = MLJModels.Registry.registry_project()
+pkgs_in_registry = pkgs(registry_project_lines)
+missing_pkgs = setdiff(pkgs_in_registry, pkgs_in_project)
+# If there are missing packages a warning is issued at the end
+
+
 # # LOG OUTSTANDING ISSUES TO STDOUT
 
-const MODELS = models();
+const MODELS = filter(models()) do m
+    pkg = m.package_name
+    api_pkg = split(m.load_path, '.') |> first
+    api_pkg in pkgs_in_project
+end
 const JULIA_MODELS = filter(m->m.is_pure_julia, MODELS);
 const OTHER_MODELS = setdiff(MODELS, JULIA_MODELS);
 
@@ -158,32 +188,6 @@ end
 WITHOUT_DATASETS = vcat(WITHOUT_DATASETS, PATHOLOGIES)
 
 
-# # CHECK PROJECT FILE INCLUDES ALL MODEL-PROVIDING PACKAGES
-
-# helper; `project_lines` are lines from a Project.toml file:
-function pkgs(project_lines)
-    project = TOML.parse(join(project_lines, "\n"))
-    headings = Set(keys(project)) ∩ ["deps", "extras"]
-    return vcat(collect.(keys.([project[h] for h in headings]))...)
-end
-
-# identify missing pkgs:
-project_path = joinpath(@__DIR__, "..", "Project.toml")
-project_lines = open(project_path) do io
-    readlines(io)
-end
-pkgs_in_project = pkgs(project_lines)
-registry_project_lines = MLJModels.Registry.registry_project()
-pkgs_in_registry = pkgs(registry_project_lines)
-missing_pkgs = setdiff(pkgs_in_registry, pkgs_in_project)
-
-# throw error if there are any:
-isempty(missing_pkgs) || error(
-    "Integration tests cannot proceed because the following packages are "*
-        "missing from the [extras] section of the MLJ Project.toml file: "*
-        join(missing_pkgs, ", ")
-)
-
 # # LOAD ALL MODEL CODE
 
 # Load all the model providing packages with a broad level=1 test:
@@ -236,10 +240,14 @@ for (model_set, level) in [
     end
 end
 
+isempty(missing_pkgs) || @warn  "Integration tests for the following packages in the "*
+    "model registry were omitted, as they do not have an entry in the [extras] "*
+    "section of the MLJ Project.toml file: "*join(missing_pkgs, ", ")
 okay = isempty(problems)
-okay || print("Integration tests failed for these models: \n $problems")
-println()
+okay || @error "Integration tests failed for these models: \n $problems"
 
+println()
+# throw error if there are any issues:
 @test okay
 
 true
