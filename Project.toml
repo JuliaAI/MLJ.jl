@@ -1,7 +1,7 @@
 name = "MLJ"
 uuid = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 authors = ["Anthony D. Blaom <anthony.blaom@gmail.com>"]
-version = "0.20.8"
+version = "0.20.9"
 
 [deps]
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
@@ -88,7 +88,6 @@ SIRUS = "cdeec39e-fb35-4959-aadb-a1dd5dede958"
 SelfOrganizingMaps = "ba4b7379-301a-4be0-bee6-171e4e152787"
 StableRNGs = "860ef19b-820b-49d6-a774-d7a799459cd3"
 Suppressor = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
-SymbolicRegression = "8254be44-1295-4e6a-a16d-46603ac705cb"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
@@ -125,7 +124,6 @@ test = [
 "PartitionedLS",
 "SelfOrganizingMaps",
 "SIRUS",
-"SymbolicRegression",
 "StableRNGs",
 "Suppressor",
 "Test",
