@@ -29,7 +29,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 
 [compat]
-CategoricalArrays = "0.8,0.9, 0.10"
+CategoricalArrays = "0.8,0.9, 0.10, 1"
 ComputationalResources = "0.3"
 Distributions = "0.21,0.22,0.23, 0.24, 0.25"
 FeatureSelection = "0.2"
@@ -62,7 +62,6 @@ Imbalance = "c709b415-507b-45b7-9a3d-1767c89fde68"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 LaplaceRedux = "c52c1a26-f7c5-402b-80be-ba1e638ad478"
 LightGBM = "7acf609c-83a4-11e9-1ffb-b912bcd3b04a"
-Maxnet = "81f79f80-22f2-4e41-ab86-00c11cf0f26f"
 MLJClusteringInterface = "d354fa79-ed1c-40d4-88ef-b8c7bd1568af"
 MLJDecisionTreeInterface = "c6f25543-311c-4c74-83dc-3ea6d1015661"
 MLJFlux = "094fc8d1-fd35-5302-93ea-dabda2abf845"
@@ -78,6 +77,7 @@ MLJTestInterface = "72560011-54dd-4dc2-94f3-c5de45b75ecd"
 MLJText = "5e27fcf9-6bac-46ba-8580-b5712f3d6387"
 MLJXGBoostInterface = "54119dfa-1dab-4055-a167-80440f4f7a91"
 Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
+Maxnet = "81f79f80-22f2-4e41-ab86-00c11cf0f26f"
 NearestNeighborModels = "636a865e-7cf4-491e-846c-de09b730eb36"
 OneRule = "90484964-6d6a-4979-af09-8657dbed84ff"
 OutlierDetectionNeighbors = "51249a0a-cb36-4849-8e04-30c7f8d311bb"
@@ -91,40 +91,4 @@ Suppressor = "fd094767-a336-5f1f-9728-57cf17d0bbfb"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = [
-"BetaML",
-"CatBoost",
-"EvoLinear",
-"EvoTrees",
-"Imbalance",
-"InteractiveUtils",
-"LightGBM",
-"LaplaceRedux",
-"Maxnet",
-"MLJClusteringInterface",
-"MLJDecisionTreeInterface",
-"MLJFlux",
-"MLJGLMInterface",
-"MLJLIBSVMInterface",
-"MLJLinearModels",
-"MLJMultivariateStatsInterface",
-"MLJNaiveBayesInterface",
-"MLJScikitLearnInterface",
-"MLJTSVDInterface",
-"MLJTestInterface",
-"MLJTestIntegration",
-"MLJText",
-"MLJXGBoostInterface",
-"Markdown",
-"NearestNeighborModels",
-"OneRule",
-"OutlierDetectionNeighbors",
-"OutlierDetectionPython",
-"ParallelKMeans",
-"PartitionedLS",
-"SelfOrganizingMaps",
-"SIRUS",
-"StableRNGs",
-"Suppressor",
-"Test",
-]
+test = ["BetaML", "CatBoost", "EvoLinear", "EvoTrees", "Imbalance", "InteractiveUtils", "LightGBM", "LaplaceRedux", "Maxnet", "MLJClusteringInterface", "MLJDecisionTreeInterface", "MLJFlux", "MLJGLMInterface", "MLJLIBSVMInterface", "MLJLinearModels", "MLJMultivariateStatsInterface", "MLJNaiveBayesInterface", "MLJScikitLearnInterface", "MLJTSVDInterface", "MLJTestInterface", "MLJTestIntegration", "MLJText", "MLJXGBoostInterface", "Markdown", "NearestNeighborModels", "OneRule", "OutlierDetectionNeighbors", "OutlierDetectionPython", "ParallelKMeans", "PartitionedLS", "SelfOrganizingMaps", "SIRUS", "StableRNGs", "Suppressor", "Test"]
