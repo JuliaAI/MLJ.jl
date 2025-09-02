@@ -1,16 +1,16 @@
 # Evaluating Model Performance
 
-MLJ allows quick evaluation of a supervised model's performance
-against a battery of selected losses or scores.
-For more on available performance measures, see
-[Performance Measures](performance_measures.md).
+MLJ allows quick evaluation of a supervised model's performance against a battery of
+selected losses or scores, using the [`evaluate`](@ref) or [`evaluate!`](@ref) methods.
+For more on available performance measures, see [Performance
+Measures](performance_measures.md).
 
 In addition to hold-out and cross-validation, the user can specify
 an explicit list of train/test pairs of row indices for resampling, or
 define new resampling strategies.
 
-For simultaneously evaluating *multiple* models, see [Comparing models of different type
-and nested cross-validation](@ref).
+For simultaneously evaluating *multiple* models, see "[Comparing models of different type
+and nested cross-validation](@ref explicit)".
 
 For externally logging the outcomes of performance evaluation experiments, see [Logging
 Workflows](@ref)
@@ -76,11 +76,6 @@ evaluate!(
 
 In classification problems, use `class_weights=...` to specify a class weight dictionary.
 
-```@docs
-MLJBase.evaluate!
-MLJBase.evaluate
-MLJBase.PerformanceEvaluation
-```
 
 ## User-specified train/test sets
 
@@ -109,8 +104,6 @@ MLJBase.StratifiedCV
 MLJBase.TimeSeriesCV
 MLJBase.InSample
 ```
-
-
 
 ## Custom resampling strategies
 
@@ -163,4 +156,14 @@ function train_test_pairs(holdout::Holdout, rows)
                           shuffle=holdout.shuffle, rng=holdout.rng)
     return [(train, test),]
 end
+```
+
+## Reference
+
+```@docs
+MLJBase.evaluate!
+MLJBase.evaluate
+MLJBase.PerformanceEvaluation
+MLJBase.CompactPerformanceEvaluation
+default_logger
 ```

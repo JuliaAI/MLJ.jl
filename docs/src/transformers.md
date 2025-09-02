@@ -1,8 +1,9 @@
 # Transformers and Other Unsupervised Models
 
-Several unsupervised models used to perform common transformations,
-such as one-hot encoding, are available in MLJ out-of-the-box. These
-are detailed in [Built-in transformers](@ref) below.
+Several unsupervised models used to perform common transformations, such as one-hot
+encoding, missing value imputation, and categorical encoding, are available in MLJ
+out-of-the-box (no need to load code with `@load`). They are detailed in [Built-in
+transformers](@ref) below.
 
 A transformer is *static* if it has no learned parameters. While such
 a transformer is tantamount to an ordinary function, realizing it as
@@ -16,24 +17,29 @@ Some unsupervised models, such as clustering algorithms, have a
 `predict` method in addition to a `transform` method. We give an
 example of this in [Transformers that also predict](@ref)
 
-Finally, we note that models that fit a distribution, or more generally
-a sampler object, to some data, which are sometimes viewed as
-unsupervised, are treated in MLJ as *supervised* models. See [Models
-that learn a probability distribution](@ref) for an example.
-
-
 ## Built-in transformers
 
-- [`Standardizer`](@ref)
-- [`OneHotEncoder`](@ref)
-- [`ContinuousEncoder`](@ref)
-- [`FillImputer`](@ref)
-- [`UnivariateFillImputer`](@ref)
-- [`UnivariateBoxCoxTransformer`](@ref)
-- [`InteractionTransformer`](@ref)
-- [`UnivariateDiscretizer`](@ref)
-- [`UnivariateTimeTypeToContinuous`](@ref)
-- [`FeatureSelector`](@ref).
+For tutorials on the transformers below, refer to the [MLJTransforms
+documentation](https://github.com/JuliaAI/MLJTransforms.jl). 
+
+| Transformer                              | Brief Description                                                                             |
+|:----------------------------------------:|:---------------------------------------------------------------------------------------------:|
+| [`Standardizer`](@ref)                   | Transforming columns of numerical features by standardization                                 |
+| [`UnivariateBoxCoxTransformer`](@ref)    | Apply BoxCox transformation given a single vector                                             |
+| [`InteractionTransformer`](@ref)         | Transforming columns of numerical features to create new interaction features                 |
+| [`UnivariateDiscretizer`](@ref)          | Discretize a continuous vector into an ordered factor                                         |
+| [`FillImputer`](@ref)                    | Fill in missing values of features belonging to any scientific type                              |
+| [`UnivariateFillImputer`](@ref)          | Fill in missing values in a single vector                                                        |
+| [`UnivariateTimeTypeToContinuous`](@ref) | Transform a vector of time type into continuous type                                          |
+| [`OneHotEncoder`](@ref)                  | Encode categorical variables into one-hot vectors                                             |
+| [`ContinuousEncoder`](@ref)              | Adds type casting functionality to OnehotEncoder                                              |
+| [`OrdinalEncoder`](@ref)                 | Encode categorical variables into ordered integers                                            |
+| [`FrequencyEncoder`](@ref)               | Encode categorical variables into their normalized or unormalized frequencies                 |
+| [`TargetEncoder`](@ref)                  | Encode categorical variables into relevant target statistics                                  |
+| [`ContrastEncoder`](@ref)                | Allows defining a custom contrast encoder via a contrast matrix                               |
+| [`CardinalityReducer`](@ref)             | Reduce cardinality of high cardinality categorical features by grouping infrequent categories |
+| [`MissingnessEncoder`](@ref)             | Encode missing values of categorical features into new values                                 |
+
 
 ## Static transformers
 
@@ -176,7 +182,7 @@ evaluate(composite, X, y, measure=l1)
 ```
 
 A static transformer can also expose byproducts of the transform computation in the report
-of any associated machine. See [Static models (models that do not generalize)](@ref) for
+of any associated machine. See [Static transformers](@ref) for
 details.
 
 ## Transformers that also predict
@@ -233,13 +239,19 @@ compare[101:108]
 ## Reference
 
 ```@docs
-MLJModels.Standardizer
-MLJModels.OneHotEncoder
-MLJModels.ContinuousEncoder
-MLJModels.FillImputer
-MLJModels.UnivariateFillImputer
-MLJModels.UnivariateBoxCoxTransformer
-MLJModels.InteractionTransformer
-MLJModels.UnivariateDiscretizer
-MLJModels.UnivariateTimeTypeToContinuous
+MLJTransforms.Standardizer
+MLJTransforms.UnivariateBoxCoxTransformer
+MLJTransforms.InteractionTransformer
+MLJTransforms.UnivariateDiscretizer
+MLJTransforms.FillImputer
+MLJTransforms.UnivariateFillImputer
+MLJTransforms.UnivariateTimeTypeToContinuous
+MLJTransforms.OneHotEncoder
+MLJTransforms.ContinuousEncoder
+MLJTransforms.OrdinalEncoder
+MLJTransforms.FrequencyEncoder
+MLJTransforms.TargetEncoder
+MLJTransforms.ContrastEncoder
+MLJTransforms.CardinalityReducer
+MLJTransforms.MissingnessEncoder
 ```

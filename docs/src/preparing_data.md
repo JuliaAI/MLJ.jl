@@ -49,9 +49,9 @@ julia> machine(tree, X, y)
 │ input_scitype(model) = Table{var"#s46"} where var"#s46"<:Union{AbstractVector{var"#s9"} where var"#s9"<:Continuous, AbstractVector{var"#s9"} where var"#s9"<:Count, AbstractVector{var"#s9"} where var"#s9"<:OrderedFactor}.
 └ @ MLJBase ~/Dropbox/Julia7/MLJ/MLJBase/src/machines.jl:103
 Machine{DecisionTreeRegressor,…} @198 trained 0 times; caches data
-  args:
-    1:  Source @628 ⏎ `Table{Union{AbstractVector{Continuous}, AbstractVector{Count}, AbstractVector{Textual}, AbstractVector{Union{Missing, Textual}}}}`
-    2:  Source @544 ⏎ `AbstractVector{Continuous}`
+args:
+1:  Source @628 ⏎ `Table{Union{AbstractVector{Continuous}, AbstractVector{Count}, AbstractVector{Textual}, AbstractVector{Union{Missing, Textual}}}}`
+2:  Source @544 ⏎ `AbstractVector{Continuous}`
 ```
 
 The meaning of the warning is:
@@ -106,7 +106,7 @@ Pipelines](@ref).
 ## Scientific type coercion
 
 Scientific type coercion is documented in detail at
-[ScientificTypesBase.jl](https://github.com/JuliaAI/ScientificTypesBase.jl). See
+[ScientificTypes.jl](https://github.com/JuliaAI/ScientificTypes.jl). See
 also the tutorial at the [this MLJ
 Workshop](https://github.com/ablaom/MachineLearningInJulia2020)
 (specifically,
@@ -119,8 +119,9 @@ Also relevant is the section, [Working with Categorical Data](@ref).
 
 ## Data transformation
 
-MLJ's Built-in transformers are documented at [Transformers and Other Unsupervised Models](@ref).
-The most relevant in the present context are: [`ContinuousEncoder`](@ref),
+MLJ's Built-in transformers are documented at [Transformers and Other Unsupervised Models](@ref). Several of these provide methods of converting categorical features (i.e., those with `OrderedFactor` or `Multiclass` element scitype) to `Continous` features. 
+
+Very commonly applied examples are: [`ContinuousEncoder`](@ref),
 [`OneHotEncoder`](@ref), [`FeatureSelector`](@ref) and [`FillImputer`](@ref).
 A Gaussian mixture models imputer is provided by BetaML, which can be loaded with
 
@@ -129,7 +130,7 @@ MissingImputator = @load MissingImputator pkg=BetaML
 ```
 
 [This MLJ
-Workshop](https://github.com/ablaom/MachineLearningInJulia2020), and
+Workshop](https://github.com/ablaom/MachineLearningInJulia2020),
 the "End-to-end examples" in [Data Science in Julia
-tutorials](https://JuliaAI.github.io/DataScienceTutorials.jl/)
+tutorials](https://JuliaAI.github.io/DataScienceTutorials.jl/), and the tutorials in [MLJTransforms.jl](https://github.com/JuliaAI/MLJTransforms.jl)
 give further illustrations of data preprocessing in MLJ.

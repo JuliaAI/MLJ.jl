@@ -2,10 +2,10 @@
 
 ## The machine interface, simplified
 
-The following is a simplified description of the `Machine` interface. It
-predates the introduction of an optional data front-end for models
-(see [Implementing a data front-end](@ref)). See also the
-[Glossary](glossary.md)
+The following is a simplified description of the `Machine` interface. It predates the
+introduction of an optional data front-end for models (see [Implementing a data
+front-end](https://juliaai.github.io/MLJModelInterface.jl/dev/implementing_a_data_front_end/)). See
+also the [Glossary](glossary.md)
 
 
 ### The Machine type

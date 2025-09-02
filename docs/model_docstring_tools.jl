@@ -70,7 +70,7 @@ handle as key in /docs/src/ModelDescriptors.toml.
 
 """
 function models_missing_descriptors()
-    handles = handle.(models(wrappers=true))
+    handles = handle.(MLJ.models(wrappers=true))
     filter(handles) do h
         !(h in HANDLES)
     end
