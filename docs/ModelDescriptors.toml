@@ -37,7 +37,6 @@ ComplementNBClassifier_MLJScikitLearnInterface = ["classification", "Bayesian_mo
 ConstantClassifier_MLJModels = ["classification"]
 ConstantRegressor_MLJModels = ["regression"]
 ContinuousEncoder_MLJTransforms = ["encoders"]
-ContrastEncoder_MLJTransforms = ["encoders"]
 CountTransformer_MLJText = ["text_analysis", "encoders"]
 DBSCAN_Clustering = ["clustering", "static_models"]
 DBSCAN_MLJScikitLearnInterface = ["clustering", "static_models"]
