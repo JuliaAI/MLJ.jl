@@ -56,6 +56,7 @@ To support MLJ development, please cite these works or star the repo:
 [Model Search](@ref model_search) |
 [Loading Model Code](@ref) |
 [Transformers and Other Unsupervised Models](@ref) |
+[Feature Selection](@ref) |
 [Simple User Defined Models](@ref) |
 [List of Supported Models](@ref model_list) |
 [Third Party Packages](@ref) 
@@ -67,8 +68,8 @@ To support MLJ development, please cite these works or star the repo:
 [Controlling Iterative Models](@ref) |
 [Learning Curves](@ref)|
 [Correcting Class Imbalance](@ref) |
-[Thresholding Probabilistic Predictors](@ref)
-
+[Thresholding Probabilistic Predictors](@ref) |
+[Recursive feature elimination](@ref)
 
 ### Composition
 [Composing Models](@ref) |

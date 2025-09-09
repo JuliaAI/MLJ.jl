@@ -52,6 +52,15 @@ FILTER_GIVEN_ISSUE = Dict(
     "https://github.com/sylvaticus/BetaML.jl/issues/75" =>
         model -> model.package_name == "BetaML" &&
         model.name == "NeuralNetworkClassifier",
+    "https://github.com/JuliaAI/MLJTransforms.jl/issues/42" =>
+        model -> model.package_name == "MLJTransforms" &&
+        model.name in [
+            "CardinalityReducer",
+            "ContrastEncoder",
+            "FrequencyEncoder",
+            "MissingnessEncoder",
+            "OrdinalEncoder",
+        ],
     # "https://github.com/JuliaAI/Imbalance.jl/issues/103" =>
     #     model -> model.package_name == "Imbalance",
 )
@@ -72,7 +81,7 @@ project_lines = open(project_path) do io
     readlines(io)
 end
 pkgs_in_project = pkgs(project_lines)
-registry_project_lines = MLJModels.Registry.registry_project()
+registry_project_lines = MLJModels.registry_project()
 pkgs_in_registry = pkgs(registry_project_lines)
 missing_pkgs = setdiff(pkgs_in_registry, pkgs_in_project)
 # If there are missing packages a warning is issued at the end
@@ -90,7 +99,7 @@ const OTHER_MODELS = setdiff(MODELS, JULIA_MODELS);
 
 const EXCLUDED_BY_ISSUE = filter(MODELS) do model
     any([p(model) for p in values(FILTER_GIVEN_ISSUE)])
-end
+end;
 
 affected_packages = unique([m.package_name for m in EXCLUDED_BY_ISSUE])
 n_excluded = length(EXCLUDED_BY_ISSUE)
@@ -102,8 +111,8 @@ Currently, $n_excluded models are excluded from integration tests because of out
 issues. When fixed, update `FILTER_GIVEN_ISSUE` in /test/integration.jl.
 
 If an issue is related to model traits (aka metadata), then the MLJ Model Registry may
-need to be updated to resolve the integration test failures. See the `MLJModels.@update`
-document string for how to do that.
+need to be updated to resolve the integration test failures. See the
+documentation of MLJModelRegistryTools.jl on how to do that.
 
 ## Oustanding issues
 
@@ -151,7 +160,9 @@ WITHOUT_DATASETS = filter(MODELS) do model
         (model.name == "MultinomialNBClassifier" &&
         model.package_name == "MLJScikitLearnInterface") ||
         (model.name == "SMOTEN" &&
-        model.package_name == "Imbalance")
+        model.package_name == "Imbalance") ||
+        (model.package_name == "MLJTransforms" &&
+        model.name == "TargetEncoder")
 end;
 
 # To remove any warning issued below, update `WITHOUT_DATASETS` defined above:
@@ -177,15 +188,20 @@ PATHOLOGIES = filter(MODELS) do model
         # infeasible":
         (model.name in ["NuSVC", "ProbabilisticNuSVC"] &&
         model.package_name == "LIBSVM") ||
+        # transformer with a target
         # too slow to train!
         (model.name == "LOCIDetector" && model.package_name == "OutlierDetectionPython") ||
         # TO REDUCE TESTING TIME
         model.package_name == "MLJScikitLearnInterface" ||
         # "https://github.com/MilesCranmer/SymbolicRegression.jl/issues/390" =>
-        model.package_name == "SymbolicRegression"
+        model.package_name == "SymbolicRegression" ||
+        # raised once already, only to recur:
+        # https://github.com/OutlierDetectionJL/OutlierDetectionPython.jl/issues/5
+        model.package_name == "OutlierDetectionPython"
+
 end
 
-WITHOUT_DATASETS = vcat(WITHOUT_DATASETS, PATHOLOGIES)
+WITHOUT_DATASETS = vcat(WITHOUT_DATASETS, PATHOLOGIES) |> unique
 
 
 # # LOAD ALL MODEL CODE

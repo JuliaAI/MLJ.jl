@@ -1,7 +1,7 @@
 # Logging Workflows
 
 Currently the following workflows can log their outcomes to an external machine learning
-tracking platform, such as [MLflow](https://mlflow.org) (see [MLflow](@ref) below):
+tracking platform, such as [MLflow](https://mlflow.org):
 
 - Estimating model performance using [`evaluate`](@ref)/[`evaluate!`](@ref).
 
@@ -17,11 +17,15 @@ and either:
 
 MLJ logging examples are given in the [MLJFlow.jl](https://github.com/JuliaAI/MLJFlow.jl)
 documentation.
-x
+
 
 ### Supported tracking platforms
 
-- [MLflow](@ref) (natively supported: MLJ re-exports `MLJFlow.Logger(...)`)
+- [MLflow](https://mlflow.org) is natively supported by MLJ. You will still need to
+  install MLflow itself, and separately launch an MLflow service; see the [MLflow
+  docs](https://mlflow.org) on how to do this. The service can immediately be wrapped
+  to create a `logger` object, as demonstrated in the [MLJFlow.jl
+  documentation](https://github.com/JuliaAI/MLJFlow.jl).
 
 
 !!! warning

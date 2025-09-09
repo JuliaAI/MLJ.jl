@@ -31,7 +31,7 @@ For more examples of direct measure usage, see the StatisticalMeasures.jl
 A list of all measures, ready to use after running `using MLJ` or `using
 StatisticalMeasures`, is
 [here](https://juliaai.github.io/StatisticalMeasures.jl/dev/auto_generated_list_of_measures/). Alternatively,
-call [`measures()`](@ref StatisticalMeasures.measures) (experimental) to generate a
+call [`measures()`](@ref) (experimental) to generate a
 dictionary keyed on available measure constructors, with measure metadata as values.
 
 
@@ -65,10 +65,14 @@ measures from that package must be explicitly imported and wrapped, as described
 
 ## Receiver operator characteristics
 
-A related performance evaluation tool provided by StatisticalMeasures.jl, and hence by MLJ, is the `roc_curve` method:
+A related performance evaluation tool provided by StatisticalMeasures.jl, and hence by
+MLJ, is the `roc_curve` method. It is  documented
+[here](https://juliaai.github.io/StatisticalMeasures.jl/dev/roc/).
 
-```@docs
-StatisticalMeasures.roc_curve
+## Reference
+
+```docs
+StatisticalMeasures.measures
 ```
 
 ## Migration guide for changes to measures in MLJBase 1.0
