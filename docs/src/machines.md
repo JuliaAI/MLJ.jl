@@ -251,10 +251,11 @@ The interested reader can learn more about machine internals by examining
 the simplified code excerpt in [Internals](internals.md).
 
 
-## API Reference
+## Reference
 
 ```@docs
 MLJBase.machine
 fit!
 fit_only!
+MLJBase.default_scitype_check_level
 ```

@@ -5,10 +5,10 @@
 Julia. It collects together functionality from separate components listed below, which can
 be loaded individually.
 
-Actual model code (e.g., code for instantiating a `DecisionTreeClassifier`) must be
-explicitly loaded from the model-providing package, using `@load`, for example. However
-core model wrappers and some common transformers are immediately
-available; do `localmodels(wrappers=true)` at startup to list.
+Actual model code (e.g., code for instantiating a `DecisionTreeClassifier`) must generally
+be loaded explicitly from the model-providing package, using `@load`, for example. However
+core model wrappers and some common transformers are immediately available; do
+`localmodels(wrappers=true)` at startup to list these.
 
 # Components
 
@@ -21,8 +21,13 @@ available; do `localmodels(wrappers=true)` at startup to list.
 - StatisticalMeasures.jl: MLJ-compatible measures (metrics) for machine learning,
   confusion matrices, ROC curves.
 
-- MLJModels.jl: Common transformers for data preprocessing, searching the model registry,
-  loading models with `@load`
+- MLJModels.jl: Hosts the MLJ Model Registry and the associated model search tools,
+  `models(...)` and `matching(...)`. Provides the `@load` macro for loading model
+  code. Provides dummy models, such as `ConstantClassifier`, and the
+  `BinaryThresholdPredictor` wrapper.
+
+- MLJTransforms: Makes immediately available common data preprocessing operations, such as
+  categorical feature encoding.
 
 - MLJTuning.jl: Hyperparameter optimization via `TunedModel` wrapper
 
@@ -69,6 +74,7 @@ import MLJBalancing
 @reexport using MLJBalancing: BalancedModel
 using MLJIteration
 import MLJIteration.IterationControl
+@reexport using MLJTransforms
 
 using Tables, CategoricalArrays
 import Distributions

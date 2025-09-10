@@ -12,6 +12,7 @@ import MLJ.MLJIteration.IterationControl
 import MLJ.MLJIteration.IterationControl.EarlyStopping
 import MLJ.MLJTuning
 import MLJ.MLJModels
+import MLJ.MLJTransforms
 import MLJ.MLJEnsembles
 import MLJ.ScientificTypes
 import MLJ.MLJBalancing
@@ -38,6 +39,8 @@ isempty(problems) || error(
 # compose the individual model docstring pages:
 @info "Getting individual model docstrings from the registry and generating "*
     "pages for them, written at /docs/src/models/ ."
+rm(PATH_TO_MODEL_DOCS; recursive=true, force=true)
+mkdir(PATH_TO_MODEL_DOCS)
 for model in models(wrappers=true)
     write_page(model)
 end
@@ -138,6 +141,7 @@ makedocs(
         MLJBase,
         MLJTuning,
         MLJModels,
+        MLJTransforms,
         MLJEnsembles,
         MLJBalancing,
         MLJIteration,

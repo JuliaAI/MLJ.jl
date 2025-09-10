@@ -1,14 +1,11 @@
 # [List of Supported Models](@id model_list)
 
-For a list of models organized around function ("classification", "regression", etc.), see
-the [Model Browser](@ref).
+List all models and associated model traits with `models()`.
 
-MLJ provides access to a wide variety of machine learning models.
-We are always looking for
-[help](https://github.com/JuliaAI/MLJ.jl/blob/master/CONTRIBUTING.md)
-adding new models or testing existing ones.  Currently available
-models are listed below; for the most up-to-date list, run `using MLJ;
-models()`. 
+For a list of models organized around function ("classification", "regression", etc.), see
+the [Model Browser](@ref), or [this](https://juliaml.ai/machines) graphical alternative.
+
+The list below was last updated in September, 2025.
 
 Indications of "maturity" in the table below are approximate,
 surjective, and possibly out-of-date. A decision to use or not use a
@@ -41,11 +38,12 @@ independent assessment.
 [LIBSVM.jl](https://github.com/mpastell/LIBSVM.jl) | [MLJLIBSVMInterface.jl](https://github.com/JuliaAI/MLJLIBSVMInterface.jl) | LinearSVC, SVC, NuSVC, NuSVR, EpsilonSVR, OneClassSVM | high | also via ScikitLearn.jl
 [LightGBM.jl](https://github.com/IQVIA-ML/LightGBM.jl) | - | LGBMClassifier, LGBMRegressor | high | 
 [FeatureSelector.jl](https://github.com/JuliaAI/FeatureSelection.jl) | - | FeatureSelector, RecursiveFeatureElimination | low |
-[Flux.jl](https://github.com/FluxML/Flux.jl) | [MLJFlux.jl](https://github.com/FluxML/MLJFlux.jl) | NeuralNetworkRegressor, NeuralNetworkClassifier, MultitargetNeuralNetworkRegressor, ImageClassifier | low |
+[Flux.jl](https://github.com/FluxML/Flux.jl) | [MLJFlux.jl](https://github.com/FluxML/MLJFlux.jl) | NeuralNetworkRegressor, NeuralNetworkClassifier, MultitargetNeuralNetworkRegressor, ImageClassifier, EntityEmbedder | medium |
 [MLJBalancing.jl](https://github.com/JuliaAI/MLJBalancing.jl) | - | BalancedBaggingClassifier | low | 
 [MLJLinearModels.jl](https://github.com/JuliaAI/MLJLinearModels.jl) | - | LinearRegressor, RidgeRegressor, LassoRegressor, ElasticNetRegressor, QuantileRegressor, HuberRegressor, RobustRegressor, LADRegressor, LogisticClassifier, MultinomialClassifier | medium |
-[MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl) (built-in) | - | ConstantClassifier, ConstantRegressor, ContinuousEncoder, DeterministicConstantClassifier, DeterministicConstantRegressor, FillImputer, InteractionTransformer, OneHotEncoder, Standardizer, UnivariateBoxCoxTransformer, UnivariateDiscretizer, UnivariateFillImputer,  UnivariateTimeTypeToContinuous, Standardizer, BinaryThreshholdPredictor | medium |
+[MLJModels.jl](https://github.com/JuliaAI/MLJModels.jl) (built-in) | - | ConstantClassifier, ConstantRegressor, DeterministicConstantClassifier, DeterministicConstantRegressor, BinaryThreshholdPredictor | mature |
 [MLJText.jl](https://github.com/JuliaAI/MLJText.jl) | - | TfidfTransformer, BM25Transformer, CountTransformer | low |
+[MLJTransforms.jl](https://github.com/JuliaAI/MLJTransforms.jl) (built-in) | - | ContinuousEncoder, FillImputer, InteractionTransformer, OneHotEncoder, Standardizer, UnivariateBoxCoxTransformer, UnivariateDiscretizer, UnivariateFillImputer,  UnivariateTimeTypeToContinuous, OrdinalEncoder, FrequencyEncoder, TargetEncoder, ContrastEncoder, CardinalityReducer, MissingnessEncoder | medium |
 [MultivariateStats.jl](https://github.com/JuliaStats/MultivariateStats.jl) | [MLJMultivariateStatsInterface.jl](https://github.com/JuliaAI/MLJMultivariateStatsInterface.jl) | LinearRegressor, MultitargetLinearRegressor, RidgeRegressor, MultitargetRidgeRegressor, PCA, KernelPCA, ICA, LDA, BayesianLDA, SubspaceLDA, BayesianSubspaceLDA, FactorAnalysis, PPCA | high | 
 [NaiveBayes.jl](https://github.com/dfdx/NaiveBayes.jl) | [MLJNaiveBayesInterface.jl](https://github.com/JuliaAI/MLJNaiveBayesInterface.jl) | GaussianNBClassifier, MultinomialNBClassifier, HybridNBClassifier | low |
 [NearestNeighborModels.jl](https://github.com/JuliaAI/NearestNeighborModels.jl) | - | KNNClassifier, KNNRegressor, MultitargetKNNClassifier, MultitargetKNNRegressor | high |

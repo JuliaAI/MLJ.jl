@@ -298,14 +298,12 @@ implements the particular convention used in the MLJ universe for
 assigning a specific scientific type (interpretation) to each julia
 object (see the `scitype` examples below).
 
-The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`,
-`OrderedFactor{N}`, `Count` and `Textual`. `Missing` and `Nothing` are
-also considered scientific types. Be sure you read [Scalar scientific
-types](@ref) below to guarantee your scalar data is interpreted
-correctly. Tools exist to coerce the data to have the appropriate
+The basic "scalar" scientific types are `Continuous`, `Multiclass{N}`, `OrderedFactor{N}`,
+`Count` and `Textual`. `Missing` and `Nothing` are also considered scientific types. Be
+sure you read [Scalar scientific types](@ref) below to guarantee your scalar data is
+interpreted correctly. Tools exist to [`coerce`](@ref) the data to have the appropriate
 scientific type; see
-[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/)
-or run `?coerce` for details.
+[ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/) for full details.
 
 Additionally, most data containers - such as tuples, vectors, matrices
 and tables - have a scientific type parameterized by scitype of the
@@ -342,7 +340,7 @@ schema(X)
 
 MLJ models expecting a table do not generally accept a matrix
 instead. However, a matrix can be wrapped as a table, using
-[`MLJ.table`](@ref):
+[`MLJ.table`](@ref) (or `Tables.table` from the Tables.jl package):
 
 ```@repl doda
 matrix_table = MLJ.table(rand(2,3));
@@ -350,7 +348,7 @@ schema(matrix_table)
 ```
 
 The matrix is *not* copied, only wrapped.  To manifest a table as a
-matrix, use [`MLJ.matrix`](@ref).
+matrix, use [`MLJ.matrix`](@ref) (or `Tables.matrix`).
 
 ### Observations correspond to rows, not columns
 
@@ -423,15 +421,26 @@ are the key features of that convention:
   respectively).
 
 - In particular, *integers* (including `Bool`s) *cannot be used to
-  represent categorical data.* Use the preceding `coerce` operations
+  represent categorical data.* Use the preceding [`coerce`](@ref) operations
   to coerce to a `Finite` scitype.
 
 - The scientific types of `nothing` and `missing` are `Nothing` and
   `Missing`, native types we also regard as scientific.
 
-Use `coerce(v, OrderedFactor)` or `coerce(v, Multiclass)` to coerce a vector `v` of
+Use [`coerce`](@ref)`(v, OrderedFactor)` or `coerce(v, Multiclass)` to coerce a vector `v` of
 integers, strings or characters to a vector with an appropriate `Finite` (categorical)
 scitype.  See also [Working with Categorical Data](@ref), and the
 [ScientificTypes.jl](https://JuliaAI.github.io/ScientificTypes.jl/dev/) documentation.
 
+
+### Reference
+
+```@docs
+MLJBase.table
+MLJBase.matrix
+ScientificTypes.scitype
+ScientificTypes.schema
+ScientificTypes.coerce
+ScientificTypes.autotype
+```
 
