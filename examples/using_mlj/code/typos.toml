@@ -1,0 +1,7 @@
+[default.extend-words]
+# Don't correct "mape" to "map"
+mape = "mape"
+yhat = "yhat"
+LSO ="LSO"
+datas = "datas"
+Missings = "Missings"
