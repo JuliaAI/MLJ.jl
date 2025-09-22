@@ -4,7 +4,7 @@
 
 ## Resources
 
-- All things MLJ: [juliaml.ai](juliaml.ai)
+- All things MLJ: [juliaml.ai](https://juliaml.ai)
 
 - [General MLJ learning resources](https://juliaai.github.io/MLJ.jl/dev/learning_mlj/)
 
