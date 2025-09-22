@@ -1,0 +1,27 @@
+/*-- scss:defaults --*/
+
+// fonts
+$font-family-sans-serif: "Computer Modern" !default;
+// $font-family-serif: 'Computer Modern' !default;
+
+// colors
+$body-bg: #ffffff !default;
+$body-color: #000 !default;
+$link-color: #51483d !default;
+$selection-bg: #26351c !default;
+
+// headings
+$presentation-heading-font: 'Computer Modern' !default;
+$presentation-heading-color: #3333b3 !default;
+
+/*-- scss:rules --*/
+
+.reveal a {
+  line-height: 1.3em;
+}
+
+.reveal .progress {
+  background: rgba(0, 0, 0, 0.2);
+  color: #3333b3;
+  height: 1%;
+}
