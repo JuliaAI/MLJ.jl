@@ -31,7 +31,7 @@ jobs:
           echo "head_ref is: ${{ github.head_ref }}"
           echo "target repository is: ${{ github.repository }}"
           echo "head repository is: ${{ github.event.pull_request.head.repo.full_name }}"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
@@ -61,7 +61,7 @@ jobs:
         os:
           - 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: julia-actions/setup-julia@v2
@@ -80,7 +80,7 @@ jobs:
     env:
       JULIA_PKG_SERVER: ""
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
       - uses: julia-actions/setup-julia@v2
