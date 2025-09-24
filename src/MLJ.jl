@@ -1,5 +1,5 @@
 """
-   MLJ
+   MLJ 
 
 [`MLJ`](https://juliaai.github.io/MLJ.jl//dev/) is a Machine Learning toolbox for
 Julia. It collects together functionality from separate components listed below, which can
