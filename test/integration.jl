@@ -37,7 +37,7 @@ FILTER_GIVEN_ISSUE = Dict(
     "https://github.com/sylvaticus/BetaML.jl/issues/79" =>
         model -> model.name in [
             "KernelPerceptronClassifier",
-            "PegasosClassifier,KMedoids",
+            "PegasosClassifier",
             "PerceptronClassifier",
         ] &&
         model.package_name == "BetaML",
