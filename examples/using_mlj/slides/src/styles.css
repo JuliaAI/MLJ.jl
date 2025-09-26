@@ -1,0 +1,75 @@
+/* ---------------------------------------------
+   Slide Logo Positioning
+--------------------------------------------- */
+.reveal .slide-logo {
+  top: 0;
+  right: 12px;
+  max-height: 1.5em;
+  position: absolute;
+}
+
+/* ---------------------------------------------
+   Base Font Settings
+--------------------------------------------- */
+.reveal div {
+  font-size: 20pt;
+  line-height: 1.6;
+}
+
+/* ---------------------------------------------
+   Headings
+--------------------------------------------- */
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4,
+.reveal h5,
+.reveal h6 {
+  font-weight: normal;
+  margin: 0.5rem 0 1rem 0.5rem;
+}
+
+/* h1: Big centered title */
+.reveal h1 {
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+/* h2: Section heading */
+.reveal h2 {
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  padding: 10px 0;
+}
+
+/* h3: Sub-section heading */
+.reveal h3 {
+  font-size: 1.75rem;
+  padding: 10px 0;
+}
+
+/* h4: Emphasized inline heading */
+.reveal h4 {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+/* ---------------------------------------------
+   Title Page Metadata
+--------------------------------------------- */
+.quarto-title-author-name,
+.date {
+  font-size: 1.5rem;
+}
+
+/* ---------------------------------------------
+   Slide Number Positioning
+--------------------------------------------- */
+.slide-number,
+.reveal.has-logo .slide-number {
+  bottom: 14px;
+  left: 50px;
+  top: unset;
+  color: #777;
+}
