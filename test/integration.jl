@@ -34,13 +34,6 @@ FILTER_GIVEN_ISSUE = Dict(
         model.package_name == "OutlierDetectionNeighbors") ||
         (model.name == "TSVDTransformer" &&
         model.package_name == "TSVD"),
-    "https://github.com/sylvaticus/BetaML.jl/issues/79" =>
-        model -> model.name in [
-            "KernelPerceptronClassifier",
-            "PegasosClassifier",
-            "PerceptronClassifier",
-        ] &&
-        model.package_name == "BetaML",
     "https://github.com/sylvaticus/BetaML.jl/issues/65" =>
         model -> model.name in ["KMeans", "KMedoids"] &&
         model.package_name == "BetaML",
