@@ -1,4 +1,4 @@
-using MLJTestIntegration, MLJModels, MLJ, Test, Markdown
+using MLJTestIntegration, MLJModels, MLJ, Test, Markdown 
 import MLJTestIntegration as MTI
 import Pkg.TOML as TOML
 using Suppressor
