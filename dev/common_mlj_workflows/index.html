@@ -53,10 +53,7 @@ schema(table)</code></pre><pre class="documenter-example-output"><code class="no
 │ target       │ Multiclass{3} │ CategoricalValue{String, UInt32} │
 └──────────────┴───────────────┴──────────────────────────────────┘
 </code></pre><p>Loading a built-in data set already split into <code>X</code> and <code>y</code>:</p><pre><code class="language-julia hljs">X, y = @load_iris;
-selectrows(X, 1:4) # selectrows works whenever `Tables.istable(X)==true`.</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(sepal_length = [5.1, 4.9, 4.7, 4.6],
- sepal_width = [3.5, 3.0, 3.2, 3.1],
- petal_length = [1.4, 1.4, 1.3, 1.5],
- petal_width = [0.2, 0.2, 0.2, 0.2],)</code></pre><pre><code class="language-julia hljs">y[1:4]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4-element CategoricalArray{String,1,UInt32}:
+selectrows(X, 1:4) # selectrows works whenever `Tables.istable(X)==true`.</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(sepal_length = [5.1, 4.9, 4.7, 4.6], sepal_width = [3.5, 3.0, 3.2, 3.1], petal_length = [1.4, 1.4, 1.3, 1.5], petal_width = [0.2, 0.2, 0.2, 0.2])</code></pre><pre><code class="language-julia hljs">y[1:4]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">4-element CategoricalArray{String,1,UInt32}:
  &quot;setosa&quot;
  &quot;setosa&quot;
  &quot;setosa&quot;
@@ -260,8 +257,8 @@ Tree = @load DecisionTreeClassifier pkg=DecisionTree</code></pre><pre class="doc
   rng = Random.TaskLocalRNG())</code></pre><p>Bind the model and data together in a <em>machine</em>, which will additionally, store the learned parameters (<em>fitresults</em>) when fit:</p><pre><code class="language-julia hljs">mach = machine(tree, X, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">untrained Machine; caches model-specific representations of data
   model: DecisionTreeClassifier(max_depth = 2, …)
   args: 
-    1:	Source @444 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @185 ⏎ AbstractVector{Multiclass{2}}
+    1:	Source @750 ⏎ Table{AbstractVector{Continuous}}
+    2:	Source @060 ⏎ AbstractVector{Multiclass{2}}
 </code></pre><p>Split row indices into training and evaluation rows:</p><pre><code class="language-julia hljs">train, test = partition(eachindex(y), 0.7); # 70:30 split</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">([1, 2, 3, 4, 5, 6, 7, 8, 9, 10  …  131, 132, 133, 134, 135, 136, 137, 138, 139, 140], [141, 142, 143, 144, 145, 146, 147, 148, 149, 150  …  191, 192, 193, 194, 195, 196, 197, 198, 199, 200])</code></pre><p>Fit on the train data set and evaluate on the test data set:</p><pre><code class="language-julia hljs">fit!(mach, rows=train)
 yhat = predict(mach, X[test,:])
 LogLoss(tol=1e-4)(yhat, y[test])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.5902424966321888</code></pre><p>Note <code>LogLoss()</code> has aliases <code>log_loss</code> and <code>cross_entropy</code>.</p><p>Predict on the new data set:</p><pre><code class="language-julia hljs">Xnew = (FL = rand(3), RW = rand(3), CL = rand(3), CW = rand(3), BD = rand(3))
@@ -363,7 +360,7 @@ Extract:
 ┌───┬─────────────────────────────────────┬─────────┐
 │   │ per_fold                            │ 1.96*SE │
 ├───┼─────────────────────────────────────┼─────────┤
-│ A │ [2.16, 1.23, 3.72, 1.33, 0.353]     │ 1.24    │
+│ A │ [2.16, 1.22, 3.72, 1.33, 0.353]     │ 1.25    │
 │ B │ [0.825, 0.825, 0.875, 0.725, 0.875] │ 0.06    │
 └───┴─────────────────────────────────────┴─────────┘
 </code></pre><h2 id="Inspecting-training-results"><a class="docs-heading-anchor" href="#Inspecting-training-results">Inspecting training results</a><a id="Inspecting-training-results-1"></a><a class="docs-heading-anchor-permalink" href="#Inspecting-training-results" title="Permalink"></a></h2><p>Fit an ordinary least square model to some synthetic data:</p><pre><code class="language-julia hljs">x1 = rand(100)
@@ -377,33 +374,25 @@ ols = OLS()
 mach =  machine(ols, X, y) |&gt; fit!</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">trained Machine; caches model-specific representations of data
   model: LinearRegressor(fit_intercept = true, …)
   args: 
-    1:	Source @254 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @092 ⏎ AbstractVector{Continuous}
-</code></pre><p>Get a named tuple representing the learned parameters, human-readable if appropriate:</p><pre><code class="language-julia hljs">fitted_params(mach)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(features = [:x1, :x2],
- coef = [0.9838768778565093, -1.9788507601521574],
- intercept = 0.04595497600615009,)</code></pre><p>Get other training-related information:</p><pre><code class="language-julia hljs">report(mach)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(stderror = [0.007943018134942184, 0.010342264453761914, 0.01055002554989521],
- dof_residual = 97.0,
- vcov = [6.309153709202042e-5 -5.070182789252689e-5 -5.5303361728072675e-5; -5.070182789252689e-5 0.0001069624340315472 -5.185148757732741e-6; -5.5303361728072675e-5 -5.185148757732741e-6 0.00011130303910344175],
- deviance = 0.08744374916998549,
- coef_table = ─────────────────────────────────────────────────────────────────────────────
-                 Coef.  Std. Error        t  Pr(&gt;|t|)   Lower 95%   Upper 95%
+    1:	Source @648 ⏎ Table{AbstractVector{Continuous}}
+    2:	Source @600 ⏎ AbstractVector{Continuous}
+</code></pre><p>Get a named tuple representing the learned parameters, human-readable if appropriate:</p><pre><code class="language-julia hljs">fitted_params(mach)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(features = [:x1, :x2], coef = [0.9939617336171651, -2.0018043863284576], intercept = 0.053014334282259545)</code></pre><p>Get other training-related information:</p><pre><code class="language-julia hljs">report(mach)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(stderror = [0.007992208400022629, 0.009274401599622107, 0.010244124525213203], dof_residual = 97.0, vcov = [6.387539510939227e-5 -4.824164719099463e-5 -5.3674054627697515e-5; -4.824164719099463e-5 8.601452503107308e-5 -2.7055608885308326e-6; -5.3674054627697515e-5 -2.7055608885308326e-6 0.00010494208728807465], deviance = 0.0753573856754337, coef_table = ─────────────────────────────────────────────────────────────────────────────
+                  Coef.  Std. Error        t  Pr(&gt;|t|)  Lower 95%   Upper 95%
 ─────────────────────────────────────────────────────────────────────────────
-(Intercept)   0.045955  0.00794302     5.79    &lt;1e-07   0.0301903   0.0617197
-x1            0.983877  0.0103423     95.13    &lt;1e-96   0.96335     1.0044
-x2           -1.97885   0.01055     -187.57    &lt;1e-99  -1.99979    -1.95791
-─────────────────────────────────────────────────────────────────────────────,)</code></pre><h2 id="Basic-fit/transform-for-unsupervised-models"><a class="docs-heading-anchor" href="#Basic-fit/transform-for-unsupervised-models">Basic fit/transform for unsupervised models</a><a id="Basic-fit/transform-for-unsupervised-models-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-fit/transform-for-unsupervised-models" title="Permalink"></a></h2><p>Load data:</p><pre><code class="language-julia hljs">X, y = @load_iris  # a table and a vector
+(Intercept)   0.0530143  0.00799221     6.63    &lt;1e-08   0.037152   0.0688767
+x1            0.993962   0.0092744    107.17    &lt;1e-99   0.975555   1.01237
+x2           -2.0018     0.0102441   -195.41    &lt;1e-99  -2.02214   -1.98147
+─────────────────────────────────────────────────────────────────────────────)</code></pre><h2 id="Basic-fit/transform-for-unsupervised-models"><a class="docs-heading-anchor" href="#Basic-fit/transform-for-unsupervised-models">Basic fit/transform for unsupervised models</a><a id="Basic-fit/transform-for-unsupervised-models-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-fit/transform-for-unsupervised-models" title="Permalink"></a></h2><p>Load data:</p><pre><code class="language-julia hljs">X, y = @load_iris  # a table and a vector
 train, test = partition(eachindex(y), 0.97, shuffle=true, rng=123)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">([55, 1, 57, 6, 34, 61, 41, 35, 148, 56  …  9, 95, 93, 137, 73, 116, 68, 43, 50, 112], [30, 127, 75, 111])</code></pre><p>Instantiate and fit the model/machine:</p><pre><code class="language-julia hljs">PCA = @load PCA
 pca = PCA(maxoutdim=2)
 mach = machine(pca, X)
 fit!(mach, rows=train)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">trained Machine; caches model-specific representations of data
   model: PCA(maxoutdim = 2, …)
   args: 
-    1:	Source @010 ⏎ Table{AbstractVector{Continuous}}
-</code></pre><p>Transform selected data bound to the machine:</p><pre><code class="language-julia hljs">transform(mach, rows=test);</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(x1 = [2.6255922258705566, -1.2645297850885582, -0.7206635869470076, -1.668268683584315],
- x2 = [-0.19331607089765088, -0.17741504590051646, 0.15137821608529245, 0.24438619364248584],)</code></pre><p>Transform new data:</p><pre><code class="language-julia hljs">Xnew = (sepal_length=rand(3), sepal_width=rand(3),
+    1:	Source @660 ⏎ Table{AbstractVector{Continuous}}
+</code></pre><p>Transform selected data bound to the machine:</p><pre><code class="language-julia hljs">transform(mach, rows=test);</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(x1 = [2.625592225870557, -1.2645297850885582, -0.7206635869470076, -1.6682686835843152], x2 = [-0.19331607089765065, -0.17741504590051652, 0.15137821608529237, 0.24438619364248587])</code></pre><p>Transform new data:</p><pre><code class="language-julia hljs">Xnew = (sepal_length=rand(3), sepal_width=rand(3),
         petal_length=rand(3), petal_width=rand(3));
-transform(mach, Xnew)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(x1 = [4.6197178260311125, 4.657430788048905, 4.550257063740848],
- x2 = [-4.742958620555549, -4.390656035582719, -4.868219184305063],)</code></pre><h2 id="Inverting-learned-transformations"><a class="docs-heading-anchor" href="#Inverting-learned-transformations">Inverting learned transformations</a><a id="Inverting-learned-transformations-1"></a><a class="docs-heading-anchor-permalink" href="#Inverting-learned-transformations" title="Permalink"></a></h2><pre><code class="language-julia hljs">y = rand(100);
+transform(mach, Xnew)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(x1 = [5.0381397791573805, 4.3339995638810365, 4.857241044277618], x2 = [-4.4978256212179435, -4.644004727129422, -4.949135875921685])</code></pre><h2 id="Inverting-learned-transformations"><a class="docs-heading-anchor" href="#Inverting-learned-transformations">Inverting learned transformations</a><a id="Inverting-learned-transformations-1"></a><a class="docs-heading-anchor-permalink" href="#Inverting-learned-transformations" title="Permalink"></a></h2><pre><code class="language-julia hljs">y = rand(100);
 stand = Standardizer()
 mach = machine(stand, y)
 fit!(mach)
@@ -466,15 +455,14 @@ forest = EnsembleModel(model=tree, n=300)</code></pre><pre class="documenter-exa
   logger = nothing)</code></pre><p>Bound the wrapped model to data:</p><pre><code class="language-julia hljs">mach = machine(tuned_forest, X, y)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">untrained Machine; does not cache data
   model: ProbabilisticTunedModel(model = ProbabilisticEnsembleModel(model = DecisionTreeClassifier(max_depth = -1, …), …), …)
   args: 
-    1:	Source @020 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @513 ⏎ AbstractVector{Multiclass{3}}
+    1:	Source @868 ⏎ Table{AbstractVector{Continuous}}
+    2:	Source @403 ⏎ AbstractVector{Multiclass{3}}
 </code></pre><p>Fitting the resultant machine optimizes the hyperparameters specified in <code>range</code>, using the specified <code>tuning</code> and <code>resampling</code> strategies and performance <code>measure</code> (possibly a vector of measures), and retrains on all data bound to the machine:</p><pre><code class="language-julia hljs">fit!(mach)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">trained Machine; does not cache data
   model: ProbabilisticTunedModel(model = ProbabilisticEnsembleModel(model = DecisionTreeClassifier(max_depth = -1, …), …), …)
   args: 
-    1:	Source @020 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @513 ⏎ AbstractVector{Multiclass{3}}
-</code></pre><p>Inspecting the optimal model:</p><pre><code class="language-julia hljs">F = fitted_params(mach)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(best_model = ProbabilisticEnsembleModel(model = DecisionTreeClassifier(max_depth = -1, …), …),
- best_fitted_params = (fitresult = WrappedEnsemble(atom = DecisionTreeClassifier(max_depth = -1, …), …),),)</code></pre><pre><code class="language-julia hljs">F.best_model</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">ProbabilisticEnsembleModel(
+    1:	Source @868 ⏎ Table{AbstractVector{Continuous}}
+    2:	Source @403 ⏎ AbstractVector{Multiclass{3}}
+</code></pre><p>Inspecting the optimal model:</p><pre><code class="language-julia hljs">F = fitted_params(mach)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(best_model = ProbabilisticEnsembleModel(model = DecisionTreeClassifier(max_depth = -1, …), …), best_fitted_params = (fitresult = WrappedEnsemble(atom = DecisionTreeClassifier(max_depth = -1, …), …),))</code></pre><pre><code class="language-julia hljs">F.best_model</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">ProbabilisticEnsembleModel(
   model = DecisionTreeClassifier(
         max_depth = -1, 
         min_samples_leaf = 1, 
@@ -493,11 +481,11 @@ forest = EnsembleModel(model=tree, n=300)</code></pre><pre class="documenter-exa
   acceleration = CPU1{Nothing}(nothing), 
   out_of_bag_measure = Any[])</code></pre><p>Inspecting details of tuning procedure:</p><pre><code class="language-julia hljs">r = report(mach);
 keys(r)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(:best_model, :best_history_entry, :history, :best_report, :plotting)</code></pre><pre><code class="language-julia hljs">r.history[[1,end]]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-element Vector{@NamedTuple{model::MLJEnsembles.ProbabilisticEnsembleModel{MLJDecisionTreeInterface.DecisionTreeClassifier}, measure::Vector{StatisticalMeasuresBase.RobustMeasure{StatisticalMeasuresBase.FussyMeasure{StatisticalMeasuresBase.RobustMeasure{StatisticalMeasures._BrierLossType}, typeof(StatisticalMeasures.l2_check)}}}, measurement::Vector{Float64}, per_fold::Vector{Vector{Float64}}, evaluation::CompactPerformanceEvaluation{MLJEnsembles.ProbabilisticEnsembleModel{MLJDecisionTreeInterface.DecisionTreeClassifier}, Vector{StatisticalMeasuresBase.RobustMeasure{StatisticalMeasuresBase.FussyMeasure{StatisticalMeasuresBase.RobustMeasure{StatisticalMeasures._BrierLossType}, typeof(StatisticalMeasures.l2_check)}}}, Vector{Float64}, Vector{typeof(predict)}, Vector{Vector{Float64}}, Vector{Vector{Vector{Float64}}}, CV}}}:
- (model = ProbabilisticEnsembleModel(model = DecisionTreeClassifier(max_depth = -1, …), …), measure = [BrierLoss()], measurement = [0.11279274074074058], per_fold = [[0.010696888888888952, 0.00034488888888893675, 0.14664799999999983, 0.15163377777777737, 0.15410755555555522, 0.21332533333333317]], evaluation = CompactPerformanceEvaluation(0.113,))
- (model = ProbabilisticEnsembleModel(model = DecisionTreeClassifier(max_depth = -1, …), …), measure = [BrierLoss()], measurement = [0.12159923641555387], per_fold = [[0.030606222222222243, 0.006216000000000115, 0.1883238765432099, 0.14817454320987636, 0.16037265306122436, 0.19590212345679028]], evaluation = CompactPerformanceEvaluation(0.122,))</code></pre><p>Visualizing these results:</p><pre><code class="language-julia hljs">using Plots
+ (model = ProbabilisticEnsembleModel(model = DecisionTreeClassifier(max_depth = -1, …), …), measure = [BrierLoss()], measurement = [0.1351911111111107], per_fold = [[-0.0, -0.0, 0.2051857777777772, 0.16012799999999938, 0.16159911111111053, 0.2842337777777771]], evaluation = CompactPerformanceEvaluation(0.135,))
+ (model = ProbabilisticEnsembleModel(model = DecisionTreeClassifier(max_depth = -1, …), …), measure = [BrierLoss()], measurement = [0.1180616172839507], per_fold = [[0.024312000000000163, 0.005629333333333477, 0.17967466666666676, 0.15351780246913577, 0.1655302222222222, 0.1797056790123459]], evaluation = CompactPerformanceEvaluation(0.118,))</code></pre><p>Visualizing these results:</p><pre><code class="language-julia hljs">using Plots
 plot(mach)</code></pre><p><img src="../img/workflows_tuning_plot.png" alt/></p><p>Predicting on new data using the optimized model trained on all data:</p><pre><code class="language-julia hljs">predict(mach, Xnew)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-element UnivariateFiniteVector{Multiclass{3}, String, UInt32, Float64}:
  UnivariateFinite{Multiclass{3}}(setosa=&gt;1.0, versicolor=&gt;0.0, virginica=&gt;0.0)
- UnivariateFinite{Multiclass{3}}(setosa=&gt;1.0, versicolor=&gt;0.0, virginica=&gt;0.0)
+ UnivariateFinite{Multiclass{3}}(setosa=&gt;0.837, versicolor=&gt;0.163, virginica=&gt;0.0)
  UnivariateFinite{Multiclass{3}}(setosa=&gt;1.0, versicolor=&gt;0.0, virginica=&gt;0.0)</code></pre><h2 id="Constructing-linear-pipelines"><a class="docs-heading-anchor" href="#Constructing-linear-pipelines">Constructing linear pipelines</a><a id="Constructing-linear-pipelines-1"></a><a class="docs-heading-anchor-permalink" href="#Constructing-linear-pipelines" title="Permalink"></a></h2><p><em>Reference:</em>   <a href="../linear_pipelines/#Linear-Pipelines">Linear Pipelines</a></p><p>Constructing a linear (unbranching) pipeline with a <em>learned</em> target transformation/inverse transformation:</p><pre><code class="language-julia hljs">X, y = @load_reduced_ames
 KNN = @load KNNRegressor
 knn_with_target = TransformedTargetModel(model=KNN(K=3), transformer=Standardizer())</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">TransformedTargetModelDeterministic(
@@ -515,7 +503,7 @@ knn_with_target = TransformedTargetModel(model=KNN(K=3), transformer=Standardize
         count = false), 
   inverse = nothing, 
   cache = true)</code></pre><pre><code class="language-julia hljs">pipe = (X -&gt; coerce(X, :age=&gt;Continuous)) |&gt; OneHotEncoder() |&gt; knn_with_target</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">DeterministicPipeline(
-  f = Main.var&quot;#15#16&quot;(), 
+  f = Main.var&quot;#23#24&quot;(), 
   one_hot_encoder = OneHotEncoder(
         features = Symbol[], 
         drop_last = false, 
@@ -562,24 +550,21 @@ Extract:
 ┌──────────────────────┬───────────┬─────────────┐
 │ measure              │ operation │ measurement │
 ├──────────────────────┼───────────┼─────────────┤
-│ LogLoss(             │ predict   │ 0.425       │
+│ LogLoss(             │ predict   │ 0.636       │
 │   tol = 2.22045e-16) │           │             │
 └──────────────────────┴───────────┴─────────────┘
-┌─────────────────────────────────────────────────┬─────────┐
-│ per_fold                                        │ 1.96*SE │
-├─────────────────────────────────────────────────┼─────────┤
-│ [3.89e-15, 3.89e-15, 0.289, 0.392, 1.56, 0.313] │ 0.508   │
-└─────────────────────────────────────────────────┴─────────┘
+┌────────────────────────────────────────────────┬─────────┐
+│ per_fold                                       │ 1.96*SE │
+├────────────────────────────────────────────────┼─────────┤
+│ [3.89e-15, 3.89e-15, 0.304, 1.65, 1.55, 0.315] │ 0.666   │
+└────────────────────────────────────────────────┴─────────┘
 </code></pre><h2 id="Performance-curves"><a class="docs-heading-anchor" href="#Performance-curves">Performance curves</a><a id="Performance-curves-1"></a><a class="docs-heading-anchor-permalink" href="#Performance-curves" title="Permalink"></a></h2><p>Generate a plot of performance, as a function of some hyperparameter (building on the preceding example)</p><p>Single performance curve:</p><pre><code class="language-julia hljs">r = range(forest, :n, lower=1, upper=1000, scale=:log10)
 curve = learning_curve(mach,
                        range=r,
                        resampling=Holdout(),
                        resolution=50,
                        measure=LogLoss(),
-                       verbosity=0)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(parameter_name = &quot;n&quot;,
- parameter_scale = :log10,
- parameter_values = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11  …  281, 324, 373, 429, 494, 569, 655, 754, 869, 1000],
- measurements = [15.218431430960575, 8.179136730607354, 5.870406530249663, 5.8593346589300594, 5.890779608965417, 5.870406530249663, 5.086270045477371, 5.068533052710726, 5.078457853123571, 5.069688947496838  …  1.3062481212070334, 1.30532420873044, 1.2864815351972942, 1.280341893111082, 1.2746724852029923, 1.2691659542957856, 1.262343300949936, 1.2588595475252553, 1.2615071271872529, 1.257289209526252],)</code></pre><pre><code class="language-julia hljs">using Plots
+                       verbosity=0)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(parameter_name = &quot;n&quot;, parameter_scale = :log10, parameter_values = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11  …  281, 324, 373, 429, 494, 569, 655, 754, 869, 1000], measurements = [7.20873067782343, 7.20873067782343, 5.682648747232906, 5.683806880591551, 5.7352086473067185, 5.747302199157554, 1.9521370678222303, 1.9776868531871326, 2.0196250009991807, 2.024197128707278  …  1.2495547213398268, 1.2523552757466834, 1.2591539587890475, 1.2575150886805087, 1.2587038946770455, 1.2566302255142505, 1.250558589005389, 1.2516073811702857, 1.2554030099820668, 0.6099201151557404])</code></pre><pre><code class="language-julia hljs">using Plots
 plot(curve.parameter_values, curve.measurements,
      xlab=curve.parameter_name, xscale=curve.parameter_scale)</code></pre><p><img src="../img/workflows_learning_curve.png" alt/></p><p>Multiple curves:</p><pre><code class="language-julia hljs">curve = learning_curve(mach,
                        range=r,
@@ -588,8 +573,5 @@ plot(curve.parameter_values, curve.measurements,
                        resolution=50,
                        rng_name=:rng,
                        rngs=4,
-                       verbosity=0)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(parameter_name = &quot;n&quot;,
- parameter_scale = :log10,
- parameter_values = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11  …  281, 324, 373, 429, 494, 569, 655, 754, 869, 1000],
- measurements = [7.20873067782343 4.805820451882287 4.004850376568572 8.009700753137146; 7.20873067782343 4.805820451882287 4.004850376568572 8.040507294495367; … ; 1.261856165541717 1.2349371287008197 1.2677161391395422 1.2474031460290036; 1.2580370403760406 1.238094238116189 1.2729907782120073 1.2461526929697504],)</code></pre><pre><code class="language-julia hljs">plot(curve.parameter_values, curve.measurements,
-     xlab=curve.parameter_name, xscale=curve.parameter_scale)</code></pre><p><img src="../img/workflows_learning_curves.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../getting_started/">« Getting Started</a><a class="docs-footer-nextpage" href="../machines/">Machines »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Friday 26 September 2025 01:19">Friday 26 September 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+                       verbosity=0)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(parameter_name = &quot;n&quot;, parameter_scale = :log10, parameter_values = [1, 2, 3, 4, 5, 6, 7, 8, 10, 11  …  281, 324, 373, 429, 494, 569, 655, 754, 869, 1000], measurements = [7.20873067782343 4.805820451882287 4.004850376568572 8.009700753137146; 7.20873067782343 4.805820451882287 4.004850376568572 8.009700753137146; … ; 1.257072685543064 1.2418907482786872 1.2564540964992865 1.241140342569628; 1.254945475885283 1.2430791857104957 1.261492507440871 1.2439199484437307])</code></pre><pre><code class="language-julia hljs">plot(curve.parameter_values, curve.measurements,
+     xlab=curve.parameter_name, xscale=curve.parameter_scale)</code></pre><p><img src="../img/workflows_learning_curves.png" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../getting_started/">« Getting Started</a><a class="docs-footer-nextpage" href="../machines/">Machines »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.15.0 on <span class="colophon-date" title="Tuesday 28 October 2025 23:38">Tuesday 28 October 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
