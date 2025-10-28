@@ -52,6 +52,9 @@ FILTER_GIVEN_ISSUE = Dict(
     "https://github.com/sylvaticus/BetaML.jl/issues/75" =>
         model -> model.package_name == "BetaML" &&
         model.name == "NeuralNetworkClassifier",
+    "https://github.com/sylvaticus/BetaML.jl/issues/80" =>
+        model -> model.package_name == "BetaML" &&
+        model.name in ["PegasosClassifier", "PerceptronClassifier"],
     "https://github.com/JuliaAI/MLJTransforms.jl/issues/42" =>
         model -> model.package_name == "MLJTransforms" &&
         model.name in [
