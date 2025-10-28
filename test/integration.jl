@@ -1,4 +1,4 @@
-using MLJTestIntegration, MLJModels, MLJ, Test, Markdown
+using MLJTestIntegration, MLJModels, MLJ, Test, Markdown 
 import MLJTestIntegration as MTI
 import Pkg.TOML as TOML
 using Suppressor
@@ -34,13 +34,6 @@ FILTER_GIVEN_ISSUE = Dict(
         model.package_name == "OutlierDetectionNeighbors") ||
         (model.name == "TSVDTransformer" &&
         model.package_name == "TSVD"),
-    "https://github.com/sylvaticus/BetaML.jl/issues/79" =>
-        model -> model.name in [
-            "KernelPerceptronClassifier",
-            "PegasosClassifier",
-            "PerceptronClassifier",
-        ] &&
-        model.package_name == "BetaML",
     "https://github.com/sylvaticus/BetaML.jl/issues/65" =>
         model -> model.name in ["KMeans", "KMedoids"] &&
         model.package_name == "BetaML",
@@ -59,6 +52,12 @@ FILTER_GIVEN_ISSUE = Dict(
     "https://github.com/sylvaticus/BetaML.jl/issues/75" =>
         model -> model.package_name == "BetaML" &&
         model.name == "NeuralNetworkClassifier",
+    "https://github.com/sylvaticus/BetaML.jl/issues/80" =>
+        model -> model.package_name == "BetaML" &&
+        model.name in ["PegasosClassifier", "PerceptronClassifier"],
+    "https://github.com/sylvaticus/BetaML.jl/issues/81" =>
+        model -> model.package_name == "BetaML" &&
+        model.name in ["RandomForestClassifier", "RandomForestRegressor"],
     "https://github.com/JuliaAI/MLJTransforms.jl/issues/42" =>
         model -> model.package_name == "MLJTransforms" &&
         model.name in [
