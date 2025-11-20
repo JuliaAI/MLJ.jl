@@ -174,11 +174,7 @@ export Grid, RandomSearch, Explicit, TunedModel, LatinHypercube,
 # re-export from MLJModels:
 export models, localmodels, @load, @iload, load, info, doc,
     ConstantRegressor, ConstantClassifier,     # builtins/Constant.jl
-    UnivariateStandardizer,
-    Standardizer, UnivariateBoxCoxTransformer,
-    OneHotEncoder, ContinuousEncoder, UnivariateDiscretizer,
-    FillImputer, matching, BinaryThresholdPredictor,
-    UnivariateTimeTypeToContinuous, InteractionTransformer  # builtins/Transformers.jl
+    matching, BinaryThresholdPredictor,
 
 # re-export from MLJIteration:
 export MLJIteration
