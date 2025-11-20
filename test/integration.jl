@@ -1,4 +1,4 @@
-using MLJTestIntegration, MLJModels, MLJ, Test, Markdown 
+using MLJTestIntegration, MLJModels, MLJ, Test, Markdown
 import MLJTestIntegration as MTI
 import Pkg.TOML as TOML
 using Suppressor
@@ -29,46 +29,7 @@ FILTER_GIVEN_ISSUE = Dict(
     "https://github.com/JuliaAI/MLJ.jl/issues/1085" =>
         model ->
         (model.name == "AdaBoostStumpClassifier" &&
-        model.package_name == "DecisionTree") ||
-        (model.name == "COFDetector" &&
-        model.package_name == "OutlierDetectionNeighbors") ||
-        (model.name == "TSVDTransformer" &&
-        model.package_name == "TSVD"),
-    "https://github.com/sylvaticus/BetaML.jl/issues/65" =>
-        model -> model.name in ["KMeans", "KMedoids"] &&
-        model.package_name == "BetaML",
-    "https://github.com/JuliaAI/MLJ.jl/issues/1074" =>
-        model -> model.name == "AutoEncoderMLJ",
-     "https://github.com/rikhuijzer/SIRUS.jl/issues/78" =>
-        model -> model.package_name == "SIRUS",
-    "MLJScikitLearnInterface - multiple issues, WIP" =>
-        model -> model.package_name == "MLJScikitLearnInterface" &&
-        model.name in [
-            "MultiTaskElasticNetCVRegressor",
-            "MultiTaskElasticNetRegressor",
-            "MultiTaskLassoCVRegressor",
-            "MultiTaskLassoRegressor",
-        ],
-    "https://github.com/sylvaticus/BetaML.jl/issues/75" =>
-        model -> model.package_name == "BetaML" &&
-        model.name == "NeuralNetworkClassifier",
-    "https://github.com/sylvaticus/BetaML.jl/issues/80" =>
-        model -> model.package_name == "BetaML" &&
-        model.name in ["PegasosClassifier", "PerceptronClassifier"],
-    "https://github.com/sylvaticus/BetaML.jl/issues/81" =>
-        model -> model.package_name == "BetaML" &&
-        model.name in ["RandomForestClassifier", "RandomForestRegressor"],
-    "https://github.com/JuliaAI/MLJTransforms.jl/issues/42" =>
-        model -> model.package_name == "MLJTransforms" &&
-        model.name in [
-            "CardinalityReducer",
-            "ContrastEncoder",
-            "FrequencyEncoder",
-            "MissingnessEncoder",
-            "OrdinalEncoder",
-        ],
-    # "https://github.com/JuliaAI/Imbalance.jl/issues/103" =>
-    #     model -> model.package_name == "Imbalance",
+        model.package_name == "DecisionTree")
 )
 
 
@@ -262,9 +223,11 @@ for (model_set, level) in [
     end
 end
 
-isempty(missing_pkgs) || @warn  "Integration tests for the following packages in the "*
-    "model registry were omitted, as they do not have an entry in the [extras] "*
-    "section of the MLJ Project.toml file: "*join(missing_pkgs, ", ")
+isempty(missing_pkgs) || @info "\nIntegration tests are only carried out for some core "*
+    "packages. To be included in tests, a package must have an entry in the "*
+    "[extras] "*
+    "section of the MLJ Project.toml file. The following packages with MLJ-registered "*
+    "model are not in that list:\n"*join(missing_pkgs, "\n")
 okay = isempty(problems)
 okay || @error "Integration tests failed for these models: \n $problems"
 
