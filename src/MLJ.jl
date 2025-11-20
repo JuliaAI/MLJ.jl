@@ -174,7 +174,8 @@ export Grid, RandomSearch, Explicit, TunedModel, LatinHypercube,
 # re-export from MLJModels:
 export models, localmodels, @load, @iload, load, info, doc,
     ConstantRegressor, ConstantClassifier,     # builtins/Constant.jl
-    matching, BinaryThresholdPredictor,
+    DeterministicConstantClassifier, DeterministicConstantRegressor,
+    matching, BinaryThresholdPredictor
 
 # re-export from MLJIteration:
 export MLJIteration
