@@ -22,12 +22,12 @@ schema(X)</code></pre><pre class="documenter-example-output"><code class="nohigh
  &quot;rejected&quot;
  &quot;accepted&quot;
  &quot;accepted&quot;
- &quot;rejected&quot;</code></pre><p>The <em>machine</em> type of the result is a <code>CategoricalArray</code>. For more on this type see <a href="#Under-the-hood:-CategoricalValue-and-CategoricalArray">Under the hood: CategoricalValue and CategoricalArray</a> below.</p><p>Inspecting the order of the levels:</p><pre><code class="language-julia hljs">levels(X.outcome)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-element Vector{String}:
+ &quot;rejected&quot;</code></pre><p>The <em>machine</em> type of the result is a <code>CategoricalArray</code>. For more on this type see <a href="#Under-the-hood:-CategoricalValue-and-CategoricalArray">Under the hood: CategoricalValue and CategoricalArray</a> below.</p><p>Inspecting the order of the levels:</p><pre><code class="language-julia hljs">levels(X.outcome)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-element CategoricalArray{String,1,UInt32}:
  &quot;accepted&quot;
  &quot;rejected&quot;</code></pre><p>Since we wish to regard &quot;accepted&quot; as the positive class, it should appear second, which we correct with the <code>levels!</code> function:</p><pre><code class="language-julia hljs">levels!(X.outcome, [&quot;rejected&quot;, &quot;accepted&quot;])
-levels(X.outcome)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-element Vector{String}:
+levels(X.outcome)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-element CategoricalArray{String,1,UInt32}:
  &quot;rejected&quot;
- &quot;accepted&quot;</code></pre><div class="admonition is-warning" id="Changing-levels-of-categorical-data-2b4ece60a6feeb04"><header class="admonition-header">Changing levels of categorical data<a class="admonition-anchor" href="#Changing-levels-of-categorical-data-2b4ece60a6feeb04" title="Permalink"></a></header><div class="admonition-body"><p>The order of levels should generally be changed early in your data science workflow and then not again. Similar remarks apply to <em>adding</em> levels (which is possible; see the <a href="https://juliadata.github.io/CategoricalArrays.jl/stable/">CategorialArrays.jl documentation</a>). MLJ supervised and unsupervised models assume levels and their order do not change.</p></div></div><p>Coercing all remaining types simultaneously:</p><pre><code class="language-julia hljs">Xnew = coerce(X, :gender     =&gt; Multiclass,
+ &quot;accepted&quot;</code></pre><div class="admonition is-warning" id="Changing-levels-of-categorical-data-69df10cdc7db5953"><header class="admonition-header">Changing levels of categorical data<a class="admonition-anchor" href="#Changing-levels-of-categorical-data-69df10cdc7db5953" title="Permalink"></a></header><div class="admonition-body"><p>The order of levels should generally be changed early in your data science workflow and then not again. Similar remarks apply to <em>adding</em> levels (which is possible; see the <a href="https://juliadata.github.io/CategoricalArrays.jl/stable/">CategorialArrays.jl documentation</a>). MLJ supervised and unsupervised models assume levels and their order do not change.</p></div></div><p>Coercing all remaining types simultaneously:</p><pre><code class="language-julia hljs">Xnew = coerce(X, :gender     =&gt; Multiclass,
                  :likes_soup =&gt; OrderedFactor,
                  :height     =&gt; Continuous,
                  :rating     =&gt; OrderedFactor)
@@ -45,16 +45,16 @@ schema(Xnew)</code></pre><pre class="documenter-example-output"><code class="noh
  2
  5
  2
- 1</code></pre><pre><code class="language-julia hljs">levels(v)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-element Vector{Int64}:
+ 1</code></pre><pre><code class="language-julia hljs">levels(v)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-element CategoricalArray{Int64,1,UInt32}:
  1
  2
- 5</code></pre><pre><code class="language-julia hljs">levels(v[1:2])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-element Vector{Int64}:
+ 5</code></pre><pre><code class="language-julia hljs">levels(v[1:2])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-element CategoricalArray{Int64,1,UInt32}:
  1
  2
- 5</code></pre><pre><code class="language-julia hljs">levels(v[2])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-element Vector{Int64}:
+ 5</code></pre><pre><code class="language-julia hljs">levels(v[2])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">3-element CategoricalArray{Int64,1,UInt32}:
  1
  2
- 5</code></pre><p>By tracking all classes in this way, MLJ avoids common pain points around categorical data, such as evaluating models on an evaluation set, only to crash your code because classes appear there which were not seen during training.</p><p>By drawing test, validation and training data from a common data structure (as described in <a href="../getting_started/#Getting-Started">Getting Started</a>, for example) one ensures that all possible classes of categorical variables are tracked at all times. However, this does not mitigate problems with new <em>production</em> data, if categorical features there are missing classes or contain previously unseen classes.</p><h2 id="New-or-missing-levels-in-production-data"><a class="docs-heading-anchor" href="#New-or-missing-levels-in-production-data">New or missing levels in production data</a><a id="New-or-missing-levels-in-production-data-1"></a><a class="docs-heading-anchor-permalink" href="#New-or-missing-levels-in-production-data" title="Permalink"></a></h2><div class="admonition is-warning" id="Warning-6a8094c9973a7353"><header class="admonition-header">Warning<a class="admonition-anchor" href="#Warning-6a8094c9973a7353" title="Permalink"></a></header><div class="admonition-body"><p>Unpredictable behavior may result whenever <code>Finite</code> categorical data presents in a production set with different classes (levels) from those presented during training</p></div></div><p>Consider, for example, the following naive workflow:</p><pre><code class="language-julia hljs"># train a one-hot encoder on some data:
+ 5</code></pre><p>By tracking all classes in this way, MLJ avoids common pain points around categorical data, such as evaluating models on an evaluation set, only to crash your code because classes appear there which were not seen during training.</p><p>By drawing test, validation and training data from a common data structure (as described in <a href="../getting_started/#Getting-Started">Getting Started</a>, for example) one ensures that all possible classes of categorical variables are tracked at all times. However, this does not mitigate problems with new <em>production</em> data, if categorical features there are missing classes or contain previously unseen classes.</p><h2 id="New-or-missing-levels-in-production-data"><a class="docs-heading-anchor" href="#New-or-missing-levels-in-production-data">New or missing levels in production data</a><a id="New-or-missing-levels-in-production-data-1"></a><a class="docs-heading-anchor-permalink" href="#New-or-missing-levels-in-production-data" title="Permalink"></a></h2><div class="admonition is-warning" id="Warning-691cb32ea8a2568"><header class="admonition-header">Warning<a class="admonition-anchor" href="#Warning-691cb32ea8a2568" title="Permalink"></a></header><div class="admonition-body"><p>Unpredictable behavior may result whenever <code>Finite</code> categorical data presents in a production set with different classes (levels) from those presented during training</p></div></div><p>Consider, for example, the following naive workflow:</p><pre><code class="language-julia hljs"># train a one-hot encoder on some data:
 x = coerce([&quot;black&quot;, &quot;white&quot;, &quot;white&quot;, &quot;black&quot;], Multiclass)
 X = DataFrame(x=x)
 
@@ -65,9 +65,9 @@ mach = machine(model, X) |&gt; fit!
 xproduction = coerce([&quot;white&quot;, &quot;white&quot;], Multiclass)
 Xproduction = DataFrame(x=xproduction)
 Xproduction == X[2:3,:]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">true</code></pre><p>So far, so good. But the following operation throws an error:</p><pre><code class="language-julia-repl hljs">julia&gt; transform(mach, Xproduction) == transform(mach, X[2:3,:])
-ERROR: Found category level mismatch in feature `x`. Consider using `levels!` to ensure fitted and transforming features have the same category levels.</code></pre><p>The problem here is that <code>levels(X.x)</code> and <code>levels(Xproduction.x)</code> are different:</p><pre><code class="language-julia hljs">levels(X.x)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-element Vector{String}:
+ERROR: Found category level mismatch in feature `x`. Consider using `levels!` to ensure fitted and transforming features have the same category levels.</code></pre><p>The problem here is that <code>levels(X.x)</code> and <code>levels(Xproduction.x)</code> are different:</p><pre><code class="language-julia hljs">levels(X.x)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-element CategoricalArray{String,1,UInt32}:
  &quot;black&quot;
- &quot;white&quot;</code></pre><pre><code class="language-julia hljs">levels(Xproduction.x)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1-element Vector{String}:
+ &quot;white&quot;</code></pre><pre><code class="language-julia hljs">levels(Xproduction.x)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1-element CategoricalArray{String,1,UInt32}:
  &quot;white&quot;</code></pre><p>This could be anticipated by the fact that the training and production data have different schema:</p><pre><code class="language-julia hljs">schema(X)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">┌───────┬───────────────┬──────────────────────────────────┐
 │ names │ scitypes      │ types                            │
 ├───────┼───────────────┼──────────────────────────────────┤
@@ -99,7 +99,7 @@ typeof(v)</code></pre><pre class="documenter-example-output"><code class="nohigh
  &#39;C&#39;</code></pre><pre><code class="language-julia hljs">scitype(v)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">AbstractVector{OrderedFactor{3}}<span class="sgr90"> (alias for AbstractArray{OrderedFactor{3}, 1})</span></code></pre><p>When you index a <code>CategoricalVector</code> you don&#39;t get a raw label, but instead an instance of <code>CategoricalValue</code>. As explained above, this value knows the complete pool of levels from the vector from which it came. Use <code>get(val)</code> to extract the raw label from a value <code>val</code>.</p><p>Despite the distinction that exists between a value (element) and a label, the two are the same, from the point of <code>==</code> and <code>in</code>:</p><pre><code class="language-julia hljs">v[1] == &#39;A&#39; # true
 &#39;A&#39; in v    # true</code></pre><h2 id="Probabilistic-predictions-of-categorical-data"><a class="docs-heading-anchor" href="#Probabilistic-predictions-of-categorical-data">Probabilistic predictions of categorical data</a><a id="Probabilistic-predictions-of-categorical-data-1"></a><a class="docs-heading-anchor-permalink" href="#Probabilistic-predictions-of-categorical-data" title="Permalink"></a></h2><p>Recall from <a href="../getting_started/#Getting-Started">Getting Started</a> that probabilistic classifiers ordinarily predict <code>UnivariateFinite</code> distributions, not raw probabilities (which are instead accessed using the <code>pdf</code> method.) Here&#39;s how to construct such a distribution yourself:</p><pre><code class="language-julia hljs">v = coerce([&quot;yes&quot;, &quot;no&quot;, &quot;yes&quot;, &quot;yes&quot;, &quot;maybe&quot;], Multiclass)
 d = UnivariateFinite([v[2], v[1]], [0.9, 0.1])</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">UnivariateFinite{Multiclass{3}}(no=&gt;0.9, yes=&gt;0.1)</code></pre><p>Or, equivalently,</p><pre><code class="language-julia hljs">d = UnivariateFinite([&quot;no&quot;, &quot;yes&quot;], [0.9, 0.1], pool=v)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">UnivariateFinite{Multiclass{3}}(no=&gt;0.9, yes=&gt;0.1)</code></pre><p>This distribution tracks <em>all</em> levels, not just the ones to which you have assigned probabilities:</p><pre><code class="language-julia hljs">pdf(d, &quot;maybe&quot;)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">0.0</code></pre><p>However, <code>pdf(d, &quot;dunno&quot;)</code> will throw an error.</p><p>You can declare <code>pool=missing</code>, but then <code>&quot;maybe&quot;</code> will not be tracked:</p><pre><code class="language-julia hljs">d = UnivariateFinite([&quot;no&quot;, &quot;yes&quot;], [0.9, 0.1], pool=missing)
-levels(d)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-element Vector{String}:
+levels(d)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">2-element CategoricalArray{String,1,UInt8}:
  &quot;no&quot;
  &quot;yes&quot;</code></pre><p>To construct a whole <em>vector</em> of <code>UnivariateFinite</code> distributions, simply give the constructor a matrix of probabilities:</p><pre><code class="language-julia hljs">yes_probs = rand(5)
 probs = hcat(1 .- yes_probs, yes_probs)
@@ -108,73 +108,59 @@ d_vec = UnivariateFinite([&quot;no&quot;, &quot;yes&quot;], probs, pool=v)</code
  UnivariateFinite{Multiclass{3}}(no=&gt;0.801, yes=&gt;0.199)
  UnivariateFinite{Multiclass{3}}(no=&gt;0.24, yes=&gt;0.76)
  UnivariateFinite{Multiclass{3}}(no=&gt;0.429, yes=&gt;0.571)
- UnivariateFinite{Multiclass{3}}(no=&gt;0.77, yes=&gt;0.23)</code></pre><p>Or, equivalently:</p><pre><code class="language-julia hljs">d_vec = UnivariateFinite([&quot;no&quot;, &quot;yes&quot;], yes_probs, augment=true, pool=v)</code></pre><p>For more options, see <a href="#CategoricalDistributions.UnivariateFinite"><code>UnivariateFinite</code></a>.</p><h2 id="Reference"><a class="docs-heading-anchor" href="#Reference">Reference</a><a id="Reference-1"></a><a class="docs-heading-anchor-permalink" href="#Reference" title="Permalink"></a></h2><article class="docstring"><header><a class="docstring-article-toggle-button fa-solid fa-chevron-down" href="javascript:;" title="Collapse docstring"></a><a class="docstring-binding" id="CategoricalDistributions.UnivariateFinite" href="#CategoricalDistributions.UnivariateFinite"><code>CategoricalDistributions.UnivariateFinite</code></a> — <span class="docstring-category">Type</span><span class="is-flex-grow-1 docstring-article-toggle-button" title="Collapse docstring"></span></header><section><div><pre><code class="language-julia hljs">UnivariateFinite(support,
-                 probs;
-                 pool=nothing,
-                 augmented=false,
-                 ordered=false)</code></pre><p>Construct a discrete univariate distribution whose finite support is the elements of the vector <code>support</code>, and whose corresponding probabilities are elements of the vector <code>probs</code>. Alternatively, construct an abstract <em>array</em> of <code>UnivariateFinite</code> distributions by choosing <code>probs</code> to be an array of one higher dimension than the array generated.</p><p>Here the word &quot;probabilities&quot; is an abuse of terminology as there is no requirement that the that probabilities actually sum to one. The only requirement is that the probabilities have a common type <code>T</code> for which <code>zero(T)</code> is defined. In particular, <code>UnivariateFinite</code> objects implement arbitrary non-negative, signed, or complex measures over finite sets of labelled points. A <code>UnivariateDistribution</code> will be a bona fide probability measure when constructed using the <code>augment=true</code> option (see below) or when <code>fit</code> to data. And the probabilities of a <code>UnivariateFinite</code> object <code>d</code> must be non-negative, with a non-zero sum, for <code>rand(d)</code> to be defined and interpretable.</p><p>Unless <code>pool</code> is specified, <code>support</code> should have type  <code>AbstractVector{&lt;:CategoricalValue}</code> and all elements are assumed to  share the same categorical pool, which may be larger than <code>support</code>.</p><p><em>Important.</em> All levels of the common pool have associated probabilities, not just those in the specified <code>support</code>. However, these probabilities are always zero (see example below).</p><p>If <code>probs</code> is a matrix, it should have a column for each class in <code>support</code> (or one less, if <code>augment=true</code>). More generally, <code>probs</code> will be an array whose size is of the form <code>(n1, n2, ..., nk, c)</code>, where <code>c = length(support)</code> (or one less, if <code>augment=true</code>) and the constructor then returns an array of <code>UnivariateFinite</code> distributions of size <code>(n1, n2, ..., nk)</code>.</p><pre><code class="language-julia hljs">using CategoricalDistributions, CategoricalArrays, Distributions
-samples = categorical([&#39;x&#39;, &#39;x&#39;, &#39;y&#39;, &#39;x&#39;, &#39;z&#39;])
-julia&gt; Distributions.fit(UnivariateFinite, samples)
-           UnivariateFinite{Multiclass{3}}
-     ┌                                        ┐
-   x ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 0.6
-   y ┤■■■■■■■■■■■■ 0.2
-   z ┤■■■■■■■■■■■■ 0.2
-     └                                        ┘
+ UnivariateFinite{Multiclass{3}}(no=&gt;0.77, yes=&gt;0.23)</code></pre><p>Or, equivalently:</p><pre><code class="language-julia hljs">d_vec = UnivariateFinite([&quot;no&quot;, &quot;yes&quot;], yes_probs, augment=true, pool=v)</code></pre><p>For more options, see <a href="#CategoricalDistributions.UnivariateFinite"><code>UnivariateFinite</code></a>.</p><h2 id="Reference"><a class="docs-heading-anchor" href="#Reference">Reference</a><a id="Reference-1"></a><a class="docs-heading-anchor-permalink" href="#Reference" title="Permalink"></a></h2><article><details class="docstring" open="true"><summary id="CategoricalDistributions.UnivariateFinite"><a class="docstring-binding" href="#CategoricalDistributions.UnivariateFinite"><code>CategoricalDistributions.UnivariateFinite</code></a> — <span class="docstring-category">Type</span></summary><div><pre><code class="language-julia hljs">UnivariateFinite(support, probs; pool=nothing, augmented=false, ordered=false)
 
-julia&gt; d = UnivariateFinite([samples[1], samples[end]], [0.1, 0.9])
-UnivariateFinite{Multiclass{3}(x=&gt;0.1, z=&gt;0.9)
-           UnivariateFinite{Multiclass{3}}
-     ┌                                        ┐
-   x ┤■■■■ 0.1
-   z ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 0.9
-     └                                        ┘
+Construct a discrete univariate distribution whose finite support is
+the elements of the vector `support`, and whose corresponding
+probabilities are elements of the vector `probs`. Alternatively,
+construct an abstract *array* of `UnivariateFinite` distributions by
+choosing `probs` to be an array of one higher dimension than the array
+generated.
 
-julia&gt; rand(d, 3)
-3-element Array{Any,1}:
- CategoricalValue{Symbol,UInt32} &#39;z&#39;
- CategoricalValue{Symbol,UInt32} &#39;z&#39;
- CategoricalValue{Symbol,UInt32} &#39;z&#39;
+`UnivariateFinite` objects can also be constructed from dictionaries; see below. 
 
-julia&gt; levels(samples)
-3-element Array{Symbol,1}:
- &#39;x&#39;
- &#39;y&#39;
- &#39;z&#39;
+Here &quot;probabilities&quot; need not sum to one. The only requirement is that the probabilities
+have a common type `T` for which `zero(T)` is defined. In particular, `UnivariateFinite`
+objects implement arbitrary non-negative, signed, or complex measures over finite sets of
+labeled points. A `UnivariateDistribution` will be a bona fide probability measure when
+constructed using the `augment=true` option (see below) or when `fit` to data. And to
+support sampling with `rand`, probabilities must have a type that implements `&gt;` and `+`
+and these probabilities must be non-negative, support addition, and not all zero, for
 
-julia&gt; pdf(d, &#39;y&#39;)
-0.0</code></pre><p><strong>Specifying a pool</strong></p><p>Alternatively, <code>support</code> may be a list of raw (non-categorical) elements if <code>pool</code> is:</p><ul><li><p>some <code>CategoricalArray</code>, <code>CategoricalValue</code> or <code>CategoricalPool</code>, such that <code>support</code> is a subset of <code>levels(pool)</code></p></li><li><p><code>missing</code>, in which case a new categorical pool is created which has <code>support</code> as its only levels.</p></li></ul><p>In the last case, specify <code>ordered=true</code> if the pool is to be considered ordered.</p><pre><code class="language-julia hljs">julia&gt; UnivariateFinite([&#39;x&#39;, &#39;z&#39;], [0.1, 0.9], pool=missing, ordered=true)
-         UnivariateFinite{OrderedFactor{2}}
-     ┌                                        ┐
-   x ┤■■■■ 0.1
-   z ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 0.9
-     └                                        ┘
+Unless `pool` is specified, `support` should have type
+ `AbstractVector{&lt;:CategoricalValue}` and all elements are assumed to
+ share the same categorical pool, which may be larger than `support`.
 
-samples = categorical([&#39;x&#39;, &#39;x&#39;, &#39;y&#39;, &#39;x&#39;, &#39;z&#39;])
-julia&gt; d = UnivariateFinite([&#39;x&#39;, &#39;z&#39;], [0.1, 0.9], pool=samples)
-     ┌                                        ┐
-   x ┤■■■■ 0.1
-   z ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 0.9
-     └                                        ┘
+*Important.* All levels of the common pool have associated
+probabilities, not just those in the specified `support`. However,
+these probabilities are always zero (see example below).
 
-julia&gt; pdf(d, &#39;y&#39;) # allowed as `&#39;y&#39; in levels(samples)`
-0.0
+If `probs` is a matrix, it should have a column for each class (level) in `support` (or
+one less, if `augment=true`). More generally, `probs` will be an array whose size is of
+the form `(n1, n2, ..., nk, c)`, where `c = length(support)` (or one less, if
+`augment=true`) and the constructor then returns an array of `UnivariateFinite`
+distributions of size `(n1, n2, ..., nk)`.
+</code></pre><p>julia-repl julia&gt; using CategoricalDistributions, CategoricalArrays, Distributions</p><p>julia&gt; samples = categorical([&#39;x&#39;, &#39;x&#39;, &#39;y&#39;, &#39;x&#39;, &#39;z&#39;]);</p><p>julia&gt; Distributions.fit(UnivariateFinite, samples) UnivariateFinite{Multiclass{3}}(x=&gt;0.6, y=&gt;0.2, z=&gt;0.2)            UnivariateFinite{Multiclass{3}}      ┌                                        ┐    x ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 0.6    y ┤■■■■■■■■■■■■ 0.2    z ┤■■■■■■■■■■■■ 0.2      └                                        ┘</p><p>julia&gt; d = UnivariateFinite([samples[1], samples[end]], [0.1, 0.9]) UnivariateFinite{Multiclass{3}(x=&gt;0.1, z=&gt;0.9)            UnivariateFinite{Multiclass{3}}      ┌                                        ┐    x ┤■■■■ 0.1    z ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 0.9      └                                        ┘</p><p>julia&gt; rand(d, 3) 3-element Vector{CategoricalValue{Char, UInt32}}:  &#39;z&#39;  &#39;z&#39;  &#39;z&#39;</p><p>julia&gt; levels(samples) 3-element CategoricalArray{Char,1,UInt32}:  &#39;x&#39;  &#39;y&#39;  &#39;z&#39;</p><p>julia&gt; pdf(d, &#39;y&#39;) 0.0</p><pre><code class="language-julia hljs">
+# Specifying a pool
 
-v = categorical([&#39;x&#39;, &#39;x&#39;, &#39;y&#39;, &#39;x&#39;, &#39;z&#39;, &#39;w&#39;])
-probs = rand(100, 3)
-probs = probs ./ sum(probs, dims=2)
-julia&gt; d1 = UnivariateFinite([&#39;x&#39;, &#39;y&#39;, &#39;z&#39;], probs, pool=v)
-100-element UnivariateFiniteVector{Multiclass{4},Symbol,UInt32,Float64}:
- UnivariateFinite{Multiclass{4}}(x=&gt;0.194, y=&gt;0.3, z=&gt;0.505)
- UnivariateFinite{Multiclass{4}}(x=&gt;0.727, y=&gt;0.234, z=&gt;0.0391)
- UnivariateFinite{Multiclass{4}}(x=&gt;0.674, y=&gt;0.00535, z=&gt;0.321)
-   ⋮
- UnivariateFinite{Multiclass{4}}(x=&gt;0.292, y=&gt;0.339, z=&gt;0.369)</code></pre><p><strong>Probability augmentation</strong></p><p>If <code>augment=true</code> the provided array is augmented by inserting appropriate elements <em>ahead</em> of those provided, along the last dimension of the array. This means the user only provides probabilities for the classes <code>c2, c3, ..., cn</code>. The class <code>c1</code> probabilities are chosen so that each <code>UnivariateFinite</code> distribution in the returned array is a bona fide probability distribution.</p><pre><code class="language-julia hljs">julia&gt; UnivariateFinite([0.1, 0.2, 0.3], augment=true, pool=missing)
-3-element UnivariateFiniteArray{Multiclass{2}, String, UInt8, Float64, 1}:
- UnivariateFinite{Multiclass{2}}(class_1=&gt;0.9, class_2=&gt;0.1)
- UnivariateFinite{Multiclass{2}}(class_1=&gt;0.8, class_2=&gt;0.2)
- UnivariateFinite{Multiclass{2}}(class_1=&gt;0.7, class_2=&gt;0.3)
+Alternatively, `support` may be a list of raw (non-categorical)
+elements if `pool` is:
 
-d2 = UnivariateFinite([&#39;x&#39;, &#39;y&#39;, &#39;z&#39;], probs[:, 2:end], augment=true, pool=v)
-julia&gt; pdf(d1, levels(v)) ≈ pdf(d2, levels(v))
-true</code></pre><hr/><pre><code class="language-julia hljs">UnivariateFinite(prob_given_class; pool=nothing, ordered=false)</code></pre><p>Construct a discrete univariate distribution whose finite support is the set of keys of the provided dictionary, <code>prob_given_class</code>, and whose values specify the corresponding probabilities.</p><p>The type requirements on the keys of the dictionary are the same as the elements of <code>support</code> given above with this exception: if non-categorical elements (raw labels) are used as keys, then <code>pool=...</code> must be specified and cannot be <code>missing</code>.</p><p>If the values (probabilities) are arrays instead of scalars, then an abstract array of <code>UnivariateFinite</code> elements is created, with the same size as the array.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/CategoricalDistributions.jl/blob/v0.1.15/src/types.jl#L177-L334">source</a></section></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../mlj_cheatsheet/">« MLJ Cheatsheet</a><a class="docs-footer-nextpage" href="../preparing_data/">Preparing Data »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.15.0 on <span class="colophon-date" title="Tuesday 28 October 2025 23:38">Tuesday 28 October 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+- some `CategoricalArray`, `CategoricalValue` or `CategoricalPool`,
+  such that `support` is a subset of `levels(pool)`
+
+- `missing`, in which case a new categorical pool is created which has
+  `support` as its only levels.
+
+In the last case, specify `ordered=true` if the pool is to be
+considered ordered.
+</code></pre><p>julia-repl julia&gt; UnivariateFinite([&#39;x&#39;, &#39;z&#39;], [0.1, 0.9], pool=missing, ordered=true) UnivariateFinite{OrderedFactor{2}}(x=&gt;0.1, z=&gt;0.9)          UnivariateFinite{OrderedFactor{2}}      ┌                                        ┐    x ┤■■■■ 0.1    z ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 0.9      └                                        ┘</p><p>julia&gt; samples = categorical([&#39;x&#39;, &#39;x&#39;, &#39;y&#39;, &#39;x&#39;, &#39;z&#39;]); julia&gt; d = UnivariateFinite([&#39;x&#39;, &#39;z&#39;], [0.1, 0.9], pool=samples) UnivariateFinite{Multiclass{3}}(x=&gt;0.1, z=&gt;0.9)</p><pre><code class="language-julia hljs"> ┌                                        ┐</code></pre><p>x ┤■■■■ 0.1    z ┤■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ 0.9      └                                        ┘</p><p>julia&gt; pdf(d, &#39;y&#39;) # allowed as <code>&#39;y&#39; in levels(samples)</code> 0.0</p><p>julia&gt; v = categorical([&#39;x&#39;, &#39;x&#39;, &#39;y&#39;, &#39;x&#39;, &#39;z&#39;, &#39;w&#39;]);</p><p>julia&gt; probs = rand(100, 3); julia&gt; probs = probs ./ sum(probs, dims=2);</p><p>julia&gt; d1 = UnivariateFinite([&#39;x&#39;, &#39;y&#39;, &#39;z&#39;], probs, pool=v) 100-element UnivariateFiniteVector{Multiclass{4}, Char, UInt32, Float64}:  UnivariateFinite{Multiclass{4}}(x=&gt;0.194, y=&gt;0.3, z=&gt;0.505)  UnivariateFinite{Multiclass{4}}(x=&gt;0.727, y=&gt;0.234, z=&gt;0.0391)  UnivariateFinite{Multiclass{4}}(x=&gt;0.674, y=&gt;0.00535, z=&gt;0.321)    ⋮  UnivariateFinite{Multiclass{4}}(x=&gt;0.292, y=&gt;0.339, z=&gt;0.369)</p><pre><code class="language-julia hljs">
+# Probability augmentation
+
+If `augment=true` the provided array is augmented by inserting
+appropriate elements *ahead* of those provided, along the last
+dimension of the array. This means the user only provides probabilities
+for the classes `c2, c3, ..., cn`. The class `c1` probabilities are
+chosen so that each `UnivariateFinite` distribution in the returned
+array is a bona fide probability distribution.
+</code></pre><p>julia-repl julia&gt; UnivariateFinite([0.1, 0.2, 0.3], augment=true, pool=missing) 3-element UnivariateFiniteArray{Multiclass{2}, String, UInt8, Float64, 1}:  UnivariateFinite{Multiclass{2}}(class<em>1=&gt;0.9, class</em>2=&gt;0.1)  UnivariateFinite{Multiclass{2}}(class<em>1=&gt;0.8, class</em>2=&gt;0.2)  UnivariateFinite{Multiclass{2}}(class<em>1=&gt;0.7, class</em>2=&gt;0.3)</p><p>julia&gt; d2 = UnivariateFinite([&#39;x&#39;, &#39;y&#39;, &#39;z&#39;], probs[:, 2:end], augment=true, pool=v); julia&gt; pdf(d1, levels(v)) ≈ pdf(d2, levels(v)) true ```</p><hr/><pre><code class="language-julia hljs">UnivariateFinite(prob_given_class; pool=nothing, ordered=false)</code></pre><p>Construct a discrete univariate distribution whose finite support is the set of keys of the provided dictionary, <code>prob_given_class</code>, and whose values specify the corresponding probabilities.</p><p>The type requirements on the keys of the dictionary are the same as the elements of <code>support</code> given above with this exception: if non-categorical elements (raw labels) are used as keys, then <code>pool=...</code> must be specified and cannot be <code>missing</code>.</p><p>If the values (probabilities) are arrays instead of scalars, then an abstract array of <code>UnivariateFinite</code> elements is created, with the same size as the array.</p><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/CategoricalDistributions.jl/blob/v0.2.1/src/types.jl#L180-L340">source</a></div></details></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../mlj_cheatsheet/">« MLJ Cheatsheet</a><a class="docs-footer-nextpage" href="../preparing_data/">Preparing Data »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.0 on <span class="colophon-date" title="Thursday 20 November 2025 19:58">Thursday 20 November 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
