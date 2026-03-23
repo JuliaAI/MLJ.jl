@@ -1,7 +1,11 @@
+!!! note
+
+	Starting with MLJ 0.23.0, MLJFlow.jl methods are not immediately available, as the package has been removed as a direct dependency. Previous behaviour will require `using MLJFlow`. See also the "Warning" below.
+
 # Logging Workflows
 
-Currently the following workflows can log their outcomes to an external machine learning
-tracking platform, such as [MLflow](https://mlflow.org):
+In principle, the following workflows can log their outcomes to an external machine learning
+tracking platform, such as [mlflow](https://mlflow.org):
 
 - Estimating model performance using [`evaluate`](@ref)/[`evaluate!`](@ref).
 
@@ -21,14 +25,13 @@ documentation.
 
 ### Supported tracking platforms
 
-- [MLflow](https://mlflow.org) is natively supported by MLJ. You will still need to
-  install MLflow itself, and separately launch an MLflow service; see the [MLflow
-  docs](https://mlflow.org) on how to do this. The service can immediately be wrapped
-  to create a `logger` object, as demonstrated in the [MLJFlow.jl
-  documentation](https://github.com/JuliaAI/MLJFlow.jl).
-
-
 !!! warning
 
-    MLJFlow.jl is a new package still under active development and should be regarded as experimental. At this time, breaking changes to MLJFlow.jl will not necessarily trigger new breaking releases of MLJ.jl.
+    Due to issues with the mlflow REST API, the current model for MLJ-mlflow integration is being reassessed. Use the existing tools at your own risk.
 
+- To use [mlflow](https://mlflow.org) with MLJ you will need to add MLJFlow to your
+  package environment and call `using MLJFlow`. You additionally need to install
+  mlflow itself, and separately launch an mlflow service; see the [mlflow
+  docs](https://mlflow.org) on how to do this. The service can immediately be wrapped to
+  create a `logger` object, as demonstrated in the [MLJFlow.jl
+  documentation](https://github.com/JuliaAI/MLJFlow.jl).
