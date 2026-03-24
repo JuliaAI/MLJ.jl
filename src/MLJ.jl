@@ -1,9 +1,9 @@
 """
-   MLJ 
+   MLJ
 
 [`MLJ`](https://juliaai.github.io/MLJ.jl//dev/) is a Machine Learning toolbox for
 Julia. It collects together functionality from separate components listed below, which can
-be loaded individually.
+be loaded individually. 
 
 Actual model code (e.g., code for instantiating a `DecisionTreeClassifier`) must generally
 be loaded explicitly from the model-providing package, using `@load`, for example. However
@@ -41,11 +41,7 @@ core model wrappers and some common transformers are immediately available; do
 - FeatureSelection.jl: Transformers for feature selection, and the supervised model wrapper
   `RecursiveFeatureSelection`.
 
-- MLJFlow.jl: Integration with MLflow workflow tracking
-
 - OpenML.jl: Tool for grabbing datasets from OpenML.org
-
-
 
 """
 module MLJ
@@ -68,7 +64,6 @@ using MLJTuning
 using MLJModels
 @reexport using FeatureSelection
 using OpenML
-@reexport using MLJFlow
 @reexport using StatisticalMeasures
 import MLJBalancing
 @reexport using MLJBalancing: BalancedModel
