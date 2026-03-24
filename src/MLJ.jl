@@ -3,7 +3,7 @@
 
 [`MLJ`](https://juliaai.github.io/MLJ.jl//dev/) is a Machine Learning toolbox for
 Julia. It collects together functionality from separate components listed below, which can
-be loaded individually.
+be loaded individually. 
 
 Actual model code (e.g., code for instantiating a `DecisionTreeClassifier`) must generally
 be loaded explicitly from the model-providing package, using `@load`, for example. However
