@@ -45,6 +45,6 @@ log_score
 
 # MLJWrappers
 
-@test Transformer isa Unsupervised
+@test Transformer <: Unsupervised
 
 true
