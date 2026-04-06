@@ -43,4 +43,8 @@ rms
 l2
 log_score
 
+# MLJWrappers
+
+@test Transformer isa Unsupervised
+
 true
