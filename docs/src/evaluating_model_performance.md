@@ -48,8 +48,8 @@ machine potentially change. )
 Multiple measures are specified as a vector:
 
 ```@repl evaluation_of_supervised_models
-evaluate!(
-    mach,
+performance_evaluation = evaluate(
+    model, X, y;
     resampling=cv,
     measures=[l1, rms, rmslp1],
     verbosity=0,
@@ -57,6 +57,37 @@ evaluate!(
 ```
 
 [Custom measures](@ref) can also be provided.
+
+
+## Multiple models
+
+To create a short named tuple summary of a performance evaluation, one can apply the
+`describe` method:
+
+```@repl evaluation_of_supervised_models
+describe(performance_evaluation)
+```
+
+This is useful when tabulating performance evaluations for multiple models, which you can
+do by providing a vector of models in place of `model` in your `evaluate` command. The
+models can also include tags to appear in the final table, as shown in the following
+example:
+
+```@repl evaluation_of_supervised_models
+performance_evaluations = evaluate(
+    ["const" => ConstantRegressor(), "ridge" => model], X, y;
+    resampling=cv,
+    measures=[l1, rms, rmslp1],
+    verbosity=0,
+)
+table = describe.(performance_evaluations);
+pretty(table)
+```
+
+!!! info
+
+    The `describe` method assumes you have at least MLJBase 1.13.0 installed.
+	
 
 ## Specifying weights
 
