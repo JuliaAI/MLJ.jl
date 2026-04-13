@@ -26,5 +26,6 @@ TypedTables = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9"
 [compat]
 Documenter = "1"
 IterationControl = "0.5.4"
+EvoTrees = "0.18.5"
 TypedTables = "1.4.6"
 julia = "1.6"
