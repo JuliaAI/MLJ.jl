@@ -84,6 +84,7 @@ import Random: AbstractRNG, MersenneTwister
 using ProgressMeter
 using ComputationalResources
 using ComputationalResources: CPUProcesses
+@reexport import DataAPI.describe # extended by MLJBase >= 1.13.0
 
 # to be extended:
 import MLJBase: fit, update, clean!, fit!, predict, fitted_params,

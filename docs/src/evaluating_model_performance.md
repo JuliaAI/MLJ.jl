@@ -5,12 +5,8 @@ selected losses or scores, using the [`evaluate`](@ref) or [`evaluate!`](@ref) m
 For more on available performance measures, see [Performance
 Measures](performance_measures.md).
 
-In addition to hold-out and cross-validation, the user can specify
-an explicit list of train/test pairs of row indices for resampling, or
-define new resampling strategies.
-
-For simultaneously evaluating *multiple* models, see "[Comparing models of different type
-and nested cross-validation](@ref explicit)".
+In addition to hold-out and cross-validation, the user can specify an explicit list of
+train/test pairs of row indices for resampling, or define new resampling strategies.
 
 For externally logging the outcomes of performance evaluation experiments, see [Logging
 Workflows](@ref)
@@ -48,8 +44,8 @@ machine potentially change. )
 Multiple measures are specified as a vector:
 
 ```@repl evaluation_of_supervised_models
-evaluate!(
-    mach,
+performance_evaluation = evaluate(
+    model, X, y;
     resampling=cv,
     measures=[l1, rms, rmslp1],
     verbosity=0,
@@ -57,6 +53,42 @@ evaluate!(
 ```
 
 [Custom measures](@ref) can also be provided.
+
+
+## Multiple models
+
+To create a short named tuple summary of a performance evaluation, one can apply the
+[`describe`](@ref) method:
+
+```@repl evaluation_of_supervised_models
+describe(performance_evaluation)
+```
+
+This is useful when tabulating performance evaluations for multiple models, which you can
+do by providing a vector of models in place of `model` in your `evaluate` command. The
+models can also include tags to appear in the final table, as shown in the following
+example:
+
+```@repl evaluation_of_supervised_models
+performance_evaluations = evaluate(
+    ["const" => ConstantRegressor(), "ridge" => model], X, y;
+    resampling=cv,
+    measures=[l1, rms, rmslp1],
+    verbosity=0,
+)
+table = describe.(performance_evaluations);
+pretty(table)
+```
+
+One can also wrap a collection of models as a single "metamodel", which always represents
+the model with the best performance evaluation estimate for the data it is trained. See
+"[Comparing models of different type and nested cross-validation](@ref explicit)".
+
+
+!!! info
+
+    The [`describe`](@ref) method assumes you have at least MLJBase 1.13.0 installed.
+	
 
 ## Specifying weights
 
@@ -165,5 +197,6 @@ MLJBase.evaluate!
 MLJBase.evaluate
 MLJBase.PerformanceEvaluation
 MLJBase.CompactPerformanceEvaluation
+describe
 default_logger
 ```
