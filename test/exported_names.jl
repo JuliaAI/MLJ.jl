@@ -47,4 +47,8 @@ log_score
 
 @test Transformer <: Unsupervised
 
+# DataAPI
+
+describe
+
 true
