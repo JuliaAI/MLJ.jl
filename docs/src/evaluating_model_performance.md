@@ -5,12 +5,8 @@ selected losses or scores, using the [`evaluate`](@ref) or [`evaluate!`](@ref) m
 For more on available performance measures, see [Performance
 Measures](performance_measures.md).
 
-In addition to hold-out and cross-validation, the user can specify
-an explicit list of train/test pairs of row indices for resampling, or
-define new resampling strategies.
-
-For simultaneously evaluating *multiple* models, see "[Comparing models of different type
-and nested cross-validation](@ref explicit)".
+In addition to hold-out and cross-validation, the user can specify an explicit list of
+train/test pairs of row indices for resampling, or define new resampling strategies.
 
 For externally logging the outcomes of performance evaluation experiments, see [Logging
 Workflows](@ref)
@@ -62,7 +58,7 @@ performance_evaluation = evaluate(
 ## Multiple models
 
 To create a short named tuple summary of a performance evaluation, one can apply the
-`describe` method:
+[`describe`](@ref) method:
 
 ```@repl evaluation_of_supervised_models
 describe(performance_evaluation)
@@ -84,9 +80,14 @@ table = describe.(performance_evaluations);
 pretty(table)
 ```
 
+One can also wrap a collection of models as a single "metamodel", which always represents
+the model with the best performance evaluation estimate for the data it is trained. See
+"[Comparing models of different type and nested cross-validation](@ref explicit)".
+
+
 !!! info
 
-    The `describe` method assumes you have at least MLJBase 1.13.0 installed.
+    The [`describe`](@ref) method assumes you have at least MLJBase 1.13.0 installed.
 	
 
 ## Specifying weights
@@ -196,5 +197,6 @@ MLJBase.evaluate!
 MLJBase.evaluate
 MLJBase.PerformanceEvaluation
 MLJBase.CompactPerformanceEvaluation
+describe
 default_logger
 ```
