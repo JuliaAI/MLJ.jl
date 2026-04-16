@@ -24,10 +24,11 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 TypedTables = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9"
 
 [compat]
+CategoricalArrays = "1.1.0"
 Documenter = "1"
-ScientificTypesBase = "3.1.0"
-IterationControl = "0.5.4"
 EvoTrees = "0.18.5"
+IterationControl = "0.5.4"
 MLJClusteringInterface = "0.1.13"
+ScientificTypesBase = "3.1.0"
 TypedTables = "1.4.6"
 julia = "1.6"
