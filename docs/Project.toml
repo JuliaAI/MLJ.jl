@@ -25,9 +25,10 @@ TypedTables = "9d95f2ec-7b3d-5a63-8d20-e2491e220bb9"
 
 [compat]
 Documenter = "1"
-ScientificTypesBase = "3.1.0"
-IterationControl = "0.5.4"
 EvoTrees = "0.18.5"
+IterationControl = "0.5.4"
+MLJBase = "1.13.0"
 MLJClusteringInterface = "0.1.13"
+ScientificTypesBase = "3.1.0"
 TypedTables = "1.4.6"
 julia = "1.6"
