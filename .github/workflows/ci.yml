@@ -32,7 +32,7 @@ jobs:
           echo "target repository is: ${{ github.repository }}"
           echo "head repository is: ${{ github.event.pull_request.head.repo.full_name }}"
       - uses: actions/checkout@v6
-      - uses: julia-actions/setup-julia@v2
+      - uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.version }}
       - uses: julia-actions/cache@v3
@@ -64,7 +64,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: julia-actions/setup-julia@v2
+      - uses: julia-actions/setup-julia@v3
         with:
           version: ${{ matrix.version }}
       - uses: julia-actions/cache@v3
@@ -83,7 +83,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: julia-actions/setup-julia@v2
+      - uses: julia-actions/setup-julia@v3
         with:
           version: '1'
       - run: |
