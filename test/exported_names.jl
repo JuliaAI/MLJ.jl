@@ -11,6 +11,7 @@ IterationControl.with_state_do(Step(2))
 
 IteratedModel
 MLJIteration
+Freezable
 
 # MLJBalancing
 
