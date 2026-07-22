@@ -3,9 +3,9 @@
 If a model has a hyper-parameter called `frozen`, and that model is bound to data in a
 machine `mach`, then calling `fit!(mach; kwargs...)` has no effect on the learned
 parameters, unles `mach` has not yet been trained. This is true even if other
-hyperparameters have changed, or one specifies new views of the data, as in `fit(mach,
+hyper-parameters have changed, or one specifies new views of the data, as in `fit(mach,
 rows=...)`.  This can be useful for freezing one component model in a [`Pipeline`](@ref)
-or model [`Stack`](@ref) when retraining that component is expensive. 
+or model [`Stack`](@ref) when retraining that component is expensive.
 
 While most models don't have the `frozen` hyper-parameter, you can achieve the same effect
 by wrapping your model using `Freezable` as explained below.
