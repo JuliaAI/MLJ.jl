@@ -56,7 +56,7 @@ For interactive loading instead, use `@iload`
 
 `scitype(x)` is the scientific type of `x`. For example `scitype(2.4) == Continuous`
 
-![scitypes_small.png](https://github.com/JuliaAI/MLJ.jl/blob/dev/docs/src/img/scitypes_small.svg)
+![scitypes_small.svg](https://raw.githubusercontent.com/JuliaAI/MLJ.jl/refs/heads/dev/docs/src/img/scitypes_small.svg)
 
 type                                       | scitype
 -------------------------------------------|----------------------------------
