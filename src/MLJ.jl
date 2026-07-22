@@ -62,7 +62,7 @@ using Reexport
 
 # from the MLJ universe:
 using MLJBase
-import MLJBase.save
+import MLJBase: save, serializable, restore!
 using MLJEnsembles
 using MLJTuning
 using MLJModels
@@ -136,7 +136,6 @@ export scitype, scitype_union, elscitype, nonmissing, trait
 export coerce, coerce!, autotype, schema, info
 
 # re-export from MLJBase:
-import MLJBase: serializable, restore!
 export nrows, color_off, color_on,
     selectrows, selectcols, restrict, corestrict, complement,
     training_losses, feature_importances,
@@ -150,7 +149,7 @@ export nrows, color_off, color_on,
     Machine, machine, AbstractNode, @node,
     source, node, fit!, freeze!, thaw!, Node, sources, origins,
     machines, sources, anonymize!, @from_network, fitresults,
-    @pipeline, Stack, Pipeline, TransformedTargetModel,
+    @pipeline, Stack, Pipeline, TransformedTargetModel, Freezable,
     ResamplingStrategy, Holdout, CV, TimeSeriesCV, InSample,
     StratifiedCV, evaluate!, Resampler, iterator, PerformanceEvaluation,
     CompactPerformanceEvaluation,

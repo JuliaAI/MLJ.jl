@@ -69,7 +69,8 @@ To support MLJ development, please cite these works or star the repo:
 [Learning Curves](@ref)|
 [Correcting Class Imbalance](@ref) |
 [Thresholding Probabilistic Predictors](@ref) |
-[Recursive feature elimination](@ref)
+[Recursive Feature Elimination](@ref) |
+[Freezing Learned Parameters](@ref)
 
 ### Composition
 [Composing Models](@ref) |
