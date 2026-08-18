@@ -87,6 +87,7 @@ pages = [
             "thresholding_probabilistic_predictors.md",
         "Target Transformations" => "target_transformations.md",
         "Homogeneous Ensembles" => "homogeneous_ensembles.md",
+        "Freezing Learned Parameters" => "freezing_learned_parameters.md",
     ],
     "Model Composition" => [
         "Composing Models" => "composing_models.md",
