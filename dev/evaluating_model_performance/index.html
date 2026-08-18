@@ -9,40 +9,40 @@
   measurement, uncertainty_radius_95, per_fold, per_observation,
   fitted_params_per_fold, report_per_fold,
   train_test_rows, resampling, repeats
-Tag: RidgeRegressor-559
+Tag: RidgeRegressor-754
 Extract:
 ┌──────────┬───────────┬─────────────┐
 │ measure  │ operation │ measurement │
 ├──────────┼───────────┼─────────────┤
-│ LPLoss(  │ predict   │ 0.166       │
+│ LPLoss(  │ predict   │ 0.209       │
 │   p = 2) │           │             │
 └──────────┴───────────┴─────────────┘
-┌────────────────────────┬─────────┐
-│ per_fold               │ 1.96*SE │
-├────────────────────────┼─────────┤
-│ [0.276, 0.208, 0.0147] │ 0.188   │
-└────────────────────────┴─────────┘</code></pre><p>Alternatively, instead of applying <code>evaluate</code> to a model + data, one may call <code>evaluate!</code> on an existing machine wrapping the model in data:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; mach = machine(model, X, y)</code><code class="nohighlight hljs ansi" style="display:block;">untrained Machine; caches model-specific representations of data
+┌───────────────────────┬─────────┐
+│ per_fold              │ 1.96*SE │
+├───────────────────────┼─────────┤
+│ [0.171, 0.192, 0.263] │ 0.0662  │
+└───────────────────────┴─────────┘</code></pre><p>Alternatively, instead of applying <code>evaluate</code> to a model + data, one may call <code>evaluate!</code> on an existing machine wrapping the model in data:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; mach = machine(model, X, y)</code><code class="nohighlight hljs ansi" style="display:block;">untrained Machine; caches model-specific representations of data
   model: RidgeRegressor(lambda = 1.0, …)
   args:
-    1:	Source @516 ⏎ Table{AbstractVector{Continuous}}
-    2:	Source @412 ⏎ AbstractVector{Continuous}</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; evaluate!(mach, resampling=cv, measure=l2, verbosity=0)</code><code class="nohighlight hljs ansi" style="display:block;">PerformanceEvaluation object with these fields:
+    1:	Source @254 ⏎ Table{AbstractVector{Continuous}}
+    2:	Source @036 ⏎ AbstractVector{Continuous}</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; evaluate!(mach, resampling=cv, measure=l2, verbosity=0)</code><code class="nohighlight hljs ansi" style="display:block;">PerformanceEvaluation object with these fields:
   model, tag, measure, operation,
   measurement, uncertainty_radius_95, per_fold, per_observation,
   fitted_params_per_fold, report_per_fold,
   train_test_rows, resampling, repeats
-Tag: RidgeRegressor-621
+Tag: RidgeRegressor-140
 Extract:
 ┌──────────┬───────────┬─────────────┐
 │ measure  │ operation │ measurement │
 ├──────────┼───────────┼─────────────┤
-│ LPLoss(  │ predict   │ 0.166       │
+│ LPLoss(  │ predict   │ 0.209       │
 │   p = 2) │           │             │
 └──────────┴───────────┴─────────────┘
-┌────────────────────────┬─────────┐
-│ per_fold               │ 1.96*SE │
-├────────────────────────┼─────────┤
-│ [0.276, 0.208, 0.0147] │ 0.188   │
-└────────────────────────┴─────────┘</code></pre><p>(The latter call is a mutating call as the learned parameters stored in the machine potentially change. )</p><h2 id="Multiple-measures"><a class="docs-heading-anchor" href="#Multiple-measures">Multiple measures</a><a id="Multiple-measures-1"></a><a class="docs-heading-anchor-permalink" href="#Multiple-measures" title="Permalink"></a></h2><p>Multiple measures are specified as a vector:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; performance_evaluation = evaluate(
+┌───────────────────────┬─────────┐
+│ per_fold              │ 1.96*SE │
+├───────────────────────┼─────────┤
+│ [0.171, 0.192, 0.263] │ 0.0662  │
+└───────────────────────┴─────────┘</code></pre><p>(The latter call is a mutating call as the learned parameters stored in the machine potentially change. )</p><h2 id="Multiple-measures"><a class="docs-heading-anchor" href="#Multiple-measures">Multiple measures</a><a id="Multiple-measures-1"></a><a class="docs-heading-anchor-permalink" href="#Multiple-measures" title="Permalink"></a></h2><p>Multiple measures are specified as a vector:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; performance_evaluation = evaluate(
            model, X, y;
            resampling=cv,
            measures=[l1, rms, rmslp1],
@@ -52,37 +52,37 @@ Extract:
   measurement, uncertainty_radius_95, per_fold, per_observation,
   fitted_params_per_fold, report_per_fold,
   train_test_rows, resampling, repeats
-Tag: RidgeRegressor-128
+Tag: RidgeRegressor-338
 Extract:
 ┌───┬──────────────────────────────────────┬───────────┬─────────────┐
 │   │ measure                              │ operation │ measurement │
 ├───┼──────────────────────────────────────┼───────────┼─────────────┤
-│ A │ LPLoss(                              │ predict   │ 0.304       │
+│ A │ LPLoss(                              │ predict   │ 0.38        │
 │   │   p = 1)                             │           │             │
-│ B │ RootMeanSquaredError()               │ predict   │ 0.408       │
-│ C │ RootMeanSquaredLogProportionalError( │ predict   │ 0.154       │
+│ B │ RootMeanSquaredError()               │ predict   │ 0.457       │
+│ C │ RootMeanSquaredLogProportionalError( │ predict   │ 0.198       │
 │   │   offset = 1)                        │           │             │
 └───┴──────────────────────────────────────┴───────────┴─────────────┘
 ┌───┬───────────────────────┬─────────┐
 │   │ per_fold              │ 1.96*SE │
 ├───┼───────────────────────┼─────────┤
-│ A │ [0.445, 0.357, 0.109] │ 0.241   │
-│ B │ [0.525, 0.456, 0.121] │ 0.3     │
-│ C │ [0.2, 0.169, 0.0498]  │ 0.11    │
-└───┴───────────────────────┴─────────┘</code></pre><p><a href="../performance_measures/#Custom-measures">Custom measures</a> can also be provided.</p><h2 id="Multiple-models"><a class="docs-heading-anchor" href="#Multiple-models">Multiple models</a><a id="Multiple-models-1"></a><a class="docs-heading-anchor-permalink" href="#Multiple-models" title="Permalink"></a></h2><p>To create a short named tuple summary of a performance evaluation, one can apply the <a href="#DataAPI.describe"><code>describe</code></a> method:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; describe(performance_evaluation)</code><code class="nohighlight hljs ansi" style="display:block;">(tag = &quot;RidgeRegressor-128&quot;, LPLoss = 0.3 ± 0.24, RootMeanSquaredError = 0.41 ± 0.3, RootMeanSquaredLogProportionalError = 0.15 ± 0.11)</code></pre><p>This is useful when tabulating performance evaluations for multiple models, which you can do by providing a vector of models in place of <code>model</code> in your <code>evaluate</code> command. The models can also include tags to appear in the final table, as shown in the following example:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; performance_evaluations = evaluate(
+│ A │ [0.351, 0.384, 0.405] │ 0.0374  │
+│ B │ [0.414, 0.438, 0.512] │ 0.071   │
+│ C │ [0.148, 0.204, 0.232] │ 0.0596  │
+└───┴───────────────────────┴─────────┘</code></pre><p><a href="../performance_measures/#Custom-measures">Custom measures</a> can also be provided.</p><h2 id="Multiple-models"><a class="docs-heading-anchor" href="#Multiple-models">Multiple models</a><a id="Multiple-models-1"></a><a class="docs-heading-anchor-permalink" href="#Multiple-models" title="Permalink"></a></h2><p>To create a short named tuple summary of a performance evaluation, one can apply the <a href="#DataAPI.describe"><code>describe</code></a> method:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; describe(performance_evaluation)</code><code class="nohighlight hljs ansi" style="display:block;">(tag = &quot;RidgeRegressor-338&quot;, LPLoss = 0.38 ± 0.037, RootMeanSquaredError = 0.457 ± 0.071, RootMeanSquaredLogProportionalError = 0.198 ± 0.06)</code></pre><p>This is useful when tabulating performance evaluations for multiple models, which you can do by providing a vector of models in place of <code>model</code> in your <code>evaluate</code> command. The models can also include tags to appear in the final table, as shown in the following example:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; performance_evaluations = evaluate(
            [&quot;const&quot; =&gt; ConstantRegressor(), &quot;ridge&quot; =&gt; model], X, y;
            resampling=cv,
            measures=[l1, rms, rmslp1],
            verbosity=0,
        )</code><code class="nohighlight hljs ansi" style="display:block;">2-element Vector{PerformanceEvaluation{M, Vector{StatisticalMeasuresBase.RobustMeasure}, Vector{Float64}, Vector{Float64}, Operation, Vector{Vector{Float64}}, Vector{Vector{Vector{Float64}}}, FittedParamsPerFold, Vector{Nothing}, CV} where {M, Operation, FittedParamsPerFold}}:
- PerformanceEvaluation(&quot;const&quot;, 0.385 ± 0.283, 0.509 ± 0.349, 0.193 ± 0.129)
- PerformanceEvaluation(&quot;ridge&quot;, 0.304 ± 0.241, 0.408 ± 0.3, 0.154 ± 0.11)</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; table = describe.(performance_evaluations);</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; pretty(table)</code><code class="nohighlight hljs ansi" style="display:block;">┌─────────┬──────────────────────┬──────────────────────┬───────────────────────
+ PerformanceEvaluation(&quot;const&quot;, 0.533 ± 0.0346, 0.646 ± 0.0743, 0.272 ± 0.0632)
+ PerformanceEvaluation(&quot;ridge&quot;, 0.38 ± 0.0374, 0.457 ± 0.071, 0.198 ± 0.0596)</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; table = describe.(performance_evaluations);</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; pretty(table)</code><code class="nohighlight hljs ansi" style="display:block;">┌─────────┬──────────────────────┬──────────────────────┬───────────────────────
 │ tag     │ LPLoss               │ RootMeanSquaredError │ RootMeanSquaredLogPr ⋯
 │ String  │ Measurement{Float64} │ Measurement{Float64} │ Measurement{Float64} ⋯
 │ Textual │ Continuous           │ Continuous           │ Continuous           ⋯
 ├─────────┼──────────────────────┼──────────────────────┼───────────────────────
-│ const   │ 0.39±0.28            │ 0.51±0.35            │ 0.19±0.13            ⋯
-│ ridge   │ 0.3±0.24             │ 0.41±0.3             │ 0.15±0.11            ⋯
+│ const   │ 0.533±0.035          │ 0.646±0.074          │ 0.272±0.063          ⋯
+│ ridge   │ 0.38±0.037           │ 0.457±0.071          │ 0.198±0.06           ⋯
 └─────────┴──────────────────────┴──────────────────────┴───────────────────────
                                                                 1 column omitted</code></pre><p>One can also wrap a collection of models as a single &quot;metamodel&quot;, which always represents the model with the best performance evaluation estimate for the data it is trained. See &quot;<a href="../tuning_models/#explicit">Comparing models of different type and nested cross-validation</a>&quot;.</p><div class="admonition is-info" id="Info-d524448e933b04bf"><header class="admonition-header">Info<a class="admonition-anchor" href="#Info-d524448e933b04bf" title="Permalink"></a></header><div class="admonition-body"><p>The <a href="#DataAPI.describe"><code>describe</code></a> method assumes you have at least MLJBase 1.13.0 installed.</p></div></div><h2 id="Specifying-weights"><a class="docs-heading-anchor" href="#Specifying-weights">Specifying weights</a><a id="Specifying-weights-1"></a><a class="docs-heading-anchor-permalink" href="#Specifying-weights" title="Permalink"></a></h2><p>Per-observation weights can be passed to measures. If a measure does not support weights, the weights are ignored:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; holdout = Holdout(fraction_train=0.8)</code><code class="nohighlight hljs ansi" style="display:block;">Holdout(
   fraction_train = 0.8,
@@ -101,20 +101,20 @@ PerformanceEvaluation object with these fields:
   measurement, uncertainty_radius_95, per_fold, per_observation,
   fitted_params_per_fold, report_per_fold,
   train_test_rows, resampling, repeats
-Tag: RidgeRegressor-676
+Tag: RidgeRegressor-792
 Extract:
 ┌───┬────────────┬───────────┬─────────────┐
 │   │ measure    │ operation │ measurement │
 ├───┼────────────┼───────────┼─────────────┤
-│ A │ LPLoss(    │ predict   │ 0.288       │
+│ A │ LPLoss(    │ predict   │ 0.358       │
 │   │   p = 2)   │           │             │
-│ B │ RSquared() │ predict   │ -0.163      │
+│ B │ RSquared() │ predict   │ -0.332      │
 └───┴────────────┴───────────┴─────────────┘
 ┌───┬────────────────────────┬─────────┐
 │   │ per_fold               │ 1.96*SE │
 ├───┼────────────────────────┼─────────┤
-│ A │ [0.335, 0.502, 0.0261] │ 0.335   │
-│ B │ [0.329, 0.3, -1.12]    │ 1.15    │
+│ A │ [0.235, 0.331, 0.509]  │ 0.193   │
+│ B │ [-0.786, -0.671, 0.46] │ 0.955   │
 └───┴────────────────────────┴─────────┘</code></pre><p>In classification problems, use <code>class_weights=...</code> to specify a class weight dictionary.</p><h2 id="User-specified-train/test-sets"><a class="docs-heading-anchor" href="#User-specified-train/test-sets">User-specified train/test sets</a><a id="User-specified-train/test-sets-1"></a><a class="docs-heading-anchor-permalink" href="#User-specified-train/test-sets" title="Permalink"></a></h2><p>Users can either provide an explicit list of train/test pairs of row indices for resampling, as in this example:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; fold1 = 1:6; fold2 = 7:12;</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; evaluate!(
            mach,
            resampling = [(fold1, fold2), (fold2, fold1)],
@@ -125,21 +125,21 @@ Extract:
   measurement, uncertainty_radius_95, per_fold, per_observation,
   fitted_params_per_fold, report_per_fold,
   train_test_rows, resampling, repeats
-Tag: RidgeRegressor-233
+Tag: RidgeRegressor-929
 Extract:
 ┌───┬──────────┬───────────┬─────────────┐
 │   │ measure  │ operation │ measurement │
 ├───┼──────────┼───────────┼─────────────┤
-│ A │ LPLoss(  │ predict   │ 0.343       │
+│ A │ LPLoss(  │ predict   │ 0.349       │
 │   │   p = 1) │           │             │
-│ B │ LPLoss(  │ predict   │ 0.197       │
+│ B │ LPLoss(  │ predict   │ 0.179       │
 │   │   p = 2) │           │             │
 └───┴──────────┴───────────┴─────────────┘
 ┌───┬────────────────┬─────────┐
 │   │ per_fold       │ 1.96*SE │
 ├───┼────────────────┼─────────┤
-│ A │ [0.231, 0.455] │ 0.31    │
-│ B │ [0.121, 0.273] │ 0.21    │
+│ A │ [0.318, 0.38]  │ 0.0862  │
+│ B │ [0.191, 0.168] │ 0.0323  │
 └───┴────────────────┴─────────┘</code></pre><p>Or the user can define their own re-usable <code>ResamplingStrategy</code> objects; see <a href="#Custom-resampling-strategies">Custom resampling strategies</a> below.</p><h2 id="Built-in-resampling-strategies"><a class="docs-heading-anchor" href="#Built-in-resampling-strategies">Built-in resampling strategies</a><a id="Built-in-resampling-strategies-1"></a><a class="docs-heading-anchor-permalink" href="#Built-in-resampling-strategies" title="Permalink"></a></h2><article><details class="docstring" open="true"><summary id="MLJBase.Holdout"><a class="docstring-binding" href="#MLJBase.Holdout"><code>MLJBase.Holdout</code></a> — <span class="docstring-category">Type</span></summary><section><div><pre><code class="language-julia hljs">holdout = Holdout(; fraction_train=0.7, shuffle=nothing, rng=nothing)</code></pre><p>Instantiate a <code>Holdout</code> resampling strategy, for use in <code>evaluate!</code>, <code>evaluate</code> and in tuning.</p><pre><code class="language-julia hljs">train_test_pairs(holdout, rows)</code></pre><p>Returns the pair <code>[(train, test)]</code>, where <code>train</code> and <code>test</code> are vectors such that <code>rows=vcat(train, test)</code> and <code>length(train)/length(rows)</code> is approximatey equal to fraction_train`.</p><p>Pre-shuffling of <code>rows</code> is controlled by <code>rng</code> and <code>shuffle</code>. If <code>rng</code> is an integer, then the <code>Holdout</code> keyword constructor resets it to <code>MersenneTwister(rng)</code>. Otherwise some <code>AbstractRNG</code> object is expected.</p><p>If <code>rng</code> is left unspecified, <code>rng</code> is reset to <code>Random.GLOBAL_RNG</code>, in which case rows are only pre-shuffled if <code>shuffle=true</code> is specified.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/MLJBase.jl/blob/v1.14.0/src/resampling/strategies.jl#L83-L106">source</a></section></details></article><article><details class="docstring" open="true"><summary id="MLJBase.CV"><a class="docstring-binding" href="#MLJBase.CV"><code>MLJBase.CV</code></a> — <span class="docstring-category">Type</span></summary><section><div><pre><code class="language-julia hljs">cv = CV(; nfolds=6,  shuffle=nothing, rng=nothing)</code></pre><p>Cross-validation resampling strategy, for use in <code>evaluate!</code>, <code>evaluate</code> and tuning.</p><pre><code class="language-julia hljs">train_test_pairs(cv, rows)</code></pre><p>Returns an <code>nfolds</code>-length iterator of <code>(train, test)</code> pairs of vectors (row indices), where each <code>train</code> and <code>test</code> is a sub-vector of <code>rows</code>. The <code>test</code> vectors are mutually exclusive and exhaust <code>rows</code>. Each <code>train</code> vector is the complement of the corresponding <code>test</code> vector. With no row pre-shuffling, the order of <code>rows</code> is preserved, in the sense that <code>rows</code> coincides precisely with the concatenation of the <code>test</code> vectors, in the order they are generated. The first <code>r</code> test vectors have length <code>n + 1</code>, where <code>n, r = divrem(length(rows), nfolds)</code>, and the remaining test vectors have length <code>n</code>.</p><p>Pre-shuffling of <code>rows</code> is controlled by <code>rng</code> and <code>shuffle</code>. If <code>rng</code> is an integer, then the <code>CV</code> keyword constructor resets it to <code>MersenneTwister(rng)</code>. Otherwise some <code>AbstractRNG</code> object is expected.</p><p>If <code>rng</code> is left unspecified, <code>rng</code> is reset to <code>Random.GLOBAL_RNG</code>, in which case rows are only pre-shuffled if <code>shuffle=true</code> is explicitly specified.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/MLJBase.jl/blob/v1.14.0/src/resampling/strategies.jl#L134-L164">source</a></section></details></article><article><details class="docstring" open="true"><summary id="MLJBase.StratifiedCV"><a class="docstring-binding" href="#MLJBase.StratifiedCV"><code>MLJBase.StratifiedCV</code></a> — <span class="docstring-category">Type</span></summary><section><div><pre><code class="language-julia hljs">stratified_cv = StratifiedCV(; nfolds=6,
                                shuffle=false,
                                rng=Random.GLOBAL_RNG)</code></pre><p>Stratified cross-validation resampling strategy, for use in <code>evaluate!</code>, <code>evaluate</code> and in tuning. Applies only to classification problems (<code>OrderedFactor</code> or <code>Multiclass</code> targets).</p><pre><code class="language-julia hljs">train_test_pairs(stratified_cv, rows, y)</code></pre><p>Returns an <code>nfolds</code>-length iterator of <code>(train, test)</code> pairs of vectors (row indices) where each <code>train</code> and <code>test</code> is a sub-vector of <code>rows</code>. The <code>test</code> vectors are mutually exclusive and exhaust <code>rows</code>. Each <code>train</code> vector is the complement of the corresponding <code>test</code> vector.</p><p>Unlike regular cross-validation, the distribution of the levels of the target <code>y</code> corresponding to each <code>train</code> and <code>test</code> is constrained, as far as possible, to replicate that of <code>y[rows]</code> as a whole.</p><p>The stratified <code>train_test_pairs</code> algorithm is invariant to label renaming. For example, if you run <code>replace!(y, &#39;a&#39; =&gt; &#39;b&#39;, &#39;b&#39; =&gt; &#39;a&#39;)</code> and then re-run <code>train_test_pairs</code>, the returned <code>(train, test)</code> pairs will be the same.</p><p>Pre-shuffling of <code>rows</code> is controlled by <code>rng</code> and <code>shuffle</code>. If <code>rng</code> is an integer, then the <code>StratifedCV</code> keywod constructor resets it to <code>MersenneTwister(rng)</code>. Otherwise some <code>AbstractRNG</code> object is expected.</p><p>If <code>rng</code> is left unspecified, <code>rng</code> is reset to <code>Random.GLOBAL_RNG</code>, in which case rows are only pre-shuffled if <code>shuffle=true</code> is explicitly specified.</p></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/MLJBase.jl/blob/v1.14.0/src/resampling/strategies.jl#L313-L348">source</a></section></details></article><article><details class="docstring" open="true"><summary id="MLJBase.TimeSeriesCV"><a class="docstring-binding" href="#MLJBase.TimeSeriesCV"><code>MLJBase.TimeSeriesCV</code></a> — <span class="docstring-category">Type</span></summary><section><div><pre><code class="language-julia hljs">tscv = TimeSeriesCV(; nfolds=4)</code></pre><p>Cross-validation resampling strategy, for use in <code>evaluate!</code>, <code>evaluate</code> and tuning, when observations are chronological and not expected to be independent.</p><pre><code class="language-julia hljs">train_test_pairs(tscv, rows)</code></pre><p>Returns an <code>nfolds</code>-length iterator of <code>(train, test)</code> pairs of vectors (row indices), where each <code>train</code> and <code>test</code> is a sub-vector of <code>rows</code>. The rows are partitioned sequentially into <code>nfolds + 1</code> approximately equal length partitions, where the first partition is the first train set, and the second partition is the first test set. The second train set consists of the first two partitions, and the second test set consists of the third partition, and so on for each fold.</p><p>The first partition (which is the first train set) has length <code>n + r</code>, where <code>n, r = divrem(length(rows), nfolds + 1)</code>, and the remaining partitions (all of the test folds) have length <code>n</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl hljs">julia&gt; MLJBase.train_test_pairs(TimeSeriesCV(nfolds=3), 1:10)
@@ -262,4 +262,4 @@ default_logger(logger)
 
 X, y = make_moons()
 model = ConstantClassifier()
-evaluate(model, X, y, measures=[log_loss, accuracy)])</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/MLJBase.jl/blob/v1.14.0/src/resampling/logging.jl#L27-L49">source</a></section></details></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../list_of_supported_models/">« List of Supported Models</a><a class="docs-footer-nextpage" href="../tuning_models/">Tuning Models »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Wednesday 22 July 2026 19:55">Wednesday 22 July 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+evaluate(model, X, y, measures=[log_loss, accuracy)])</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/JuliaAI/MLJBase.jl/blob/v1.14.0/src/resampling/logging.jl#L27-L49">source</a></section></details></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../list_of_supported_models/">« List of Supported Models</a><a class="docs-footer-nextpage" href="../tuning_models/">Tuning Models »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Tuesday 18 August 2026 21:56">Tuesday 18 August 2026</span>. Using Julia version 1.12.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
