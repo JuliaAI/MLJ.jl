@@ -20,7 +20,7 @@
     <img src="https://img.shields.io/badge/License-MIT-yelllow"
        alt="bibtex">
   </a>
-  <a href="BIBLIOGRAPHY.md">
+  <a href="CITATIONS.md">
     <img src="https://img.shields.io/badge/cite-BibTeX-blue"
        alt="bibtex">
   </a>
