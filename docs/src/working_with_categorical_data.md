@@ -246,8 +246,8 @@ d.(v_int)
 
 In MLJ the objects with `OrderedFactor` or `Multiclass` scientific
 type have machine type `CategoricalValue`, from the
-[CategoricalArrays.jl]
-(https://juliadata.github.io/CategoricalArrays.jl/stable/) package.
+[CategoricalArrays.jl](https://juliadata.github.io/CategoricalArrays.jl/stable/)
+package.
 In some sense `CategoricalValue`s are an implementation detail users
 can ignore for the most part, as shown above. However, you may want
 some basic understanding of these types, and those implementing MLJ's
