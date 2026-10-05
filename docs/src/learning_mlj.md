@@ -16,7 +16,7 @@ If you are an ML practitioner transitioning from another platform, we highly rec
 
 - [Julia Data Science](https://github.com/JuliaDataScience/JuliaDataScience)
 
-- [MLJTutorial](https://github.com/ablaom/MLJTutorial.jl): material for a 4 hour MLJ
+- [MLJTutorial](https://github.com/JuliaAI/MLJTutorial.jl): material for a 4 hour MLJ
   workshop
 
 - [MLCourse](https://github.com/jbrea/MLCourse): Teaching material for an introductory
