@@ -4,6 +4,7 @@ The main sources for MLJ tutorials are:
 
 - [Complete list](https://juliaml.ai/tutorials): structured by topic
 - [Data Science Tutorials](https://juliaai.github.io/DataScienceTutorials.jl): smaller curated collection of tutorials, generally completed in sequence
+- 🆕 [Using MLJ](https://www.youtube.com/playlist?list=PLHwT4lR4GIv8) video tutorials
 
 If you are an ML practitioner transitioning from another platform, we highly recommend
 [MLJ for Data Scientists in Two Hours](https://juliaai.github.io/DataScienceTutorials.jl/end-to-end/telco/).
@@ -16,7 +17,7 @@ If you are an ML practitioner transitioning from another platform, we highly rec
 
 - [Julia Data Science](https://github.com/JuliaDataScience/JuliaDataScience)
 
-- [MLJTutorial](https://github.com/JuliaAI/MLJTutorial.jl): material for a 4 hour MLJ
+- [MLJTutorial](https://juliaai.github.io/MLJTutorial.jl/dev/): material for a 4 hour MLJ
   workshop
 
 - [MLCourse](https://github.com/jbrea/MLCourse): Teaching material for an introductory
